@@ -1,0 +1,213 @@
+{
+  "DRAFT_FAST_ACCEPTANCE": "PASS",
+  "FIRST_RUN": {
+    "RuntimeSec": 315.15,
+    "Resolution": "540x960",
+    "FPS": 30,
+    "Frames": 360,
+    "BlenderStartups": 1,
+    "DaemonReuse": 4,
+    "AverageRenderPerFrameSec": 0.8525944444444445,
+    "EncodeTimeMs": 2258,
+    "CacheHitRate": 0,
+    "JobsRendered": 5,
+    "ShotsReused": 0,
+    "AssetLoadMs": 70,
+    "FrameRenderMs": 306934,
+    "outputPath": "/agent/artifacts/episodes/extreme-speed-acceptance/draft_fast/ExtremeSpeed_DRAFT_FAST.mp4",
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 540,
+          "height": 960,
+          "r_frame_rate": "30/1"
+        },
+        {
+          "codec_name": "aac",
+          "r_frame_rate": "0/0"
+        }
+      ],
+      "format": {
+        "duration": "11.462993"
+      }
+    }
+  },
+  "IDENTICAL_SECOND_RUN": {
+    "RuntimeSec": 0.07,
+    "CacheHitRate": 1,
+    "ShotsReused": 5,
+    "ShotsRerendered": 0,
+    "Speedup": 4438.6760563380285
+  },
+  "ONE_SHOT_EDIT_TEST": {
+    "ChangedShot": 3,
+    "ShotsInvalidated": 1,
+    "ShotsReused": 4,
+    "ShotsRerendered": 1,
+    "RuntimeSec": 70.26,
+    "Pass": true
+  },
+  "PIP_ANIMATION_TEST": {
+    "Result": "PASS",
+    "plan": {
+      "shotsTotal": 5,
+      "shotsToRender": 1,
+      "shotsToReuse": 4,
+      "plan": [
+        {
+          "shotId": "5ad0306b-38df-4a42-868c-74be4e7d8f79",
+          "shotNumber": 1,
+          "fingerprint": "d02a769f6004b221ddb3187e83fb76960dc29994b6034ad69ca442a11b153b47",
+          "action": "REUSE",
+          "outputUri": "http://127.0.0.1:9000/doodle-dash-production/draft-renders/worker-jobs/45fe623c-68fd-40c8-907a-16014c51b469/shot.mp4"
+        },
+        {
+          "shotId": "1452d918-5afb-44c9-9987-b91c4c2384d7",
+          "shotNumber": 2,
+          "fingerprint": "8b81794b4dd0b21b92c2e8a7b6b462aa5ecf2c097a204138232aceb00e2df518",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "9f1ccdaf-7a52-4625-ab54-15c6c51ca021",
+          "shotNumber": 3,
+          "fingerprint": "5eec7f12c6e9220cca8db03887ebbfb015e74734a029c1c21f4065181f59c738",
+          "action": "REUSE",
+          "outputUri": "http://127.0.0.1:9000/doodle-dash-production/draft-renders/worker-jobs/0870ece6-5240-4ccf-83cb-038bbd431fab/shot.mp4"
+        },
+        {
+          "shotId": "36c4dee2-a064-478a-9a30-d545432a26f0",
+          "shotNumber": 4,
+          "fingerprint": "5996dbcf4f318f217f01e2d73490fe9e938f97824ecb808de034d888a3fd484e",
+          "action": "REUSE",
+          "outputUri": "http://127.0.0.1:9000/doodle-dash-production/draft-renders/worker-jobs/af5b35ac-b845-4e2e-a181-ade809f23c23/shot.mp4"
+        },
+        {
+          "shotId": "d7a3c12f-6be5-491a-a62c-7ae88534862e",
+          "shotNumber": 5,
+          "fingerprint": "400cfcd379e719c23e89e9bea87727d29138ca6bcf6078a42b3b8bb0bfaa7d62",
+          "action": "REUSE",
+          "outputUri": "http://127.0.0.1:9000/doodle-dash-production/draft-renders/worker-jobs/311419d9-73cf-4e95-bf1d-a1d659dd8bf1/shot.mp4"
+        }
+      ]
+    }
+  },
+  "PIP_BASE_ASSET_INVALIDATION": {
+    "Result": "PASS",
+    "plan": {
+      "shotsTotal": 5,
+      "shotsToRender": 5,
+      "shotsToReuse": 0,
+      "plan": [
+        {
+          "shotId": "5ad0306b-38df-4a42-868c-74be4e7d8f79",
+          "shotNumber": 1,
+          "fingerprint": "bc72917c549a01dc6de08c236610b47b26c935b123bf44b02ef159cfd69df2fc",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "1452d918-5afb-44c9-9987-b91c4c2384d7",
+          "shotNumber": 2,
+          "fingerprint": "d170b77d05fe3630fcb4f1e944fb51b02b843f8c4ab2a81ed6cb800e76e24755",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "9f1ccdaf-7a52-4625-ab54-15c6c51ca021",
+          "shotNumber": 3,
+          "fingerprint": "c4260be3cf5e9b0aadd59867cd7c62cf501a7914f91116d840b8bc83dd9793ee",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "36c4dee2-a064-478a-9a30-d545432a26f0",
+          "shotNumber": 4,
+          "fingerprint": "b3f2bd5506a4b037dedba93f2ac55cde332afc48f960b67fb2d3e4e3704ac754",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "d7a3c12f-6be5-491a-a62c-7ae88534862e",
+          "shotNumber": 5,
+          "fingerprint": "f62d6f9f5977642f979c8552c16403bb6837d75f3d92c9e188cffbe608ade27b",
+          "action": "RENDER",
+          "outputUri": null
+        }
+      ]
+    }
+  },
+  "GOAT_DEPENDENCY_INVALIDATION": {
+    "Result": "PASS",
+    "plan": {
+      "shotsTotal": 5,
+      "shotsToRender": 5,
+      "shotsToReuse": 0,
+      "plan": [
+        {
+          "shotId": "5ad0306b-38df-4a42-868c-74be4e7d8f79",
+          "shotNumber": 1,
+          "fingerprint": "8fab98ab59a506211bd21500ec875a50c7435da0e18fb20018e7c7d94f611273",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "1452d918-5afb-44c9-9987-b91c4c2384d7",
+          "shotNumber": 2,
+          "fingerprint": "15b144438817f1da36c5893a1f1d28fb47f3dde4c48ac3fae3cb3b9ecd2071bb",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "9f1ccdaf-7a52-4625-ab54-15c6c51ca021",
+          "shotNumber": 3,
+          "fingerprint": "9304368b022e94959f4c5e2a2615df2978e409f0063ca7f60a3a7d8711074a34",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "36c4dee2-a064-478a-9a30-d545432a26f0",
+          "shotNumber": 4,
+          "fingerprint": "ff9c77b91ecb4955826e962eea7516ae026b9afee632ffd7289f56506dd0411a",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "d7a3c12f-6be5-491a-a62c-7ae88534862e",
+          "shotNumber": 5,
+          "fingerprint": "801d61e6d1484afe04446549246b9d7376f7696e0295f037440c4659c56d83d7",
+          "action": "RENDER",
+          "outputUri": null
+        }
+      ]
+    }
+  },
+  "CHARACTER_LOCK": {
+    "Pip": "INSPECTED_DRAFT_FRAMES",
+    "Goat": "INSPECTED_DRAFT_FRAMES",
+    "GoatCollar": "PASS (asset close-up Goat)",
+    "inspectDir": "/agent/artifacts/episodes/extreme-speed-acceptance/draft_fast/inspect"
+  },
+  "HARDWARE": {
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "cpuCores": 4,
+    "ramGiB": 15.6,
+    "gpu": "NONE_DETECTED",
+    "vram": "N/A",
+    "os": "Linux 6.12.94+",
+    "blenderVersion": "Blender 4.0.2",
+    "selectedRenderDevice": "CPU",
+    "hardwareEncoder": [
+      "h264_nvenc",
+      "h264_qsv",
+      "h264_vaapi",
+      "libx264"
+    ],
+    "diskHint": "check lsblk ROTA (1=HDD/unknown virt)"
+  },
+  "SLOWEST_REMAINING_OPERATION": "EEVEE frame_render (CPU draft shading)",
+  "RECOMMENDED_OPTIMIZATION": "Reuse preloaded Pip/Goat/meadow objects across shots in the persistent daemon instead of append-per-shot; keep DRAFT samples moderate.",
+  "generatedAt": "2026-08-11T22:54:10.885Z"
+}
