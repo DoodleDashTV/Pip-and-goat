@@ -4,7 +4,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV = [
-  { href: '/', label: 'Home' },
+  { href: '/', label: 'Dashboard' },
+  { href: '/new-episode', label: 'New Episode' },
+  { href: '/production', label: 'Continue Episode' },
+  { href: '/asset-intake', label: 'Assets' },
+  { href: '/animations', label: 'Animations' },
+  { href: '/render-queue', label: 'Render Queue' },
+  { href: '/readiness', label: 'Readiness' },
+  { href: '/costs', label: 'Costs' },
+  { href: '/production-settings', label: 'Production Settings' },
   { href: '/universe', label: 'Universe' },
   { href: '/characters', label: 'Characters' },
   { href: '/canon', label: 'Canon' },
@@ -14,26 +22,19 @@ const NAV = [
   { href: '/seasons', label: 'Seasons' },
   { href: '/episodes', label: 'Episodes' },
   { href: '/storyboards', label: 'Storyboards' },
-  { href: '/production', label: 'Production' },
-  { href: '/readiness', label: 'Readiness' },
-  { href: '/asset-intake', label: 'Asset Intake' },
   { href: '/episodes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/readiness', label: 'Meadow Mystery' },
   { href: '/vertical-slice', label: 'Vertical Slice' },
   { href: '/voices', label: 'Voices' },
   { href: '/blender-worker', label: 'Blender Worker' },
-  { href: '/render-queue', label: 'Render Queue' },
   { href: '/audio', label: 'Audio' },
-  { href: '/animations', label: 'Animations' },
   { href: '/poses', label: 'Poses' },
   { href: '/expressions', label: 'Expressions' },
   { href: '/rigs', label: 'Rigs' },
   { href: '/references', label: 'References' },
   { href: '/relationships', label: 'Relationships' },
-  { href: '/assets', label: 'Assets' },
   { href: '/continuity', label: 'Continuity' },
   { href: '/publishing', label: 'Publishing' },
   { href: '/analytics', label: 'Analytics' },
-  { href: '/costs', label: 'Costs' },
   { href: '/search', label: 'Search' },
   { href: '/debug', label: 'Debug' },
   { href: '/settings', label: 'Settings' },
@@ -52,10 +53,10 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
               Doodle Dash
             </p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-sun-400">
-              TV Studio
+              Production
             </p>
             <p className="mt-3 text-sm text-[var(--muted)]">
-              Permanent universe. Reusable characters. Native 3D first.
+              Create once. Validate. Version. Lock. Reuse. Assemble. Render.
             </p>
             <nav className="mt-6 grid max-h-[70vh] grid-cols-2 gap-2 overflow-y-auto lg:grid-cols-1">
               {NAV.map((item) => {

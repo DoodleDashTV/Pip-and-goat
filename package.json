@@ -2,7 +2,7 @@
   "name": "doodle-dash-tv-studio",
   "private": true,
   "version": "0.1.0",
-  "description": "Doodle Dash TV Studio — persistent 3D animation production platform",
+  "description": "Doodle Dash Production — Blender-first, EEVEE-first children’s animation studio",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "pnpm --filter @doodle-dash/web dev",

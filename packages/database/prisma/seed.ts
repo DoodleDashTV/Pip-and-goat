@@ -11,13 +11,15 @@ const GOAT_VERSION_ID = '55555555-5555-4555-8555-555555555555';
 async function seed() {
   const universe = await prisma.universe.upsert({
     where: { id: UNIVERSE_ID },
-    update: {},
+    update: {
+      brandName: 'Doodle Dash Production',
+    },
     create: {
       id: UNIVERSE_ID,
       name: 'Doodle Dash Universe',
-      brandName: 'Doodle Dash TV',
+      brandName: 'Doodle Dash Production',
       description:
-        'Persistent kids adventure universe for connected Doodle Dash TV seasons and episodes.',
+        'Persistent kids adventure universe for connected Doodle Dash Production seasons and episodes.',
       targetAudience: 'Kids and families',
       worldDescription:
         'A colorful adventure world where curiosity, friendship, and gentle comedy drive short-form stories.',

@@ -1378,12 +1378,57 @@ export class ProductionManifestService {
       where: { id: episodeId },
       include: { scenes: { include: { shots: true } } },
     });
+    const settings = await studioSettingsService.getJson('PRODUCTION_SETTINGS', {
+      defaultFinalProfile: 'FINAL_1080P',
+      defaultDraftProfile: 'DRAFT_FAST',
+      defaultFinalEngine: 'EEVEE',
+      aiVideoEnabled: false,
+    } as Record<string, unknown>);
+    const profiles = await prisma.productionRenderProfile.findMany();
+    const draftProfile = profiles.find((p) => p.code === 'DRAFT_FAST');
+    const finalProfile = profiles.find((p) => p.code === 'FINAL_1080P');
+    const audio = await prisma.soundClip.findMany({
+      where: { universeId: episode.universeId, status: 'APPROVED' },
+      take: 50,
+    });
+    const music = await prisma.musicTrack.findMany({
+      where: { universeId: episode.universeId, status: 'APPROVED' },
+      take: 20,
+    });
+    const animations = await prisma.animationDefinition.findMany({
+      where: { universeId: episode.universeId, approved: true },
+      take: 100,
+    });
+    const renderJobs = await prisma.renderJob.findMany({
+      where: { episodeId },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+    const costs = await prisma.costLedgerEntry.findMany({
+      where: { episodeId },
+      take: 100,
+    });
+    const defaultEngine = String(settings.defaultFinalEngine ?? 'EEVEE');
     const manifest = {
       episodeId,
+      episodeVersion: episode.updatedAt.toISOString(),
       kind,
       lockedAt: new Date().toISOString(),
-      story: { title: episode.title, status: episode.status },
-      shots: episode.scenes.flatMap((s) => s.shots.map((sh) => ({ id: sh.id, n: sh.shotNumber }))),
+      story: { title: episode.title, status: episode.status, version: episode.status },
+      shots: episode.scenes.flatMap((s) =>
+        s.shots.map((sh) => {
+          const job = renderJobs.find((j) => j.shotId === sh.id);
+          return {
+            id: sh.id,
+            n: sh.shotNumber,
+            cameraPreset: sh.cameraPreset,
+            lightingPreset: sh.lightingPreset,
+            renderMode: sh.renderMode,
+            renderEngine: job?.engine ?? defaultEngine,
+            renderPreset: kind === 'FINAL' ? 'FINAL_1080P' : 'DRAFT_FAST',
+          };
+        }),
+      ),
       characters: founding.map((c, i) => ({
         id: c.id,
         code: c.internalCode,
@@ -1392,8 +1437,78 @@ export class ProductionManifestService {
         referenceVersion: refs[i]?.versionNumber ?? null,
         voiceVersion: voices[i]?.versionNumber ?? null,
       })),
+      pipVersion: (() => {
+        const i = founding.findIndex((c) => c.internalCode === 'CHAR_PIP_001');
+        return i >= 0
+          ? {
+              modelVersion: models[i]?.version ?? null,
+              referenceVersion: refs[i]?.versionNumber ?? null,
+              voiceVersion: voices[i]?.versionNumber ?? null,
+            }
+          : null;
+      })(),
+      goatVersion: (() => {
+        const i = founding.findIndex((c) => c.internalCode === 'CHAR_GOAT_001');
+        return i >= 0
+          ? {
+              modelVersion: models[i]?.version ?? null,
+              referenceVersion: refs[i]?.versionNumber ?? null,
+              voiceVersion: voices[i]?.versionNumber ?? null,
+            }
+          : null;
+      })(),
+      animations: animations.map((a) => ({ code: a.code, version: 1, approved: a.approved })),
+      cameraPresets: [
+        ...new Set(
+          episode.scenes.flatMap((s) => s.shots.map((sh) => sh.cameraPreset)).filter(Boolean) as string[],
+        ),
+      ],
+      lighting: [
+        ...new Set(
+          episode.scenes.flatMap((s) => s.shots.map((sh) => sh.lightingPreset)).filter(Boolean) as string[],
+        ),
+      ],
+      renderPreset: kind === 'FINAL' ? 'FINAL_1080P' : 'DRAFT_FAST',
+      draftProfile: draftProfile
+        ? {
+            code: draftProfile.code,
+            width: draftProfile.width,
+            height: draftProfile.height,
+            engine: draftProfile.engine,
+          }
+        : null,
+      finalProfile: finalProfile
+        ? {
+            code: finalProfile.code,
+            width: finalProfile.width,
+            height: finalProfile.height,
+            engine: finalProfile.engine,
+          }
+        : { code: 'FINAL_1080P', width: 1080, height: 1920, engine: 'EEVEE' },
+      audioAssets: audio.map((a) => ({ code: a.code, status: a.status })),
+      sfx: audio.map((a) => a.code),
+      music: music.map((m) => ({ code: m.code, category: m.category })),
+      guardianReport: null,
+      qcReport: null,
+      renderTimestamps: renderJobs.map((j) => ({
+        id: j.id,
+        shotId: j.shotId,
+        status: j.status,
+        createdAt: j.createdAt.toISOString(),
+      })),
+      estimatedExternalCosts: costs
+        .filter((c) => !c.category.startsWith('LOCAL'))
+        .reduce((sum, c) => sum + c.amountUnits, 0),
+      actualExternalCosts: costs
+        .filter((c) => !c.category.startsWith('LOCAL'))
+        .reduce((sum, c) => sum + c.amountUnits, 0),
+      localComputeUnits: costs
+        .filter((c) => c.category.startsWith('LOCAL'))
+        .reduce((sum, c) => sum + c.amountUnits, 0),
+      aiVideoEnabledDefault: false,
       profile: 'DOODLE_DASH_SHORTS',
-      output: { width: 1080, height: 1920, fps: 30 },
+      output: { width: 1080, height: 1920, fps: 30, engine: 'EEVEE' },
+      philosophy: 'CREATE_ONCE_VALIDATE_VERSION_LOCK_REUSE_ASSEMBLE_RENDER',
     };
     const bytes = new TextEncoder().encode(JSON.stringify(manifest, null, 2));
     const stored = await this.storage.storeUpload({
@@ -1416,7 +1531,7 @@ export class ProductionManifestService {
 }
 
 export class DraftFinalOrchestrator {
-  async generateFirstDraft(episodeId: string) {
+  async generateFirstDraft(episodeId: string, profileCode: 'DRAFT_FAST' | 'DRAFT_HD' = 'DRAFT_FAST') {
     const strict = await studioSettingsService.isStrictCharacterLockEnabled();
     if (!strict) {
       throw new AppError('STRICT_CHARACTER_LOCK must remain enabled.', 'CHARACTER_LOCK_REQUIRED', 409);
@@ -1428,6 +1543,13 @@ export class DraftFinalOrchestrator {
         'DRAFT_GATED',
         409,
       );
+    }
+
+    // Blender-first — never silent AI fallback.
+    const { blenderFirstRouter } = await import('./cost-optimized-production');
+    const route = await blenderFirstRouter.routeRender();
+    if (route.path === 'PAID_AI_VIDEO') {
+      throw new AppError('Draft path must use Blender.', 'BLENDER_REQUIRED_FOR_DRAFT', 409);
     }
 
     const prior = await prisma.episodePipelineRun.findFirst({
@@ -1446,6 +1568,9 @@ export class DraftFinalOrchestrator {
         status: 'PENDING',
         warnings: {
           note: 'Draft target — final requires manual approval after real render completes.',
+          profileCode,
+          route: route.path,
+          engine: 'EEVEE',
         },
       },
     });
@@ -1484,17 +1609,34 @@ export class DraftFinalOrchestrator {
     });
   }
 
-  async generateFinal(episodeId: string) {
+  async generateFinal(
+    episodeId: string,
+    opts?: { debugOverride?: boolean; profileCode?: 'FINAL_1080P' | 'PREMIUM' },
+  ) {
     const draft = await prisma.draftReview.findFirst({
       where: { episodeId, status: 'APPROVED' },
       orderBy: { createdAt: 'desc' },
     });
-    if (!draft) {
+    if (!draft && !opts?.debugOverride) {
       throw new AppError('Final requires an approved draft.', 'DRAFT_APPROVAL_REQUIRED', 409);
     }
+    const { blenderFirstRouter, productionProfileService } = await import('./cost-optimized-production');
+    await blenderFirstRouter.routeRender();
+    const profileCode = opts?.profileCode ?? 'FINAL_1080P';
+    const engine = await productionProfileService.resolveShotEngine({
+      profileCode,
+      shotEngineOverride: null,
+    });
     await this.assertCharacterDriftProtection(episodeId);
     const manifest = await new ProductionManifestService().lock(episodeId, 'FINAL');
-    return { draft, manifest, status: 'FINAL_QUEUED_WHEN_WORKER_AVAILABLE' };
+    return {
+      draft,
+      manifest,
+      status: 'FINAL_QUEUED_WHEN_WORKER_AVAILABLE',
+      profileCode,
+      engine,
+      resolution: { width: 1080, height: 1920, fps: 30 },
+    };
   }
 
   async assertCharacterDriftProtection(episodeId: string) {

@@ -35,7 +35,7 @@ describe('Milestone 1 foundation', () => {
 
   it('seeds Doodle Dash Universe', async () => {
     const universe = await prisma.universe.findFirst({
-      where: { brandName: 'Doodle Dash TV' },
+      where: { brandName: 'Doodle Dash Production' },
     });
     expect(universe?.name).toBe('Doodle Dash Universe');
     expect(universe?.defaultOutputFormat).toBe('1080x1920');

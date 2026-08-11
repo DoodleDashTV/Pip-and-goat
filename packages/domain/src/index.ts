@@ -6,7 +6,76 @@ export const FOUNDING_CODES = {
 } as const;
 
 export const DEFAULT_UNIVERSE_NAME = 'Doodle Dash Universe';
-export const DEFAULT_BRAND_NAME = 'Doodle Dash TV';
+export const DEFAULT_BRAND_NAME = 'Doodle Dash Production';
+export const PRODUCT_DISPLAY_NAME = 'Doodle Dash Production';
+
+/** Permanent production philosophy: Blender-first, EEVEE-first, 1080×1920 finals. */
+export const ProductionRenderProfiles = [
+  'DRAFT_FAST',
+  'DRAFT_HD',
+  'FINAL_1080P',
+  'PREMIUM',
+] as const;
+export type ProductionRenderProfileCode = (typeof ProductionRenderProfiles)[number];
+
+export const DEFAULT_FINAL_RENDER_PROFILE = 'FINAL_1080P' as const;
+export const DEFAULT_DRAFT_RENDER_PROFILE = 'DRAFT_FAST' as const;
+export const DEFAULT_FINAL_ENGINE = 'EEVEE' as const;
+export const DEFAULT_FINAL_RESOLUTION = '1080x1920' as const;
+export const DEFAULT_FINAL_FPS = 30 as const;
+export const DEFAULT_AI_VIDEO_ENABLED = false;
+
+export const SEMANTIC_ANIMATION_CODES = [
+  'IDLE',
+  'WALK',
+  'RUN',
+  'JUMP',
+  'LAND',
+  'TURN',
+  'WAVE',
+  'POINT',
+  'NOD',
+  'SHAKE_HEAD',
+  'LOOK',
+  'TALK',
+  'LISTEN',
+  'THINK',
+  'LAUGH',
+  'CRY',
+  'SURPRISED',
+  'SCARED',
+  'HAPPY',
+  'SAD',
+  'EXCITED',
+  'PICK_UP',
+  'PUT_DOWN',
+  'HOLD',
+  'PUSH',
+  'PULL',
+  'SIT',
+  'STAND',
+  'CELEBRATE',
+] as const;
+
+export const PROCEDURAL_CAMERA_CODES = [
+  'ESTABLISHING',
+  'WIDE',
+  'MEDIUM',
+  'CLOSE_UP',
+  'EXTREME_CLOSE_UP',
+  'TWO_SHOT',
+  'OVER_SHOULDER',
+  'FOLLOW',
+  'TRACK',
+  'PUSH_IN',
+  'PULL_OUT',
+  'PAN',
+  'TILT',
+  'REVEAL',
+  'REACTION',
+  'LOW_ANGLE',
+  'HIGH_ANGLE',
+] as const;
 
 export const MODEL_STATUS_FLOW = [
   'MISSING',

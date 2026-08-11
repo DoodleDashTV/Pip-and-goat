@@ -31,6 +31,20 @@ export class StudioSettingsService {
     });
   }
 
+  async getJson<T = unknown>(key: string, fallback: T): Promise<T> {
+    const row = await prisma.studioSetting.findUnique({ where: { key } });
+    if (!row || row.value === null || row.value === undefined) return fallback;
+    return row.value as T;
+  }
+
+  async setJson(key: string, value: unknown) {
+    return prisma.studioSetting.upsert({
+      where: { key },
+      update: { value: value as object },
+      create: { key, value: value as object },
+    });
+  }
+
   async isStrictCharacterLockEnabled() {
     return this.getBoolean('STRICT_CHARACTER_LOCK', true);
   }

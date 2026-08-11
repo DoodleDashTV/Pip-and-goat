@@ -1,22 +1,28 @@
-# Doodle Dash TV Studio
+# Doodle Dash Production
 
-Persistent 3D animation production platform for **Doodle Dash TV**.
+Persistent Blender-first 3D animation production platform for **extremely high-quality children’s animated episodes** at the **best quality per dollar**.
 
-Primary pipeline:
+## Default delivery
 
-AI Story / Directing → Universe DB → Permanent characters / locations / props / animations → Scene assembly → Blender worker → Voice / Music → FFmpeg → 1080×1920 → Publishing
+- **1080 × 1920** (9:16 vertical)
+- **30 FPS**
+- **EEVEE** final (Cycles only per-shot premium override)
+- YouTube Shorts compatible
 
-Generative video providers (Sora, Seedance) are optional later — not the core.
+## Philosophy
 
-## Milestone 1
+**CREATE ONCE → VALIDATE → VERSION → LOCK → REUSE → ASSEMBLE → RENDER**
 
-- Doodle Dash Universe
-- Founding characters: Pip (`CHAR_PIP_001`), Goat (`CHAR_GOAT_001`)
-- Canon system with lock / immutable rules
-- Character registry, versions, DNA layers
-- Asset registry (metadata; binaries not in Postgres)
-- Studio dashboard + character pages
-- 3D model status: **MISSING** (not production ready)
+Paid generative video (Sora, Seedance, etc.) is **optional**, **off by default**, and **never** a silent fallback when Blender cannot run.
+
+## Core path
+
+```
+EPISODE IDEA → STORY → SHOTS → LOCKED REUSABLE ASSETS
+→ REUSABLE/COMPOSED ANIMATION → CHEAP EEVEE DRAFT → REVIEW
+→ RERENDER ONLY CHANGED SHOTS → APPROVAL
+→ HIGH-QUALITY 1080×1920 EEVEE FINAL → AUDIO/CAPTIONS → YOUTUBE PACKAGE
+```
 
 ## Stack
 
@@ -24,16 +30,15 @@ Generative video providers (Sora, Seedance) are optional later — not the core.
 - PostgreSQL + Prisma
 - Vitest
 - pnpm workspaces
+- Local/self-hosted Blender worker
 
 ## Setup
 
 ```bash
 cp .env.example .env
-# ensure PostgreSQL is running and DATABASE_URL is correct
-
 pnpm install
 pnpm db:generate
-pnpm --filter @doodle-dash/database exec prisma migrate dev --name milestone1_init
+pnpm db:migrate
 pnpm db:seed
 pnpm dev
 ```
@@ -52,5 +57,10 @@ Open http://localhost:3000
 
 ## Docs
 
-- `docs/DOODLE_DASH_STUDIO_AUDIT.md`
-- `docs/DOODLE_DASH_STUDIO_ROADMAP.md`
+- `docs/DOODLE_DASH_PRODUCTION.md`
+- `docs/LOW_COST_HIGH_QUALITY_STRATEGY.md`
+- `docs/ANIMATION_LIBRARY.md`
+- `docs/RENDER_PROFILES.md`
+- `docs/COST_GUARDIAN.md`
+- `docs/EPISODE_PRODUCTION_WORKFLOW.md`
+- Legacy audits/roadmaps retained under `docs/`

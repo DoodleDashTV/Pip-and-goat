@@ -1960,3 +1960,158 @@ model EpisodeReferenceVersionLink {
   @@unique([episodeId, characterId])
   @@map("episode_reference_version_links")
 }
+
+// ============================================================
+// Cost-Optimized 1080p Production Philosophy
+// ============================================================
+
+model ProductionRenderProfile {
+  id              String   @id @default(uuid()) @db.Uuid
+  code            String   @unique
+  name            String
+  width           Int
+  height          Int
+  aspectRatio     String   @default("9:16") @map("aspect_ratio")
+  fps             Int      @default(30)
+  engine          String   @default("EEVEE")
+  qualityPreset   Json?    @map("quality_preset")
+  purpose         String?
+  isDefaultFinal  Boolean  @default(false) @map("is_default_final")
+  isDefaultDraft  Boolean  @default(false) @map("is_default_draft")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("production_render_profiles")
+}
+
+model ShotRenderCacheEntry {
+  id              String   @id @default(uuid()) @db.Uuid
+  shotId          String   @map("shot_id") @db.Uuid
+  fingerprint     String
+  profileCode     String   @map("profile_code")
+  engine          String
+  renderJobId     String?  @map("render_job_id") @db.Uuid
+  outputUri       String?  @map("output_uri")
+  approved        Boolean  @default(false)
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([shotId, fingerprint, profileCode])
+  @@index([shotId])
+  @@map("shot_render_cache_entries")
+}
+
+model VoiceGenerationCacheEntry {
+  id              String   @id @default(uuid()) @db.Uuid
+  fingerprint     String   @unique
+  characterId     String   @map("character_id") @db.Uuid
+  voiceVersionId  String?  @map("voice_version_id") @db.Uuid
+  text            String
+  provider        String?
+  settings        Json?
+  audioUri        String?  @map("audio_uri")
+  hitCount        Int      @default(0) @map("hit_count")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([characterId])
+  @@map("voice_generation_cache_entries")
+}
+
+model PaidGenerationApproval {
+  id              String   @id @default(uuid()) @db.Uuid
+  episodeId       String?  @map("episode_id") @db.Uuid
+  shotId          String?  @map("shot_id") @db.Uuid
+  provider        String
+  model           String?
+  estimatedCost   Float?   @map("estimated_cost")
+  reason          String
+  status          String   @default("PENDING")
+  decidedBy       String?  @map("decided_by")
+  decidedAt       DateTime? @map("decided_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([status])
+  @@map("paid_generation_approvals")
+}
+
+model AssetUsageEvent {
+  id           String   @id @default(uuid()) @db.Uuid
+  assetType    String   @map("asset_type")
+  assetKey     String   @map("asset_key")
+  episodeId    String?  @map("episode_id") @db.Uuid
+  shotId       String?  @map("shot_id") @db.Uuid
+  usageCount   Int      @default(1) @map("usage_count")
+  lastUsedAt   DateTime @default(now()) @map("last_used_at")
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([assetType, assetKey])
+  @@map("asset_usage_events")
+}
+
+model MotionComposition {
+  id              String   @id @default(uuid()) @db.Uuid
+  shotId          String?  @map("shot_id") @db.Uuid
+  episodeId       String?  @map("episode_id") @db.Uuid
+  layers          Json
+  decisionPath    Json?    @map("decision_path")
+  status          String   @default("DRAFT")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([shotId])
+  @@map("motion_compositions")
+}
+
+model AnimationLibraryMeta {
+  id                    String   @id @default(uuid()) @db.Uuid
+  animationDefinitionId String   @unique @map("animation_definition_id") @db.Uuid
+  version               Int      @default(1)
+  characterCompatibility Json?   @map("character_compatibility")
+  rigCompatibility      Json?    @map("rig_compatibility")
+  rootMotion            Boolean  @default(false) @map("root_motion")
+  facialComponent       Boolean  @default(false) @map("facial_component")
+  tags                  Json?
+  qualityStatus         String   @default("UNKNOWN") @map("quality_status")
+  source                String?
+  usageCount            Int      @default(0) @map("usage_count")
+  lastUsedAt            DateTime? @map("last_used_at")
+  loopableOverride      Boolean? @map("loopable_override")
+  notes                 String?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("animation_library_meta")
+}
+
+model RenderCostEstimate {
+  id                    String   @id @default(uuid()) @db.Uuid
+  episodeId             String   @map("episode_id") @db.Uuid
+  profileCode           String   @map("profile_code")
+  frameCount            Int      @map("frame_count")
+  estimatedRenderMinutes Float   @map("estimated_render_minutes")
+  estimatedLocalComputeUnits Float? @map("estimated_local_compute_units")
+  estimatedExternalApiCost Float  @default(0) @map("estimated_external_api_cost")
+  shotsToRerender       Json?    @map("shots_to_rerender")
+  shotsCacheReusable    Json?    @map("shots_cache_reusable")
+  assumptions           Json?
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  @@index([episodeId, createdAt])
+  @@map("render_cost_estimates")
+}
+
+model FramingValidationReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  shotId      String   @map("shot_id") @db.Uuid
+  passed      Boolean  @default(false)
+  warnings    Json
+  checks      Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([shotId])
+  @@map("framing_validation_reports")
+}

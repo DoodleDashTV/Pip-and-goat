@@ -17,6 +17,7 @@
     "@doodle-dash/shared": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "@types/node": "^22.13.10"
   }
 }
