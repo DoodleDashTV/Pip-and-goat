@@ -336,7 +336,7 @@ export class CaptionService {
 export const formatSrtTimestamp = CaptionService.formatSrtTimestamp;
 export const generateSrt = CaptionService.toSrt;
 
-const AudioLibraryItemSchema: z.ZodType<AudioLibraryItem> = z.object({
+const AudioLibraryItemSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   uri: z.string().min(1),
@@ -346,7 +346,7 @@ const AudioLibraryItemSchema: z.ZodType<AudioLibraryItem> = z.object({
   metadata: z.record(z.unknown()).default({}),
 });
 
-const AudioTrackSchema: z.ZodType<AudioTrack> = z.object({
+const AudioTrackSchema = z.object({
   id: z.string().min(1),
   uri: z.string().min(1),
   kind: z.enum(['dialogue', 'sfx', 'music', 'ambience']),
@@ -356,7 +356,7 @@ const AudioTrackSchema: z.ZodType<AudioTrack> = z.object({
   duckingPriority: z.number().int().optional(),
 });
 
-const CaptionCueSchema: z.ZodType<CaptionCue> = z.object({
+const CaptionCueSchema = z.object({
   index: z.number().int().positive().optional(),
   startMs: z.number().int().min(0),
   endMs: z.number().int().min(0),
