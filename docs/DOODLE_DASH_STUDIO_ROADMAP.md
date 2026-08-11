@@ -5,7 +5,7 @@
 | Milestone | Focus | Status |
 |-----------|-------|--------|
 | **1** | Core platform: Universe, Pip/Goat, Canon, Characters, DNA, Versions, Assets, Dashboard | **COMPLETE** |
-| 2 | Character production: 3D models, rigs, facial, refs, poses, expressions, animations | NOT STARTED |
+| **2** | Character production: 3D models, rigs, facial, refs, poses, expressions, animations | **COMPLETE** |
 | 3 | Character DNA depth + Character Lock polish | NOT STARTED |
 | 4 | Character development events | NOT STARTED |
 | 5 | Relationships (seed Pip↔Goat) | NOT STARTED |

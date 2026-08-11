@@ -8,6 +8,44 @@ export const FOUNDING_CODES = {
 export const DEFAULT_UNIVERSE_NAME = 'Doodle Dash Universe';
 export const DEFAULT_BRAND_NAME = 'Doodle Dash TV';
 
+export const MODEL_STATUS_FLOW = [
+  'MISSING',
+  'MODELING',
+  'TEXTURING',
+  'RIGGING',
+  'FACIAL_RIGGING',
+  'REVIEW',
+  'APPROVED',
+  'PRODUCTION_READY',
+] as const;
+
+export const REQUIRED_EXPRESSIONS = [
+  'neutral',
+  'happy',
+  'sad',
+  'surprised',
+  'afraid',
+  'confused',
+  'curious',
+  'determined',
+  'angry',
+  'laughing',
+  'worried',
+] as const;
+
+export const REQUIRED_VISEMES = [
+  'A',
+  'E',
+  'I',
+  'O',
+  'U',
+  'M_B_P',
+  'F_V',
+  'L',
+  'TH',
+  'REST',
+] as const;
+
 export const CanonLevelSchema = z.enum(['IMMUTABLE', 'CURRENT', 'HISTORICAL']);
 export const CanonSubjectTypeSchema = z.enum([
   'UNIVERSE',

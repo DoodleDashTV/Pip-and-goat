@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@doodle-dash/database';
+import { characterPreflightService } from '@doodle-dash/characters';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,10 @@ export default async function CharacterDetailPage({
     where: { internalCode: code },
     include: {
       versions: { orderBy: { versionNumber: 'asc' } },
-      models: true,
+      models: { include: { rig: true, facialRig: true } },
+      rigs: true,
+      facialRigs: true,
+      referenceImages: { orderBy: { createdAt: 'asc' } },
       visualDna: true,
       personalityDna: true,
       motionDna: true,
@@ -26,6 +30,7 @@ export default async function CharacterDetailPage({
   if (!character) notFound();
 
   const model = character.models[0];
+  const preflight = await characterPreflightService.runForCharacter(character.id);
 
   return (
     <div className="space-y-6">
@@ -70,6 +75,26 @@ export default async function CharacterDetailPage({
         </div>
 
         <div className="space-y-4">
+          <Panel title="Native Render Preflight">
+            <p className="text-sm font-semibold">
+              STRICT_CHARACTER_LOCK:{' '}
+              <span className="text-sun-300">{String(preflight.strictCharacterLock)}</span>
+            </p>
+            <p className="mt-2 text-sm">
+              Status:{' '}
+              <span className={preflight.blocked ? 'text-sun-300' : 'text-leaf-300'}>
+                {preflight.blocked ? 'BLOCKED' : 'CLEAR'}
+              </span>
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-[var(--muted)]">
+              {preflight.issues.map((issue) => (
+                <li key={issue.code}>
+                  [{issue.severity}] {issue.message}
+                </li>
+              ))}
+            </ul>
+          </Panel>
+
           <Panel title="Versions">
             <ul className="space-y-3">
               {character.versions.map((version) => (
@@ -98,6 +123,45 @@ export default async function CharacterDetailPage({
             </p>
           </Panel>
         </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <Panel title="Body Rig">
+          {character.rigs[0] ? (
+            <>
+              <p className="text-sm font-semibold">{character.rigs[0].rigVersion}</p>
+              <p className="mt-2 text-sm text-sun-300">{character.rigs[0].status}</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">
+                approved: {String(character.rigs[0].approved)}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-[var(--muted)]">Missing</p>
+          )}
+        </Panel>
+        <Panel title="Facial Rig">
+          {character.facialRigs[0] ? (
+            <>
+              <p className="text-sm font-semibold">{character.facialRigs[0].rigVersion}</p>
+              <p className="mt-2 text-sm text-sun-300">{character.facialRigs[0].status}</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">
+                approved: {String(character.facialRigs[0].approved)}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-[var(--muted)]">Missing</p>
+          )}
+        </Panel>
+        <Panel title="References">
+          <ul className="space-y-2 text-sm">
+            {character.referenceImages.map((reference) => (
+              <li key={reference.id}>
+                {reference.title}{' '}
+                <span className="text-sun-300">({reference.reviewStatus})</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">

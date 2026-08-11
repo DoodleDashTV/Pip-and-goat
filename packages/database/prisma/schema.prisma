@@ -73,6 +73,30 @@ enum AssetType {
   OTHER
 }
 
+enum AnimationCategory {
+  LOCOMOTION
+  DIALOGUE
+  REACTION
+  INTERACTION
+  EMOTIONAL
+  IDLE
+}
+
+enum ReferenceReviewStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  CONFLICTING
+}
+
+enum RegistryApprovalStatus {
+  MISSING
+  DRAFT
+  REVIEW
+  APPROVED
+  REJECTED
+}
+
 model Universe {
   id                   String         @id @default(uuid()) @db.Uuid
   name                 String
@@ -86,9 +110,13 @@ model Universe {
   createdAt            DateTime       @default(now()) @map("created_at")
   updatedAt            DateTime       @updatedAt @map("updated_at")
 
-  characters Character[]
-  canonFacts CanonFact[]
-  assets     Asset[]
+  characters       Character[]
+  canonFacts       CanonFact[]
+  assets           Asset[]
+  animations       AnimationDefinition[]
+  poses            PoseDefinition[]
+  expressions      ExpressionDefinition[]
+  referenceImages  CharacterReferenceImage[]
 
   @@map("universes")
 }
@@ -146,14 +174,17 @@ model Character {
   createdAt        DateTime        @default(now()) @map("created_at")
   updatedAt        DateTime        @updatedAt @map("updated_at")
 
-  universe   Universe            @relation(fields: [universeId], references: [id], onDelete: Cascade)
-  versions   CharacterVersion[]
-  models     Character3dModel[]
-  visualDna  CharacterVisualDna?
-  personalityDna CharacterPersonalityDna?
-  motionDna  CharacterMotionDna?
-  voiceDna   CharacterVoiceDna?
-  storyDna   CharacterStoryDna?
+  universe        Universe                 @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  versions        CharacterVersion[]
+  models          Character3dModel[]
+  rigs            CharacterRig[]
+  facialRigs      CharacterFacialRig[]
+  referenceImages CharacterReferenceImage[]
+  visualDna       CharacterVisualDna?
+  personalityDna  CharacterPersonalityDna?
+  motionDna       CharacterMotionDna?
+  voiceDna        CharacterVoiceDna?
+  storyDna        CharacterStoryDna?
 
   @@index([universeId])
   @@map("characters")
@@ -170,8 +201,11 @@ model CharacterVersion {
   approved             Boolean  @default(false)
   createdAt            DateTime @default(now()) @map("created_at")
 
-  character Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  models    Character3dModel[]
+  character       Character                 @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  models          Character3dModel[]
+  rigs            CharacterRig[]
+  facialRigs      CharacterFacialRig[]
+  referenceImages CharacterReferenceImage[]
 
   @@unique([characterId, versionNumber])
   @@map("character_versions")
@@ -308,14 +342,193 @@ model Character3dModel {
   status              CharacterModelStatus @default(MISSING)
   approved            Boolean              @default(false)
   productionReady     Boolean              @default(false) @map("production_ready")
+  notes               String?
   createdAt           DateTime             @default(now()) @map("created_at")
   updatedAt           DateTime             @updatedAt @map("updated_at")
 
   character Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
   version   CharacterVersion? @relation(fields: [characterVersionId], references: [id], onDelete: SetNull)
+  rig       CharacterRig?     @relation(fields: [rigId], references: [id], onDelete: SetNull)
+  facialRig CharacterFacialRig? @relation(fields: [facialRigId], references: [id], onDelete: SetNull)
 
   @@index([characterId])
+  @@index([status])
   @@map("character_3d_models")
+}
+
+model CharacterRig {
+  id                   String                 @id @default(uuid()) @db.Uuid
+  characterId          String                 @map("character_id") @db.Uuid
+  characterVersionId   String?                @map("character_version_id") @db.Uuid
+  rigVersion           String                 @map("rig_version")
+  skeletonType         String?                @map("skeleton_type")
+  boneMap              Json?                  @map("bone_map")
+  ikConfiguration      Json?                  @map("ik_configuration")
+  controlRig           Json?                  @map("control_rig")
+  supportsFeet         Boolean                @default(true) @map("supports_feet")
+  supportsHands        Boolean                @default(true) @map("supports_hands")
+  supportsHead         Boolean                @default(true) @map("supports_head")
+  supportsEyes         Boolean                @default(true) @map("supports_eyes")
+  supportsSpine        Boolean                @default(true) @map("supports_spine")
+  supportsEars         Boolean                @default(false) @map("supports_ears")
+  supportsTail         Boolean                @default(false) @map("supports_tail")
+  assetId              String?                @map("asset_id") @db.Uuid
+  status               RegistryApprovalStatus @default(MISSING)
+  approved             Boolean                @default(false)
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+
+  character    Character                 @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  version      CharacterVersion?         @relation(fields: [characterVersionId], references: [id], onDelete: SetNull)
+  models       Character3dModel[]
+  compatibilities AnimationRigCompatibility[]
+
+  @@index([characterId])
+  @@map("character_rigs")
+}
+
+model CharacterFacialRig {
+  id                 String                 @id @default(uuid()) @db.Uuid
+  characterId        String                 @map("character_id") @db.Uuid
+  characterVersionId String?                @map("character_version_id") @db.Uuid
+  rigVersion         String                 @map("rig_version")
+  shapeKeys          Json?                  @map("shape_keys")
+  facialBones        Json?                  @map("facial_bones")
+  visemes            Json?
+  supportedExpressions Json?                @map("supported_expressions")
+  assetId            String?                @map("asset_id") @db.Uuid
+  status             RegistryApprovalStatus @default(MISSING)
+  approved           Boolean                @default(false)
+  createdAt          DateTime               @default(now()) @map("created_at")
+  updatedAt          DateTime               @updatedAt @map("updated_at")
+
+  character Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  version   CharacterVersion? @relation(fields: [characterVersionId], references: [id], onDelete: SetNull)
+  models    Character3dModel[]
+
+  @@index([characterId])
+  @@map("character_facial_rigs")
+}
+
+model CharacterReferenceImage {
+  id                 String                @id @default(uuid()) @db.Uuid
+  universeId         String                @map("universe_id") @db.Uuid
+  characterId        String                @map("character_id") @db.Uuid
+  characterVersionId String?               @map("character_version_id") @db.Uuid
+  assetId            String?               @map("asset_id") @db.Uuid
+  title              String
+  viewType           String?               @map("view_type")
+  reviewStatus       ReferenceReviewStatus @default(PENDING_REVIEW) @map("review_status")
+  isPrimary          Boolean               @default(false) @map("is_primary")
+  notes              String?
+  conflictGroup      String?               @map("conflict_group")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+
+  universe  Universe          @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  character Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  version   CharacterVersion? @relation(fields: [characterVersionId], references: [id], onDelete: SetNull)
+
+  @@index([characterId])
+  @@index([reviewStatus])
+  @@map("character_reference_images")
+}
+
+model AnimationDefinition {
+  id           String            @id @default(uuid()) @db.Uuid
+  universeId   String            @map("universe_id") @db.Uuid
+  code         String
+  name         String
+  category     AnimationCategory
+  durationMs   Int?              @map("duration_ms")
+  loopable     Boolean           @default(false)
+  emotion      String?
+  assetId      String?           @map("asset_id") @db.Uuid
+  status       RegistryApprovalStatus @default(MISSING)
+  approved     Boolean           @default(false)
+  notes        String?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  universe        Universe                    @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  compatibilities AnimationRigCompatibility[]
+
+  @@unique([universeId, code])
+  @@index([category])
+  @@map("animation_definitions")
+}
+
+model AnimationRigCompatibility {
+  id           String @id @default(uuid()) @db.Uuid
+  animationId  String @map("animation_id") @db.Uuid
+  rigId        String @map("rig_id") @db.Uuid
+  compatible   Boolean @default(true)
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  animation AnimationDefinition @relation(fields: [animationId], references: [id], onDelete: Cascade)
+  rig       CharacterRig        @relation(fields: [rigId], references: [id], onDelete: Cascade)
+
+  @@unique([animationId, rigId])
+  @@map("animation_rig_compatibilities")
+}
+
+model PoseDefinition {
+  id         String                 @id @default(uuid()) @db.Uuid
+  universeId String                 @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  category   String?
+  assetId    String?                @map("asset_id") @db.Uuid
+  status     RegistryApprovalStatus @default(MISSING)
+  approved   Boolean                @default(false)
+  notes      String?
+  createdAt  DateTime               @default(now()) @map("created_at")
+  updatedAt  DateTime               @updatedAt @map("updated_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("pose_definitions")
+}
+
+model ExpressionDefinition {
+  id         String                 @id @default(uuid()) @db.Uuid
+  universeId String                 @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  intensity  String?
+  assetId    String?                @map("asset_id") @db.Uuid
+  status     RegistryApprovalStatus @default(MISSING)
+  approved   Boolean                @default(false)
+  notes      String?
+  createdAt  DateTime               @default(now()) @map("created_at")
+  updatedAt  DateTime               @updatedAt @map("updated_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("expression_definitions")
+}
+
+model VisemeDefinition {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  name      String
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("viseme_definitions")
+}
+
+model StudioSetting {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("studio_settings")
 }
 
 model Asset {

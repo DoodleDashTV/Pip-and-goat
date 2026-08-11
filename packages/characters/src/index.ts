@@ -4,7 +4,10 @@ import { AppError } from '@doodle-dash/shared';
 
 const characterInclude = {
   versions: { orderBy: { versionNumber: 'asc' as const } },
-  models: true,
+  models: { include: { rig: true, facialRig: true } },
+  rigs: true,
+  facialRigs: true,
+  referenceImages: { orderBy: { createdAt: 'asc' as const } },
   visualDna: true,
   personalityDna: true,
   motionDna: true,
@@ -173,5 +176,7 @@ export class AssetService {
 
 export const characterService = new CharacterService();
 export const assetService = new AssetService();
+
+export * from './production';
 
 export type { Character };

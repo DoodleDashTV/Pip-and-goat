@@ -361,10 +361,314 @@ async function seed() {
     }
   }
 
+  await prisma.studioSetting.upsert({
+    where: { key: 'STRICT_CHARACTER_LOCK' },
+    update: { value: true },
+    create: { key: 'STRICT_CHARACTER_LOCK', value: true },
+  });
+
+  async function ensureRig(params: {
+    characterId: string;
+    versionId: string;
+    name: string;
+    supportsEars?: boolean;
+    supportsTail?: boolean;
+  }) {
+    const existing = await prisma.characterRig.findFirst({
+      where: { characterId: params.characterId, rigVersion: 'v1' },
+    });
+    if (existing) return existing;
+    return prisma.characterRig.create({
+      data: {
+        characterId: params.characterId,
+        characterVersionId: params.versionId,
+        rigVersion: 'v1',
+        skeletonType: 'biped_cartoon',
+        boneMap: {
+          feet: true,
+          hands: true,
+          head: true,
+          eyes: true,
+          spine: true,
+          ears: Boolean(params.supportsEars),
+          tail: Boolean(params.supportsTail),
+        },
+        ikConfiguration: { feet: true, hands: true },
+        controlRig: { status: 'MISSING' },
+        supportsEars: Boolean(params.supportsEars),
+        supportsTail: Boolean(params.supportsTail),
+        status: 'MISSING',
+        approved: false,
+      },
+    });
+  }
+
+  async function ensureFacialRig(params: {
+    characterId: string;
+    versionId: string;
+  }) {
+    const existing = await prisma.characterFacialRig.findFirst({
+      where: { characterId: params.characterId, rigVersion: 'v1' },
+    });
+    if (existing) return existing;
+    return prisma.characterFacialRig.create({
+      data: {
+        characterId: params.characterId,
+        characterVersionId: params.versionId,
+        rigVersion: 'v1',
+        shapeKeys: [],
+        facialBones: [],
+        visemes: ['A', 'E', 'I', 'O', 'U', 'M_B_P', 'F_V', 'L', 'TH', 'REST'],
+        supportedExpressions: [
+          'neutral',
+          'happy',
+          'sad',
+          'surprised',
+          'afraid',
+          'confused',
+          'curious',
+          'determined',
+          'angry',
+          'laughing',
+          'worried',
+        ],
+        status: 'MISSING',
+        approved: false,
+      },
+    });
+  }
+
+  const pipRig = await ensureRig({
+    characterId: pip.id,
+    versionId: PIP_VERSION_ID,
+    name: 'Pip',
+  });
+  const goatRig = await ensureRig({
+    characterId: goat.id,
+    versionId: GOAT_VERSION_ID,
+    name: 'Goat',
+    supportsEars: true,
+    supportsTail: true,
+  });
+  const pipFacial = await ensureFacialRig({
+    characterId: pip.id,
+    versionId: PIP_VERSION_ID,
+  });
+  const goatFacial = await ensureFacialRig({
+    characterId: goat.id,
+    versionId: GOAT_VERSION_ID,
+  });
+
+  await prisma.character3dModel.updateMany({
+    where: { characterId: pip.id, modelName: 'Pip Production Master' },
+    data: {
+      rigId: pipRig.id,
+      facialRigId: pipFacial.id,
+      status: CharacterModelStatus.MISSING,
+      approved: false,
+      productionReady: false,
+      notes: 'No real .blend/.fbx/.glb uploaded. Status remains MISSING.',
+    },
+  });
+  await prisma.character3dModel.updateMany({
+    where: { characterId: goat.id, modelName: 'Goat Production Master' },
+    data: {
+      rigId: goatRig.id,
+      facialRigId: goatFacial.id,
+      status: CharacterModelStatus.MISSING,
+      approved: false,
+      productionReady: false,
+      notes: 'No real .blend/.fbx/.glb uploaded. Status remains MISSING.',
+    },
+  });
+
+  // Reference registry placeholders — PENDING_REVIEW, no invented approved looks.
+  for (const character of [pip, goat]) {
+    const existingRef = await prisma.characterReferenceImage.findFirst({
+      where: {
+        characterId: character.id,
+        title: `${character.name} primary reference slot`,
+      },
+    });
+    if (!existingRef) {
+      await prisma.characterReferenceImage.create({
+        data: {
+          universeId: universe.id,
+          characterId: character.id,
+          characterVersionId:
+            character.id === pip.id ? PIP_VERSION_ID : GOAT_VERSION_ID,
+          title: `${character.name} primary reference slot`,
+          viewType: 'turnaround',
+          reviewStatus: 'PENDING_REVIEW',
+          isPrimary: true,
+          notes:
+            'Slot reserved. Upload approved reference images before locking visual DNA.',
+        },
+      });
+    }
+  }
+
+  const animations: Array<{
+    code: string;
+    name: string;
+    category:
+      | 'LOCOMOTION'
+      | 'DIALOGUE'
+      | 'REACTION'
+      | 'INTERACTION'
+      | 'EMOTIONAL'
+      | 'IDLE';
+    loopable?: boolean;
+    emotion?: string;
+  }> = [
+    { code: 'walk', name: 'Walk', category: 'LOCOMOTION', loopable: true },
+    { code: 'run', name: 'Run', category: 'LOCOMOTION', loopable: true },
+    { code: 'jump', name: 'Jump', category: 'LOCOMOTION' },
+    { code: 'land', name: 'Land', category: 'LOCOMOTION' },
+    { code: 'turn', name: 'Turn', category: 'LOCOMOTION' },
+    { code: 'sit', name: 'Sit', category: 'IDLE' },
+    { code: 'stand', name: 'Stand', category: 'IDLE', loopable: true },
+    { code: 'point', name: 'Point', category: 'INTERACTION' },
+    { code: 'wave', name: 'Wave', category: 'INTERACTION' },
+    { code: 'pick_up', name: 'Pick Up', category: 'INTERACTION' },
+    { code: 'put_down', name: 'Put Down', category: 'INTERACTION' },
+    { code: 'laugh', name: 'Laugh', category: 'EMOTIONAL', emotion: 'happy' },
+    { code: 'celebrate', name: 'Celebrate', category: 'EMOTIONAL', emotion: 'excited' },
+    { code: 'talk_calm', name: 'Talk Calm', category: 'DIALOGUE', loopable: true },
+    {
+      code: 'talk_excited',
+      name: 'Talk Excited',
+      category: 'DIALOGUE',
+      loopable: true,
+      emotion: 'excited',
+    },
+    { code: 'listen', name: 'Listen', category: 'DIALOGUE', loopable: true },
+    { code: 'nod', name: 'Nod', category: 'REACTION' },
+    {
+      code: 'scared_idle',
+      name: 'Scared Idle',
+      category: 'IDLE',
+      loopable: true,
+      emotion: 'afraid',
+    },
+    {
+      code: 'happy_idle',
+      name: 'Happy Idle',
+      category: 'IDLE',
+      loopable: true,
+      emotion: 'happy',
+    },
+  ];
+
+  for (const animation of animations) {
+    await prisma.animationDefinition.upsert({
+      where: {
+        universeId_code: { universeId: universe.id, code: animation.code },
+      },
+      update: {},
+      create: {
+        universeId: universe.id,
+        code: animation.code,
+        name: animation.name,
+        category: animation.category,
+        loopable: animation.loopable ?? false,
+        emotion: animation.emotion,
+        status: 'MISSING',
+        approved: false,
+        notes: 'Definition only — animation file not uploaded.',
+      },
+    });
+  }
+
+  const poses = [
+    'standing_neutral',
+    'standing_confident',
+    'standing_nervous',
+    'pointing',
+    'waving',
+    'sitting',
+    'thinking',
+    'surprised',
+    'celebrating',
+    'scared',
+  ];
+  for (const code of poses) {
+    await prisma.poseDefinition.upsert({
+      where: { universeId_code: { universeId: universe.id, code } },
+      update: {},
+      create: {
+        universeId: universe.id,
+        code,
+        name: code
+          .split('_')
+          .map((part) => part[0]!.toUpperCase() + part.slice(1))
+          .join(' '),
+        status: 'MISSING',
+        approved: false,
+        notes: 'Pose definition only — no pose asset file yet.',
+      },
+    });
+  }
+
+  const expressions = [
+    'neutral',
+    'happy',
+    'very_happy',
+    'sad',
+    'surprised',
+    'afraid',
+    'confused',
+    'curious',
+    'determined',
+    'angry',
+    'laughing',
+    'worried',
+  ];
+  for (const code of expressions) {
+    await prisma.expressionDefinition.upsert({
+      where: { universeId_code: { universeId: universe.id, code } },
+      update: {},
+      create: {
+        universeId: universe.id,
+        code,
+        name: code
+          .split('_')
+          .map((part) => part[0]!.toUpperCase() + part.slice(1))
+          .join(' '),
+        status: 'MISSING',
+        approved: false,
+        notes: 'Expression definition only — facial asset pending.',
+      },
+    });
+  }
+
+  const visemes = [
+    ['A', 'Viseme A'],
+    ['E', 'Viseme E'],
+    ['I', 'Viseme I'],
+    ['O', 'Viseme O'],
+    ['U', 'Viseme U'],
+    ['M_B_P', 'Viseme M/B/P'],
+    ['F_V', 'Viseme F/V'],
+    ['L', 'Viseme L'],
+    ['TH', 'Viseme TH'],
+    ['REST', 'Viseme Rest'],
+  ] as const;
+  for (const [code, name] of visemes) {
+    await prisma.visemeDefinition.upsert({
+      where: { code },
+      update: {},
+      create: { code, name, notes: 'Standard lip-sync viseme target.' },
+    });
+  }
+
   console.log('Seed complete:', {
     universe: universe.name,
     pip: pip.internalCode,
     goat: goat.internalCode,
+    animations: animations.length,
+    poses: poses.length,
+    expressions: expressions.length,
   });
 }
 
