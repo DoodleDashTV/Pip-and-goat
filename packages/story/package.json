@@ -2,9 +2,25 @@
   "name": "@doodle-dash/story",
   "version": "0.1.0",
   "private": true,
-  "description": "Story / seasons / episodes package — reserved for later milestones",
+  "description": "Story, seasons, episodes, memory, storyboard, and cinematic direction services",
   "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "typecheck": "node -e \"console.log('story package stub')\""
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@doodle-dash/characters": "workspace:*",
+    "@doodle-dash/database": "workspace:*",
+    "@doodle-dash/domain": "workspace:*",
+    "@doodle-dash/shared": "workspace:*",
+    "@doodle-dash/universe": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
   }
 }

@@ -101,3 +101,75 @@ export const PersonalityScoresSchema = z.object({
 
 export type CreateCanonFactInput = z.infer<typeof CreateCanonFactSchema>;
 export type CreateAssetInput = z.infer<typeof CreateAssetSchema>;
+
+export const ProductionModes = [
+  'ECONOMY',
+  'BALANCED_CINEMATIC',
+  'STUDIO',
+  'HERO',
+] as const;
+
+export const DEFAULT_PRODUCTION_MODE = 'BALANCED_CINEMATIC' as const;
+
+export const RenderModes = [
+  'REUSE_EXISTING_RENDER',
+  'REUSE_ANIMATION',
+  'NATIVE_3D',
+  'NATIVE_3D_HIGH',
+  'STILL_IMAGE_MOTION',
+  'AI_VIDEO_OPTIONAL',
+  'COMPOSITE',
+] as const;
+
+export const RenderJobStatuses = [
+  'QUEUED',
+  'PLANNING',
+  'PRELIGHT',
+  'RENDERING',
+  'COMPOSITING',
+  'QC',
+  'APPROVED',
+  'FAILED',
+  'CANCELLED',
+] as const;
+
+export const AssetRequestStatuses = [
+  'REQUESTED',
+  'IN_REVIEW',
+  'APPROVED',
+  'IN_PROGRESS',
+  'READY',
+  'REJECTED',
+  'BLOCKED',
+] as const;
+
+export const PublishingStatuses = [
+  'DRAFT',
+  'SCHEDULED',
+  'PUBLISHED',
+  'FAILED',
+  'RETRACTED',
+] as const;
+
+export const ContinuityReviewStatuses = [
+  'PASS',
+  'WARN',
+  'BLOCK',
+] as const;
+
+export const VISUAL_QC_THRESHOLD = 90;
+export const DOODLE_GUARDIAN_THRESHOLD = 92;
+
+export const ProductionModeSchema = z.enum(ProductionModes).default(DEFAULT_PRODUCTION_MODE);
+export const RenderModeSchema = z.enum(RenderModes);
+export const RenderJobStatusSchema = z.enum(RenderJobStatuses);
+export const AssetRequestStatusSchema = z.enum(AssetRequestStatuses);
+export const PublishingStatusSchema = z.enum(PublishingStatuses);
+export const ContinuityReviewStatusSchema = z.enum(ContinuityReviewStatuses);
+
+export type ProductionMode = z.infer<typeof ProductionModeSchema>;
+export type RenderMode = z.infer<typeof RenderModeSchema>;
+export type RenderJobStatus = z.infer<typeof RenderJobStatusSchema>;
+export type AssetRequestStatus = z.infer<typeof AssetRequestStatusSchema>;
+export type PublishingStatus = z.infer<typeof PublishingStatusSchema>;
+export type ContinuityReviewStatus = z.infer<typeof ContinuityReviewStatusSchema>;
