@@ -34,17 +34,17 @@ docs/
 
 | System | Status |
 |--------|--------|
-| Application shell | In progress |
-| PostgreSQL + Prisma | In progress |
-| Universes | In progress |
-| Canon facts | In progress |
-| Characters (Pip, Goat) | In progress |
-| Character versions | In progress |
-| Character DNA (5 layers) | In progress |
-| Asset registry | In progress |
-| Studio dashboard | In progress |
-| Character pages | In progress |
-| Tests | In progress |
+| Application shell | Complete |
+| PostgreSQL + Prisma | Complete |
+| Universes | Complete |
+| Canon facts | Complete |
+| Characters (Pip, Goat) | Complete |
+| Character versions | Complete |
+| Character DNA (5 layers) | Complete |
+| Asset registry | Complete |
+| Studio dashboard | Complete |
+| Character pages | Complete |
+| Tests | Complete |
 
 ## Explicitly out of scope for Milestone 1
 

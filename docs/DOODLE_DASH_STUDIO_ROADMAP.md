@@ -4,7 +4,7 @@
 
 | Milestone | Focus | Status |
 |-----------|-------|--------|
-| **1** | Core platform: Universe, Pip/Goat, Canon, Characters, DNA, Versions, Assets, Dashboard | **IN PROGRESS** |
+| **1** | Core platform: Universe, Pip/Goat, Canon, Characters, DNA, Versions, Assets, Dashboard | **COMPLETE** |
 | 2 | Character production: 3D models, rigs, facial, refs, poses, expressions, animations | NOT STARTED |
 | 3 | Character DNA depth + Character Lock polish | NOT STARTED |
 | 4 | Character development events | NOT STARTED |
@@ -26,18 +26,28 @@
 ## Milestone 1 exit criteria
 
 - [x] Docs: audit + roadmap
-- [ ] PostgreSQL + Prisma migrations applied
-- [ ] Doodle Dash Universe seeded
-- [ ] Pip (`CHAR_PIP_001`) and Goat (`CHAR_GOAT_001`) seeded as founding characters
-- [ ] 3D model status = MISSING (not PRODUCTION_READY)
-- [ ] Canon foundation with lock support
-- [ ] Asset registry foundation
-- [ ] Character DNA tables + seed defaults
-- [ ] Character versioning (v1 for each)
-- [ ] Studio dashboard + character pages
-- [ ] API routes for universe / characters / canon / assets
-- [ ] Tests passing
-- [ ] Typecheck / lint / build green
+- [x] PostgreSQL + Prisma migrations applied
+- [x] Doodle Dash Universe seeded
+- [x] Pip (`CHAR_PIP_001`) and Goat (`CHAR_GOAT_001`) seeded as founding characters
+- [x] 3D model status = MISSING (not PRODUCTION_READY)
+- [x] Canon foundation with lock support
+- [x] Asset registry foundation
+- [x] Character DNA tables + seed defaults
+- [x] Character versioning (v1 for each)
+- [x] Studio dashboard + character pages
+- [x] API routes for universe / characters / canon / assets
+- [x] Tests passing
+- [x] Typecheck / lint / build green
+
+## Next milestone
+
+**Milestone 2 — Character production system**
+
+- Expand 3D model registry workflows
+- Rig + facial rig registries
+- Reference image registry
+- Pose / expression / animation library definitions (assets remain MISSING until files exist)
+- Enforce STRICT_CHARACTER_LOCK in preflight stubs
 
 ## Primary production model (unchanged)
 
