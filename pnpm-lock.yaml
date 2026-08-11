@@ -129,7 +129,30 @@ importers:
         specifier: ^5.8.2
         version: 5.9.3
 
-  packages/production: {}
+  packages/production:
+    dependencies:
+      '@doodle-dash/characters':
+        specifier: workspace:*
+        version: link:../characters
+      '@doodle-dash/database':
+        specifier: workspace:*
+        version: link:../database
+      '@doodle-dash/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@doodle-dash/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@doodle-dash/universe':
+        specifier: workspace:*
+        version: link:../universe
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
 
   packages/providers: {}
 
@@ -141,7 +164,30 @@ importers:
         specifier: ^5.8.2
         version: 5.9.3
 
-  packages/story: {}
+  packages/story:
+    dependencies:
+      '@doodle-dash/characters':
+        specifier: workspace:*
+        version: link:../characters
+      '@doodle-dash/database':
+        specifier: workspace:*
+        version: link:../database
+      '@doodle-dash/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@doodle-dash/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@doodle-dash/universe':
+        specifier: workspace:*
+        version: link:../universe
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
 
   packages/universe:
     dependencies:
