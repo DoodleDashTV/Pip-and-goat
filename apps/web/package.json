@@ -11,10 +11,15 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@doodle-dash/audio": "workspace:*",
     "@doodle-dash/characters": "workspace:*",
     "@doodle-dash/database": "workspace:*",
     "@doodle-dash/domain": "workspace:*",
+    "@doodle-dash/production": "workspace:*",
+    "@doodle-dash/providers": "workspace:*",
+    "@doodle-dash/rendering": "workspace:*",
     "@doodle-dash/shared": "workspace:*",
+    "@doodle-dash/story": "workspace:*",
     "@doodle-dash/universe": "workspace:*",
     "next": "^15.2.4",
     "react": "^19.0.0",

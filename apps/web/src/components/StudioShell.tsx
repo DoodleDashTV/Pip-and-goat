@@ -8,19 +8,29 @@ const NAV = [
   { href: '/universe', label: 'Universe' },
   { href: '/characters', label: 'Characters' },
   { href: '/canon', label: 'Canon' },
-  { href: '/assets', label: 'Assets' },
+  { href: '/world', label: 'World' },
+  { href: '/locations', label: 'Locations' },
+  { href: '/props', label: 'Props' },
+  { href: '/seasons', label: 'Seasons' },
+  { href: '/episodes', label: 'Episodes' },
+  { href: '/storyboards', label: 'Storyboards' },
+  { href: '/production', label: 'Production' },
+  { href: '/render-queue', label: 'Render Queue' },
+  { href: '/audio', label: 'Audio' },
   { href: '/animations', label: 'Animations' },
   { href: '/poses', label: 'Poses' },
   { href: '/expressions', label: 'Expressions' },
   { href: '/rigs', label: 'Rigs' },
   { href: '/references', label: 'References' },
   { href: '/relationships', label: 'Relationships' },
+  { href: '/assets', label: 'Assets' },
+  { href: '/continuity', label: 'Continuity' },
+  { href: '/publishing', label: 'Publishing' },
+  { href: '/analytics', label: 'Analytics' },
+  { href: '/costs', label: 'Costs' },
+  { href: '/search', label: 'Search' },
+  { href: '/debug', label: 'Debug' },
   { href: '/settings', label: 'Settings' },
-  { href: '/seasons', label: 'Seasons', soon: true },
-  { href: '/episodes', label: 'Episodes', soon: true },
-  { href: '/world', label: 'World', soon: true },
-  { href: '/production', label: 'Production', soon: true },
-  { href: '/render-queue', label: 'Render Queue', soon: true },
 ];
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
@@ -41,7 +51,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
             <p className="mt-3 text-sm text-[var(--muted)]">
               Permanent universe. Reusable characters. Native 3D first.
             </p>
-            <nav className="mt-6 grid grid-cols-2 gap-2 lg:grid-cols-1">
+            <nav className="mt-6 grid max-h-[70vh] grid-cols-2 gap-2 overflow-y-auto lg:grid-cols-1">
               {NAV.map((item) => {
                 const active =
                   item.href === '/'
@@ -50,25 +60,15 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
                 return (
                   <Link
                     key={item.href}
-                    href={item.soon ? '#' : item.href}
-                    aria-disabled={item.soon}
+                    href={item.href}
                     className={[
                       'rounded-2xl px-3 py-2 text-sm font-semibold transition',
                       active
                         ? 'bg-leaf-500/20 text-leaf-300'
                         : 'text-mist-200/80 hover:bg-white/5 hover:text-mist-100',
-                      item.soon ? 'cursor-not-allowed opacity-45' : '',
                     ].join(' ')}
-                    onClick={(event) => {
-                      if (item.soon) event.preventDefault();
-                    }}
                   >
                     {item.label}
-                    {item.soon ? (
-                      <span className="ml-2 text-[10px] uppercase tracking-wider text-sun-400">
-                        soon
-                      </span>
-                    ) : null}
                   </Link>
                 );
               })}

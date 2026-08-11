@@ -118,6 +118,25 @@ model Universe {
   expressions      ExpressionDefinition[]
   referenceImages  CharacterReferenceImage[]
   relationships    CharacterRelationship[]
+  locations        Location[]
+  props            Prop[]
+  seasons          Season[]
+  episodes         Episode[]
+  storyThreads     StoryThread[]
+  foreshadowings   Foreshadowing[]
+  episodeMemories  EpisodeMemory[]
+  styleBibles      StyleBible[]
+  materials        MaterialPreset[]
+  lightingPresets  LightingPreset[]
+  cameraPresets    CameraPreset[]
+  vfxPresets       VfxPreset[]
+  assetRequests    AssetRequest[]
+  voiceProfiles    VoiceProfile[]
+  soundClips       SoundClip[]
+  musicTracks      MusicTrack[]
+  publishingReleases PublishingRelease[]
+  costLedgerEntries CostLedgerEntry[]
+  analyticsMetrics AnalyticsMetric[]
 
   @@map("universes")
 }
@@ -647,4 +666,763 @@ model Asset {
   @@index([type])
   @@index([entityType, entityId])
   @@map("assets")
+}
+
+// ============================================================
+// Milestone 6+ — World, Story, Production, Render, Audio, Publish
+// ============================================================
+
+enum StoryWorkflowStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  IN_PRODUCTION
+  LOCKED
+}
+
+enum ThreadStatus {
+  OPEN
+  PLANTED
+  PAYING_OFF
+  RESOLVED
+  DROPPED
+  PLANNED
+  ACTIVE
+  PAUSED
+  ABANDONED
+}
+
+enum ForeshadowStatus {
+  PLANNED
+  PLANTED
+  PAID_OFF
+  RETIRED
+}
+
+enum PropCondition {
+  NEW
+  GOOD
+  WORN
+  DAMAGED
+  LOST
+  RESTORED
+}
+
+enum RenderJobStatus {
+  QUEUED
+  PREPARING
+  RENDERING
+  ENCODING
+  QUALITY_CHECK
+  COMPLETE
+  FAILED
+  CANCELLED
+}
+
+model Location {
+  id                 String   @id @default(uuid()) @db.Uuid
+  universeId         String   @map("universe_id") @db.Uuid
+  internalCode       String   @map("internal_code")
+  name               String
+  description        String?
+  environmentType    String?  @map("environment_type")
+  lightingRules      String?  @map("lighting_rules")
+  palette            String?
+  landmarks          String?
+  weatherRules       String?  @map("weather_rules")
+  timeOfDayRules     String?  @map("time_of_day_rules")
+  history            String?
+  masterBlendAssetId String?  @map("master_blend_asset_id") @db.Uuid
+  mapX               Float?   @map("map_x")
+  mapY               Float?   @map("map_y")
+  approved           Boolean  @default(false)
+  status             RegistryApprovalStatus @default(MISSING)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  universe    Universe             @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  versions    LocationVersion[]
+  variants    LocationVariant[]
+  connectionsFrom LocationConnection[] @relation("LocationFrom")
+  connectionsTo   LocationConnection[] @relation("LocationTo")
+  props       Prop[]
+  scenes      Scene[]
+
+  @@unique([universeId, internalCode])
+  @@map("locations")
+}
+
+model LocationVersion {
+  id           String   @id @default(uuid()) @db.Uuid
+  locationId   String   @map("location_id") @db.Uuid
+  versionNumber Int     @map("version_number")
+  versionName  String   @map("version_name")
+  changeSummary String? @map("change_summary")
+  approved     Boolean  @default(false)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId, versionNumber])
+  @@map("location_versions")
+}
+
+model LocationVariant {
+  id          String   @id @default(uuid()) @db.Uuid
+  locationId  String   @map("location_id") @db.Uuid
+  code        String
+  name        String
+  condition   String
+  notes       String?
+  assetId     String?  @map("asset_id") @db.Uuid
+  approved    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId, code])
+  @@map("location_variants")
+}
+
+model LocationConnection {
+  id               String   @id @default(uuid()) @db.Uuid
+  fromLocationId   String   @map("from_location_id") @db.Uuid
+  toLocationId     String   @map("to_location_id") @db.Uuid
+  travelDescription String? @map("travel_description")
+  bidirectional    Boolean  @default(true)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  fromLocation Location @relation("LocationFrom", fields: [fromLocationId], references: [id], onDelete: Cascade)
+  toLocation   Location @relation("LocationTo", fields: [toLocationId], references: [id], onDelete: Cascade)
+
+  @@unique([fromLocationId, toLocationId])
+  @@map("location_connections")
+}
+
+model Prop {
+  id                String        @id @default(uuid()) @db.Uuid
+  universeId        String        @map("universe_id") @db.Uuid
+  internalCode      String        @map("internal_code")
+  name              String
+  description       String?
+  ownerCharacterId  String?       @map("owner_character_id") @db.Uuid
+  locationId        String?       @map("location_id") @db.Uuid
+  condition         PropCondition @default(GOOD)
+  storySignificance String?       @map("story_significance")
+  currentState      String?       @map("current_state")
+  approved          Boolean       @default(false)
+  status            RegistryApprovalStatus @default(MISSING)
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  universe Universe      @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  location Location?     @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  versions PropVersion[]
+  history  PropHistory[]
+
+  @@unique([universeId, internalCode])
+  @@map("props")
+}
+
+model PropVersion {
+  id            String   @id @default(uuid()) @db.Uuid
+  propId        String   @map("prop_id") @db.Uuid
+  versionNumber Int      @map("version_number")
+  versionName   String   @map("version_name")
+  changeSummary String?  @map("change_summary")
+  approved      Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  prop Prop @relation(fields: [propId], references: [id], onDelete: Cascade)
+
+  @@unique([propId, versionNumber])
+  @@map("prop_versions")
+}
+
+model PropHistory {
+  id            String   @id @default(uuid()) @db.Uuid
+  propId        String   @map("prop_id") @db.Uuid
+  storyEventRef String   @map("story_event_ref")
+  summary       String
+  condition     PropCondition?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  prop Prop @relation(fields: [propId], references: [id], onDelete: Cascade)
+
+  @@map("prop_history")
+}
+
+model StyleBible {
+  id          String   @id @default(uuid()) @db.Uuid
+  universeId  String   @map("universe_id") @db.Uuid
+  name        String
+  version     Int      @default(1)
+  locked      Boolean  @default(false)
+  config      Json
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, name, version])
+  @@map("style_bibles")
+}
+
+model MaterialPreset {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  notes      String?
+  assetId    String?  @map("asset_id") @db.Uuid
+  status     RegistryApprovalStatus @default(MISSING)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("material_presets")
+}
+
+model LightingPreset {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  config     Json?
+  notes      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("lighting_presets")
+}
+
+model CameraPreset {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  config     Json?
+  notes      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("camera_presets")
+}
+
+model VfxPreset {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  notes      String?
+  assetId    String?  @map("asset_id") @db.Uuid
+  status     RegistryApprovalStatus @default(MISSING)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("vfx_presets")
+}
+
+model Season {
+  id                    String              @id @default(uuid()) @db.Uuid
+  universeId            String              @map("universe_id") @db.Uuid
+  seasonNumber          Int                 @map("season_number")
+  title                 String
+  logline               String
+  theme                 String?
+  targetEpisodeCount    Int                 @default(10) @map("target_episode_count")
+  status                StoryWorkflowStatus @default(DRAFT)
+  approvalStatus        String              @default("PENDING_APPROVAL") @map("approval_status")
+  approvedForProduction Boolean             @default(false) @map("approved_for_production")
+  proposal              Json?
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+
+  universe     Universe      @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  episodes     Episode[]
+  storyThreads StoryThread[]
+  arcs         SeasonArc[]
+
+  @@unique([universeId, seasonNumber])
+  @@map("seasons")
+}
+
+model SeasonArc {
+  id          String   @id @default(uuid()) @db.Uuid
+  seasonId    String   @map("season_id") @db.Uuid
+  title       String
+  summary     String
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  season Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@map("season_arcs")
+}
+
+model Episode {
+  id            String              @id @default(uuid()) @db.Uuid
+  universeId    String              @map("universe_id") @db.Uuid
+  seasonId      String?             @map("season_id") @db.Uuid
+  episodeNumber Int                 @map("episode_number")
+  title         String
+  logline       String
+  synopsis      String?
+  durationSec   Int?                @map("duration_sec")
+  hook          String?
+  objective     String?
+  problem       String?
+  conflict      String?
+  adventure     String?
+  characterMoment String?           @map("character_moment")
+  emotionalBeat String?             @map("emotional_beat")
+  resolution    String?
+  lesson        String?
+  callback      String?
+  seasonAdvancement String?         @map("season_advancement")
+  nextEpisodeSeed String?           @map("next_episode_seed")
+  status        StoryWorkflowStatus @default(DRAFT)
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+
+  universe      Universe       @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  season        Season?        @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  storyboard    Storyboard[]
+  scenes        Scene[]
+  memories      EpisodeMemory[]
+  storyThreads  StoryThread[]
+  renderJobs    RenderJob[]
+  assetRequests AssetRequest[]
+  publishingReleases PublishingRelease[]
+  dialogues     DialogueLine[]
+  timeline      EditorTimeline?
+
+  @@unique([universeId, seasonId, episodeNumber])
+  @@map("episodes")
+}
+
+model StoryThread {
+  id         String       @id @default(uuid()) @db.Uuid
+  universeId String       @map("universe_id") @db.Uuid
+  seasonId   String?      @map("season_id") @db.Uuid
+  episodeId  String?      @map("episode_id") @db.Uuid
+  title      String
+  summary    String
+  priority   Int          @default(50)
+  status     ThreadStatus @default(OPEN)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  universe       Universe        @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  season         Season?         @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  episode        Episode?        @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+  foreshadowings Foreshadowing[]
+  events         StoryThreadEvent[]
+
+  @@map("story_threads")
+}
+
+model StoryThreadEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  threadId      String   @map("thread_id") @db.Uuid
+  summary       String
+  storyEventRef String   @map("story_event_ref")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  thread StoryThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("story_thread_events")
+}
+
+model Foreshadowing {
+  id               String           @id @default(uuid()) @db.Uuid
+  universeId       String           @map("universe_id") @db.Uuid
+  threadId         String?          @map("thread_id") @db.Uuid
+  plantedEpisodeId String?          @map("planted_episode_id") @db.Uuid
+  payoffEpisodeId  String?          @map("payoff_episode_id") @db.Uuid
+  clue             String
+  intendedPayoff   String           @map("intended_payoff")
+  subtlety         Int              @default(60)
+  foreshadowType   String?          @map("foreshadow_type")
+  status           ForeshadowStatus @default(PLANNED)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  universe Universe     @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  thread   StoryThread? @relation(fields: [threadId], references: [id], onDelete: SetNull)
+
+  @@map("foreshadowings")
+}
+
+model EpisodeMemory {
+  id                   String   @id @default(uuid()) @db.Uuid
+  universeId           String   @map("universe_id") @db.Uuid
+  episodeId            String?  @map("episode_id") @db.Uuid
+  subjectType          String   @map("subject_type")
+  subjectId            String?  @map("subject_id") @db.Uuid
+  statement            String
+  importance           Int      @default(50)
+  source               String?
+  lockedCanonMutation  Boolean  @default(false) @map("locked_canon_mutation")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  episode  Episode? @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+
+  @@map("episode_memories")
+}
+
+model Storyboard {
+  id         String              @id @default(uuid()) @db.Uuid
+  episodeId  String              @map("episode_id") @db.Uuid
+  title      String
+  version    Int                 @default(1)
+  status     StoryWorkflowStatus @default(DRAFT)
+  notes      String?
+  createdAt  DateTime            @default(now()) @map("created_at")
+  updatedAt  DateTime            @updatedAt @map("updated_at")
+
+  episode Episode           @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  panels  StoryboardPanel[]
+  scenes  Scene[]
+
+  @@map("storyboards")
+}
+
+model StoryboardPanel {
+  id           String   @id @default(uuid()) @db.Uuid
+  storyboardId String   @map("storyboard_id") @db.Uuid
+  panelNumber  Int      @map("panel_number")
+  sceneHint    String?  @map("scene_hint")
+  shotHint     String?  @map("shot_hint")
+  characters   Json?
+  locationCode String?  @map("location_code")
+  pose         String?
+  camera       String?
+  dialogue     String?
+  action       String?
+  durationSec  Float?   @map("duration_sec")
+  status       String   @default("DRAFT")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  storyboard Storyboard @relation(fields: [storyboardId], references: [id], onDelete: Cascade)
+
+  @@unique([storyboardId, panelNumber])
+  @@map("storyboard_panels")
+}
+
+model Scene {
+  id             String   @id @default(uuid()) @db.Uuid
+  episodeId      String   @map("episode_id") @db.Uuid
+  storyboardId   String?  @map("storyboard_id") @db.Uuid
+  sceneNumber    Int      @map("scene_number")
+  title          String
+  description    String
+  locationId     String?  @map("location_id") @db.Uuid
+  characterIds   Json     @default("[]") @map("character_ids")
+  emotionalBeat  String?  @map("emotional_beat")
+  durationSec    Float?   @map("duration_sec")
+  lightingPreset String?  @map("lighting_preset")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  episode    Episode     @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  storyboard Storyboard? @relation(fields: [storyboardId], references: [id], onDelete: SetNull)
+  location   Location?   @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  shots      Shot[]
+
+  @@unique([episodeId, sceneNumber])
+  @@map("scenes")
+}
+
+model Shot {
+  id               String   @id @default(uuid()) @db.Uuid
+  sceneId          String   @map("scene_id") @db.Uuid
+  shotNumber       Int      @map("shot_number")
+  description      String
+  cameraPreset     String?  @map("camera_preset")
+  lightingPreset   String?  @map("lighting_preset")
+  durationSeconds  Float    @default(4) @map("duration_seconds")
+  characterIds     Json     @default("[]") @map("character_ids")
+  productionNotes  String?  @map("production_notes")
+  renderMode       String?  @map("render_mode")
+  status           String   @default("DRAFT")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  scene      Scene       @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  renderJobs RenderJob[]
+
+  @@unique([sceneId, shotNumber])
+  @@map("shots")
+}
+
+model RenderWorker {
+  id              String   @id @default(uuid()) @db.Uuid
+  name            String
+  status          String   @default("IDLE")
+  capabilities    Json?
+  lastHeartbeatAt DateTime? @map("last_heartbeat_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  jobs RenderJob[]
+
+  @@map("render_workers")
+}
+
+model RenderJob {
+  id                   String          @id @default(uuid()) @db.Uuid
+  episodeId            String?         @map("episode_id") @db.Uuid
+  shotId               String?         @map("shot_id") @db.Uuid
+  workerId             String?         @map("worker_id") @db.Uuid
+  renderMode           String?         @map("render_mode")
+  status               RenderJobStatus @default(QUEUED)
+  cinematicImportance  Int?            @map("cinematic_importance")
+  estimatedCostUnits   Float?          @map("estimated_cost_units")
+  estimatedMinutes     Float?          @map("estimated_minutes")
+  rationale            String?
+  priority             Int             @default(50)
+  resolution           String?
+  fps                  Int?
+  engine               String?
+  payload              Json?
+  progress             Float           @default(0)
+  error                String?
+  startedAt            DateTime?       @map("started_at")
+  completedAt          DateTime?       @map("completed_at")
+  createdAt            DateTime        @default(now()) @map("created_at")
+  updatedAt            DateTime        @updatedAt @map("updated_at")
+
+  episode  Episode?        @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+  shot     Shot?           @relation(fields: [shotId], references: [id], onDelete: SetNull)
+  worker   RenderWorker?   @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  attempts RenderAttempt[]
+  outputs  RenderOutput[]
+  assets   RenderAsset[]
+
+  @@index([status, priority])
+  @@map("render_jobs")
+}
+
+model RenderAttempt {
+  id          String   @id @default(uuid()) @db.Uuid
+  renderJobId String   @map("render_job_id") @db.Uuid
+  workerId    String   @map("worker_id")
+  status      String
+  startedAt   DateTime @default(now()) @map("started_at")
+  finishedAt  DateTime? @map("finished_at")
+  error       String?
+  metadata    Json?
+
+  renderJob RenderJob @relation(fields: [renderJobId], references: [id], onDelete: Cascade)
+
+  @@map("render_attempts")
+}
+
+model RenderOutput {
+  id          String   @id @default(uuid()) @db.Uuid
+  renderJobId String   @map("render_job_id") @db.Uuid
+  kind        String   @default("preview")
+  uri         String
+  resolution  String?
+  checksum    String?
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  renderJob RenderJob @relation(fields: [renderJobId], references: [id], onDelete: Cascade)
+
+  @@map("render_outputs")
+}
+
+model RenderAsset {
+  id          String   @id @default(uuid()) @db.Uuid
+  renderJobId String?  @map("render_job_id") @db.Uuid
+  role        String
+  uri         String
+  checksum    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  renderJob RenderJob? @relation(fields: [renderJobId], references: [id], onDelete: SetNull)
+
+  @@map("render_assets")
+}
+
+model AssetRequest {
+  id          String   @id @default(uuid()) @db.Uuid
+  universeId  String?  @map("universe_id") @db.Uuid
+  episodeId   String?  @map("episode_id") @db.Uuid
+  shotId      String?  @map("shot_id") @db.Uuid
+  entityType  String   @map("entity_type")
+  entityId    String?  @map("entity_id") @db.Uuid
+  assetType   String   @map("asset_type")
+  title       String
+  description String?
+  priority    Int      @default(50)
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  universe Universe? @relation(fields: [universeId], references: [id], onDelete: SetNull)
+  episode  Episode?  @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+
+  @@map("asset_requests")
+}
+
+model VoiceProfile {
+  id              String   @id @default(uuid()) @db.Uuid
+  universeId      String   @map("universe_id") @db.Uuid
+  characterId     String?  @map("character_id") @db.Uuid
+  name            String
+  providerType    String?  @map("provider_type")
+  providerVoiceId String?  @map("provider_voice_id")
+  approved        Boolean  @default(false)
+  pendingReview   Boolean  @default(true) @map("pending_review")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@map("voice_profiles")
+}
+
+model DialogueLine {
+  id          String   @id @default(uuid()) @db.Uuid
+  episodeId   String   @map("episode_id") @db.Uuid
+  speakerId   String?  @map("speaker_id") @db.Uuid
+  text        String
+  startMs     Int?     @map("start_ms")
+  endMs       Int?     @map("end_ms")
+  emotion     String?
+  intensity   Int?
+  speed       Float?
+  emphasis    String?
+  pauseMs     Int?     @map("pause_ms")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  episode Episode       @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  lipSync LipSyncTrack?
+
+  @@map("dialogue_lines")
+}
+
+model LipSyncTrack {
+  id             String   @id @default(uuid()) @db.Uuid
+  dialogueLineId String   @unique @map("dialogue_line_id") @db.Uuid
+  visemeTimeline Json     @map("viseme_timeline")
+  audioHash      String?  @map("audio_hash")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  dialogue DialogueLine @relation(fields: [dialogueLineId], references: [id], onDelete: Cascade)
+
+  @@map("lip_sync_tracks")
+}
+
+model SoundClip {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  tags       String[]
+  assetId    String?  @map("asset_id") @db.Uuid
+  status     RegistryApprovalStatus @default(MISSING)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("sound_clips")
+}
+
+model MusicTrack {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  code       String
+  name       String
+  category   String
+  assetId    String?  @map("asset_id") @db.Uuid
+  status     RegistryApprovalStatus @default(MISSING)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@unique([universeId, code])
+  @@map("music_tracks")
+}
+
+model EditorTimeline {
+  id        String   @id @default(uuid()) @db.Uuid
+  episodeId String   @unique @map("episode_id") @db.Uuid
+  tracks    Json     @default("[]")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@map("editor_timelines")
+}
+
+model PublishingRelease {
+  id          String   @id @default(uuid()) @db.Uuid
+  universeId  String?  @map("universe_id") @db.Uuid
+  episodeId   String?  @map("episode_id") @db.Uuid
+  title       String
+  status      String   @default("DRAFT")
+  packageMeta Json?    @map("package_meta")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  universe Universe? @relation(fields: [universeId], references: [id], onDelete: SetNull)
+  episode  Episode?  @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+
+  @@map("publishing_releases")
+}
+
+model CostLedgerEntry {
+  id          String   @id @default(uuid()) @db.Uuid
+  universeId  String   @map("universe_id") @db.Uuid
+  episodeId   String?  @map("episode_id") @db.Uuid
+  category    String
+  amountUnits Float    @map("amount_units")
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@map("cost_ledger_entries")
+}
+
+model AnalyticsMetric {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  episodeId  String?  @map("episode_id") @db.Uuid
+  metricKey  String   @map("metric_key")
+  metricValue Float   @map("metric_value")
+  dimensions Json?
+  recordedAt DateTime @default(now()) @map("recorded_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@map("analytics_metrics")
+}
+
+model CharacterTimelineEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  characterId   String   @map("character_id") @db.Uuid
+  storyEventRef String   @map("story_event_ref")
+  title         String
+  summary       String?
+  episodeId     String?  @map("episode_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([characterId])
+  @@map("character_timeline_events")
 }

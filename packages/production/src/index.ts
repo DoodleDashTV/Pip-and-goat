@@ -798,7 +798,7 @@ export class BackupExportService {
         orderBy: { episodeNumber: 'asc' },
       }) ?? [],
       optionalDelegate('renderJob')?.findMany({
-        where: { universeId },
+        where: { episode: { universeId } },
         orderBy: { createdAt: 'desc' },
       }) ?? [],
     ]);

@@ -782,6 +782,323 @@ async function seed() {
     });
   }
 
+  // Milestone 6+: world, style, libraries, sample season scaffold
+  const meadow = await prisma.location.upsert({
+    where: {
+      universeId_internalCode: { universeId: universe.id, internalCode: 'LOC_MEADOW_001' },
+    },
+    update: {},
+    create: {
+      universeId: universe.id,
+      internalCode: 'LOC_MEADOW_001',
+      name: 'Sunny Meadow',
+      description: 'Open grassy meadow used for early adventures.',
+      environmentType: 'outdoor',
+      lightingRules: 'Soft daylight; avoid harsh noon contrast.',
+      palette: 'greens, soft yellows',
+      landmarks: 'Lone oak, creek bend',
+      weatherRules: 'Clear or light breeze preferred',
+      timeOfDayRules: 'Morning and golden hour defaults',
+      mapX: 20,
+      mapY: 40,
+      approved: false,
+      status: 'MISSING',
+    },
+  });
+
+  const creek = await prisma.location.upsert({
+    where: {
+      universeId_internalCode: { universeId: universe.id, internalCode: 'LOC_CREEK_001' },
+    },
+    update: {},
+    create: {
+      universeId: universe.id,
+      internalCode: 'LOC_CREEK_001',
+      name: 'Whisper Creek',
+      description: 'Shallow creek with stepping stones.',
+      environmentType: 'outdoor_water',
+      mapX: 55,
+      mapY: 62,
+      approved: false,
+      status: 'MISSING',
+    },
+  });
+
+  await prisma.locationConnection.upsert({
+    where: {
+      fromLocationId_toLocationId: {
+        fromLocationId: meadow.id,
+        toLocationId: creek.id,
+      },
+    },
+    update: {},
+    create: {
+      fromLocationId: meadow.id,
+      toLocationId: creek.id,
+      travelDescription: 'Short path through tall grass.',
+      bidirectional: true,
+    },
+  });
+
+  for (const condition of ['morning', 'day', 'sunset', 'night', 'rain', 'fog']) {
+    await prisma.locationVariant.upsert({
+      where: {
+        locationId_code: { locationId: meadow.id, code: condition },
+      },
+      update: {},
+      create: {
+        locationId: meadow.id,
+        code: condition,
+        name: `${meadow.name} ${condition}`,
+        condition,
+        notes: 'Lighting/world variant — do not rebuild geometry.',
+        approved: false,
+      },
+    });
+  }
+
+  const mapProp = await prisma.prop.upsert({
+    where: {
+      universeId_internalCode: { universeId: universe.id, internalCode: 'PROP_MAP_001' },
+    },
+    update: {},
+    create: {
+      universeId: universe.id,
+      internalCode: 'PROP_MAP_001',
+      name: 'Adventure Map',
+      description: 'Foldable map prop. Asset pending.',
+      ownerCharacterId: pip.id,
+      locationId: meadow.id,
+      condition: 'GOOD',
+      storySignificance: 'Helps plan journeys',
+      currentState: 'carried',
+      approved: false,
+      status: 'MISSING',
+    },
+  });
+
+  await prisma.styleBible.upsert({
+    where: {
+      universeId_name_version: {
+        universeId: universe.id,
+        name: 'Doodle Dash Visual Style Bible',
+        version: 1,
+      },
+    },
+    update: {},
+    create: {
+      universeId: universe.id,
+      name: 'Doodle Dash Visual Style Bible',
+      version: 1,
+      locked: false,
+      config: {
+        animationStyle: 'soft cartoon 3D',
+        characterProportions: 'appealing kids proportions',
+        materials: 'slightly soft subsurface',
+        lighting: 'warm friendly key',
+        shadowStyle: 'soft',
+        saturation: 'moderate-high',
+        facialExaggeration: 'readable but not extreme',
+        cameraStyle: 'stable storytelling',
+        depthOfField: 'subtle',
+        motionExaggeration: 'playful',
+        environmentComplexity: 'readable mid',
+        physicsStyle: 'cartoon-lite',
+      },
+      notes: 'LOCK_STYLE_BIBLE available via studio settings when approved.',
+    },
+  });
+
+  await prisma.studioSetting.upsert({
+    where: { key: 'LOCK_STYLE_BIBLE' },
+    update: {},
+    create: { key: 'LOCK_STYLE_BIBLE', value: false },
+  });
+
+  for (const [code, name] of [
+    ['morning', 'Morning'],
+    ['sunny_day', 'Sunny Day'],
+    ['golden_hour', 'Golden Hour'],
+    ['moonlight', 'Moonlight'],
+    ['interior_warm', 'Interior Warm'],
+    ['mystery', 'Mystery'],
+    ['cave', 'Cave'],
+    ['magical_glow', 'Magical Glow'],
+    ['storm', 'Storm'],
+  ] as const) {
+    await prisma.lightingPreset.upsert({
+      where: { universeId_code: { universeId: universe.id, code } },
+      update: {},
+      create: { universeId: universe.id, code, name, config: { preset: code } },
+    });
+  }
+
+  for (const code of [
+    'establishing',
+    'wide',
+    'medium',
+    'close_up',
+    'extreme_close_up',
+    'over_shoulder',
+    'POV',
+    'low_angle',
+    'high_angle',
+    'tracking',
+    'dolly',
+    'push_in',
+    'pull_out',
+    'pan',
+    'tilt',
+    'crane',
+    'orbit',
+    'reaction',
+  ]) {
+    await prisma.cameraPreset.upsert({
+      where: { universeId_code: { universeId: universe.id, code } },
+      update: {},
+      create: {
+        universeId: universe.id,
+        code,
+        name: code
+          .split('_')
+          .map((part) => part[0]!.toUpperCase() + part.slice(1))
+          .join(' '),
+        config: { code },
+      },
+    });
+  }
+
+  for (const code of [
+    'dust',
+    'sparkles',
+    'leaves',
+    'rain',
+    'snow',
+    'water_splash',
+    'glow',
+    'fireflies',
+    'fog',
+    'clouds',
+  ]) {
+    await prisma.vfxPreset.upsert({
+      where: { universeId_code: { universeId: universe.id, code } },
+      update: {},
+      create: {
+        universeId: universe.id,
+        code,
+        name: code
+          .split('_')
+          .map((part) => part[0]!.toUpperCase() + part.slice(1))
+          .join(' '),
+        status: 'MISSING',
+        notes: 'VFX definition only — binary asset not uploaded.',
+      },
+    });
+  }
+
+  for (const code of [
+    'footsteps',
+    'forest',
+    'creek',
+    'birds',
+    'doors',
+    'rocks',
+    'wind',
+    'magic',
+    'impacts',
+    'cartoon_reactions',
+  ]) {
+    await prisma.soundClip.upsert({
+      where: { universeId_code: { universeId: universe.id, code } },
+      update: {},
+      create: {
+        universeId: universe.id,
+        code,
+        name: code
+          .split('_')
+          .map((part) => part[0]!.toUpperCase() + part.slice(1))
+          .join(' '),
+        tags: [code],
+        status: 'MISSING',
+      },
+    });
+  }
+
+  for (const category of [
+    'adventure',
+    'mystery',
+    'happy',
+    'sad',
+    'excited',
+    'danger',
+    'discovery',
+    'ending',
+  ]) {
+    await prisma.musicTrack.upsert({
+      where: { universeId_code: { universeId: universe.id, code: `music_${category}` } },
+      update: {},
+      create: {
+        universeId: universe.id,
+        code: `music_${category}`,
+        name: `${category[0]!.toUpperCase()}${category.slice(1)} Theme`,
+        category,
+        status: 'MISSING',
+      },
+    });
+  }
+
+  await prisma.voiceProfile.upsert({
+    where: { id: '66666666-6666-4666-8666-666666666666' },
+    update: {},
+    create: {
+      id: '66666666-6666-4666-8666-666666666666',
+      universeId: universe.id,
+      characterId: pip.id,
+      name: 'Pip Voice Slot',
+      providerType: null,
+      providerVoiceId: null,
+      approved: false,
+      pendingReview: true,
+    },
+  });
+  await prisma.voiceProfile.upsert({
+    where: { id: '77777777-7777-4777-8777-777777777777' },
+    update: {},
+    create: {
+      id: '77777777-7777-4777-8777-777777777777',
+      universeId: universe.id,
+      characterId: goat.id,
+      name: 'Goat Voice Slot',
+      providerType: null,
+      providerVoiceId: null,
+      approved: false,
+      pendingReview: true,
+    },
+  });
+
+  const season = await prisma.season.upsert({
+    where: {
+      universeId_seasonNumber: { universeId: universe.id, seasonNumber: 1 },
+    },
+    update: {},
+    create: {
+      universeId: universe.id,
+      seasonNumber: 1,
+      title: 'Season 1: First Adventures',
+      logline: 'Pip and Goat explore their world and learn to be brave together.',
+      theme: 'friendship and curiosity',
+      targetEpisodeCount: 8,
+      status: 'DRAFT',
+      approvalStatus: 'PENDING_APPROVAL',
+      approvedForProduction: false,
+      proposal: {
+        type: 'SEASON_PROPOSAL',
+        requiresApprovalBeforeProduction: true,
+        notes: 'Scaffold only — approve before production.',
+      },
+    },
+  });
+
   console.log('Seed complete:', {
     universe: universe.name,
     pip: pip.internalCode,
@@ -790,6 +1107,9 @@ async function seed() {
     poses: poses.length,
     expressions: expressions.length,
     relationships: [pipToGoat.label, goatToPip.label],
+    locations: [meadow.internalCode, creek.internalCode],
+    prop: mapProp.internalCode,
+    season: season.title,
   });
 }
 

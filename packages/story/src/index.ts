@@ -589,7 +589,7 @@ export class ContextRetrievalService {
             universeId: params.universeId,
             ...(params.locationIds?.length ? { id: { in: params.locationIds } } : {}),
           },
-          orderBy: [{ importance: 'desc' }, { name: 'asc' }],
+          orderBy: [{ name: 'asc' }],
           take: params.locationIds?.length ? undefined : perBucket,
         }) ?? [],
         prisma.canonFact.findMany({

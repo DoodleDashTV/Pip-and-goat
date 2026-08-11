@@ -17,6 +17,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@doodle-dash/audio':
+        specifier: workspace:*
+        version: link:../../packages/audio
       '@doodle-dash/characters':
         specifier: workspace:*
         version: link:../../packages/characters
@@ -26,9 +29,21 @@ importers:
       '@doodle-dash/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@doodle-dash/production':
+        specifier: workspace:*
+        version: link:../../packages/production
+      '@doodle-dash/providers':
+        specifier: workspace:*
+        version: link:../../packages/providers
+      '@doodle-dash/rendering':
+        specifier: workspace:*
+        version: link:../../packages/rendering
       '@doodle-dash/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@doodle-dash/story':
+        specifier: workspace:*
+        version: link:../../packages/story
       '@doodle-dash/universe':
         specifier: workspace:*
         version: link:../../packages/universe
