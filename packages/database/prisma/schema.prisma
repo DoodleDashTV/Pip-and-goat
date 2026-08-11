@@ -1,0 +1,345 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UniverseStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum CanonLevel {
+  IMMUTABLE
+  CURRENT
+  HISTORICAL
+}
+
+enum CanonSubjectType {
+  UNIVERSE
+  CHARACTER
+  LOCATION
+  PROP
+  EPISODE
+  SEASON
+  GENERAL
+}
+
+enum CharacterStatus {
+  PROPOSED
+  DESIGN
+  ACTIVE
+  RETIRED
+  ARCHIVED
+}
+
+enum CharacterModelStatus {
+  MISSING
+  MODELING
+  TEXTURING
+  RIGGING
+  FACIAL_RIGGING
+  REVIEW
+  APPROVED
+  PRODUCTION_READY
+}
+
+enum AssetType {
+  CHARACTER_MODEL
+  RIG
+  FACIAL_RIG
+  ANIMATION
+  POSE
+  EXPRESSION
+  LOCATION
+  PROP
+  MATERIAL
+  TEXTURE
+  LIGHTING_RIG
+  CAMERA
+  VFX
+  AUDIO
+  MUSIC
+  SFX
+  STORYBOARD
+  VIDEO
+  FINAL_EPISODE
+  THUMBNAIL
+  REFERENCE_IMAGE
+  OTHER
+}
+
+model Universe {
+  id                   String         @id @default(uuid()) @db.Uuid
+  name                 String
+  brandName            String         @map("brand_name")
+  description          String?
+  targetAudience       String?        @map("target_audience")
+  worldDescription     String?        @map("world_description")
+  visualStyleId        String?        @map("visual_style_id") @db.Uuid
+  defaultOutputFormat  String         @default("1080x1920") @map("default_output_format")
+  status               UniverseStatus @default(ACTIVE)
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+
+  characters Character[]
+  canonFacts CanonFact[]
+  assets     Asset[]
+
+  @@map("universes")
+}
+
+model CanonFact {
+  id                   String           @id @default(uuid()) @db.Uuid
+  universeId           String           @map("universe_id") @db.Uuid
+  subjectType          CanonSubjectType @map("subject_type")
+  subjectId            String?          @map("subject_id") @db.Uuid
+  category             String
+  statement            String
+  canonLevel           CanonLevel       @default(CURRENT) @map("canon_level")
+  importance           Int              @default(50)
+  locked               Boolean          @default(false)
+  introducedEpisodeId  String?          @map("introduced_episode_id") @db.Uuid
+  effectiveEpisodeId   String?          @map("effective_episode_id") @db.Uuid
+  retiredEpisodeId     String?          @map("retired_episode_id") @db.Uuid
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
+
+  universe Universe @relation(fields: [universeId], references: [id], onDelete: Cascade)
+
+  @@index([universeId])
+  @@index([subjectType, subjectId])
+  @@map("canon_facts")
+}
+
+model Character {
+  id               String          @id @default(uuid()) @db.Uuid
+  universeId       String          @map("universe_id") @db.Uuid
+  internalCode     String          @unique @map("internal_code")
+  name             String
+  nickname         String?
+  species          String?
+  role             String?
+  ageRange         String?         @map("age_range")
+  biography        String?
+  personality      String?
+  strengths        String?
+  weaknesses       String?
+  fears            String?
+  motivations      String?
+  goals            String?
+  habits           String?
+  likes            String?
+  dislikes         String?
+  catchphrases     String?
+  speechStyle      String?         @map("speech_style")
+  comedyStyle      String?         @map("comedy_style")
+  movementStyle    String?         @map("movement_style")
+  foundingCharacter Boolean        @default(false) @map("founding_character")
+  status           CharacterStatus @default(ACTIVE)
+  firstEpisodeId   String?         @map("first_episode_id") @db.Uuid
+  currentVersionId String?         @map("current_version_id") @db.Uuid
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  universe   Universe            @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  versions   CharacterVersion[]
+  models     Character3dModel[]
+  visualDna  CharacterVisualDna?
+  personalityDna CharacterPersonalityDna?
+  motionDna  CharacterMotionDna?
+  voiceDna   CharacterVoiceDna?
+  storyDna   CharacterStoryDna?
+
+  @@index([universeId])
+  @@map("characters")
+}
+
+model CharacterVersion {
+  id                   String   @id @default(uuid()) @db.Uuid
+  characterId          String   @map("character_id") @db.Uuid
+  versionNumber        Int      @map("version_number")
+  versionName          String   @map("version_name")
+  changeSummary        String?  @map("change_summary")
+  activeFromEpisodeId  String?  @map("active_from_episode_id") @db.Uuid
+  activeUntilEpisodeId String?  @map("active_until_episode_id") @db.Uuid
+  approved             Boolean  @default(false)
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  character Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  models    Character3dModel[]
+
+  @@unique([characterId, versionNumber])
+  @@map("character_versions")
+}
+
+model CharacterVisualDna {
+  id                 String   @id @default(uuid()) @db.Uuid
+  characterId        String   @unique @map("character_id") @db.Uuid
+  bodyProportions    String?  @map("body_proportions")
+  headRatio          String?  @map("head_ratio")
+  faceShape          String?  @map("face_shape")
+  eyeDesign          String?  @map("eye_design")
+  bodyColoration     String?  @map("body_coloration")
+  furFeatherDetails  String?  @map("fur_feather_details")
+  clothing           String?
+  accessories        String?
+  silhouette         String?
+  palette            String?
+  materials          String?
+  textures           String?
+  visualRestrictions String?  @map("visual_restrictions")
+  pendingReview      Boolean  @default(true) @map("pending_review")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_visual_dna")
+}
+
+model CharacterPersonalityDna {
+  id             String   @id @default(uuid()) @db.Uuid
+  characterId    String   @unique @map("character_id") @db.Uuid
+  friendliness   Int      @default(50)
+  confidence     Int      @default(50)
+  bravery        Int      @default(50)
+  curiosity      Int      @default(50)
+  patience       Int      @default(50)
+  energy         Int      @default(50)
+  empathy        Int      @default(50)
+  leadership     Int      @default(50)
+  independence   Int      @default(50)
+  impulsiveness  Int      @default(50)
+  humor          Int      @default(50)
+  temperament    String?
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_personality_dna")
+}
+
+model CharacterMotionDna {
+  id             String   @id @default(uuid()) @db.Uuid
+  characterId    String   @unique @map("character_id") @db.Uuid
+  walk           String?
+  run            String?
+  jump           String?
+  idle           String?
+  turn           String?
+  gestureStyle   String?  @map("gesture_style")
+  reactionStyle  String?  @map("reaction_style")
+  happyMotion    String?  @map("happy_motion")
+  sadMotion      String?  @map("sad_motion")
+  fearMotion     String?  @map("fear_motion")
+  excitedMotion  String?  @map("excited_motion")
+  angryMotion    String?  @map("angry_motion")
+  pendingReview  Boolean  @default(true) @map("pending_review")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_motion_dna")
+}
+
+model CharacterVoiceDna {
+  id              String   @id @default(uuid()) @db.Uuid
+  characterId     String   @unique @map("character_id") @db.Uuid
+  voiceProfile    String?  @map("voice_profile")
+  pitch           String?
+  cadence         String?
+  speed           String?
+  energy          String?
+  vocabulary      String?
+  pronunciation   String?
+  emotionalRange  String?  @map("emotional_range")
+  providerType    String?  @map("provider_type")
+  providerVoiceId String?  @map("provider_voice_id")
+  pendingReview   Boolean  @default(true) @map("pending_review")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_voice_dna")
+}
+
+model CharacterStoryDna {
+  id               String   @id @default(uuid()) @db.Uuid
+  characterId      String   @unique @map("character_id") @db.Uuid
+  coreDesire       String?  @map("core_desire")
+  mainFear         String?  @map("main_fear")
+  longTermGoal     String?  @map("long_term_goal")
+  growthDirection  String?  @map("growth_direction")
+  weakness         String?
+  lesson           String?
+  conflicts        String?
+  importantRelationships String? @map("important_relationships")
+  pendingReview    Boolean  @default(true) @map("pending_review")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_story_dna")
+}
+
+model Character3dModel {
+  id                  String               @id @default(uuid()) @db.Uuid
+  characterId         String               @map("character_id") @db.Uuid
+  characterVersionId  String?              @map("character_version_id") @db.Uuid
+  modelName           String               @map("model_name")
+  masterBlendAssetId  String?              @map("master_blend_asset_id") @db.Uuid
+  fbxAssetId          String?              @map("fbx_asset_id") @db.Uuid
+  gltfAssetId         String?              @map("gltf_asset_id") @db.Uuid
+  textureSetId        String?              @map("texture_set_id") @db.Uuid
+  rigId               String?              @map("rig_id") @db.Uuid
+  facialRigId         String?              @map("facial_rig_id") @db.Uuid
+  materialSetId       String?              @map("material_set_id") @db.Uuid
+  scale               Float                @default(1.0)
+  status              CharacterModelStatus @default(MISSING)
+  approved            Boolean              @default(false)
+  productionReady     Boolean              @default(false) @map("production_ready")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+
+  character Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  version   CharacterVersion? @relation(fields: [characterVersionId], references: [id], onDelete: SetNull)
+
+  @@index([characterId])
+  @@map("character_3d_models")
+}
+
+model Asset {
+  id               String    @id @default(uuid()) @db.Uuid
+  universeId       String?   @map("universe_id") @db.Uuid
+  type             AssetType
+  entityType       String?   @map("entity_type")
+  entityId         String?   @map("entity_id") @db.Uuid
+  name             String
+  version          Int       @default(1)
+  storageLocation  String?   @map("storage_location")
+  mimeType         String?   @map("mime_type")
+  dimensions       String?
+  durationMs       Int?      @map("duration_ms")
+  hash             String?
+  approved         Boolean   @default(false)
+  missing          Boolean   @default(true)
+  notes            String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  universe Universe? @relation(fields: [universeId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([entityType, entityId])
+  @@map("assets")
+}

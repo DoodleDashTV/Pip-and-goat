@@ -1,0 +1,23 @@
+{
+  "name": "doodle-dash-tv-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Doodle Dash TV Studio — persistent 3D animation production platform",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --filter @doodle-dash/web dev",
+    "build": "pnpm db:generate && pnpm --filter @doodle-dash/web build",
+    "lint": "pnpm --filter @doodle-dash/web lint",
+    "typecheck": "pnpm db:generate && pnpm --filter @doodle-dash/domain typecheck && pnpm --filter @doodle-dash/shared typecheck && pnpm --filter @doodle-dash/universe typecheck && pnpm --filter @doodle-dash/characters typecheck && pnpm --filter @doodle-dash/web typecheck",
+    "test": "pnpm db:generate && pnpm --filter @doodle-dash/web test",
+    "db:generate": "pnpm --filter @doodle-dash/database generate",
+    "db:migrate": "pnpm --filter @doodle-dash/database migrate",
+    "db:push": "pnpm --filter @doodle-dash/database db:push",
+    "db:seed": "pnpm --filter @doodle-dash/database seed",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  }
+}

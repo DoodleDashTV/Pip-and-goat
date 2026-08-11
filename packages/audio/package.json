@@ -1,0 +1,10 @@
+{
+  "name": "@doodle-dash/audio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Audio / voice / lip-sync package — reserved for later milestones",
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "node -e \"console.log('audio package stub')\""
+  }
+}

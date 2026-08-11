@@ -1,0 +1,10 @@
+{
+  "name": "@doodle-dash/production",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production director package — reserved for later milestones",
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "node -e \"console.log('production package stub')\""
+  }
+}

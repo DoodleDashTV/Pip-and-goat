@@ -1,0 +1,10 @@
+{
+  "name": "@doodle-dash/providers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Optional AI video providers (Sora/Seedance) — reserved for later milestones",
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "node -e \"console.log('providers package stub')\""
+  }
+}
