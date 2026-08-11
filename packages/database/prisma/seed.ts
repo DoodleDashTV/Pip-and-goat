@@ -158,21 +158,31 @@ async function seed() {
 
   await prisma.characterVisualDna.upsert({
     where: { characterId: pip.id },
-    update: {},
+    update: {
+      visualRestrictions:
+        'LOCKED: golden-yellow chick, red 3-lobe comb, brown eyes, orange beak/feet, purple backpack when present. Not plastic. Not a production model.',
+      pendingReview: false,
+    },
     create: {
       characterId: pip.id,
-      visualRestrictions: 'Do not invent final silhouette, palette, or costume until references are approved.',
-      pendingReview: true,
+      visualRestrictions:
+        'LOCKED: golden-yellow chick, red 3-lobe comb, brown eyes, orange beak/feet, purple backpack when present. Not plastic. Not a production model.',
+      pendingReview: false,
     },
   });
 
   await prisma.characterVisualDna.upsert({
     where: { characterId: goat.id },
-    update: {},
+    update: {
+      visualRestrictions:
+        'LOCKED: cream goat, curled brown horns, brown eyes, coral nose, blue collar + GOAT tag. Not plastic. Not a production model.',
+      pendingReview: false,
+    },
     create: {
       characterId: goat.id,
-      visualRestrictions: 'Do not invent final silhouette, palette, or costume until references are approved.',
-      pendingReview: true,
+      visualRestrictions:
+        'LOCKED: cream goat, curled brown horns, brown eyes, coral nose, blue collar + GOAT tag. Not plastic. Not a production model.',
+      pendingReview: false,
     },
   });
 

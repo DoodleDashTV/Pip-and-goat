@@ -65,14 +65,18 @@ export const CHARACTER_TEST_POSES = [
   'FRONT_NEUTRAL',
   'THREE_QUARTER_NEUTRAL',
   'SIDE_NEUTRAL',
+  'BACK_NEUTRAL',
   'SMILE',
+  'HAPPY',
   'SURPRISED',
+  'CONCERNED',
   'BLINK',
   'MOUTH_OPEN',
-  'WALK',
-  'RUN',
-  'JUMP',
-  'WAVE',
+  'TALK_TEST',
+  'WALK_POSE',
+  'RUN_POSE',
+  'JUMP_POSE',
+  'WAVE_POSE',
 ] as const;
 
 export const CANONICAL_AUDITION_SCRIPT = [
@@ -211,6 +215,7 @@ export class CharacterOnboardingService {
       | 'TEXTURE'
       | 'MATERIAL'
       | 'REFERENCE_IMAGE'
+      | 'PRIMARY_CANONICAL_REFERENCE'
       | 'TURNAROUND'
       | 'EXPRESSION_SHEET'
       | 'POSE_REFERENCE'
@@ -231,7 +236,7 @@ export class CharacterOnboardingService {
       universeId: params.universeId,
       entityType: 'character',
       entityId: params.characterId,
-      kind: params.kind,
+      kind: params.kind === 'PRIMARY_CANONICAL_REFERENCE' ? 'PRIMARY_CANONICAL_REFERENCE' : params.kind,
       originalFilename: params.fileName,
       mimeType: params.contentType,
       storageLocation: stored.uri,
@@ -241,7 +246,9 @@ export class CharacterOnboardingService {
 
     let referenceImage = null;
     if (
-      ['REFERENCE_IMAGE', 'TURNAROUND', 'EXPRESSION_SHEET', 'POSE_REFERENCE'].includes(params.kind)
+      ['REFERENCE_IMAGE', 'PRIMARY_CANONICAL_REFERENCE', 'TURNAROUND', 'EXPRESSION_SHEET', 'POSE_REFERENCE'].includes(
+        params.kind,
+      )
     ) {
       const character = await prisma.character.findUniqueOrThrow({
         where: { id: params.characterId },
@@ -266,8 +273,10 @@ export class CharacterOnboardingService {
           characterVersionId: character.currentVersionId,
           assetId: asset.id,
           title: params.fileName,
-          viewType: params.kind,
+          viewType:
+            params.kind === 'PRIMARY_CANONICAL_REFERENCE' ? 'PRIMARY' : params.kind,
           reviewStatus: 'PENDING_REVIEW',
+          isPrimary: params.kind === 'PRIMARY_CANONICAL_REFERENCE' || params.kind === 'REFERENCE_IMAGE',
         },
       });
     }
@@ -1429,21 +1438,43 @@ export class ProductionManifestService {
           };
         }),
       ),
-      characters: founding.map((c, i) => ({
-        id: c.id,
-        code: c.internalCode,
-        modelIntakeId: models[i]?.id ?? null,
-        modelVersion: models[i]?.version ?? null,
-        referenceVersion: refs[i]?.versionNumber ?? null,
-        voiceVersion: voices[i]?.versionNumber ?? null,
-      })),
+      characters: await Promise.all(
+        founding.map(async (c, i) => {
+          const pkg = await prisma.characterCanonicalPackage.findUnique({
+            where: { characterId: c.id },
+          });
+          const rig = await prisma.characterRig.findFirst({
+            where: { characterId: c.id },
+            orderBy: { createdAt: 'desc' },
+          });
+          return {
+            characterId: c.id,
+            code: c.internalCode,
+            dnaVersion: pkg?.dnaVersion ?? null,
+            referenceVersion: refs[i]?.versionNumber ?? null,
+            modelVersion: models[i]?.version ?? null,
+            modelIntakeId: models[i]?.id ?? null,
+            rigVersion: rig?.id ?? null,
+            materialVersion: null,
+            voiceVersion: voices[i]?.versionNumber ?? null,
+            animationVersions: [],
+            accessoryState:
+              c.internalCode === 'CHAR_PIP_001'
+                ? { backpack: 'PRESENT', starCharm: 'PRESENT' }
+                : { collar: 'PRESENT', goatTag: 'PRESENT', tagText: 'GOAT' },
+          };
+        }),
+      ),
       pipVersion: (() => {
         const i = founding.findIndex((c) => c.internalCode === 'CHAR_PIP_001');
         return i >= 0
           ? {
+              characterId: founding[i]!.id,
+              code: 'CHAR_PIP_001',
               modelVersion: models[i]?.version ?? null,
               referenceVersion: refs[i]?.versionNumber ?? null,
               voiceVersion: voices[i]?.versionNumber ?? null,
+              accessoryState: { backpack: 'PRESENT', starCharm: 'PRESENT' },
             }
           : null;
       })(),
@@ -1451,9 +1482,12 @@ export class ProductionManifestService {
         const i = founding.findIndex((c) => c.internalCode === 'CHAR_GOAT_001');
         return i >= 0
           ? {
+              characterId: founding[i]!.id,
+              code: 'CHAR_GOAT_001',
               modelVersion: models[i]?.version ?? null,
               referenceVersion: refs[i]?.versionNumber ?? null,
               voiceVersion: voices[i]?.versionNumber ?? null,
+              accessoryState: { collar: 'PRESENT', goatTag: 'PRESENT', tagText: 'GOAT' },
             }
           : null;
       })(),

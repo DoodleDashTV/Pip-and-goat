@@ -1448,6 +1448,7 @@ enum IntakeAssetKind {
   RIG
   FACIAL_SHAPEKEYS
   REFERENCE_IMAGE
+  PRIMARY_CANONICAL_REFERENCE
   TURNAROUND
   EXPRESSION_SHEET
   POSE_REFERENCE
@@ -2114,4 +2115,61 @@ model FramingValidationReport {
 
   @@index([shotId])
   @@map("framing_validation_reports")
+}
+
+// ============================================================
+// Canonical Pip / Goat character lock
+// ============================================================
+
+model CharacterCanonicalPackage {
+  id                         String    @id @default(uuid()) @db.Uuid
+  characterId                String    @unique @map("character_id") @db.Uuid
+  characterCode              String    @map("character_code")
+  dnaVersion                 Int       @default(1) @map("dna_version")
+  lockedTraits               Json      @map("locked_traits")
+  styleLock                  Json?     @map("style_lock")
+  accessoryCanon             Json?     @map("accessory_canon")
+  rigRequirements            Json?     @map("rig_requirements")
+  facialRequirements         Json?     @map("facial_requirements")
+  visemeRequirements         Json?     @map("viseme_requirements")
+  primaryReferenceVersionId  String?   @map("primary_reference_version_id") @db.Uuid
+  primaryReferenceApprovedAt DateTime? @map("primary_reference_approved_at")
+  immutable                  Boolean   @default(true)
+  notes                      String?
+  createdAt                  DateTime  @default(now()) @map("created_at")
+  updatedAt                  DateTime  @updatedAt @map("updated_at")
+
+  @@index([characterCode])
+  @@map("character_canonical_packages")
+}
+
+model ShotAccessoryState {
+  id           String   @id @default(uuid()) @db.Uuid
+  shotId       String   @map("shot_id") @db.Uuid
+  characterId  String   @map("character_id") @db.Uuid
+  accessories  Json
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([shotId, characterId])
+  @@index([characterId])
+  @@map("shot_accessory_states")
+}
+
+model ProductionModelReview {
+  id                  String    @id @default(uuid()) @db.Uuid
+  characterId         String    @map("character_id") @db.Uuid
+  modelIntakeId       String    @map("model_intake_id") @db.Uuid
+  referenceVersionId  String    @map("reference_version_id") @db.Uuid
+  status              String    @default("PENDING")
+  checklist           Json?
+  decidedBy           String?   @map("decided_by")
+  decidedAt           DateTime? @map("decided_at")
+  notes               String?
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  @@index([characterId, status])
+  @@map("production_model_reviews")
 }

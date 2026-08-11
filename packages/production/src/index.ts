@@ -960,3 +960,4 @@ export const nextEpisodeOrchestrator = new NextEpisodeOrchestrator();
 export * from './readiness';
 export * from './launch-prep';
 export * from './cost-optimized-production';
+export * from './canonical-characters';

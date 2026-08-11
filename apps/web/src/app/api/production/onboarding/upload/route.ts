@@ -62,7 +62,7 @@ export async function POST(request: Request) {
         where: { internalCode: upload.entityCode },
       });
       if (
-        ['TEXTURE', 'MATERIAL', 'REFERENCE_IMAGE', 'TURNAROUND', 'EXPRESSION_SHEET', 'POSE_REFERENCE', 'FACIAL_SHAPEKEYS', 'RIG'].includes(
+        ['TEXTURE', 'MATERIAL', 'REFERENCE_IMAGE', 'PRIMARY_CANONICAL_REFERENCE', 'TURNAROUND', 'EXPRESSION_SHEET', 'POSE_REFERENCE', 'FACIAL_SHAPEKEYS', 'RIG'].includes(
           upload.kind,
         )
       ) {

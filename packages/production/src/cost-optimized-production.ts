@@ -614,6 +614,28 @@ export class ShotRenderCacheService {
     const profile = await prisma.productionRenderProfile.findUnique({
       where: { code: profileCode },
     });
+    const packages = characterIds.length
+      ? await prisma.characterCanonicalPackage.findMany({
+          where: { characterId: { in: characterIds } },
+        })
+      : [];
+    const refVersions = characterIds.length
+      ? await prisma.approvedReferenceVersion.findMany({
+          where: { characterId: { in: characterIds } },
+          orderBy: { versionNumber: 'desc' },
+        })
+      : [];
+    const accessoryStates = characterIds.length
+      ? await prisma.shotAccessoryState.findMany({
+          where: { shotId, characterId: { in: characterIds } },
+        })
+      : [];
+    const latestRefByCharacter = new Map<string, number>();
+    for (const rv of refVersions) {
+      if (!latestRefByCharacter.has(rv.characterId)) {
+        latestRefByCharacter.set(rv.characterId, rv.versionNumber);
+      }
+    }
     return fingerprint([
       shot.id,
       shot.description,
@@ -622,6 +644,19 @@ export class ShotRenderCacheService {
       shot.lightingPreset,
       shot.characterIds,
       intakes.map((i) => ({ id: i.id, version: i.version, checksum: i.checksum, kind: i.kind })),
+      packages.map((p) => ({
+        characterId: p.characterId,
+        dnaVersion: p.dnaVersion,
+        primaryReferenceVersionId: p.primaryReferenceVersionId,
+      })),
+      [...latestRefByCharacter.entries()].map(([characterId, versionNumber]) => ({
+        characterId,
+        versionNumber,
+      })),
+      accessoryStates.map((a) => ({
+        characterId: a.characterId,
+        accessories: a.accessories,
+      })),
       dialogues.map((d) => ({ id: d.id, text: d.text, speakerId: d.speakerId })),
       profileCode,
       profile?.engine,
@@ -1099,12 +1134,15 @@ export class CostOptimizedWorkflowService {
     const settings = await new ProductionSettingsService().ensureDefaults();
     const animations = await new AnimationReuseEngine().ensureSemanticLibrary(universe.id);
     const audio = await new AudioLibraryReuseService().ensureSlots(universe.id);
+    const { canonicalCharacterService } = await import('./canonical-characters');
+    const characters = await canonicalCharacterService.bootstrapFoundingCharacters();
     return {
       universeId: universe.id,
       profiles,
       settings,
       animationSlots: animations.length,
       audioSlots: audio.length,
+      characters,
     };
   }
 }

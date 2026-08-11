@@ -87,10 +87,16 @@ export default async function AssetIntakePage() {
           <li>Production-ready approval</li>
         </ol>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <UploadDropzone entityCode="CHAR_PIP_001" accept=".blend,.glb,.gltf,.fbx" label="1. Pip model (.blend/.glb/.gltf/.fbx)" />
+          <UploadDropzone
+            entityCode="CHAR_PIP_001"
+            kind="PRIMARY_CANONICAL_REFERENCE"
+            accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png"
+            label="PRIMARY CANONICAL REFERENCE (JPEG) — not a 3D model"
+          />
+          <UploadDropzone entityCode="CHAR_PIP_001" accept=".blend,.glb,.gltf,.fbx" label="1. Pip production model (.blend preferred)" />
           <UploadDropzone entityCode="CHAR_PIP_001" kind="TEXTURE" accept="image/*,.png,.jpg,.exr" label="2. Pip textures" />
-          <UploadDropzone entityCode="CHAR_PIP_001" kind="TURNAROUND" accept="image/*" label="5. Turnaround / reference images" />
-          <UploadDropzone entityCode="CHAR_PIP_001" kind="EXPRESSION_SHEET" accept="image/*" label="Expression sheet" />
+          <UploadDropzone entityCode="CHAR_PIP_001" kind="TURNAROUND" accept="image/*" label="Turnaround views (FRONT/SIDE/BACK — optional)" />
+          <UploadDropzone entityCode="CHAR_PIP_001" kind="EXPRESSION_SHEET" accept="image/*" label="Expression sheet (optional)" />
         </div>
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <Link href={`/facial-mapping/${FOUNDING_CODES.PIP}`} className="font-semibold text-leaf-300 underline">
@@ -112,10 +118,16 @@ export default async function AssetIntakePage() {
         <h2 className="font-display text-3xl font-bold">GOAT</h2>
         <p className="mt-1 text-sm text-sun-400">CHAR_GOAT_001 · {goat.id}</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <UploadDropzone entityCode="CHAR_GOAT_001" accept=".blend,.glb,.gltf,.fbx" label="1. Goat model (.blend/.glb/.gltf/.fbx)" />
+          <UploadDropzone
+            entityCode="CHAR_GOAT_001"
+            kind="PRIMARY_CANONICAL_REFERENCE"
+            accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png"
+            label="PRIMARY CANONICAL REFERENCE (JPEG) — not a 3D model"
+          />
+          <UploadDropzone entityCode="CHAR_GOAT_001" accept=".blend,.glb,.gltf,.fbx" label="1. Goat production model (.blend preferred)" />
           <UploadDropzone entityCode="CHAR_GOAT_001" kind="TEXTURE" accept="image/*,.png,.jpg,.exr" label="2. Goat textures" />
-          <UploadDropzone entityCode="CHAR_GOAT_001" kind="TURNAROUND" accept="image/*" label="5. Turnaround / reference images" />
-          <UploadDropzone entityCode="CHAR_GOAT_001" kind="EXPRESSION_SHEET" accept="image/*" label="Expression sheet" />
+          <UploadDropzone entityCode="CHAR_GOAT_001" kind="TURNAROUND" accept="image/*" label="Turnaround views (FRONT/SIDE/BACK — optional)" />
+          <UploadDropzone entityCode="CHAR_GOAT_001" kind="EXPRESSION_SHEET" accept="image/*" label="Expression sheet (optional)" />
         </div>
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <Link href={`/facial-mapping/${FOUNDING_CODES.GOAT}`} className="font-semibold text-leaf-300 underline">

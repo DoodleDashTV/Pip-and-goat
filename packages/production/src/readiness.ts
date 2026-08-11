@@ -50,6 +50,7 @@ export const RegisterIntakeSchema = z.object({
     'RIG',
     'FACIAL_SHAPEKEYS',
     'REFERENCE_IMAGE',
+    'PRIMARY_CANONICAL_REFERENCE',
     'TURNAROUND',
     'EXPRESSION_SHEET',
     'POSE_REFERENCE',
@@ -281,9 +282,43 @@ export class CharacterAssetValidator {
     });
     checks.push({
       code: 'REFERENCE_APPROVED',
-      passed: character.referenceImages.some((r) => r.reviewStatus === 'APPROVED'),
+      passed: character.referenceImages.some((r) => r.reviewStatus === 'APPROVED' && Boolean(r.assetId)),
       severity: 'error',
-      message: 'No approved visual reference.',
+      message: 'No approved visual reference with uploaded asset.',
+    });
+    const pkg = await prisma.characterCanonicalPackage.findUnique({
+      where: { characterId },
+    });
+    checks.push({
+      code: 'CANONICAL_DNA_LOCKED',
+      passed: Boolean(pkg?.immutable) && Boolean(character.visualDna) && !character.visualDna?.pendingReview,
+      severity: 'error',
+      message: pkg?.immutable
+        ? `Canonical DNA v${pkg.dnaVersion} locked.`
+        : 'Canonical visual DNA not locked.',
+    });
+    checks.push({
+      code: 'PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE',
+      passed: !(
+        character.referenceImages.some((r) => r.reviewStatus === 'APPROVED') &&
+        (model?.productionReady || model?.status === 'PRODUCTION_READY') &&
+        !hasBlend &&
+        !hasGlb
+      ),
+      severity: 'error',
+      message:
+        'Reference JPEG must never imply production model readiness without a real .blend/.glb intake.',
+    });
+    const modelReview = await prisma.productionModelReview.findFirst({
+      where: { characterId, status: 'APPROVED' },
+    });
+    checks.push({
+      code: 'FINAL_1080P_CHARACTER_VALIDATION',
+      passed: Boolean(modelReview) && (hasBlend || hasGlb),
+      severity: 'error',
+      message: modelReview
+        ? 'Model-to-reference review approved; confirm FINAL_1080P Blender renders still pass.'
+        : '1080P character validation BLOCKED — requires Blender model-to-reference review approval.',
     });
     checks.push({
       code: 'VERTICAL_FRAMING',
@@ -310,6 +345,17 @@ export class CharacterAssetValidator {
         missingVisemes.length || !facial?.approved
           ? `Missing lip-sync controls/approval. Missing visemes: ${missingVisemes.join(', ') || 'facial unapproved'}`
           : 'Lip-sync viseme set present.',
+    });
+    const facialMap = await prisma.characterFacialControlMap.findFirst({
+      where: { characterId, approved: true },
+    });
+    checks.push({
+      code: 'FACIAL_SEMANTIC_MAP',
+      passed: Boolean(facialMap),
+      severity: 'error',
+      message: facialMap
+        ? 'Approved facial semantic map present.'
+        : 'FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.',
     });
 
     const errors = checks.filter((c) => c.severity === 'error' && !c.passed);
@@ -394,11 +440,15 @@ export class ReferenceLockService {
 
   async requireApprovedReference(characterId: string) {
     const locked = await prisma.approvedCharacterReference.findFirst({
-      where: { characterId, role: 'PRIMARY', immutable: true },
+      where: {
+        characterId,
+        immutable: true,
+        role: { in: ['PRIMARY', 'PRIMARY_CANONICAL_REFERENCE'] },
+      },
     });
     if (!locked) {
       throw new AppError(
-        'Approved immutable visual reference required. AI generation blocked.',
+        'Approved PRIMARY_CANONICAL_REFERENCE required. FAIL CLOSED — no text-only recreation.',
         'REFERENCE_LOCK_REQUIRED',
         409,
       );

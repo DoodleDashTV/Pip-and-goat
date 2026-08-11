@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@doodle-dash/database';
 import { characterPreflightService } from '@doodle-dash/characters';
+import { canonicalCharacterService } from '@doodle-dash/production';
+import { FOUNDING_CODES } from '@doodle-dash/domain';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +37,12 @@ export default async function CharacterDetailPage({
 
   const model = character.models[0];
   const preflight = await characterPreflightService.runForCharacter(character.id);
+  const isFounding =
+    character.internalCode === FOUNDING_CODES.PIP || character.internalCode === FOUNDING_CODES.GOAT;
+  if (isFounding) await canonicalCharacterService.bootstrapFoundingCharacters();
+  const readiness = isFounding
+    ? await canonicalCharacterService.readinessMatrix(character.internalCode)
+    : null;
 
   return (
     <div className="space-y-6">
@@ -62,7 +70,51 @@ export default async function CharacterDetailPage({
           </div>
         </div>
         <p className="mt-6 max-w-3xl text-mist-200/90">{character.biography}</p>
+        {isFounding ? (
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            <Link href="/asset-intake" className="text-leaf-300 underline">
+              Upload PRIMARY reference / model
+            </Link>
+            <Link
+              href={`/references/approve/${character.internalCode}`}
+              className="text-leaf-300 underline"
+            >
+              Approve canonical reference
+            </Link>
+          </div>
+        ) : null}
       </header>
+
+      {readiness ? (
+        <section className="rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
+          <h2 className="font-display text-2xl font-semibold">Canonical readiness</h2>
+          <p className="mt-2 text-sm text-[var(--muted)]">{readiness.note}</p>
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+            {(
+              [
+                ['Canonical ID', readiness.canonicalId],
+                ['Canon', readiness.canon],
+                ['DNA', readiness.dna],
+                ['Primary reference', readiness.primaryReference],
+                ['Production model', readiness.productionModel],
+                ['Rig', readiness.rig],
+                ['Facial rig', readiness.facialRig],
+                ['Lip sync', readiness.lipSync],
+                ['Voice', readiness.voice],
+                ['Animation', readiness.animation],
+                ['1080p validation', readiness.final1080pCharacterValidation],
+              ] as const
+            ).map(([label, value]) => (
+              <div key={label} className="rounded-2xl bg-ink-950/40 px-4 py-3">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-sun-400">
+                  {label}
+                </dt>
+                <dd className="mt-1 font-semibold text-mist-100">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
 
       <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[1.75rem] border border-[var(--line)] bg-ink-800/70 p-6">
