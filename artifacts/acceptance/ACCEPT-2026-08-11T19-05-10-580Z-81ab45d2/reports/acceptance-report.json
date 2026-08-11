@@ -868,5 +868,30 @@
   "blenderSelfTestRetest": {
     "status": "SUCCEEDED",
     "fixedMissingCamera": true
-  }
+  },
+  "remainingWorkBeforeRealEpisode": [
+    "Configure durable S3-compatible storage (currently local WARNING \u2014 NOT PRODUCTION DURABLE)",
+    "Upload + approve Pip primary canonical reference",
+    "Upload + approve Goat primary canonical reference",
+    "Upload real Pip .blend model (not auto READY)",
+    "Upload real Goat .blend model",
+    "Approve Pip/Goat rigs + facial controls + visemes",
+    "Configure + approve Pip/Goat voices (TTS provider SDK currently not wired)",
+    "Upload Meadow .blend + Adventure Map prop",
+    "Replace production Blender assemble_scene.py / render_frames.py stubs with real asset assembly (diagnostic path proved EEVEE+FFmpeg)",
+    "Wire worker downloadAssets/uploadOutputs stubs to durable storage",
+    "Add 720x1280 to RenderResolutionSchema to align DRAFT_HD job queue with profile DB"
+  ],
+  "artifactPreviewUrls": {
+    "finalMp4": "https://open-jon-companies-buf.trycloudflare.com/api/acceptance/artifacts?testId=ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2&file=exports/FINAL_1080P.mp4",
+    "productionSetup": "https://open-jon-companies-buf.trycloudflare.com/production-setup",
+    "report": "https://open-jon-companies-buf.trycloudflare.com/api/acceptance/artifacts?testId=ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2&file=reports/acceptance-report.json"
+  },
+  "gates": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "tests": "101/101",
+    "build": "PASS"
+  },
+  "endingSha": "ref: refs/heads/cursor/production-acceptance-test-f291"
 }
