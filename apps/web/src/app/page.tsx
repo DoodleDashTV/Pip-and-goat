@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { prisma } from '@doodle-dash/database';
 import {
-  blenderWorkerHealthService,
   costAnalyticsService,
   costOptimizedWorkflowService,
+  productionSetupService,
 } from '@doodle-dash/production';
 import { PRODUCT_DISPLAY_NAME } from '@doodle-dash/domain';
 
@@ -18,128 +18,54 @@ export default async function HomePage() {
     await costOptimizedWorkflowService.bootstrap(universe.id);
   }
 
-  const [
-    characters,
-    episodes,
-    pipelineRuns,
-    draftReviews,
-    missingAssets,
-    blender,
-    costs,
-  ] = await Promise.all([
-    prisma.character.findMany({
-      where: { foundingCharacter: true },
-      include: { models: true },
-      orderBy: { internalCode: 'asc' },
-    }),
-    prisma.episode.findMany({ orderBy: { updatedAt: 'desc' }, take: 8 }),
-    prisma.episodePipelineRun.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 8,
-      include: { stages: true },
-    }),
-    prisma.draftReview.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
-    prisma.asset.count({ where: { missing: true } }),
-    blenderWorkerHealthService.status(),
+  const [setup, costs, draftReviews] = await Promise.all([
+    productionSetupService.buildChecklist(),
     costAnalyticsService.summarize(),
+    prisma.draftReview.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
   ]);
 
-  const blockedRuns = pipelineRuns.filter((r) => r.status === 'BLOCKED').length;
   const draftsAwaiting = draftReviews.filter((d) => d.status === 'PENDING').length;
-  const finalsReady = draftReviews.filter((d) => d.status === 'APPROVED').length;
-  const continueEpisode =
-    episodes.find((e) =>
-      ['DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'IN_PRODUCTION'].includes(e.status),
-    ) ??
-    episodes[0] ??
-    null;
+  const readyCount = setup.steps.filter((s) => s.state === 'READY').length;
 
   return (
-    <div className="space-y-8">
-      <header className="overflow-hidden rounded-[2rem] border border-[var(--line)] bg-[var(--panel)] p-8 shadow-studio backdrop-blur-md md:p-10">
+    <div className="space-y-8 overflow-x-hidden">
+      <header className="overflow-hidden rounded-[2rem] border border-[var(--line)] bg-[var(--panel)] p-6 shadow-studio backdrop-blur-md sm:p-8 md:p-10">
         <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">
           {PRODUCT_DISPLAY_NAME}
         </p>
         <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-mist-100 md:text-5xl">
           {universe?.brandName ?? PRODUCT_DISPLAY_NAME}
         </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--muted)] md:text-lg">
-          Extremely high-quality children’s animation at the best quality per dollar. Blender-first.
-          EEVEE-first. 1080×1920 finals. Reuse locked assets. Render only what changed.
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--muted)]">
+          Extremely high-quality children’s animation. Blender-first. EEVEE-first. 1080×1920 @ 30
+          FPS. Reuse locked assets. Paid AI video off.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href="/new-episode"
-            className="rounded-2xl bg-leaf-500 px-5 py-3 text-sm font-extrabold text-ink-950 transition hover:bg-leaf-400"
-          >
-            NEW EPISODE
-          </Link>
-          <Link
-            href={
-              continueEpisode
-                ? `/episodes/${continueEpisode.id}/readiness`
-                : '/episodes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/readiness'
-            }
-            className="rounded-2xl border border-leaf-400/40 px-5 py-3 text-sm font-bold text-leaf-300 transition hover:bg-leaf-500/10"
-          >
-            CONTINUE EPISODE
-          </Link>
-          <Link
-            href="/asset-intake"
-            className="rounded-2xl border border-leaf-400/40 px-5 py-3 text-sm font-bold text-leaf-300"
-          >
-            ASSETS
-          </Link>
-          <Link
-            href="/animations"
-            className="rounded-2xl border border-leaf-400/40 px-5 py-3 text-sm font-bold text-leaf-300"
-          >
-            ANIMATIONS
-          </Link>
-          <Link
-            href="/render-queue"
-            className="rounded-2xl border border-leaf-400/40 px-5 py-3 text-sm font-bold text-leaf-300"
-          >
-            RENDER QUEUE
-          </Link>
-          <Link
-            href="/readiness"
-            className="rounded-2xl border border-leaf-400/40 px-5 py-3 text-sm font-bold text-leaf-300"
-          >
-            READINESS
-          </Link>
-          <Link
-            href="/costs"
-            className="rounded-2xl border border-leaf-400/40 px-5 py-3 text-sm font-bold text-leaf-300"
-          >
-            COSTS
-          </Link>
-        </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="rounded-[1.75rem] border border-leaf-400/40 bg-leaf-500/10 p-5 sm:p-6">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-leaf-300">
+          What do I need to do next?
+        </p>
+        <p className="mt-3 text-sm text-mist-100">{setup.primaryAction.reason}</p>
+        <Link
+          href={setup.primaryAction.href}
+          className="mt-5 flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-leaf-500 px-5 py-4 text-center text-base font-extrabold text-ink-950"
+        >
+          {setup.primaryAction.label}
+        </Link>
+        <Link
+          href="/production-setup"
+          className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-2xl border border-leaf-400/40 px-4 py-3 text-center text-sm font-bold text-leaf-300"
+        >
+          Open full Production Setup checklist
+        </Link>
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-3">
         {[
-          { label: 'Episodes in progress', value: String(episodes.length) },
-          { label: 'Episodes blocked', value: String(blockedRuns) },
+          { label: 'Setup steps ready', value: `${readyCount}/${setup.steps.length}` },
           { label: 'Drafts awaiting approval', value: String(draftsAwaiting) },
-          { label: 'Finals ready', value: String(finalsReady) },
-          {
-            label: 'Render worker',
-            value: blender.blender.available
-              ? blender.workerOnline
-                ? 'Online'
-                : 'Blender OK / worker offline'
-              : 'BLENDER REQUIRED',
-          },
-          { label: 'Missing assets', value: String(missingAssets) },
-          {
-            label: 'Paid external (ledger)',
-            value: String(costs.paidExternal.toFixed(2)),
-          },
-          {
-            label: 'Local compute units',
-            value: String(costs.localNoApiCharge.toFixed(2)),
-          },
+          { label: 'Paid external (ledger)', value: costs.paidExternal.toFixed(2) },
         ].map((card) => (
           <div
             key={card.label}
@@ -153,26 +79,31 @@ export default async function HomePage() {
         ))}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        {characters.map((character) => {
-          const model = character.models[0];
-          return (
-            <Link
-              key={character.id}
-              href={`/characters/${character.internalCode}`}
-              className="group rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6 transition hover:border-leaf-400/50"
-            >
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-sun-400">
-                {character.internalCode}
-              </p>
-              <h2 className="mt-2 font-display text-3xl font-bold">{character.name}</h2>
-              <p className="mt-2 text-sm text-[var(--muted)]">
-                Model: {model?.status ?? 'MISSING'} · productionReady=
-                {String(model?.productionReady ?? false)}
-              </p>
-            </Link>
-          );
-        })}
+      <section className="grid gap-3 sm:grid-cols-2">
+        <Link
+          href="/asset-intake"
+          className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 font-semibold text-leaf-300"
+        >
+          Assets / Pip & Goat uploads
+        </Link>
+        <Link
+          href={`/episodes/${setup.episodeId}/readiness`}
+          className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 font-semibold text-leaf-300"
+        >
+          Meadow Map Mystery readiness
+        </Link>
+        <Link
+          href="/voices"
+          className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 font-semibold text-leaf-300"
+        >
+          Voices
+        </Link>
+        <Link
+          href="/costs"
+          className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 font-semibold text-leaf-300"
+        >
+          Costs / approvals
+        </Link>
       </section>
     </div>
   );

@@ -278,11 +278,13 @@ export class DurableStorageOpsService {
         'STORAGE_LAST_SUCCESS_WRITE',
         new Date().toISOString(),
       );
+      await studioSettingsService.setJson('STORAGE_SELF_TEST_OK', new Date().toISOString());
     } else {
       await studioSettingsService.setJson('STORAGE_LAST_FAILED_WRITE', {
         at: new Date().toISOString(),
         message: result.error ?? 'self-test failed',
       });
+      await studioSettingsService.setJson('STORAGE_SELF_TEST_OK', null);
     }
     return result;
   }

@@ -1,15 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export function BlenderWorkerPanel() {
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
+  const [panel, setPanel] = useState<Record<string, unknown> | null>(null);
   const [test, setTest] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   async function refresh() {
-    const res = await fetch('/api/production/launch?action=blender-status');
-    setStatus(await res.json());
+    const [launchRes, setupRes] = await Promise.all([
+      fetch('/api/production/launch?action=blender-status'),
+      fetch('/api/production/setup'),
+    ]);
+    setStatus(await launchRes.json());
+    const setup = await setupRes.json();
+    setPanel(setup.blender ?? null);
   }
 
   useEffect(() => {
@@ -18,7 +25,7 @@ export function BlenderWorkerPanel() {
 
   async function selfTest() {
     setMessage(null);
-    const res = await fetch('/api/production/launch', {
+    const res = await fetch('/api/production/setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'blender-self-test' }),
@@ -29,6 +36,7 @@ export function BlenderWorkerPanel() {
       return;
     }
     setTest(data.test);
+    if (data.blender) setPanel(data.blender);
     await refresh();
   }
 
@@ -40,63 +48,65 @@ export function BlenderWorkerPanel() {
     message?: string;
   };
 
+  const yn = (v: unknown) => (v ? 'YES' : 'NO');
+
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 overflow-x-hidden px-1">
       <header>
         <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">Infrastructure</p>
         <h1 className="mt-2 font-display text-4xl font-bold">Blender Worker Health</h1>
         <p className="mt-3 text-[var(--muted)]">
-          Self-test may render a primitive cube (infrastructure only — never Pip/Goat/production assets).
+          Self-test may render a primitive cube (infrastructure only — never Pip/Goat/production
+          assets).
         </p>
+        <Link
+          href="/production-setup#blender"
+          className="mt-3 inline-block text-sm text-leaf-300 underline"
+        >
+          Back to Production Setup
+        </Link>
       </header>
 
-      <section className="rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6 text-sm">
-        <ul className="space-y-2">
-          <li>Worker configured: {String(status?.workerConfigured)}</li>
-          <li>Worker online/offline: {status?.workerOnline ? 'online' : 'offline'}</li>
-          <li>Blender executable: {blender.bin ?? '—'}</li>
-          <li>Blender version: {blender.version ?? blender.message ?? '—'}</li>
-          <li>Supported engines: {(blender.engines ?? []).join(', ') || '—'}</li>
-          <li>GPU mode: {String(status?.gpuMode)}</li>
-          <li>Queue length: {String(status?.queueLength ?? 0)}</li>
-          <li>
-            Current render:{' '}
-            {status?.currentRender
-              ? String((status.currentRender as { id?: string }).id)
-              : 'none'}
-          </li>
-          <li>
-            Last success:{' '}
-            {status?.lastSuccessfulRender
-              ? String((status.lastSuccessfulRender as { id?: string }).id)
-              : 'none'}
-          </li>
-          <li>
-            Last failure:{' '}
-            {status?.lastFailure ? String((status.lastFailure as { id?: string }).id) : 'none'}
-          </li>
-        </ul>
+      <section className="rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
+        <dl className="grid gap-2 sm:grid-cols-2">
+          {[
+            ['Blender installed', yn(panel?.blenderInstalled ?? blender.available)],
+            ['Version', String(panel?.version ?? blender.version ?? blender.message ?? '—')],
+            [
+              'EEVEE available',
+              yn(panel?.eeveeAvailable ?? (blender.engines ?? []).includes('EEVEE')),
+            ],
+            ['FFmpeg available', yn(panel?.ffmpegAvailable)],
+            ['Worker connected', yn(panel?.workerConnected ?? status?.workerOnline)],
+            ['Render writable', yn(panel?.renderWritable)],
+            ['Storage connected', yn(panel?.storageConnected)],
+            ['Queue length', String(status?.queueLength ?? 0)],
+          ].map(([k, v]) => (
+            <div key={k} className="rounded-2xl bg-ink-950/40 px-4 py-3">
+              <dt className="text-[10px] font-bold uppercase text-sun-400">{k}</dt>
+              <dd className="mt-1 break-all font-semibold">{v}</dd>
+            </div>
+          ))}
+        </dl>
         {!blender.available ? (
           <p className="mt-4 font-semibold text-rose-300">BLENDER EXECUTION REQUIRED</p>
         ) : null}
       </section>
 
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => void refresh()}
-          className="rounded-2xl border border-leaf-400/40 px-4 py-2 text-sm font-bold text-leaf-300"
-        >
-          Refresh
-        </button>
-        <button
-          type="button"
-          onClick={() => void selfTest()}
-          className="rounded-2xl bg-leaf-500 px-4 py-2 text-sm font-extrabold text-ink-950"
-        >
-          RUN WORKER SELF-TEST
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => void selfTest()}
+        className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-leaf-500 px-4 py-3 text-base font-extrabold text-ink-950"
+      >
+        RUN BLENDER SELF-TEST
+      </button>
+      <button
+        type="button"
+        onClick={() => void refresh()}
+        className="flex min-h-[48px] w-full items-center justify-center rounded-2xl border border-leaf-400/40 px-4 py-3 text-sm font-bold text-leaf-300"
+      >
+        Refresh
+      </button>
       {message ? <p className="text-sm text-rose-300">{message}</p> : null}
       {test ? (
         <pre className="overflow-x-auto rounded-2xl bg-ink-950/50 p-4 text-xs">
