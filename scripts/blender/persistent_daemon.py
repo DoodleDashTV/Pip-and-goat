@@ -205,14 +205,23 @@ def handle_render(job: dict) -> dict:
 
     t1 = time.time()
     imported_by_role = {}
+    role_load_ms = {}
     for asset in assets:
         role = str(asset.get("id") or asset.get("role") or "other")
         local_path = asset.get("localPath") or asset.get("path")
         if not local_path or not Path(local_path).exists():
             raise FileNotFoundError(f"Missing asset {role}: {local_path}")
+        rt = time.time()
         objs = append_blend(local_path)
+        role_load_ms[role] = int((time.time() - rt) * 1000)
         imported_by_role.setdefault(role, []).extend(objs)
+        PRELOADED[role] = local_path
     timings["asset_loading_ms"] = int((time.time() - t1) * 1000)
+    timings["pip_load_ms"] = role_load_ms.get("pip")
+    timings["goat_load_ms"] = role_load_ms.get("goat")
+    timings["environment_load_ms"] = role_load_ms.get("meadow") or role_load_ms.get("environment")
+    timings["prop_load_ms"] = role_load_ms.get("map") or role_load_ms.get("prop")
+    timings["role_load_ms"] = role_load_ms
 
     t2 = time.time()
     placements = shot_meta.get("placements") or {}
