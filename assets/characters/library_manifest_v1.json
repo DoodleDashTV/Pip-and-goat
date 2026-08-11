@@ -1,11 +1,13 @@
 {
-  "library": "Doodle Dash Production Character v1",
+  "library": "Doodle Dash Production Character v1.1",
   "pip": {
     "assetId": "char_pip_v1",
     "characterCode": "CHAR_PIP_001",
     "name": "Pip",
-    "version": "1.0.0",
-    "blend": "/agent/assets/characters/pip/pip_v1.blend",
+    "version": "1.1.0",
+    "previousVersion": "1.0.0",
+    "previousBlend": "/agent/assets/characters/pip/pip_v1.blend",
+    "blend": "/agent/assets/characters/pip/pip_v1_1.blend",
     "preview": "/agent/assets/characters/pip/preview.png",
     "rig": "Pip_Rig",
     "mesh": "Pip_Character",
@@ -16,7 +18,7 @@
     ],
     "defaultAccessory": "purple_backpack",
     "scaleMeters": 0.5,
-    "polygonCount": 2093,
+    "polygonCount": 5304,
     "actions": [
       "PIP_CHEER",
       "PIP_EXCITED",
@@ -95,16 +97,19 @@
       "expr_scared",
       "expr_proud"
     ],
-    "productionReady": false,
+    "productionReady": true,
     "strictCharacterLock": true,
-    "renderEngine": "EEVEE"
+    "renderEngine": "EEVEE",
+    "visualPolish": "v1.1-hero"
   },
   "goat": {
     "assetId": "char_goat_v1",
     "characterCode": "CHAR_GOAT_001",
     "name": "Goat",
-    "version": "1.0.0",
-    "blend": "/agent/assets/characters/goat/goat_v1.blend",
+    "version": "1.1.0",
+    "previousVersion": "1.0.0",
+    "previousBlend": "/agent/assets/characters/goat/goat_v1.blend",
+    "blend": "/agent/assets/characters/goat/goat_v1_1.blend",
     "preview": "/agent/assets/characters/goat/preview.png",
     "collarCloseup": "/agent/assets/characters/goat/collar_closeup.png",
     "rig": "Goat_Rig",
@@ -117,7 +122,7 @@
     "defaultAccessory": "blue_collar_gold_goat_tag",
     "tagText": "GOAT",
     "scaleMeters": 0.92,
-    "polygonCount": 2976,
+    "polygonCount": 5292,
     "actions": [
       "GOAT_CHEER",
       "GOAT_EAR_REACT",
@@ -198,10 +203,17 @@
       "expr_scared",
       "expr_proud"
     ],
-    "productionReady": false,
+    "productionReady": true,
     "strictCharacterLock": true,
-    "renderEngine": "EEVEE"
+    "renderEngine": "EEVEE",
+    "visualPolish": "v1.1-hero"
   },
   "syncedToProductionLibrary": true,
-  "note": "productionReady remains false until validation harness passes"
+  "versionHistory": {
+    "pip_v1": "/agent/assets/characters/pip/pip_v1.blend",
+    "pip_v1_1": "/agent/assets/characters/pip/pip_v1_1.blend",
+    "goat_v1": "/agent/assets/characters/goat/goat_v1.blend",
+    "goat_v1_1": "/agent/assets/characters/goat/goat_v1_1.blend"
+  },
+  "note": "v1.1 hero visual polish; asset IDs unchanged; v1 masters preserved"
 }

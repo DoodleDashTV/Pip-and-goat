@@ -11,8 +11,8 @@ import time
 from pathlib import Path
 
 ROOT = Path(os.environ.get("REPO_ROOT", "/agent"))
-PIP = ROOT / "assets/characters/pip/pip_v1.blend"
-GOAT = ROOT / "assets/characters/goat/goat_v1.blend"
+PIP = ROOT / "assets/characters/pip/pip_v1_1.blend"
+GOAT = ROOT / "assets/characters/goat/goat_v1_1.blend"
 MEADOW = ROOT / "production-library/environments/meadow_production.blend"
 OUT = ROOT / "artifacts/performance/master-build/validation"
 FRAMES = 60  # 2 seconds @ 30fps — real animation proof

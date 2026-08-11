@@ -2,8 +2,10 @@
   "assetId": "char_pip_v1",
   "characterCode": "CHAR_PIP_001",
   "name": "Pip",
-  "version": "1.0.0",
-  "blend": "/agent/assets/characters/pip/pip_v1.blend",
+  "version": "1.1.0",
+  "previousVersion": "1.0.0",
+  "previousBlend": "/agent/assets/characters/pip/pip_v1.blend",
+  "blend": "/agent/assets/characters/pip/pip_v1_1.blend",
   "preview": "/agent/assets/characters/pip/preview.png",
   "rig": "Pip_Rig",
   "mesh": "Pip_Character",
@@ -14,7 +16,7 @@
   ],
   "defaultAccessory": "purple_backpack",
   "scaleMeters": 0.5,
-  "polygonCount": 2093,
+  "polygonCount": 5304,
   "actions": [
     "PIP_CHEER",
     "PIP_EXCITED",
@@ -95,5 +97,6 @@
   ],
   "productionReady": true,
   "strictCharacterLock": true,
-  "renderEngine": "EEVEE"
+  "renderEngine": "EEVEE",
+  "visualPolish": "v1.1-hero"
 }
