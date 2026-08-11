@@ -18,7 +18,7 @@
     ],
     "defaultAccessory": "purple_backpack",
     "scaleMeters": 0.5,
-    "polygonCount": 5304,
+    "polygonCount": 4072,
     "actions": [
       "PIP_CHEER",
       "PIP_EXCITED",
@@ -122,7 +122,7 @@
     "defaultAccessory": "blue_collar_gold_goat_tag",
     "tagText": "GOAT",
     "scaleMeters": 0.92,
-    "polygonCount": 5292,
+    "polygonCount": 4060,
     "actions": [
       "GOAT_CHEER",
       "GOAT_EAR_REACT",

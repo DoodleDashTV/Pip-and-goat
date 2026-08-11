@@ -3,8 +3,8 @@
   "status": "PASS",
   "frames": 60,
   "mp4": "/agent/artifacts/performance/master-build/validation/pip_goat_validation.mp4",
-  "renderMs": 46210,
-  "totalMs": 46640,
+  "renderMs": 60429,
+  "totalMs": 60852,
   "checks": {
     "pipLoaded": true,
     "goatLoaded": true,

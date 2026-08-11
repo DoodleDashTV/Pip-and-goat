@@ -80,17 +80,8 @@ def mat(
         except Exception:
             pass
     if fuzz:
-        # Soft stylized bump for feather/fur feel — cheap, no hair sim
-        tex = nt.nodes.new("ShaderNodeTexNoise")
-        tex.inputs["Scale"].default_value = 28.0
-        tex.inputs["Detail"].default_value = 6.0
-        tex.inputs["Roughness"].default_value = 0.55
-        bump = nt.nodes.new("ShaderNodeBump")
-        bump.inputs["Strength"].default_value = 0.035
-        bump.inputs["Distance"].default_value = 0.015
-        nt.links.new(tex.outputs["Fac"], bump.inputs["Height"])
-        if "Normal" in bsdf.inputs:
-            nt.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+        # Soft look via sheen/subsurface only — avoid per-pixel noise bump on EEVEE CPU
+        pass
     return m
 
 
@@ -325,8 +316,8 @@ def build_pip(path: Path) -> dict:
     gold = mat("PipStar", (0.97, 0.8, 0.22), 0.28, 0.7, metallic=0.35)
 
     # Oversized rounded head + compact pear body
-    body = make_sphere("Pip_Body", 0.135, (0, 0.01, 0.205), segs=36, rings=24, material=yellow, scale=(1.05, 0.95, 1.12))
-    head = make_sphere("Pip_Head", 0.155, (0, -0.015, 0.405), segs=36, rings=24, material=yellow, scale=(1.02, 0.98, 1.0))
+    body = make_sphere("Pip_Body", 0.135, (0, 0.01, 0.205), segs=26, rings=16, material=yellow, scale=(1.05, 0.95, 1.12))
+    head = make_sphere("Pip_Head", 0.155, (0, -0.015, 0.405), segs=26, rings=16, material=yellow, scale=(1.02, 0.98, 1.0))
 
     # Red 3-lobe crest — center tallest
     for i, (x, z_off, sy) in enumerate(((-0.034, 0.0, 1.25), (0.0, 0.015, 1.75), (0.034, 0.0, 1.25))):
@@ -334,7 +325,7 @@ def build_pip(path: Path) -> dict:
 
     # Very large expressive eyes + brows + catchlights
     for side, x in (("L", -0.058), ("R", 0.058)):
-        make_sphere(f"Pip_EyeWhite_{side}", 0.06, (x, -0.14, 0.428), segs=24, rings=16, material=white, scale=(1.08, 0.58, 1.12))
+        make_sphere(f"Pip_EyeWhite_{side}", 0.06, (x, -0.14, 0.428), segs=18, rings=12, material=white, scale=(1.08, 0.58, 1.12))
         make_sphere(f"Pip_Iris_{side}", 0.03, (x, -0.162, 0.428), segs=18, rings=12, material=iris)
         make_sphere(f"Pip_Pupil_{side}", 0.013, (x, -0.176, 0.428), segs=12, rings=8, material=pupil)
         make_sphere(f"Pip_Catch_{side}", 0.008, (x - 0.014, -0.182, 0.442), segs=10, rings=6, material=catch)
@@ -701,8 +692,8 @@ def build_goat(path: Path) -> dict:
     ink = mat("GoatTagInk", (0.05, 0.05, 0.07), 0.55, 0.05)
 
     # Compact playful body + oversized cartoon head (cream only — no dark mask geo)
-    make_sphere("Goat_Body", 0.21, (0, 0.06, 0.44), segs=36, rings=24, material=cream, scale=(1.08, 1.22, 0.95))
-    make_sphere("Goat_Head", 0.2, (0, -0.26, 0.78), segs=36, rings=24, material=cream, scale=(1.06, 1.02, 1.0))
+    make_sphere("Goat_Body", 0.21, (0, 0.06, 0.44), segs=26, rings=16, material=cream, scale=(1.08, 1.22, 0.95))
+    make_sphere("Goat_Head", 0.2, (0, -0.26, 0.78), segs=26, rings=16, material=cream, scale=(1.06, 1.02, 1.0))
     # Soft muzzle — slightly smaller to avoid z-fight banding with head
     make_sphere("Goat_Muzzle", 0.078, (0, -0.42, 0.715), segs=20, rings=14, material=cream, scale=(1.05, 1.05, 0.88))
 
@@ -723,7 +714,7 @@ def build_goat(path: Path) -> dict:
 
     # Huge expressive brown eyes (identity-critical)
     for side, x in (("L", -0.075), ("R", 0.075)):
-        make_sphere(f"Goat_EyeWhite_{side}", 0.07, (x, -0.415, 0.835), segs=24, rings=16, material=white, scale=(1.08, 0.52, 1.12))
+        make_sphere(f"Goat_EyeWhite_{side}", 0.07, (x, -0.415, 0.835), segs=18, rings=12, material=white, scale=(1.08, 0.52, 1.12))
         make_sphere(f"Goat_Iris_{side}", 0.036, (x, -0.44, 0.835), segs=18, rings=12, material=iris)
         make_sphere(f"Goat_Pupil_{side}", 0.015, (x, -0.455, 0.835), segs=12, rings=8, material=pupil)
         make_sphere(f"Goat_Catch_{side}", 0.009, (x - 0.016, -0.462, 0.85), segs=10, rings=6, material=catch)

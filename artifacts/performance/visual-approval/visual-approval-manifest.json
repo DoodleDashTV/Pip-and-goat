@@ -1,0 +1,97 @@
+{
+  "package": "visual-approval-v1.1-final-stills",
+  "elapsedSeconds": 180.56,
+  "pipBlend": "/agent/assets/characters/pip/pip_v1_1.blend",
+  "goatBlend": "/agent/assets/characters/goat/goat_v1_1.blend",
+  "stills": {
+    "pip": {
+      "front": "/agent/artifacts/performance/visual-approval/stills/pip/front.png",
+      "left": "/agent/artifacts/performance/visual-approval/stills/pip/left.png",
+      "right": "/agent/artifacts/performance/visual-approval/stills/pip/right.png",
+      "rear": "/agent/artifacts/performance/visual-approval/stills/pip/rear.png",
+      "three_quarter": "/agent/artifacts/performance/visual-approval/stills/pip/three_quarter.png",
+      "closeup": "/agent/artifacts/performance/visual-approval/stills/pip/closeup.png",
+      "full_body": "/agent/artifacts/performance/visual-approval/stills/pip/full_body.png",
+      "backpack": "/agent/artifacts/performance/visual-approval/stills/pip/backpack.png"
+    },
+    "goat": {
+      "front": "/agent/artifacts/performance/visual-approval/stills/goat/front.png",
+      "left": "/agent/artifacts/performance/visual-approval/stills/goat/left.png",
+      "right": "/agent/artifacts/performance/visual-approval/stills/goat/right.png",
+      "rear": "/agent/artifacts/performance/visual-approval/stills/goat/rear.png",
+      "three_quarter": "/agent/artifacts/performance/visual-approval/stills/goat/three_quarter.png",
+      "closeup": "/agent/artifacts/performance/visual-approval/stills/goat/closeup.png",
+      "full_body": "/agent/artifacts/performance/visual-approval/stills/goat/full_body.png",
+      "collar_tag": "/agent/artifacts/performance/visual-approval/stills/goat/collar_tag.png"
+    },
+    "together": {
+      "front_two_shot": "/agent/artifacts/performance/visual-approval/stills/together/front_two_shot.png",
+      "three_quarter_adventure": "/agent/artifacts/performance/visual-approval/stills/together/three_quarter_adventure.png",
+      "interaction": "/agent/artifacts/performance/visual-approval/motion/together/interaction.mp4"
+    }
+  },
+  "expressions": {
+    "pip": {
+      "neutral": "/agent/artifacts/performance/visual-approval/expressions/pip/neutral.png",
+      "happy": "/agent/artifacts/performance/visual-approval/expressions/pip/happy.png",
+      "excited": "/agent/artifacts/performance/visual-approval/expressions/pip/excited.png",
+      "surprised": "/agent/artifacts/performance/visual-approval/expressions/pip/surprised.png",
+      "worried": "/agent/artifacts/performance/visual-approval/expressions/pip/worried.png",
+      "sad": "/agent/artifacts/performance/visual-approval/expressions/pip/sad.png",
+      "thinking": "/agent/artifacts/performance/visual-approval/expressions/pip/thinking.png",
+      "shy": "/agent/artifacts/performance/visual-approval/expressions/pip/shy.png",
+      "determined": "/agent/artifacts/performance/visual-approval/expressions/pip/determined.png",
+      "confused": "/agent/artifacts/performance/visual-approval/expressions/pip/confused.png",
+      "laughing": "/agent/artifacts/performance/visual-approval/expressions/pip/laughing.png",
+      "scared": "/agent/artifacts/performance/visual-approval/expressions/pip/scared.png",
+      "proud": "/agent/artifacts/performance/visual-approval/expressions/pip/proud.png"
+    },
+    "goat": {
+      "neutral": "/agent/artifacts/performance/visual-approval/expressions/goat/neutral.png",
+      "happy": "/agent/artifacts/performance/visual-approval/expressions/goat/happy.png",
+      "excited": "/agent/artifacts/performance/visual-approval/expressions/goat/excited.png",
+      "surprised": "/agent/artifacts/performance/visual-approval/expressions/goat/surprised.png",
+      "worried": "/agent/artifacts/performance/visual-approval/expressions/goat/worried.png",
+      "sad": "/agent/artifacts/performance/visual-approval/expressions/goat/sad.png",
+      "thinking": "/agent/artifacts/performance/visual-approval/expressions/goat/thinking.png",
+      "shy": "/agent/artifacts/performance/visual-approval/expressions/goat/shy.png",
+      "determined": "/agent/artifacts/performance/visual-approval/expressions/goat/determined.png",
+      "confused": "/agent/artifacts/performance/visual-approval/expressions/goat/confused.png",
+      "laughing": "/agent/artifacts/performance/visual-approval/expressions/goat/laughing.png",
+      "scared": "/agent/artifacts/performance/visual-approval/expressions/goat/scared.png",
+      "proud": "/agent/artifacts/performance/visual-approval/expressions/goat/proud.png"
+    }
+  },
+  "motion": {
+    "pip": {
+      "PIP_IDLE": "/agent/artifacts/performance/visual-approval/motion/pip/pip_idle.mp4",
+      "PIP_WALK": "/agent/artifacts/performance/visual-approval/motion/pip/pip_walk.mp4",
+      "PIP_RUN": "/agent/artifacts/performance/visual-approval/motion/pip/pip_run.mp4",
+      "PIP_WAVE": "/agent/artifacts/performance/visual-approval/motion/pip/pip_wave.mp4",
+      "PIP_JUMP": "/agent/artifacts/performance/visual-approval/motion/pip/pip_jump.mp4",
+      "PIP_TALK": "/agent/artifacts/performance/visual-approval/motion/pip/pip_talk.mp4",
+      "PIP_FLAP_EXCITED": "/agent/artifacts/performance/visual-approval/motion/pip/pip_flap_excited.mp4"
+    },
+    "goat": {
+      "GOAT_IDLE": "/agent/artifacts/performance/visual-approval/motion/goat/goat_idle.mp4",
+      "GOAT_WALK": "/agent/artifacts/performance/visual-approval/motion/goat/goat_walk.mp4",
+      "GOAT_RUN": "/agent/artifacts/performance/visual-approval/motion/goat/goat_run.mp4",
+      "GOAT_HEAD_NOD": "/agent/artifacts/performance/visual-approval/motion/goat/goat_head_nod.mp4",
+      "GOAT_EAR_REACT": "/agent/artifacts/performance/visual-approval/motion/goat/goat_ear_react.mp4",
+      "GOAT_TALK": "/agent/artifacts/performance/visual-approval/motion/goat/goat_talk.mp4",
+      "GOAT_HAPPY_REACTION": "/agent/artifacts/performance/visual-approval/motion/goat/goat_happy_reaction.mp4"
+    },
+    "together": "/agent/artifacts/performance/visual-approval/motion/together/interaction.mp4"
+  },
+  "resolution": {
+    "x": 540,
+    "y": 960
+  },
+  "samples": 8,
+  "motionFrames": 24,
+  "elapsedSecondsStillsRefresh": 61.82,
+  "polygonCounts": {
+    "pip": 4072,
+    "goat": 4060
+  }
+}

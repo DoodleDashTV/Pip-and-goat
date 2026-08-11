@@ -18,7 +18,7 @@
   "defaultAccessory": "blue_collar_gold_goat_tag",
   "tagText": "GOAT",
   "scaleMeters": 0.92,
-  "polygonCount": 5292,
+  "polygonCount": 4060,
   "actions": [
     "GOAT_CHEER",
     "GOAT_EAR_REACT",
@@ -102,5 +102,7 @@
   "productionReady": true,
   "strictCharacterLock": true,
   "renderEngine": "EEVEE",
-  "visualPolish": "v1.1-hero"
+  "visualPolish": "v1.1-hero",
+  "visualApprovalPackage": "/agent/artifacts/performance/visual-approval",
+  "visualApprovalStatus": "PENDING_HUMAN_REVIEW"
 }

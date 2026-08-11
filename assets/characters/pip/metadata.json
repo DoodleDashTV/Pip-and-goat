@@ -16,7 +16,7 @@
   ],
   "defaultAccessory": "purple_backpack",
   "scaleMeters": 0.5,
-  "polygonCount": 5304,
+  "polygonCount": 4072,
   "actions": [
     "PIP_CHEER",
     "PIP_EXCITED",
@@ -98,5 +98,7 @@
   "productionReady": true,
   "strictCharacterLock": true,
   "renderEngine": "EEVEE",
-  "visualPolish": "v1.1-hero"
+  "visualPolish": "v1.1-hero",
+  "visualApprovalPackage": "/agent/artifacts/performance/visual-approval",
+  "visualApprovalStatus": "PENDING_HUMAN_REVIEW"
 }
