@@ -1222,16 +1222,13 @@ async function seed() {
   });
 
   const verticalSlice = await prisma.episode.upsert({
-    where: {
-      universeId_seasonId_episodeNumber: {
-        universeId: universe.id,
-        seasonId: testSeason.id,
-        episodeNumber: 1,
-      },
-    },
+    where: { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' },
     update: {
       title: '[PRODUCTION TEST] Meadow Map Mystery',
       status: 'APPROVED',
+      seasonId: testSeason.id,
+      synopsis:
+        'INTERNAL PRODUCTION TEST ONLY. Pip is a founding character of the Doodle Dash Universe (CHAR_PIP_001). Goat is a founding character of the Doodle Dash Universe (CHAR_GOAT_001). The show brand is Doodle Dash TV. Pip and Goat discover Adventure Map in Sunny Meadow, ask a question, and end on a gentle cliffhanger. Not Season 1 canon.',
     },
     create: {
       id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
@@ -1407,6 +1404,19 @@ async function seed() {
       status: 'OPEN',
     },
   });
+
+  const mapPropProfile = await prisma.prop.findFirst({ where: { internalCode: 'PROP_MAP_001' } });
+  if (mapPropProfile) {
+    await prisma.propProductionProfile.upsert({
+      where: { propId: mapPropProfile.id },
+      update: {},
+      create: {
+        propId: mapPropProfile.id,
+        productionReady: false,
+        blockedReason: 'BLOCKED — PROP ASSET REQUIRED',
+      },
+    });
+  }
 
   console.log('Seed complete:', {
     universe: universe.name,

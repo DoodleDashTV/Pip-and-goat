@@ -1,0 +1,51 @@
+{
+  "episodeId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "kind": "DRAFT",
+  "lockedAt": "2026-08-11T15:16:59.114Z",
+  "story": {
+    "title": "[PRODUCTION TEST] Meadow Map Mystery",
+    "status": "APPROVED"
+  },
+  "shots": [
+    {
+      "id": "32af32e7-7b2f-457c-b0b2-322fa87bf553",
+      "n": 1
+    },
+    {
+      "id": "4882d960-d997-4bf3-8767-7eb68c5bb35e",
+      "n": 2
+    },
+    {
+      "id": "591da46c-7412-4e08-bb9e-2a6788fa84f3",
+      "n": 3
+    },
+    {
+      "id": "91bf16af-8db5-41d2-9741-2a8be1709cce",
+      "n": 4
+    }
+  ],
+  "characters": [
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "code": "CHAR_GOAT_001",
+      "modelIntakeId": null,
+      "modelVersion": null,
+      "referenceVersion": null,
+      "voiceVersion": null
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "code": "CHAR_PIP_001",
+      "modelIntakeId": "d2d6a1b7-91cc-4831-a25f-30461f5fe6ae",
+      "modelVersion": 2,
+      "referenceVersion": 2,
+      "voiceVersion": 1
+    }
+  ],
+  "profile": "DOODLE_DASH_SHORTS",
+  "output": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  }
+}

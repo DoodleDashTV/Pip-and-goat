@@ -16,35 +16,38 @@ type VoiceRow = {
 
 export default function VoicesPage() {
   const [voices, setVoices] = useState<VoiceRow[]>([]);
+  const [script, setScript] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const [versions, setVersions] = useState<Record<string, number>>({});
 
   async function load() {
     const res = await fetch('/api/production/voices');
     const data = await res.json();
     setVoices(data.voices ?? []);
+    const scriptRes = await fetch('/api/production/launch?action=audition-script');
+    const scriptData = await scriptRes.json();
+    setScript(scriptData.script ?? '');
   }
 
   useEffect(() => {
     void load();
   }, []);
 
-  async function save(characterId: string, form: HTMLFormElement) {
+  async function saveVersion(characterId: string, form: HTMLFormElement) {
     setMessage(null);
     const fd = new FormData(form);
-    const provider = String(fd.get('provider') || '').trim() || null;
-    const voiceId = String(fd.get('voiceId') || '').trim() || null;
-    const res = await fetch('/api/production/voices', {
+    const res = await fetch('/api/production/launch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        action: 'voice-version',
         characterId,
-        provider,
-        voiceId,
-        voiceVersion: String(fd.get('voiceVersion') || '').trim() || null,
+        provider: String(fd.get('provider') || '').trim() || null,
+        voiceId: String(fd.get('voiceId') || '').trim() || null,
+        model: String(fd.get('model') || '').trim() || null,
         speed: fd.get('speed') ? Number(fd.get('speed')) : null,
         pitch: fd.get('pitch') ? Number(fd.get('pitch')) : null,
         stability: fd.get('stability') ? Number(fd.get('stability')) : null,
-        auditionNotes: String(fd.get('auditionNotes') || '').trim() || null,
       }),
     });
     const data = await res.json();
@@ -52,40 +55,61 @@ export default function VoicesPage() {
       setMessage(data.error ?? 'Save failed');
       return;
     }
-    setMessage('Saved (not approved until you explicitly approve after audition).');
+    setVersions((prev) => ({ ...prev, [characterId]: data.version.versionNumber }));
+    setMessage(`Voice config version ${data.version.versionNumber} created (not approved yet).`);
     await load();
   }
 
-  async function approve(characterId: string) {
-    const res = await fetch('/api/production/voices', {
+  async function audition(characterId: string) {
+    const res = await fetch('/api/production/launch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'generate-audition', characterId }),
+    });
+    const data = await res.json();
+    setMessage(res.ok ? `Audition status: ${data.version.status}` : data.error);
+  }
+
+  async function decide(characterId: string, decision: 'APPROVE' | 'REJECT') {
+    const versionNumber = versions[characterId];
+    if (!versionNumber) {
+      setMessage('Save a voice version first.');
+      return;
+    }
+    const res = await fetch('/api/production/launch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        action: 'voice-decision',
         characterId,
-        approve: true,
-        approvedBy: 'studio-operator',
+        versionNumber,
+        decision,
+        by: 'studio-operator',
       }),
     });
     const data = await res.json();
-    if (!res.ok) {
-      setMessage(data.error ?? 'Approve failed');
-      return;
-    }
-    setMessage('Voice approved for final production.');
+    setMessage(res.ok ? `Voice ${decision}: v${versionNumber}` : data.error);
     await load();
   }
 
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">Voice Production</p>
-        <h1 className="mt-2 font-display text-4xl font-bold">Voice Configuration</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">Voice Onboarding</p>
+        <h1 className="mt-2 font-display text-4xl font-bold">Character Voice Approval</h1>
         <p className="mt-3 max-w-2xl text-[var(--muted)]">
-          Enter real provider voice IDs only. Pip and Goat cannot enter final production until
-          explicitly approved. No invented IDs.
+          Enter real provider voice IDs only. GENERATE AUDITION requires credentials — never fabricated.
+          Approvals are versioned.
         </p>
       </header>
+
+      <section className="rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
+        <h2 className="font-display text-xl font-bold">Canonical audition script</h2>
+        <pre className="mt-3 whitespace-pre-wrap text-sm text-[var(--muted)]">{script}</pre>
+      </section>
+
       {message ? <p className="text-sm text-sun-400">{message}</p> : null}
+
       {voices.map((row) => (
         <section
           key={row.character.id}
@@ -96,15 +120,13 @@ export default function VoicesPage() {
             <span className="text-base text-[var(--muted)]">{row.character.code}</span>
           </h2>
           <p className="mt-2 text-sm text-rose-300">
-            {row.config.approved
-              ? 'APPROVED'
-              : row.config.blockedReason ?? 'Not configured'}
+            {row.config.approved ? 'APPROVED' : row.config.blockedReason ?? 'Not configured'}
           </p>
           <form
             className="mt-4 grid gap-3 md:grid-cols-2"
             onSubmit={(e) => {
               e.preventDefault();
-              void save(row.character.id, e.currentTarget);
+              void saveVersion(row.character.id, e.currentTarget);
             }}
           >
             <label className="text-sm">
@@ -112,7 +134,6 @@ export default function VoicesPage() {
               <input
                 name="provider"
                 defaultValue={row.config.provider ?? ''}
-                placeholder="e.g. elevenlabs"
                 className="mt-1 w-full rounded-xl border border-[var(--line)] bg-ink-950/50 px-3 py-2"
               />
             </label>
@@ -126,10 +147,9 @@ export default function VoicesPage() {
               />
             </label>
             <label className="text-sm">
-              Voice version
+              Model
               <input
-                name="voiceVersion"
-                defaultValue={row.config.voiceVersion ?? ''}
+                name="model"
                 className="mt-1 w-full rounded-xl border border-[var(--line)] bg-ink-950/50 px-3 py-2"
               />
             </label>
@@ -160,28 +180,33 @@ export default function VoicesPage() {
                 className="mt-1 w-full rounded-xl border border-[var(--line)] bg-ink-950/50 px-3 py-2"
               />
             </label>
-            <label className="text-sm md:col-span-2">
-              Audition notes
-              <textarea
-                name="auditionNotes"
-                defaultValue={row.config.auditionNotes ?? ''}
-                className="mt-1 w-full rounded-xl border border-[var(--line)] bg-ink-950/50 px-3 py-2"
-                rows={2}
-              />
-            </label>
             <div className="flex flex-wrap gap-3 md:col-span-2">
               <button
                 type="submit"
                 className="rounded-2xl bg-leaf-500 px-4 py-2 text-sm font-extrabold text-ink-950"
               >
-                Save config
+                Save voice version
               </button>
               <button
                 type="button"
-                onClick={() => void approve(row.character.id)}
+                onClick={() => void audition(row.character.id)}
                 className="rounded-2xl border border-leaf-400/40 px-4 py-2 text-sm font-bold text-leaf-300"
               >
-                Approve after audition
+                GENERATE AUDITION
+              </button>
+              <button
+                type="button"
+                onClick={() => void decide(row.character.id, 'APPROVE')}
+                className="rounded-2xl border border-leaf-400/40 px-4 py-2 text-sm font-bold text-leaf-300"
+              >
+                APPROVE VOICE
+              </button>
+              <button
+                type="button"
+                onClick={() => void decide(row.character.id, 'REJECT')}
+                className="rounded-2xl border border-rose-400/40 px-4 py-2 text-sm font-bold text-rose-300"
+              >
+                REJECT VOICE
               </button>
             </div>
           </form>

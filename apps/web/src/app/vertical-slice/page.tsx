@@ -51,6 +51,18 @@ export default async function VerticalSlicePage() {
           <Link href="/asset-intake" className="font-semibold text-leaf-300 underline">
             Asset Intake
           </Link>
+          <Link
+            href="/episodes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/readiness"
+            className="font-semibold text-leaf-300 underline"
+          >
+            Episode checklist + GENERATE FIRST DRAFT
+          </Link>
+          <Link
+            href="/episodes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/shots"
+            className="font-semibold text-leaf-300 underline"
+          >
+            Shot Inspector
+          </Link>
         </div>
       </header>
 

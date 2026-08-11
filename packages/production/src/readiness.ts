@@ -56,6 +56,8 @@ export const RegisterIntakeSchema = z.object({
     'LOCATION_BLEND',
     'LOCATION_PROP',
     'LIGHTING_SETUP',
+    'PROP_BLEND',
+    'PROP_GLB',
     'OTHER',
   ]),
   originalFilename: z.string().min(1).optional(),
@@ -66,7 +68,7 @@ export const RegisterIntakeSchema = z.object({
   /** When true, register a required-but-missing intake slot (no fake file). */
   markMissing: z.boolean().default(false),
   missingReason: z.string().optional(),
-  fileBytes: z.instanceof(Uint8Array).optional(),
+  fileBytes: z.instanceof(Uint8Array).or(z.instanceof(Buffer)).optional(),
 });
 
 export class AssetIntakeService {

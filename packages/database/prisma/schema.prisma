@@ -1454,6 +1454,8 @@ enum IntakeAssetKind {
   LOCATION_BLEND
   LOCATION_PROP
   LIGHTING_SETUP
+  PROP_BLEND
+  PROP_GLB
   OTHER
 }
 
@@ -1705,4 +1707,256 @@ model ProductionJobObservation {
   @@index([jobType, jobId])
   @@index([episodeId])
   @@map("production_job_observations")
+}
+
+// ============================================================
+// First Real Episode Launch Prep
+// ============================================================
+
+model StoredProductionObject {
+  id           String   @id @default(uuid()) @db.Uuid
+  storageKey   String   @unique @map("storage_key")
+  provider     String   @default("local")
+  category     String
+  uri          String
+  checksum     String?
+  byteSize     Int?     @map("byte_size")
+  contentType  String?  @map("content_type")
+  originalName String?  @map("original_name")
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([category])
+  @@map("stored_production_objects")
+}
+
+model CharacterModelInspection {
+  id              String   @id @default(uuid()) @db.Uuid
+  characterId     String   @map("character_id") @db.Uuid
+  intakeId        String?  @map("intake_id") @db.Uuid
+  assetVersion    Int      @default(1) @map("asset_version")
+  fileName        String?  @map("file_name")
+  fileSize        Int?     @map("file_size")
+  fileHash        String?  @map("file_hash")
+  format          String?
+  report          Json
+  requiredFindings Json?   @map("required_findings")
+  recommendedFindings Json? @map("recommended_findings")
+  optionalFindings Json?   @map("optional_findings")
+  productionReadyEligible Boolean @default(false) @map("production_ready_eligible")
+  blenderInspectStatus String @default("PENDING") @map("blender_inspect_status")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([characterId, createdAt])
+  @@map("character_model_inspections")
+}
+
+model CharacterFacialControlMap {
+  id               String   @id @default(uuid()) @db.Uuid
+  characterId      String   @map("character_id") @db.Uuid
+  assetVersion     Int      @default(1) @map("asset_version")
+  intakeId         String?  @map("intake_id") @db.Uuid
+  controlType      String   @default("SHAPE_KEY") @map("control_type")
+  mappings         Json
+  requiredComplete Boolean  @default(false) @map("required_complete")
+  missingRequired  Json?    @map("missing_required")
+  approved         Boolean  @default(false)
+  approvedBy       String?  @map("approved_by")
+  approvedAt       DateTime? @map("approved_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([characterId, assetVersion])
+  @@map("character_facial_control_maps")
+}
+
+model ApprovedReferenceVersion {
+  id                 String   @id @default(uuid()) @db.Uuid
+  characterId        String   @map("character_id") @db.Uuid
+  versionNumber      Int      @map("version_number")
+  primaryImageId     String?  @map("primary_image_id") @db.Uuid
+  additionalImageIds Json?    @map("additional_image_ids")
+  palette            Json?
+  silhouetteNotes    String?  @map("silhouette_notes")
+  proportionNotes    String?  @map("proportion_notes")
+  lockedTraits       Json?    @map("locked_traits")
+  assetVersion       Int?     @map("asset_version")
+  immutable          Boolean  @default(true)
+  approvedBy         String?
+  approvedAt         DateTime @default(now()) @map("approved_at")
+  summary            Json?
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@unique([characterId, versionNumber])
+  @@index([characterId])
+  @@map("approved_reference_versions")
+}
+
+model CharacterPreviewJob {
+  id            String   @id @default(uuid()) @db.Uuid
+  characterId   String   @map("character_id") @db.Uuid
+  poseCode      String   @map("pose_code")
+  status        String   @default("QUEUED")
+  renderJobId   String?  @map("render_job_id") @db.Uuid
+  artifactUri   String?  @map("artifact_uri")
+  blockedReason String?  @map("blocked_reason")
+  notes         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([characterId, poseCode])
+  @@map("character_preview_jobs")
+}
+
+model EnvironmentValidationReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  locationId  String   @map("location_id") @db.Uuid
+  passed      Boolean  @default(false)
+  checks      Json
+  blockers    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([locationId, createdAt])
+  @@map("environment_validation_reports")
+}
+
+model PropProductionProfile {
+  id                   String   @id @default(uuid()) @db.Uuid
+  propId               String   @unique @map("prop_id") @db.Uuid
+  intakeId             String?  @map("intake_id") @db.Uuid
+  scale                Float?
+  originNotes          String?  @map("origin_notes")
+  interactionPoints    Json?    @map("interaction_points")
+  handGripLocation     Json?    @map("hand_grip_location")
+  physicsEnabled       Boolean  @default(false) @map("physics_enabled")
+  characterCompatibility Json?  @map("character_compatibility")
+  approvedAssetVersion Int?     @map("approved_asset_version")
+  productionReady      Boolean  @default(false) @map("production_ready")
+  blockedReason        String?  @map("blocked_reason")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@map("prop_production_profiles")
+}
+
+model VoiceConfigVersion {
+  id              String   @id @default(uuid()) @db.Uuid
+  characterId     String   @map("character_id") @db.Uuid
+  versionNumber   Int      @map("version_number")
+  provider        String?
+  voiceId         String?  @map("voice_id")
+  model           String?
+  settings        Json?
+  auditionUri     String?  @map("audition_uri")
+  auditionScript  String?  @map("audition_script")
+  status          String   @default("DRAFT")
+  approvedBy      String?  @map("approved_by")
+  approvedAt      DateTime? @map("approved_at")
+  rejectedReason  String?  @map("rejected_reason")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@unique([characterId, versionNumber])
+  @@index([characterId, status])
+  @@map("voice_config_versions")
+}
+
+model BlenderWorkerSelfTest {
+  id            String   @id @default(uuid()) @db.Uuid
+  workerId      String?  @map("worker_id")
+  status        String   @default("QUEUED")
+  blenderBin    String?  @map("blender_bin")
+  blenderVersion String? @map("blender_version")
+  artifactUri   String?  @map("artifact_uri")
+  storageKey    String?  @map("storage_key")
+  logExcerpt    String?  @map("log_excerpt")
+  error         String?
+  startedAt     DateTime? @map("started_at")
+  finishedAt    DateTime? @map("finished_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("blender_worker_self_tests")
+}
+
+model EpisodeChecklistItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  episodeId   String   @map("episode_id") @db.Uuid
+  category    String
+  state       ProductionReadinessState
+  reason      String
+  fixHref     String?  @map("fix_href")
+  details     Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([episodeId, category])
+  @@map("episode_checklist_items")
+}
+
+model DraftReview {
+  id            String   @id @default(uuid()) @db.Uuid
+  episodeId     String   @map("episode_id") @db.Uuid
+  pipelineRunId String?  @map("pipeline_run_id") @db.Uuid
+  status        String   @default("PENDING")
+  draftUri      String?  @map("draft_uri")
+  guardianScore Float?   @map("guardian_score")
+  qcScore       Float?   @map("qc_score")
+  warnings      Json?
+  versionsUsed  Json?    @map("versions_used")
+  approvedBy    String?  @map("approved_by")
+  approvedAt    DateTime? @map("approved_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  notes DraftReviewNote[]
+
+  @@index([episodeId])
+  @@map("draft_reviews")
+}
+
+model DraftReviewNote {
+  id            String   @id @default(uuid()) @db.Uuid
+  draftReviewId String   @map("draft_review_id") @db.Uuid
+  shotId        String?  @map("shot_id") @db.Uuid
+  note          String
+  createdBy     String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  draftReview DraftReview @relation(fields: [draftReviewId], references: [id], onDelete: Cascade)
+
+  @@map("draft_review_notes")
+}
+
+model ProductionManifest {
+  id            String   @id @default(uuid()) @db.Uuid
+  episodeId     String   @map("episode_id") @db.Uuid
+  kind          String   @default("DRAFT")
+  locked        Boolean  @default(true)
+  manifest      Json
+  storageKey    String?  @map("storage_key")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([episodeId, kind])
+  @@map("production_manifests")
+}
+
+model DialogueVoiceVersionLink {
+  id                  String   @id @default(uuid()) @db.Uuid
+  dialogueLineId      String   @map("dialogue_line_id") @db.Uuid
+  voiceConfigVersionId String  @map("voice_config_version_id") @db.Uuid
+  characterId         String   @map("character_id") @db.Uuid
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  @@unique([dialogueLineId])
+  @@map("dialogue_voice_version_links")
+}
+
+model EpisodeReferenceVersionLink {
+  id                       String   @id @default(uuid()) @db.Uuid
+  episodeId                String   @map("episode_id") @db.Uuid
+  characterId              String   @map("character_id") @db.Uuid
+  approvedReferenceVersionId String @map("approved_reference_version_id") @db.Uuid
+  createdAt                DateTime @default(now()) @map("created_at")
+
+  @@unique([episodeId, characterId])
+  @@map("episode_reference_version_links")
 }

@@ -1,3 +1,6 @@
+import { promises as fs } from 'node:fs';
+import { dirname, join } from 'node:path';
+
 export class AppError extends Error {
   constructor(
     message: string,
@@ -13,11 +16,26 @@ export function assertNever(value: never): never {
   throw new Error(`Unexpected value: ${String(value)}`);
 }
 
-/** S3-compatible storage port — implementations arrive in later milestones. */
+/** Object storage port — local filesystem in development; S3/R2 later without redesign. */
+export type StorageCategory =
+  | 'original_uploads'
+  | 'approved_assets'
+  | 'working_files'
+  | 'draft_renders'
+  | 'final_renders'
+  | 'audio'
+  | 'captions'
+  | 'thumbnails'
+  | 'reports'
+  | 'manifests'
+  | 'worker_tests';
+
 export interface ObjectStorage {
   putObject(key: string, body: Uint8Array, contentType?: string): Promise<string>;
   getObjectUrl(key: string): Promise<string>;
   deleteObject(key: string): Promise<void>;
+  exists?(key: string): Promise<boolean>;
+  readObject?(key: string): Promise<Uint8Array>;
 }
 
 export class MissingObjectStorage implements ObjectStorage {
@@ -36,6 +54,76 @@ export class MissingObjectStorage implements ObjectStorage {
   async deleteObject(): Promise<void> {
     throw new AppError('Object storage is not configured.', 'STORAGE_NOT_CONFIGURED', 501);
   }
+}
+
+/**
+ * Local filesystem storage for development. Keys are logical; paths are never stored as the
+ * sole identity of a production asset — callers persist storageKey + provider.
+ */
+export class LocalFilesystemStorage implements ObjectStorage {
+  constructor(private readonly rootDir: string) {}
+
+  private resolve(key: string): string {
+    const safe = assertSafePath(key, { allowRelative: true });
+    return join(this.rootDir, safe);
+  }
+
+  async putObject(key: string, body: Uint8Array, contentType?: string): Promise<string> {
+    const full = this.resolve(key);
+    await fs.mkdir(dirname(full), { recursive: true });
+    await fs.writeFile(full, body);
+    if (contentType) {
+      await fs.writeFile(`${full}.contentType`, contentType, 'utf8');
+    }
+    return `local://${key}`;
+  }
+
+  async getObjectUrl(key: string): Promise<string> {
+    return `file://${this.resolve(key)}`;
+  }
+
+  async deleteObject(key: string): Promise<void> {
+    try {
+      await fs.unlink(this.resolve(key));
+    } catch {
+      /* missing is fine */
+    }
+  }
+
+  async exists(key: string): Promise<boolean> {
+    try {
+      await fs.access(this.resolve(key));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async readObject(key: string): Promise<Uint8Array> {
+    const buf = await fs.readFile(this.resolve(key));
+    return new Uint8Array(buf);
+  }
+}
+
+export function storageKeyFor(
+  category: StorageCategory,
+  parts: Array<string | number>,
+): string {
+  const cleaned = parts
+    .map((p) => String(p).replace(/[^A-Za-z0-9._@+-]+/g, '_'))
+    .filter(Boolean);
+  return [category, ...cleaned].join('/');
+}
+
+export function createDefaultObjectStorage(): ObjectStorage {
+  const mode = process.env.OBJECT_STORAGE_PROVIDER ?? 'local';
+  if (mode === 'none' || mode === 'missing') {
+    return new MissingObjectStorage();
+  }
+  const root =
+    process.env.OBJECT_STORAGE_ROOT ||
+    `${process.cwd()}/.doodle-dash-storage`;
+  return new LocalFilesystemStorage(root);
 }
 
 const UNSAFE_SHELL_CHARS = /[\0\r\n]/;
