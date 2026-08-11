@@ -13,10 +13,15 @@ export async function POST(
     data: {
       status: 'FAILED',
       error: body.message ?? body.error ?? 'Render failed',
+      completedAt: new Date(),
     },
   });
   if (body.workerId) {
-    await renderJobService.heartbeat(body.workerId, 'IDLE');
+    try {
+      await renderJobService.heartbeat(body.workerId, 'IDLE');
+    } catch {
+      // Worker row may be gone after crash/restart — failure still recorded.
+    }
   }
   return NextResponse.json({ job });
 }

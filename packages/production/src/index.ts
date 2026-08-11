@@ -963,3 +963,4 @@ export * from './cost-optimized-production';
 export * from './canonical-characters';
 export * from './production-setup';
 export * from './episode-render';
+export * from './performance';

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { prisma } from '@doodle-dash/database';
 import { FOUNDING_CODES } from '@doodle-dash/domain';
 import { studioSettingsService } from '@doodle-dash/characters';
-import { canonicalCharacterService, productionStorageService } from '@doodle-dash/production';
+import { canonicalCharacterService, ProductionStorageService } from '@doodle-dash/production';
 import {
   AppError,
   createDefaultObjectStorage,
@@ -62,13 +62,30 @@ describe('mobile canonical reference intake', () => {
   }, 180_000);
 
   it('reports local storage as non-durable for Cloud Agent / redeploy safety', () => {
-    const status = describeObjectStorageStatus();
-    expect(status.provider).toBe('local');
-    expect(status.durable).toBe(false);
-    expect(status.banner).toBe('DURABLE STORAGE NOT CONFIGURED');
-    expect(status.requiredConfig.some((line) => line.includes('OBJECT_STORAGE_PROVIDER=s3'))).toBe(
-      true,
-    );
+    const keys = [
+      'OBJECT_STORAGE_PROVIDER',
+      'OBJECT_STORAGE_ENDPOINT',
+      'OBJECT_STORAGE_BUCKET',
+      'OBJECT_STORAGE_ACCESS_KEY_ID',
+      'OBJECT_STORAGE_SECRET_ACCESS_KEY',
+    ] as const;
+    const prev = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
+    process.env.OBJECT_STORAGE_PROVIDER = 'local';
+    for (const k of keys.slice(1)) delete process.env[k];
+    try {
+      const status = describeObjectStorageStatus();
+      expect(status.provider).toBe('local');
+      expect(status.durable).toBe(false);
+      expect(status.banner).toBe('DURABLE STORAGE NOT CONFIGURED');
+      expect(status.requiredConfig.some((line) => line.includes('OBJECT_STORAGE_PROVIDER=s3'))).toBe(
+        true,
+      );
+    } finally {
+      for (const k of keys) {
+        if (prev[k] === undefined) delete process.env[k];
+        else process.env[k] = prev[k];
+      }
+    }
   });
 
   it('accepts JPEG and PNG primary uploads with SHA-256 + pending approval', async () => {
@@ -101,21 +118,39 @@ describe('mobile canonical reference intake', () => {
   });
 
   it('persists actual binary bytes through the storage abstraction', async () => {
-    const bytes = fakeImage('persist', 'jpg');
-    const stored = await productionStorageService.storeUpload({
-      category: 'original_uploads',
-      parts: ['test', 'mobile-persist', Date.now(), 'probe.jpeg'],
-      bytes,
-      contentType: 'image/jpeg',
-      originalName: 'probe.jpeg',
-    });
-    expect(stored.checksum).toHaveLength(64);
-    expect(stored.uri.startsWith('local://')).toBe(true);
-    const key = parseLocalStorageKey(stored.uri);
-    expect(key).toBeTruthy();
-    const storage = createDefaultObjectStorage();
-    const readBack = await storage.readObject!(key!);
-    expect(Buffer.from(readBack).equals(Buffer.from(bytes))).toBe(true);
+    const keys = [
+      'OBJECT_STORAGE_PROVIDER',
+      'OBJECT_STORAGE_ENDPOINT',
+      'OBJECT_STORAGE_BUCKET',
+      'OBJECT_STORAGE_ACCESS_KEY_ID',
+      'OBJECT_STORAGE_SECRET_ACCESS_KEY',
+    ] as const;
+    const prev = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
+    process.env.OBJECT_STORAGE_PROVIDER = 'local';
+    for (const k of keys.slice(1)) delete process.env[k];
+    try {
+      const bytes = fakeImage('persist', 'jpg');
+      const localStorage = createDefaultObjectStorage();
+      const service = new ProductionStorageService(localStorage);
+      const stored = await service.storeUpload({
+        category: 'original_uploads',
+        parts: ['test', 'mobile-persist', Date.now(), 'probe.jpeg'],
+        bytes,
+        contentType: 'image/jpeg',
+        originalName: 'probe.jpeg',
+      });
+      expect(stored.checksum).toHaveLength(64);
+      expect(stored.uri.startsWith('local://')).toBe(true);
+      const key = parseLocalStorageKey(stored.uri);
+      expect(key).toBeTruthy();
+      const readBack = await localStorage.readObject!(key!);
+      expect(Buffer.from(readBack).equals(Buffer.from(bytes))).toBe(true);
+    } finally {
+      for (const k of keys) {
+        if (prev[k] === undefined) delete process.env[k];
+        else process.env[k] = prev[k];
+      }
+    }
   });
 
   it('rejects unsupported formats and keeps Pip/Goat associations unique', async () => {

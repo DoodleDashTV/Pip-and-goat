@@ -10,8 +10,15 @@ import { prisma } from '@doodle-dash/database';
 import { FOUNDING_CODES } from '@doodle-dash/domain';
 import { AppError, sha256Hex } from '@doodle-dash/shared';
 import { characterService } from '@doodle-dash/characters';
-import { EEVEE_QUALITY_PRESETS, voiceGenerationCacheService } from './cost-optimized-production';
+import { EEVEE_QUALITY_PRESETS, shotRenderCacheService, voiceGenerationCacheService } from './cost-optimized-production';
 import { ProductionStorageService } from './launch-prep';
+import {
+  assertFinalQualityNotDegraded,
+  dirtyShotPlanner,
+  globalPerformanceProfiler,
+  profileResolution,
+  resolvePerformanceConfig,
+} from './performance';
 import { shotPackageService } from './readiness';
 
 const PIP_ID = '22222222-2222-4222-8222-222222222222';
@@ -222,10 +229,31 @@ export class EpisodeShotRenderService {
       throw new AppError(`Unknown render profile ${params.profileCode}`, 'PROFILE_MISSING', 404);
     }
     const resolution = PROFILE_RESOLUTION[params.profileCode];
-    const presetSamples = (EEVEE_QUALITY_PRESETS[params.profileCode] as { samples?: number }).samples ?? 32;
-    // Keep visual quality: draft uses preset; final caps at 40 for EEVEE CPU throughput without soft look.
+    const perf = resolvePerformanceConfig({
+      mode: params.profileCode === 'FINAL_1080P' ? 'FINAL_1080P' : params.profileCode,
+    });
+    const resProfile = profileResolution(perf.mode);
     const samples =
-      params.profileCode === 'DRAFT_FAST' ? Math.min(presetSamples, 12) : Math.min(presetSamples, 40);
+      params.profileCode === 'FINAL_1080P'
+        ? resProfile.samples
+        : params.profileCode === 'DRAFT_FAST'
+          ? Math.min(resProfile.samples, perf.draftFastSamples)
+          : resProfile.samples;
+    if (params.profileCode === 'FINAL_1080P') {
+      assertFinalQualityNotDegraded(samples);
+    }
+
+    const dirty = perf.enableShotCache
+      ? await dirtyShotPlanner.planEpisode({
+          episodeId: params.episodeId,
+          profileCode: params.profileCode,
+          buildFingerprint: (shotId, profileCode) =>
+            shotRenderCacheService.buildFingerprint(shotId, profileCode),
+        })
+      : null;
+    const force = new Set((params as { forceRerenderShotIds?: string[] }).forceRerenderShotIds || []);
+    const reused: Array<{ shotId: string; shotNumber: number; outputUri: string | null; fingerprint: string }> =
+      [];
 
     const episode = await prisma.episode.findUniqueOrThrow({
       where: { id: params.episodeId },
@@ -252,6 +280,25 @@ export class EpisodeShotRenderService {
 
     for (const scene of episode.scenes) {
       for (const shot of scene.shots.sort((a, b) => a.shotNumber - b.shotNumber)) {
+        const dirtyItem = dirty?.plan.find((p) => p.shotId === shot.id);
+        if (
+          perf.enableShotCache &&
+          dirtyItem?.action === 'REUSE' &&
+          dirtyItem.outputUri &&
+          !force.has(shot.id)
+        ) {
+          reused.push({
+            shotId: shot.id,
+            shotNumber: shot.shotNumber,
+            outputUri: dirtyItem.outputUri,
+            fingerprint: dirtyItem.fingerprint,
+          });
+          globalPerformanceProfiler.addShots(0, 1);
+          globalPerformanceProfiler.addCache(true);
+          cursorSec += shot.durationSeconds || 4;
+          continue;
+        }
+
         const pkg = await shotPackageService.buildForShot(shot.id);
         if (pkg.status === 'BLOCKED') {
           throw new AppError(
@@ -291,6 +338,11 @@ export class EpisodeShotRenderService {
         };
 
         const cameraPreset = CAMERA_MAP[shot.cameraPreset || ''] || 'TWO_SHOT';
+        const cacheSlot = await shotRenderCacheService.lookupOrMark({
+          shotId: shot.id,
+          profileCode: params.profileCode,
+          engine: 'EEVEE',
+        });
 
         const job = await prisma.renderJob.create({
           data: {
@@ -321,6 +373,7 @@ export class EpisodeShotRenderService {
                 samples,
                 cameraPreset,
                 packageId: pkg.id,
+                cacheFingerprint: cacheSlot.fingerprint,
                 shotMeta: {
                   shotNumber: shot.shotNumber,
                   description: shot.description,
@@ -343,6 +396,8 @@ export class EpisodeShotRenderService {
         });
 
         jobs.push({ jobId: job.id, shotId: shot.id, shotNumber: shot.shotNumber, endFrame, durationSec });
+        globalPerformanceProfiler.addShots(1, 0);
+        globalPerformanceProfiler.addCache(false);
         cursorSec += durationSec;
       }
     }
@@ -355,8 +410,11 @@ export class EpisodeShotRenderService {
       samples,
       jobCount: jobs.length,
       jobs,
+      reused,
+      dirtyPlan: dirty,
       dialogueAudio,
       estimatedFrames: jobs.reduce((n, j) => n + j.endFrame, 0),
+      blenderDevice: 'CPU',
     };
   }
 }

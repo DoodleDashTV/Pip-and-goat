@@ -9,12 +9,14 @@ const os = require('node:os');
 const path = require('node:path');
 const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
 
+const { PersistentBlenderDaemon } = require('./persistent-daemon');
+
 const DEFAULT_CAPABILITIES = {
   engines: ['EEVEE', 'CYCLES'],
   resolutions: ['270x480', '360x640', '540x960', '720x1280', '1080x1920'],
   fps: [24, 30, 60],
   supportsGpu: Boolean(process.env.BLENDER_GPU),
-  maxConcurrentJobs: 1,
+  maxConcurrentJobs: Number(process.env.RENDER_CONCURRENCY) > 0 ? Number(process.env.RENDER_CONCURRENCY) : 1,
 };
 
 const config = {
@@ -26,9 +28,22 @@ const config = {
   pollIntervalMs: Number(process.env.RENDER_POLL_INTERVAL_MS || 5000),
   once: process.argv.includes('--once'),
   storageRoot: process.env.OBJECT_STORAGE_ROOT || path.resolve(process.cwd(), '.doodle-dash-storage'),
+  persistent:
+    String(process.env.PERSISTENT_BLENDER_WORKERS ?? 'true').toLowerCase() !== 'false',
 };
 
 let s3Client = null;
+let daemon = null;
+
+function getDaemon() {
+  if (!daemon) {
+    daemon = new PersistentBlenderDaemon({
+      blenderBin: config.blenderBin,
+      repoRoot: process.env.REPO_ROOT || path.resolve(__dirname, '../../..'),
+    });
+  }
+  return daemon;
+}
 
 function getS3() {
   if (s3Client) return s3Client;
@@ -179,6 +194,33 @@ async function downloadUri(uri, localPath, expectedChecksum) {
 
 async function runBlender(job, localAssets, outputDir) {
   await fsp.mkdir(outputDir, { recursive: true });
+  if (config.persistent) {
+    await reportProgress(job.id || job.queueId, 'RENDERING', 30, 'Persistent Blender daemon render');
+    const d = getDaemon();
+    await d.start();
+    const payload = job.payload || {};
+    const meta = payload.metadata || {};
+    const result = await d.render({
+      resolution: job.resolution || '540x960',
+      fps: job.fps || 30,
+      outputDir,
+      assets: localAssets,
+      metadata: {
+        ...meta,
+        startFrame: meta.startFrame || 1,
+        endFrame:
+          meta.endFrame || Math.max(1, Math.round((meta.durationSec || 2) * (job.fps || 30))),
+        samples: meta.samples || (job.resolution === '1080x1920' ? 20 : 8),
+        cameraPreset: meta.cameraPreset || 'WIDE',
+        shotMeta: meta.shotMeta || meta,
+      },
+    });
+    await fsp.writeFile(path.join(outputDir, 'daemon_timings.json'), JSON.stringify(result, null, 2));
+    const frames = (await fsp.readdir(outputDir)).filter((f) => f.startsWith('frame_') && f.endsWith('.png'));
+    if (!frames.length) throw new Error('Daemon completed but produced no frames');
+    return result;
+  }
+
   const argv = buildBlenderArgs(job, localAssets, outputDir);
   const scriptPath = argv[argv.indexOf('--python') + 1] || 'assemble_scene.py';
   await reportProgress(job.id || job.queueId, 'RENDERING', 30, `Blender start: ${path.basename(scriptPath)}`);
@@ -190,7 +232,6 @@ async function runBlender(job, localAssets, outputDir) {
       else reject(new Error(`Blender exited with code ${code}`));
     });
   });
-  // Encode shot.mp4 from frames for easier episode assembly
   const frames = (await fsp.readdir(outputDir))
     .filter((f) => f.startsWith('frame_') && f.endsWith('.png'))
     .sort();
