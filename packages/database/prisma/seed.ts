@@ -662,6 +662,126 @@ async function seed() {
     });
   }
 
+  // Milestone 3-5: development baselines + Pip↔Goat relationship (neutral defaults).
+  await prisma.characterDevelopment.upsert({
+    where: { characterId: pip.id },
+    update: {},
+    create: {
+      characterId: pip.id,
+      confidence: 55,
+      courage: 60,
+      patience: 45,
+      empathy: 70,
+      leadership: 50,
+      independence: 55,
+      curiosity: 90,
+      responsibility: 50,
+      notes: 'Founding baseline. Editable via story-referenced development events only.',
+    },
+  });
+  await prisma.characterDevelopment.upsert({
+    where: { characterId: goat.id },
+    update: {},
+    create: {
+      characterId: goat.id,
+      confidence: 60,
+      courage: 55,
+      patience: 70,
+      empathy: 75,
+      leadership: 45,
+      independence: 50,
+      curiosity: 65,
+      responsibility: 65,
+      notes: 'Founding baseline. Editable via story-referenced development events only.',
+    },
+  });
+
+  const pipBaselineEvent = await prisma.characterDevelopmentEvent.findFirst({
+    where: { characterId: pip.id, storyEventRef: 'SEED_FOUNDING_BASELINE' },
+  });
+  if (!pipBaselineEvent) {
+    await prisma.characterDevelopmentEvent.create({
+      data: {
+        characterId: pip.id,
+        attribute: 'curiosity',
+        previousValue: 50,
+        newValue: 90,
+        delta: 40,
+        storyEventRef: 'SEED_FOUNDING_BASELINE',
+        summary: 'Initial registry baseline for Pip. Not an episode plot event.',
+        approved: true,
+      },
+    });
+  }
+
+  const goatBaselineEvent = await prisma.characterDevelopmentEvent.findFirst({
+    where: { characterId: goat.id, storyEventRef: 'SEED_FOUNDING_BASELINE' },
+  });
+  if (!goatBaselineEvent) {
+    await prisma.characterDevelopmentEvent.create({
+      data: {
+        characterId: goat.id,
+        attribute: 'empathy',
+        previousValue: 50,
+        newValue: 75,
+        delta: 25,
+        storyEventRef: 'SEED_FOUNDING_BASELINE',
+        summary: 'Initial registry baseline for Goat. Not an episode plot event.',
+        approved: true,
+      },
+    });
+  }
+
+  async function ensureRelationship(fromId: string, toId: string, label: string) {
+    return prisma.characterRelationship.upsert({
+      where: {
+        fromCharacterId_toCharacterId: {
+          fromCharacterId: fromId,
+          toCharacterId: toId,
+        },
+      },
+      update: {},
+      create: {
+        universeId: universe.id,
+        fromCharacterId: fromId,
+        toCharacterId: toId,
+        trust: 70,
+        friendship: 75,
+        respect: 65,
+        dependence: 55,
+        tension: 15,
+        rivalry: 5,
+        familiarity: 80,
+        label,
+        notes: 'Neutral founding companion defaults. Adjust only via story-referenced events.',
+      },
+    });
+  }
+
+  const pipToGoat = await ensureRelationship(pip.id, goat.id, 'Pip → Goat');
+  const goatToPip = await ensureRelationship(goat.id, pip.id, 'Goat → Pip');
+
+  const existingRelEvent = await prisma.relationshipEvent.findFirst({
+    where: {
+      relationshipId: pipToGoat.id,
+      storyEventRef: 'SEED_FOUNDING_RELATIONSHIP',
+    },
+  });
+  if (!existingRelEvent) {
+    await prisma.relationshipEvent.create({
+      data: {
+        relationshipId: pipToGoat.id,
+        attribute: 'friendship',
+        previousValue: 50,
+        newValue: 75,
+        delta: 25,
+        storyEventRef: 'SEED_FOUNDING_RELATIONSHIP',
+        summary: 'Founding companion relationship baseline.',
+        approved: true,
+      },
+    });
+  }
+
   console.log('Seed complete:', {
     universe: universe.name,
     pip: pip.internalCode,
@@ -669,6 +789,7 @@ async function seed() {
     animations: animations.length,
     poses: poses.length,
     expressions: expressions.length,
+    relationships: [pipToGoat.label, goatToPip.label],
   });
 }
 

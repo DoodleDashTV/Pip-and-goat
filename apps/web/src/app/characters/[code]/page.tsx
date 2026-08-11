@@ -24,6 +24,10 @@ export default async function CharacterDetailPage({
       motionDna: true,
       voiceDna: true,
       storyDna: true,
+      development: true,
+      developmentEvents: { orderBy: { createdAt: 'desc' }, take: 8 },
+      relationshipsFrom: { include: { toCharacter: true } },
+      relationshipsTo: { include: { fromCharacter: true } },
     },
   });
 
@@ -158,6 +162,56 @@ export default async function CharacterDetailPage({
               <li key={reference.id}>
                 {reference.title}{' '}
                 <span className="text-sun-300">({reference.reviewStatus})</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <Panel title="Development">
+          {character.development ? (
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {Object.entries({
+                confidence: character.development.confidence,
+                courage: character.development.courage,
+                patience: character.development.patience,
+                empathy: character.development.empathy,
+                leadership: character.development.leadership,
+                independence: character.development.independence,
+                curiosity: character.development.curiosity,
+                responsibility: character.development.responsibility,
+              }).map(([key, value]) => (
+                <div key={key} className="rounded-xl bg-ink-950/40 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]">{key}</p>
+                  <p className="font-bold text-leaf-300">{value}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--muted)]">Not seeded</p>
+          )}
+          <ul className="mt-4 space-y-2 text-xs text-[var(--muted)]">
+            {character.developmentEvents.map((event) => (
+              <li key={event.id}>
+                {event.attribute} {event.previousValue}→{event.newValue} · {event.storyEventRef}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+
+        <Panel title="Relationships">
+          <ul className="space-y-3 text-sm">
+            {character.relationshipsFrom.map((relationship) => (
+              <li key={relationship.id} className="rounded-2xl bg-ink-950/40 px-4 py-3">
+                → {relationship.toCharacter.name} · friendship {relationship.friendship} · trust{' '}
+                {relationship.trust}
+              </li>
+            ))}
+            {character.relationshipsTo.map((relationship) => (
+              <li key={relationship.id} className="rounded-2xl bg-ink-950/40 px-4 py-3">
+                ← {relationship.fromCharacter.name} · friendship {relationship.friendship} · trust{' '}
+                {relationship.trust}
               </li>
             ))}
           </ul>

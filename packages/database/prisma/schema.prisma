@@ -117,6 +117,7 @@ model Universe {
   poses            PoseDefinition[]
   expressions      ExpressionDefinition[]
   referenceImages  CharacterReferenceImage[]
+  relationships    CharacterRelationship[]
 
   @@map("universes")
 }
@@ -185,6 +186,10 @@ model Character {
   motionDna       CharacterMotionDna?
   voiceDna        CharacterVoiceDna?
   storyDna        CharacterStoryDna?
+  development     CharacterDevelopment?
+  developmentEvents CharacterDevelopmentEvent[]
+  relationshipsFrom CharacterRelationship[] @relation("RelationshipFrom")
+  relationshipsTo   CharacterRelationship[] @relation("RelationshipTo")
 
   @@index([universeId])
   @@map("characters")
@@ -529,6 +534,93 @@ model StudioSetting {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("studio_settings")
+}
+
+model CharacterDevelopment {
+  id             String   @id @default(uuid()) @db.Uuid
+  characterId    String   @unique @map("character_id") @db.Uuid
+  confidence     Int      @default(50)
+  courage        Int      @default(50)
+  patience       Int      @default(50)
+  empathy        Int      @default(50)
+  leadership     Int      @default(50)
+  independence   Int      @default(50)
+  curiosity      Int      @default(50)
+  responsibility Int      @default(50)
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_development")
+}
+
+model CharacterDevelopmentEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  characterId     String   @map("character_id") @db.Uuid
+  attribute       String
+  previousValue   Int      @map("previous_value")
+  newValue        Int      @map("new_value")
+  delta           Int
+  storyEventRef   String   @map("story_event_ref")
+  episodeId       String?  @map("episode_id") @db.Uuid
+  summary         String?
+  approved        Boolean  @default(false)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@index([storyEventRef])
+  @@map("character_development_events")
+}
+
+model CharacterRelationship {
+  id                 String   @id @default(uuid()) @db.Uuid
+  universeId         String   @map("universe_id") @db.Uuid
+  fromCharacterId    String   @map("from_character_id") @db.Uuid
+  toCharacterId      String   @map("to_character_id") @db.Uuid
+  trust              Int      @default(50)
+  friendship         Int      @default(50)
+  respect            Int      @default(50)
+  dependence         Int      @default(50)
+  tension            Int      @default(20)
+  rivalry            Int      @default(10)
+  familiarity        Int      @default(50)
+  label              String?
+  notes              String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  fromCharacter Character @relation("RelationshipFrom", fields: [fromCharacterId], references: [id], onDelete: Cascade)
+  toCharacter   Character @relation("RelationshipTo", fields: [toCharacterId], references: [id], onDelete: Cascade)
+  universe      Universe  @relation(fields: [universeId], references: [id], onDelete: Cascade)
+  events        RelationshipEvent[]
+
+  @@unique([fromCharacterId, toCharacterId])
+  @@index([universeId])
+  @@map("character_relationships")
+}
+
+model RelationshipEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  relationshipId  String   @map("relationship_id") @db.Uuid
+  attribute       String
+  previousValue   Int      @map("previous_value")
+  newValue        Int      @map("new_value")
+  delta           Int
+  storyEventRef   String   @map("story_event_ref")
+  episodeId       String?  @map("episode_id") @db.Uuid
+  summary         String?
+  approved        Boolean  @default(false)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  relationship CharacterRelationship @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+
+  @@index([relationshipId])
+  @@index([storyEventRef])
+  @@map("relationship_events")
 }
 
 model Asset {

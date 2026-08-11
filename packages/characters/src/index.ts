@@ -13,6 +13,14 @@ const characterInclude = {
   motionDna: true,
   voiceDna: true,
   storyDna: true,
+  development: true,
+  developmentEvents: { orderBy: { createdAt: 'desc' as const }, take: 20 },
+  relationshipsFrom: {
+    include: { toCharacter: true, events: { orderBy: { createdAt: 'desc' as const }, take: 5 } },
+  },
+  relationshipsTo: {
+    include: { fromCharacter: true, events: { orderBy: { createdAt: 'desc' as const }, take: 5 } },
+  },
 };
 
 export type CharacterDetail = Awaited<ReturnType<CharacterService['getByCode']>>;
@@ -178,5 +186,6 @@ export const characterService = new CharacterService();
 export const assetService = new AssetService();
 
 export * from './production';
+export * from './continuity';
 
 export type { Character };

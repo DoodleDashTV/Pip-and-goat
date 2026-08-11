@@ -14,7 +14,8 @@
   "dependencies": {
     "@doodle-dash/database": "workspace:*",
     "@doodle-dash/domain": "workspace:*",
-    "@doodle-dash/shared": "workspace:*"
+    "@doodle-dash/shared": "workspace:*",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "typescript": "^5.8.2"

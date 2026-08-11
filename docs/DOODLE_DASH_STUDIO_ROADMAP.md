@@ -6,9 +6,9 @@
 |-----------|-------|--------|
 | **1** | Core platform: Universe, Pip/Goat, Canon, Characters, DNA, Versions, Assets, Dashboard | **COMPLETE** |
 | **2** | Character production: 3D models, rigs, facial, refs, poses, expressions, animations | **COMPLETE** |
-| 3 | Character DNA depth + Character Lock polish | NOT STARTED |
-| 4 | Character development events | NOT STARTED |
-| 5 | Relationships (seed Pip↔Goat) | NOT STARTED |
+| **3** | Character DNA depth + Character Lock polish | **IN PROGRESS** |
+| **4** | Character development events | **IN PROGRESS** |
+| **5** | Relationships (seed Pip↔Goat) | **IN PROGRESS** |
 | 6 | Locations | NOT STARTED |
 | 7 | World map UI | NOT STARTED |
 | 8 | Props | NOT STARTED |
@@ -39,17 +39,22 @@
 - [x] Tests passing
 - [x] Typecheck / lint / build green
 
+## Milestone 2 exit criteria
+
+- [x] Character rig registry
+- [x] Facial rig registry
+- [x] Reference image registry (pending review slots)
+- [x] Animation / pose / expression / viseme definitions (MISSING assets)
+- [x] STRICT_CHARACTER_LOCK setting + preflight blocking
+- [x] Model status flow enforced (no fake PRODUCTION_READY)
+- [x] Studio UI pages for libraries/rigs/references
+- [x] Tests / typecheck / lint / build green
+
 ## Next milestone
 
-**Milestone 2 — Character production system**
+**Milestone 3–5** — Character DNA polish, development events, Pip↔Goat relationship seed
 
-- Expand 3D model registry workflows
-- Rig + facial rig registries
-- Reference image registry
-- Pose / expression / animation library definitions (assets remain MISSING until files exist)
-- Enforce STRICT_CHARACTER_LOCK in preflight stubs
-
-## Primary production model (unchanged)
+Or continue with **Milestone 6** locations if preferred.
 
 AI Story/Directing → Universe DB → Permanent characters/locations/props/animations → Scene assembly → Blender worker → Voice/Music → FFmpeg → 1080×1920 → Publishing
 

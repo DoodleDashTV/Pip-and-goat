@@ -14,12 +14,13 @@ const NAV = [
   { href: '/expressions', label: 'Expressions' },
   { href: '/rigs', label: 'Rigs' },
   { href: '/references', label: 'References' },
+  { href: '/relationships', label: 'Relationships' },
+  { href: '/settings', label: 'Settings' },
   { href: '/seasons', label: 'Seasons', soon: true },
   { href: '/episodes', label: 'Episodes', soon: true },
   { href: '/world', label: 'World', soon: true },
   { href: '/production', label: 'Production', soon: true },
   { href: '/render-queue', label: 'Render Queue', soon: true },
-  { href: '/settings', label: 'Settings', soon: true },
 ];
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
