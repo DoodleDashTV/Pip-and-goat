@@ -52,7 +52,8 @@ describe('Milestone 1 foundation', () => {
       expect(character.foundingCharacter).toBe(true);
       expect(character.versions.length).toBeGreaterThanOrEqual(1);
       expect(character.personalityDna).toBeTruthy();
-      expect(character.visualDna?.pendingReview).toBe(true);
+      // Founding visual DNA is canonically locked (pendingReview=false) while models remain MISSING.
+      expect(character.visualDna?.pendingReview).toBe(false);
       expect(character.models[0]?.status).toBe('MISSING');
       expect(character.models[0]?.productionReady).toBe(false);
     }
