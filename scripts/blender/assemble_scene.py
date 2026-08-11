@@ -146,6 +146,18 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
 def ensure_lights(scene) -> None:
     import bpy
 
+    world = scene.world or bpy.data.worlds.new("MeadowWorld")
+    scene.world = world
+    world.use_nodes = True
+    nodes = world.node_tree.nodes
+    links = world.node_tree.links
+    nodes.clear()
+    bg = nodes.new(type="ShaderNodeBackground")
+    bg.inputs[0].default_value = (0.45, 0.72, 0.95, 1.0)  # soft sky blue
+    bg.inputs[1].default_value = 1.0
+    out = nodes.new(type="ShaderNodeOutputWorld")
+    links.new(bg.outputs[0], out.inputs[0])
+
     if any(o.type == "LIGHT" for o in bpy.data.objects):
         return
     bpy.ops.object.light_add(type="SUN", location=(4, -3, 10))

@@ -180,7 +180,8 @@ async function downloadUri(uri, localPath, expectedChecksum) {
 async function runBlender(job, localAssets, outputDir) {
   await fsp.mkdir(outputDir, { recursive: true });
   const argv = buildBlenderArgs(job, localAssets, outputDir);
-  await reportProgress(job.id || job.queueId, 'RENDERING', 30, `Blender start: ${path.basename(argv[4] || 'assemble')}`);
+  const scriptPath = argv[argv.indexOf('--python') + 1] || 'assemble_scene.py';
+  await reportProgress(job.id || job.queueId, 'RENDERING', 30, `Blender start: ${path.basename(scriptPath)}`);
   await new Promise((resolve, reject) => {
     const child = spawn(config.blenderBin, argv, { stdio: 'inherit' });
     child.on('error', reject);
@@ -196,12 +197,10 @@ async function runBlender(job, localAssets, outputDir) {
   if (frames.length) {
     const fps = String(job.fps || 30);
     const mp4Path = path.join(outputDir, 'shot.mp4');
-    const pattern = path.join(outputDir, 'frame_%04d.png');
-    // Blender may write frame_0001.png or frame_1.png — detect
     const sample = frames[0];
     const padded = /frame_\d{4}\.png$/.test(sample);
     const ffmpegArgs = padded
-      ? ['-y', '-framerate', fps, '-i', pattern, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', mp4Path]
+      ? ['-y', '-framerate', fps, '-i', path.join(outputDir, 'frame_%04d.png'), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', mp4Path]
       : [
           '-y',
           '-framerate',
@@ -268,14 +267,31 @@ function buildBlenderArgs(job, localAssets, outputDir) {
 
 async function uploadOutputs(job, outputDir) {
   const jobId = job.id || job.queueId;
-  const files = (await fsp.readdir(outputDir)).filter((f) => f.endsWith('.png') || f.endsWith('.mp4') || f.endsWith('.json'));
+  const all = await fsp.readdir(outputDir);
+  const hasMp4 = all.includes('shot.mp4');
+  // Prefer compact shot.mp4 + metadata + a few preview frames (avoid uploading every PNG).
+  const files = all.filter((file) => {
+    if (file === 'shot.mp4' || file.endsWith('.json')) return true;
+    if (!file.endsWith('.png')) return false;
+    if (!hasMp4) return true;
+    // Keep first/middle/last preview frames only when mp4 exists.
+    const m = file.match(/frame_(\d+)\.png$/);
+    if (!m) return false;
+    const n = Number(m[1]);
+    const frames = all.filter((f) => f.startsWith('frame_') && f.endsWith('.png')).length;
+    return n === 1 || n === Math.floor(frames / 2) || n === frames;
+  });
   const outputs = [];
   for (const file of files) {
     const full = path.join(outputDir, file);
     const bytes = await fsp.readFile(full);
     const checksum = createHash('sha256').update(bytes).digest('hex');
     const key = `draft-renders/worker-jobs/${jobId}/${file}`;
-    const uri = await putObject(key, bytes, file.endsWith('.png') ? 'image/png' : 'application/octet-stream');
+    const uri = await putObject(
+      key,
+      bytes,
+      file.endsWith('.png') ? 'image/png' : file.endsWith('.mp4') ? 'video/mp4' : 'application/octet-stream',
+    );
     outputs.push({
       kind: file.endsWith('.png') ? 'frames' : file.endsWith('.mp4') ? 'final' : 'metadata',
       uri,

@@ -12,7 +12,8 @@ export async function POST(
     data: {
       status: body.status ?? undefined,
       progress: typeof body.progress === 'number' ? body.progress : undefined,
-      error: body.message ?? undefined,
+      // Progress messages are not failures — keep error null unless explicitly provided.
+      ...(body.error !== undefined ? { error: body.error } : {}),
     },
   });
   return NextResponse.json({ job });
