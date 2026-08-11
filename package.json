@@ -10,6 +10,7 @@
     "lint": "pnpm --filter @doodle-dash/web lint",
     "typecheck": "pnpm db:generate && pnpm --filter @doodle-dash/domain typecheck && pnpm --filter @doodle-dash/shared typecheck && pnpm --filter @doodle-dash/universe typecheck && pnpm --filter @doodle-dash/characters typecheck && pnpm --filter @doodle-dash/story typecheck && pnpm --filter @doodle-dash/production typecheck && pnpm --filter @doodle-dash/rendering typecheck && pnpm --filter @doodle-dash/audio typecheck && pnpm --filter @doodle-dash/providers typecheck && pnpm --filter @doodle-dash/web typecheck",
     "test": "pnpm db:generate && pnpm --filter @doodle-dash/web test",
+    "acceptance": "pnpm --filter @doodle-dash/web exec tsx --env-file=../../.env scripts/run-acceptance.ts",
     "db:generate": "pnpm --filter @doodle-dash/database generate",
     "db:migrate": "pnpm --filter @doodle-dash/database migrate",
     "db:push": "pnpm --filter @doodle-dash/database db:push",
