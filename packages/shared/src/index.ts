@@ -126,6 +126,69 @@ export function createDefaultObjectStorage(): ObjectStorage {
   return new LocalFilesystemStorage(root);
 }
 
+export type ObjectStorageStatus = {
+  provider: string;
+  root: string | null;
+  durable: boolean;
+  banner: 'OK' | 'DURABLE STORAGE NOT CONFIGURED' | 'STORAGE NOT CONFIGURED';
+  message: string;
+  requiredConfig: string[];
+};
+
+/**
+ * Local filesystem storage survives process restarts on the same disk but is NOT
+ * durable across Cloud Agent redeploys / ephemeral VMs. Production requires a
+ * durable object-storage provider (e.g. S3-compatible).
+ */
+export function describeObjectStorageStatus(): ObjectStorageStatus {
+  const provider = process.env.OBJECT_STORAGE_PROVIDER ?? 'local';
+  if (provider === 'none' || provider === 'missing') {
+    return {
+      provider,
+      root: null,
+      durable: false,
+      banner: 'STORAGE NOT CONFIGURED',
+      message:
+        'Object storage is disabled. Uploads cannot persist binaries until a storage provider is configured.',
+      requiredConfig: [
+        'Set OBJECT_STORAGE_PROVIDER to a durable provider (recommended: s3).',
+        'Set OBJECT_STORAGE_BUCKET (or equivalent) and credentials for that provider.',
+        'Alternatively for local-only development: OBJECT_STORAGE_PROVIDER=local and OBJECT_STORAGE_ROOT=/absolute/persistent/path',
+      ],
+    };
+  }
+  if (provider === 'local') {
+    const root =
+      process.env.OBJECT_STORAGE_ROOT || `${process.cwd()}/.doodle-dash-storage`;
+    return {
+      provider: 'local',
+      root,
+      durable: false,
+      banner: 'DURABLE STORAGE NOT CONFIGURED',
+      message:
+        'Uploads use local filesystem storage. Binaries survive app restarts on this same machine/path, but are NOT production-safe across Cloud Agent redeploys or ephemeral disks.',
+      requiredConfig: [
+        'For production durability set OBJECT_STORAGE_PROVIDER=s3 (S3-compatible).',
+        'Also set OBJECT_STORAGE_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION (or provider-equivalent vars).',
+        'Until then, treat JPEG/model uploads on this agent as temporary and re-upload after redeploy if needed.',
+      ],
+    };
+  }
+  return {
+    provider,
+    root: process.env.OBJECT_STORAGE_ROOT ?? null,
+    durable: true,
+    banner: 'OK',
+    message: `Using configured durable provider "${provider}".`,
+    requiredConfig: [],
+  };
+}
+
+export function parseLocalStorageKey(uri: string): string | null {
+  if (uri.startsWith('local://')) return uri.slice('local://'.length);
+  return null;
+}
+
 const UNSAFE_SHELL_CHARS = /[\0\r\n]/;
 const SAFE_PATH_SEGMENT = /^[A-Za-z0-9._/@:+,=\- ]+$/;
 

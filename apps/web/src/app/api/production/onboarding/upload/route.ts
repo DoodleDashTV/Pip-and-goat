@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import {
   characterOnboardingService,
+  canonicalCharacterService,
   environmentOnboardingService,
   propOnboardingService,
   VERTICAL_SLICE_EPISODE_ID,
 } from '@doodle-dash/production';
 import { prisma } from '@doodle-dash/database';
 import { FOUNDING_CODES } from '@doodle-dash/domain';
-import { AppError } from '@doodle-dash/shared';
+import { AppError, describeObjectStorageStatus } from '@doodle-dash/shared';
 
 async function readUpload(request: Request) {
   const form = await request.formData();
@@ -49,6 +50,7 @@ export async function GET() {
     prop,
     intakes,
     inspections,
+    storage: describeObjectStorageStatus(),
   });
 }
 
@@ -61,10 +63,38 @@ export async function POST(request: Request) {
       const character = await prisma.character.findUniqueOrThrow({
         where: { internalCode: upload.entityCode },
       });
+
+      if (upload.kind === 'PRIMARY_CANONICAL_REFERENCE') {
+        const result = await canonicalCharacterService.ingestPrimaryCanonicalReference({
+          characterCode: upload.entityCode,
+          fileName: upload.fileName,
+          bytes: upload.bytes,
+          contentType: upload.contentType,
+          autoApprove: false,
+        });
+        return NextResponse.json(
+          {
+            ...result,
+            status: 'PENDING APPROVAL',
+            previewUrl: result.referenceImage.assetId
+              ? `/api/production/media?assetId=${result.referenceImage.assetId}`
+              : null,
+          },
+          { status: 201 },
+        );
+      }
+
       if (
-        ['TEXTURE', 'MATERIAL', 'REFERENCE_IMAGE', 'PRIMARY_CANONICAL_REFERENCE', 'TURNAROUND', 'EXPRESSION_SHEET', 'POSE_REFERENCE', 'FACIAL_SHAPEKEYS', 'RIG'].includes(
-          upload.kind,
-        )
+        [
+          'TEXTURE',
+          'MATERIAL',
+          'REFERENCE_IMAGE',
+          'TURNAROUND',
+          'EXPRESSION_SHEET',
+          'POSE_REFERENCE',
+          'FACIAL_SHAPEKEYS',
+          'RIG',
+        ].includes(upload.kind)
       ) {
         const result = await characterOnboardingService.uploadTextureOrReference({
           characterId: character.id,

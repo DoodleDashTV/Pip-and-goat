@@ -58,6 +58,18 @@ export async function POST(request: Request) {
       const version = await canonicalCharacterService.approvePrimaryCanonical(parsed);
       return NextResponse.json({ version });
     }
+    if (action === 'reject-primary') {
+      const parsed = z
+        .object({
+          characterCode: z.enum([FOUNDING_CODES.PIP, FOUNDING_CODES.GOAT]),
+          referenceImageId: z.string().uuid(),
+          rejectedBy: z.string().min(1).default('studio-operator'),
+          reason: z.string().optional(),
+        })
+        .parse(body);
+      const image = await canonicalCharacterService.rejectPrimaryCandidate(parsed);
+      return NextResponse.json({ image });
+    }
     if (action === 'accessory-continuity') {
       const episodeId = z.string().uuid().parse(body.episodeId);
       return NextResponse.json(await accessoryContinuityGuardian.evaluateEpisode(episodeId));

@@ -29,7 +29,7 @@ Duck / generic bird / realistic or adult chicken / plastic look / wrong colors /
 | Canonical ID | READY |
 | DNA | READY |
 | Primary reference | READY after upload+approve |
-| Production model | **BLOCKED — REAL MODEL REQUIRED** |
+| Production model | **BLOCKED — REAL .BLEND REQUIRED** |
 | Rig / facial / lip-sync / 1080p validation | **BLOCKED** |
 
 ## Studio screens

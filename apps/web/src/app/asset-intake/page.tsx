@@ -1,6 +1,13 @@
 import { prisma } from '@doodle-dash/database';
 import { FOUNDING_CODES } from '@doodle-dash/domain';
-import { propOnboardingService } from '@doodle-dash/production';
+import {
+  PIP_CANONICAL_DNA,
+  GOAT_CANONICAL_DNA,
+  canonicalCharacterService,
+  propOnboardingService,
+} from '@doodle-dash/production';
+import { describeObjectStorageStatus } from '@doodle-dash/shared';
+import { CanonicalCharacterIntakeCard } from '@/components/CanonicalCharacterIntakeCard';
 import { UploadDropzone } from '@/components/UploadDropzone';
 import Link from 'next/link';
 
@@ -11,7 +18,14 @@ function SlotList({
   rows,
 }: {
   title: string;
-  rows: Array<{ id: string; kind: string; approvalStatus: string; storageLocation: string | null; missingReason: string | null; version: number }>;
+  rows: Array<{
+    id: string;
+    kind: string;
+    approvalStatus: string;
+    storageLocation: string | null;
+    missingReason: string | null;
+    version: number;
+  }>;
 }) {
   return (
     <div>
@@ -22,7 +36,9 @@ function SlotList({
             <div className="flex flex-wrap justify-between gap-2">
               <span className="font-semibold">{row.kind}</span>
               <span className={row.storageLocation ? 'text-leaf-300' : 'text-rose-300'}>
-                {row.storageLocation ? `${row.approvalStatus} · v${row.version}` : 'PRODUCTION ASSET REQUIRED'}
+                {row.storageLocation
+                  ? `${row.approvalStatus} · v${row.version}`
+                  : 'PRODUCTION ASSET REQUIRED'}
               </span>
             </div>
             {row.missingReason ? <p className="mt-1 text-[var(--muted)]">{row.missingReason}</p> : null}
@@ -33,13 +49,49 @@ function SlotList({
   );
 }
 
+function pickCandidate(
+  images: Array<{
+    id: string;
+    assetId: string | null;
+    title: string | null;
+    reviewStatus: string;
+    notes: string | null;
+    isPrimary: boolean;
+    createdAt: Date;
+  }>,
+) {
+  const withAsset = images.filter((i) => i.assetId);
+  return (
+    withAsset.find((i) => i.isPrimary && i.reviewStatus === 'PENDING_REVIEW') ??
+    withAsset.find((i) => i.reviewStatus === 'PENDING_REVIEW') ??
+    withAsset.find((i) => i.isPrimary && i.reviewStatus === 'APPROVED') ??
+    withAsset.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0] ??
+    null
+  );
+}
+
 export default async function AssetIntakePage() {
+  await canonicalCharacterService.bootstrapFoundingCharacters();
+  const storage = describeObjectStorageStatus();
+
   const [pip, goat, meadow, propBundle] = await Promise.all([
-    prisma.character.findUniqueOrThrow({ where: { internalCode: FOUNDING_CODES.PIP } }),
-    prisma.character.findUniqueOrThrow({ where: { internalCode: FOUNDING_CODES.GOAT } }),
+    prisma.character.findUniqueOrThrow({
+      where: { internalCode: FOUNDING_CODES.PIP },
+      include: { referenceImages: { orderBy: { createdAt: 'desc' } } },
+    }),
+    prisma.character.findUniqueOrThrow({
+      where: { internalCode: FOUNDING_CODES.GOAT },
+      include: { referenceImages: { orderBy: { createdAt: 'desc' } } },
+    }),
     prisma.location.findFirstOrThrow({ where: { internalCode: 'LOC_MEADOW_001' } }),
     propOnboardingService.ensureMapPropProfile(),
   ]);
+
+  const [pipReady, goatReady] = await Promise.all([
+    canonicalCharacterService.readinessMatrix(FOUNDING_CODES.PIP),
+    canonicalCharacterService.readinessMatrix(FOUNDING_CODES.GOAT),
+  ]);
+
   const intakes = await prisma.productionAssetIntake.findMany({
     orderBy: [{ kind: 'asc' }, { version: 'desc' }],
   });
@@ -49,103 +101,111 @@ export default async function AssetIntakePage() {
   });
 
   const forEntity = (entityId: string) =>
-    intakes.filter((i) => i.entityId === entityId).filter((row, idx, arr) => arr.findIndex((x) => x.kind === row.kind) === idx);
+    intakes
+      .filter((i) => i.entityId === entityId)
+      .filter((row, idx, arr) => arr.findIndex((x) => x.kind === row.kind) === idx);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 overflow-x-hidden">
       <header>
         <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">Launch Prep</p>
-        <h1 className="mt-2 font-display text-4xl font-bold">Production Asset Onboarding</h1>
-        <p className="mt-3 max-w-3xl text-[var(--muted)]">
-          Upload real Pip, Goat, Meadow, and prop assets. Validators run immediately. Uploads never auto-grant
-          production-ready status.
+        <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">
+          Production Asset Onboarding
+        </h1>
+        <p className="mt-3 max-w-3xl text-sm text-[var(--muted)] sm:text-base">
+          Upload real Pip and Goat primary references from your phone. Validators run immediately.
+          Uploads never auto-grant production-ready status.
         </p>
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
-          <Link href="/episodes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/readiness" className="text-leaf-300 underline">
+          <Link href={`/references/approve/${FOUNDING_CODES.PIP}`} className="text-leaf-300 underline">
+            Approve Pip
+          </Link>
+          <Link href={`/references/approve/${FOUNDING_CODES.GOAT}`} className="text-leaf-300 underline">
+            Approve Goat
+          </Link>
+          <Link
+            href="/episodes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/readiness"
+            className="text-leaf-300 underline"
+          >
             Meadow Map Mystery readiness
-          </Link>
-          <Link href="/blender-worker" className="text-leaf-300 underline">
-            Blender worker
-          </Link>
-          <Link href="/voices" className="text-leaf-300 underline">
-            Voices
           </Link>
         </div>
       </header>
 
-      <section id="pip" className="scroll-mt-8 rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
-        <h2 className="font-display text-3xl font-bold">PIP</h2>
-        <p className="mt-1 text-sm text-sun-400">CHAR_PIP_001 · {pip.id}</p>
-        <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm text-[var(--muted)]">
-          <li>Character model upload</li>
-          <li>Texture upload</li>
-          <li>Rig validation</li>
-          <li>Facial-control validation / mapping</li>
-          <li>Reference-image upload</li>
-          <li>Reference approval</li>
-          <li>Character-lock validation</li>
-          <li>Production-ready approval</li>
-        </ol>
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <UploadDropzone
-            entityCode="CHAR_PIP_001"
-            kind="PRIMARY_CANONICAL_REFERENCE"
-            accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png"
-            label="PRIMARY CANONICAL REFERENCE (JPEG) — not a 3D model"
-          />
-          <UploadDropzone entityCode="CHAR_PIP_001" accept=".blend,.glb,.gltf,.fbx" label="1. Pip production model (.blend preferred)" />
-          <UploadDropzone entityCode="CHAR_PIP_001" kind="TEXTURE" accept="image/*,.png,.jpg,.exr" label="2. Pip textures" />
-          <UploadDropzone entityCode="CHAR_PIP_001" kind="TURNAROUND" accept="image/*" label="Turnaround views (FRONT/SIDE/BACK — optional)" />
-          <UploadDropzone entityCode="CHAR_PIP_001" kind="EXPRESSION_SHEET" accept="image/*" label="Expression sheet (optional)" />
-        </div>
-        <div className="mt-4 flex flex-wrap gap-3 text-sm">
-          <Link href={`/facial-mapping/${FOUNDING_CODES.PIP}`} className="font-semibold text-leaf-300 underline">
-            Facial mapping
-          </Link>
-          <Link href={`/references/approve/${FOUNDING_CODES.PIP}`} className="font-semibold text-leaf-300 underline">
-            Reference approval
-          </Link>
-          <Link href={`/character-test/${FOUNDING_CODES.PIP}`} className="font-semibold text-leaf-300 underline">
-            Character test stage
-          </Link>
-        </div>
-        <div className="mt-6">
-          <SlotList title="Pip intake slots" rows={forEntity(pip.id)} />
-        </div>
+      <section
+        className={[
+          'rounded-[1.75rem] border p-4 sm:p-5',
+          storage.durable
+            ? 'border-leaf-400/30 bg-leaf-500/10'
+            : 'border-sun-400/40 bg-sun-500/10',
+        ].join(' ')}
+      >
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-sun-300">
+          {storage.banner}
+        </p>
+        <p className="mt-2 text-sm text-mist-100">{storage.message}</p>
+        <p className="mt-2 text-xs text-[var(--muted)]">
+          Provider: <span className="font-semibold text-mist-100">{storage.provider}</span>
+          {storage.root ? (
+            <>
+              {' '}
+              · root <span className="break-all">{storage.root}</span>
+            </>
+          ) : null}
+        </p>
+        {!storage.durable ? (
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-sun-100/90">
+            {storage.requiredConfig.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
-      <section id="goat" className="scroll-mt-8 rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
-        <h2 className="font-display text-3xl font-bold">GOAT</h2>
-        <p className="mt-1 text-sm text-sun-400">CHAR_GOAT_001 · {goat.id}</p>
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <UploadDropzone
-            entityCode="CHAR_GOAT_001"
-            kind="PRIMARY_CANONICAL_REFERENCE"
-            accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png"
-            label="PRIMARY CANONICAL REFERENCE (JPEG) — not a 3D model"
-          />
-          <UploadDropzone entityCode="CHAR_GOAT_001" accept=".blend,.glb,.gltf,.fbx" label="1. Goat production model (.blend preferred)" />
-          <UploadDropzone entityCode="CHAR_GOAT_001" kind="TEXTURE" accept="image/*,.png,.jpg,.exr" label="2. Goat textures" />
-          <UploadDropzone entityCode="CHAR_GOAT_001" kind="TURNAROUND" accept="image/*" label="Turnaround views (FRONT/SIDE/BACK — optional)" />
-          <UploadDropzone entityCode="CHAR_GOAT_001" kind="EXPRESSION_SHEET" accept="image/*" label="Expression sheet (optional)" />
-        </div>
-        <div className="mt-4 flex flex-wrap gap-3 text-sm">
-          <Link href={`/facial-mapping/${FOUNDING_CODES.GOAT}`} className="font-semibold text-leaf-300 underline">
-            Facial mapping
-          </Link>
-          <Link href={`/references/approve/${FOUNDING_CODES.GOAT}`} className="font-semibold text-leaf-300 underline">
-            Reference approval
-          </Link>
-          <Link href={`/character-test/${FOUNDING_CODES.GOAT}`} className="font-semibold text-leaf-300 underline">
-            Character test stage
-          </Link>
-        </div>
-        <div className="mt-6">
-          <SlotList title="Goat intake slots" rows={forEntity(goat.id)} />
-        </div>
-      </section>
+      <CanonicalCharacterIntakeCard
+        name="Pip"
+        characterCode={FOUNDING_CODES.PIP}
+        characterId={pip.id}
+        initialReadiness={{
+          canon: pipReady.canon,
+          dna: pipReady.dna,
+          primaryReference: pipReady.primaryReference,
+          productionModel: pipReady.productionModel,
+          rig: pipReady.rig,
+          facialRig: pipReady.facialRig,
+          lipSync: pipReady.lipSync,
+          final1080pCharacterValidation: pipReady.final1080pCharacterValidation,
+          referenceVersion: pipReady.referenceVersion,
+          note: pipReady.note,
+        }}
+        initialCandidate={pickCandidate(pip.referenceImages)}
+      />
 
-      <section id="meadow" className="scroll-mt-8 rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
+      <CanonicalCharacterIntakeCard
+        name="Goat"
+        characterCode={FOUNDING_CODES.GOAT}
+        characterId={goat.id}
+        initialReadiness={{
+          canon: goatReady.canon,
+          dna: goatReady.dna,
+          primaryReference: goatReady.primaryReference,
+          productionModel: goatReady.productionModel,
+          rig: goatReady.rig,
+          facialRig: goatReady.facialRig,
+          lipSync: goatReady.lipSync,
+          final1080pCharacterValidation: goatReady.final1080pCharacterValidation,
+          referenceVersion: goatReady.referenceVersion,
+          note: goatReady.note,
+        }}
+        initialCandidate={pickCandidate(goat.referenceImages)}
+      />
+
+      <p className="text-center text-xs text-[var(--muted)]">
+        DNA locked: Pip v{PIP_CANONICAL_DNA.dnaVersion} · Goat v{GOAT_CANONICAL_DNA.dnaVersion}. Do not
+        invent substitute reference images.
+      </p>
+
+      <section id="meadow" className="scroll-mt-8 rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-5 sm:p-6">
         <h2 className="font-display text-3xl font-bold">MEADOW ENVIRONMENT</h2>
         <p className="mt-1 text-sm text-sun-400">LOC_MEADOW_001 · used by Meadow Map Mystery</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -159,7 +219,7 @@ export default async function AssetIntakePage() {
         </div>
       </section>
 
-      <section id="props" className="scroll-mt-8 rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
+      <section id="props" className="scroll-mt-8 rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-5 sm:p-6">
         <h2 className="font-display text-3xl font-bold">PROPS</h2>
         <p className="mt-1 text-sm text-sun-400">PROP_MAP_001 · Adventure Map</p>
         <p className="mt-2 text-sm text-rose-300">
@@ -177,7 +237,7 @@ export default async function AssetIntakePage() {
         ) : null}
       </section>
 
-      <section className="rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
+      <section className="rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-5 sm:p-6">
         <h2 className="font-display text-2xl font-bold">Recent model inspections</h2>
         <ul className="mt-4 space-y-3 text-sm">
           {inspections.map((ins) => (

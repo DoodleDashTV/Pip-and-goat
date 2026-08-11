@@ -2,8 +2,8 @@
 
 ## Preferred Studio path
 
-1. `/asset-intake` → upload `PRIMARY_CANONICAL_REFERENCE` JPEG for Pip and Goat  
-2. `/references/approve/CHAR_PIP_001` and `/references/approve/CHAR_GOAT_001` → approve immutable version  
+1. `/asset-intake` → open **PIP** / **GOAT** cards → tap **UPLOAD PRIMARY REFERENCE** (iPhone Photos/Files picker; drag-drop optional on desktop)  
+2. `/references/approve/CHAR_PIP_001` and `/references/approve/CHAR_GOAT_001` → **APPROVE & LOCK** (or REJECT / REPLACE CANDIDATE)  
 3. Later: upload real `.blend`, complete rig/facial maps, queue `/character-test/[code]`, complete model-to-reference review  
 4. Only then pursue `PRODUCTION_READY`
 

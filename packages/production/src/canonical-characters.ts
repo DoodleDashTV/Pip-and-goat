@@ -368,6 +368,31 @@ export class CanonicalCharacterService {
     return created;
   }
 
+  assertSupportedReferenceImage(fileName: string, contentType?: string) {
+    const lower = fileName.toLowerCase();
+    const extOk =
+      lower.endsWith('.jpg') ||
+      lower.endsWith('.jpeg') ||
+      lower.endsWith('.png') ||
+      lower.endsWith('.webp');
+    const type = (contentType ?? '').toLowerCase();
+    const typeOk =
+      !type ||
+      type === 'application/octet-stream' ||
+      type === 'image/jpeg' ||
+      type === 'image/jpg' ||
+      type === 'image/png' ||
+      type === 'image/webp' ||
+      type === 'image/*';
+    if (!extOk || !typeOk) {
+      throw new AppError(
+        'PRIMARY_CANONICAL_REFERENCE must be JPEG, JPG, PNG, or WEBP.',
+        'UNSUPPORTED_REFERENCE_FORMAT',
+        400,
+      );
+    }
+  }
+
   /**
    * Ingest a real reference JPEG as PRIMARY_CANONICAL_REFERENCE candidate.
    * Never marks MODEL/RIG/FACIAL as READY.
@@ -383,6 +408,7 @@ export class CanonicalCharacterService {
     if (!params.bytes.length) {
       throw new AppError('Empty reference file', 'REFERENCE_BYTES_REQUIRED', 400);
     }
+    this.assertSupportedReferenceImage(params.fileName, params.contentType);
     const character = await prisma.character.findUniqueOrThrow({
       where: { internalCode: params.characterCode },
     });
@@ -453,6 +479,42 @@ export class CanonicalCharacterService {
       readiness,
       note: 'Reference ingestion complete. MODEL remains BLOCKED until a real .blend is uploaded and approved.',
     };
+  }
+
+  async rejectPrimaryCandidate(params: {
+    characterCode: string;
+    referenceImageId: string;
+    rejectedBy: string;
+    reason?: string;
+  }) {
+    const character = await prisma.character.findUniqueOrThrow({
+      where: { internalCode: params.characterCode },
+    });
+    const image = await prisma.characterReferenceImage.findFirst({
+      where: { id: params.referenceImageId, characterId: character.id },
+    });
+    if (!image) {
+      throw new AppError('Reference image not found for character', 'REFERENCE_NOT_FOUND', 404);
+    }
+    if (image.reviewStatus === 'APPROVED') {
+      throw new AppError(
+        'Approved immutable references cannot be rejected — upload a NEW CANDIDATE VERSION instead.',
+        'IMMUTABLE_REFERENCE',
+        409,
+      );
+    }
+    return prisma.characterReferenceImage.update({
+      where: { id: image.id },
+      data: {
+        reviewStatus: 'REJECTED',
+        notes: [
+          image.notes ?? '',
+          `Rejected by ${params.rejectedBy}${params.reason ? `: ${params.reason}` : ''}`,
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      },
+    });
   }
 
   async approvePrimaryCanonical(params: {
@@ -560,7 +622,7 @@ export class CanonicalCharacterService {
         : ('BLOCKED — UPLOAD+APPROVE PRIMARY_CANONICAL_REFERENCE JPEG' as const),
       productionModel: modelReady
         ? ('READY' as const)
-        : ('BLOCKED — REAL MODEL REQUIRED' as const),
+        : ('BLOCKED — REAL .BLEND REQUIRED' as const),
       rig: rigReady ? ('READY' as const) : ('BLOCKED' as const),
       facialRig: facialReady ? ('READY' as const) : ('BLOCKED' as const),
       lipSync: facialMap ? ('READY' as const) : ('BLOCKED' as const),
