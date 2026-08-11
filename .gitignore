@@ -15,3 +15,5 @@ packages/database/prisma/*.db
 packages/database/prisma/*.db-journal
 apps/web/test-results
 *.tsbuildinfo
+.doodle-dash-storage
+**/.doodle-dash-storage/
