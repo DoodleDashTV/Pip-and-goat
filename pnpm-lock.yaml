@@ -280,6 +280,9 @@ importers:
 
   workers/blender-renderer:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 3.758.0
+        version: 3.758.0
       '@doodle-dash/rendering':
         specifier: workspace:*
         version: link:../../packages/rendering

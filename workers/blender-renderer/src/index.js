@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
 const { spawn, spawnSync } = require('node:child_process');
+const { createHash } = require('node:crypto');
+const fs = require('node:fs');
+const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 const DEFAULT_CAPABILITIES = {
   engines: ['EEVEE', 'CYCLES'],
-  resolutions: ['270x480', '360x640', '540x960', '1080x1920'],
+  resolutions: ['270x480', '360x640', '540x960', '720x1280', '1080x1920'],
   fps: [24, 30, 60],
   supportsGpu: Boolean(process.env.BLENDER_GPU),
   maxConcurrentJobs: 1,
@@ -20,7 +24,34 @@ const config = {
   workspaceDir: process.env.RENDER_WORKSPACE_DIR || path.join(os.tmpdir(), 'doodle-dash-blender-renderer'),
   pollIntervalMs: Number(process.env.RENDER_POLL_INTERVAL_MS || 5000),
   once: process.argv.includes('--once'),
+  storageRoot: process.env.OBJECT_STORAGE_ROOT || path.resolve(process.cwd(), '.doodle-dash-storage'),
 };
+
+let s3Client = null;
+
+function getS3() {
+  if (s3Client) return s3Client;
+  const provider = (process.env.OBJECT_STORAGE_PROVIDER || 'local').toLowerCase();
+  if (!['s3', 'r2', 'b2', 'minio'].includes(provider)) return null;
+  const bucket = process.env.OBJECT_STORAGE_BUCKET;
+  const accessKeyId = process.env.OBJECT_STORAGE_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.OBJECT_STORAGE_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
+  if (!bucket || !accessKeyId || !secretAccessKey) {
+    throw new Error('S3-compatible storage selected but credentials/bucket incomplete');
+  }
+  s3Client = {
+    bucket,
+    client: new S3Client({
+      region: process.env.OBJECT_STORAGE_REGION || process.env.AWS_REGION || 'us-east-1',
+      endpoint: process.env.OBJECT_STORAGE_ENDPOINT || undefined,
+      forcePathStyle:
+        String(process.env.OBJECT_STORAGE_FORCE_PATH_STYLE || '').toLowerCase() === 'true' ||
+        Boolean(process.env.OBJECT_STORAGE_ENDPOINT),
+      credentials: { accessKeyId, secretAccessKey },
+    }),
+  };
+  return s3Client;
+}
 
 async function main() {
   await registerWorker();
@@ -68,9 +99,10 @@ async function processJob(job) {
     }
 
     await reportProgress(jobId, 'RENDERING', 20, 'Starting Blender headless render.');
-    await runBlender(job, localAssets);
+    const outputDir = path.join(config.workspaceDir, jobId, 'output');
+    await runBlender(job, localAssets, outputDir);
     await reportProgress(jobId, 'ENCODING', 85, 'Uploading render outputs.');
-    const outputs = await uploadOutputs(job);
+    const outputs = await uploadOutputs(job, outputDir);
     await postJson(`/jobs/${encodeURIComponent(jobId)}/complete`, { workerId: config.workerId, outputs });
   } catch (error) {
     await failJob(jobId, normalizeError(error));
@@ -79,18 +111,75 @@ async function processJob(job) {
 
 async function downloadAssets(job) {
   const assets = Array.isArray(job.payload && job.payload.assets) ? job.payload.assets : [];
-  await reportProgress(job.id || job.queueId, 'PREPARING', 10, `Asset download stub recorded ${assets.length} assets.`);
-  return assets.map((asset) => ({
-    ...asset,
-    localPath: path.join(config.workspaceDir, job.id || job.queueId, path.basename(asset.uri || asset.id || 'asset')),
-    downloaded: false,
-    note: 'download stub; storage adapter not configured',
-  }));
+  const jobId = job.id || job.queueId;
+  const destRoot = path.join(config.workspaceDir, jobId, 'assets');
+  await fsp.mkdir(destRoot, { recursive: true });
+  const local = [];
+  for (const [index, asset] of assets.entries()) {
+    const uri = asset.uri || asset.storageLocation || '';
+    const safeName = path.basename(uri || asset.id || `asset-${index}`).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const localPath = path.join(destRoot, `${index}-${safeName}`);
+    await downloadUri(uri, localPath, asset.checksum);
+    local.push({
+      ...asset,
+      role: asset.id || asset.role || 'other',
+      localPath,
+      downloaded: true,
+    });
+    const progress = 10 + Math.floor(((index + 1) / Math.max(assets.length, 1)) * 10);
+    await reportProgress(jobId, 'PREPARING', progress, `Downloaded ${index + 1}/${assets.length} assets`);
+  }
+  return local;
 }
 
-async function runBlender(job, localAssets) {
-  const argv = buildBlenderArgs(job, localAssets);
-  await reportProgress(job.id || job.queueId, 'RENDERING', 30, `Blender argv prepared: ${argv.join(' ')}`);
+async function downloadUri(uri, localPath, expectedChecksum) {
+  if (!uri) throw new Error('Asset URI missing');
+  await fsp.mkdir(path.dirname(localPath), { recursive: true });
+
+  if (uri.startsWith('local://')) {
+    const key = uri.slice('local://'.length);
+    const src = path.join(config.storageRoot, key);
+    await fsp.copyFile(src, localPath);
+  } else if (uri.startsWith('file://')) {
+    await fsp.copyFile(uri.slice('file://'.length), localPath);
+  } else if (uri.startsWith('/') || uri.startsWith('.')) {
+    await fsp.copyFile(uri, localPath);
+  } else if (uri.startsWith('s3://') || uri.startsWith('http://') || uri.startsWith('https://')) {
+    const s3 = getS3();
+    if (!s3) throw new Error(`Cannot download ${uri}: S3 storage not configured`);
+    let key = uri;
+    if (uri.startsWith('s3://')) {
+      const without = uri.slice('s3://'.length);
+      const slash = without.indexOf('/');
+      key = slash >= 0 ? without.slice(slash + 1) : without;
+    } else if (process.env.OBJECT_STORAGE_PUBLIC_BASE_URL && uri.startsWith(process.env.OBJECT_STORAGE_PUBLIC_BASE_URL)) {
+      key = uri.slice(process.env.OBJECT_STORAGE_PUBLIC_BASE_URL.replace(/\/$/, '').length + 1);
+    } else {
+      // path-style endpoint URL: http://host/bucket/key
+      const bucket = s3.bucket;
+      const marker = `/${bucket}/`;
+      const idx = uri.indexOf(marker);
+      key = idx >= 0 ? uri.slice(idx + marker.length) : path.basename(uri);
+    }
+    const out = await s3.client.send(new GetObjectCommand({ Bucket: s3.bucket, Key: key }));
+    const bytes = Buffer.from(await out.Body.transformToByteArray());
+    await fsp.writeFile(localPath, bytes);
+  } else {
+    throw new Error(`Unsupported asset URI scheme: ${uri}`);
+  }
+
+  if (expectedChecksum) {
+    const actual = sha256File(localPath);
+    if (actual !== expectedChecksum) {
+      throw new Error(`Checksum mismatch for ${uri}: expected ${expectedChecksum}, got ${actual}`);
+    }
+  }
+}
+
+async function runBlender(job, localAssets, outputDir) {
+  await fsp.mkdir(outputDir, { recursive: true });
+  const argv = buildBlenderArgs(job, localAssets, outputDir);
+  await reportProgress(job.id || job.queueId, 'RENDERING', 30, `Blender start: ${path.basename(argv[4] || 'assemble')}`);
   await new Promise((resolve, reject) => {
     const child = spawn(config.blenderBin, argv, { stdio: 'inherit' });
     child.on('error', reject);
@@ -99,16 +188,52 @@ async function runBlender(job, localAssets) {
       else reject(new Error(`Blender exited with code ${code}`));
     });
   });
+  // Encode shot.mp4 from frames for easier episode assembly
+  const frames = (await fsp.readdir(outputDir))
+    .filter((f) => f.startsWith('frame_') && f.endsWith('.png'))
+    .sort();
+  if (frames.length) {
+    const fps = String(job.fps || 30);
+    const mp4Path = path.join(outputDir, 'shot.mp4');
+    const pattern = path.join(outputDir, 'frame_%04d.png');
+    // Blender may write frame_0001.png or frame_1.png — detect
+    const sample = frames[0];
+    const padded = /frame_\d{4}\.png$/.test(sample);
+    const ffmpegArgs = padded
+      ? ['-y', '-framerate', fps, '-i', pattern, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', mp4Path]
+      : [
+          '-y',
+          '-framerate',
+          fps,
+          '-pattern_type',
+          'glob',
+          '-i',
+          path.join(outputDir, 'frame_*.png'),
+          '-c:v',
+          'libx264',
+          '-pix_fmt',
+          'yuv420p',
+          '-crf',
+          '18',
+          mp4Path,
+        ];
+    const enc = spawnSync('ffmpeg', ffmpegArgs, { encoding: 'utf8' });
+    if (enc.status !== 0) {
+      console.warn('ffmpeg shot encode warning:', enc.stderr?.slice(-500));
+    }
+  } else {
+    throw new Error('Blender completed but produced no frames');
+  }
 }
 
-function buildBlenderArgs(job, localAssets) {
+function buildBlenderArgs(job, localAssets, outputDir) {
   const repoRoot = process.env.REPO_ROOT || path.resolve(__dirname, '../../..');
   const assembleScript = path.join(repoRoot, 'scripts/blender/assemble_scene.py');
   const payload = job.payload || {};
   const resolution = job.resolution || '540x960';
   const fps = String(job.fps || 30);
   const engine = job.engine || 'EEVEE';
-  const outputDir = path.join(config.workspaceDir, job.id || job.queueId, 'output');
+  const meta = payload.metadata || {};
   return [
     '--background',
     '--factory-startup',
@@ -127,18 +252,75 @@ function buildBlenderArgs(job, localAssets) {
     outputDir,
     '--assets-json',
     JSON.stringify(localAssets),
+    '--start-frame',
+    String(meta.startFrame || 1),
+    '--end-frame',
+    String(meta.endFrame || Math.max(1, Math.round((meta.durationSec || 2) * (job.fps || 30)))),
+    '--samples',
+    String(meta.samples || (resolution === '1080x1920' ? 32 : 16)),
+    '--camera-preset',
+    String(meta.cameraPreset || 'WIDE'),
+    '--shot-meta-json',
+    JSON.stringify(meta.shotMeta || meta || {}),
   ];
 }
 
-async function uploadOutputs(job) {
+async function uploadOutputs(job, outputDir) {
   const jobId = job.id || job.queueId;
-  return [
-    {
-      kind: 'metadata',
-      uri: `stub://render-outputs/${jobId}/metadata.json`,
-      metadata: { uploaded: false, note: 'upload stub; object storage adapter not configured' },
-    },
-  ];
+  const files = (await fsp.readdir(outputDir)).filter((f) => f.endsWith('.png') || f.endsWith('.mp4') || f.endsWith('.json'));
+  const outputs = [];
+  for (const file of files) {
+    const full = path.join(outputDir, file);
+    const bytes = await fsp.readFile(full);
+    const checksum = createHash('sha256').update(bytes).digest('hex');
+    const key = `draft-renders/worker-jobs/${jobId}/${file}`;
+    const uri = await putObject(key, bytes, file.endsWith('.png') ? 'image/png' : 'application/octet-stream');
+    outputs.push({
+      kind: file.endsWith('.png') ? 'frames' : file.endsWith('.mp4') ? 'final' : 'metadata',
+      uri,
+      checksum,
+      resolution: job.resolution || null,
+      metadata: {
+        file,
+        bytes: bytes.length,
+        uploaded: true,
+      },
+    });
+  }
+  return outputs;
+}
+
+async function putObject(key, bytes, contentType) {
+  const provider = (process.env.OBJECT_STORAGE_PROVIDER || 'local').toLowerCase();
+  if (provider === 'local' || provider === 'none' || provider === 'missing') {
+    const full = path.join(config.storageRoot, key);
+    await fsp.mkdir(path.dirname(full), { recursive: true });
+    await fsp.writeFile(full, bytes);
+    return `local://${key}`;
+  }
+  const s3 = getS3();
+  if (!s3) throw new Error('No storage backend available for upload');
+  await s3.client.send(
+    new PutObjectCommand({
+      Bucket: s3.bucket,
+      Key: key,
+      Body: bytes,
+      ContentType: contentType,
+    }),
+  );
+  if (process.env.OBJECT_STORAGE_PUBLIC_BASE_URL) {
+    return `${process.env.OBJECT_STORAGE_PUBLIC_BASE_URL.replace(/\/$/, '')}/${key}`;
+  }
+  if (process.env.OBJECT_STORAGE_ENDPOINT) {
+    return `${process.env.OBJECT_STORAGE_ENDPOINT.replace(/\/$/, '')}/${s3.bucket}/${key}`;
+  }
+  return `s3://${s3.bucket}/${key}`;
+}
+
+function sha256File(filePath) {
+  const hash = createHash('sha256');
+  hash.update(fs.readFileSync(filePath));
+  return hash.digest('hex');
 }
 
 async function reportProgress(jobId, status, progress, message) {
@@ -205,6 +387,6 @@ function delay(ms) {
 }
 
 main().catch((error) => {
-  console.error(normalizeError(error));
+  console.error(error);
   process.exitCode = 1;
 });

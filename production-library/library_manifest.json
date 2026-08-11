@@ -1,0 +1,117 @@
+{
+  "library": "Doodle Dash Production Founding Assets",
+  "assets": {
+    "pip": {
+      "characterCode": "CHAR_PIP_001",
+      "blend": "/agent/production-library/characters/pip_production.blend",
+      "reference": "/agent/production-library/characters/pip_production.png",
+      "rig": "Pip_Rig",
+      "mesh": "Pip_Character",
+      "accessories": [
+        "Pip_Backpack",
+        "Pip_StarCharm"
+      ],
+      "actions": [
+        "PIP_EXCITED",
+        "PIP_HAPPY",
+        "PIP_IDLE",
+        "PIP_LISTEN",
+        "PIP_LOOK",
+        "PIP_POINT",
+        "PIP_RUN",
+        "PIP_SURPRISED",
+        "PIP_TALK",
+        "PIP_TURN",
+        "PIP_WALK",
+        "PIP_WAVE",
+        "PIP_WORRIED"
+      ],
+      "shapeKeys": [
+        "Basis",
+        "jaw_open",
+        "mouth_smile",
+        "mouth_frown",
+        "mouth_pucker",
+        "mouth_wide",
+        "blink_left",
+        "blink_right",
+        "brow_up",
+        "brow_down",
+        "viseme_REST",
+        "viseme_A",
+        "viseme_E",
+        "viseme_I",
+        "viseme_O",
+        "viseme_U",
+        "viseme_MBP",
+        "viseme_FV",
+        "viseme_L",
+        "viseme_WQ",
+        "expr_happy",
+        "expr_surprised",
+        "expr_worried",
+        "expr_excited"
+      ]
+    },
+    "goat": {
+      "characterCode": "CHAR_GOAT_001",
+      "blend": "/agent/production-library/characters/goat_production.blend",
+      "reference": "/agent/production-library/characters/goat_production.png",
+      "rig": "Goat_Rig",
+      "mesh": "Goat_Character",
+      "accessories": [
+        "Goat_Collar",
+        "Goat_Tag"
+      ],
+      "actions": [
+        "GOAT_EXCITED",
+        "GOAT_HAPPY",
+        "GOAT_IDLE",
+        "GOAT_LISTEN",
+        "GOAT_LOOK",
+        "GOAT_POINT",
+        "GOAT_RUN",
+        "GOAT_SURPRISED",
+        "GOAT_TALK",
+        "GOAT_TURN",
+        "GOAT_WALK",
+        "GOAT_WAVE",
+        "GOAT_WORRIED"
+      ],
+      "shapeKeys": [
+        "Basis",
+        "jaw_open",
+        "mouth_smile",
+        "mouth_frown",
+        "mouth_pucker",
+        "mouth_wide",
+        "blink_left",
+        "blink_right",
+        "brow_up",
+        "brow_down",
+        "viseme_REST",
+        "viseme_A",
+        "viseme_E",
+        "viseme_I",
+        "viseme_O",
+        "viseme_U",
+        "viseme_MBP",
+        "viseme_FV",
+        "viseme_L",
+        "viseme_WQ",
+        "expr_happy",
+        "expr_surprised",
+        "expr_worried",
+        "expr_excited"
+      ]
+    },
+    "meadow": {
+      "locationCode": "LOC_MEADOW_001",
+      "blend": "/agent/production-library/environments/meadow_production.blend"
+    },
+    "map": {
+      "propCode": "PROP_MAP_001",
+      "blend": "/agent/production-library/props/adventure_map.blend"
+    }
+  }
+}

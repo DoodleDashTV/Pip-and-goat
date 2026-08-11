@@ -16,7 +16,7 @@ export const RenderStatusSchema = z.enum([
 ]);
 export type RenderStatus = z.infer<typeof RenderStatusSchema>;
 
-export const RenderResolutionSchema = z.enum(['270x480', '360x640', '540x960', '1080x1920']);
+export const RenderResolutionSchema = z.enum(['270x480', '360x640', '540x960', '720x1280', '1080x1920']);
 export type RenderResolution = z.infer<typeof RenderResolutionSchema>;
 
 export const RenderFpsSchema = z.union([z.literal(24), z.literal(30), z.literal(60)]);
@@ -25,7 +25,7 @@ export type RenderFps = z.infer<typeof RenderFpsSchema>;
 export const RenderEngineSchema = z.enum(['EEVEE', 'CYCLES']);
 export type RenderEngine = z.infer<typeof RenderEngineSchema>;
 
-export const DraftRenderResolutionSchema = z.enum(['270x480', '360x640', '540x960']);
+export const DraftRenderResolutionSchema = z.enum(['270x480', '360x640', '540x960', '720x1280']);
 export const FinalRenderResolutionSchema = z.literal('1080x1920');
 
 export const RENDER_STATUSES: RenderStatus[] = RenderStatusSchema.options;

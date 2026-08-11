@@ -1320,6 +1320,75 @@ export class VoiceOnboardingService {
     if (!latest) {
       throw new AppError('No voice version to audition.', 'VOICE_VERSION_MISSING', 404);
     }
+
+    const provider = String(config.provider).toLowerCase();
+    if (provider === 'espeak-local' || provider === 'espeak') {
+      const { spawnSync } = await import('node:child_process');
+      const { promises: fs } = await import('node:fs');
+      const os = await import('node:os');
+      const path = await import('node:path');
+      const script = Array.isArray(latest.auditionScript)
+        ? (latest.auditionScript as string[]).join(' ')
+        : typeof latest.auditionScript === 'string'
+          ? latest.auditionScript
+          : CANONICAL_AUDITION_SCRIPT;
+      const wavPath = path.join(os.tmpdir(), `doodle-audition-${characterId}-${Date.now()}.wav`);
+      const voice = config.voiceId || 'en-us';
+      const pitch = config.pitch != null ? String(Math.round(40 + Number(config.pitch) * 20)) : '50';
+      const speed = config.speed != null ? String(Math.round(140 * Number(config.speed))) : '160';
+      const result = spawnSync(
+        'espeak-ng',
+        ['-v', voice, '-p', pitch, '-s', speed, '-w', wavPath, script],
+        { encoding: 'utf8' },
+      );
+      if (result.status !== 0) {
+        throw new AppError(
+          `espeak-local audition failed: ${result.stderr || result.error || 'unknown'}`,
+          'VOICE_AUDITION_FAILED',
+          500,
+        );
+      }
+      const bytes = new Uint8Array(await fs.readFile(wavPath));
+      const stored = await new ProductionStorageService().storeUpload({
+        category: 'voices',
+        parts: [characterId, 'auditions', latest.versionNumber, 'audition.wav'],
+        bytes,
+        contentType: 'audio/wav',
+        originalName: 'audition.wav',
+        metadata: { provider: 'espeak-local', voiceId: voice, freeLocal: true },
+      });
+      const { createHash } = await import('node:crypto');
+      const fingerprint = createHash('sha256')
+        .update(JSON.stringify([characterId, latest.id, script, 'espeak-local', { voiceId: voice, pitch, speed }]))
+        .digest('hex');
+      await prisma.voiceGenerationCacheEntry.upsert({
+        where: { fingerprint },
+        update: { audioUri: stored.uri, hitCount: { increment: 1 } },
+        create: {
+          fingerprint,
+          characterId,
+          voiceVersionId: latest.id,
+          text: script,
+          provider: 'espeak-local',
+          settings: { voiceId: voice, pitch, speed },
+          audioUri: stored.uri,
+        },
+      });
+      await prisma.voiceProductionConfig.update({
+        where: { characterId },
+        data: {
+          auditionNotes: `Local espeak-ng audition generated (${stored.uri}). No external API cost.`,
+        },
+      });
+      return prisma.voiceConfigVersion.update({
+        where: { id: latest.id },
+        data: {
+          status: 'AUDITIONED',
+          auditionUri: stored.uri,
+        },
+      });
+    }
+
     const hasCreds = Boolean(process.env.VOICE_PROVIDER_API_KEY);
     if (!hasCreds) {
       return prisma.voiceConfigVersion.update({
@@ -1327,12 +1396,12 @@ export class VoiceOnboardingService {
         data: {
           status: 'AUDITION_BLOCKED',
           rejectedReason:
-            'VOICE PROVIDER CREDENTIALS REQUIRED — audition not fabricated. Configure VOICE_PROVIDER_API_KEY.',
+            'VOICE PROVIDER CREDENTIALS REQUIRED — audition not fabricated. Configure VOICE_PROVIDER_API_KEY for cloud TTS, or use provider=espeak-local for free local speech.',
         },
       });
     }
     throw new AppError(
-      'Voice provider credentials present but provider SDK not wired for this deployment. Refusing to fabricate audition audio.',
+      'Cloud voice provider credentials present but provider SDK not wired for this deployment. Use provider=espeak-local or wire the vendor SDK. Refusing to fabricate audition audio.',
       'VOICE_PROVIDER_SDK_NOT_WIRED',
       501,
     );
@@ -1664,6 +1733,24 @@ export class EpisodeReadinessAggregator {
       include: { stages: true },
     });
 
+    const pipValidation = await characterAssetValidator.validate(pip.id).catch(() => null);
+    const goatValidation = await characterAssetValidator.validate(goat.id).catch(() => null);
+    const pipReady = Boolean(pipValidation?.passed);
+    const goatReady = Boolean(goatValidation?.passed);
+    const meadowIntakeReady = meadow
+      ? Boolean(
+          await prisma.productionAssetIntake.findFirst({
+            where: {
+              entityType: 'location',
+              entityId: meadow.id,
+              kind: 'LOCATION_BLEND',
+              storageLocation: { not: null },
+              productionReady: true,
+            },
+          }),
+        )
+      : false;
+
     const hasModel = async (characterId: string) =>
       Boolean(
         await prisma.productionAssetIntake.findFirst({
@@ -1732,26 +1819,32 @@ export class EpisodeReadinessAggregator {
       },
       {
         category: 'PIP',
-        state: pipModel ? 'WARNING' : 'BLOCKED',
-        reason: pipModel
-          ? 'Model uploaded — validation/approval still required'
-          : 'BLOCKED — Pip production model required',
+        state: pipReady ? 'READY' : pipModel ? 'WARNING' : 'BLOCKED',
+        reason: pipReady
+          ? 'Pip production assets validated'
+          : pipModel
+            ? 'Model uploaded — validation/approval still required'
+            : 'BLOCKED — Pip production model required',
         fixHref: '/asset-intake#pip',
       },
       {
         category: 'GOAT',
-        state: goatModel ? 'WARNING' : 'BLOCKED',
-        reason: goatModel
-          ? 'Model uploaded — validation/approval still required'
-          : 'BLOCKED — Goat production model required',
+        state: goatReady ? 'READY' : goatModel ? 'WARNING' : 'BLOCKED',
+        reason: goatReady
+          ? 'Goat production assets validated'
+          : goatModel
+            ? 'Model uploaded — validation/approval still required'
+            : 'BLOCKED — Goat production model required',
         fixHref: '/asset-intake#goat',
       },
       {
         category: 'MEADOW',
-        state: meadowReady ? 'WARNING' : 'BLOCKED',
-        reason: meadowReady
-          ? 'Environment uploaded — validation pending'
-          : 'BLOCKED — Meadow environment asset required',
+        state: meadowIntakeReady ? 'READY' : meadowReady ? 'WARNING' : 'BLOCKED',
+        reason: meadowIntakeReady
+          ? 'Meadow environment production-ready'
+          : meadowReady
+            ? 'Environment uploaded — validation pending'
+            : 'BLOCKED — Meadow environment asset required',
         fixHref: '/asset-intake#meadow',
       },
       {
@@ -2084,6 +2177,13 @@ export class DraftFinalOrchestrator {
       throw new AppError('Draft path must use Blender.', 'BLENDER_REQUIRED_FOR_DRAFT', 409);
     }
 
+    const { episodeShotRenderService } = await import('./episode-render');
+    const queued = await episodeShotRenderService.queueEpisode({
+      episodeId,
+      profileCode,
+      priority: 70,
+    });
+
     const prior = await prisma.episodePipelineRun.findFirst({
       where: { episodeId },
       orderBy: { createdAt: 'desc' },
@@ -2093,21 +2193,44 @@ export class DraftFinalOrchestrator {
       ? await buildEpisodeOrchestrator.resume(prior.id)
       : await buildEpisodeOrchestrator.start({ episodeId, durationTargetSec: 30 });
 
-    await prisma.draftReview.create({
+    await prisma.episodePipelineStage.updateMany({
+      where: { pipelineRunId: run.id, stage: 'DRAFT_RENDER' },
+      data: {
+        status: 'RUNNING',
+        blockedReason: null,
+        outputs: {
+          profileCode,
+          jobIds: queued.jobs.map((j) => j.jobId),
+          estimatedFrames: queued.estimatedFrames,
+          resolution: queued.resolution,
+        } as object,
+      },
+    });
+    await prisma.episodePipelineStage.updateMany({
+      where: { pipelineRunId: run.id, stage: 'VOICE_GENERATION' },
+      data: {
+        status: 'SUCCEEDED',
+        outputs: { lines: queued.dialogueAudio.length, cacheHits: queued.dialogueAudio.filter((d) => d.cacheHit).length },
+      },
+    });
+
+    const review = await prisma.draftReview.create({
       data: {
         episodeId,
         pipelineRunId: run.id,
         status: 'PENDING',
         warnings: {
-          note: 'Draft target — final requires manual approval after real render completes.',
+          note: 'Draft queued to Blender worker — approve after real render completes.',
           profileCode,
           route: route.path,
           engine: 'EEVEE',
+          jobIds: queued.jobs.map((j) => j.jobId),
+          resolution: queued.resolution,
         },
       },
     });
 
-    return run;
+    return { run, review, queued };
   }
 
   async approveDraft(params: { draftReviewId: string; approvedBy: string }) {
@@ -2156,18 +2279,25 @@ export class DraftFinalOrchestrator {
     await blenderFirstRouter.routeRender();
     const profileCode = opts?.profileCode ?? 'FINAL_1080P';
     const engine = await productionProfileService.resolveShotEngine({
-      profileCode,
+      profileCode: profileCode === 'PREMIUM' ? 'FINAL_1080P' : profileCode,
       shotEngineOverride: null,
     });
     await this.assertCharacterDriftProtection(episodeId);
     const manifest = await new ProductionManifestService().lock(episodeId, 'FINAL');
+    const { episodeShotRenderService } = await import('./episode-render');
+    const queued = await episodeShotRenderService.queueEpisode({
+      episodeId,
+      profileCode: 'FINAL_1080P',
+      priority: 90,
+    });
     return {
       draft,
       manifest,
-      status: 'FINAL_QUEUED_WHEN_WORKER_AVAILABLE',
-      profileCode,
+      status: 'FINAL_QUEUED',
+      profileCode: 'FINAL_1080P',
       engine,
       resolution: { width: 1080, height: 1920, fps: 30 },
+      queued,
     };
   }
 

@@ -333,8 +333,9 @@ export class CharacterAssetValidator {
       message: 'EEVEE/Cycles compatibility deferred until model loads.',
     });
 
-    const facial = character.facialRigs[0];
-    const visemes = Array.isArray(facial?.visemes) ? facial!.visemes : [];
+    const facial =
+      character.facialRigs.find((r) => r.approved && r.status === 'APPROVED') ?? character.facialRigs[0];
+    const visemes = Array.isArray(facial?.visemes) ? (facial!.visemes as string[]) : [];
     const requiredVisemes = ['A', 'E', 'I', 'O', 'U', 'M_B_P', 'F_V', 'L', 'TH', 'REST'];
     const missingVisemes = requiredVisemes.filter((v) => !visemes.includes(v));
     checks.push({

@@ -547,7 +547,7 @@ export class PreflightService {
     }
 
     const shots = ((await optionalDelegate('shot')?.findMany({
-      where: { episodeId },
+      where: { scene: { episodeId } },
       orderBy: { shotNumber: 'asc' },
     })) ?? []) as Array<{
       id?: string;
@@ -962,3 +962,4 @@ export * from './launch-prep';
 export * from './cost-optimized-production';
 export * from './canonical-characters';
 export * from './production-setup';
+export * from './episode-render';
