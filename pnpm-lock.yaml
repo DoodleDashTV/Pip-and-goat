@@ -79,7 +79,21 @@ importers:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@22.20.1)(jiti@1.21.7)(tsx@4.23.12)
 
-  packages/audio: {}
+  packages/audio:
+    dependencies:
+      '@doodle-dash/shared':
+        specifier: workspace:*
+        version: link:../shared
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
 
   packages/characters:
     dependencies:
@@ -154,9 +168,34 @@ importers:
         specifier: ^5.8.2
         version: 5.9.3
 
-  packages/providers: {}
+  packages/providers:
+    dependencies:
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
 
-  packages/rendering: {}
+  packages/rendering:
+    dependencies:
+      '@doodle-dash/database':
+        specifier: workspace:*
+        version: link:../database
+      '@doodle-dash/shared':
+        specifier: workspace:*
+        version: link:../shared
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
 
   packages/shared:
     devDependencies:
@@ -204,6 +243,12 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
+
+  workers/blender-renderer:
+    dependencies:
+      '@doodle-dash/rendering':
+        specifier: workspace:*
+        version: link:../../packages/rendering
 
 packages:
 

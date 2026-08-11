@@ -1,0 +1,15 @@
+{
+  "name": "@doodle-dash/blender-renderer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Blender render worker that claims jobs over HTTP",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "once": "node ./src/index.js --once",
+    "check": "node --check ./src/index.js"
+  },
+  "dependencies": {
+    "@doodle-dash/rendering": "workspace:*"
+  }
+}

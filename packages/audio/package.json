@@ -2,9 +2,22 @@
   "name": "@doodle-dash/audio",
   "version": "0.1.0",
   "private": true,
-  "description": "Audio / voice / lip-sync package — reserved for later milestones",
+  "description": "Audio, voice, lip-sync, library, mix, and caption services",
   "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "typecheck": "node -e \"console.log('audio package stub')\""
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@doodle-dash/shared": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
   }
 }
