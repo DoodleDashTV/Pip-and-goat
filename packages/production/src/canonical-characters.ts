@@ -596,6 +596,16 @@ export class CanonicalCharacterService {
           (r.viewType === 'PRIMARY' || r.viewType === 'PRIMARY_CANONICAL_REFERENCE'),
       ) || Boolean(refVersion);
     const model = character.models[0];
+    const candidateModel = await prisma.productionAssetIntake.findFirst({
+      where: {
+        entityType: 'character',
+        entityId: character.id,
+        kind: { in: ['CHARACTER_BLEND', 'CHARACTER_GLB', 'CHARACTER_GLTF', 'CHARACTER_FBX'] },
+        storageLocation: { not: null },
+        approvalStatus: { not: 'MISSING' },
+      },
+      orderBy: { version: 'desc' },
+    });
     const modelReady = Boolean(model?.productionReady && model.status === 'PRODUCTION_READY');
     const rigReady = character.rigs.some((r) => r.approved && r.status === 'APPROVED');
     const facialReady = character.facialRigs.some((r) => r.approved && r.status === 'APPROVED');
@@ -622,7 +632,9 @@ export class CanonicalCharacterService {
         : ('BLOCKED — UPLOAD+APPROVE PRIMARY_CANONICAL_REFERENCE JPEG' as const),
       productionModel: modelReady
         ? ('READY' as const)
-        : ('BLOCKED — REAL .BLEND REQUIRED' as const),
+        : candidateModel
+          ? ('CANDIDATE / BLOCKED — AWAITING MANUAL APPROVAL' as const)
+          : ('BLOCKED — REAL .BLEND REQUIRED' as const),
       rig: rigReady ? ('READY' as const) : ('BLOCKED' as const),
       facialRig: facialReady ? ('READY' as const) : ('BLOCKED' as const),
       lipSync: facialMap ? ('READY' as const) : ('BLOCKED' as const),
@@ -634,6 +646,7 @@ export class CanonicalCharacterService {
       dnaVersion: pkg?.dnaVersion ?? null,
       referenceVersion: refVersion?.versionNumber ?? null,
       modelStatus: model?.status ?? 'MISSING',
+      modelCandidateVersion: candidateModel?.version ?? null,
       productionReadyFlag: model?.productionReady ?? false,
       note: 'JPEG reference ≠ production model. Never treat reference approval as MODEL READY.',
     };

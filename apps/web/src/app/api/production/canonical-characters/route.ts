@@ -58,6 +58,18 @@ export async function POST(request: Request) {
       const version = await canonicalCharacterService.approvePrimaryCanonical(parsed);
       return NextResponse.json({ version });
     }
+    if (action === 'decide-model-review') {
+      const parsed = z
+        .object({
+          reviewId: z.string().uuid(),
+          decision: z.enum(['APPROVED', 'REJECTED']),
+          decidedBy: z.string().min(1),
+          notes: z.string().optional(),
+        })
+        .parse(body);
+      const review = await canonicalCharacterService.decideModelReview(parsed);
+      return NextResponse.json({ review });
+    }
     if (action === 'reject-primary') {
       const parsed = z
         .object({

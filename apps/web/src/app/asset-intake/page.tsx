@@ -4,10 +4,11 @@ import {
   PIP_CANONICAL_DNA,
   GOAT_CANONICAL_DNA,
   canonicalCharacterService,
+  durableStorageOpsService,
   propOnboardingService,
 } from '@doodle-dash/production';
-import { describeObjectStorageStatus } from '@doodle-dash/shared';
 import { CanonicalCharacterIntakeCard } from '@/components/CanonicalCharacterIntakeCard';
+import { StorageHealthPanel } from '@/components/StorageHealthPanel';
 import { UploadDropzone } from '@/components/UploadDropzone';
 import Link from 'next/link';
 
@@ -72,7 +73,7 @@ function pickCandidate(
 
 export default async function AssetIntakePage() {
   await canonicalCharacterService.bootstrapFoundingCharacters();
-  const storage = describeObjectStorageStatus();
+  const storage = await durableStorageOpsService.health();
 
   const [pip, goat, meadow, propBundle] = await Promise.all([
     prisma.character.findUniqueOrThrow({
@@ -132,35 +133,7 @@ export default async function AssetIntakePage() {
         </div>
       </header>
 
-      <section
-        className={[
-          'rounded-[1.75rem] border p-4 sm:p-5',
-          storage.durable
-            ? 'border-leaf-400/30 bg-leaf-500/10'
-            : 'border-sun-400/40 bg-sun-500/10',
-        ].join(' ')}
-      >
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-sun-300">
-          {storage.banner}
-        </p>
-        <p className="mt-2 text-sm text-mist-100">{storage.message}</p>
-        <p className="mt-2 text-xs text-[var(--muted)]">
-          Provider: <span className="font-semibold text-mist-100">{storage.provider}</span>
-          {storage.root ? (
-            <>
-              {' '}
-              · root <span className="break-all">{storage.root}</span>
-            </>
-          ) : null}
-        </p>
-        {!storage.durable ? (
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-sun-100/90">
-            {storage.requiredConfig.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        ) : null}
-      </section>
+      <StorageHealthPanel initial={storage} />
 
       <CanonicalCharacterIntakeCard
         name="Pip"

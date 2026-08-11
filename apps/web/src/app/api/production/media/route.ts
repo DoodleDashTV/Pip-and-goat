@@ -3,7 +3,7 @@ import { prisma } from '@doodle-dash/database';
 import {
   AppError,
   createDefaultObjectStorage,
-  parseLocalStorageKey,
+  parseStorageKeyFromUri,
 } from '@doodle-dash/shared';
 
 export const dynamic = 'force-dynamic';
@@ -26,19 +26,22 @@ export async function GET(request: Request) {
     }
 
     const storage = createDefaultObjectStorage();
-    const key = parseLocalStorageKey(asset.storageLocation);
-    if (!key || !storage.readObject) {
+    const parsed = parseStorageKeyFromUri(asset.storageLocation);
+    if (!parsed?.key || !storage.readObject) {
+      // Public HTTP(S) URLs from OBJECT_STORAGE_PUBLIC_BASE_URL can be redirected.
+      if (/^https?:\/\//i.test(asset.storageLocation)) {
+        return NextResponse.redirect(asset.storageLocation);
+      }
       return NextResponse.json(
         {
           error:
             'Cannot preview this storage URI with the current provider. Configure readable object storage.',
-          storageLocation: asset.storageLocation,
         },
         { status: 501 },
       );
     }
 
-    const bytes = await storage.readObject(key);
+    const bytes = await storage.readObject(parsed.key);
     const contentType = asset.mimeType || 'application/octet-stream';
     return new NextResponse(Buffer.from(bytes), {
       status: 200,

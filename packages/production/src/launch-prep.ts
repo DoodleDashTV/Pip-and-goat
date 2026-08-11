@@ -1,12 +1,18 @@
-import { createHash } from 'crypto';
 import { spawnSync } from 'node:child_process';
 import { prisma } from '@doodle-dash/database';
 import { FOUNDING_CODES } from '@doodle-dash/domain';
 import {
   AppError,
   createDefaultObjectStorage,
+  describeObjectStorageStatus,
+  migrateLocalUriToStorage,
+  normalizeStorageCategory,
+  resolveObjectStorageConfig,
+  runObjectStorageSelfTest,
+  sha256Hex,
   storageKeyFor,
   type ObjectStorage,
+  type StorageCategory,
 } from '@doodle-dash/shared';
 import { characterService, studioSettingsService } from '@doodle-dash/characters';
 import {
@@ -61,6 +67,36 @@ export const REQUIRED_MOUTH_CONTROLS = [
   'viseme_rest',
 ] as const;
 
+/** Semantic facial controls required for lip-sync readiness (matches canonical lock). */
+export const REQUIRED_SEMANTIC_FACIAL_CORE = [
+  'jaw_open',
+  'mouth_smile',
+  'mouth_frown',
+  'mouth_pucker',
+  'mouth_wide',
+  'blink_left',
+  'blink_right',
+  'eye_look_left',
+  'eye_look_right',
+  'eye_look_up',
+  'eye_look_down',
+  'brow_up',
+  'brow_down',
+] as const;
+
+export const REQUIRED_VISEMES = [
+  'REST',
+  'A',
+  'E',
+  'I',
+  'O',
+  'U',
+  'MBP',
+  'FV',
+  'L',
+  'WQ',
+] as const;
+
 export const CHARACTER_TEST_POSES = [
   'FRONT_NEUTRAL',
   'THREE_QUARTER_NEUTRAL',
@@ -90,39 +126,94 @@ export const CANONICAL_AUDITION_SCRIPT = [
 ].join(' ');
 
 function hashBytes(bytes: Uint8Array) {
-  return createHash('sha256').update(bytes).digest('hex');
+  return sha256Hex(bytes);
+}
+
+function categoryForKind(kind?: string): StorageCategory {
+  switch (kind) {
+    case 'PRIMARY_CANONICAL_REFERENCE':
+    case 'REFERENCE_IMAGE':
+    case 'TURNAROUND':
+    case 'EXPRESSION_SHEET':
+    case 'POSE_REFERENCE':
+      return 'canonical-references';
+    case 'CHARACTER_BLEND':
+    case 'CHARACTER_GLB':
+    case 'CHARACTER_GLTF':
+    case 'CHARACTER_FBX':
+      return 'character-models';
+    case 'TEXTURE':
+    case 'MATERIAL':
+      return 'textures';
+    case 'RIG':
+    case 'FACIAL_SHAPEKEYS':
+      return 'rigs';
+    case 'LOCATION_BLEND':
+    case 'LIGHTING_SETUP':
+    case 'LOCATION_PROP':
+      return 'environments';
+    case 'PROP_BLEND':
+    case 'PROP_MODEL':
+    case 'PROP_GLB':
+      return 'props';
+    case 'VOICE':
+      return 'voices';
+    default:
+      return 'canonical-references';
+  }
 }
 
 export class ProductionStorageService {
   constructor(private readonly storage: ObjectStorage = createDefaultObjectStorage()) {}
 
   async storeUpload(input: {
-    category:
-      | 'original_uploads'
-      | 'approved_assets'
-      | 'working_files'
-      | 'draft_renders'
-      | 'final_renders'
-      | 'audio'
-      | 'captions'
-      | 'thumbnails'
-      | 'reports'
-      | 'manifests'
-      | 'worker_tests';
+    category: StorageCategory | string;
     parts: Array<string | number>;
     bytes: Uint8Array;
     contentType?: string;
     originalName?: string;
     metadata?: object;
+    kind?: string;
   }) {
-    const storageKey = storageKeyFor(input.category, input.parts);
+    const category = normalizeStorageCategory(
+      input.kind ? categoryForKind(input.kind) : input.category,
+    ) as StorageCategory;
+    const storageKey = storageKeyFor(category, input.parts);
     const checksum = hashBytes(input.bytes);
-    const uri = await this.storage.putObject(storageKey, input.bytes, input.contentType);
+    let uri: string;
+    try {
+      uri = await this.storage.putObject(storageKey, input.bytes, input.contentType);
+      await studioSettingsService.setJson(
+        'STORAGE_LAST_SUCCESS_WRITE',
+        new Date().toISOString(),
+      );
+    } catch (error) {
+      await studioSettingsService.setJson('STORAGE_LAST_FAILED_WRITE', {
+        at: new Date().toISOString(),
+        message: (error as Error).message,
+        key: storageKey,
+      });
+      throw error;
+    }
+    const config = (() => {
+      try {
+        return resolveObjectStorageConfig();
+      } catch {
+        return null;
+      }
+    })();
+    const provider =
+      config && 'provider' in config
+        ? config.provider === 's3'
+          ? 's3'
+          : config.provider
+        : this.storage.providerName;
+
     const record = await prisma.storedProductionObject.create({
       data: {
         storageKey,
-        provider: process.env.OBJECT_STORAGE_PROVIDER ?? 'local',
-        category: input.category,
+        provider,
+        category,
         uri,
         checksum,
         byteSize: input.bytes.byteLength,
@@ -131,11 +222,135 @@ export class ProductionStorageService {
         metadata: input.metadata ?? undefined,
       },
     });
-    return { record, storageKey, uri, checksum };
+    return { record, storageKey, uri, checksum, provider, category };
   }
 
   get underlying() {
     return this.storage;
+  }
+}
+
+export class DurableStorageOpsService {
+  constructor(private readonly storage = new ProductionStorageService()) {}
+
+  async health() {
+    const lastSuccess = await studioSettingsService.getJson<string | null>(
+      'STORAGE_LAST_SUCCESS_WRITE',
+      null,
+    );
+    const lastFail = await studioSettingsService.getJson<{ at?: string } | string | null>(
+      'STORAGE_LAST_FAILED_WRITE',
+      null,
+    );
+    const lastFailedWrite =
+      typeof lastFail === 'string' ? lastFail : lastFail?.at ?? null;
+    const status = describeObjectStorageStatus({
+      lastSuccessfulWrite: lastSuccess,
+      lastFailedWrite,
+    });
+    return {
+      ...status,
+      prefixes: [
+        'canonical-references/',
+        'character-models/',
+        'textures/',
+        'rigs/',
+        'facial-maps/',
+        'environments/',
+        'props/',
+        'voices/',
+        'audio/',
+        'draft-renders/',
+        'final-renders/',
+        'captions/',
+        'thumbnails/',
+        'reports/',
+        'manifests/',
+        'worker-tests/',
+      ],
+    };
+  }
+
+  async selfTest() {
+    const result = await runObjectStorageSelfTest(this.storage.underlying);
+    if (result.ok) {
+      await studioSettingsService.setJson(
+        'STORAGE_LAST_SUCCESS_WRITE',
+        new Date().toISOString(),
+      );
+    } else {
+      await studioSettingsService.setJson('STORAGE_LAST_FAILED_WRITE', {
+        at: new Date().toISOString(),
+        message: result.error ?? 'self-test failed',
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Migrate local:// stored objects into the currently configured durable provider.
+   * Never deletes local originals — verification required before manual cleanup.
+   */
+  async migrateLocalToConfiguredStorage(options?: { limit?: number; dryRun?: boolean }) {
+    const config = resolveObjectStorageConfig();
+    if (config.provider !== 's3') {
+      throw new AppError(
+        'Migration requires OBJECT_STORAGE_PROVIDER=s3 (or r2/b2/minio).',
+        'MIGRATION_REQUIRES_S3',
+        409,
+      );
+    }
+    const localRoot =
+      process.env.OBJECT_STORAGE_ROOT || `${process.cwd()}/.doodle-dash-storage`;
+    const rows = await prisma.storedProductionObject.findMany({
+      where: { provider: 'local', uri: { startsWith: 'local://' } },
+      orderBy: { createdAt: 'asc' },
+      take: options?.limit ?? 500,
+    });
+    const report = {
+      scanned: rows.length,
+      migrated: 0,
+      verified: 0,
+      skipped: 0,
+      errors: [] as string[],
+      deletedLocal: false as const,
+      dryRun: Boolean(options?.dryRun),
+      note: 'Local originals were NOT deleted. Verify checksums, then clean up manually.',
+    };
+    const target = this.storage.underlying;
+    for (const row of rows) {
+      try {
+        if (options?.dryRun) {
+          report.skipped += 1;
+          continue;
+        }
+        const migrated = await migrateLocalUriToStorage({
+          localUri: row.uri,
+          localRoot,
+          target,
+          targetKey: row.storageKey,
+        });
+        await prisma.storedProductionObject.update({
+          where: { id: row.id },
+          data: {
+            provider: 's3',
+            uri: migrated.targetUri,
+            checksum: migrated.checksum,
+            metadata: {
+              ...(typeof row.metadata === 'object' && row.metadata ? row.metadata : {}),
+              migratedFrom: row.uri,
+              migratedAt: new Date().toISOString(),
+              verified: migrated.verified,
+            },
+          },
+        });
+        report.migrated += 1;
+        if (migrated.verified) report.verified += 1;
+      } catch (error) {
+        report.errors.push(`${row.storageKey}: ${(error as Error).message}`);
+      }
+    }
+    return report;
   }
 }
 
@@ -173,12 +388,45 @@ export class CharacterOnboardingService {
       );
     }
 
+    const previous = await prisma.productionAssetIntake.findFirst({
+      where: {
+        entityType: 'character',
+        entityId: params.characterId,
+        kind,
+        approvalStatus: { not: 'MISSING' },
+      },
+      orderBy: { version: 'desc' },
+    });
+    const nextVersion = (previous?.version ?? 0) + 1;
+
     const stored = await this.storage.storeUpload({
-      category: 'original_uploads',
-      parts: ['characters', params.characterId, kind, Date.now(), params.fileName],
+      category: 'character-models',
+      kind,
+      parts: ['characters', params.characterId, kind, `v${nextVersion}`, Date.now(), params.fileName],
       bytes: params.bytes,
-      contentType: params.contentType,
+      contentType: params.contentType ?? 'application/octet-stream',
       originalName: params.fileName,
+      metadata: {
+        characterId: params.characterId,
+        kind,
+        version: nextVersion,
+        immutable: false,
+        approvalStatus: 'CANDIDATE',
+      },
+    });
+
+    const asset = await prisma.asset.create({
+      data: {
+        universeId: params.universeId,
+        name: params.fileName,
+        type: 'CHARACTER_MODEL',
+        storageLocation: stored.uri,
+        hash: stored.checksum,
+        mimeType: params.contentType ?? 'application/octet-stream',
+        missing: false,
+        approved: false,
+        notes: `Candidate model v${nextVersion} — not production-ready`,
+      },
     });
 
     const intake = await this.intake.register({
@@ -191,8 +439,68 @@ export class CharacterOnboardingService {
       storageLocation: stored.uri,
       source: params.source ?? 'onboarding-upload',
       fileBytes: Buffer.from(params.bytes),
-      notes: `Stored as ${stored.storageKey}`,
+      notes: JSON.stringify({
+        storageKey: stored.storageKey,
+        checksum: stored.checksum,
+        version: nextVersion,
+        approvalStatus: 'CANDIDATE',
+        immutable: false,
+        assetId: asset.id,
+      }),
     });
+
+    await prisma.productionAssetIntake.update({
+      where: { id: intake.id },
+      data: {
+        assetId: asset.id,
+        checksum: stored.checksum,
+        version: nextVersion,
+        approvalStatus: 'CANDIDATE',
+        productionReady: false,
+        uploadedAt: new Date(),
+      },
+    });
+
+    const character = await prisma.character.findUniqueOrThrow({
+      where: { id: params.characterId },
+    });
+    const existingModel = await prisma.character3dModel.findFirst({
+      where: { characterId: params.characterId },
+      orderBy: { createdAt: 'asc' },
+    });
+    const modelNotes = `CANDIDATE v${nextVersion} · sha256=${stored.checksum} · awaiting validation + Blender tests + reference comparison + manual approval`;
+    const model = existingModel
+      ? await prisma.character3dModel.update({
+          where: { id: existingModel.id },
+          data: {
+            modelName: params.fileName,
+            masterBlendAssetId:
+              kind === 'CHARACTER_BLEND' ? asset.id : existingModel.masterBlendAssetId,
+            gltfAssetId:
+              kind === 'CHARACTER_GLB' || kind === 'CHARACTER_GLTF'
+                ? asset.id
+                : existingModel.gltfAssetId,
+            fbxAssetId: kind === 'CHARACTER_FBX' ? asset.id : existingModel.fbxAssetId,
+            status: 'REVIEW',
+            approved: false,
+            productionReady: false,
+            notes: modelNotes,
+          },
+        })
+      : await prisma.character3dModel.create({
+          data: {
+            characterId: params.characterId,
+            characterVersionId: character.currentVersionId,
+            modelName: params.fileName,
+            masterBlendAssetId: kind === 'CHARACTER_BLEND' ? asset.id : null,
+            gltfAssetId: kind === 'CHARACTER_GLB' || kind === 'CHARACTER_GLTF' ? asset.id : null,
+            fbxAssetId: kind === 'CHARACTER_FBX' ? asset.id : null,
+            status: 'REVIEW',
+            approved: false,
+            productionReady: false,
+            notes: modelNotes,
+          },
+        });
 
     const inspection = await this.inspectModel({
       characterId: params.characterId,
@@ -202,10 +510,68 @@ export class CharacterOnboardingService {
       fileHash: stored.checksum,
       format: ext,
       storageUri: stored.uri,
+      assetVersion: nextVersion,
     });
 
+    await new FacialMappingService().getOrCreate(params.characterId, nextVersion);
+    const previewJobs = await new CharacterPreviewService().queuePoseTests(params.characterId);
+
+    const refVersion = await prisma.approvedReferenceVersion.findFirst({
+      where: { characterId: params.characterId },
+      orderBy: { versionNumber: 'desc' },
+    });
+    let modelReview = null;
+    if (refVersion) {
+      modelReview = await prisma.productionModelReview.create({
+        data: {
+          characterId: params.characterId,
+          modelIntakeId: intake.id,
+          referenceVersionId: refVersion.id,
+          status: 'PENDING',
+          checklist: {
+            silhouette: null,
+            proportions: null,
+            eyeSize: null,
+            eyeColor: null,
+            primaryColors: null,
+            materials: null,
+            surface: null,
+            combOrHorns: null,
+            accessories: null,
+            overallIdentity: null,
+            final1080pQuality: null,
+            workflow: [
+              'MODEL UPLOADED',
+              'VALIDATION',
+              'BLENDER TEST RENDERS',
+              'REFERENCE COMPARISON',
+              'MANUAL APPROVAL',
+              'PRODUCTION MODEL LOCKED',
+            ],
+            note: 'Manual side-by-side Blender render vs PRIMARY_CANONICAL_REFERENCE required.',
+          },
+        },
+      });
+    }
+
     const validation = await this.validator.validate(params.characterId);
-    return { intake, stored, inspection, validation };
+    return {
+      intake: {
+        ...intake,
+        version: nextVersion,
+        approvalStatus: 'CANDIDATE',
+        checksum: stored.checksum,
+      },
+      stored,
+      asset,
+      model,
+      inspection,
+      previewJobs,
+      modelReview,
+      validation,
+      status: 'CANDIDATE / BLOCKED',
+      note: 'Model uploaded as candidate. Not production-ready until validation + Blender tests + reference comparison + manual approval.',
+    };
   }
 
   async uploadTextureOrReference(params: {
@@ -226,11 +592,17 @@ export class CharacterOnboardingService {
     contentType?: string;
   }) {
     const stored = await this.storage.storeUpload({
-      category: 'original_uploads',
+      category: categoryForKind(params.kind),
+      kind: params.kind,
       parts: ['characters', params.characterId, params.kind, Date.now(), params.fileName],
       bytes: params.bytes,
       contentType: params.contentType,
       originalName: params.fileName,
+      metadata: {
+        characterId: params.characterId,
+        kind: params.kind,
+        approvalStatus: 'PENDING',
+      },
     });
     const intake = await this.intake.register({
       universeId: params.universeId,
@@ -292,21 +664,109 @@ export class CharacterOnboardingService {
     fileHash: string;
     format: string;
     storageUri: string;
+    assetVersion?: number;
   }) {
     const blenderAvailable = detectBlenderBinary().available;
+    const blendReadable =
+      params.format === 'blend'
+        ? params.fileSize > 64 && Boolean(params.fileHash)
+        : ['glb', 'gltf', 'fbx'].includes(params.format);
     const required = [
-      { code: 'FILE_PRESENT', passed: true, message: 'Binary uploaded to object storage.' },
+      {
+        code: 'FILE_READABLE',
+        passed: blendReadable,
+        message: blendReadable
+          ? 'Binary present in object storage with checksum.'
+          : 'Uploaded file missing or unreadable.',
+      },
       {
         code: 'SUPPORTED_FORMAT',
         passed: ['blend', 'glb', 'gltf', 'fbx'].includes(params.format),
         message: `Format: ${params.format}`,
       },
       {
-        code: 'BLENDER_SCENE_GRAPH',
+        code: 'BLENDER_CAN_OPEN',
         passed: false,
         message: blenderAvailable
-          ? 'Blender scene-graph inspection pending worker job.'
-          : 'BLENDER EXECUTION REQUIRED for scene objects/meshes/bones/shape keys.',
+          ? 'Queued for Blender open/load inspection — not auto-passed.'
+          : 'BLENDER EXECUTION REQUIRED to confirm file opens.',
+      },
+      {
+        code: 'MESHES_EXIST',
+        passed: false,
+        message: blenderAvailable ? 'Pending Blender mesh inspection.' : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'MATERIALS_EXIST',
+        passed: false,
+        message: blenderAvailable
+          ? 'Pending Blender material inspection.'
+          : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'TEXTURES_RESOLVE',
+        passed: false,
+        message: blenderAvailable
+          ? 'Pending Blender texture dependency inspection.'
+          : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'ARMATURE_EXISTS',
+        passed: false,
+        message: blenderAvailable
+          ? 'Pending Blender armature inspection.'
+          : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'BONE_COUNT',
+        passed: false,
+        message: blenderAvailable ? 'Pending bone count.' : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'SHAPE_KEYS',
+        passed: false,
+        message: blenderAvailable ? 'Pending shape-key inspection.' : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'FACIAL_CONTROLS',
+        passed: false,
+        message: `Required semantic controls: ${REQUIRED_SEMANTIC_FACIAL_CORE.join(', ')}`,
+      },
+      {
+        code: 'EYE_BLINK_JAW_MOUTH',
+        passed: false,
+        message: 'Pending eye/blink/jaw/mouth control verification.',
+      },
+      {
+        code: 'VISEME_MAPPINGS',
+        passed: false,
+        message: `Required visemes: ${REQUIRED_VISEMES.join(', ')}`,
+      },
+      {
+        code: 'SCALE_ORIENTATION_BOUNDS',
+        passed: false,
+        message: blenderAvailable
+          ? 'Pending Blender scale/orientation/bounds.'
+          : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'EEVEE_COMPAT',
+        passed: false,
+        message: blenderAvailable
+          ? 'Pending EEVEE compatibility check.'
+          : 'BLENDER EXECUTION REQUIRED',
+      },
+      {
+        code: 'FRAME_1080x1920',
+        passed: false,
+        message: 'Pending 1080×1920 framing compatibility check.',
+      },
+      {
+        code: 'MISSING_DEPENDENCIES',
+        passed: false,
+        message: blenderAvailable
+          ? 'Pending missing-dependency scan.'
+          : 'BLENDER EXECUTION REQUIRED',
       },
       {
         code: 'NOT_AUTO_PRODUCTION_READY',
@@ -321,6 +781,14 @@ export class CharacterOnboardingService {
       fileHash: params.fileHash,
       format: params.format,
       storageUri: params.storageUri,
+      workflow: [
+        'MODEL UPLOADED',
+        'VALIDATION',
+        'BLENDER TEST RENDERS',
+        'REFERENCE COMPARISON',
+        'MANUAL APPROVAL',
+        'PRODUCTION MODEL LOCKED',
+      ],
       sceneObjects: blenderAvailable ? 'PENDING_WORKER' : 'BLENDER_EXECUTION_REQUIRED',
       meshes: blenderAvailable ? 'PENDING_WORKER' : 'BLENDER_EXECUTION_REQUIRED',
       materials: blenderAvailable ? 'PENDING_WORKER' : 'BLENDER_EXECUTION_REQUIRED',
@@ -329,10 +797,14 @@ export class CharacterOnboardingService {
       bones: blenderAvailable ? 'PENDING_WORKER' : 'BLENDER_EXECUTION_REQUIRED',
       shapeKeys: blenderAvailable ? 'PENDING_WORKER' : 'BLENDER_EXECUTION_REQUIRED',
       animations: blenderAvailable ? 'PENDING_WORKER' : 'BLENDER_EXECUTION_REQUIRED',
+      facialControls: [...REQUIRED_SEMANTIC_FACIAL_CORE],
+      visemes: [...REQUIRED_VISEMES],
       missingDependencies: [] as string[],
       scale: 'UNKNOWN_UNTIL_BLENDER',
       orientation: 'UNKNOWN_UNTIL_BLENDER',
       bounds: 'UNKNOWN_UNTIL_BLENDER',
+      eevee: 'UNKNOWN_UNTIL_BLENDER',
+      frame1080x1920: 'UNKNOWN_UNTIL_BLENDER',
       rig: {
         boneCount: null,
         rootBone: null,
@@ -349,6 +821,7 @@ export class CharacterOnboardingService {
       data: {
         characterId: params.characterId,
         intakeId: params.intakeId ?? null,
+        assetVersion: params.assetVersion ?? 1,
         fileName: params.fileName,
         fileSize: params.fileSize,
         fileHash: params.fileHash,
@@ -358,6 +831,10 @@ export class CharacterOnboardingService {
         recommendedFindings: [
           { code: 'TURNAROUND_REFS', message: 'Upload turnaround sheets before lock.' },
           { code: 'FACIAL_MAP', message: 'Map facial controls after rig inspection.' },
+          {
+            code: 'REFERENCE_COMPARISON',
+            message: 'Compare Blender test renders to approved PRIMARY_CANONICAL_REFERENCE.',
+          },
         ],
         optionalFindings: [
           { code: 'FBX_EXCHANGE', message: 'FBX exchange copy if pipeline tools need it.' },
@@ -513,11 +990,12 @@ export class CharacterPreviewService {
         storageLocation: { not: null },
         approvalStatus: { not: 'MISSING' },
       },
+      orderBy: { version: 'desc' },
     });
     const blender = detectBlenderBinary();
     const jobs = [];
     for (const poseCode of CHARACTER_TEST_POSES) {
-      if (!modelReady) {
+      if (!modelReady?.storageLocation) {
         jobs.push(
           await prisma.characterPreviewJob.create({
             data: {
@@ -538,18 +1016,33 @@ export class CharacterPreviewService {
               poseCode,
               status: 'BLOCKED',
               blockedReason: 'BLENDER EXECUTION REQUIRED — no placeholder preview images.',
+              notes: `Uses real uploaded model ${modelReady.storageLocation}`,
             },
           }),
         );
         continue;
       }
+      // Reserve durable output key for draft test render — never invent image bytes here.
+      const outputKey = storageKeyFor('draft-renders', [
+        'character-tests',
+        characterId,
+        poseCode,
+        Date.now(),
+      ]);
       jobs.push(
         await prisma.characterPreviewJob.create({
           data: {
             characterId,
             poseCode,
             status: 'QUEUED',
-            notes: 'Deterministic Blender inspection/render job queued for real uploaded model.',
+            notes: JSON.stringify({
+              modelStorage: modelReady.storageLocation,
+              outputKey,
+              engine: 'EEVEE',
+              resolution: { width: 1080, height: 1920 },
+              message:
+                'Deterministic Blender inspection/render job queued for real uploaded model. Output must land in durable draft-renders/.',
+            }),
           },
         }),
       );
@@ -571,7 +1064,8 @@ export class EnvironmentOnboardingService {
   }) {
     const kind = params.kind ?? 'LOCATION_BLEND';
     const stored = await this.storage.storeUpload({
-      category: 'original_uploads',
+      category: 'environments',
+      kind,
       parts: ['locations', params.locationId, kind, Date.now(), params.fileName],
       bytes: params.bytes,
       contentType: params.contentType,
@@ -688,7 +1182,8 @@ export class PropOnboardingService {
     const ext = params.fileName.toLowerCase().split('.').pop() ?? '';
     const kind = ext === 'glb' ? 'PROP_GLB' : 'PROP_BLEND';
     const stored = await this.storage.storeUpload({
-      category: 'original_uploads',
+      category: 'props',
+      kind,
       parts: ['props', params.propId, kind, Date.now(), params.fileName],
       bytes: params.bytes,
       contentType: params.contentType,
@@ -996,7 +1491,7 @@ export class BlenderWorkerHealthService {
     }
 
     const stored = await this.storage.storeUpload({
-      category: 'worker_tests',
+      category: 'worker-tests',
       parts: ['selftest', Date.now(), 'cube.png'],
       bytes,
       contentType: 'image/png',
@@ -1706,6 +2201,7 @@ export class DraftFinalOrchestrator {
 }
 
 export const productionStorageService = new ProductionStorageService();
+export const durableStorageOpsService = new DurableStorageOpsService();
 export const characterOnboardingService = new CharacterOnboardingService();
 export const facialMappingService = new FacialMappingService();
 export const referenceApprovalService = new ReferenceApprovalService();

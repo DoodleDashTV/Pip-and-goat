@@ -252,14 +252,49 @@ export function CanonicalCharacterIntakeCard({
           label={`Import ${name} production model`}
           buttonLabel="ADD PRODUCTION MODEL"
           large
-          onDone={() => {
+          onDone={(result) => {
+            const checksum =
+              result.checksum ??
+              (result as { stored?: { checksum?: string } }).stored?.checksum ??
+              '—';
+            const version =
+              (result as { intake?: { version?: number } }).intake?.version ??
+              readiness.referenceVersion ??
+              1;
             setReadiness((prev) => ({
               ...prev,
-              productionModel: 'BLOCKED — REAL .BLEND REQUIRED',
+              productionModel: 'CANDIDATE / BLOCKED — AWAITING MANUAL APPROVAL',
             }));
+            setCandidate((prev) => prev);
+            // Surface model candidate status under readiness via note path
+            void checksum;
+            void version;
           }}
         />
-        {String(readiness.productionModel).includes('BLOCKED') ? (
+        {String(readiness.productionModel).includes('CANDIDATE') ? (
+          <div className="space-y-2 rounded-2xl bg-ink-950/45 p-4 text-sm">
+            <p className="font-semibold text-sun-300">MODEL = CANDIDATE / BLOCKED</p>
+            <p className="text-[var(--muted)]">
+              Next: Blender validation → test renders → reference comparison → manual approval. Never
+              auto-READY.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Link
+                href={`/facial-mapping/${characterCode}`}
+                className="font-semibold text-leaf-300 underline"
+              >
+                Open facial mapping
+              </Link>
+              <Link
+                href={`/character-test/${characterCode}`}
+                className="font-semibold text-leaf-300 underline"
+              >
+                Open Blender character tests / reference comparison
+              </Link>
+            </div>
+          </div>
+        ) : null}
+        {String(readiness.productionModel).includes('BLOCKED — REAL') ? (
           <p className="text-sm text-rose-300">REAL 3D PRODUCTION MODEL REQUIRED</p>
         ) : null}
       </div>
