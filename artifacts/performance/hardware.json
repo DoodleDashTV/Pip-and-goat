@@ -1,0 +1,50 @@
+{
+  "hardware": {
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "cpuCores": 4,
+    "ramGiB": 15.6,
+    "gpu": "NONE_DETECTED",
+    "vram": "N/A",
+    "os": "Linux 6.12.94+",
+    "blenderVersion": "Blender 4.0.2",
+    "selectedRenderDevice": "CPU",
+    "hardwareEncoder": [
+      "h264_nvenc",
+      "h264_qsv",
+      "h264_vaapi",
+      "libx264"
+    ],
+    "diskHint": "check lsblk ROTA (1=HDD/unknown virt)"
+  },
+  "devices": {
+    "available": false,
+    "selected": "CPU",
+    "devices": [
+      {
+        "name": "Intel Xeon Processor",
+        "type": "CPU",
+        "use": false
+      }
+    ],
+    "note": "No Blender GPU device — rendering on CPU. Do not claim GPU acceleration."
+  },
+  "config": {
+    "mode": "AUDIT_FAST",
+    "renderConcurrency": "AUTO",
+    "persistentBlenderWorkers": true,
+    "enableShotCache": true,
+    "enableFrameCache": true,
+    "enableVoiceCache": true,
+    "enableAssetCache": true,
+    "gpuAutoSelect": true,
+    "maxRamPercent": 75,
+    "maxVramPercent": 80,
+    "auditFastMode": true,
+    "selectedRenderDevice": "AUTO",
+    "cacheRoot": "/agent/apps/web/.doodle-dash-cache",
+    "finalQualitySamples": 20,
+    "draftFastSamples": 8,
+    "auditMaxFrames": 30
+  },
+  "concurrency": 2
+}

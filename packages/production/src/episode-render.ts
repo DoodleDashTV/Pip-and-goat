@@ -24,7 +24,7 @@ import { shotPackageService } from './readiness';
 const PIP_ID = '22222222-2222-4222-8222-222222222222';
 const GOAT_ID = '33333333-3333-4333-8333-333333333333';
 
-type ProfileCode = 'DRAFT_FAST' | 'DRAFT_HD' | 'FINAL_1080P';
+type ProfileCode = 'AUDIT_FAST' | 'DRAFT_FAST' | 'DRAFT_HD' | 'FINAL_1080P';
 type BlendKind =
   | 'CHARACTER_BLEND'
   | 'CHARACTER_GLB'
@@ -32,7 +32,8 @@ type BlendKind =
   | 'PROP_BLEND'
   | 'PROP_GLB';
 
-const PROFILE_RESOLUTION: Record<ProfileCode, '540x960' | '720x1280' | '1080x1920'> = {
+const PROFILE_RESOLUTION: Record<ProfileCode, '270x480' | '540x960' | '720x1280' | '1080x1920'> = {
+  AUDIT_FAST: '270x480',
   DRAFT_FAST: '540x960',
   DRAFT_HD: '720x1280',
   FINAL_1080P: '1080x1920',
@@ -225,20 +226,28 @@ export class EpisodeShotRenderService {
     const profile = await prisma.productionRenderProfile.findUnique({
       where: { code: params.profileCode },
     });
-    if (!profile) {
+    // AUDIT_FAST may not be seeded — allow ephemeral audit without DB profile row.
+    if (!profile && params.profileCode !== 'AUDIT_FAST') {
       throw new AppError(`Unknown render profile ${params.profileCode}`, 'PROFILE_MISSING', 404);
     }
     const resolution = PROFILE_RESOLUTION[params.profileCode];
     const perf = resolvePerformanceConfig({
-      mode: params.profileCode === 'FINAL_1080P' ? 'FINAL_1080P' : params.profileCode,
+      mode:
+        params.profileCode === 'FINAL_1080P'
+          ? 'FINAL_1080P'
+          : params.profileCode === 'AUDIT_FAST'
+            ? 'AUDIT_FAST'
+            : params.profileCode,
     });
     const resProfile = profileResolution(perf.mode);
     const samples =
       params.profileCode === 'FINAL_1080P'
         ? resProfile.samples
-        : params.profileCode === 'DRAFT_FAST'
-          ? Math.min(resProfile.samples, perf.draftFastSamples)
-          : resProfile.samples;
+        : params.profileCode === 'AUDIT_FAST'
+          ? 4
+          : params.profileCode === 'DRAFT_FAST'
+            ? Math.min(resProfile.samples, perf.draftFastSamples)
+            : resProfile.samples;
     if (params.profileCode === 'FINAL_1080P') {
       assertFinalQualityNotDegraded(samples);
     }
@@ -330,14 +339,48 @@ export class EpisodeShotRenderService {
 
         const actionFor = (role: 'pip' | 'goat', shotNumber: number) => {
           const prefix = role === 'pip' ? 'PIP' : 'GOAT';
+          let notes: { actions?: { pip?: string; goat?: string } } = {};
+          try {
+            if (shot.productionNotes) {
+              notes = JSON.parse(shot.productionNotes) as {
+                actions?: { pip?: string; goat?: string };
+              };
+            }
+          } catch {
+            notes = {};
+          }
+          const override = role === 'pip' ? notes.actions?.pip : notes.actions?.goat;
+          if (override) return override;
           if (shotNumber === 1) return `${prefix}_LOOK`;
           if (shotNumber === 2) return `${prefix}_TALK`;
           if (shotNumber === 3) return `${prefix}_WALK`;
           if (shotNumber === 4) return `${prefix}_POINT`;
+          if (shotNumber === 5) return `${prefix}_SURPRISED`;
           return `${prefix}_IDLE`;
         };
 
         const cameraPreset = CAMERA_MAP[shot.cameraPreset || ''] || 'TWO_SHOT';
+        const actions = {
+          pip: actionFor('pip', shot.shotNumber),
+          goat: actionFor('goat', shot.shotNumber),
+        };
+        // Persist actions into productionNotes so fingerprints track animation changes (Test C).
+        const notesPayload = (() => {
+          try {
+            return shot.productionNotes ? JSON.parse(shot.productionNotes) : {};
+          } catch {
+            return {};
+          }
+        })() as Record<string, unknown>;
+        if (JSON.stringify(notesPayload.actions) !== JSON.stringify(actions)) {
+          await prisma.shot.update({
+            where: { id: shot.id },
+            data: {
+              productionNotes: JSON.stringify({ ...notesPayload, actions }),
+            },
+          });
+        }
+
         const cacheSlot = await shotRenderCacheService.lookupOrMark({
           shotId: shot.id,
           profileCode: params.profileCode,
@@ -378,15 +421,12 @@ export class EpisodeShotRenderService {
                   shotNumber: shot.shotNumber,
                   description: shot.description,
                   placements: {
-                    pip: { location: [-0.7, 0, 0], action: actionFor('pip', shot.shotNumber) },
-                    goat: { location: [0.9, 0, 0], action: actionFor('goat', shot.shotNumber) },
+                    pip: { location: [-0.7, 0, 0], action: actions.pip },
+                    goat: { location: [0.9, 0, 0], action: actions.goat },
                     meadow: { location: [0, 0, 0] },
                     map: { location: [0, 0.35, 0.05] },
                   },
-                  actions: {
-                    pip: actionFor('pip', shot.shotNumber),
-                    goat: actionFor('goat', shot.shotNumber),
-                  },
+                  actions,
                   lipSync,
                   dialogue: shotLines,
                 },

@@ -61,8 +61,10 @@
       "mesh": "Goat_Character",
       "accessories": [
         "Goat_Collar",
-        "Goat_Tag"
+        "Goat_Tag",
+        "Goat_Tag_Text"
       ],
+      "tagText": "Goat",
       "actions": [
         "GOAT_EXCITED",
         "GOAT_HAPPY",

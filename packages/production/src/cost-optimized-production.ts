@@ -589,10 +589,15 @@ export class CharacterFramingValidator {
 }
 
 export class ShotRenderCacheService {
+  /**
+   * Content-addressed fingerprint of everything that can change Blender frame output.
+   * Encoding-only knobs (CRF, container remux) are intentionally excluded so TEST F
+   * does not force Blender rerenders when frames remain compatible.
+   */
   async buildFingerprint(shotId: string, profileCode: string) {
     const shot = await prisma.shot.findUnique({
       where: { id: shotId },
-      include: { scene: { include: { location: true } } },
+      include: { scene: { include: { location: true, shots: { orderBy: { shotNumber: 'asc' } } } } },
     });
     if (!shot) throw new AppError('Shot not found', 'SHOT_NOT_FOUND', 404);
     const characterIds = Array.isArray(shot.characterIds) ? (shot.characterIds as string[]) : [];
@@ -604,12 +609,42 @@ export class ShotRenderCacheService {
             ? { entityType: 'location', entityId: shot.scene.locationId }
             : undefined,
         ].filter(Boolean) as object[],
+        kind: {
+          in: ['CHARACTER_BLEND', 'CHARACTER_GLB', 'LOCATION_BLEND', 'PROP_BLEND', 'PROP_GLB'],
+        },
       },
       orderBy: { version: 'desc' },
     });
-    const dialogues = await prisma.dialogueLine.findMany({
+    // Latest intake only per entity+kind — older rows must not poison the key.
+    const latestIntakeByKey = new Map<string, (typeof intakes)[number]>();
+    for (const intake of intakes) {
+      const key = `${intake.entityType}:${intake.entityId}:${intake.kind}`;
+      if (!latestIntakeByKey.has(key)) latestIntakeByKey.set(key, intake);
+    }
+
+    // Dialogue scoped to this shot's timeline window (not the whole episode).
+    let cursorSec = 0;
+    let shotStartMs = 0;
+    let shotEndMs = Math.round((shot.durationSeconds || 4) * 1000);
+    for (const sibling of shot.scene.shots) {
+      const dur = sibling.durationSeconds || 4;
+      if (sibling.id === shot.id) {
+        shotStartMs = Math.round(cursorSec * 1000);
+        shotEndMs = Math.round((cursorSec + dur) * 1000);
+        break;
+      }
+      cursorSec += dur;
+    }
+    const allDialogues = await prisma.dialogueLine.findMany({
       where: { episodeId: shot.scene.episodeId },
-      take: 50,
+      take: 200,
+    });
+    const dialogues = allDialogues.filter((d) => {
+      const start = d.startMs ?? 0;
+      const end = d.endMs ?? start;
+      // Untimed legacy lines attach only to shot 1 so they do not invalidate every shot.
+      if (d.startMs == null && d.endMs == null) return shot.shotNumber === 1;
+      return start < shotEndMs && end > shotStartMs;
     });
     const profile = await prisma.productionRenderProfile.findUnique({
       where: { code: profileCode },
@@ -630,12 +665,26 @@ export class ShotRenderCacheService {
           where: { shotId, characterId: { in: characterIds } },
         })
       : [];
+    const animPackage = await prisma.shotAnimationPackage.findFirst({
+      where: { shotId },
+      orderBy: { packageVersion: 'desc' },
+    });
     const latestRefByCharacter = new Map<string, number>();
     for (const rv of refVersions) {
       if (!latestRefByCharacter.has(rv.characterId)) {
         latestRefByCharacter.set(rv.characterId, rv.versionNumber);
       }
     }
+    // Render-affecting profile knobs only (not encode-only remux settings).
+    const qp = (profile?.qualityPreset || {}) as Record<string, unknown>;
+    const renderQuality = {
+      engine: profile?.engine,
+      qualityPreset: profile?.qualityPreset,
+      width: profile?.width,
+      height: profile?.height,
+      fps: profile?.fps,
+      samples: typeof qp.samples === 'number' ? qp.samples : null,
+    };
     return fingerprint([
       shot.id,
       shot.description,
@@ -643,7 +692,15 @@ export class ShotRenderCacheService {
       shot.cameraPreset,
       shot.lightingPreset,
       shot.characterIds,
-      intakes.map((i) => ({ id: i.id, version: i.version, checksum: i.checksum, kind: i.kind })),
+      shot.productionNotes,
+      shot.renderMode,
+      [...latestIntakeByKey.values()].map((i) => ({
+        entityType: i.entityType,
+        entityId: i.entityId,
+        version: i.version,
+        checksum: i.checksum,
+        kind: i.kind,
+      })),
       packages.map((p) => ({
         characterId: p.characterId,
         dnaVersion: p.dnaVersion,
@@ -657,10 +714,46 @@ export class ShotRenderCacheService {
         characterId: a.characterId,
         accessories: a.accessories,
       })),
-      dialogues.map((d) => ({ id: d.id, text: d.text, speakerId: d.speakerId })),
+      animPackage
+        ? {
+            packageVersion: animPackage.packageVersion,
+            instructions: animPackage.instructions,
+            characterPlacements: animPackage.characterPlacements,
+            camera: animPackage.camera,
+            lighting: animPackage.lighting,
+            props: animPackage.props,
+            lipSyncRefs: animPackage.lipSyncRefs,
+          }
+        : null,
+      dialogues.map((d) => ({
+        id: d.id,
+        text: d.text,
+        speakerId: d.speakerId,
+        startMs: d.startMs,
+        endMs: d.endMs,
+      })),
       profileCode,
-      profile?.engine,
-      profile?.qualityPreset,
+      renderQuality,
+      // Explicitly exclude encode-only settings (container/CRF/bitrate) from frame key.
+      'frame-output-v2',
+    ]);
+  }
+
+  /** Encode-stage fingerprint — changing this alone must not invalidate Blender frames. */
+  buildEncodeFingerprint(input: {
+    frameFingerprint: string;
+    codec?: string;
+    crf?: number | string;
+    audioBitrate?: string;
+    container?: string;
+  }) {
+    return fingerprint([
+      input.frameFingerprint,
+      input.codec ?? 'libx264',
+      input.crf ?? 18,
+      input.audioBitrate ?? '192k',
+      input.container ?? 'mp4',
+      'encode-v1',
     ]);
   }
 
@@ -683,6 +776,7 @@ export class ShotRenderCacheService {
         },
       },
     });
+    // Never reuse unapproved / incomplete / poisoned entries.
     if (existing?.approved && existing.outputUri) {
       return { reusable: true as const, entry: existing, fingerprint: fp };
     }
@@ -694,7 +788,11 @@ export class ShotRenderCacheService {
           profileCode: input.profileCode,
         },
       },
-      update: { engine: input.engine },
+      // Interrupted/failed attempts stay unapproved; do not clear a prior approved URI here.
+      update: {
+        engine: input.engine,
+        ...(existing?.approved ? {} : { approved: false, outputUri: null, renderJobId: null }),
+      },
       create: {
         shotId: input.shotId,
         fingerprint: fp,
@@ -707,6 +805,9 @@ export class ShotRenderCacheService {
   }
 
   async markApproved(entryId: string, outputUri: string, renderJobId?: string) {
+    if (!outputUri) {
+      throw new AppError('Cannot approve shot cache without output URI', 'CACHE_APPROVE_INVALID', 400);
+    }
     return prisma.shotRenderCacheEntry.update({
       where: { id: entryId },
       data: {
@@ -715,6 +816,35 @@ export class ShotRenderCacheService {
         renderJobId: renderJobId ?? null,
       },
     });
+  }
+
+  /** Failed / interrupted jobs must never leave an approved cache poison. */
+  async markRejected(entryId: string, reason?: string) {
+    return prisma.shotRenderCacheEntry.update({
+      where: { id: entryId },
+      data: {
+        approved: false,
+        outputUri: null,
+        renderJobId: null,
+        // Store rejection hint in engine field suffix only if needed — keep schema intact.
+      },
+    });
+  }
+
+  async rejectForJob(input: { shotId?: string | null; profileCode?: string | null; engine?: string }) {
+    if (!input.shotId || !input.profileCode) return null;
+    const fp = await this.buildFingerprint(input.shotId, input.profileCode);
+    const existing = await prisma.shotRenderCacheEntry.findUnique({
+      where: {
+        shotId_fingerprint_profileCode: {
+          shotId: input.shotId,
+          fingerprint: fp,
+          profileCode: input.profileCode,
+        },
+      },
+    });
+    if (!existing || existing.approved) return existing;
+    return this.markRejected(existing.id);
   }
 }
 

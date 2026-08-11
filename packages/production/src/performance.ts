@@ -467,3 +467,96 @@ export function assertFinalQualityNotDegraded(samples: number) {
     );
   }
 }
+
+/**
+ * Soft regression guards — flag material regressions without hard-failing across hardware.
+ * Thresholds are relative to a recorded baseline for the same machine class when available.
+ */
+export type PerformanceGuardResult = {
+  status: 'PASS' | 'WARN' | 'FAIL';
+  flags: string[];
+  machine: { cpuCores: number; ramGiB: number; device: string };
+  measured: Record<string, number | null>;
+  thresholds: Record<string, number>;
+};
+
+export function evaluatePerformanceGuards(input: {
+  blenderStartups: number;
+  jobsHandled?: number;
+  secondsPerFrame: number | null;
+  episodeProductionMs: number | null;
+  cacheHitPct: number | null;
+  reusedShotPct: number | null;
+  completeShotMs?: number | null;
+  /** Optional prior baseline on similar hardware (from previous acceptance run). */
+  baseline?: Partial<{
+    secondsPerFrame: number;
+    episodeProductionMs: number;
+    blenderStartups: number;
+  }>;
+}): PerformanceGuardResult {
+  const hw = detectHardware();
+  const flags: string[] = [];
+  // Absolute ceilings are intentionally loose — Cloud Agent CPU VMs vary widely.
+  const thresholds = {
+    maxBlenderStartupsPerWarmEpisode: 2,
+    maxSecondsPerFrameCpuFinal: 12,
+    minCacheHitPctWarmRerun: 80,
+    minReusedShotPctWarmRerun: 80,
+    maxEpisodeRegressionFactor: 1.5,
+  };
+  if (input.blenderStartups > thresholds.maxBlenderStartupsPerWarmEpisode && (input.jobsHandled || 0) > 1) {
+    flags.push(
+      `WARN: Blender startups=${input.blenderStartups} for ${input.jobsHandled} jobs — persistent daemon may not be reusing process`,
+    );
+  }
+  if (input.secondsPerFrame != null && hw.gpu === 'NONE_DETECTED') {
+    if (input.secondsPerFrame > thresholds.maxSecondsPerFrameCpuFinal) {
+      flags.push(
+        `WARN: FINAL seconds/frame ${input.secondsPerFrame.toFixed(2)} exceeds soft CPU ceiling ${thresholds.maxSecondsPerFrameCpuFinal}`,
+      );
+    }
+  }
+  if (input.cacheHitPct != null && input.cacheHitPct * 100 < thresholds.minCacheHitPctWarmRerun) {
+    flags.push(
+      `WARN: warm cache hit ${(input.cacheHitPct * 100).toFixed(0)}% below ${thresholds.minCacheHitPctWarmRerun}%`,
+    );
+  }
+  if (input.reusedShotPct != null && input.reusedShotPct * 100 < thresholds.minReusedShotPctWarmRerun) {
+    flags.push(
+      `WARN: reused shot ${(input.reusedShotPct * 100).toFixed(0)}% below ${thresholds.minReusedShotPctWarmRerun}%`,
+    );
+  }
+  if (
+    input.baseline?.episodeProductionMs &&
+    input.episodeProductionMs &&
+    input.episodeProductionMs > input.baseline.episodeProductionMs * thresholds.maxEpisodeRegressionFactor
+  ) {
+    flags.push(
+      `FAIL: episode time ${input.episodeProductionMs}ms > ${thresholds.maxEpisodeRegressionFactor}× baseline ${input.baseline.episodeProductionMs}ms`,
+    );
+  }
+  const status = flags.some((f) => f.startsWith('FAIL'))
+    ? 'FAIL'
+    : flags.some((f) => f.startsWith('WARN'))
+      ? 'WARN'
+      : 'PASS';
+  return {
+    status,
+    flags,
+    machine: {
+      cpuCores: hw.cpuCores,
+      ramGiB: hw.ramGiB,
+      device: hw.selectedRenderDevice,
+    },
+    measured: {
+      blenderStartups: input.blenderStartups,
+      secondsPerFrame: input.secondsPerFrame,
+      episodeProductionMs: input.episodeProductionMs,
+      cacheHitPct: input.cacheHitPct,
+      reusedShotPct: input.reusedShotPct,
+      completeShotMs: input.completeShotMs ?? null,
+    },
+    thresholds,
+  };
+}

@@ -77,10 +77,20 @@ async function ensureCharacterProduction(code: 'CHAR_PIP_001' | 'CHAR_GOAT_001')
     orderBy: { createdAt: 'desc' },
   });
 
+  const blendBytes = new Uint8Array(readFileSync(blendPath));
+  const blendChecksum = sha(Buffer.from(blendBytes));
+  const latestIntake = await prisma.productionAssetIntake.findFirst({
+    where: { entityId: character.id, kind: { in: ['CHARACTER_BLEND', 'CHARACTER_GLB'] } },
+    orderBy: { version: 'desc' },
+  });
+  const forceRefresh =
+    process.argv.includes('--force-refresh') ||
+    (latestIntake?.checksum && latestIntake.checksum !== blendChecksum);
+
   let model = existingReadyModel;
   let assetVersion = 1;
 
-  if (!model) {
+  if (!model || forceRefresh) {
     await characterOnboardingService.uploadTextureOrReference({
       characterId: character.id,
       universeId: character.universeId,
@@ -90,7 +100,6 @@ async function ensureCharacterProduction(code: 'CHAR_PIP_001' | 'CHAR_GOAT_001')
       contentType: 'image/png',
     });
 
-    const blendBytes = new Uint8Array(readFileSync(blendPath));
     const uploaded = await characterOnboardingService.uploadModel({
       characterId: character.id,
       universeId: character.universeId,
@@ -302,9 +311,15 @@ async function ensureEnvironmentAndProp() {
   const mapBytes = new Uint8Array(readFileSync(path.join(LIB, 'props', 'adventure_map.blend')));
 
   const existingEnv = await prisma.productionAssetIntake.findFirst({
-    where: { entityId: meadow.id, kind: 'LOCATION_BLEND', productionReady: true },
+    where: { entityId: meadow.id, kind: 'LOCATION_BLEND' },
+    orderBy: { version: 'desc' },
   });
-  if (!existingEnv) {
+  const meadowChecksum = sha(Buffer.from(meadowBytes));
+  const refreshEnv =
+    process.argv.includes('--force-refresh') ||
+    !existingEnv?.productionReady ||
+    (existingEnv?.checksum && existingEnv.checksum !== meadowChecksum);
+  if (refreshEnv) {
     await environmentOnboardingService.uploadEnvironment({
       locationId: meadow.id,
       universeId: meadow.universeId,

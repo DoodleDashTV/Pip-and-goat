@@ -422,22 +422,43 @@ def build_goat(path: Path) -> dict:
     tail.scale = (0.7, 1.2, 0.7)
     tail.data.materials.append(cream)
 
-    # Collar + tag
+    # Collar + gold tag with readable "Goat" lettering (canonical accessory)
+    lettering = mat("GoatTagInk", (0.08, 0.08, 0.1), 0.55, 0.05)
     bpy.ops.mesh.primitive_torus_add(major_radius=0.28, minor_radius=0.035, location=(0, -0.35, 1.1))
     collar = bpy.context.object
     collar.name = "Goat_Collar"
     collar.rotation_euler = (math.radians(90), 0, 0)
     collar.data.materials.append(blue)
-    bpy.ops.mesh.primitive_cylinder_add(radius=0.07, depth=0.02, location=(0, -0.55, 1.0))
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.09, depth=0.018, location=(0, -0.58, 1.02))
     tag = bpy.context.object
     tag.name = "Goat_Tag"
     tag.rotation_euler = (math.radians(90), 0, 0)
     tag.data.materials.append(gold)
+    # Embossed readable name — must literally spell "Goat" (not placeholder / garbled)
+    bpy.ops.object.text_add(location=(0.0, -0.62, 1.02))
+    tag_text = bpy.context.object
+    tag_text.name = "Goat_Tag_Text"
+    tag_text.data.body = "Goat"
+    tag_text.data.size = 0.07
+    tag_text.data.extrude = 0.006
+    tag_text.data.align_x = "CENTER"
+    tag_text.data.align_y = "CENTER"
+    # Face camera (front of goat is -Y)
+    tag_text.rotation_euler = (math.radians(90), 0, 0)
+    bpy.ops.object.convert(target="MESH")
+    tag_text = bpy.context.object
+    tag_text.name = "Goat_Tag_Text"
+    if tag_text.data.materials:
+        tag_text.data.materials[0] = lettering
+    else:
+        tag_text.data.materials.append(lettering)
 
     meshes = [
         o
         for o in bpy.data.objects
-        if o.type == "MESH" and o.name.startswith("Goat_") and o.name not in ("Goat_Collar", "Goat_Tag")
+        if o.type == "MESH"
+        and o.name.startswith("Goat_")
+        and o.name not in ("Goat_Collar", "Goat_Tag", "Goat_Tag_Text")
     ]
     bpy.ops.object.select_all(action="DESELECT")
     for o in meshes:
@@ -493,6 +514,9 @@ def build_goat(path: Path) -> dict:
     parent_with_armature(goat, arm)
     parent_with_armature(bpy.data.objects["Goat_Collar"], arm)
     parent_with_armature(bpy.data.objects["Goat_Tag"], arm)
+    parent_with_armature(bpy.data.objects["Goat_Tag_Text"], arm)
+    goat["ddp_tag_text"] = "Goat"
+    goat["ddp_character_code"] = "CHAR_GOAT_001"
 
     def idle(a, f, t):
         a.pose.bones["head"].rotation_euler = (0.04 * math.sin(t * math.pi * 2), 0, 0)
@@ -536,18 +560,31 @@ def build_goat(path: Path) -> dict:
     cam.rotation_euler = (math.radians(88), 0, 0)
     bpy.context.scene.camera = cam
     bpy.ops.object.light_add(type="SUN", location=(2, -2, 5))
-    bpy.context.object.data.energy = 3.0
+    bpy.context.object.data.energy = 4.5
+    bpy.ops.object.light_add(type="AREA", location=(0, -2.5, 1.4))
+    fill = bpy.context.object
+    fill.data.energy = 80
+    fill.data.size = 3
+    # Front key so collar/tag lettering is readable in the primary reference
+    bpy.ops.object.light_add(type="AREA", location=(0, -1.8, 0.9))
+    front = bpy.context.object
+    front.data.energy = 50
+    front.data.size = 1.5
+    front.rotation_euler = (math.radians(90), 0, 0)
 
     path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(path))
     ref = path.with_suffix(".png")
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_EEVEE"
-    scene.eevee.taa_render_samples = 16
+    scene.eevee.taa_render_samples = 24
     scene.render.resolution_x = 1024
     scene.render.resolution_y = 1024
     scene.render.filepath = str(ref)
     scene.render.image_settings.file_format = "PNG"
+    # Three-quarter pull-back so collar + "Goat" tag lettering are visible in the primary reference
+    cam.location = (1.1, -3.4, 1.35)
+    cam.rotation_euler = (math.radians(78), 0, math.radians(18))
     bpy.ops.render.render(write_still=True)
 
     return {
@@ -556,7 +593,8 @@ def build_goat(path: Path) -> dict:
         "reference": str(ref),
         "rig": "Goat_Rig",
         "mesh": "Goat_Character",
-        "accessories": ["Goat_Collar", "Goat_Tag"],
+        "accessories": ["Goat_Collar", "Goat_Tag", "Goat_Tag_Text"],
+        "tagText": "Goat",
         "actions": [a.name for a in bpy.data.actions if a.name.startswith("GOAT_")],
         "shapeKeys": [kb.name for kb in goat.data.shape_keys.key_blocks],
     }
@@ -585,27 +623,44 @@ def build_meadow(path: Path) -> dict:
     pth.scale = (1.2, 10, 0.04)
     pth.data.materials.append(path_mat)
 
-    # Flowers
-    for i in range(18):
-        ang = i * 0.7
-        r = 2.5 + (i % 5) * 0.7
+    # Flowers — fewer unique objects (joined) to cut EEVEE per-frame sync cost
+    flower_objs = []
+    for i in range(12):
+        ang = i * 0.85
+        r = 2.5 + (i % 4) * 0.8
         x, y = math.cos(ang) * r, math.sin(ang) * r
-        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.12, location=(x, y, 0.15), segments=10, ring_count=6)
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.12, location=(x, y, 0.15), segments=8, ring_count=5)
         fl = bpy.context.object
         fl.name = f"Meadow_Flower_{i}"
         fl.data.materials.append(flower_a if i % 2 == 0 else flower_b)
+        flower_objs.append(fl)
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in flower_objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = flower_objs[0]
+    bpy.ops.object.join()
+    bpy.context.object.name = "Meadow_Flowers"
 
-    # Trees / bushes
+    # Trees / bushes — join trunks + canopies into two meshes for faster sync
+    tree_parts = []
     for i, (x, y) in enumerate(((-5, 4), (5, 5), (-6, -3), (6, -2), (-3, 7), (4, -6))):
         bpy.ops.mesh.primitive_cylinder_add(radius=0.18, depth=1.4, location=(x, y, 0.7))
         trunk = bpy.context.object
         trunk.name = f"Meadow_Trunk_{i}"
         trunk.data.materials.append(bark)
-        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.9, location=(x, y, 1.7), segments=16, ring_count=8)
+        tree_parts.append(trunk)
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.9, location=(x, y, 1.7), segments=12, ring_count=6)
         canopy = bpy.context.object
         canopy.name = f"Meadow_Canopy_{i}"
         canopy.scale = (1.1, 1.1, 0.85)
         canopy.data.materials.append(leaf)
+        tree_parts.append(canopy)
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in tree_parts:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = tree_parts[0]
+    bpy.ops.object.join()
+    bpy.context.object.name = "Meadow_Trees"
 
     # Sky dome (inside out)
     bpy.ops.mesh.primitive_uv_sphere_add(radius=40, location=(0, 0, 0), segments=24, ring_count=12)

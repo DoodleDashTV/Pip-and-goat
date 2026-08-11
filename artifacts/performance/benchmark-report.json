@@ -1,0 +1,210 @@
+{
+  "OVERALL_PERFORMANCE_STATUS": "PARTIAL",
+  "HARDWARE": {
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "cpuCores": 4,
+    "ramGiB": 15.6,
+    "gpu": "NONE_DETECTED",
+    "vram": "N/A",
+    "os": "Linux 6.12.94+",
+    "blenderVersion": "Blender 4.0.2",
+    "selectedRenderDevice": "CPU",
+    "hardwareEncoder": [
+      "h264_nvenc",
+      "h264_qsv",
+      "h264_vaapi",
+      "libx264"
+    ],
+    "diskHint": "check lsblk ROTA (1=HDD/unknown virt)"
+  },
+  "BLENDER_DEVICE": {
+    "available": false,
+    "selected": "CPU",
+    "devices": [
+      {
+        "name": "Intel Xeon Processor",
+        "type": "CPU",
+        "use": false
+      }
+    ],
+    "note": "No Blender GPU device \u2014 rendering on CPU. Do not claim GPU acceleration."
+  },
+  "BEFORE_TOTAL_TIME_SEC": 746,
+  "AFTER_TOTAL_TIME_NOTE": "AFTER uses AUDIT_FAST 30f + FINAL rep 30f via persistent daemon; not a full episode re-time",
+  "AFTER_AUDIT_COLD_MS": 8852,
+  "AFTER_AUDIT_WARM_MS": 8058,
+  "AFTER_FINAL_REP_1S_MS": 127436,
+  "SPEEDUP_AUDIT_WARM_VS_COLD": 1.1,
+  "BEFORE_SECONDS_PER_FRAME": 2.487,
+  "AFTER_SECONDS_PER_FRAME_FINAL_REP": 4.221,
+  "COLD_CACHE_TIME_MS": 8852,
+  "WARM_CACHE_TIME_MS": 8058,
+  "WARM_CACHE_SPEEDUP": 1.1,
+  "BLENDER_STARTUPS_BEFORE": 1,
+  "BLENDER_STARTUPS_AFTER": 1,
+  "JOBS_HANDLED_SAME_PROCESS": 3,
+  "ONE_SHOT_CHANGE": {
+    "SHOTS_TOTAL": 4,
+    "SHOTS_CHANGED": 1,
+    "SHOTS_RERENDERED": 1,
+    "SHOTS_REUSED": 3,
+    "PASS": true,
+    "beforeReuseAll": true
+  },
+  "FAST_AUDIT_MS": 6950,
+  "FAST_AUDIT_TYPECHECK_OK": true,
+  "FAST_AUDIT_UNIT_OK": true,
+  "VISUAL_DIAGNOSTIC_MS": 16910,
+  "FINAL_1080P_REP": {
+    "RESOLUTION": "1080x1920",
+    "FPS": 30,
+    "CODEC": "H.264 (shot.mp4 from ffmpeg)",
+    "SAMPLES": 20,
+    "FRAMES": 30,
+    "WALL_MS": 127436
+  },
+  "VISUAL_QUALITY_REGRESSION": "NO",
+  "note": "FINAL samples floor protected; AUDIT_FAST uses lower res/samples for tests only",
+  "PIP_QUALITY": "PASS",
+  "GOAT_QUALITY": "PASS",
+  "STRICT_CHARACTER_LOCK": "PASS",
+  "DOODLE_GUARDIAN": "PASS",
+  "COST_GUARDIAN": "PASS",
+  "EXTERNAL_API_COST": 0,
+  "BIGGEST_REMAINING_BOTTLENECK": "CPU-only EEVEE frame shading with meadow instance sync (no GPU in this Cloud Agent VM)",
+  "RECOMMENDED_NEXT_OPTIMIZATION": "GPU-capable worker pool + geometry instancing in meadow + multi-worker concurrency on larger hosts",
+  "timingsCold": {
+    "scene_reset_ms": 26,
+    "asset_loading_ms": 18,
+    "animation_application_ms": 0,
+    "facial_visemes_ms": 0,
+    "scene_assembly_ms": 0,
+    "frame_render_ms": 8706,
+    "ffmpeg_encoding_ms": 98
+  },
+  "timingsWarm": {
+    "scene_reset_ms": 30,
+    "asset_loading_ms": 15,
+    "animation_application_ms": 0,
+    "facial_visemes_ms": 0,
+    "scene_assembly_ms": 0,
+    "frame_render_ms": 7909,
+    "ffmpeg_encoding_ms": 102
+  },
+  "timingsFinalRep": {
+    "scene_reset_ms": 29,
+    "asset_loading_ms": 15,
+    "animation_application_ms": 0,
+    "facial_visemes_ms": 0,
+    "scene_assembly_ms": 0,
+    "frame_render_ms": 126644,
+    "ffmpeg_encoding_ms": 745
+  },
+  "dashboard": {
+    "config": {
+      "mode": "DRAFT_FAST",
+      "renderConcurrency": "AUTO",
+      "persistentBlenderWorkers": true,
+      "enableShotCache": true,
+      "enableFrameCache": true,
+      "enableVoiceCache": true,
+      "enableAssetCache": true,
+      "gpuAutoSelect": true,
+      "maxRamPercent": 75,
+      "maxVramPercent": 80,
+      "auditFastMode": false,
+      "selectedRenderDevice": "AUTO",
+      "cacheRoot": "/agent/apps/web/.doodle-dash-cache",
+      "finalQualitySamples": 20,
+      "draftFastSamples": 8,
+      "auditMaxFrames": 30
+    },
+    "hardware": {
+      "cpuModel": "Intel(R) Xeon(R) Processor",
+      "cpuCores": 4,
+      "ramGiB": 15.6,
+      "gpu": "NONE_DETECTED",
+      "vram": "N/A",
+      "os": "Linux 6.12.94+",
+      "blenderVersion": "Blender 4.0.2",
+      "selectedRenderDevice": "CPU",
+      "hardwareEncoder": [
+        "h264_nvenc",
+        "h264_qsv",
+        "h264_vaapi",
+        "libx264"
+      ],
+      "diskHint": "check lsblk ROTA (1=HDD/unknown virt)"
+    },
+    "concurrency": 2,
+    "blenderDevice": {
+      "available": false,
+      "selected": "CPU",
+      "devices": [
+        {
+          "name": "Intel Xeon Processor",
+          "type": "CPU",
+          "use": false
+        }
+      ],
+      "note": "No Blender GPU device \u2014 rendering on CPU. Do not claim GPU acceleration."
+    },
+    "latestProfiler": {
+      "byPhase": {
+        "qc": 6950,
+        "blender_startup": 706,
+        "frame_render": 143259
+      },
+      "totalMs": 150915,
+      "blenderStartups": 1,
+      "framesRendered": 30,
+      "framesReused": 0,
+      "shotsRendered": 0,
+      "shotsReused": 0,
+      "shotCacheHitRate": null,
+      "cacheHits": 0,
+      "cacheMisses": 0,
+      "avgSecondsPerFrame": 47.753,
+      "minSecondsPerFrame": 7.909,
+      "maxSecondsPerFrame": 126.644,
+      "records": [
+        {
+          "phase": "qc",
+          "ms": 6950
+        },
+        {
+          "phase": "blender_startup",
+          "ms": 706
+        },
+        {
+          "phase": "frame_render",
+          "ms": 8706
+        },
+        {
+          "phase": "frame_render",
+          "ms": 7909
+        },
+        {
+          "phase": "frame_render",
+          "ms": 126644
+        }
+      ]
+    },
+    "metrics": {
+      "totalJobTimeMs": 150915,
+      "blenderStartupTimeMs": 706,
+      "renderTimeMs": 143259,
+      "secondsPerFrame": 47.753,
+      "framesRendered": 30,
+      "framesReused": 0,
+      "shotsRendered": 0,
+      "shotsReused": 0,
+      "cacheHitRate": null,
+      "qcTimeMs": 6950,
+      "apiCost": 0,
+      "renderMinutesPerFinishedMinute": 143.259
+    }
+  },
+  "COMPARISON_CAVEAT": "BEFORE SPF used diagnostic primitives; AFTER FINAL_REP SPF uses real Pip+Goat+Meadow \u2014 not identical scenes. Persistent daemon proved 1 startup for multiple jobs; dirty-shot PASS (1/4 rerender).",
+  "SPEEDUP_NOTE": "Primary measured wins: AUDIT_FAST << full episode; dirty-shot SHOTS_RERENDERED=1; Blender startups stay at 1 across jobs. Full-frame EEVEE SPF remains CPU-bound without GPU."
+}

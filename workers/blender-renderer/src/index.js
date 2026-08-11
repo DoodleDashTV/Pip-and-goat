@@ -130,21 +130,22 @@ async function downloadAssets(job) {
   const jobId = job.id || job.queueId;
   const destRoot = path.join(config.workspaceDir, jobId, 'assets');
   await fsp.mkdir(destRoot, { recursive: true });
-  const local = [];
-  for (const [index, asset] of assets.entries()) {
-    const uri = asset.uri || asset.storageLocation || '';
-    const safeName = path.basename(uri || asset.id || `asset-${index}`).replace(/[^a-zA-Z0-9._-]/g, '_');
-    const localPath = path.join(destRoot, `${index}-${safeName}`);
-    await downloadUri(uri, localPath, asset.checksum);
-    local.push({
-      ...asset,
-      role: asset.id || asset.role || 'other',
-      localPath,
-      downloaded: true,
-    });
-    const progress = 10 + Math.floor(((index + 1) / Math.max(assets.length, 1)) * 10);
-    await reportProgress(jobId, 'PREPARING', progress, `Downloaded ${index + 1}/${assets.length} assets`);
-  }
+  // Parallel asset download — independent filesystem/S3 fetches (no shared Blender state).
+  const local = await Promise.all(
+    assets.map(async (asset, index) => {
+      const uri = asset.uri || asset.storageLocation || '';
+      const safeName = path.basename(uri || asset.id || `asset-${index}`).replace(/[^a-zA-Z0-9._-]/g, '_');
+      const localPath = path.join(destRoot, `${index}-${safeName}`);
+      await downloadUri(uri, localPath, asset.checksum);
+      return {
+        ...asset,
+        role: asset.id || asset.role || 'other',
+        localPath,
+        downloaded: true,
+      };
+    }),
+  );
+  await reportProgress(jobId, 'PREPARING', 20, `Downloaded ${local.length} assets (parallel)`);
   return local;
 }
 
