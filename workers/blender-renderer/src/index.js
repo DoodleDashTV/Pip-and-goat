@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { randomUUID } = require('node:crypto');
 const { spawn, spawnSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
 const fs = require('node:fs');
@@ -18,7 +19,7 @@ const DEFAULT_CAPABILITIES = {
 
 const config = {
   apiUrl: stripTrailingSlash(process.env.RENDER_API_URL || 'http://localhost:3000/api/render-worker'),
-  workerId: process.env.RENDER_WORKER_ID || `${os.hostname()}-${process.pid}`,
+  workerId: process.env.RENDER_WORKER_ID || randomUUID(),
   workerName: process.env.RENDER_WORKER_NAME || `blender-${os.hostname()}`,
   blenderBin: process.env.BLENDER_BIN || 'blender',
   workspaceDir: process.env.RENDER_WORKSPACE_DIR || path.join(os.tmpdir(), 'doodle-dash-blender-renderer'),
