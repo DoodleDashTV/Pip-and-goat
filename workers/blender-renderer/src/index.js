@@ -88,6 +88,28 @@ async function registerWorker() {
     name: config.workerName,
     capabilities: DEFAULT_CAPABILITIES,
   });
+  // Render device / backend detection at worker startup (truthful — no fake GPU)
+  try {
+    const { spawnSync } = require('node:child_process');
+    const os = require('node:os');
+    const blender = spawnSync(config.blenderBin, ['--version'], { encoding: 'utf8' });
+    const nvidia = spawnSync('nvidia-smi', ['-L'], { encoding: 'utf8' });
+    const gpuDetected = nvidia.status === 0 && Boolean((nvidia.stdout || '').trim());
+    console.log('[RENDER DEVICE]');
+    console.log(`Blender version: ${((blender.stdout || '').split('\\n')[0] || 'unknown').trim()}`);
+    console.log('EEVEE version: Blender built-in EEVEE (Blender 4.x)');
+    console.log(`OS: ${os.type()} ${os.release()}`);
+    console.log(`GPU detected: ${gpuDetected}`);
+    console.log(`GPU model: ${gpuDetected ? (nvidia.stdout || '').trim().split('\\n')[0] : 'NONE'}`);
+    console.log('Graphics backend: CPU (EEVEE viewport/render path — no Cycles GPU assumed)');
+    console.log(`Relevant Blender device/backend: ${gpuDetected ? 'AUTO/GPU probe present' : 'CPU'}`);
+    console.log(`CPU: ${os.cpus()[0]?.model || 'unknown'} x${os.cpus().length}`);
+    console.log(`Hardware acceleration available: ${gpuDetected}`);
+    console.log(`Selected configuration: ${gpuDetected && process.env.BLENDER_GPU ? 'GPU attempted' : 'CPU fallback'}`);
+    console.log(`Fallback: CPU EEVEE`);
+  } catch (e) {
+    console.log('[RENDER DEVICE] detection error:', e.message || e);
+  }
 }
 
 async function claimJob() {

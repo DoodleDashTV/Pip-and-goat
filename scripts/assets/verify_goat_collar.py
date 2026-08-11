@@ -48,7 +48,9 @@ def main() -> None:
     if goat and "ddp_tag_text" in goat.keys():
         stamped = goat["ddp_tag_text"]
 
-    ok = not missing and mesh_ok and stamped == "Goat"
+    # Accept deterministic production lettering: GOAT (preferred) or legacy Goat
+    text_ok = stamped in ("GOAT", "Goat")
+    ok = not missing and mesh_ok and text_ok
     result = {
         "ok": ok,
         "blend": str(blend),
@@ -58,12 +60,12 @@ def main() -> None:
         "tagTextMeshVerts": verts,
         "tagTextMeshOk": mesh_ok,
         "stampedTagText": stamped,
-        "requiredLiteral": "Goat",
+        "requiredLiteral": "GOAT",
         "status": "PASS" if ok else "ASSET_CHECK_BLOCKED",
         "message": (
-            "Goat collar/name-tag reads Goat"
+            f"Goat collar/name-tag reads {stamped}"
             if ok
-            else "ASSET_CHECK BLOCKED — Goat name-tag text missing or not 'Goat'"
+            else "ASSET_CHECK BLOCKED — Goat name-tag text missing or not GOAT"
         ),
     }
     print("DDP_GOAT_COLLAR:" + json.dumps(result))

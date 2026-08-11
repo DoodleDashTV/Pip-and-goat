@@ -1,0 +1,520 @@
+{
+  "STARTING_GIT_SHA": "3987dc964881496f5befed13c3a82d60dc439e84",
+  "generatedAt": "2026-08-11T23:17:05.436Z",
+  "AUDIT_FAST": {
+    "AUDIT_FAST": "PASS",
+    "totalSec": 3.292,
+    "totalMs": 3292,
+    "blenderStartups": 1,
+    "jobsHandledSameProcess": 1,
+    "pipLoadMs": 12,
+    "goatLoadMs": 17,
+    "microRenderMs": 1277,
+    "cacheValidationMs": 38,
+    "micro": {
+      "ok": true,
+      "frameCount": 1,
+      "resolution": "270x480",
+      "fps": 30,
+      "samples": 2,
+      "secondsPerFrame": 1.193,
+      "timings": {
+        "scene_reset_ms": 43,
+        "asset_loading_ms": 37,
+        "pip_load_ms": 10,
+        "goat_load_ms": 16,
+        "environment_load_ms": 6,
+        "prop_load_ms": 4,
+        "role_load_ms": {
+          "pip": 10,
+          "goat": 16,
+          "meadow": 6,
+          "map": 4
+        },
+        "animation_application_ms": 0,
+        "facial_visemes_ms": 0,
+        "scene_assembly_ms": 0,
+        "frame_render_ms": 1193,
+        "ffmpeg_encoding_ms": 0
+      },
+      "blenderStartupsThisProcess": 1,
+      "outputDir": "/agent/artifacts/performance/audit-fast/micro",
+      "mp4": null,
+      "device": "CPU",
+      "auditMicro": true,
+      "frameCountCap": 1
+    },
+    "validation": {
+      "ok": true,
+      "checks": [
+        {
+          "role": "pip",
+          "ok": true,
+          "objectCount": 8,
+          "hasArmature": true,
+          "armature": "Pip_Rig",
+          "mesh": "Pip_Character",
+          "loadMs": 12,
+          "names": [
+            "Area",
+            "Pip_Backpack",
+            "Pip_Backpack_Pouch",
+            "Pip_Character",
+            "Pip_Rig",
+            "Pip_StarCharm",
+            "RefCam",
+            "Sun"
+          ]
+        },
+        {
+          "role": "goat",
+          "ok": true,
+          "objectCount": 8,
+          "hasArmature": true,
+          "armature": "Goat_Rig",
+          "mesh": "Goat_Character",
+          "loadMs": 17,
+          "names": [
+            "Area.001",
+            "Goat_Character",
+            "Goat_Collar",
+            "Goat_Rig",
+            "Goat_Tag",
+            "Goat_Tag_Text",
+            "RefCam.001",
+            "Sun.001"
+          ],
+          "collar": true,
+          "tag": true,
+          "tagTextObject": true,
+          "stampedTagText": "GOAT"
+        },
+        {
+          "role": "meadow",
+          "ok": true,
+          "objectCount": 8,
+          "hasArmature": false,
+          "armature": null,
+          "mesh": "Meadow_Trees",
+          "loadMs": 6,
+          "names": [
+            "Area.002",
+            "MeadowCam",
+            "Meadow_Flowers",
+            "Meadow_Ground",
+            "Meadow_Path",
+            "Meadow_Sky",
+            "Meadow_Sun",
+            "Meadow_Trees"
+          ]
+        },
+        {
+          "role": "map",
+          "ok": true,
+          "objectCount": 2,
+          "hasArmature": false,
+          "armature": null,
+          "mesh": "MapMark",
+          "loadMs": 4,
+          "names": [
+            "AdventureMap",
+            "MapMark"
+          ]
+        }
+      ],
+      "timings": {
+        "scene_reset_ms": 37,
+        "asset_loading_ms": 39,
+        "pip_load_ms": 12,
+        "goat_load_ms": 17
+      },
+      "blenderStartupsThisProcess": 1,
+      "uptimeMs": 81,
+      "loadedRoles": [
+        "pip",
+        "goat",
+        "meadow",
+        "map"
+      ]
+    },
+    "staticResult": {
+      "pipBlend": {
+        "ok": true,
+        "value": {
+          "path": "/agent/production-library/characters/pip_production.blend",
+          "sha256": "e9c895722d1dd474a4dee51a8106f07fe4722ebec73610ce39d8df5c5915960e",
+          "bytes": 8138608
+        },
+        "ms": 813
+      },
+      "goatBlend": {
+        "ok": true,
+        "value": {
+          "path": "/agent/production-library/characters/goat_production.blend",
+          "sha256": "a8e1297c48de5f5c620fb1a75cd85b7d76840b44e3969c1e7fe88fa0f97543b4",
+          "bytes": 10983160
+        },
+        "ms": 799
+      },
+      "meadowBlend": {
+        "ok": true,
+        "value": {
+          "path": "/agent/production-library/environments/meadow_production.blend",
+          "sha256": "2bf49aabad0710b528294d6394b68b28075b522228fd10c6d2f8d893d64ad3c6"
+        },
+        "ms": 781
+      },
+      "mapBlend": {
+        "ok": true,
+        "value": {
+          "path": "/agent/production-library/props/adventure_map.blend",
+          "sha256": "9f466176dab6f3fcacfa79838a5db3d30c7aef372a1ed2d57152c5761578f4f2"
+        },
+        "ms": 777
+      },
+      "ffmpeg": {
+        "ok": true,
+        "value": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+        "ms": 776
+      },
+      "blenderBin": {
+        "ok": true,
+        "value": "Blender 4.0.2",
+        "ms": 739
+      },
+      "hardware": {
+        "ok": true,
+        "value": {
+          "cpuModel": "Intel(R) Xeon(R) Processor",
+          "cpuCores": 4,
+          "ramGiB": 15.6,
+          "gpu": "NONE_DETECTED",
+          "vram": "N/A",
+          "os": "Linux 6.12.94+",
+          "blenderVersion": "Blender 4.0.2",
+          "selectedRenderDevice": "CPU",
+          "hardwareEncoder": [
+            "h264_nvenc",
+            "h264_qsv",
+            "h264_vaapi",
+            "libx264"
+          ],
+          "diskHint": "check lsblk ROTA (1=HDD/unknown virt)"
+        },
+        "ms": 584
+      },
+      "blenderDeviceHint": {
+        "ok": true,
+        "value": {
+          "selected": "CPU",
+          "gpu": "NONE_DETECTED",
+          "note": "Full Blender device enum deferred to persistent daemon (single startup)."
+        },
+        "ms": 294
+      },
+      "outputWritable": {
+        "ok": true,
+        "value": "/agent/artifacts/performance/audit-fast/.write-probe-1786490226250",
+        "ms": 1
+      },
+      "config": {
+        "ok": true,
+        "value": {
+          "resolution": "270x480",
+          "samples": 2,
+          "maxFrames": 3,
+          "mode": "AUDIT_FAST"
+        },
+        "ms": 1
+      },
+      "dbIntakes": {
+        "ok": true,
+        "value": {
+          "pipId": "22222222-2222-4222-8222-222222222222",
+          "goatId": "33333333-3333-4333-8333-333333333333",
+          "intakeCount": 9,
+          "checksums": [
+            {
+              "entityId": "22222222-2222-4222-8222-222222222222",
+              "version": 6,
+              "checksum": "e9c895722d1dd474a4dee51a8106f07fe4722ebec73610ce39d8df5c5915960e"
+            },
+            {
+              "entityId": "22222222-2222-4222-8222-222222222222",
+              "version": 5,
+              "checksum": "8d35faee740a9d8d3d1101a6d2ce69303b0d2a31a43f724a47a6e518e34df452"
+            },
+            {
+              "entityId": "33333333-3333-4333-8333-333333333333",
+              "version": 4,
+              "checksum": "a8e1297c48de5f5c620fb1a75cd85b7d76840b44e3969c1e7fe88fa0f97543b4"
+            },
+            {
+              "entityId": "22222222-2222-4222-8222-222222222222",
+              "version": 4,
+              "checksum": "c263780aefb7d1eb7ae3ceb7ed5b793dcc44e540f0bf66569e5a9e780c356522"
+            }
+          ]
+        },
+        "ms": 78
+      },
+      "cacheKeys": {
+        "ok": true,
+        "value": {
+          "shots": 5,
+          "fingerprints": [
+            {
+              "shotNumber": 1,
+              "fingerprint": "4669adecf0b59044"
+            },
+            {
+              "shotNumber": 2,
+              "fingerprint": "bce093f7537ccf66"
+            },
+            {
+              "shotNumber": 3,
+              "fingerprint": "f9e280610bc2fe3c"
+            },
+            {
+              "shotNumber": 4,
+              "fingerprint": "a55425eab1cea361"
+            },
+            {
+              "shotNumber": 5,
+              "fingerprint": "220b4416b84809d3"
+            }
+          ],
+          "planSummary": {
+            "total": 5,
+            "render": 5,
+            "reuse": 0
+          }
+        },
+        "ms": 174
+      }
+    },
+    "cacheValidation": {
+      "shotsTotal": 5,
+      "shotsToRender": 5,
+      "shotsToReuse": 0,
+      "plan": [
+        {
+          "shotId": "5ad0306b-38df-4a42-868c-74be4e7d8f79",
+          "shotNumber": 1,
+          "fingerprint": "4669adecf0b59044a8a56d5b004b5185b4f8e08a8edc839101ae7bce4cd15e7c",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "1452d918-5afb-44c9-9987-b91c4c2384d7",
+          "shotNumber": 2,
+          "fingerprint": "bce093f7537ccf667494b12d69cb41c68158ccd7b69e60a7ac04059f4b3f76bf",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "9f1ccdaf-7a52-4625-ab54-15c6c51ca021",
+          "shotNumber": 3,
+          "fingerprint": "f9e280610bc2fe3cdfb12745be47e1bd89de1973bba9ba4ecf9be46bfc20b98e",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "36c4dee2-a064-478a-9a30-d545432a26f0",
+          "shotNumber": 4,
+          "fingerprint": "a55425eab1cea361b74d3627fc2d0c8ad8d77d8ae376708e578ee7fa72671c70",
+          "action": "RENDER",
+          "outputUri": null
+        },
+        {
+          "shotId": "d7a3c12f-6be5-491a-a62c-7ae88534862e",
+          "shotNumber": 5,
+          "fingerprint": "220b4416b84809d340a8653746afd5ad95f41bacbe36644ac53c7a29addcfef4",
+          "action": "RENDER",
+          "outputUri": null
+        }
+      ]
+    },
+    "timings": [
+      {
+        "stage": "Static preflight",
+        "sec": 0.988,
+        "ms": 988,
+        "detail": "ok"
+      },
+      {
+        "stage": "Blender startup",
+        "sec": 0.91,
+        "ms": 910,
+        "detail": "startups=1"
+      },
+      {
+        "stage": "Asset validation",
+        "sec": 0.079,
+        "ms": 79,
+        "detail": "pip=12ms goat=17ms"
+      },
+      {
+        "stage": "Micro-render",
+        "sec": 1.277,
+        "ms": 1277,
+        "detail": "frames=1 samples=2"
+      },
+      {
+        "stage": "Cache validation",
+        "sec": 0.038,
+        "ms": 38,
+        "detail": "planner only"
+      }
+    ],
+    "liveLog": [
+      "[AUDIT] Static preflight: 0.99 sec — ok",
+      "[AUDIT] Blender startup: 0.91 sec — startups=1",
+      "[AUDIT] Asset validation: 0.08 sec — pip=12ms goat=17ms",
+      "[AUDIT] Micro-render: 1.28 sec — frames=1 samples=2",
+      "[AUDIT] Cache validation: 0.04 sec — planner only"
+    ],
+    "slowestOperation": {
+      "stage": "Micro-render",
+      "sec": 1.277,
+      "ms": 1277,
+      "detail": "frames=1 samples=2"
+    },
+    "thresholds": {
+      "idealSec": 60,
+      "acceptableSec": 180,
+      "performanceFailureSec": 300
+    },
+    "note": "AUDIT_FAST does not queue episode shot renders or run FINAL quality.",
+    "generatedAt": "2026-08-11T23:17:08.729Z"
+  },
+  "VALIDATION_SCENE": {
+    "ok": true,
+    "status": "PASS",
+    "frames": 60,
+    "mp4": "/agent/artifacts/performance/master-build/validation/pip_goat_validation.mp4",
+    "renderMs": 46210,
+    "totalMs": 46640,
+    "checks": {
+      "pipLoaded": true,
+      "goatLoaded": true,
+      "pipBackpack": true,
+      "goatCollar": true,
+      "goatTag": true,
+      "goatTagText": true,
+      "goatStamp": "GOAT",
+      "pipAction": true,
+      "goatAction": true,
+      "pipShapeKeys": 43,
+      "goatShapeKeys": 44
+    },
+    "resolution": "540x960",
+    "fps": 30,
+    "note": "Real animation validation — not a still frame"
+  },
+  "CACHE": {
+    "PIP_ANIMATION_1_RENDER_4_REUSE": "PASS",
+    "pipAnimPlan": {
+      "render": 1,
+      "reuse": 4
+    },
+    "PIP_INVALIDATION": "5/5",
+    "pipBasePass": true,
+    "GOAT_INVALIDATION": "5/5",
+    "goatBasePass": true
+  },
+  "DRAFT_FAST": {
+    "status": "PASS",
+    "runtimeSec": 0.1,
+    "jobs": 0,
+    "reused": 5,
+    "plan": {
+      "shotsTotal": 5,
+      "shotsToRender": 0,
+      "shotsToReuse": 5,
+      "plan": [
+        {
+          "shotId": "5ad0306b-38df-4a42-868c-74be4e7d8f79",
+          "shotNumber": 1,
+          "fingerprint": "4669adecf0b59044a8a56d5b004b5185b4f8e08a8edc839101ae7bce4cd15e7c",
+          "action": "REUSE",
+          "outputUri": "file:///agent/artifacts/episodes/extreme-speed-acceptance/draft_fast/work/shot-1.mp4"
+        },
+        {
+          "shotId": "1452d918-5afb-44c9-9987-b91c4c2384d7",
+          "shotNumber": 2,
+          "fingerprint": "bce093f7537ccf667494b12d69cb41c68158ccd7b69e60a7ac04059f4b3f76bf",
+          "action": "REUSE",
+          "outputUri": "file:///agent/artifacts/episodes/extreme-speed-acceptance/draft_fast/work/shot-2.mp4"
+        },
+        {
+          "shotId": "9f1ccdaf-7a52-4625-ab54-15c6c51ca021",
+          "shotNumber": 3,
+          "fingerprint": "f9e280610bc2fe3cdfb12745be47e1bd89de1973bba9ba4ecf9be46bfc20b98e",
+          "action": "REUSE",
+          "outputUri": "file:///agent/artifacts/episodes/extreme-speed-acceptance/draft_fast/work/shot-3.mp4"
+        },
+        {
+          "shotId": "36c4dee2-a064-478a-9a30-d545432a26f0",
+          "shotNumber": 4,
+          "fingerprint": "a55425eab1cea361b74d3627fc2d0c8ad8d77d8ae376708e578ee7fa72671c70",
+          "action": "REUSE",
+          "outputUri": "file:///agent/artifacts/episodes/extreme-speed-acceptance/draft_fast/work/shot-4.mp4"
+        },
+        {
+          "shotId": "d7a3c12f-6be5-491a-a62c-7ae88534862e",
+          "shotNumber": 5,
+          "fingerprint": "220b4416b84809d340a8653746afd5ad95f41bacbe36644ac53c7a29addcfef4",
+          "action": "REUSE",
+          "outputUri": "file:///agent/artifacts/episodes/extreme-speed-acceptance/draft_fast/work/shot-5.mp4"
+        }
+      ]
+    }
+  },
+  "ENDING_GIT_SHA": "3987dc964881496f5befed13c3a82d60dc439e84",
+  "OVERALL": "PASS",
+  "PIP_PRODUCTION_READY": "YES",
+  "GOAT_PRODUCTION_READY": "YES",
+  "PIP_BLEND_PATH": "/agent/assets/characters/pip/pip_v1.blend",
+  "GOAT_BLEND_PATH": "/agent/assets/characters/goat/goat_v1.blend",
+  "PIP_ASSET_ID": "char_pip_v1",
+  "GOAT_ASSET_ID": "char_goat_v1",
+  "PIP_POLYGON_COUNT": 2093,
+  "GOAT_POLYGON_COUNT": 2976,
+  "GOAT_TAG_TEXT_VERIFIED": "PASS",
+  "collarResult": {
+    "ok": true,
+    "blend": "/agent/assets/characters/goat/goat_v1.blend",
+    "missing": [],
+    "hasTagTextObject": true,
+    "tagTextBody": null,
+    "tagTextMeshVerts": 868,
+    "tagTextMeshOk": true,
+    "stampedTagText": "GOAT",
+    "requiredLiteral": "GOAT",
+    "status": "PASS",
+    "message": "Goat collar/name-tag reads GOAT"
+  },
+  "HARDWARE": {
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "cpuCores": 4,
+    "ramGiB": 15.6,
+    "gpu": "NONE_DETECTED",
+    "vram": "N/A",
+    "os": "Linux 6.12.94+",
+    "blenderVersion": "Blender 4.0.2",
+    "selectedRenderDevice": "CPU",
+    "hardwareEncoder": [
+      "h264_nvenc",
+      "h264_qsv",
+      "h264_vaapi",
+      "libx264"
+    ],
+    "diskHint": "check lsblk ROTA (1=HDD/unknown virt)"
+  },
+  "FINAL_1080P": "NOT RUN",
+  "SLOWEST_REMAINING_OPERATION": "CPU EEVEE frame_render (draft ~0.85s/frame previously measured)",
+  "RECOMMENDED_NEXT_OPTIMIZATION": "GPU EEVEE worker when available; resident asset reuse across shots",
+  "REMAINING_HUMAN_ART_WORK": "Hero sculpt polish, painted textures, and human model-to-reference approval for film-quality FINAL",
+  "REMAINING_TECHNICAL_BLOCKERS": "No GPU in this Cloud Agent VM; real TTS provider voice IDs not configured"
+}

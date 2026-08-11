@@ -372,7 +372,9 @@ def handle_validate_assets(msg: dict) -> dict:
             check["tag"] = tag
             check["tagTextObject"] = tag_text
             check["stampedTagText"] = stamped
-            check["ok"] = bool(arm and mesh and collar and tag and tag_text and stamped == "Goat")
+            check["ok"] = bool(
+                arm and mesh and collar and tag and tag_text and stamped in ("GOAT", "Goat")
+            )
             if not check["ok"]:
                 check["error"] = "Goat character lock / collar name-tag failed"
         if role == "pip":

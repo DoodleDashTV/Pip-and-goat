@@ -1,27 +1,37 @@
 {
   "AUDIT_FAST": "PASS",
-  "totalSec": 2.655,
-  "totalMs": 2655,
+  "totalSec": 3.292,
+  "totalMs": 3292,
   "blenderStartups": 1,
   "jobsHandledSameProcess": 1,
-  "pipLoadMs": 3,
-  "goatLoadMs": 4,
-  "microRenderMs": 1062,
-  "cacheValidationMs": 35,
+  "pipLoadMs": 12,
+  "goatLoadMs": 17,
+  "microRenderMs": 1277,
+  "cacheValidationMs": 38,
   "micro": {
     "ok": true,
     "frameCount": 1,
     "resolution": "270x480",
     "fps": 30,
     "samples": 2,
-    "secondsPerFrame": 1.017,
+    "secondsPerFrame": 1.193,
     "timings": {
-      "scene_reset_ms": 28,
-      "asset_loading_ms": 14,
+      "scene_reset_ms": 43,
+      "asset_loading_ms": 37,
+      "pip_load_ms": 10,
+      "goat_load_ms": 16,
+      "environment_load_ms": 6,
+      "prop_load_ms": 4,
+      "role_load_ms": {
+        "pip": 10,
+        "goat": 16,
+        "meadow": 6,
+        "map": 4
+      },
       "animation_application_ms": 0,
       "facial_visemes_ms": 0,
       "scene_assembly_ms": 0,
-      "frame_render_ms": 1017,
+      "frame_render_ms": 1193,
       "ffmpeg_encoding_ms": 0
     },
     "blenderStartupsThisProcess": 1,
@@ -37,14 +47,15 @@
       {
         "role": "pip",
         "ok": true,
-        "objectCount": 7,
+        "objectCount": 8,
         "hasArmature": true,
         "armature": "Pip_Rig",
         "mesh": "Pip_Character",
-        "loadMs": 3,
+        "loadMs": 12,
         "names": [
           "Area",
           "Pip_Backpack",
+          "Pip_Backpack_Pouch",
           "Pip_Character",
           "Pip_Rig",
           "Pip_StarCharm",
@@ -55,14 +66,13 @@
       {
         "role": "goat",
         "ok": true,
-        "objectCount": 9,
+        "objectCount": 8,
         "hasArmature": true,
         "armature": "Goat_Rig",
         "mesh": "Goat_Character",
-        "loadMs": 4,
+        "loadMs": 17,
         "names": [
           "Area.001",
-          "Area.002",
           "Goat_Character",
           "Goat_Collar",
           "Goat_Rig",
@@ -74,7 +84,7 @@
         "collar": true,
         "tag": true,
         "tagTextObject": true,
-        "stampedTagText": "Goat"
+        "stampedTagText": "GOAT"
       },
       {
         "role": "meadow",
@@ -83,9 +93,9 @@
         "hasArmature": false,
         "armature": null,
         "mesh": "Meadow_Trees",
-        "loadMs": 3,
+        "loadMs": 6,
         "names": [
-          "Area.003",
+          "Area.002",
           "MeadowCam",
           "Meadow_Flowers",
           "Meadow_Ground",
@@ -102,7 +112,7 @@
         "hasArmature": false,
         "armature": null,
         "mesh": "MapMark",
-        "loadMs": 3,
+        "loadMs": 4,
         "names": [
           "AdventureMap",
           "MapMark"
@@ -110,13 +120,13 @@
       }
     ],
     "timings": {
-      "scene_reset_ms": 26,
-      "asset_loading_ms": 13,
-      "pip_load_ms": 3,
-      "goat_load_ms": 4
+      "scene_reset_ms": 37,
+      "asset_loading_ms": 39,
+      "pip_load_ms": 12,
+      "goat_load_ms": 17
     },
     "blenderStartupsThisProcess": 1,
-    "uptimeMs": 73,
+    "uptimeMs": 81,
     "loadedRoles": [
       "pip",
       "goat",
@@ -129,19 +139,19 @@
       "ok": true,
       "value": {
         "path": "/agent/production-library/characters/pip_production.blend",
-        "sha256": "c263780aefb7d1eb7ae3ceb7ed5b793dcc44e540f0bf66569e5a9e780c356522",
-        "bytes": 1568732
+        "sha256": "e9c895722d1dd474a4dee51a8106f07fe4722ebec73610ce39d8df5c5915960e",
+        "bytes": 8138608
       },
-      "ms": 681
+      "ms": 813
     },
     "goatBlend": {
       "ok": true,
       "value": {
         "path": "/agent/production-library/characters/goat_production.blend",
-        "sha256": "fd91d246b67b8e06d1c3a244c3af73244dd9636b4df4a4ebb0ca2535d2f83059",
-        "bytes": 2140968
+        "sha256": "a8e1297c48de5f5c620fb1a75cd85b7d76840b44e3969c1e7fe88fa0f97543b4",
+        "bytes": 10983160
       },
-      "ms": 675
+      "ms": 799
     },
     "meadowBlend": {
       "ok": true,
@@ -149,7 +159,7 @@
         "path": "/agent/production-library/environments/meadow_production.blend",
         "sha256": "2bf49aabad0710b528294d6394b68b28075b522228fd10c6d2f8d893d64ad3c6"
       },
-      "ms": 668
+      "ms": 781
     },
     "mapBlend": {
       "ok": true,
@@ -157,17 +167,17 @@
         "path": "/agent/production-library/props/adventure_map.blend",
         "sha256": "9f466176dab6f3fcacfa79838a5db3d30c7aef372a1ed2d57152c5761578f4f2"
       },
-      "ms": 667
+      "ms": 777
     },
     "ffmpeg": {
       "ok": true,
       "value": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
-      "ms": 666
+      "ms": 776
     },
     "blenderBin": {
       "ok": true,
       "value": "Blender 4.0.2",
-      "ms": 632
+      "ms": 739
     },
     "hardware": {
       "ok": true,
@@ -188,7 +198,7 @@
         ],
         "diskHint": "check lsblk ROTA (1=HDD/unknown virt)"
       },
-      "ms": 491
+      "ms": 584
     },
     "blenderDeviceHint": {
       "ok": true,
@@ -197,11 +207,11 @@
         "gpu": "NONE_DETECTED",
         "note": "Full Blender device enum deferred to persistent daemon (single startup)."
       },
-      "ms": 239
+      "ms": 294
     },
     "outputWritable": {
       "ok": true,
-      "value": "/agent/artifacts/performance/audit-fast/.write-probe-1786488236393",
+      "value": "/agent/artifacts/performance/audit-fast/.write-probe-1786490226250",
       "ms": 1
     },
     "config": {
@@ -219,31 +229,31 @@
       "value": {
         "pipId": "22222222-2222-4222-8222-222222222222",
         "goatId": "33333333-3333-4333-8333-333333333333",
-        "intakeCount": 5,
+        "intakeCount": 9,
         "checksums": [
+          {
+            "entityId": "22222222-2222-4222-8222-222222222222",
+            "version": 6,
+            "checksum": "e9c895722d1dd474a4dee51a8106f07fe4722ebec73610ce39d8df5c5915960e"
+          },
+          {
+            "entityId": "22222222-2222-4222-8222-222222222222",
+            "version": 5,
+            "checksum": "8d35faee740a9d8d3d1101a6d2ce69303b0d2a31a43f724a47a6e518e34df452"
+          },
+          {
+            "entityId": "33333333-3333-4333-8333-333333333333",
+            "version": 4,
+            "checksum": "a8e1297c48de5f5c620fb1a75cd85b7d76840b44e3969c1e7fe88fa0f97543b4"
+          },
           {
             "entityId": "22222222-2222-4222-8222-222222222222",
             "version": 4,
             "checksum": "c263780aefb7d1eb7ae3ceb7ed5b793dcc44e540f0bf66569e5a9e780c356522"
-          },
-          {
-            "entityId": "22222222-2222-4222-8222-222222222222",
-            "version": 3,
-            "checksum": "b2ad373502dd375a2b0a12f2c5a3e4a9944861f841101d531bdc35a296bf5fe7"
-          },
-          {
-            "entityId": "22222222-2222-4222-8222-222222222222",
-            "version": 2,
-            "checksum": "b2ad373502dd375a2b0a12f2c5a3e4a9944861f841101d531bdc35a296bf5fe7"
-          },
-          {
-            "entityId": "33333333-3333-4333-8333-333333333333",
-            "version": 2,
-            "checksum": "fd91d246b67b8e06d1c3a244c3af73244dd9636b4df4a4ebb0ca2535d2f83059"
           }
         ]
       },
-      "ms": 69
+      "ms": 78
     },
     "cacheKeys": {
       "ok": true,
@@ -252,23 +262,23 @@
         "fingerprints": [
           {
             "shotNumber": 1,
-            "fingerprint": "d02a769f6004b221"
+            "fingerprint": "4669adecf0b59044"
           },
           {
             "shotNumber": 2,
-            "fingerprint": "d115da2272dda99d"
+            "fingerprint": "bce093f7537ccf66"
           },
           {
             "shotNumber": 3,
-            "fingerprint": "5eec7f12c6e9220c"
+            "fingerprint": "f9e280610bc2fe3c"
           },
           {
             "shotNumber": 4,
-            "fingerprint": "5996dbcf4f318f21"
+            "fingerprint": "a55425eab1cea361"
           },
           {
             "shotNumber": 5,
-            "fingerprint": "400cfcd379e719c2"
+            "fingerprint": "220b4416b84809d3"
           }
         ],
         "planSummary": {
@@ -277,7 +287,7 @@
           "reuse": 0
         }
       },
-      "ms": 127
+      "ms": 174
     }
   },
   "cacheValidation": {
@@ -288,35 +298,35 @@
       {
         "shotId": "5ad0306b-38df-4a42-868c-74be4e7d8f79",
         "shotNumber": 1,
-        "fingerprint": "d02a769f6004b221ddb3187e83fb76960dc29994b6034ad69ca442a11b153b47",
+        "fingerprint": "4669adecf0b59044a8a56d5b004b5185b4f8e08a8edc839101ae7bce4cd15e7c",
         "action": "RENDER",
         "outputUri": null
       },
       {
         "shotId": "1452d918-5afb-44c9-9987-b91c4c2384d7",
         "shotNumber": 2,
-        "fingerprint": "d115da2272dda99db896fff58693a6758fae3c8c049ff79d396d7ba21047c556",
+        "fingerprint": "bce093f7537ccf667494b12d69cb41c68158ccd7b69e60a7ac04059f4b3f76bf",
         "action": "RENDER",
         "outputUri": null
       },
       {
         "shotId": "9f1ccdaf-7a52-4625-ab54-15c6c51ca021",
         "shotNumber": 3,
-        "fingerprint": "5eec7f12c6e9220cca8db03887ebbfb015e74734a029c1c21f4065181f59c738",
+        "fingerprint": "f9e280610bc2fe3cdfb12745be47e1bd89de1973bba9ba4ecf9be46bfc20b98e",
         "action": "RENDER",
         "outputUri": null
       },
       {
         "shotId": "36c4dee2-a064-478a-9a30-d545432a26f0",
         "shotNumber": 4,
-        "fingerprint": "5996dbcf4f318f217f01e2d73490fe9e938f97824ecb808de034d888a3fd484e",
+        "fingerprint": "a55425eab1cea361b74d3627fc2d0c8ad8d77d8ae376708e578ee7fa72671c70",
         "action": "RENDER",
         "outputUri": null
       },
       {
         "shotId": "d7a3c12f-6be5-491a-a62c-7ae88534862e",
         "shotNumber": 5,
-        "fingerprint": "400cfcd379e719c23e89e9bea87727d29138ca6bcf6078a42b3b8bb0bfaa7d62",
+        "fingerprint": "220b4416b84809d340a8653746afd5ad95f41bacbe36644ac53c7a29addcfef4",
         "action": "RENDER",
         "outputUri": null
       }
@@ -325,46 +335,46 @@
   "timings": [
     {
       "stage": "Static preflight",
-      "sec": 0.809,
-      "ms": 809,
+      "sec": 0.988,
+      "ms": 988,
       "detail": "ok"
     },
     {
       "stage": "Blender startup",
-      "sec": 0.706,
-      "ms": 706,
+      "sec": 0.91,
+      "ms": 910,
       "detail": "startups=1"
     },
     {
       "stage": "Asset validation",
-      "sec": 0.043,
-      "ms": 43,
-      "detail": "pip=3ms goat=4ms"
+      "sec": 0.079,
+      "ms": 79,
+      "detail": "pip=12ms goat=17ms"
     },
     {
       "stage": "Micro-render",
-      "sec": 1.062,
-      "ms": 1062,
+      "sec": 1.277,
+      "ms": 1277,
       "detail": "frames=1 samples=2"
     },
     {
       "stage": "Cache validation",
-      "sec": 0.035,
-      "ms": 35,
+      "sec": 0.038,
+      "ms": 38,
       "detail": "planner only"
     }
   ],
   "liveLog": [
-    "[AUDIT] Static preflight: 0.81 sec — ok",
-    "[AUDIT] Blender startup: 0.71 sec — startups=1",
-    "[AUDIT] Asset validation: 0.04 sec — pip=3ms goat=4ms",
-    "[AUDIT] Micro-render: 1.06 sec — frames=1 samples=2",
+    "[AUDIT] Static preflight: 0.99 sec — ok",
+    "[AUDIT] Blender startup: 0.91 sec — startups=1",
+    "[AUDIT] Asset validation: 0.08 sec — pip=12ms goat=17ms",
+    "[AUDIT] Micro-render: 1.28 sec — frames=1 samples=2",
     "[AUDIT] Cache validation: 0.04 sec — planner only"
   ],
   "slowestOperation": {
     "stage": "Micro-render",
-    "sec": 1.062,
-    "ms": 1062,
+    "sec": 1.277,
+    "ms": 1277,
     "detail": "frames=1 samples=2"
   },
   "thresholds": {
@@ -373,5 +383,5 @@
     "performanceFailureSec": 300
   },
   "note": "AUDIT_FAST does not queue episode shot renders or run FINAL quality.",
-  "generatedAt": "2026-08-11T22:43:58.367Z"
+  "generatedAt": "2026-08-11T23:17:08.729Z"
 }

@@ -4,14 +4,24 @@
   "resolution": "270x480",
   "fps": 30,
   "samples": 2,
-  "secondsPerFrame": 1.017,
+  "secondsPerFrame": 1.193,
   "timings": {
-    "scene_reset_ms": 28,
-    "asset_loading_ms": 14,
+    "scene_reset_ms": 43,
+    "asset_loading_ms": 37,
+    "pip_load_ms": 10,
+    "goat_load_ms": 16,
+    "environment_load_ms": 6,
+    "prop_load_ms": 4,
+    "role_load_ms": {
+      "pip": 10,
+      "goat": 16,
+      "meadow": 6,
+      "map": 4
+    },
     "animation_application_ms": 0,
     "facial_visemes_ms": 0,
     "scene_assembly_ms": 0,
-    "frame_render_ms": 1017,
+    "frame_render_ms": 1193,
     "ffmpeg_encoding_ms": 0
   },
   "blenderStartupsThisProcess": 1,

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "status": "PASS",
+  "frames": 60,
+  "mp4": "/agent/artifacts/performance/master-build/validation/pip_goat_validation.mp4",
+  "renderMs": 46210,
+  "totalMs": 46640,
+  "checks": {
+    "pipLoaded": true,
+    "goatLoaded": true,
+    "pipBackpack": true,
+    "goatCollar": true,
+    "goatTag": true,
+    "goatTagText": true,
+    "goatStamp": "GOAT",
+    "pipAction": true,
+    "goatAction": true,
+    "pipShapeKeys": 43,
+    "goatShapeKeys": 44
+  },
+  "resolution": "540x960",
+  "fps": 30,
+  "note": "Real animation validation \u2014 not a still frame"
+}
