@@ -285,7 +285,7 @@ export class FileRenderQueue implements RenderQueue {
   }
 }
 
-const QueuedRenderJobSchema: z.ZodType<QueuedRenderJob> = z.object({
+const QueuedRenderJobSchema = z.object({
   queueId: z.string(),
   job: CreateRenderJobSchema,
   enqueuedAt: z.string(),
