@@ -88,8 +88,8 @@ export function profileResolution(mode: PerformanceMode): {
       return {
         resolution: '270x480',
         fps: 30,
-        samples: 4,
-        purpose: 'Automated pipeline correctness only — NEVER final visual proof',
+        samples: 2,
+        purpose: 'Static+daemon+micro-frame preflight ONLY — never full shot renders',
       };
     case 'DRAFT_FAST':
       return { resolution: '540x960', fps: 30, samples: cfg.draftFastSamples, purpose: 'story timing review' };

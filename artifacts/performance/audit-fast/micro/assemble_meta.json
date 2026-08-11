@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "frameCount": 1,
+  "resolution": "270x480",
+  "fps": 30,
+  "samples": 2,
+  "secondsPerFrame": 1.017,
+  "timings": {
+    "scene_reset_ms": 28,
+    "asset_loading_ms": 14,
+    "animation_application_ms": 0,
+    "facial_visemes_ms": 0,
+    "scene_assembly_ms": 0,
+    "frame_render_ms": 1017,
+    "ffmpeg_encoding_ms": 0
+  },
+  "blenderStartupsThisProcess": 1,
+  "outputDir": "/agent/artifacts/performance/audit-fast/micro",
+  "mp4": null,
+  "device": "CPU"
+}

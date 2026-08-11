@@ -964,3 +964,4 @@ export * from './canonical-characters';
 export * from './production-setup';
 export * from './episode-render';
 export * from './performance';
+export * from './audit-fast';

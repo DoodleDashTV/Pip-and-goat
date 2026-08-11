@@ -223,6 +223,9 @@ export class EpisodeShotRenderService {
     profileCode: ProfileCode;
     priority?: number;
   }) {
+    const { assertAuditFastDoesNotQueueFullRenders } = await import('./audit-fast');
+    assertAuditFastDoesNotQueueFullRenders(params.profileCode);
+
     const profile = await prisma.productionRenderProfile.findUnique({
       where: { code: params.profileCode },
     });

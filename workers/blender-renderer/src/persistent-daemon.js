@@ -79,6 +79,24 @@ class PersistentBlenderDaemon {
     });
   }
 
+  async validateAssets(assets) {
+    const res = await this.send({ cmd: 'validate_assets', assets });
+    if (res.status !== 'ok') {
+      throw new Error(res.error || 'validate_assets failed');
+    }
+    return res.result;
+  }
+
+  async microRender(job) {
+    const res = await this.send({ cmd: 'micro_render', job });
+    if (res.status !== 'ok') {
+      this.corrupt = true;
+      throw new Error(res.error || 'micro_render failed');
+    }
+    this.jobsHandled += 1;
+    return res.result;
+  }
+
   async render(job) {
     const res = await this.send({ cmd: 'render', job });
     if (res.status !== 'ok') {

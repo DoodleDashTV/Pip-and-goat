@@ -250,10 +250,11 @@ def handle_render(job: dict) -> dict:
     frame_count = len(frames)
     seconds_per_frame = (timings["frame_render_ms"] / 1000 / frame_count) if frame_count else None
 
-    # Encode shot.mp4 via ffmpeg if available
+    # Encode shot.mp4 via ffmpeg if available (skipped for AUDIT_FAST micro renders)
     t5 = time.time()
     mp4 = output_dir / "shot.mp4"
-    if frames:
+    skip_encode = bool(meta.get("skipEncode") or meta.get("auditMicro"))
+    if frames and not skip_encode:
         import subprocess
 
         sample = frames[0].name
@@ -294,7 +295,7 @@ def handle_render(job: dict) -> dict:
                 str(mp4),
             ]
         subprocess.run(argv, check=False, capture_output=True)
-    timings["ffmpeg_encoding_ms"] = int((time.time() - t5) * 1000)
+    timings["ffmpeg_encoding_ms"] = 0 if skip_encode else int((time.time() - t5) * 1000)
 
     meta_out = {
         "ok": True,
@@ -311,6 +312,100 @@ def handle_render(job: dict) -> dict:
     }
     (output_dir / "assemble_meta.json").write_text(json.dumps(meta_out, indent=2))
     return meta_out
+
+
+def handle_validate_assets(msg: dict) -> dict:
+    """Load Pip/Goat/env once and verify mesh/rig/collar identity — no animation render."""
+    import bpy
+
+    timings = {}
+    t0 = time.time()
+    reset_scene()
+    timings["scene_reset_ms"] = int((time.time() - t0) * 1000)
+
+    assets = msg.get("assets") or []
+    checks = []
+    load_ms = {}
+    imported = {}
+    for asset in assets:
+        role = str(asset.get("id") or asset.get("role") or "other")
+        local_path = asset.get("localPath") or asset.get("path")
+        t1 = time.time()
+        if not local_path or not Path(local_path).exists():
+            checks.append({"role": role, "ok": False, "error": f"missing {local_path}"})
+            continue
+        objs = append_blend(local_path)
+        imported[role] = objs
+        load_ms[role] = int((time.time() - t1) * 1000)
+        names = {o.name for o in objs}
+        arm = find_armature(objs)
+        mesh = next((o for o in objs if o.type == "MESH" and "Character" in o.name), None)
+        if mesh is None:
+            mesh = next((o for o in objs if o.type == "MESH"), None)
+        check = {
+            "role": role,
+            "ok": True,
+            "objectCount": len(objs),
+            "hasArmature": bool(arm),
+            "armature": arm.name if arm else None,
+            "mesh": mesh.name if mesh else None,
+            "loadMs": load_ms[role],
+            "names": sorted(names)[:40],
+        }
+        if role == "goat":
+            tag_text = "Goat_Tag_Text" in names
+            collar = "Goat_Collar" in names
+            tag = "Goat_Tag" in names
+            stamped = None
+            if mesh and "ddp_tag_text" in mesh.keys():
+                stamped = mesh["ddp_tag_text"]
+            check["collar"] = collar
+            check["tag"] = tag
+            check["tagTextObject"] = tag_text
+            check["stampedTagText"] = stamped
+            check["ok"] = bool(arm and mesh and collar and tag and tag_text and stamped == "Goat")
+            if not check["ok"]:
+                check["error"] = "Goat character lock / collar name-tag failed"
+        if role == "pip":
+            check["ok"] = bool(arm and mesh and ("Pip_Character" in names or mesh is not None))
+            if not check["ok"]:
+                check["error"] = "Pip character lock failed"
+        checks.append(check)
+        PRELOADED[role] = local_path
+
+    timings["asset_loading_ms"] = sum(load_ms.values())
+    timings["pip_load_ms"] = load_ms.get("pip")
+    timings["goat_load_ms"] = load_ms.get("goat")
+    ok = all(c.get("ok") for c in checks) and len(checks) > 0
+    return {
+        "ok": ok,
+        "checks": checks,
+        "timings": timings,
+        "blenderStartupsThisProcess": BLENDER_STARTUPS,
+        "uptimeMs": int((time.time() - STARTED_AT) * 1000),
+        "loadedRoles": list(imported.keys()),
+    }
+
+
+def handle_micro_render(msg: dict) -> dict:
+    """1–3 frame EEVEE smoke at tiny resolution. No final encoding."""
+    import bpy
+
+    job = dict(msg.get("job") or msg)
+    meta = dict(job.get("metadata") or {})
+    meta["samples"] = int(meta.get("samples") or 2)
+    meta["startFrame"] = 1
+    meta["endFrame"] = max(1, min(int(meta.get("endFrame") or 1), 3))
+    meta["skipEncode"] = True
+    meta["auditMicro"] = True
+    job["metadata"] = meta
+    job["resolution"] = job.get("resolution") or "270x480"
+    job["fps"] = int(job.get("fps") or 30)
+    result = handle_render(job)
+    result["auditMicro"] = True
+    result["frameCountCap"] = meta["endFrame"]
+    result["samples"] = meta["samples"]
+    return result
 
 
 def main() -> None:
@@ -334,11 +429,24 @@ def main() -> None:
         cmd = msg.get("cmd")
         try:
             if cmd == "ping":
-                emit({"status": "ok", "cmd": "ping", "blenderStartups": BLENDER_STARTUPS})
+                emit(
+                    {
+                        "status": "ok",
+                        "cmd": "ping",
+                        "blenderStartups": BLENDER_STARTUPS,
+                        "uptimeMs": int((time.time() - STARTED_AT) * 1000),
+                    }
+                )
             elif cmd == "preload":
                 for a in msg.get("assets") or []:
                     PRELOADED[str(a.get("id"))] = str(a.get("path"))
                 emit({"status": "ok", "cmd": "preload", "count": len(PRELOADED)})
+            elif cmd == "validate_assets":
+                result = handle_validate_assets(msg)
+                emit({"status": "ok", "cmd": "validate_assets", "result": result})
+            elif cmd == "micro_render":
+                result = handle_micro_render(msg)
+                emit({"status": "ok", "cmd": "micro_render", "result": result})
             elif cmd == "reset":
                 reset_scene()
                 emit({"status": "ok", "cmd": "reset"})
