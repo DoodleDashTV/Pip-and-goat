@@ -17,3 +17,10 @@ apps/web/test-results
 *.tsbuildinfo
 .doodle-dash-storage
 **/.doodle-dash-storage/
+artifacts/acceptance/**/shots/
+artifacts/acceptance/**/frames/
+artifacts/acceptance/**/exports/*.mp4
+artifacts/acceptance/**/exports/*_burned.mp4
+artifacts/acceptance/**/exports/*.jpg
+artifacts/acceptance/**/exports/*.png
+artifacts/acceptance/LATEST
