@@ -1,0 +1,53 @@
+{
+  "DRAFT_FAST": {
+    "file": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST.mp4",
+    "width": 540,
+    "height": 960,
+    "fps": 30,
+    "duration": 4.536,
+    "size": 166320,
+    "bitrate": 293333,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "audioCodec": "aac",
+    "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST.srt",
+    "burned": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST_burned.mp4",
+    "thumb": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST_thumb.jpg",
+    "resPass": true,
+    "fpsPass": true
+  },
+  "DRAFT_HD": {
+    "file": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "duration": 3.033333,
+    "size": 170705,
+    "bitrate": 450211,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "audioCodec": "aac",
+    "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD.srt",
+    "burned": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD_burned.mp4",
+    "thumb": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD_thumb.jpg",
+    "resPass": true,
+    "fpsPass": true
+  },
+  "FINAL_1080P": {
+    "file": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P.mp4",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration": 10.037333,
+    "size": 740718,
+    "bitrate": 590370,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "audioCodec": "aac",
+    "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P.srt",
+    "burned": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P_burned.mp4",
+    "thumb": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P_thumb.jpg",
+    "resPass": true,
+    "fpsPass": true
+  }
+}

@@ -1,0 +1,11 @@
+1
+00:00:00,000 --> 00:00:00,950
+DIAGNOSTIC shot 1 — non-canonical primitives
+
+2
+00:00:01,000 --> 00:00:01,950
+DIAGNOSTIC shot 2 — non-canonical primitives
+
+3
+00:00:02,000 --> 00:00:02,950
+DIAGNOSTIC shot 3 — non-canonical primitives

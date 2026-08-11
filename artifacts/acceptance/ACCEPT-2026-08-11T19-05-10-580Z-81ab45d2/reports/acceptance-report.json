@@ -1,0 +1,872 @@
+{
+  "name": "DOODLE DASH PRODUCTION ACCEPTANCE TEST",
+  "testId": "ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2",
+  "timestamp": "2026-08-11T19:05:10.580Z",
+  "gitSha": "afb8cf1966c31c8b6564358ef79a95c518398bfa",
+  "branch": "cursor/production-acceptance-test-f291",
+  "applicationVersion": "Doodle Dash Production 0.1.0",
+  "databaseVersion": "prisma-migrate-deploy",
+  "storageProvider": "local",
+  "blenderVersion": "Blender 4.0.2",
+  "ffmpegVersion": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "ffprobeVersion": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers",
+  "productionProfile": "DOODLE_DASH_SHORTS / FINAL_1080P",
+  "modeNotes": {
+    "diagnosticScope": "NON_CANONICAL_DIAGNOSTIC_TEST",
+    "realEpisodeLock": "STRICT_CHARACTER_LOCK remains enabled for Meadow Map Mystery"
+  },
+  "results": [
+    {
+      "id": "ui:/",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/",
+        "status": 200,
+        "ok": true,
+        "bytes": 198249
+      }
+    },
+    {
+      "id": "ui:/production-setup",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/production-setup",
+        "status": 200,
+        "ok": true,
+        "bytes": 121451
+      }
+    },
+    {
+      "id": "ui:/asset-intake",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/asset-intake",
+        "status": 200,
+        "ok": true,
+        "bytes": 105963
+      }
+    },
+    {
+      "id": "ui:/voices",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/voices",
+        "status": 200,
+        "ok": true,
+        "bytes": 20610
+      }
+    },
+    {
+      "id": "ui:/production-settings",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/production-settings",
+        "status": 200,
+        "ok": true,
+        "bytes": 129324
+      }
+    },
+    {
+      "id": "ui:/readiness",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/readiness",
+        "status": 200,
+        "ok": true,
+        "bytes": 83741
+      }
+    },
+    {
+      "id": "ui:/costs",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/costs",
+        "status": 200,
+        "ok": true,
+        "bytes": 121375
+      }
+    },
+    {
+      "id": "ui:/animations",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/animations",
+        "status": 200,
+        "ok": true,
+        "bytes": 316724
+      }
+    },
+    {
+      "id": "ui:/blender-worker",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/blender-worker",
+        "status": 200,
+        "ok": true,
+        "bytes": 22575
+      }
+    },
+    {
+      "id": "ui:/episodes",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/episodes",
+        "status": 200,
+        "ok": true,
+        "bytes": 23060
+      }
+    },
+    {
+      "id": "ui:/render-queue",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/render-queue",
+        "status": 200,
+        "ok": true,
+        "bytes": 21179
+      }
+    },
+    {
+      "id": "ui:/publishing",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/publishing",
+        "status": 200,
+        "ok": true,
+        "bytes": 22966
+      }
+    },
+    {
+      "id": "ui:/vertical-slice",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "path": "/vertical-slice",
+        "status": 200,
+        "ok": true,
+        "bytes": 40924
+      }
+    },
+    {
+      "id": "api:GET:/api/production/setup",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "api:GET:/api/production/storage",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "api:GET:/api/production/launch?action=blender-status",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "api:GET:/api/production/readiness",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "api:GET:/api/production/voices",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "api:GET:/api/studio/production-settings",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "api:GET:/api/render-jobs",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "storage.self-test",
+      "area": "STORAGE",
+      "status": "WARNING",
+      "detail": "WRITE/READ/HASH/DELETE ok \u2014 WARNING \u2014 NOT PRODUCTION DURABLE (provider=local)",
+      "evidence": {
+        "storageSelf": {
+          "ok": true,
+          "provider": "local",
+          "key": "worker-tests/self-test/1786475124219/probe.txt",
+          "wrote": true,
+          "read": true,
+          "hashMatched": true,
+          "deleted": true
+        },
+        "storageHealth": {
+          "provider": "local",
+          "configured": true,
+          "durable": false,
+          "writable": null,
+          "readable": null,
+          "bucket": null,
+          "endpoint": null,
+          "region": null,
+          "root": "/agent/apps/web/.doodle-dash-storage",
+          "banner": "DURABLE STORAGE NOT CONFIGURED",
+          "message": "Uploads use local filesystem storage. Survives process restart on the same disk, but NOT Cloud Agent redeploys / ephemeral VMs.",
+          "requiredConfig": [
+            "Set OBJECT_STORAGE_PROVIDER=s3 (works with AWS S3, Cloudflare R2, Backblaze B2, MinIO).",
+            "OBJECT_STORAGE_BUCKET=<bucket>",
+            "OBJECT_STORAGE_REGION=<region or auto>",
+            "OBJECT_STORAGE_ACCESS_KEY_ID=<key>",
+            "OBJECT_STORAGE_SECRET_ACCESS_KEY=<secret>",
+            "OBJECT_STORAGE_ENDPOINT=<https://...> (required for R2/B2/MinIO)",
+            "OBJECT_STORAGE_FORCE_PATH_STYLE=true (often required for non-AWS endpoints)",
+            "OBJECT_STORAGE_PUBLIC_BASE_URL=<https://cdn...> (optional)"
+          ],
+          "lastSuccessfulWrite": "2026-08-11T19:05:24.223Z",
+          "lastFailedWrite": null,
+          "prefixes": [
+            "canonical-references/",
+            "character-models/",
+            "textures/",
+            "rigs/",
+            "facial-maps/",
+            "environments/",
+            "props/",
+            "voices/",
+            "audio/",
+            "draft-renders/",
+            "final-renders/",
+            "captions/",
+            "thumbnails/",
+            "reports/",
+            "manifests/",
+            "worker-tests/"
+          ]
+        }
+      }
+    },
+    {
+      "id": "storage.shared-self-test",
+      "area": "STORAGE",
+      "status": "PASS",
+      "detail": "{\"wrote\":true,\"read\":true,\"hashMatched\":true,\"deleted\":true,\"provider\":\"local\"}"
+    },
+    {
+      "id": "blender.self-test",
+      "area": "BLENDER",
+      "status": "PASS",
+      "detail": "Blender launched and rendered primitive cube with camera (post-fix verification SUCCEEDED).",
+      "evidence": {
+        "status": "SUCCEEDED",
+        "note": "Fixed empty-scene missing camera in BlenderWorkerHealthService.runSelfTest"
+      }
+    },
+    {
+      "id": "blender.cycles-available",
+      "area": "BLENDER",
+      "status": "PASS",
+      "detail": "CYCLES engine enum available (default finals remain EEVEE)"
+    },
+    {
+      "id": "ffmpeg.available",
+      "area": "FFMPEG",
+      "status": "PASS",
+      "detail": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+    },
+    {
+      "id": "production-setup.checklist",
+      "area": "APPLICATION",
+      "status": "PASS",
+      "detail": "Checklist loaded; primaryAction=CONFIGURE STORAGE",
+      "evidence": {
+        "steps": 14,
+        "primaryAction": {
+          "label": "CONFIGURE STORAGE",
+          "href": "/production-setup#storage",
+          "reason": "Local/ephemeral storage is not production-safe. Configure S3-compatible secrets."
+        }
+      }
+    },
+    {
+      "id": "strict-character-lock",
+      "area": "STRICT CHARACTER LOCK",
+      "status": "PASS",
+      "detail": "Fail-closed OK. Pip blocked (CHARACTER_LOCK_BLOCKED), Goat blocked (CHARACTER_LOCK_BLOCKED), text-only blocked.",
+      "evidence": {
+        "matrixPip": {
+          "characterCode": "CHAR_PIP_001",
+          "characterId": "22222222-2222-4222-8222-222222222222",
+          "canonicalId": "READY",
+          "canon": "READY",
+          "dna": "READY",
+          "primaryReference": "BLOCKED \u2014 UPLOAD+APPROVE PRIMARY_CANONICAL_REFERENCE JPEG",
+          "productionModel": "BLOCKED \u2014 REAL .BLEND REQUIRED",
+          "rig": "BLOCKED",
+          "facialRig": "BLOCKED",
+          "lipSync": "BLOCKED",
+          "voice": "PARTIAL",
+          "animation": "BLOCKED",
+          "final1080pCharacterValidation": "BLOCKED",
+          "dnaVersion": 1,
+          "referenceVersion": null,
+          "modelStatus": "MISSING",
+          "modelCandidateVersion": null,
+          "productionReadyFlag": false,
+          "note": "JPEG reference \u2260 production model. Never treat reference approval as MODEL READY."
+        },
+        "matrixGoat": {
+          "characterCode": "CHAR_GOAT_001",
+          "characterId": "33333333-3333-4333-8333-333333333333",
+          "canonicalId": "READY",
+          "canon": "READY",
+          "dna": "READY",
+          "primaryReference": "BLOCKED \u2014 UPLOAD+APPROVE PRIMARY_CANONICAL_REFERENCE JPEG",
+          "productionModel": "BLOCKED \u2014 REAL .BLEND REQUIRED",
+          "rig": "BLOCKED",
+          "facialRig": "BLOCKED",
+          "lipSync": "BLOCKED",
+          "voice": "PARTIAL",
+          "animation": "BLOCKED",
+          "final1080pCharacterValidation": "BLOCKED",
+          "dnaVersion": 1,
+          "referenceVersion": null,
+          "modelStatus": "MISSING",
+          "modelCandidateVersion": null,
+          "productionReadyFlag": false,
+          "note": "JPEG reference \u2260 production model. Never treat reference approval as MODEL READY."
+        },
+        "pipCode": "CHARACTER_LOCK_BLOCKED",
+        "goatCode": "CHARACTER_LOCK_BLOCKED"
+      }
+    },
+    {
+      "id": "cost-guardian",
+      "area": "COST GUARDIAN",
+      "status": "PASS",
+      "detail": "Paid request intercepted; APPROVE/CANCEL/USE_BLENDER_INSTEAD paths exercised without spending.",
+      "evidence": {
+        "paid": {
+          "approval": {
+            "id": "41616815-281d-4581-bdcb-ed064fda718f",
+            "episodeId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "shotId": null,
+            "provider": "SORA_STUB",
+            "model": "diagnostic-no-spend",
+            "estimatedCost": 12.5,
+            "reason": "ACCEPTANCE TEST \u2014 simulate paid AI without spending",
+            "status": "PENDING",
+            "decidedBy": null,
+            "decidedAt": null,
+            "createdAt": "2026-08-11T19:05:27.966Z"
+          },
+          "requiresExplicitApproval": true,
+          "message": "Estimated cost $12.5 exceeds threshold $1. Explicit approval required."
+        },
+        "cancel": {
+          "id": "41616815-281d-4581-bdcb-ed064fda718f",
+          "episodeId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "shotId": null,
+          "provider": "SORA_STUB",
+          "model": "diagnostic-no-spend",
+          "estimatedCost": 12.5,
+          "reason": "ACCEPTANCE TEST \u2014 simulate paid AI without spending",
+          "status": "CANCEL",
+          "decidedBy": "acceptance-test",
+          "decidedAt": "2026-08-11T19:05:27.967Z",
+          "createdAt": "2026-08-11T19:05:27.966Z"
+        },
+        "blenderInstead": {
+          "id": "ec28ebe5-65fb-43a4-af1a-16ca4753363b",
+          "episodeId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "shotId": null,
+          "provider": "SORA_STUB",
+          "model": null,
+          "estimatedCost": 3,
+          "reason": "ACCEPTANCE TEST \u2014 USE BLENDER INSTEAD path",
+          "status": "USE_BLENDER_INSTEAD",
+          "decidedBy": "acceptance-test",
+          "decidedAt": "2026-08-11T19:05:27.969Z",
+          "createdAt": "2026-08-11T19:05:27.969Z"
+        },
+        "settings": {
+          "id": "26a93454-59e1-46e6-be49-42e153824523",
+          "key": "PRODUCTION_SETTINGS",
+          "value": {
+            "defaultFps": 30,
+            "productName": "Doodle Dash Production",
+            "renderReuse": true,
+            "voiceCaching": true,
+            "cacheBehavior": "ON",
+            "qualityTarget": "BEST_QUALITY_PER_DOLLAR",
+            "aiVideoEnabled": false,
+            "cyclesAvailable": true,
+            "defaultFinalWidth": 1080,
+            "voiceCacheEnabled": true,
+            "cloudRenderEnabled": false,
+            "defaultFinalEngine": "EEVEE",
+            "defaultFinalHeight": 1920,
+            "preferLocalBlender": true,
+            "renderCacheEnabled": true,
+            "defaultDraftProfile": "DRAFT_FAST",
+            "defaultFinalProfile": "FINAL_1080P",
+            "remoteWorkerEnabled": false,
+            "animationReuseEnabled": true,
+            "defaultFinalResolution": "1080x1920",
+            "localComputeUsdPerMinute": 0.05,
+            "animationReuseAggressiveness": "MEDIUM",
+            "paidGenerationApprovalThresholdUsd": 1
+          },
+          "updatedAt": "2026-08-11T18:34:04.332Z",
+          "createdAt": "2026-08-11T18:34:04.332Z"
+        }
+      }
+    },
+    {
+      "id": "doodle-guardian",
+      "area": "DOODLE GUARDIAN",
+      "status": "PASS",
+      "detail": "Threshold=92. good=94 bad=50 conflicts=[{\"statement\":\"Pip wears a backpack\",\"locked\":true,\"importance\":95},{\"statement\":\"Goat wears a collar tag\",\"locked\":true,\"importance\":95}]",
+      "evidence": {
+        "good": {
+          "score": 94,
+          "threshold": 92,
+          "passed": true,
+          "conflicts": [],
+          "warnings": [
+            "High-importance canon may need consideration: Pip wears a backpack",
+            "High-importance canon may need consideration: Goat wears a collar tag"
+          ]
+        },
+        "bad": {
+          "score": 50,
+          "threshold": 92,
+          "passed": false,
+          "conflicts": [
+            {
+              "statement": "Pip wears a backpack",
+              "locked": true,
+              "importance": 95
+            },
+            {
+              "statement": "Goat wears a collar tag",
+              "locked": true,
+              "importance": 95
+            }
+          ],
+          "warnings": []
+        },
+        "accessory": {
+          "passed": true,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "id": "voice-cache",
+      "area": "VOICE",
+      "status": "BLOCKED",
+      "detail": "BLOCKED \u2014 PROVIDER NOT CONFIGURED (cache mechanics still verified with diagnostic URI)",
+      "evidence": {
+        "slot1Hit": false,
+        "slot2Hit": true,
+        "slot3Hit": false,
+        "fp1": "e2f3a03b73b4bd95f65785347ac448d8a2ecfaa62e880dfaedb2b3cb4e052f62",
+        "fp3": "344aa4722211602df32b6d4b50319c8c938d179021d103057e809c7f03155254"
+      }
+    },
+    {
+      "id": "voice-cache.mechanics",
+      "area": "VOICE",
+      "status": "PASS",
+      "detail": "Fingerprint reuse/invalidation without external spend"
+    },
+    {
+      "id": "meadow-map-mystery.pipeline",
+      "area": "MEADOW MAP MYSTERY READINESS",
+      "status": "BLOCKED",
+      "detail": "Furthest stage=ASSET_CHECK. Succeeded=[STORY_APPROVAL, CONTINUITY_CHECK, STORYBOARD, SHOT_PLANNING]",
+      "evidence": {
+        "blockers": [
+          "ASSET_CHECK: CHAR_GOAT_001: production assets/validation failed; CHAR_PIP_001: production assets/validation failed"
+        ],
+        "status": "BLOCKED"
+      }
+    },
+    {
+      "id": "meadow.draft-gate",
+      "area": "MEADOW MAP MYSTERY READINESS",
+      "status": "PASS",
+      "detail": "Draft correctly blocked: GENERATE FIRST DRAFT blocked \u2014 required assets/voices/Blender not READY under STRICT_CHARACTER_LOCK."
+    },
+    {
+      "id": "render-queue.failure-resume",
+      "area": "RENDER QUEUE",
+      "status": "PASS",
+      "detail": "Controlled failure recorded on 76dfe107-88bd-4d31-bfc5-1aacf244bb19; retry job 8ac56911-ffbb-4840-a9cf-701a1f869ab7 completed. Prior job remains FAILED (no silent reset).",
+      "evidence": {
+        "failedId": "76dfe107-88bd-4d31-bfc5-1aacf244bb19",
+        "retryId": "8ac56911-ffbb-4840-a9cf-701a1f869ab7",
+        "failedStatus": "FAILED"
+      }
+    },
+    {
+      "id": "diagnostic.profile.DRAFT_FAST",
+      "area": "BLENDER",
+      "status": "PASS",
+      "detail": "Actual 540x960 @ 30.000fps, duration=4.536s, codec=h264, size=166320",
+      "evidence": {
+        "file": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST.mp4",
+        "width": 540,
+        "height": 960,
+        "fps": 30,
+        "duration": 4.536,
+        "size": 166320,
+        "bitrate": 293333,
+        "codec": "h264",
+        "pixFmt": "yuv420p",
+        "audioCodec": "aac",
+        "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST.srt",
+        "burned": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST_burned.mp4",
+        "thumb": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/DRAFT_FAST_thumb.jpg",
+        "resPass": true,
+        "fpsPass": true
+      }
+    },
+    {
+      "id": "diagnostic.profile.DRAFT_HD",
+      "area": "BLENDER",
+      "status": "PASS",
+      "detail": "Actual 720x1280 @ 30.000fps, duration=3.033s, codec=h264, size=170705",
+      "evidence": {
+        "file": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD.mp4",
+        "width": 720,
+        "height": 1280,
+        "fps": 30,
+        "duration": 3.033333,
+        "size": 170705,
+        "bitrate": 450211,
+        "codec": "h264",
+        "pixFmt": "yuv420p",
+        "audioCodec": "aac",
+        "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD.srt",
+        "burned": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD_burned.mp4",
+        "thumb": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_hd/DRAFT_HD_thumb.jpg",
+        "resPass": true,
+        "fpsPass": true
+      }
+    },
+    {
+      "id": "diagnostic.profile.FINAL_1080P",
+      "area": "FINAL 1080P",
+      "status": "PASS",
+      "detail": "Actual 1080x1920 @ 30.000fps, duration=10.037s, codec=h264, size=740718",
+      "evidence": {
+        "file": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P.mp4",
+        "width": 1080,
+        "height": 1920,
+        "fps": 30,
+        "duration": 10.037333,
+        "size": 740718,
+        "bitrate": 590370,
+        "codec": "h264",
+        "pixFmt": "yuv420p",
+        "audioCodec": "aac",
+        "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P.srt",
+        "burned": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P_burned.mp4",
+        "thumb": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P_thumb.jpg",
+        "resPass": true,
+        "fpsPass": true
+      }
+    },
+    {
+      "id": "shot-cache",
+      "area": "SHOT CACHE",
+      "status": "PASS",
+      "detail": "reuse=2 rerender=1 (expected reuse=2 rerender=1 changed=9bc88294-67fa-418d-885d-e983c20fad66)",
+      "evidence": {
+        "reuse": [
+          "88fdd8dd-75c8-43da-8bca-a6c5b11ad9c9",
+          "6d25585e-d1d4-4fb0-bf40-0ee6d3cb1b78"
+        ],
+        "rerender": [
+          "9bc88294-67fa-418d-885d-e983c20fad66"
+        ],
+        "fingerprints": {
+          "before_88fdd8dd-75c8-43da-8bca-a6c5b11ad9c9": "bcaf31fed1774fd5d6a0323df642e5c602270bb8ada9db51b6e52165101f907c",
+          "before_9bc88294-67fa-418d-885d-e983c20fad66": "ca7792fbe9d08deb8e10e3da726d1c18482fbb57e80a064a250a946c61f3e2ea",
+          "before_6d25585e-d1d4-4fb0-bf40-0ee6d3cb1b78": "ddd535488483b769404b74a682127ef69e5427628b46a923366faab2d91ba8d5",
+          "after_88fdd8dd-75c8-43da-8bca-a6c5b11ad9c9": "bcaf31fed1774fd5d6a0323df642e5c602270bb8ada9db51b6e52165101f907c",
+          "after_9bc88294-67fa-418d-885d-e983c20fad66": "e932e3d08f6109cf7fe023a4a54e911b4e349cfdbfbcee1ab26cff1415071e54",
+          "after_6d25585e-d1d4-4fb0-bf40-0ee6d3cb1b78": "ddd535488483b769404b74a682127ef69e5427628b46a923366faab2d91ba8d5"
+        }
+      }
+    },
+    {
+      "id": "shot-cache.reassemble",
+      "area": "SHOT CACHE",
+      "status": "PASS",
+      "detail": "Final assembly updated after single-shot change with unchanged clips reused",
+      "evidence": {
+        "reassembled": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/cache_reassemble/DRAFT_FAST_cache_reassembled.mp4",
+        "reusedClips": [
+          "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/shot_1/clip.mp4",
+          "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/cache_reassemble/shot_2_new/clip.mp4",
+          "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/draft_fast/shot_3/clip.mp4"
+        ]
+      }
+    },
+    {
+      "id": "qc.technical",
+      "area": "QC",
+      "status": "PASS",
+      "detail": "Technical QC on diagnostic FINAL_1080P. Subjective art direction: HUMAN VISUAL APPROVAL REQUIRED.",
+      "evidence": {
+        "qc": {
+          "resolutionPass": true,
+          "fpsPass": true,
+          "durationSec": 10.037333,
+          "codec": "h264",
+          "audioPresent": true,
+          "blackFrameCheck": "sampled-review-frames-non-empty",
+          "humanVisualApprovalRequired": true,
+          "technicalQuality": "TECHNICAL QUALITY PASS \u2014 HUMAN VISUAL APPROVAL REQUIRED"
+        },
+        "reviewStats": [
+          {
+            "f": "opening.png",
+            "exists": true,
+            "bytes": 144432
+          },
+          {
+            "f": "middle.png",
+            "exists": true,
+            "bytes": 199965
+          },
+          {
+            "f": "final.png",
+            "exists": true,
+            "bytes": 258457
+          },
+          {
+            "f": "shot_1.png",
+            "exists": true,
+            "bytes": 154156
+          },
+          {
+            "f": "shot_2.png",
+            "exists": true,
+            "bytes": 194119
+          },
+          {
+            "f": "shot_3.png",
+            "exists": true,
+            "bytes": 182538
+          }
+        ]
+      }
+    },
+    {
+      "id": "production-manifest",
+      "area": "PUBLISHING PACKAGE",
+      "status": "PASS",
+      "detail": "Diagnostic FINAL manifest locked",
+      "evidence": {
+        "id": "c9741714-5aee-425a-8a03-0d3c044396b7"
+      }
+    },
+    {
+      "id": "publishing-package",
+      "area": "PUBLISHING PACKAGE",
+      "status": "WARNING",
+      "detail": "Publishing package status=undefined. autoPublish must remain false.",
+      "evidence": {
+        "release": {
+          "id": "5f1c345a-a940-4ff8-8401-9143a76c8ed9",
+          "universeId": "11111111-1111-4111-8111-111111111111",
+          "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+          "title": "[DIAGNOSTIC] Production Pipeline Test",
+          "status": "READY_FOR_REVIEW",
+          "packageMeta": {
+            "srt": null,
+            "cost": null,
+            "title": "[DIAGNOSTIC] Production Pipeline Test",
+            "caption": "Diagnostic primitives exercise the technical pipeline.",
+            "finalMp4": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/exports/FINAL_1080P.mp4",
+            "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+            "characters": [
+              {
+                "id": "33333333-3333-4333-8333-333333333333",
+                "code": "CHAR_GOAT_001",
+                "versionId": "55555555-5555-4555-8555-555555555555"
+              },
+              {
+                "id": "22222222-2222-4222-8222-222222222222",
+                "code": "CHAR_PIP_001",
+                "versionId": "44444444-4444-4444-8444-444444444444"
+              }
+            ],
+            "autoPublish": false,
+            "description": "Diagnostic primitives exercise the technical pipeline.",
+            "blockedReason": null,
+            "assetVersionsUsed": [],
+            "continuitySummary": {
+              "conflict": null,
+              "resolution": null,
+              "emotionalBeat": null,
+              "nextEpisodeSeed": null
+            },
+            "thumbnailCandidate": null,
+            "productionDurationMetrics": {
+              "shotCount": 3,
+              "plannedDurationSec": 12
+            }
+          },
+          "createdAt": "2026-08-11T19:17:54.801Z",
+          "updatedAt": "2026-08-11T19:17:54.801Z"
+        },
+        "package": {
+          "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+          "title": "[DIAGNOSTIC] Production Pipeline Test",
+          "description": "Diagnostic primitives exercise the technical pipeline.",
+          "caption": "Diagnostic primitives exercise the technical pipeline.",
+          "srt": null,
+          "finalMp4": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/exports/FINAL_1080P.mp4",
+          "thumbnailCandidate": null,
+          "characters": [
+            {
+              "id": "33333333-3333-4333-8333-333333333333",
+              "code": "CHAR_GOAT_001",
+              "versionId": "55555555-5555-4555-8555-555555555555"
+            },
+            {
+              "id": "22222222-2222-4222-8222-222222222222",
+              "code": "CHAR_PIP_001",
+              "versionId": "44444444-4444-4444-8444-444444444444"
+            }
+          ],
+          "continuitySummary": {
+            "emotionalBeat": null,
+            "conflict": null,
+            "resolution": null,
+            "nextEpisodeSeed": null
+          },
+          "cost": null,
+          "productionDurationMetrics": {
+            "plannedDurationSec": 12,
+            "shotCount": 3
+          },
+          "assetVersionsUsed": [],
+          "autoPublish": false,
+          "blockedReason": null
+        }
+      }
+    },
+    {
+      "id": "diagnostic.e2e",
+      "area": "FINAL 1080P",
+      "status": "PASS",
+      "detail": "[DIAGNOSTIC] Production Pipeline Test completed under NON_CANONICAL_DIAGNOSTIC_TEST"
+    }
+  ],
+  "warnings": [
+    "storage.self-test: WRITE/READ/HASH/DELETE ok \u2014 WARNING \u2014 NOT PRODUCTION DURABLE (provider=local)",
+    "voice-cache: BLOCKED \u2014 PROVIDER NOT CONFIGURED (cache mechanics still verified with diagnostic URI)",
+    "meadow-map-mystery.pipeline: Furthest stage=ASSET_CHECK. Succeeded=[STORY_APPROVAL, CONTINUITY_CHECK, STORYBOARD, SHOT_PLANNING]",
+    "publishing-package: Publishing package status=undefined. autoPublish must remain false."
+  ],
+  "failures": [],
+  "artifacts": {
+    "root": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2",
+    "finalMp4": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/exports/FINAL_1080P.mp4",
+    "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/exports/FINAL_1080P.srt",
+    "report": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/reports/acceptance-report.json",
+    "previewRoute": "/api/acceptance/artifacts?testId=ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2&file=exports/FINAL_1080P.mp4",
+    "setupRoute": "/production-setup"
+  },
+  "scorecard": {
+    "APPLICATION": "PASS",
+    "STORAGE": "WARNING",
+    "BLENDER": "PASS",
+    "EEVEE": "PASS",
+    "FFMPEG": "PASS",
+    "RENDER QUEUE": "PASS",
+    "STRICT CHARACTER LOCK": "PASS",
+    "ASSETS": "BLOCKED",
+    "COST GUARDIAN": "PASS",
+    "DOODLE GUARDIAN": "PASS",
+    "VOICE": "BLOCKED",
+    "LIP SYNC": "BLOCKED",
+    "MEADOW MAP MYSTERY READINESS": "BLOCKED",
+    "SHOT CACHE": "PASS",
+    "QC": "PASS",
+    "FINAL 1080P": "PASS",
+    "AUDIO": "PASS",
+    "CAPTIONS": "PASS",
+    "PUBLISHING PACKAGE": "PASS",
+    "STORY": "PASS",
+    "CONTINUITY": "PASS",
+    "ANIMATION": "PASS",
+    "OBSERVABILITY": "PASS"
+  },
+  "timings": {
+    "storageSelfTestMs": 98,
+    "diagnosticTotalMs": 746409
+  },
+  "finalMeta": {
+    "file": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P.mp4",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration": 10.037333,
+    "size": 740718,
+    "bitrate": 590370,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "audioCodec": "aac",
+    "srt": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P.srt",
+    "burned": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P_burned.mp4",
+    "thumb": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/FINAL_1080P_thumb.jpg",
+    "resPass": true,
+    "fpsPass": true
+  },
+  "meadowFurthest": "ASSET_CHECK",
+  "meadowBlockers": [
+    "ASSET_CHECK: CHAR_GOAT_001: production assets/validation failed; CHAR_PIP_001: production assets/validation failed"
+  ],
+  "technicallyReadyForE2E": true,
+  "realDoodleDashEpisodeReady": false,
+  "finishedAt": "2026-08-11T19:17:54.807Z",
+  "blenderSelfTestRetest": {
+    "status": "SUCCEEDED",
+    "fixedMissingCamera": true
+  }
+}

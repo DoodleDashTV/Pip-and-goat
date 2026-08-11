@@ -1,0 +1,10 @@
+{
+  "resolutionPass": true,
+  "fpsPass": true,
+  "durationSec": 10.037333,
+  "codec": "h264",
+  "audioPresent": true,
+  "blackFrameCheck": "sampled-review-frames-non-empty",
+  "humanVisualApprovalRequired": true,
+  "technicalQuality": "TECHNICAL QUALITY PASS — HUMAN VISUAL APPROVAL REQUIRED"
+}

@@ -730,7 +730,12 @@ async function main() {
     await renderJobService.registerWorker({
       id: '00000000-0000-4000-8000-00000000acc1',
       name: 'acceptance-worker',
-      capabilities: { engines: ['EEVEE'], resolutions: ['540x960'], gpu: false },
+      capabilities: {
+        engines: ['EEVEE'],
+        resolutions: ['540x960', '1080x1920'],
+        fps: [30],
+        supportsGpu: false,
+      },
     });
     await renderJobService.updateStatus(job.id, 'RENDERING');
     await renderJobService.recordAttempt({

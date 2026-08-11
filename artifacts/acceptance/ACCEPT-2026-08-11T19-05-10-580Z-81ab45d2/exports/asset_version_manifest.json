@@ -1,0 +1,9 @@
+{
+  "mode": "NON_CANONICAL_DIAGNOSTIC_TEST",
+  "characters": [],
+  "primitives": [
+    "DIAG_SPHERE",
+    "DIAG_CUBE",
+    "DIAG_GROUND"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "mode": "NON_CANONICAL_DIAGNOSTIC_TEST",
+  "shotId": "9bc88294-67fa-418d-885d-e983c20fad66",
+  "engine": "BLENDER_EEVEE",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "frames": 100,
+  "outputDir": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/shots/final_1080p/shot_2",
+  "canon": false,
+  "characters": [],
+  "note": "Primitive-only diagnostic. Not Pip/Goat/Meadow."
+}

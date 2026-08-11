@@ -1,0 +1,164 @@
+{
+  "first": {
+    "release": {
+      "id": "714e1e63-b71f-48f4-9f18-236953d7b6ec",
+      "universeId": "11111111-1111-4111-8111-111111111111",
+      "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+      "title": "[DIAGNOSTIC] Production Pipeline Test",
+      "status": "BLOCKED",
+      "packageMeta": {
+        "srt": null,
+        "cost": null,
+        "title": "[DIAGNOSTIC] Production Pipeline Test",
+        "caption": "Diagnostic primitives exercise the technical pipeline.",
+        "finalMp4": null,
+        "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+        "characters": [
+          {
+            "id": "33333333-3333-4333-8333-333333333333",
+            "code": "CHAR_GOAT_001",
+            "versionId": "55555555-5555-4555-8555-555555555555"
+          },
+          {
+            "id": "22222222-2222-4222-8222-222222222222",
+            "code": "CHAR_PIP_001",
+            "versionId": "44444444-4444-4444-8444-444444444444"
+          }
+        ],
+        "autoPublish": false,
+        "description": "Diagnostic primitives exercise the technical pipeline.",
+        "blockedReason": "Final MP4 not available — no completed Blender render output. Package metadata only.",
+        "assetVersionsUsed": [],
+        "continuitySummary": {
+          "conflict": null,
+          "resolution": null,
+          "emotionalBeat": null,
+          "nextEpisodeSeed": null
+        },
+        "thumbnailCandidate": null,
+        "productionDurationMetrics": {
+          "shotCount": 3,
+          "plannedDurationSec": 12
+        }
+      },
+      "createdAt": "2026-08-11T19:17:54.785Z",
+      "updatedAt": "2026-08-11T19:17:54.785Z"
+    },
+    "package": {
+      "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+      "title": "[DIAGNOSTIC] Production Pipeline Test",
+      "description": "Diagnostic primitives exercise the technical pipeline.",
+      "caption": "Diagnostic primitives exercise the technical pipeline.",
+      "srt": null,
+      "finalMp4": null,
+      "thumbnailCandidate": null,
+      "characters": [
+        {
+          "id": "33333333-3333-4333-8333-333333333333",
+          "code": "CHAR_GOAT_001",
+          "versionId": "55555555-5555-4555-8555-555555555555"
+        },
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "code": "CHAR_PIP_001",
+          "versionId": "44444444-4444-4444-8444-444444444444"
+        }
+      ],
+      "continuitySummary": {
+        "emotionalBeat": null,
+        "conflict": null,
+        "resolution": null,
+        "nextEpisodeSeed": null
+      },
+      "cost": null,
+      "productionDurationMetrics": {
+        "plannedDurationSec": 12,
+        "shotCount": 3
+      },
+      "assetVersionsUsed": [],
+      "autoPublish": false,
+      "blockedReason": "Final MP4 not available — no completed Blender render output. Package metadata only."
+    }
+  },
+  "afterOutput": {
+    "release": {
+      "id": "5f1c345a-a940-4ff8-8401-9143a76c8ed9",
+      "universeId": "11111111-1111-4111-8111-111111111111",
+      "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+      "title": "[DIAGNOSTIC] Production Pipeline Test",
+      "status": "READY_FOR_REVIEW",
+      "packageMeta": {
+        "srt": null,
+        "cost": null,
+        "title": "[DIAGNOSTIC] Production Pipeline Test",
+        "caption": "Diagnostic primitives exercise the technical pipeline.",
+        "finalMp4": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/exports/FINAL_1080P.mp4",
+        "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+        "characters": [
+          {
+            "id": "33333333-3333-4333-8333-333333333333",
+            "code": "CHAR_GOAT_001",
+            "versionId": "55555555-5555-4555-8555-555555555555"
+          },
+          {
+            "id": "22222222-2222-4222-8222-222222222222",
+            "code": "CHAR_PIP_001",
+            "versionId": "44444444-4444-4444-8444-444444444444"
+          }
+        ],
+        "autoPublish": false,
+        "description": "Diagnostic primitives exercise the technical pipeline.",
+        "blockedReason": null,
+        "assetVersionsUsed": [],
+        "continuitySummary": {
+          "conflict": null,
+          "resolution": null,
+          "emotionalBeat": null,
+          "nextEpisodeSeed": null
+        },
+        "thumbnailCandidate": null,
+        "productionDurationMetrics": {
+          "shotCount": 3,
+          "plannedDurationSec": 12
+        }
+      },
+      "createdAt": "2026-08-11T19:17:54.801Z",
+      "updatedAt": "2026-08-11T19:17:54.801Z"
+    },
+    "package": {
+      "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+      "title": "[DIAGNOSTIC] Production Pipeline Test",
+      "description": "Diagnostic primitives exercise the technical pipeline.",
+      "caption": "Diagnostic primitives exercise the technical pipeline.",
+      "srt": null,
+      "finalMp4": "/agent/artifacts/acceptance/ACCEPT-2026-08-11T19-05-10-580Z-81ab45d2/exports/FINAL_1080P.mp4",
+      "thumbnailCandidate": null,
+      "characters": [
+        {
+          "id": "33333333-3333-4333-8333-333333333333",
+          "code": "CHAR_GOAT_001",
+          "versionId": "55555555-5555-4555-8555-555555555555"
+        },
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "code": "CHAR_PIP_001",
+          "versionId": "44444444-4444-4444-8444-444444444444"
+        }
+      ],
+      "continuitySummary": {
+        "emotionalBeat": null,
+        "conflict": null,
+        "resolution": null,
+        "nextEpisodeSeed": null
+      },
+      "cost": null,
+      "productionDurationMetrics": {
+        "plannedDurationSec": 12,
+        "shotCount": 3
+      },
+      "assetVersionsUsed": [],
+      "autoPublish": false,
+      "blockedReason": null
+    }
+  }
+}

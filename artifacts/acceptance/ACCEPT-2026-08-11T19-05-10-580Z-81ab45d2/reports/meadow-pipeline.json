@@ -1,0 +1,1214 @@
+{
+  "id": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+  "episodeId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "profileCode": "DOODLE_DASH_SHORTS",
+  "status": "BLOCKED",
+  "currentStage": "ASSET_CHECK",
+  "resumable": true,
+  "costEstimate": null,
+  "costActual": null,
+  "durationTargetSec": 30,
+  "errorSummary": "Pipeline stopped at dependency boundary. See stages for exact blockers.",
+  "observability": {
+    "finishedAt": "2026-08-11T19:05:28.231Z",
+    "stageResults": [
+      {
+        "stage": "STORY_APPROVAL",
+        "status": "RUNNING"
+      },
+      {
+        "stage": "STORY_APPROVAL",
+        "status": "SUCCEEDED"
+      },
+      {
+        "stage": "CONTINUITY_CHECK",
+        "status": "RUNNING"
+      },
+      {
+        "stage": "CONTINUITY_CHECK",
+        "detail": {
+          "outputs": {
+            "score": 97,
+            "passed": true,
+            "warnings": [
+              "High-importance canon may need consideration: Native 3D production uses permanent reusable assets. Generative video providers are optional supplemental tools only."
+            ],
+            "conflicts": [],
+            "threshold": 92
+          }
+        },
+        "status": "SUCCEEDED"
+      },
+      {
+        "stage": "STORYBOARD",
+        "status": "RUNNING"
+      },
+      {
+        "stage": "STORYBOARD",
+        "status": "SUCCEEDED"
+      },
+      {
+        "stage": "SHOT_PLANNING",
+        "status": "RUNNING"
+      },
+      {
+        "stage": "SHOT_PLANNING",
+        "detail": {
+          "outputs": {
+            "mode": "BALANCED_CINEMATIC",
+            "totals": {
+              "count": 4,
+              "estimatedMinutes": 30,
+              "estimatedCostUnits": 93.75,
+              "averageCinematicImportance": 68
+            },
+            "shotPlans": [
+              {
+                "shotId": "64b2b65e-a3dd-45c9-b760-09e6045984fe",
+                "rationale": [
+                  "Approved 3D assets or cinematic priority justify native 3D."
+                ],
+                "renderMode": "NATIVE_3D",
+                "estimatedMinutes": 4,
+                "estimatedCostUnits": 12.5,
+                "cinematicImportance": 68
+              },
+              {
+                "shotId": "bdee7315-88b8-463a-b80e-024f4ac7df4c",
+                "rationale": [
+                  "Approved 3D assets or cinematic priority justify native 3D."
+                ],
+                "renderMode": "NATIVE_3D",
+                "estimatedMinutes": 8,
+                "estimatedCostUnits": 25,
+                "cinematicImportance": 68
+              },
+              {
+                "shotId": "287f029f-ffd3-4cf9-ab46-adeb036f5512",
+                "rationale": [
+                  "Approved 3D assets or cinematic priority justify native 3D."
+                ],
+                "renderMode": "NATIVE_3D",
+                "estimatedMinutes": 10,
+                "estimatedCostUnits": 31.25,
+                "cinematicImportance": 68
+              },
+              {
+                "shotId": "26e2fd07-da17-4625-8b42-dfe9d51bca0a",
+                "rationale": [
+                  "Approved 3D assets or cinematic priority justify native 3D."
+                ],
+                "renderMode": "NATIVE_3D",
+                "estimatedMinutes": 8,
+                "estimatedCostUnits": 25,
+                "cinematicImportance": 68
+              }
+            ]
+          }
+        },
+        "status": "SUCCEEDED"
+      },
+      {
+        "stage": "ASSET_CHECK",
+        "status": "RUNNING"
+      },
+      {
+        "stage": "ASSET_CHECK",
+        "detail": {
+          "outputs": [
+            {
+              "checks": [
+                {
+                  "code": "MODEL_EXISTS",
+                  "passed": false,
+                  "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+                  "severity": "error"
+                },
+                {
+                  "code": "FILE_LOADABLE",
+                  "passed": false,
+                  "message": "Cannot load — production file missing.",
+                  "severity": "error"
+                },
+                {
+                  "code": "RIG_EXISTS",
+                  "passed": false,
+                  "message": "Approved body rig required.",
+                  "severity": "error"
+                },
+                {
+                  "code": "FACIAL_RIG_EXISTS",
+                  "passed": false,
+                  "message": "Approved facial rig required for lip sync.",
+                  "severity": "error"
+                },
+                {
+                  "code": "TEXTURES_RESOLVE",
+                  "passed": false,
+                  "message": "Texture set not uploaded.",
+                  "severity": "error"
+                },
+                {
+                  "code": "MATERIALS_RESOLVE",
+                  "passed": false,
+                  "message": "Material set not uploaded.",
+                  "severity": "warning"
+                },
+                {
+                  "code": "REFERENCE_APPROVED",
+                  "passed": false,
+                  "message": "No approved visual reference with uploaded asset.",
+                  "severity": "error"
+                },
+                {
+                  "code": "CANONICAL_DNA_LOCKED",
+                  "passed": true,
+                  "message": "Canonical DNA v1 locked.",
+                  "severity": "error"
+                },
+                {
+                  "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+                  "passed": true,
+                  "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+                  "severity": "error"
+                },
+                {
+                  "code": "FINAL_1080P_CHARACTER_VALIDATION",
+                  "passed": false,
+                  "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+                  "severity": "error"
+                },
+                {
+                  "code": "VERTICAL_FRAMING",
+                  "passed": true,
+                  "message": "Vertical framing check deferred until model loads.",
+                  "severity": "warning"
+                },
+                {
+                  "code": "RENDER_ENGINE_COMPAT",
+                  "passed": true,
+                  "message": "EEVEE/Cycles compatibility deferred until model loads.",
+                  "severity": "warning"
+                },
+                {
+                  "code": "LIP_SYNC_CAPABILITY",
+                  "passed": false,
+                  "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+                  "severity": "error"
+                },
+                {
+                  "code": "FACIAL_SEMANTIC_MAP",
+                  "passed": false,
+                  "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+                  "severity": "error"
+                }
+              ],
+              "passed": false,
+              "report": {
+                "id": "1cbd127b-681e-45a6-b4e6-22255b5b845f",
+                "score": 29,
+                "checks": [
+                  {
+                    "code": "MODEL_EXISTS",
+                    "passed": false,
+                    "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FILE_LOADABLE",
+                    "passed": false,
+                    "message": "Cannot load — production file missing.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "RIG_EXISTS",
+                    "passed": false,
+                    "message": "Approved body rig required.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FACIAL_RIG_EXISTS",
+                    "passed": false,
+                    "message": "Approved facial rig required for lip sync.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "TEXTURES_RESOLVE",
+                    "passed": false,
+                    "message": "Texture set not uploaded.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "MATERIALS_RESOLVE",
+                    "passed": false,
+                    "message": "Material set not uploaded.",
+                    "severity": "warning"
+                  },
+                  {
+                    "code": "REFERENCE_APPROVED",
+                    "passed": false,
+                    "message": "No approved visual reference with uploaded asset.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "CANONICAL_DNA_LOCKED",
+                    "passed": true,
+                    "message": "Canonical DNA v1 locked.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+                    "passed": true,
+                    "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FINAL_1080P_CHARACTER_VALIDATION",
+                    "passed": false,
+                    "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "VERTICAL_FRAMING",
+                    "passed": true,
+                    "message": "Vertical framing check deferred until model loads.",
+                    "severity": "warning"
+                  },
+                  {
+                    "code": "RENDER_ENGINE_COMPAT",
+                    "passed": true,
+                    "message": "EEVEE/Cycles compatibility deferred until model loads.",
+                    "severity": "warning"
+                  },
+                  {
+                    "code": "LIP_SYNC_CAPABILITY",
+                    "passed": false,
+                    "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FACIAL_SEMANTIC_MAP",
+                    "passed": false,
+                    "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+                    "severity": "error"
+                  }
+                ],
+                "passed": false,
+                "modelId": "918f8c27-c780-47a8-9f69-63c53f6587dd",
+                "createdAt": "2026-08-11T19:05:28.198Z",
+                "characterId": "33333333-3333-4333-8333-333333333333",
+                "blockedFinal": true,
+                "missingControls": {
+                  "visemes": [],
+                  "productionAssets": [
+                    "CHARACTER_BLEND",
+                    "CHARACTER_GLB",
+                    "REFERENCE_IMAGE",
+                    "TURNAROUND",
+                    "EXPRESSION_SHEET",
+                    "RIG",
+                    "FACIAL_SHAPEKEYS",
+                    "TEXTURE"
+                  ]
+                }
+              },
+              "strict": true,
+              "characterId": "33333333-3333-4333-8333-333333333333",
+              "internalCode": "CHAR_GOAT_001"
+            },
+            {
+              "checks": [
+                {
+                  "code": "MODEL_EXISTS",
+                  "passed": false,
+                  "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+                  "severity": "error"
+                },
+                {
+                  "code": "FILE_LOADABLE",
+                  "passed": false,
+                  "message": "Cannot load — production file missing.",
+                  "severity": "error"
+                },
+                {
+                  "code": "RIG_EXISTS",
+                  "passed": false,
+                  "message": "Approved body rig required.",
+                  "severity": "error"
+                },
+                {
+                  "code": "FACIAL_RIG_EXISTS",
+                  "passed": false,
+                  "message": "Approved facial rig required for lip sync.",
+                  "severity": "error"
+                },
+                {
+                  "code": "TEXTURES_RESOLVE",
+                  "passed": false,
+                  "message": "Texture set not uploaded.",
+                  "severity": "error"
+                },
+                {
+                  "code": "MATERIALS_RESOLVE",
+                  "passed": false,
+                  "message": "Material set not uploaded.",
+                  "severity": "warning"
+                },
+                {
+                  "code": "REFERENCE_APPROVED",
+                  "passed": false,
+                  "message": "No approved visual reference with uploaded asset.",
+                  "severity": "error"
+                },
+                {
+                  "code": "CANONICAL_DNA_LOCKED",
+                  "passed": true,
+                  "message": "Canonical DNA v1 locked.",
+                  "severity": "error"
+                },
+                {
+                  "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+                  "passed": true,
+                  "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+                  "severity": "error"
+                },
+                {
+                  "code": "FINAL_1080P_CHARACTER_VALIDATION",
+                  "passed": false,
+                  "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+                  "severity": "error"
+                },
+                {
+                  "code": "VERTICAL_FRAMING",
+                  "passed": true,
+                  "message": "Vertical framing check deferred until model loads.",
+                  "severity": "warning"
+                },
+                {
+                  "code": "RENDER_ENGINE_COMPAT",
+                  "passed": true,
+                  "message": "EEVEE/Cycles compatibility deferred until model loads.",
+                  "severity": "warning"
+                },
+                {
+                  "code": "LIP_SYNC_CAPABILITY",
+                  "passed": false,
+                  "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+                  "severity": "error"
+                },
+                {
+                  "code": "FACIAL_SEMANTIC_MAP",
+                  "passed": false,
+                  "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+                  "severity": "error"
+                }
+              ],
+              "passed": false,
+              "report": {
+                "id": "b3e8c1b2-96c2-4d23-ad05-081fe69ddfdb",
+                "score": 29,
+                "checks": [
+                  {
+                    "code": "MODEL_EXISTS",
+                    "passed": false,
+                    "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FILE_LOADABLE",
+                    "passed": false,
+                    "message": "Cannot load — production file missing.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "RIG_EXISTS",
+                    "passed": false,
+                    "message": "Approved body rig required.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FACIAL_RIG_EXISTS",
+                    "passed": false,
+                    "message": "Approved facial rig required for lip sync.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "TEXTURES_RESOLVE",
+                    "passed": false,
+                    "message": "Texture set not uploaded.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "MATERIALS_RESOLVE",
+                    "passed": false,
+                    "message": "Material set not uploaded.",
+                    "severity": "warning"
+                  },
+                  {
+                    "code": "REFERENCE_APPROVED",
+                    "passed": false,
+                    "message": "No approved visual reference with uploaded asset.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "CANONICAL_DNA_LOCKED",
+                    "passed": true,
+                    "message": "Canonical DNA v1 locked.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+                    "passed": true,
+                    "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FINAL_1080P_CHARACTER_VALIDATION",
+                    "passed": false,
+                    "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "VERTICAL_FRAMING",
+                    "passed": true,
+                    "message": "Vertical framing check deferred until model loads.",
+                    "severity": "warning"
+                  },
+                  {
+                    "code": "RENDER_ENGINE_COMPAT",
+                    "passed": true,
+                    "message": "EEVEE/Cycles compatibility deferred until model loads.",
+                    "severity": "warning"
+                  },
+                  {
+                    "code": "LIP_SYNC_CAPABILITY",
+                    "passed": false,
+                    "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+                    "severity": "error"
+                  },
+                  {
+                    "code": "FACIAL_SEMANTIC_MAP",
+                    "passed": false,
+                    "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+                    "severity": "error"
+                  }
+                ],
+                "passed": false,
+                "modelId": "7a8b4a27-8800-4eaa-aa19-393f941af879",
+                "createdAt": "2026-08-11T19:05:28.211Z",
+                "characterId": "22222222-2222-4222-8222-222222222222",
+                "blockedFinal": true,
+                "missingControls": {
+                  "visemes": [],
+                  "productionAssets": [
+                    "CHARACTER_BLEND",
+                    "CHARACTER_GLB",
+                    "REFERENCE_IMAGE",
+                    "TURNAROUND",
+                    "EXPRESSION_SHEET",
+                    "RIG",
+                    "FACIAL_SHAPEKEYS",
+                    "TEXTURE"
+                  ]
+                }
+              },
+              "strict": true,
+              "characterId": "22222222-2222-4222-8222-222222222222",
+              "internalCode": "CHAR_PIP_001"
+            }
+          ],
+          "blockedReason": "CHAR_GOAT_001: production assets/validation failed; CHAR_PIP_001: production assets/validation failed"
+        },
+        "status": "BLOCKED"
+      }
+    ]
+  },
+  "createdAt": "2026-08-11T19:05:28.147Z",
+  "updatedAt": "2026-08-11T19:05:28.232Z",
+  "stages": [
+    {
+      "id": "f595b820-486c-4164-a548-cc05c3824404",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "STORY_APPROVAL",
+      "status": "SUCCEEDED",
+      "startedAt": "2026-08-11T19:05:28.149Z",
+      "finishedAt": "2026-08-11T19:05:28.152Z",
+      "attemptCount": 1,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.153Z"
+    },
+    {
+      "id": "c4f34582-0a82-4441-a0c2-08d7c8789bad",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "CONTINUITY_CHECK",
+      "status": "SUCCEEDED",
+      "startedAt": "2026-08-11T19:05:28.154Z",
+      "finishedAt": "2026-08-11T19:05:28.162Z",
+      "attemptCount": 1,
+      "warnings": null,
+      "errors": null,
+      "outputs": {
+        "score": 97,
+        "passed": true,
+        "warnings": [
+          "High-importance canon may need consideration: Native 3D production uses permanent reusable assets. Generative video providers are optional supplemental tools only."
+        ],
+        "conflicts": [],
+        "threshold": 92
+      },
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.162Z"
+    },
+    {
+      "id": "d582b715-3d4e-4cee-a88c-162940bf7241",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "STORYBOARD",
+      "status": "SUCCEEDED",
+      "startedAt": "2026-08-11T19:05:28.165Z",
+      "finishedAt": "2026-08-11T19:05:28.167Z",
+      "attemptCount": 1,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.168Z"
+    },
+    {
+      "id": "afbd2f38-6f7f-4da4-99b5-c480d7e217d1",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "ASSET_CHECK",
+      "status": "BLOCKED",
+      "startedAt": "2026-08-11T19:05:28.176Z",
+      "finishedAt": "2026-08-11T19:05:28.212Z",
+      "attemptCount": 1,
+      "warnings": null,
+      "errors": null,
+      "outputs": [
+        {
+          "checks": [
+            {
+              "code": "MODEL_EXISTS",
+              "passed": false,
+              "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+              "severity": "error"
+            },
+            {
+              "code": "FILE_LOADABLE",
+              "passed": false,
+              "message": "Cannot load — production file missing.",
+              "severity": "error"
+            },
+            {
+              "code": "RIG_EXISTS",
+              "passed": false,
+              "message": "Approved body rig required.",
+              "severity": "error"
+            },
+            {
+              "code": "FACIAL_RIG_EXISTS",
+              "passed": false,
+              "message": "Approved facial rig required for lip sync.",
+              "severity": "error"
+            },
+            {
+              "code": "TEXTURES_RESOLVE",
+              "passed": false,
+              "message": "Texture set not uploaded.",
+              "severity": "error"
+            },
+            {
+              "code": "MATERIALS_RESOLVE",
+              "passed": false,
+              "message": "Material set not uploaded.",
+              "severity": "warning"
+            },
+            {
+              "code": "REFERENCE_APPROVED",
+              "passed": false,
+              "message": "No approved visual reference with uploaded asset.",
+              "severity": "error"
+            },
+            {
+              "code": "CANONICAL_DNA_LOCKED",
+              "passed": true,
+              "message": "Canonical DNA v1 locked.",
+              "severity": "error"
+            },
+            {
+              "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+              "passed": true,
+              "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+              "severity": "error"
+            },
+            {
+              "code": "FINAL_1080P_CHARACTER_VALIDATION",
+              "passed": false,
+              "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+              "severity": "error"
+            },
+            {
+              "code": "VERTICAL_FRAMING",
+              "passed": true,
+              "message": "Vertical framing check deferred until model loads.",
+              "severity": "warning"
+            },
+            {
+              "code": "RENDER_ENGINE_COMPAT",
+              "passed": true,
+              "message": "EEVEE/Cycles compatibility deferred until model loads.",
+              "severity": "warning"
+            },
+            {
+              "code": "LIP_SYNC_CAPABILITY",
+              "passed": false,
+              "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+              "severity": "error"
+            },
+            {
+              "code": "FACIAL_SEMANTIC_MAP",
+              "passed": false,
+              "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+              "severity": "error"
+            }
+          ],
+          "passed": false,
+          "report": {
+            "id": "1cbd127b-681e-45a6-b4e6-22255b5b845f",
+            "score": 29,
+            "checks": [
+              {
+                "code": "MODEL_EXISTS",
+                "passed": false,
+                "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+                "severity": "error"
+              },
+              {
+                "code": "FILE_LOADABLE",
+                "passed": false,
+                "message": "Cannot load — production file missing.",
+                "severity": "error"
+              },
+              {
+                "code": "RIG_EXISTS",
+                "passed": false,
+                "message": "Approved body rig required.",
+                "severity": "error"
+              },
+              {
+                "code": "FACIAL_RIG_EXISTS",
+                "passed": false,
+                "message": "Approved facial rig required for lip sync.",
+                "severity": "error"
+              },
+              {
+                "code": "TEXTURES_RESOLVE",
+                "passed": false,
+                "message": "Texture set not uploaded.",
+                "severity": "error"
+              },
+              {
+                "code": "MATERIALS_RESOLVE",
+                "passed": false,
+                "message": "Material set not uploaded.",
+                "severity": "warning"
+              },
+              {
+                "code": "REFERENCE_APPROVED",
+                "passed": false,
+                "message": "No approved visual reference with uploaded asset.",
+                "severity": "error"
+              },
+              {
+                "code": "CANONICAL_DNA_LOCKED",
+                "passed": true,
+                "message": "Canonical DNA v1 locked.",
+                "severity": "error"
+              },
+              {
+                "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+                "passed": true,
+                "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+                "severity": "error"
+              },
+              {
+                "code": "FINAL_1080P_CHARACTER_VALIDATION",
+                "passed": false,
+                "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+                "severity": "error"
+              },
+              {
+                "code": "VERTICAL_FRAMING",
+                "passed": true,
+                "message": "Vertical framing check deferred until model loads.",
+                "severity": "warning"
+              },
+              {
+                "code": "RENDER_ENGINE_COMPAT",
+                "passed": true,
+                "message": "EEVEE/Cycles compatibility deferred until model loads.",
+                "severity": "warning"
+              },
+              {
+                "code": "LIP_SYNC_CAPABILITY",
+                "passed": false,
+                "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+                "severity": "error"
+              },
+              {
+                "code": "FACIAL_SEMANTIC_MAP",
+                "passed": false,
+                "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+                "severity": "error"
+              }
+            ],
+            "passed": false,
+            "modelId": "918f8c27-c780-47a8-9f69-63c53f6587dd",
+            "createdAt": "2026-08-11T19:05:28.198Z",
+            "characterId": "33333333-3333-4333-8333-333333333333",
+            "blockedFinal": true,
+            "missingControls": {
+              "visemes": [],
+              "productionAssets": [
+                "CHARACTER_BLEND",
+                "CHARACTER_GLB",
+                "REFERENCE_IMAGE",
+                "TURNAROUND",
+                "EXPRESSION_SHEET",
+                "RIG",
+                "FACIAL_SHAPEKEYS",
+                "TEXTURE"
+              ]
+            }
+          },
+          "strict": true,
+          "characterId": "33333333-3333-4333-8333-333333333333",
+          "internalCode": "CHAR_GOAT_001"
+        },
+        {
+          "checks": [
+            {
+              "code": "MODEL_EXISTS",
+              "passed": false,
+              "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+              "severity": "error"
+            },
+            {
+              "code": "FILE_LOADABLE",
+              "passed": false,
+              "message": "Cannot load — production file missing.",
+              "severity": "error"
+            },
+            {
+              "code": "RIG_EXISTS",
+              "passed": false,
+              "message": "Approved body rig required.",
+              "severity": "error"
+            },
+            {
+              "code": "FACIAL_RIG_EXISTS",
+              "passed": false,
+              "message": "Approved facial rig required for lip sync.",
+              "severity": "error"
+            },
+            {
+              "code": "TEXTURES_RESOLVE",
+              "passed": false,
+              "message": "Texture set not uploaded.",
+              "severity": "error"
+            },
+            {
+              "code": "MATERIALS_RESOLVE",
+              "passed": false,
+              "message": "Material set not uploaded.",
+              "severity": "warning"
+            },
+            {
+              "code": "REFERENCE_APPROVED",
+              "passed": false,
+              "message": "No approved visual reference with uploaded asset.",
+              "severity": "error"
+            },
+            {
+              "code": "CANONICAL_DNA_LOCKED",
+              "passed": true,
+              "message": "Canonical DNA v1 locked.",
+              "severity": "error"
+            },
+            {
+              "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+              "passed": true,
+              "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+              "severity": "error"
+            },
+            {
+              "code": "FINAL_1080P_CHARACTER_VALIDATION",
+              "passed": false,
+              "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+              "severity": "error"
+            },
+            {
+              "code": "VERTICAL_FRAMING",
+              "passed": true,
+              "message": "Vertical framing check deferred until model loads.",
+              "severity": "warning"
+            },
+            {
+              "code": "RENDER_ENGINE_COMPAT",
+              "passed": true,
+              "message": "EEVEE/Cycles compatibility deferred until model loads.",
+              "severity": "warning"
+            },
+            {
+              "code": "LIP_SYNC_CAPABILITY",
+              "passed": false,
+              "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+              "severity": "error"
+            },
+            {
+              "code": "FACIAL_SEMANTIC_MAP",
+              "passed": false,
+              "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+              "severity": "error"
+            }
+          ],
+          "passed": false,
+          "report": {
+            "id": "b3e8c1b2-96c2-4d23-ad05-081fe69ddfdb",
+            "score": 29,
+            "checks": [
+              {
+                "code": "MODEL_EXISTS",
+                "passed": false,
+                "message": "PRODUCTION ASSET REQUIRED — no .blend/.glb uploaded.",
+                "severity": "error"
+              },
+              {
+                "code": "FILE_LOADABLE",
+                "passed": false,
+                "message": "Cannot load — production file missing.",
+                "severity": "error"
+              },
+              {
+                "code": "RIG_EXISTS",
+                "passed": false,
+                "message": "Approved body rig required.",
+                "severity": "error"
+              },
+              {
+                "code": "FACIAL_RIG_EXISTS",
+                "passed": false,
+                "message": "Approved facial rig required for lip sync.",
+                "severity": "error"
+              },
+              {
+                "code": "TEXTURES_RESOLVE",
+                "passed": false,
+                "message": "Texture set not uploaded.",
+                "severity": "error"
+              },
+              {
+                "code": "MATERIALS_RESOLVE",
+                "passed": false,
+                "message": "Material set not uploaded.",
+                "severity": "warning"
+              },
+              {
+                "code": "REFERENCE_APPROVED",
+                "passed": false,
+                "message": "No approved visual reference with uploaded asset.",
+                "severity": "error"
+              },
+              {
+                "code": "CANONICAL_DNA_LOCKED",
+                "passed": true,
+                "message": "Canonical DNA v1 locked.",
+                "severity": "error"
+              },
+              {
+                "code": "PRODUCTION_MODEL_SEPARATE_FROM_REFERENCE",
+                "passed": true,
+                "message": "Reference JPEG must never imply production model readiness without a real .blend/.glb intake.",
+                "severity": "error"
+              },
+              {
+                "code": "FINAL_1080P_CHARACTER_VALIDATION",
+                "passed": false,
+                "message": "1080P character validation BLOCKED — requires Blender model-to-reference review approval.",
+                "severity": "error"
+              },
+              {
+                "code": "VERTICAL_FRAMING",
+                "passed": true,
+                "message": "Vertical framing check deferred until model loads.",
+                "severity": "warning"
+              },
+              {
+                "code": "RENDER_ENGINE_COMPAT",
+                "passed": true,
+                "message": "EEVEE/Cycles compatibility deferred until model loads.",
+                "severity": "warning"
+              },
+              {
+                "code": "LIP_SYNC_CAPABILITY",
+                "passed": false,
+                "message": "Missing lip-sync controls/approval. Missing visemes: facial unapproved",
+                "severity": "error"
+              },
+              {
+                "code": "FACIAL_SEMANTIC_MAP",
+                "passed": false,
+                "message": "FACIAL RIG / LIP SYNC BLOCKED — approved semantic facial map required.",
+                "severity": "error"
+              }
+            ],
+            "passed": false,
+            "modelId": "7a8b4a27-8800-4eaa-aa19-393f941af879",
+            "createdAt": "2026-08-11T19:05:28.211Z",
+            "characterId": "22222222-2222-4222-8222-222222222222",
+            "blockedFinal": true,
+            "missingControls": {
+              "visemes": [],
+              "productionAssets": [
+                "CHARACTER_BLEND",
+                "CHARACTER_GLB",
+                "REFERENCE_IMAGE",
+                "TURNAROUND",
+                "EXPRESSION_SHEET",
+                "RIG",
+                "FACIAL_SHAPEKEYS",
+                "TEXTURE"
+              ]
+            }
+          },
+          "strict": true,
+          "characterId": "22222222-2222-4222-8222-222222222222",
+          "internalCode": "CHAR_PIP_001"
+        }
+      ],
+      "blockedReason": "CHAR_GOAT_001: production assets/validation failed; CHAR_PIP_001: production assets/validation failed",
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.213Z"
+    },
+    {
+      "id": "da2496cc-0488-4164-ab01-01de9ebd28cb",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "VOICE_GENERATION",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "e2fb2edb-57a7-4213-b36c-960e83626167",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "ANIMATION",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "14e471c0-c293-4ba8-9b72-6068a7ccf223",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "PREFLIGHT",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "a592d5dc-e296-478c-b156-699ba17387f9",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "DOODLE_GUARDIAN",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "aadcf153-3d33-4999-834c-785386220546",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "DRAFT_RENDER",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "04a0d470-59ab-41e4-91b9-2783f937e76c",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "QC",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "0d9f3e0e-8dd5-4d10-a7c5-4a183490514e",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "FINAL_RENDER",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "41922570-2523-48a3-8a59-295056911399",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "AUDIO_POST",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "24be366d-23bf-45e5-b3d3-8cf516b65720",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "CAPTIONS",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "45411754-3a04-4f59-a42b-232a6f4b3247",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "PUBLISHING_PACKAGE",
+      "status": "PENDING",
+      "startedAt": null,
+      "finishedAt": null,
+      "attemptCount": 0,
+      "warnings": null,
+      "errors": null,
+      "outputs": null,
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.147Z"
+    },
+    {
+      "id": "a13da55f-f1b2-4954-9cab-1b3c43c70e85",
+      "pipelineRunId": "d6359b82-ef20-4cae-8d4d-4e6f707cfff2",
+      "stage": "SHOT_PLANNING",
+      "status": "SUCCEEDED",
+      "startedAt": "2026-08-11T19:05:28.169Z",
+      "finishedAt": "2026-08-11T19:05:28.173Z",
+      "attemptCount": 1,
+      "warnings": null,
+      "errors": null,
+      "outputs": {
+        "mode": "BALANCED_CINEMATIC",
+        "totals": {
+          "count": 4,
+          "estimatedMinutes": 30,
+          "estimatedCostUnits": 93.75,
+          "averageCinematicImportance": 68
+        },
+        "shotPlans": [
+          {
+            "shotId": "64b2b65e-a3dd-45c9-b760-09e6045984fe",
+            "rationale": [
+              "Approved 3D assets or cinematic priority justify native 3D."
+            ],
+            "renderMode": "NATIVE_3D",
+            "estimatedMinutes": 4,
+            "estimatedCostUnits": 12.5,
+            "cinematicImportance": 68
+          },
+          {
+            "shotId": "bdee7315-88b8-463a-b80e-024f4ac7df4c",
+            "rationale": [
+              "Approved 3D assets or cinematic priority justify native 3D."
+            ],
+            "renderMode": "NATIVE_3D",
+            "estimatedMinutes": 8,
+            "estimatedCostUnits": 25,
+            "cinematicImportance": 68
+          },
+          {
+            "shotId": "287f029f-ffd3-4cf9-ab46-adeb036f5512",
+            "rationale": [
+              "Approved 3D assets or cinematic priority justify native 3D."
+            ],
+            "renderMode": "NATIVE_3D",
+            "estimatedMinutes": 10,
+            "estimatedCostUnits": 31.25,
+            "cinematicImportance": 68
+          },
+          {
+            "shotId": "26e2fd07-da17-4625-8b42-dfe9d51bca0a",
+            "rationale": [
+              "Approved 3D assets or cinematic priority justify native 3D."
+            ],
+            "renderMode": "NATIVE_3D",
+            "estimatedMinutes": 8,
+            "estimatedCostUnits": 25,
+            "cinematicImportance": 68
+          }
+        ]
+      },
+      "blockedReason": null,
+      "createdAt": "2026-08-11T19:05:28.147Z",
+      "updatedAt": "2026-08-11T19:05:28.174Z"
+    }
+  ]
+}

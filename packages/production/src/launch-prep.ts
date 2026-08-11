@@ -1457,7 +1457,8 @@ export class BlenderWorkerHealthService {
       [
         '-b',
         '--python-expr',
-        `import bpy; bpy.ops.wm.read_factory_settings(use_empty=True); bpy.ops.mesh.primitive_cube_add(); bpy.context.scene.render.resolution_x=64; bpy.context.scene.render.resolution_y=64; bpy.context.scene.render.filepath=r'${tmpOut}'; bpy.ops.render.render(write_still=True); print('DOODLE_SELFTEST_OK')`,
+        // Empty factory scenes have no camera — add one for a real still render.
+        `import bpy; bpy.ops.wm.read_factory_settings(use_empty=True); bpy.ops.mesh.primitive_cube_add(); cam=bpy.data.objects.new('SelfTestCam', bpy.data.cameras.new('SelfTestCam')); bpy.context.collection.objects.link(cam); cam.location=(0.0,-4.5,1.8); cam.rotation_euler=(1.2,0.0,0.0); bpy.context.scene.camera=cam; bpy.ops.object.light_add(type='SUN', location=(2,2,6)); bpy.context.scene.render.engine='BLENDER_EEVEE'; bpy.context.scene.render.resolution_x=64; bpy.context.scene.render.resolution_y=64; bpy.context.scene.render.filepath=r'${tmpOut}'; bpy.context.scene.render.image_settings.file_format='PNG'; bpy.ops.render.render(write_still=True); print('DOODLE_SELFTEST_OK')`,
       ],
       { encoding: 'utf8', timeout: 120_000 },
     );

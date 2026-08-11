@@ -1,0 +1,145 @@
+{
+  "id": "c9741714-5aee-425a-8a03-0d3c044396b7",
+  "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+  "kind": "FINAL",
+  "locked": true,
+  "manifest": {
+    "sfx": [],
+    "kind": "FINAL",
+    "music": [],
+    "shots": [
+      {
+        "n": 1,
+        "id": "88fdd8dd-75c8-43da-8bca-a6c5b11ad9c9",
+        "renderMode": null,
+        "cameraPreset": "WIDE",
+        "renderEngine": "EEVEE",
+        "renderPreset": "FINAL_1080P",
+        "lightingPreset": "DEFAULT_KEY_FILL"
+      },
+      {
+        "n": 2,
+        "id": "9bc88294-67fa-418d-885d-e983c20fad66",
+        "renderMode": null,
+        "cameraPreset": "WIDE",
+        "renderEngine": "EEVEE",
+        "renderPreset": "FINAL_1080P",
+        "lightingPreset": "DEFAULT_KEY_FILL"
+      },
+      {
+        "n": 3,
+        "id": "6d25585e-d1d4-4fb0-bf40-0ee6d3cb1b78",
+        "renderMode": null,
+        "cameraPreset": "PUSH_IN",
+        "renderEngine": "EEVEE",
+        "renderPreset": "FINAL_1080P",
+        "lightingPreset": "DEFAULT_KEY_FILL"
+      }
+    ],
+    "story": {
+      "title": "[DIAGNOSTIC] Production Pipeline Test",
+      "status": "IN_PRODUCTION",
+      "version": "IN_PRODUCTION"
+    },
+    "output": {
+      "fps": 30,
+      "width": 1080,
+      "engine": "EEVEE",
+      "height": 1920
+    },
+    "profile": "DOODLE_DASH_SHORTS",
+    "lighting": [
+      "DEFAULT_KEY_FILL"
+    ],
+    "lockedAt": "2026-08-11T19:17:54.747Z",
+    "qcReport": null,
+    "episodeId": "85875cc1-eae1-4d26-9751-941fb6edd525",
+    "animations": [],
+    "characters": [
+      {
+        "code": "CHAR_GOAT_001",
+        "dnaVersion": 1,
+        "rigVersion": "787d3f47-9411-472f-be6e-1ab71ae8b83a",
+        "characterId": "33333333-3333-4333-8333-333333333333",
+        "modelVersion": null,
+        "voiceVersion": null,
+        "modelIntakeId": null,
+        "accessoryState": {
+          "collar": "PRESENT",
+          "goatTag": "PRESENT",
+          "tagText": "GOAT"
+        },
+        "materialVersion": null,
+        "referenceVersion": null,
+        "animationVersions": []
+      },
+      {
+        "code": "CHAR_PIP_001",
+        "dnaVersion": 1,
+        "rigVersion": "09c871cc-4126-4885-b09b-e22ffeaa4de9",
+        "characterId": "22222222-2222-4222-8222-222222222222",
+        "modelVersion": null,
+        "voiceVersion": null,
+        "modelIntakeId": null,
+        "accessoryState": {
+          "backpack": "PRESENT",
+          "starCharm": "PRESENT"
+        },
+        "materialVersion": null,
+        "referenceVersion": null,
+        "animationVersions": []
+      }
+    ],
+    "philosophy": "CREATE_ONCE_VALIDATE_VERSION_LOCK_REUSE_ASSEMBLE_RENDER",
+    "pipVersion": {
+      "code": "CHAR_PIP_001",
+      "characterId": "22222222-2222-4222-8222-222222222222",
+      "modelVersion": null,
+      "voiceVersion": null,
+      "accessoryState": {
+        "backpack": "PRESENT",
+        "starCharm": "PRESENT"
+      },
+      "referenceVersion": null
+    },
+    "audioAssets": [],
+    "goatVersion": {
+      "code": "CHAR_GOAT_001",
+      "characterId": "33333333-3333-4333-8333-333333333333",
+      "modelVersion": null,
+      "voiceVersion": null,
+      "accessoryState": {
+        "collar": "PRESENT",
+        "goatTag": "PRESENT",
+        "tagText": "GOAT"
+      },
+      "referenceVersion": null
+    },
+    "draftProfile": {
+      "code": "DRAFT_FAST",
+      "width": 540,
+      "engine": "EEVEE",
+      "height": 960
+    },
+    "finalProfile": {
+      "code": "FINAL_1080P",
+      "width": 1080,
+      "engine": "EEVEE",
+      "height": 1920
+    },
+    "renderPreset": "FINAL_1080P",
+    "cameraPresets": [
+      "WIDE",
+      "PUSH_IN"
+    ],
+    "episodeVersion": "2026-08-11T19:05:28.395Z",
+    "guardianReport": null,
+    "renderTimestamps": [],
+    "localComputeUnits": 0,
+    "actualExternalCosts": 0,
+    "aiVideoEnabledDefault": false,
+    "estimatedExternalCosts": 0
+  },
+  "storageKey": "manifests/85875cc1-eae1-4d26-9751-941fb6edd525/FINAL/1786475874760",
+  "createdAt": "2026-08-11T19:17:54.766Z"
+}
