@@ -1099,6 +1099,315 @@ async function seed() {
     },
   });
 
+  // Production readiness: Shorts profile, intake slots, voice configs (no invented IDs)
+  await prisma.shortsProductionProfile.upsert({
+    where: { code: 'DOODLE_DASH_SHORTS' },
+    update: {},
+    create: {
+      code: 'DOODLE_DASH_SHORTS',
+      name: 'Doodle Dash Shorts',
+      width: 1080,
+      height: 1920,
+      aspectRatio: '9:16',
+      fps: 30,
+      allowedDurations: [15, 30, 45, 60],
+      titleSafePct: 0.1,
+      captionSafePct: 0.15,
+      config: {
+        openingHookSeconds: 2,
+        mobileCropPreview: true,
+        compositionGuides: true,
+      },
+    },
+  });
+
+  for (const character of [pip, goat]) {
+    await prisma.voiceProductionConfig.upsert({
+      where: { characterId: character.id },
+      update: {},
+      create: {
+        characterId: character.id,
+        provider: null,
+        voiceId: null,
+        approved: false,
+        blockedReason: 'Voice provider ID not configured.',
+      },
+    });
+  }
+
+  const intakeKinds = [
+    'CHARACTER_BLEND',
+    'CHARACTER_GLB',
+    'REFERENCE_IMAGE',
+    'TURNAROUND',
+    'EXPRESSION_SHEET',
+    'RIG',
+    'FACIAL_SHAPEKEYS',
+    'TEXTURE',
+  ] as const;
+  for (const character of [pip, goat]) {
+    for (const kind of intakeKinds) {
+      const existing = await prisma.productionAssetIntake.findFirst({
+        where: { entityType: 'character', entityId: character.id, kind },
+      });
+      if (!existing) {
+        await prisma.productionAssetIntake.create({
+          data: {
+            universeId: universe.id,
+            entityType: 'character',
+            entityId: character.id,
+            kind,
+            approvalStatus: 'MISSING',
+            productionReady: false,
+            missingReason: `PRODUCTION ASSET REQUIRED for ${character.internalCode}: ${kind}`,
+            notes: 'Intake slot reserved. Upload real production file to proceed.',
+          },
+        });
+      }
+    }
+  }
+
+  for (const location of [meadow, creek]) {
+    for (const kind of [
+      'LOCATION_BLEND',
+      'LOCATION_PROP',
+      'TEXTURE',
+      'LIGHTING_SETUP',
+      'REFERENCE_IMAGE',
+    ] as const) {
+      const existing = await prisma.productionAssetIntake.findFirst({
+        where: { entityType: 'location', entityId: location.id, kind },
+      });
+      if (!existing) {
+        await prisma.productionAssetIntake.create({
+          data: {
+            universeId: universe.id,
+            entityType: 'location',
+            entityId: location.id,
+            kind,
+            approvalStatus: 'MISSING',
+            productionReady: false,
+            missingReason: `PRODUCTION ASSET REQUIRED for ${location.internalCode}: ${kind}`,
+          },
+        });
+      }
+    }
+  }
+
+  // INTERNAL production-test season + vertical-slice episode (does not overwrite Season 1 canon)
+  const testSeason = await prisma.season.upsert({
+    where: {
+      universeId_seasonNumber: { universeId: universe.id, seasonNumber: 99 },
+    },
+    update: {
+      approvedForProduction: true,
+      title: 'INTERNAL: Production Test Season',
+    },
+    create: {
+      universeId: universe.id,
+      seasonNumber: 99,
+      title: 'INTERNAL: Production Test Season',
+      logline: 'Internal-only season for pipeline vertical-slice testing. Not public canon.',
+      theme: 'production readiness',
+      targetEpisodeCount: 1,
+      status: 'APPROVED',
+      approvalStatus: 'APPROVED',
+      approvedForProduction: true,
+      proposal: {
+        type: 'INTERNAL_PRODUCTION_TEST',
+        publicCanon: false,
+        notes: 'Do not treat as Season 1 story canon.',
+      },
+    },
+  });
+
+  const verticalSlice = await prisma.episode.upsert({
+    where: {
+      universeId_seasonId_episodeNumber: {
+        universeId: universe.id,
+        seasonId: testSeason.id,
+        episodeNumber: 1,
+      },
+    },
+    update: {
+      title: '[PRODUCTION TEST] Meadow Map Mystery',
+      status: 'APPROVED',
+    },
+    create: {
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      universeId: universe.id,
+      seasonId: testSeason.id,
+      episodeNumber: 1,
+      title: '[PRODUCTION TEST] Meadow Map Mystery',
+      logline: 'Pip and Goat find a map in the meadow and wonder where it leads.',
+      synopsis:
+        'INTERNAL PRODUCTION TEST ONLY. Pip is a founding character of the Doodle Dash Universe (CHAR_PIP_001). Goat is a founding character of the Doodle Dash Universe (CHAR_GOAT_001). The show brand is Doodle Dash TV. Pip and Goat discover Adventure Map in Sunny Meadow, ask a question, and end on a gentle cliffhanger. Not Season 1 canon.',
+      durationSec: 30,
+      hook: 'A folded map flutters into the meadow grass.',
+      objective: 'Figure out what the map is for.',
+      problem: 'The map is upside down and confusing.',
+      conflict: 'Pip wants to run; Goat wants to study it.',
+      adventure: 'They try walking in two directions and laugh.',
+      characterMoment: 'They decide to explore together.',
+      emotionalBeat: 'curiosity + teamwork',
+      resolution: 'They agree to follow one path tomorrow.',
+      lesson: 'Friends solve puzzles better together.',
+      callback: 'Map stays tucked under the oak.',
+      nextEpisodeSeed: 'Where does the first path lead?',
+      status: 'APPROVED',
+    },
+  });
+
+  const storyboard = await prisma.storyboard.upsert({
+    where: { id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' },
+    update: {},
+    create: {
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      episodeId: verticalSlice.id,
+      title: 'Vertical slice storyboard',
+      status: 'APPROVED',
+    },
+  });
+
+  for (const panel of [
+    { n: 1, desc: 'Hook: map flutters into meadow (first-frame interest).' },
+    { n: 2, desc: 'Pip and Goat react; dialogue begins.' },
+    { n: 3, desc: 'They move; camera follows; cliffhanger on path.' },
+  ]) {
+    await prisma.storyboardPanel.upsert({
+      where: {
+        storyboardId_panelNumber: { storyboardId: storyboard.id, panelNumber: panel.n },
+      },
+      update: { action: panel.desc },
+      create: {
+        storyboardId: storyboard.id,
+        panelNumber: panel.n,
+        action: panel.desc,
+        locationCode: 'LOC_MEADOW_001',
+        characters: [pip.internalCode, goat.internalCode],
+        status: 'APPROVED',
+      },
+    });
+  }
+
+  const scene = await prisma.scene.upsert({
+    where: {
+      episodeId_sceneNumber: { episodeId: verticalSlice.id, sceneNumber: 1 },
+    },
+    update: {},
+    create: {
+      episodeId: verticalSlice.id,
+      storyboardId: storyboard.id,
+      sceneNumber: 1,
+      title: 'Meadow discovery',
+      description: 'Pip and Goat find the map in Sunny Meadow.',
+      locationId: meadow.id,
+      characterIds: [pip.id, goat.id],
+      emotionalBeat: 'curiosity',
+      durationSec: 30,
+      lightingPreset: 'sunnyPlayroom',
+    },
+  });
+
+  const shotSpecs = [
+    {
+      n: 1,
+      desc: 'Opening hook: map flutters into grass; Pip moves closer.',
+      dur: 4,
+      cam: 'storyWide',
+      chars: [pip.id, goat.id],
+    },
+    {
+      n: 2,
+      desc: 'Dialogue medium: Pip asks Goat what the map is.',
+      dur: 8,
+      cam: 'storyMedium',
+      chars: [pip.id, goat.id],
+    },
+    {
+      n: 3,
+      desc: 'They walk two directions, reunite, camera push to path cliffhanger.',
+      dur: 10,
+      cam: 'storyTracking',
+      chars: [pip.id, goat.id],
+    },
+    {
+      n: 4,
+      desc: 'Close-up map under oak; gentle SFX; caption end card space.',
+      dur: 8,
+      cam: 'storyClose',
+      chars: [pip.id, goat.id],
+    },
+  ];
+  for (const shot of shotSpecs) {
+    await prisma.shot.upsert({
+      where: { sceneId_shotNumber: { sceneId: scene.id, shotNumber: shot.n } },
+      update: { description: shot.desc },
+      create: {
+        sceneId: scene.id,
+        shotNumber: shot.n,
+        description: shot.desc,
+        cameraPreset: shot.cam,
+        lightingPreset: 'sunnyPlayroom',
+        durationSeconds: shot.dur,
+        characterIds: shot.chars,
+        productionNotes: 'Vertical slice — exercises movement, dialogue, camera, captions plan.',
+        renderMode: 'NATIVE_3D',
+        status: 'PLANNED',
+      },
+    });
+  }
+
+  const dialogueCount = await prisma.dialogueLine.count({ where: { episodeId: verticalSlice.id } });
+  if (dialogueCount === 0) {
+    await prisma.dialogueLine.createMany({
+      data: [
+        {
+          episodeId: verticalSlice.id,
+          speakerId: pip.id,
+          text: 'Goat! Look — a map!',
+          startMs: 4000,
+          endMs: 6500,
+          emotion: 'excited',
+          intensity: 70,
+        },
+        {
+          episodeId: verticalSlice.id,
+          speakerId: goat.id,
+          text: 'Hmm. It is upside down.',
+          startMs: 7000,
+          endMs: 9500,
+          emotion: 'thoughtful',
+          intensity: 40,
+        },
+        {
+          episodeId: verticalSlice.id,
+          speakerId: pip.id,
+          text: 'Then we explore both ways — together!',
+          startMs: 16000,
+          endMs: 19000,
+          emotion: 'happy',
+          intensity: 65,
+        },
+      ],
+    });
+  }
+
+  await prisma.storyThread.upsert({
+    where: { id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc' },
+    update: {},
+    create: {
+      id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      universeId: universe.id,
+      seasonId: testSeason.id,
+      episodeId: verticalSlice.id,
+      title: 'INTERNAL: Map mystery thread',
+      summary: 'Production-test continuity thread for the meadow map.',
+      priority: 10,
+      status: 'OPEN',
+    },
+  });
+
   console.log('Seed complete:', {
     universe: universe.name,
     pip: pip.internalCode,
@@ -1110,6 +1419,8 @@ async function seed() {
     locations: [meadow.internalCode, creek.internalCode],
     prop: mapProp.internalCode,
     season: season.title,
+    verticalSlice: verticalSlice.title,
+    testSeason: testSeason.title,
   });
 }
 

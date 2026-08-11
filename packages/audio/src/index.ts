@@ -207,6 +207,84 @@ export class DialogueService {
 export class LipSyncService {
   constructor(private readonly repository: KeyValueRepository<LipSyncTimeline> = new InMemoryRepository<LipSyncTimeline>()) {}
 
+  /** Required mouth/viseme controls for final production lip sync. */
+  static readonly REQUIRED_VISEMES = [
+    'A',
+    'E',
+    'I',
+    'O',
+    'U',
+    'M_B_P',
+    'F_V',
+    'L',
+    'TH',
+    'REST',
+  ] as const;
+
+  /**
+   * Per-character viseme mapping helper. Final render must be blocked if controls are missing.
+   */
+  assertFacialControlsForFinal(input: {
+    characterCode: string;
+    approvedFacialRig: boolean;
+    availableVisemes: string[];
+    characterVisemeMap?: Record<string, string>;
+  }) {
+    const mapped = input.characterVisemeMap
+      ? LipSyncService.REQUIRED_VISEMES.map((v) => input.characterVisemeMap![v] ?? v)
+      : [...LipSyncService.REQUIRED_VISEMES];
+    const missing = mapped.filter((v) => !input.availableVisemes.includes(v));
+    if (!input.approvedFacialRig || missing.length) {
+      throw new AppError(
+        `Lip-sync blocked for ${input.characterCode}. Missing mouth controls: ${
+          missing.join(', ') || 'facial rig unapproved'
+        }`,
+        'LIP_SYNC_CONTROLS_MISSING',
+        409,
+      );
+    }
+    return { ok: true as const, mappedVisemes: mapped };
+  }
+
+  /**
+   * Pipeline: dialogue → voice audio → phoneme/viseme extraction → timed mouth animation.
+   * Does not invent audio; requires cues from a real extractor or manual timing.
+   */
+  async buildFromDialogueAudio(input: {
+    dialogueLineId: string;
+    audioAssetId?: string;
+    cues: VisemeCue[];
+    characterCode: string;
+    approvedFacialRig: boolean;
+    availableVisemes: string[];
+    characterVisemeMap?: Record<string, string>;
+  }) {
+    this.assertFacialControlsForFinal(input);
+    if (!input.audioAssetId) {
+      throw new AppError(
+        'Voice audio asset required before lip-sync timing.',
+        'LIP_SYNC_AUDIO_REQUIRED',
+        409,
+      );
+    }
+    if (!input.cues.length) {
+      throw new AppError(
+        'Phoneme/viseme cues required — extraction not fabricated.',
+        'LIP_SYNC_CUES_REQUIRED',
+        409,
+      );
+    }
+    return this.persistTimeline({
+      dialogueLineId: input.dialogueLineId,
+      audioAssetId: input.audioAssetId,
+      cues: input.cues,
+      metadata: {
+        characterCode: input.characterCode,
+        pipeline: ['dialogue', 'voice_audio', 'phoneme_viseme', 'mouth_animation', 'validation'],
+      },
+    });
+  }
+
   async persistTimeline(input: {
     id?: string;
     dialogueLineId: string;

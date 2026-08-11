@@ -1426,3 +1426,283 @@ model CharacterTimelineEvent {
   @@index([characterId])
   @@map("character_timeline_events")
 }
+
+// ============================================================
+// Production Readiness + First Episode Vertical Slice
+// ============================================================
+
+enum ProductionReadinessState {
+  READY
+  WARNING
+  BLOCKED
+  NOT_CONFIGURED
+}
+
+enum IntakeAssetKind {
+  CHARACTER_BLEND
+  CHARACTER_GLB
+  CHARACTER_GLTF
+  CHARACTER_FBX
+  TEXTURE
+  MATERIAL
+  RIG
+  FACIAL_SHAPEKEYS
+  REFERENCE_IMAGE
+  TURNAROUND
+  EXPRESSION_SHEET
+  POSE_REFERENCE
+  LOCATION_BLEND
+  LOCATION_PROP
+  LIGHTING_SETUP
+  OTHER
+}
+
+enum PipelineStageCode {
+  STORY_APPROVAL
+  CONTINUITY_CHECK
+  STORYBOARD
+  SHOT_PLANNING
+  ASSET_CHECK
+  VOICE_GENERATION
+  ANIMATION
+  PREFLIGHT
+  DOODLE_GUARDIAN
+  DRAFT_RENDER
+  QC
+  FINAL_RENDER
+  AUDIO_POST
+  CAPTIONS
+  PUBLISHING_PACKAGE
+}
+
+enum PipelineStageStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  BLOCKED
+  SKIPPED
+}
+
+model ProductionAssetIntake {
+  id               String          @id @default(uuid()) @db.Uuid
+  universeId       String          @map("universe_id") @db.Uuid
+  entityType       String          @map("entity_type")
+  entityId         String          @map("entity_id") @db.Uuid
+  kind             IntakeAssetKind
+  assetId          String?         @map("asset_id") @db.Uuid
+  originalFilename String?         @map("original_filename")
+  mimeType         String?         @map("mime_type")
+  storageLocation  String?         @map("storage_location")
+  checksum         String?
+  version          Int             @default(1)
+  source           String?
+  approvalStatus   String          @default("PENDING") @map("approval_status")
+  rigStatus        String?         @map("rig_status")
+  facialRigStatus  String?         @map("facial_rig_status")
+  textureStatus    String?         @map("texture_status")
+  productionReady  Boolean         @default(false) @map("production_ready")
+  approvedBy       String?         @map("approved_by")
+  notes            String?
+  missingReason    String?         @map("missing_reason")
+  uploadedAt       DateTime?       @map("uploaded_at")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  @@index([entityType, entityId])
+  @@index([kind, approvalStatus])
+  @@map("production_asset_intakes")
+}
+
+model CharacterValidationReport {
+  id              String   @id @default(uuid()) @db.Uuid
+  characterId     String   @map("character_id") @db.Uuid
+  modelId         String?  @map("model_id") @db.Uuid
+  passed          Boolean  @default(false)
+  blockedFinal    Boolean  @default(true) @map("blocked_final")
+  score           Int      @default(0)
+  checks          Json
+  missingControls Json?    @map("missing_controls")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([characterId, createdAt])
+  @@map("character_validation_reports")
+}
+
+model ApprovedCharacterReference {
+  id                 String   @id @default(uuid()) @db.Uuid
+  characterId        String   @map("character_id") @db.Uuid
+  characterVersionId String?  @map("character_version_id") @db.Uuid
+  referenceImageId   String?  @map("reference_image_id") @db.Uuid
+  role               String   @default("PRIMARY")
+  immutable          Boolean  @default(false)
+  approvedAt         DateTime? @map("approved_at")
+  approvedBy         String?  @map("approved_by")
+  palette            Json?
+  proportions        Json?
+  silhouette         String?
+  clothing           String?
+  accessories        String?
+  forbiddenChanges   String?  @map("forbidden_changes")
+  notes              String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([characterId, role])
+  @@map("approved_character_references")
+}
+
+model VoiceProductionConfig {
+  id                     String   @id @default(uuid()) @db.Uuid
+  characterId            String   @unique @map("character_id") @db.Uuid
+  voiceProfileId         String?  @map("voice_profile_id") @db.Uuid
+  provider               String?
+  voiceId                String?  @map("voice_id")
+  voiceVersion           String?  @map("voice_version")
+  speed                  Float?
+  pitch                  Float?
+  stability              Float?
+  pronunciationDictionary Json?   @map("pronunciation_dictionary")
+  emotionalDelivery      Json?    @map("emotional_delivery")
+  approved               Boolean  @default(false)
+  approvedBy             String?  @map("approved_by")
+  approvedAt             DateTime? @map("approved_at")
+  auditionNotes          String?  @map("audition_notes")
+  blockedReason          String?  @map("blocked_reason")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@map("voice_production_configs")
+}
+
+model ShotAnimationPackage {
+  id              String   @id @default(uuid()) @db.Uuid
+  shotId          String   @map("shot_id") @db.Uuid
+  episodeId       String?  @map("episode_id") @db.Uuid
+  packageVersion  Int      @default(1) @map("package_version")
+  instructions    Json
+  characterPlacements Json? @map("character_placements")
+  camera          Json?
+  lighting        Json?
+  props           Json?
+  vfx             Json?
+  lipSyncRefs     Json?    @map("lip_sync_refs")
+  status          String   @default("DRAFT")
+  blockedReasons  Json?    @map("blocked_reasons")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([shotId])
+  @@map("shot_animation_packages")
+}
+
+model EpisodePipelineRun {
+  id              String   @id @default(uuid()) @db.Uuid
+  episodeId       String   @map("episode_id") @db.Uuid
+  profileCode     String   @default("DOODLE_DASH_SHORTS") @map("profile_code")
+  status          String   @default("PENDING")
+  currentStage    String?  @map("current_stage")
+  resumable       Boolean  @default(true)
+  costEstimate    Float?   @map("cost_estimate")
+  costActual      Float?   @map("cost_actual")
+  durationTargetSec Int?   @map("duration_target_sec")
+  errorSummary    String?  @map("error_summary")
+  observability   Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  stages EpisodePipelineStage[]
+
+  @@index([episodeId, createdAt])
+  @@map("episode_pipeline_runs")
+}
+
+model EpisodePipelineStage {
+  id            String              @id @default(uuid()) @db.Uuid
+  pipelineRunId String              @map("pipeline_run_id") @db.Uuid
+  stage         PipelineStageCode
+  status        PipelineStageStatus @default(PENDING)
+  startedAt     DateTime?           @map("started_at")
+  finishedAt    DateTime?           @map("finished_at")
+  attemptCount  Int                 @default(0) @map("attempt_count")
+  warnings      Json?
+  errors        Json?
+  outputs       Json?
+  blockedReason String?             @map("blocked_reason")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+
+  pipelineRun EpisodePipelineRun @relation(fields: [pipelineRunId], references: [id], onDelete: Cascade)
+
+  @@unique([pipelineRunId, stage])
+  @@map("episode_pipeline_stages")
+}
+
+model ProductionReadinessSnapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  universeId String   @map("universe_id") @db.Uuid
+  area       String
+  entityKey  String   @map("entity_key")
+  state      ProductionReadinessState
+  reason     String
+  details    Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([universeId, area])
+  @@map("production_readiness_snapshots")
+}
+
+model ShortsProductionProfile {
+  id                String   @id @default(uuid()) @db.Uuid
+  code              String   @unique @default("DOODLE_DASH_SHORTS")
+  name              String   @default("Doodle Dash Shorts")
+  width             Int      @default(1080)
+  height            Int      @default(1920)
+  aspectRatio       String   @default("9:16") @map("aspect_ratio")
+  fps               Int      @default(30)
+  allowedDurations  Int[]    @default([15, 30, 45, 60]) @map("allowed_durations")
+  titleSafePct      Float    @default(0.1) @map("title_safe_pct")
+  captionSafePct    Float    @default(0.15) @map("caption_safe_pct")
+  config            Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("shorts_production_profiles")
+}
+
+model EpisodePacingReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  episodeId   String   @map("episode_id") @db.Uuid
+  metrics     Json
+  warnings    Json?
+  guidance    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([episodeId])
+  @@map("episode_pacing_reports")
+}
+
+model ProductionJobObservation {
+  id               String   @id @default(uuid()) @db.Uuid
+  jobId            String   @map("job_id")
+  jobType          String   @map("job_type")
+  episodeId        String?  @map("episode_id") @db.Uuid
+  sceneId          String?  @map("scene_id") @db.Uuid
+  shotId           String?  @map("shot_id") @db.Uuid
+  characterVersions Json?   @map("character_versions")
+  assetVersions    Json?    @map("asset_versions")
+  provider         String?
+  model            String?
+  startedAt        DateTime? @map("started_at")
+  finishedAt       DateTime? @map("finished_at")
+  durationMs       Int?     @map("duration_ms")
+  costUnits        Float?   @map("cost_units")
+  warnings         Json?
+  errors           Json?
+  retryCount       Int      @default(0) @map("retry_count")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([jobType, jobId])
+  @@index([episodeId])
+  @@map("production_job_observations")
+}
