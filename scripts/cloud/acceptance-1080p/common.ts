@@ -39,9 +39,10 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * All three constants must be re-pinned together whenever the image is rebuilt.
  */
 export const WORKER_IMAGE =
-  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882'; // pragma: allowlist secret
-export const WORKER_IMAGE_SOURCE_COMMIT = 'PENDING_REBUILD';
-export const WORKER_IMAGE_RENDER_CODE_SHA256 = 'PENDING_REBUILD';
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = 'bb5270372ad558e71673fe789260a12fb51a9c6d';
+export const WORKER_IMAGE_RENDER_CODE_SHA256 =
+  'c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91';
 
 export const HARD_CAP_USD = 0.25;
 
