@@ -1,0 +1,1956 @@
+{
+  "sampleFrames": [
+    1,
+    10,
+    20,
+    30
+  ],
+  "cameraMotionCountedAsCharacterMotion": false,
+  "assets": {
+    "pip": {
+      "role": "pip",
+      "blend": "/tmp/ddp-rigging-repair/assets/characters/pip/pip_v1_1.blend",
+      "armature": "Pip_Rig",
+      "mesh": "Pip_Character",
+      "accessories": [
+        "Pip_StarCharm",
+        "Pip_Backpack_Pouch",
+        "Pip_Backpack"
+      ],
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.05
+          ]
+        },
+        {
+          "name": "pelvis",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.12
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.2
+          ]
+        },
+        {
+          "name": "spine",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.2
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.32
+          ]
+        },
+        {
+          "name": "chest",
+          "parent": "spine",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.32
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.38
+          ]
+        },
+        {
+          "name": "neck",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.01,
+            0.38
+          ],
+          "tail": [
+            0.0,
+            -0.02,
+            0.42
+          ]
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.02,
+            0.42
+          ],
+          "tail": [
+            0.0,
+            -0.04,
+            0.52
+          ]
+        },
+        {
+          "name": "comb",
+          "parent": "head",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.02,
+            0.5
+          ],
+          "tail": [
+            0.0,
+            -0.02,
+            0.56
+          ]
+        },
+        {
+          "name": "wing_L",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            -0.08,
+            0.0,
+            0.26
+          ],
+          "tail": [
+            -0.18,
+            0.0,
+            0.22
+          ]
+        },
+        {
+          "name": "wing_R",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.08,
+            0.0,
+            0.26
+          ],
+          "tail": [
+            0.18,
+            0.0,
+            0.22
+          ]
+        },
+        {
+          "name": "backpack",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.1,
+            0.26
+          ],
+          "tail": [
+            0.0,
+            0.16,
+            0.26
+          ]
+        },
+        {
+          "name": "leg_L",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            -0.05,
+            0.0,
+            0.14
+          ],
+          "tail": [
+            -0.05,
+            0.0,
+            0.04
+          ]
+        },
+        {
+          "name": "foot_L",
+          "parent": "leg_L",
+          "use_deform": true,
+          "head": [
+            -0.05,
+            0.0,
+            0.04
+          ],
+          "tail": [
+            -0.05,
+            -0.04,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_R",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            0.05,
+            0.0,
+            0.14
+          ],
+          "tail": [
+            0.05,
+            0.0,
+            0.04
+          ]
+        },
+        {
+          "name": "foot_R",
+          "parent": "leg_R",
+          "use_deform": true,
+          "head": [
+            0.05,
+            0.0,
+            0.04
+          ],
+          "tail": [
+            0.05,
+            -0.04,
+            0.02
+          ]
+        }
+      ],
+      "poseRotationModes": {
+        "root": "XYZ",
+        "pelvis": "XYZ",
+        "spine": "XYZ",
+        "chest": "XYZ",
+        "neck": "XYZ",
+        "head": "XYZ",
+        "comb": "XYZ",
+        "wing_L": "XYZ",
+        "wing_R": "XYZ",
+        "backpack": "XYZ",
+        "leg_L": "XYZ",
+        "foot_L": "XYZ",
+        "leg_R": "XYZ",
+        "foot_R": "XYZ"
+      },
+      "modifiers": [
+        {
+          "name": "Auto Smooth",
+          "type": "NODES",
+          "object": null,
+          "use_vertex_groups": null,
+          "use_bone_envelopes": null
+        },
+        {
+          "name": "Armature",
+          "type": "ARMATURE",
+          "object": "Pip_Rig",
+          "use_vertex_groups": true,
+          "use_bone_envelopes": false
+        }
+      ],
+      "vertexGroups": [
+        {
+          "name": "root",
+          "weightedVerts": 255
+        },
+        {
+          "name": "pelvis",
+          "weightedVerts": 237
+        },
+        {
+          "name": "spine",
+          "weightedVerts": 419
+        },
+        {
+          "name": "chest",
+          "weightedVerts": 457
+        },
+        {
+          "name": "neck",
+          "weightedVerts": 1179
+        },
+        {
+          "name": "head",
+          "weightedVerts": 1715
+        },
+        {
+          "name": "comb",
+          "weightedVerts": 1727
+        },
+        {
+          "name": "wing_L",
+          "weightedVerts": 556
+        },
+        {
+          "name": "wing_R",
+          "weightedVerts": 556
+        },
+        {
+          "name": "backpack",
+          "weightedVerts": 194
+        },
+        {
+          "name": "leg_L",
+          "weightedVerts": 257
+        },
+        {
+          "name": "foot_L",
+          "weightedVerts": 266
+        },
+        {
+          "name": "leg_R",
+          "weightedVerts": 257
+        },
+        {
+          "name": "foot_R",
+          "weightedVerts": 266
+        }
+      ],
+      "parenting": {
+        "meshParent": "Pip_Rig",
+        "meshParentType": "OBJECT",
+        "meshParentBone": ""
+      },
+      "motion": {
+        "actionFound": true,
+        "actionName": "PIP_POINT",
+        "fcurveCount": 84,
+        "eulerChannelCount": 42,
+        "quatChannelCount": 0,
+        "locationChannelCount": 42,
+        "eulerMaxDelta": 0.699999988079071,
+        "meshCenterDelta": 0.001529,
+        "maxVertexDelta": 0.069525,
+        "boneWorldDelta": 0.037977,
+        "meaningfulMeshMotion": true,
+        "meaningfulBoneMotion": true,
+        "sampleFrames": [
+          1,
+          10,
+          20,
+          30
+        ],
+        "legacySampleFramesNote": {
+          "legacy": [
+            1,
+            30,
+            60,
+            90
+          ],
+          "whyNotUsed": "For 30-frame cyclic clips, frames 30/60/90 are rest/hold and hide real mid-clip motion."
+        },
+        "meshSamples": [
+          {
+            "frame": 1,
+            "bounds": {
+              "min": [
+                -0.1832,
+                -0.2445,
+                0.0054
+              ],
+              "max": [
+                0.1832,
+                0.13825,
+                0.6175
+              ],
+              "center": [
+                -0.0,
+                -0.053125,
+                0.31145
+              ],
+              "diag": 0.809576,
+              "vertCount": 3800
+            }
+          },
+          {
+            "frame": 10,
+            "bounds": {
+              "min": [
+                -0.184412,
+                -0.243413,
+                0.0054
+              ],
+              "max": [
+                0.185148,
+                0.137971,
+                0.616456
+              ],
+              "center": [
+                0.000368,
+                -0.052721,
+                0.310928
+              ],
+              "diag": 0.809579,
+              "vertCount": 3800
+            }
+          },
+          {
+            "frame": 20,
+            "bounds": {
+              "min": [
+                -0.186649,
+                -0.242078,
+                0.0054
+              ],
+              "max": [
+                0.187811,
+                0.137588,
+                0.616248
+              ],
+              "center": [
+                0.000581,
+                -0.052245,
+                0.310824
+              ],
+              "diag": 0.810865,
+              "vertCount": 3800
+            }
+          },
+          {
+            "frame": 30,
+            "bounds": {
+              "min": [
+                -0.186982,
+                -0.241852,
+                0.0054
+              ],
+              "max": [
+                0.186855,
+                0.137497,
+                0.615102
+              ],
+              "center": [
+                -6.3e-05,
+                -0.052178,
+                0.310251
+              ],
+              "diag": 0.809566,
+              "vertCount": 3800
+            }
+          }
+        ],
+        "modeMismatchEulerOnQuaternionBones": false
+      },
+      "checks": {
+        "RIG_BINDING_VALID": true,
+        "ANIMATION_CHANNELS_VALID": true,
+        "PIP_MOTION_VALID": true
+      },
+      "rigStrategyHypothesis": "deform_rig"
+    },
+    "goat": {
+      "role": "goat",
+      "blend": "/tmp/ddp-rigging-repair/assets/characters/goat/goat_v1_1.blend",
+      "armature": "Goat_Rig",
+      "mesh": "Goat_Character",
+      "accessories": [
+        "Goat_Tag_Text",
+        "Goat_Tag",
+        "Goat_Collar"
+      ],
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.08
+          ]
+        },
+        {
+          "name": "pelvis",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.05,
+            0.35
+          ],
+          "tail": [
+            0.0,
+            0.05,
+            0.45
+          ]
+        },
+        {
+          "name": "spine",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.02,
+            0.45
+          ],
+          "tail": [
+            0.0,
+            -0.05,
+            0.6
+          ]
+        },
+        {
+          "name": "chest",
+          "parent": "spine",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.05,
+            0.6
+          ],
+          "tail": [
+            0.0,
+            -0.12,
+            0.68
+          ]
+        },
+        {
+          "name": "neck",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.15,
+            0.68
+          ],
+          "tail": [
+            0.0,
+            -0.25,
+            0.78
+          ]
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.28,
+            0.78
+          ],
+          "tail": [
+            0.0,
+            -0.4,
+            0.92
+          ]
+        },
+        {
+          "name": "ear_L",
+          "parent": "head",
+          "use_deform": true,
+          "head": [
+            -0.12,
+            -0.25,
+            0.86
+          ],
+          "tail": [
+            -0.2,
+            -0.22,
+            0.86
+          ]
+        },
+        {
+          "name": "ear_R",
+          "parent": "head",
+          "use_deform": true,
+          "head": [
+            0.12,
+            -0.25,
+            0.86
+          ],
+          "tail": [
+            0.2,
+            -0.22,
+            0.86
+          ]
+        },
+        {
+          "name": "collar",
+          "parent": "neck",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.2,
+            0.66
+          ],
+          "tail": [
+            0.0,
+            -0.3,
+            0.64
+          ]
+        },
+        {
+          "name": "tail",
+          "parent": "spine",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.35,
+            0.5
+          ],
+          "tail": [
+            0.0,
+            0.48,
+            0.52
+          ]
+        },
+        {
+          "name": "leg_FL",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            -0.1,
+            0.35
+          ],
+          "tail": [
+            -0.1,
+            -0.1,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_FL",
+          "parent": "leg_FL",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            -0.1,
+            0.05
+          ],
+          "tail": [
+            -0.1,
+            -0.14,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_FR",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.1,
+            -0.1,
+            0.35
+          ],
+          "tail": [
+            0.1,
+            -0.1,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_FR",
+          "parent": "leg_FR",
+          "use_deform": true,
+          "head": [
+            0.1,
+            -0.1,
+            0.05
+          ],
+          "tail": [
+            0.1,
+            -0.14,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_BL",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            0.22,
+            0.35
+          ],
+          "tail": [
+            -0.1,
+            0.22,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_BL",
+          "parent": "leg_BL",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            0.22,
+            0.05
+          ],
+          "tail": [
+            -0.1,
+            0.26,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_BR",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.1,
+            0.22,
+            0.35
+          ],
+          "tail": [
+            0.1,
+            0.22,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_BR",
+          "parent": "leg_BR",
+          "use_deform": true,
+          "head": [
+            0.1,
+            0.22,
+            0.05
+          ],
+          "tail": [
+            0.1,
+            0.26,
+            0.02
+          ]
+        }
+      ],
+      "poseRotationModes": {
+        "root": "XYZ",
+        "pelvis": "XYZ",
+        "spine": "XYZ",
+        "chest": "XYZ",
+        "neck": "XYZ",
+        "head": "XYZ",
+        "ear_L": "XYZ",
+        "ear_R": "XYZ",
+        "collar": "XYZ",
+        "tail": "XYZ",
+        "leg_FL": "XYZ",
+        "hoof_FL": "XYZ",
+        "leg_FR": "XYZ",
+        "hoof_FR": "XYZ",
+        "leg_BL": "XYZ",
+        "hoof_BL": "XYZ",
+        "leg_BR": "XYZ",
+        "hoof_BR": "XYZ"
+      },
+      "modifiers": [
+        {
+          "name": "Auto Smooth",
+          "type": "NODES",
+          "object": null,
+          "use_vertex_groups": null,
+          "use_bone_envelopes": null
+        },
+        {
+          "name": "Armature",
+          "type": "ARMATURE",
+          "object": "Goat_Rig",
+          "use_vertex_groups": true,
+          "use_bone_envelopes": false
+        }
+      ],
+      "vertexGroups": [
+        {
+          "name": "root",
+          "weightedVerts": 0
+        },
+        {
+          "name": "pelvis",
+          "weightedVerts": 381
+        },
+        {
+          "name": "spine",
+          "weightedVerts": 256
+        },
+        {
+          "name": "chest",
+          "weightedVerts": 200
+        },
+        {
+          "name": "neck",
+          "weightedVerts": 232
+        },
+        {
+          "name": "head",
+          "weightedVerts": 1515
+        },
+        {
+          "name": "ear_L",
+          "weightedVerts": 1217
+        },
+        {
+          "name": "ear_R",
+          "weightedVerts": 1217
+        },
+        {
+          "name": "collar",
+          "weightedVerts": 650
+        },
+        {
+          "name": "tail",
+          "weightedVerts": 128
+        },
+        {
+          "name": "leg_FL",
+          "weightedVerts": 198
+        },
+        {
+          "name": "hoof_FL",
+          "weightedVerts": 32
+        },
+        {
+          "name": "leg_FR",
+          "weightedVerts": 200
+        },
+        {
+          "name": "hoof_FR",
+          "weightedVerts": 32
+        },
+        {
+          "name": "leg_BL",
+          "weightedVerts": 260
+        },
+        {
+          "name": "hoof_BL",
+          "weightedVerts": 32
+        },
+        {
+          "name": "leg_BR",
+          "weightedVerts": 261
+        },
+        {
+          "name": "hoof_BR",
+          "weightedVerts": 32
+        }
+      ],
+      "parenting": {
+        "meshParent": "Goat_Rig",
+        "meshParentType": "OBJECT",
+        "meshParentBone": ""
+      },
+      "motion": {
+        "actionFound": true,
+        "actionName": "GOAT_HEAD_NOD",
+        "fcurveCount": 108,
+        "eulerChannelCount": 54,
+        "quatChannelCount": 0,
+        "locationChannelCount": 54,
+        "eulerMaxDelta": 0.49926671385765076,
+        "meshCenterDelta": 0.011002,
+        "maxVertexDelta": 0.074366,
+        "boneWorldDelta": 0.042727,
+        "meaningfulMeshMotion": true,
+        "meaningfulBoneMotion": true,
+        "sampleFrames": [
+          1,
+          10,
+          20,
+          30
+        ],
+        "legacySampleFramesNote": {
+          "legacy": [
+            1,
+            30,
+            60,
+            90
+          ],
+          "whyNotUsed": "For 30-frame cyclic clips, frames 30/60/90 are rest/hold and hide real mid-clip motion."
+        },
+        "meshSamples": [
+          {
+            "frame": 1,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.090026
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.553613
+              ],
+              "diag": 1.579789,
+              "vertCount": 3848
+            }
+          },
+          {
+            "frame": 10,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.100336
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.558768
+              ],
+              "diag": 1.586808,
+              "vertCount": 3848
+            }
+          },
+          {
+            "frame": 20,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.068022
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.542611
+              ],
+              "diag": 1.56493,
+              "vertCount": 3848
+            }
+          },
+          {
+            "frame": 30,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.090026
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.553613
+              ],
+              "diag": 1.579789,
+              "vertCount": 3848
+            }
+          }
+        ],
+        "modeMismatchEulerOnQuaternionBones": false
+      },
+      "checks": {
+        "RIG_BINDING_VALID": true,
+        "ANIMATION_CHANNELS_VALID": true,
+        "GOAT_MOTION_VALID": true
+      },
+      "rigStrategyHypothesis": "deform_rig"
+    }
+  },
+  "productionLibrary": {
+    "pip": {
+      "role": "pip",
+      "blend": "/tmp/ddp-rigging-repair/production-library/characters/pip_production.blend",
+      "armature": "Pip_Rig",
+      "mesh": "Pip_Character",
+      "accessories": [
+        "Pip_StarCharm",
+        "Pip_Backpack_Pouch",
+        "Pip_Backpack"
+      ],
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.05
+          ]
+        },
+        {
+          "name": "pelvis",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.12
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.2
+          ]
+        },
+        {
+          "name": "spine",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.2
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.32
+          ]
+        },
+        {
+          "name": "chest",
+          "parent": "spine",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.32
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.38
+          ]
+        },
+        {
+          "name": "neck",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.01,
+            0.38
+          ],
+          "tail": [
+            0.0,
+            -0.02,
+            0.42
+          ]
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.02,
+            0.42
+          ],
+          "tail": [
+            0.0,
+            -0.04,
+            0.52
+          ]
+        },
+        {
+          "name": "comb",
+          "parent": "head",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.02,
+            0.5
+          ],
+          "tail": [
+            0.0,
+            -0.02,
+            0.56
+          ]
+        },
+        {
+          "name": "wing_L",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            -0.08,
+            0.0,
+            0.26
+          ],
+          "tail": [
+            -0.18,
+            0.0,
+            0.22
+          ]
+        },
+        {
+          "name": "wing_R",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.08,
+            0.0,
+            0.26
+          ],
+          "tail": [
+            0.18,
+            0.0,
+            0.22
+          ]
+        },
+        {
+          "name": "backpack",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.1,
+            0.26
+          ],
+          "tail": [
+            0.0,
+            0.16,
+            0.26
+          ]
+        },
+        {
+          "name": "leg_L",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            -0.05,
+            0.0,
+            0.14
+          ],
+          "tail": [
+            -0.05,
+            0.0,
+            0.04
+          ]
+        },
+        {
+          "name": "foot_L",
+          "parent": "leg_L",
+          "use_deform": true,
+          "head": [
+            -0.05,
+            0.0,
+            0.04
+          ],
+          "tail": [
+            -0.05,
+            -0.04,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_R",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            0.05,
+            0.0,
+            0.14
+          ],
+          "tail": [
+            0.05,
+            0.0,
+            0.04
+          ]
+        },
+        {
+          "name": "foot_R",
+          "parent": "leg_R",
+          "use_deform": true,
+          "head": [
+            0.05,
+            0.0,
+            0.04
+          ],
+          "tail": [
+            0.05,
+            -0.04,
+            0.02
+          ]
+        }
+      ],
+      "poseRotationModes": {
+        "root": "XYZ",
+        "pelvis": "XYZ",
+        "spine": "XYZ",
+        "chest": "XYZ",
+        "neck": "XYZ",
+        "head": "XYZ",
+        "comb": "XYZ",
+        "wing_L": "XYZ",
+        "wing_R": "XYZ",
+        "backpack": "XYZ",
+        "leg_L": "XYZ",
+        "foot_L": "XYZ",
+        "leg_R": "XYZ",
+        "foot_R": "XYZ"
+      },
+      "modifiers": [
+        {
+          "name": "Auto Smooth",
+          "type": "NODES",
+          "object": null,
+          "use_vertex_groups": null,
+          "use_bone_envelopes": null
+        },
+        {
+          "name": "Armature",
+          "type": "ARMATURE",
+          "object": "Pip_Rig",
+          "use_vertex_groups": true,
+          "use_bone_envelopes": false
+        }
+      ],
+      "vertexGroups": [
+        {
+          "name": "root",
+          "weightedVerts": 255
+        },
+        {
+          "name": "pelvis",
+          "weightedVerts": 237
+        },
+        {
+          "name": "spine",
+          "weightedVerts": 419
+        },
+        {
+          "name": "chest",
+          "weightedVerts": 457
+        },
+        {
+          "name": "neck",
+          "weightedVerts": 1179
+        },
+        {
+          "name": "head",
+          "weightedVerts": 1715
+        },
+        {
+          "name": "comb",
+          "weightedVerts": 1727
+        },
+        {
+          "name": "wing_L",
+          "weightedVerts": 556
+        },
+        {
+          "name": "wing_R",
+          "weightedVerts": 556
+        },
+        {
+          "name": "backpack",
+          "weightedVerts": 194
+        },
+        {
+          "name": "leg_L",
+          "weightedVerts": 257
+        },
+        {
+          "name": "foot_L",
+          "weightedVerts": 266
+        },
+        {
+          "name": "leg_R",
+          "weightedVerts": 257
+        },
+        {
+          "name": "foot_R",
+          "weightedVerts": 266
+        }
+      ],
+      "parenting": {
+        "meshParent": "Pip_Rig",
+        "meshParentType": "OBJECT",
+        "meshParentBone": ""
+      },
+      "motion": {
+        "actionFound": true,
+        "actionName": "PIP_POINT",
+        "fcurveCount": 84,
+        "eulerChannelCount": 42,
+        "quatChannelCount": 0,
+        "locationChannelCount": 42,
+        "eulerMaxDelta": 0.699999988079071,
+        "meshCenterDelta": 0.001529,
+        "maxVertexDelta": 0.069525,
+        "boneWorldDelta": 0.037977,
+        "meaningfulMeshMotion": true,
+        "meaningfulBoneMotion": true,
+        "sampleFrames": [
+          1,
+          10,
+          20,
+          30
+        ],
+        "legacySampleFramesNote": {
+          "legacy": [
+            1,
+            30,
+            60,
+            90
+          ],
+          "whyNotUsed": "For 30-frame cyclic clips, frames 30/60/90 are rest/hold and hide real mid-clip motion."
+        },
+        "meshSamples": [
+          {
+            "frame": 1,
+            "bounds": {
+              "min": [
+                -0.1832,
+                -0.2445,
+                0.0054
+              ],
+              "max": [
+                0.1832,
+                0.13825,
+                0.6175
+              ],
+              "center": [
+                -0.0,
+                -0.053125,
+                0.31145
+              ],
+              "diag": 0.809576,
+              "vertCount": 3800
+            }
+          },
+          {
+            "frame": 10,
+            "bounds": {
+              "min": [
+                -0.184412,
+                -0.243413,
+                0.0054
+              ],
+              "max": [
+                0.185148,
+                0.137971,
+                0.616456
+              ],
+              "center": [
+                0.000368,
+                -0.052721,
+                0.310928
+              ],
+              "diag": 0.809579,
+              "vertCount": 3800
+            }
+          },
+          {
+            "frame": 20,
+            "bounds": {
+              "min": [
+                -0.186649,
+                -0.242078,
+                0.0054
+              ],
+              "max": [
+                0.187811,
+                0.137588,
+                0.616248
+              ],
+              "center": [
+                0.000581,
+                -0.052245,
+                0.310824
+              ],
+              "diag": 0.810865,
+              "vertCount": 3800
+            }
+          },
+          {
+            "frame": 30,
+            "bounds": {
+              "min": [
+                -0.186982,
+                -0.241852,
+                0.0054
+              ],
+              "max": [
+                0.186855,
+                0.137497,
+                0.615102
+              ],
+              "center": [
+                -6.3e-05,
+                -0.052178,
+                0.310251
+              ],
+              "diag": 0.809566,
+              "vertCount": 3800
+            }
+          }
+        ],
+        "modeMismatchEulerOnQuaternionBones": false
+      },
+      "checks": {
+        "RIG_BINDING_VALID": true,
+        "ANIMATION_CHANNELS_VALID": true,
+        "PIP_MOTION_VALID": true
+      },
+      "rigStrategyHypothesis": "deform_rig"
+    },
+    "goat": {
+      "role": "goat",
+      "blend": "/tmp/ddp-rigging-repair/production-library/characters/goat_production.blend",
+      "armature": "Goat_Rig",
+      "mesh": "Goat_Character",
+      "accessories": [
+        "Goat_Tag_Text",
+        "Goat_Tag",
+        "Goat_Collar"
+      ],
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "tail": [
+            0.0,
+            0.0,
+            0.08
+          ]
+        },
+        {
+          "name": "pelvis",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.05,
+            0.35
+          ],
+          "tail": [
+            0.0,
+            0.05,
+            0.45
+          ]
+        },
+        {
+          "name": "spine",
+          "parent": "pelvis",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.02,
+            0.45
+          ],
+          "tail": [
+            0.0,
+            -0.05,
+            0.6
+          ]
+        },
+        {
+          "name": "chest",
+          "parent": "spine",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.05,
+            0.6
+          ],
+          "tail": [
+            0.0,
+            -0.12,
+            0.68
+          ]
+        },
+        {
+          "name": "neck",
+          "parent": "chest",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.15,
+            0.68
+          ],
+          "tail": [
+            0.0,
+            -0.25,
+            0.78
+          ]
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.28,
+            0.78
+          ],
+          "tail": [
+            0.0,
+            -0.4,
+            0.92
+          ]
+        },
+        {
+          "name": "ear_L",
+          "parent": "head",
+          "use_deform": true,
+          "head": [
+            -0.12,
+            -0.25,
+            0.86
+          ],
+          "tail": [
+            -0.2,
+            -0.22,
+            0.86
+          ]
+        },
+        {
+          "name": "ear_R",
+          "parent": "head",
+          "use_deform": true,
+          "head": [
+            0.12,
+            -0.25,
+            0.86
+          ],
+          "tail": [
+            0.2,
+            -0.22,
+            0.86
+          ]
+        },
+        {
+          "name": "collar",
+          "parent": "neck",
+          "use_deform": true,
+          "head": [
+            0.0,
+            -0.2,
+            0.66
+          ],
+          "tail": [
+            0.0,
+            -0.3,
+            0.64
+          ]
+        },
+        {
+          "name": "tail",
+          "parent": "spine",
+          "use_deform": true,
+          "head": [
+            0.0,
+            0.35,
+            0.5
+          ],
+          "tail": [
+            0.0,
+            0.48,
+            0.52
+          ]
+        },
+        {
+          "name": "leg_FL",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            -0.1,
+            0.35
+          ],
+          "tail": [
+            -0.1,
+            -0.1,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_FL",
+          "parent": "leg_FL",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            -0.1,
+            0.05
+          ],
+          "tail": [
+            -0.1,
+            -0.14,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_FR",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.1,
+            -0.1,
+            0.35
+          ],
+          "tail": [
+            0.1,
+            -0.1,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_FR",
+          "parent": "leg_FR",
+          "use_deform": true,
+          "head": [
+            0.1,
+            -0.1,
+            0.05
+          ],
+          "tail": [
+            0.1,
+            -0.14,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_BL",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            0.22,
+            0.35
+          ],
+          "tail": [
+            -0.1,
+            0.22,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_BL",
+          "parent": "leg_BL",
+          "use_deform": true,
+          "head": [
+            -0.1,
+            0.22,
+            0.05
+          ],
+          "tail": [
+            -0.1,
+            0.26,
+            0.02
+          ]
+        },
+        {
+          "name": "leg_BR",
+          "parent": "root",
+          "use_deform": true,
+          "head": [
+            0.1,
+            0.22,
+            0.35
+          ],
+          "tail": [
+            0.1,
+            0.22,
+            0.05
+          ]
+        },
+        {
+          "name": "hoof_BR",
+          "parent": "leg_BR",
+          "use_deform": true,
+          "head": [
+            0.1,
+            0.22,
+            0.05
+          ],
+          "tail": [
+            0.1,
+            0.26,
+            0.02
+          ]
+        }
+      ],
+      "poseRotationModes": {
+        "root": "XYZ",
+        "pelvis": "XYZ",
+        "spine": "XYZ",
+        "chest": "XYZ",
+        "neck": "XYZ",
+        "head": "XYZ",
+        "ear_L": "XYZ",
+        "ear_R": "XYZ",
+        "collar": "XYZ",
+        "tail": "XYZ",
+        "leg_FL": "XYZ",
+        "hoof_FL": "XYZ",
+        "leg_FR": "XYZ",
+        "hoof_FR": "XYZ",
+        "leg_BL": "XYZ",
+        "hoof_BL": "XYZ",
+        "leg_BR": "XYZ",
+        "hoof_BR": "XYZ"
+      },
+      "modifiers": [
+        {
+          "name": "Auto Smooth",
+          "type": "NODES",
+          "object": null,
+          "use_vertex_groups": null,
+          "use_bone_envelopes": null
+        },
+        {
+          "name": "Armature",
+          "type": "ARMATURE",
+          "object": "Goat_Rig",
+          "use_vertex_groups": true,
+          "use_bone_envelopes": false
+        }
+      ],
+      "vertexGroups": [
+        {
+          "name": "root",
+          "weightedVerts": 0
+        },
+        {
+          "name": "pelvis",
+          "weightedVerts": 381
+        },
+        {
+          "name": "spine",
+          "weightedVerts": 256
+        },
+        {
+          "name": "chest",
+          "weightedVerts": 200
+        },
+        {
+          "name": "neck",
+          "weightedVerts": 232
+        },
+        {
+          "name": "head",
+          "weightedVerts": 1515
+        },
+        {
+          "name": "ear_L",
+          "weightedVerts": 1217
+        },
+        {
+          "name": "ear_R",
+          "weightedVerts": 1217
+        },
+        {
+          "name": "collar",
+          "weightedVerts": 650
+        },
+        {
+          "name": "tail",
+          "weightedVerts": 128
+        },
+        {
+          "name": "leg_FL",
+          "weightedVerts": 198
+        },
+        {
+          "name": "hoof_FL",
+          "weightedVerts": 32
+        },
+        {
+          "name": "leg_FR",
+          "weightedVerts": 200
+        },
+        {
+          "name": "hoof_FR",
+          "weightedVerts": 32
+        },
+        {
+          "name": "leg_BL",
+          "weightedVerts": 260
+        },
+        {
+          "name": "hoof_BL",
+          "weightedVerts": 32
+        },
+        {
+          "name": "leg_BR",
+          "weightedVerts": 261
+        },
+        {
+          "name": "hoof_BR",
+          "weightedVerts": 32
+        }
+      ],
+      "parenting": {
+        "meshParent": "Goat_Rig",
+        "meshParentType": "OBJECT",
+        "meshParentBone": ""
+      },
+      "motion": {
+        "actionFound": true,
+        "actionName": "GOAT_HEAD_NOD",
+        "fcurveCount": 108,
+        "eulerChannelCount": 54,
+        "quatChannelCount": 0,
+        "locationChannelCount": 54,
+        "eulerMaxDelta": 0.49926671385765076,
+        "meshCenterDelta": 0.011002,
+        "maxVertexDelta": 0.074366,
+        "boneWorldDelta": 0.042727,
+        "meaningfulMeshMotion": true,
+        "meaningfulBoneMotion": true,
+        "sampleFrames": [
+          1,
+          10,
+          20,
+          30
+        ],
+        "legacySampleFramesNote": {
+          "legacy": [
+            1,
+            30,
+            60,
+            90
+          ],
+          "whyNotUsed": "For 30-frame cyclic clips, frames 30/60/90 are rest/hold and hide real mid-clip motion."
+        },
+        "meshSamples": [
+          {
+            "frame": 1,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.090026
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.553613
+              ],
+              "diag": 1.579789,
+              "vertCount": 3848
+            }
+          },
+          {
+            "frame": 10,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.100336
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.558768
+              ],
+              "diag": 1.586808,
+              "vertCount": 3848
+            }
+          },
+          {
+            "frame": 20,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.068022
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.542611
+              ],
+              "diag": 1.56493,
+              "vertCount": 3848
+            }
+          },
+          {
+            "frame": 30,
+            "bounds": {
+              "min": [
+                -0.29722,
+                -0.5307,
+                0.0172
+              ],
+              "max": [
+                0.29722,
+                0.465,
+                1.090026
+              ],
+              "center": [
+                0.0,
+                -0.03285,
+                0.553613
+              ],
+              "diag": 1.579789,
+              "vertCount": 3848
+            }
+          }
+        ],
+        "modeMismatchEulerOnQuaternionBones": false
+      },
+      "checks": {
+        "RIG_BINDING_VALID": true,
+        "ANIMATION_CHANNELS_VALID": true,
+        "GOAT_MOTION_VALID": true
+      },
+      "rigStrategyHypothesis": "deform_rig"
+    }
+  },
+  "summaryChecks": {
+    "RIG_BINDING_VALID": true,
+    "PIP_MOTION_VALID": true,
+    "GOAT_MOTION_VALID": true,
+    "ANIMATION_CHANNELS_VALID": true
+  },
+  "status": "PASS"
+}

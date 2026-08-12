@@ -96,11 +96,22 @@ def ensure_armature(name: str, bones: list[tuple[str, tuple, tuple, str | None]]
 
 
 def parent_with_armature(obj, arm):
+    """Parent + bind with automatic weights so armature deformation is usable."""
     import bpy
 
-    obj.parent = arm
-    mod = obj.modifiers.new(name="Armature", type="ARMATURE")
-    mod.object = arm
+    for mod in list(obj.modifiers):
+        if mod.type == "ARMATURE":
+            obj.modifiers.remove(mod)
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.parent_set(type="ARMATURE_AUTO")
+    for mod in obj.modifiers:
+        if mod.type == "ARMATURE":
+            mod.object = arm
+            mod.use_vertex_groups = True
+            mod.use_bone_envelopes = False
 
 
 def add_action(arm, action_name: str, frames: int, mutate):
@@ -110,9 +121,16 @@ def add_action(arm, action_name: str, frames: int, mutate):
     if not arm.animation_data:
         arm.animation_data_create()
     arm.animation_data.action = action
+    for pb in arm.pose.bones:
+        pb.rotation_mode = "XYZ"
     for f in range(1, frames + 1):
+        for pb in arm.pose.bones:
+            pb.rotation_mode = "XYZ"
+            pb.location = (0.0, 0.0, 0.0)
+            pb.rotation_euler = (0.0, 0.0, 0.0)
         mutate(arm, f, (f - 1) / max(frames - 1, 1))
         for pb in arm.pose.bones:
+            pb.rotation_mode = "XYZ"
             pb.keyframe_insert(data_path="location", frame=f)
             pb.keyframe_insert(data_path="rotation_euler", frame=f)
     return action

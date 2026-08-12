@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "checks": {
+    "RIG_BINDING_VALID": true,
+    "PIP_MOTION_VALID": true,
+    "GOAT_MOTION_VALID": true,
+    "ANIMATION_CHANNELS_VALID": true
+  },
+  "missing": [],
+  "failed": [],
+  "sampleFrames": [
+    1,
+    10,
+    20,
+    30
+  ],
+  "cameraMotionCountedAsCharacterMotion": false,
+  "audit": "/tmp/ddp-rigging-repair/artifacts/performance/rigging-audit/rigging-animation-audit.json"
+}
