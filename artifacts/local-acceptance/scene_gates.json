@@ -1,0 +1,243 @@
+{
+  "ok": true,
+  "status": "PASS",
+  "gates": {
+    "RIG_BINDING_VALID": true,
+    "PIP_MOTION_VALID": true,
+    "GOAT_MOTION_VALID": true,
+    "ANIMATION_CHANNELS_VALID": true,
+    "LIGHTING_STATE_VALID": true,
+    "NO_DUPLICATE_LIGHTS": true,
+    "ASSET_HIERARCHY_VALID": true
+  },
+  "injectedFault": null,
+  "faultExpectedGate": null,
+  "resolution": "1080x1920",
+  "frames": 90,
+  "sampleFrames": [
+    1,
+    30,
+    60,
+    90
+  ],
+  "thresholds": {
+    "minTotalMotion": 0.01,
+    "minIntervalMotion": 0.002,
+    "expectedLightCount": 3
+  },
+  "motion": {
+    "pip": {
+      "framesSampled": [
+        1,
+        30,
+        60,
+        90
+      ],
+      "maxBoneDelta": 1.048021,
+      "maxVertexDelta": 0.126589,
+      "pairwiseVertexDeltas": {
+        "1->30": 0.126096,
+        "30->60": 0.052141,
+        "60->90": 0.159992
+      },
+      "minConsecutiveVertexDelta": 0.052141,
+      "movingBones": [
+        "backpack",
+        "chest",
+        "comb",
+        "foot_L",
+        "foot_R",
+        "head",
+        "leg_L",
+        "leg_R",
+        "neck",
+        "pelvis",
+        "root",
+        "spine",
+        "wing_L",
+        "wing_R"
+      ],
+      "vertexCount": 4244,
+      "role": "pip",
+      "armature": "Pip_Rig",
+      "action": "PIP_POINT"
+    },
+    "goat": {
+      "framesSampled": [
+        1,
+        30,
+        60,
+        90
+      ],
+      "maxBoneDelta": 0.719718,
+      "maxVertexDelta": 0.219655,
+      "pairwiseVertexDeltas": {
+        "1->30": 0.129035,
+        "30->60": 0.32175,
+        "60->90": 0.168605
+      },
+      "minConsecutiveVertexDelta": 0.129035,
+      "movingBones": [
+        "chest",
+        "collar",
+        "ear_L",
+        "ear_R",
+        "head",
+        "hoof_BL",
+        "hoof_BR",
+        "hoof_FL",
+        "hoof_FR",
+        "leg_BL",
+        "leg_BR",
+        "leg_FL",
+        "leg_FR",
+        "neck",
+        "pelvis",
+        "root",
+        "spine",
+        "tail"
+      ],
+      "vertexCount": 5548,
+      "role": "goat",
+      "armature": "Goat_Rig",
+      "action": "GOAT_HEAD_NOD"
+    }
+  },
+  "binding": [
+    {
+      "mesh": "Goat_Character",
+      "vertexGroups": 18,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Goat_Collar",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Goat_Tag",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Goat_Tag_Text",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Pip_Backpack",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Pip_Backpack_Pouch",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Pip_Character",
+      "vertexGroups": 14,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Pip_StarCharm",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    }
+  ],
+  "rotationConflicts": [],
+  "lighting": {
+    "skyObjects": [
+      "Meadow_Sky"
+    ],
+    "lightingState": "DAY_KEY",
+    "requested": "DAY_KEY",
+    "created": [
+      "DDP_Key",
+      "DDP_Fill",
+      "DDP_Rim"
+    ],
+    "activeLightCount": 3,
+    "activeLights": [
+      "DDP_Fill",
+      "DDP_Key",
+      "DDP_Rim"
+    ],
+    "worldStrength": 0.25,
+    "look": "AgX - Punchy",
+    "lookRequested": "AgX - Punchy",
+    "exposure": -2.200000047683716,
+    "viewTransform": "AgX"
+  },
+  "activeLights": [
+    "DDP_Fill",
+    "DDP_Key",
+    "DDP_Rim"
+  ],
+  "strippedFromAssets": {
+    "lights": [
+      "Meadow_Sun",
+      "Area",
+      "Sun",
+      "Area.001",
+      "Area.002",
+      "Sun.001",
+      "Area.003",
+      "Area.004"
+    ],
+    "cameras": [
+      "MeadowCam",
+      "RefCam",
+      "RefCam.001"
+    ]
+  },
+  "placementRoots": {
+    "meadow": {
+      "object": "meadow_Root",
+      "kind": "created-root"
+    },
+    "map": {
+      "object": "map_Root",
+      "kind": "created-root"
+    },
+    "pip": {
+      "object": "Pip_Rig",
+      "kind": "armature"
+    },
+    "goat": {
+      "object": "Goat_Rig",
+      "kind": "armature"
+    }
+  },
+  "appliedActions": {
+    "pip": "PIP_POINT",
+    "goat": "GOAT_HEAD_NOD"
+  },
+  "map": {
+    "objects": [
+      "AdventureMap",
+      "MapMark"
+    ],
+    "root": {
+      "object": "map_Root",
+      "kind": "created-root"
+    },
+    "paperToMarkDistance": 0.115758,
+    "sharedRoot": true
+  },
+  "assetSha256": {
+    "meadow": "2bf49aabad0710b528294d6394b68b28075b522228fd10c6d2f8d893d64ad3c6",
+    "map": "9f466176dab6f3fcacfa79838a5db3d30c7aef372a1ed2d57152c5761578f4f2",
+    "pip": "dd0d1c03b6625d69e9f96af087562aeecd0b14d401b280fe88b9f35418d005cb",
+    "goat": "a54d491264e06ea52ffe9e2ba16e79d60be0d1900b1d369848774c9f9eac0ad5"
+  },
+  "blenderVersion": "4.2.3 LTS"
+}

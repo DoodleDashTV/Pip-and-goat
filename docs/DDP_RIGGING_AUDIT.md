@@ -101,6 +101,31 @@ first second and the character then freezes. Both headline actions are now
 authored across all 90 frames of the shot with a monotonic drift component, so no
 two sampled frames can coincide.
 
+## Rendered proof, before and after
+
+The claim "the characters are static" is not an inference from the rig data; it is
+measurable in pixels. Both columns below are the same shot rendered locally at
+270×480 with a **locked-off camera**, so no camera movement can contribute a
+single changed pixel, sampled at frames 1/30/60/90.
+
+| Measurement | Before (`75fc73a`) | After (`HEAD`) |
+| --- | --- | --- |
+| Moving pixels, frame 1→30 | 0.0% | 3.7% |
+| Moving pixels, frame 30→60 | 0.0% | 4.3% |
+| Moving pixels, frame 60→90 | 0.0% | 4.3% |
+| Active scene lights | 8 | 3 (`DDP_Key`/`DDP_Fill`/`DDP_Rim`) |
+| Mean frame luma | 219.6/255 | 147–154/255 |
+| Darkest pixel | 172.8/255 | 9–12/255 |
+| Mean saturation | 10.4/128 | 37–41/128 |
+
+Before the repair the rendered frames were **bit-identical**: not "subtle" motion,
+none. A darkest pixel of 172.8/255 also means literally nothing in the frame was
+in shadow, which is what eight stacked lights does.
+
+Reproduce with `pnpm gates:local`; the report lands in
+`artifacts/local-acceptance/local_acceptance.json` and the frames it judged in
+`artifacts/local-acceptance/keyframes/`.
+
 ## Fail-closed conditions
 
 `audit_rig.py` exits non-zero when any of these hold, and `scene_gates.py`

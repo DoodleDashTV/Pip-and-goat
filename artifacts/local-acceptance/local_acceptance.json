@@ -1,0 +1,152 @@
+{
+  "ok": true,
+  "status": "PASS",
+  "gate": {
+    "LOCAL_VISUAL_ACCEPTANCE": true
+  },
+  "resolution": "270x480",
+  "aspect": "9:16 (same as FINAL_1080P)",
+  "frames": 90,
+  "fps": 30,
+  "samples": 16,
+  "checks": {
+    "frameCount": true,
+    "resolution": true,
+    "staticCameraFramesRendered": true,
+    "characterPixelMotion": true,
+    "noDuplicateLights": true,
+    "exposureControlled": true,
+    "hasTrueBlacks": true,
+    "hasHighlights": true,
+    "saturationHealthy": true,
+    "videoEncoded": true
+  },
+  "keyFrameStats": [
+    {
+      "frame": "frame_0001.png",
+      "height": 480,
+      "width": 270,
+      "meanLuma": 153.53,
+      "minLuma": 11.79,
+      "maxLuma": 183.89,
+      "meanSaturation": 36.97
+    },
+    {
+      "frame": "frame_0030.png",
+      "height": 480,
+      "width": 270,
+      "meanLuma": 152.4,
+      "minLuma": 11.79,
+      "maxLuma": 182.1,
+      "meanSaturation": 37.77
+    },
+    {
+      "frame": "frame_0060.png",
+      "height": 480,
+      "width": 270,
+      "meanLuma": 149.42,
+      "minLuma": 11.79,
+      "maxLuma": 182.1,
+      "meanSaturation": 39.65
+    },
+    {
+      "frame": "frame_0090.png",
+      "height": 480,
+      "width": 270,
+      "meanLuma": 147.48,
+      "minLuma": 9.09,
+      "maxLuma": 188.74,
+      "meanSaturation": 40.79
+    }
+  ],
+  "keyFrames": [
+    "artifacts/local-acceptance/keyframes/production_0001.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0001.png",
+    "artifacts/local-acceptance/keyframes/production_0030.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0030.png",
+    "artifacts/local-acceptance/keyframes/production_0060.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0060.png",
+    "artifacts/local-acceptance/keyframes/production_0090.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0090.png"
+  ],
+  "staticCameraMovingPixelFraction": {
+    "1->30": 0.036667,
+    "30->60": 0.042539,
+    "60->90": 0.042639
+  },
+  "minStaticCameraMovingPixelFraction": 0.036667,
+  "thresholds": {
+    "pixelDelta": 8.0,
+    "minMovingPixelFraction": 0.005
+  },
+  "activeLights": [
+    "DDP_Fill",
+    "DDP_Key",
+    "DDP_Rim"
+  ],
+  "lighting": {
+    "skyObjects": [
+      "Meadow_Sky"
+    ],
+    "lightingState": "DAY_KEY",
+    "requested": "DAY_KEY",
+    "created": [
+      "DDP_Key",
+      "DDP_Fill",
+      "DDP_Rim"
+    ],
+    "activeLightCount": 3,
+    "activeLights": [
+      "DDP_Fill",
+      "DDP_Key",
+      "DDP_Rim"
+    ],
+    "worldStrength": 0.25,
+    "look": "AgX - Punchy",
+    "lookRequested": "AgX - Punchy",
+    "exposure": -2.200000047683716,
+    "viewTransform": "AgX"
+  },
+  "placementRoots": {
+    "meadow": {
+      "object": "meadow_Root",
+      "kind": "created-root"
+    },
+    "map": {
+      "object": "map_Root",
+      "kind": "created-root"
+    },
+    "pip": {
+      "object": "Pip_Rig",
+      "kind": "armature"
+    },
+    "goat": {
+      "object": "Goat_Rig",
+      "kind": "armature"
+    }
+  },
+  "appliedActions": {
+    "pip": "PIP_POINT",
+    "goat": "GOAT_HEAD_NOD"
+  },
+  "strippedFromAssets": {
+    "lights": [
+      "Meadow_Sun",
+      "Area",
+      "Sun",
+      "Area.001",
+      "Area.002",
+      "Sun.001",
+      "Area.003",
+      "Area.004"
+    ],
+    "cameras": [
+      "MeadowCam",
+      "RefCam",
+      "RefCam.001"
+    ]
+  },
+  "video": "artifacts/local-acceptance/local_acceptance_270x480.mp4",
+  "ffmpegOk": true,
+  "blenderVersion": "4.2.3 LTS"
+}
