@@ -271,6 +271,16 @@ async function main() {
       if (existsFn) {
         complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
         summary.heartbeat = await existsFn(`${BENCH_PREFIX}/results/heartbeat.txt`);
+        if (summary.heartbeat && storage.readObject) {
+          try {
+            const hb = Buffer.from(
+              await storage.readObject(`${BENCH_PREFIX}/results/heartbeat.txt`),
+            ).toString('utf8');
+            summary.heartbeatText = hb.trim().slice(0, 200);
+          } catch {
+            /* ignore */
+          }
+        }
       }
       console.log('POLL', {
         uptimeSec,
@@ -278,6 +288,7 @@ async function main() {
         podStatus,
         complete,
         heartbeat: summary.heartbeat,
+        heartbeatText: summary.heartbeatText,
         missingPolls,
       });
 
@@ -293,12 +304,17 @@ async function main() {
       if (podStatus === 'EXITED' || podStatus === 'TERMINATED') {
         if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
         summary.selfTerminated = true;
+        // Give uploads a moment if worker just finished.
+        if (!complete) await sleep(10_000);
+        if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
         break;
       }
       if (podStatus === 'MISSING') {
         missingPolls += 1;
-        // Pod list can lag briefly after create; only fail after sustained absence.
-        if (missingPolls >= 4) {
+        // If R2 heartbeat is alive, keep waiting — GraphQL/REST can briefly omit pods.
+        const heartbeatAlive = Boolean(summary.heartbeat);
+        const missingLimit = heartbeatAlive ? 40 : 12; // ~10min with hb, ~3min without
+        if (missingPolls >= missingLimit) {
           if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
           summary.selfTerminated = true;
           summary.failed = complete ? undefined : 'POD_DISAPPEARED_NO_RESULTS';

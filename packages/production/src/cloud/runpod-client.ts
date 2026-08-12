@@ -266,7 +266,39 @@ export class RunpodClient {
     machine: { gpuDisplayName?: string | null } | null;
     costPerHr: number | null;
   } | null> {
-    // Prefer myself.pods listing — single-pod query shape varies by API version.
+    // Prefer REST get — GraphQL myself.pods can lag/omit Community pods mid-run.
+    try {
+      const res = await fetch(`https://rest.runpod.io/v1/pods/${encodeURIComponent(podId)}`, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'User-Agent': this.userAgent,
+        },
+      });
+      if (res.status === 404) return null;
+      if (res.ok) {
+        const pod = (await res.json()) as {
+          id?: string;
+          name?: string;
+          desiredStatus?: string;
+          costPerHr?: number;
+          runtime?: { uptimeInSeconds?: number } | null;
+          machine?: { gpuDisplayName?: string } | null;
+        };
+        if (pod.id) {
+          return {
+            id: pod.id,
+            name: pod.name ?? null,
+            desiredStatus: pod.desiredStatus ?? null,
+            runtime: pod.runtime ?? null,
+            machine: pod.machine ?? null,
+            costPerHr: pod.costPerHr ?? null,
+          };
+        }
+      }
+    } catch {
+      /* fall through to GraphQL */
+    }
+
     const data = await this.graphql<{
       myself?: {
         pods?: Array<{
