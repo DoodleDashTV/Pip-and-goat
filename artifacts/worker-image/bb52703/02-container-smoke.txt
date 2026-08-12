@@ -1,0 +1,48 @@
+=== 1. TOOLCHAIN ===
+Blender 4.2.3 LTS
+	build date: 2024-10-14
+	build time: 23:31:34
+--- ffmpeg ---
+ffmpeg version 4.4.2-0ubuntu0.22.04.1 Copyright (c) 2000-2021 the FFmpeg developers
+--- ffprobe ---
+ffprobe version 4.4.2-0ubuntu0.22.04.1 Copyright (c) 2007-2021 the FFmpeg developers
+--- node ---
+v20.20.2
+
+=== 2. PROVENANCE FILE ===
+{
+  "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+  "workerBuildTime": "2026-08-12T22:25:23Z",
+  "imageDigest": null,
+  "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+  "renderCodeSha256Declared": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+  "renderCodeMatch": true,
+  "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+  "renderCodeFileCount": 30,
+  "workerVersion": "0.1.0"
+}
+
+=== 2b. ENV STAMPS ===
+DDP_SOURCE_COMMIT=bb5270372ad558e71673fe789260a12fb51a9c6d
+DDP_WORKER_BUILD_TIME=2026-08-12T22:25:23Z
+DDP_RENDER_CODE_SHA256=c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+
+=== 3. MODULE LOAD CHECKS ===
+worker.js LOADED OK
+manifest.js LOADED OK
+manifest exports: buildManifest,validateManifest,MANIFEST_SCHEMA
+{
+  "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+  "workerBuildTime": "2026-08-12T22:25:23Z",
+  "imageDigest": null,
+  "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+  "renderCodeSha256Declared": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+  "renderCodeMatch": true,
+  "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+  "renderCodeFileCount": 30,
+  "workerVersion": "0.1.0"
+}
+
+=== 4. ASSEMBLE SCRIPT HASH ===
+764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709  /opt/ddp-worker/blender/assemble_scene.py
+expected:  764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709

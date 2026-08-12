@@ -1,0 +1,70 @@
+=== LOCAL CHECKOUT RENDER CODE ===
+localRenderCodeSha256 = c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+fileCount = 30
+
+=== REGISTRY FACTS: NEW IMAGE (anonymous) ===
+ok=true amd64=true detail=config blob read; linux/amd64=true
+digest = sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27
+ddp.source.commit     = bb5270372ad558e71673fe789260a12fb51a9c6d
+ddp.worker.build.time = 2026-08-12T22:25:23Z
+ddp.render.code.sha256 = c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+org.opencontainers.image.revision = bb5270372ad558e71673fe789260a12fb51a9c6d
+org.opencontainers.image.created  = 2026-08-12T22:25:23Z
+env.DDP_SOURCE_COMMIT       = bb5270372ad558e71673fe789260a12fb51a9c6d
+env.DDP_WORKER_BUILD_TIME   = 2026-08-12T22:25:23Z
+env.DDP_RENDER_CODE_SHA256  = c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+
+=== REGISTRY FACTS: OLD STALE IMAGE (anonymous) ===
+ok=true amd64=true detail=config blob read; linux/amd64=true
+digest = sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882
+ddp.source.commit     = (absent)
+ddp.render.code.sha256 = (absent)
+env.DDP_RENDER_CODE_SHA256  = (absent)
+
+
+=== CASE 1: NEW digest, correct expected values → must be ok=true code=OK ===
+
+--- NEW / correct ---
+ok=true code=OK
+  reason: image sha256:e80cf523b7cb… contains this checkout's render code (c4afa39c8c06…)
+  facts: {
+    "imageDigest": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+    "imageSourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "imageRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "imageBuildTime": "2026-08-12T22:25:23Z",
+    "expectedSourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "expectedRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "localRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91"
+  }
+
+
+=== CASE 2: OLD stale digest → must be ok=false code=PROVENANCE_MISSING ===
+
+--- OLD stale digest (STALE IMAGE PREFLIGHT FAULT TEST) ---
+ok=false code=PROVENANCE_MISSING
+  reason: image carries no build provenance (ddp.source.commit=absent, ddp.render.code.sha256=absent); it predates provenance stamping and its render code cannot be established
+  facts: {
+    "imageDigest": "sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882",
+    "imageSourceCommit": null,
+    "imageRenderCodeSha256": null,
+    "imageBuildTime": null,
+    "expectedSourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "expectedRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "localRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91"
+  }
+
+
+=== CASE 3: NEW digest, deliberately WRONG expected render hash → must be ok=false code=RENDER_CODE_MISMATCH ===
+
+--- NEW / wrong expected render hash ---
+ok=false code=RENDER_CODE_MISMATCH
+  reason: image render code c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91 != pinned render code deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+  facts: {
+    "imageDigest": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+    "imageSourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "imageRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "imageBuildTime": "2026-08-12T22:25:23Z",
+    "expectedSourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "expectedRenderCodeSha256": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+    "localRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91"
+  }

@@ -1,0 +1,65 @@
+### docker build -f workers/runpod-blender/Dockerfile --platform linux/amd64 (repo root context)
+### build args: DDP_SOURCE_COMMIT / DDP_WORKER_BUILD_TIME / DDP_RENDER_CODE_SHA256
+
+===== provenance assertion step (the build fails if the label disagrees with the baked code) =====
+#15 [11/11] RUN node ./src/provenance.js --write "/opt/ddp-worker/provenance.json" --expect "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91"
+#15 0.205 {
+#15 0.205   "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+#15 0.205   "workerBuildTime": "2026-08-12T22:25:23Z",
+#15 0.205   "imageDigest": null,
+#15 0.205   "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+#15 0.205   "renderCodeSha256Declared": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+#15 0.205   "renderCodeMatch": true,
+#15 0.205   "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+#15 0.205   "renderCodeFileCount": 30,
+#15 0.205   "workerVersion": "0.1.0"
+#15 0.205 }
+#15 0.205 RENDER_CODE_FINGERPRINT_OK c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+#15 DONE 0.2s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 9.2s done
+#16 writing image sha256:7a7274fb1f0aef21d0fc819e9427bab6114fe5719de3544c54b337de242172d0 done
+
+===== build log tail =====
+#12 4.030 
+#12 4.030 To address all issues, run:
+#12 4.030   npm audit fix --force
+#12 4.030 
+#12 4.030 Run `npm audit` for details.
+#12 4.031 npm notice
+#12 4.031 npm notice New major version of npm available! 10.8.2 -> 12.0.2
+#12 4.031 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.2
+#12 4.031 npm notice To update run: npm install -g npm@12.0.2
+#12 4.031 npm notice
+#12 4.116 npm warn using --force Recommended protections disabled.
+#12 DONE 4.3s
+
+#13 [ 9/11] COPY workers/runpod-blender/src ./src
+#13 DONE 0.0s
+
+#14 [10/11] COPY scripts/blender ./blender
+#14 DONE 0.0s
+
+#15 [11/11] RUN node ./src/provenance.js --write "/opt/ddp-worker/provenance.json" --expect "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91"
+#15 0.205 {
+#15 0.205   "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+#15 0.205   "workerBuildTime": "2026-08-12T22:25:23Z",
+#15 0.205   "imageDigest": null,
+#15 0.205   "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+#15 0.205   "renderCodeSha256Declared": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+#15 0.205   "renderCodeMatch": true,
+#15 0.205   "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+#15 0.205   "renderCodeFileCount": 30,
+#15 0.205   "workerVersion": "0.1.0"
+#15 0.205 }
+#15 0.205 RENDER_CODE_FINGERPRINT_OK c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+#15 DONE 0.2s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 9.2s done
+#16 writing image sha256:7a7274fb1f0aef21d0fc819e9427bab6114fe5719de3544c54b337de242172d0 done
+#16 naming to ghcr.io/<org>/ddp-runpod-blender:bb52703 done
+#16 DONE 9.2s
