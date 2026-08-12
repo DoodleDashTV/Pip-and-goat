@@ -17,6 +17,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 3.758.0
+        version: 3.758.0
       '@doodle-dash/audio':
         specifier: workspace:*
         version: link:../../packages/audio

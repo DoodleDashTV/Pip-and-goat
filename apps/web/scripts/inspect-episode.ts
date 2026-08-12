@@ -31,7 +31,7 @@ async function main() {
           })),
         })),
         dialogues: ep?.dialogues?.map((d) => ({
-          characterId: d.characterId,
+          speakerId: d.speakerId,
           text: d.text?.slice(0, 80),
           startMs: d.startMs,
         })),
