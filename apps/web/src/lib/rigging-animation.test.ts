@@ -3,7 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { evaluateRiggingGates, RIGGING_GATES, type RiggingCharacterEvidence } from './rigging-animation-gates';
 
-const repoRoot = path.resolve(__dirname, '../../..');
+const repoRoot = path.resolve(__dirname, '../../../..');
 const validationPath = path.join(repoRoot, 'artifacts/performance/rigging-audit/validation.json');
 const auditPath = path.join(repoRoot, 'artifacts/performance/rigging-audit/rigging-animation-audit.json');
 
