@@ -2173,3 +2173,74 @@ model ProductionModelReview {
   @@index([characterId, status])
   @@map("production_model_reviews")
 }
+
+// ============================================================
+// Cloud production engine — season queue + GPU spend ledger
+// ============================================================
+
+model SeasonProductionQueueEntry {
+  id             String   @id @default(uuid()) @db.Uuid
+  seasonId       String   @map("season_id") @db.Uuid
+  episodeId      String   @map("episode_id") @db.Uuid
+  episodeNumber  Int      @map("episode_number")
+  priority       Int      @default(50)
+  draftApproved  Boolean  @default(false) @map("draft_approved")
+  finalApproved  Boolean  @default(false) @map("final_approved")
+  renderStatus   String   @default("PENDING") @map("render_status")
+  qcStatus       String   @default("PENDING") @map("qc_status")
+  cloudCost      Float?   @map("cloud_cost")
+  finalOutput    String?  @map("final_output")
+  provider       String?  // LOCAL_BLENDER | RUNPOD_BLENDER
+  batchSessionId String?  @map("batch_session_id")
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([seasonId, episodeNumber])
+  @@index([seasonId, renderStatus])
+  @@index([episodeId])
+  @@map("season_production_queue_entries")
+}
+
+model CloudGpuSpendEntry {
+  id              String   @id @default(uuid()) @db.Uuid
+  jobId           String?  @map("job_id")
+  episodeId       String?  @map("episode_id") @db.Uuid
+  batchSessionId  String?  @map("batch_session_id")
+  provider        String   @default("RUNPOD_BLENDER")
+  gpuType         String?  @map("gpu_type")
+  podId           String?  @map("pod_id")
+  estimatedCostUsd Float?  @map("estimated_cost_usd")
+  actualCostUsd   Float?   @map("actual_cost_usd")
+  runtimeMinutes  Float?   @map("runtime_minutes")
+  hourlyPriceUsd  Float?   @map("hourly_price_usd")
+  status          String   @default("ESTIMATED")
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([episodeId])
+  @@map("cloud_gpu_spend_entries")
+}
+
+model CloudRenderSession {
+  id                 String   @id @default(uuid()) @db.Uuid
+  batchSessionId     String   @unique @map("batch_session_id")
+  provider           String   @default("RUNPOD_BLENDER")
+  podId              String?  @map("pod_id")
+  status             String   @default("PLANNED")
+  gpuType            String?  @map("gpu_type")
+  sharedAssetsLoaded Boolean  @default(false) @map("shared_assets_loaded")
+  episodeIds         Json     @map("episode_ids")
+  completedEpisodeIds Json?   @map("completed_episode_ids")
+  failedEpisodeIds   Json?    @map("failed_episode_ids")
+  estimatedCostUsd   Float?   @map("estimated_cost_usd")
+  actualCostUsd      Float?   @map("actual_cost_usd")
+  idleShutdownAt     DateTime? @map("idle_shutdown_at")
+  terminatedAt       DateTime? @map("terminated_at")
+  log                Json?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("cloud_render_sessions")
+}

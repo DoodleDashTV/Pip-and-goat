@@ -103,6 +103,15 @@ export type ProductionSettings = {
   qualityTarget: 'BEST_QUALITY_PER_DOLLAR' | 'MAXIMUM_QUALITY' | 'MINIMUM_COST';
   localComputeUsdPerMinute: number;
   productName: string;
+  /** Cloud GPU cost guardrails (Phase 12). Conservative defaults. */
+  maxGpuHourlyPrice: number;
+  maxSingleJobCost: number;
+  maxDailyGpuCost: number;
+  maxMonthlyGpuCost: number;
+  idleShutdownMinutes: number;
+  maxJobRuntimeMinutes: number;
+  allowPaidGpuLaunch: boolean;
+  cloudFallbackPolicy: 'LOCAL_ONLY' | 'FAIL_CLOSED' | 'CLOUD_THEN_FAIL';
 };
 
 export const DEFAULT_PRODUCTION_SETTINGS: ProductionSettings = {
@@ -129,6 +138,14 @@ export const DEFAULT_PRODUCTION_SETTINGS: ProductionSettings = {
   qualityTarget: 'BEST_QUALITY_PER_DOLLAR',
   localComputeUsdPerMinute: 0.05,
   productName: PRODUCT_DISPLAY_NAME,
+  maxGpuHourlyPrice: 0.8,
+  maxSingleJobCost: 2.0,
+  maxDailyGpuCost: 10.0,
+  maxMonthlyGpuCost: 50.0,
+  idleShutdownMinutes: 5,
+  maxJobRuntimeMinutes: 180,
+  allowPaidGpuLaunch: false,
+  cloudFallbackPolicy: 'FAIL_CLOSED',
 };
 
 function fingerprint(parts: unknown[]): string {
@@ -296,9 +313,15 @@ export class ProductionProfileService {
 
 /**
  * Blender-first routing. Never silently falls back to paid AI video.
+ * Extends to Runpod cloud when enabled — does not replace local Blender.
  */
 export class BlenderFirstRouter {
-  async routeRender(input?: { explicitAiVideo?: boolean; reason?: string }) {
+  async routeRender(input?: {
+    explicitAiVideo?: boolean;
+    reason?: string;
+    profileCode?: string;
+    preferCloudFinal?: boolean;
+  }) {
     const settings = await new ProductionSettingsService().ensureDefaults();
     const blender = detectBlenderBinary();
 
@@ -314,6 +337,30 @@ export class BlenderFirstRouter {
         path: 'PAID_AI_VIDEO' as const,
         requiresApproval: true,
         reason: input.reason ?? 'Explicit specialty AI video request',
+      };
+    }
+
+    const profile = input?.profileCode ?? '';
+    if (profile === 'AUDIT_FAST') {
+      return {
+        path: 'LOCAL_BLENDER' as const,
+        blender,
+        engineDefault: settings.defaultFinalEngine,
+        reason: 'AUDIT_FAST always uses LOCAL Blender',
+      };
+    }
+
+    // FINAL_1080P prefers cloud when explicitly enabled (Phase 16)
+    if (
+      settings.cloudRenderEnabled &&
+      (profile === 'FINAL_1080P' || profile === 'PREMIUM' || input?.preferCloudFinal)
+    ) {
+      return {
+        path: 'CLOUD_RENDER' as const,
+        provider: 'RUNPOD_BLENDER' as const,
+        engineDefault: settings.defaultFinalEngine,
+        reason: 'Cloud render enabled for final/premium profile',
+        requiresPaidGpuApproval: !settings.allowPaidGpuLaunch,
       };
     }
 
@@ -333,7 +380,11 @@ export class BlenderFirstRouter {
     }
 
     if (settings.cloudRenderEnabled) {
-      return { path: 'CLOUD_RENDER' as const };
+      return {
+        path: 'CLOUD_RENDER' as const,
+        provider: 'RUNPOD_BLENDER' as const,
+        requiresPaidGpuApproval: !settings.allowPaidGpuLaunch,
+      };
     }
 
     throw new AppError(

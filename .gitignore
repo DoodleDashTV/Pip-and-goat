@@ -27,3 +27,4 @@ artifacts/acceptance/**/exports/*_burned.mp4
 artifacts/acceptance/**/exports/*.jpg
 artifacts/acceptance/**/exports/*.png
 artifacts/acceptance/LATEST
+workers/runpod-blender/node_modules/
