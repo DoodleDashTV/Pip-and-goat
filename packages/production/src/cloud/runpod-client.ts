@@ -158,9 +158,12 @@ export class RunpodClient {
     imageName: string;
     gpuTypeId: string;
     confirmPaidLaunch: true;
-    cloudType?: 'SECURE' | 'COMMUNITY';
+    cloudType?: 'SECURE' | 'COMMUNITY' | 'ALL';
     containerDiskInGb?: number;
     volumeInGb?: number;
+    dockerArgs?: string;
+    ports?: string;
+    volumeMountPath?: string;
     env?: Record<string, string>;
   }): Promise<{ podId: string }> {
     const limits = resolveCloudCostLimitsFromEnv();
@@ -177,13 +180,20 @@ export class RunpodClient {
     if (input.confirmPaidLaunch !== true) {
       throw new AppError('confirmPaidLaunch must be true.', 'PAID_GPU_NOT_CONFIRMED', 403);
     }
+    if (limits.maxGpuHourlyPrice < 0.34) {
+      throw new AppError(
+        `MAX_GPU_HOURLY_PRICE ${limits.maxGpuHourlyPrice} is below preferred RTX 4090 rate.`,
+        'GPU_PRICE_CAP_TOO_LOW',
+        400,
+      );
+    }
 
     // Intentionally not auto-invoked. Mutation included for Phase 22 only after approval.
     const data = await this.graphql<{
       podFindAndDeployOnDemand?: { id?: string } | null;
     }>(
       `mutation ($input: PodFindAndDeployOnDemandInput!) {
-        podFindAndDeployOnDemand(input: $input) { id }
+        podFindAndDeployOnDemand(input: $input) { id imageName machineId }
       }`,
       {
         input: {
@@ -191,8 +201,14 @@ export class RunpodClient {
           imageName: input.imageName,
           gpuTypeId: input.gpuTypeId,
           cloudType: input.cloudType ?? 'SECURE',
+          gpuCount: 1,
+          minVcpuCount: 4,
+          minMemoryInGb: 24,
           containerDiskInGb: input.containerDiskInGb ?? 40,
-          volumeInGb: input.volumeInGb ?? 20,
+          volumeInGb: input.volumeInGb ?? 0,
+          volumeMountPath: input.volumeMountPath ?? '/workspace',
+          dockerArgs: input.dockerArgs ?? '',
+          ports: input.ports ?? '8080/http',
           env: Object.entries(input.env ?? {}).map(([key, value]) => ({ key, value })),
         },
       },
@@ -203,6 +219,52 @@ export class RunpodClient {
       throw new AppError('Runpod pod create returned no id.', 'RUNPOD_POD_CREATE_FAILED', 502);
     }
     return { podId };
+  }
+
+  async getPod(podId: string): Promise<{
+    id: string;
+    name: string | null;
+    desiredStatus: string | null;
+    runtime: { uptimeInSeconds?: number | null } | null;
+    machine: { gpuDisplayName?: string | null } | null;
+    costPerHr: number | null;
+  } | null> {
+    // Prefer myself.pods listing — single-pod query shape varies by API version.
+    const data = await this.graphql<{
+      myself?: {
+        pods?: Array<{
+          id?: string;
+          name?: string;
+          desiredStatus?: string;
+          costPerHr?: number;
+          runtime?: { uptimeInSeconds?: number } | null;
+          machine?: { gpuDisplayName?: string } | null;
+        }>;
+      } | null;
+    }>(
+      `query {
+        myself {
+          pods {
+            id
+            name
+            desiredStatus
+            costPerHr
+            runtime { uptimeInSeconds }
+            machine { gpuDisplayName }
+          }
+        }
+      }`,
+    );
+    const pod = (data.myself?.pods ?? []).find((p) => p.id === podId);
+    if (!pod?.id) return null;
+    return {
+      id: pod.id,
+      name: pod.name ?? null,
+      desiredStatus: pod.desiredStatus ?? null,
+      runtime: pod.runtime ?? null,
+      machine: pod.machine ?? null,
+      costPerHr: pod.costPerHr ?? null,
+    };
   }
 
   async terminatePod(podId: string): Promise<void> {
