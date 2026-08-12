@@ -24,21 +24,25 @@ describe("control center web wiring", () => {
     const orch = new ControlCenterOrchestrator(
       loadConfig({
         dataDir: dir,
+        runtimeMode: "test",
         safeMode: true,
-        authToken: "web-token",
-        sessionSecret: "web-sess",
+        authToken: "test-token-dev-only-0001",
+        sessionSecret: "test-session-dev-only-0001",
+        pollIntervalMs: 60_000,
       }),
     );
+    orch.poller.stop();
+    orch.clearDispatchDenied("test");
     globalThis.__ddpControlCenter = orch;
     const { job } = await orch.runSafeZeroLoop("web wiring");
     const dash = orch.getDashboard();
     expect(dash.jobs.some((j) => j.id === job.id)).toBe(true);
     expect(dash.safeMode).toBe(true);
     expect(dash.canonicalOwner).toBe("DoodleDash Production");
+    expect(dash.branchIsolationGuarantee).toMatch(/workOnCurrentBranch=false/);
   });
 });
 
 declare global {
-  // eslint-disable-next-line no-var
   var __ddpControlCenter: ControlCenterOrchestrator | undefined;
 }

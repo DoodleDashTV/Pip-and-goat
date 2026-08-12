@@ -26,7 +26,8 @@
     "db:seed": "pnpm --filter @doodle-dash/database seed",
     "control-center:dev": "pnpm --filter @doodle-dash/control-center-web dev",
     "control-center:build": "pnpm --filter @doodle-dash/control-center-web build",
-    "control-center:test": "pnpm --filter @doodle-dash/control-center test",
+    "control-center:test": "pnpm --filter @doodle-dash/control-center test && pnpm --filter @doodle-dash/control-center-web test",
+    "control-center:lint": "pnpm --filter @doodle-dash/control-center-web lint",
     "control-center:safe-zero": "tsx scripts/control-center/safe-zero-loop.ts",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore"
   },

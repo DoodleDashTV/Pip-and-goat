@@ -1,4 +1,10 @@
-import { mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from "node:fs";
+import {
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  writeFileSync,
+  existsSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import type {
   ApprovalRecord,
@@ -10,8 +16,9 @@ import type {
 import { nowIso } from "./ids";
 
 const EMPTY_STATE = (): ControlCenterState => ({
-  version: 1,
+  version: 2,
   killSwitch: false,
+  dispatchDenied: false,
   autopilot: "paused",
   projects: [],
   jobs: [],
@@ -23,6 +30,8 @@ const EMPTY_STATE = (): ControlCenterState => ({
 export class JsonStore {
   readonly path: string;
   private state: ControlCenterState;
+  /** Set when recovery from corrupt/missing state denies dispatch. */
+  recoveredUnsafe = false;
 
   constructor(dataDir: string, filename = "state.json") {
     this.path = join(dataDir, filename);
@@ -33,16 +42,60 @@ export class JsonStore {
   private load(): ControlCenterState {
     if (!existsSync(this.path)) {
       const fresh = EMPTY_STATE();
+      // Missing state: deny dispatch until operator enables (fail closed).
+      fresh.dispatchDenied = true;
+      fresh.killSwitch = true;
+      fresh.audit.push({
+        id: `audit_recovery_${Date.now()}`,
+        at: nowIso(),
+        action: "system.recovery",
+        actor: "system",
+        detail:
+          "No persisted state found — dispatch denied and kill switch latched until operator clears",
+      });
+      this.recoveredUnsafe = true;
       this.persist(fresh);
       return fresh;
     }
     try {
       const raw = readFileSync(this.path, "utf8");
-      const parsed = JSON.parse(raw) as ControlCenterState;
-      if (parsed.version !== 1 || !Array.isArray(parsed.jobs)) {
+      const parsed = JSON.parse(raw) as {
+        version?: number;
+        killSwitch?: boolean;
+        dispatchDenied?: boolean;
+        autopilot?: ControlCenterState["autopilot"];
+        projects?: ProjectRecord[];
+        jobs?: Array<JobRecord & { workerBranch?: string }>;
+        approvals?: ApprovalRecord[];
+        audit?: AuditRecord[];
+        updatedAt?: string;
+      };
+      if (!parsed || (parsed.version !== 1 && parsed.version !== 2) || !Array.isArray(parsed.jobs)) {
         throw new Error("invalid state shape");
       }
-      return parsed;
+      // migrate v1 → v2
+      if (parsed.version === 1) {
+        parsed.version = 2;
+        parsed.dispatchDenied = false;
+        for (const job of parsed.jobs) {
+          if (!job.workerBranchPolicy && job.workerBranch) {
+            job.workerBranchPolicy = job.workerBranch;
+          }
+          if (!job.dispatchPhase) job.dispatchPhase = job.cursorAgentId ? "created" : "none";
+        }
+      }
+      if (typeof parsed.dispatchDenied !== "boolean") parsed.dispatchDenied = false;
+      return {
+        version: 2,
+        killSwitch: Boolean(parsed.killSwitch),
+        dispatchDenied: Boolean(parsed.dispatchDenied),
+        autopilot: parsed.autopilot || "paused",
+        projects: parsed.projects || [],
+        jobs: parsed.jobs || [],
+        approvals: parsed.approvals || [],
+        audit: parsed.audit || [],
+        updatedAt: parsed.updatedAt || nowIso(),
+      };
     } catch {
       const backup = `${this.path}.corrupt-${Date.now()}`;
       try {
@@ -51,13 +104,16 @@ export class JsonStore {
         /* ignore */
       }
       const fresh = EMPTY_STATE();
+      fresh.dispatchDenied = true;
+      fresh.killSwitch = true;
       fresh.audit.push({
         id: `audit_recovery_${Date.now()}`,
         at: nowIso(),
         action: "system.recovery",
         actor: "system",
-        detail: `Recovered from corrupt state; previous file moved to ${backup}`,
+        detail: `Corrupt state quarantined to ${backup}; dispatch denied until operator clears`,
       });
+      this.recoveredUnsafe = true;
       this.persist(fresh);
       return fresh;
     }
@@ -159,6 +215,16 @@ export class JsonStore {
 
   getKillSwitch(): boolean {
     return this.state.killSwitch;
+  }
+
+  setDispatchDenied(denied: boolean): void {
+    this.update((s) => {
+      s.dispatchDenied = denied;
+    });
+  }
+
+  getDispatchDenied(): boolean {
+    return this.state.dispatchDenied;
   }
 
   setAutopilot(state: ControlCenterState["autopilot"]): void {

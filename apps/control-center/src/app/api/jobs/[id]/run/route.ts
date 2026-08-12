@@ -1,4 +1,5 @@
-import { json, requireAuth } from "@/lib/http";
+import { idSchema, parseOrThrow } from "@doodle-dash/control-center";
+import { errorResponse, json, requireAuth } from "@/lib/http";
 import { getOrchestrator } from "@/lib/server";
 
 export async function POST(
@@ -7,14 +8,12 @@ export async function POST(
 ) {
   const auth = requireAuth(req);
   if (!auth.ok) return auth.response;
-  const { id } = await ctx.params;
   try {
+    const { id } = await ctx.params;
+    parseOrThrow(idSchema, id);
     const job = await getOrchestrator().runJob(id, auth.actor);
     return json({ job });
   } catch (err) {
-    return json(
-      { error: err instanceof Error ? err.message : String(err) },
-      { status: 400 },
-    );
+    return errorResponse(err);
   }
 }

@@ -1,5 +1,6 @@
-import { json, requireAuth } from "@/lib/http";
-import { getOrchestrator } from "@/lib/server";
+import { createJobSchema, parseOrThrow } from "@doodle-dash/control-center";
+import { errorResponse, json, requireAuth } from "@/lib/http";
+import { getConfig, getOrchestrator } from "@/lib/server";
 
 export async function GET(req: Request) {
   const auth = requireAuth(req);
@@ -10,27 +11,21 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const auth = requireAuth(req);
   if (!auth.ok) return auth.response;
-  const body = (await req.json().catch(() => ({}))) as {
-    title?: string;
-    goal?: string;
-    requestedBranch?: string;
-    startingRef?: string;
-    idempotencyKey?: string;
-    forcePaid?: boolean;
-    forceDestructive?: boolean;
-    run?: boolean;
-  };
-
-  if (!body.title?.trim() || !body.goal?.trim()) {
-    return json({ error: "title and goal are required" }, { status: 400 });
-  }
-
-  const orch = getOrchestrator();
   try {
+    const config = getConfig();
+    const contentLength = req.headers.get("content-length");
+    if (contentLength && Number(contentLength) > config.maxRequestBytes) {
+      return json(
+        { error: `Request body exceeds ${config.maxRequestBytes} bytes`, category: "validation" },
+        { status: 413 },
+      );
+    }
+    const body = parseOrThrow(createJobSchema, await req.json().catch(() => ({})));
+    const orch = getOrchestrator();
     const created = orch.createJob({
       projectId: "proj_ddp_default",
-      title: body.title.trim(),
-      goal: body.goal.trim(),
+      title: body.title,
+      goal: body.goal,
       requestedBranch: body.requestedBranch,
       startingRef: body.startingRef,
       idempotencyKey: body.idempotencyKey,
@@ -43,11 +38,12 @@ export async function POST(req: Request) {
     if (body.run && job.status === "queued") {
       job = await orch.runJob(job.id, auth.actor);
     }
-    return json({ job, approval: created.approval, blockedReason: created.blockedReason });
+    return json({
+      job,
+      approval: created.approval,
+      blockedReason: created.blockedReason,
+    });
   } catch (err) {
-    return json(
-      { error: err instanceof Error ? err.message : String(err) },
-      { status: 400 },
-    );
+    return errorResponse(err);
   }
 }

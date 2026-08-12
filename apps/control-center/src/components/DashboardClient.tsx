@@ -5,10 +5,13 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 type Dash = {
   safeMode: boolean;
   killSwitch: boolean;
+  envKillSwitch?: boolean;
+  dispatchDenied?: boolean;
   autopilot: "running" | "paused";
   canonicalOwner: string;
   cloudRenderEnabled: boolean;
   allowPaidGpuLaunch: boolean;
+  branchIsolationGuarantee?: string;
   project?: {
     name: string;
     repoUrl: string;
@@ -19,7 +22,9 @@ type Dash = {
     id: string;
     title: string;
     status: string;
-    workerBranch: string;
+    workerBranchPolicy?: string;
+    workerBranch?: string;
+    observedBranches?: string[];
     resultSummary?: string;
     cursorUrl?: string;
     error?: string;
@@ -41,16 +46,12 @@ type Dash = {
   credentials: { openai: boolean; cursor: boolean };
 };
 
-async function api<T>(
-  path: string,
-  token: string,
-  init?: RequestInit,
-): Promise<T> {
+async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
+    credentials: "include",
     ...init,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
       ...(init?.headers || {}),
     },
   });
@@ -60,7 +61,7 @@ async function api<T>(
 }
 
 export function DashboardClient() {
-  const [token, setToken] = useState("");
+  const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState("");
   const [dash, setDash] = useState<Dash | null>(null);
   const [goal, setGoal] = useState(
@@ -71,37 +72,25 @@ export function DashboardClient() {
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem("ddp-cc-token");
-    if (saved) setToken(saved);
-  }, []);
-
-  const authed = Boolean(token);
-
   const refresh = () => {
-    if (!token) return;
     startTransition(async () => {
       try {
         setError(null);
-        const data = await api<{ dashboard: Dash }>("/api/dashboard", token);
+        const data = await api<{ dashboard: Dash }>("/api/dashboard");
         setDash(data.dashboard);
+        setAuthed(true);
       } catch (err) {
+        setAuthed(false);
         setError(err instanceof Error ? err.message : String(err));
-        if (String(err).includes("Invalid") || String(err).includes("Missing")) {
-          setToken("");
-          window.localStorage.removeItem("ddp-cc-token");
-        }
       }
     });
   };
 
   useEffect(() => {
-    if (!token) return;
     refresh();
-    const id = window.setInterval(refresh, 8000);
+    const id = window.setInterval(refresh, 5000);
     return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, []);
 
   const statusTone = useMemo(
     () => ({
@@ -109,9 +98,13 @@ export function DashboardClient() {
       failed: "bg-red-100 text-alert",
       cancelled: "bg-stone-200 text-stone-700",
       running: "bg-amber-100 text-amber-900",
+      dispatched: "bg-amber-100 text-amber-900",
       awaiting_approval: "bg-orange-100 text-orange-900",
       blocked: "bg-red-100 text-alert",
       queued: "bg-white/80 text-ink",
+      result_requires_integration_review: "bg-orange-100 text-orange-900",
+      cancel_failed: "bg-red-100 text-alert",
+      cancel_pending: "bg-amber-100 text-amber-900",
     }),
     [],
   );
@@ -142,14 +135,15 @@ export function DashboardClient() {
             startTransition(async () => {
               try {
                 setError(null);
-                const data = await fetch("/api/auth/login", {
+                const data = await api<{ token?: string }>("/api/auth/login", {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ password }),
-                }).then((r) => r.json());
-                if (!data.token) throw new Error(data.error || "Login failed");
-                window.localStorage.setItem("ddp-cc-token", data.token);
-                setToken(data.token);
+                });
+                if (!data.token && data) {
+                  /* cookie set by server */
+                }
+                setAuthed(true);
+                refresh();
               } catch (err) {
                 setError(err instanceof Error ? err.message : String(err));
               }
@@ -199,6 +193,22 @@ export function DashboardClient() {
       {notice && (
         <p className="mt-4 rounded-xl bg-meadow/60 px-4 py-3 text-sm">{notice}</p>
       )}
+      {dash?.dispatchDenied && (
+        <div className="mt-4 rounded-xl bg-orange-50 px-4 py-3 text-sm">
+          Dispatch denied after state recovery.{" "}
+          <button
+            className="font-semibold text-moss underline"
+            onClick={() =>
+              startTransition(async () => {
+                await api("/api/dispatch-clear", { method: "POST" });
+                refresh();
+              })
+            }
+          >
+            Clear latch
+          </button>
+        </div>
+      )}
 
       <section className="mt-5 rounded-3xl border border-ink/10 bg-white/70 p-5">
         <h2 className="font-display text-xl font-semibold">Dispatch job</h2>
@@ -227,14 +237,10 @@ export function DashboardClient() {
                 try {
                   setError(null);
                   setNotice(null);
-                  const created = await api<{ job: { id: string } }>(
-                    "/api/jobs",
-                    token,
-                    {
-                      method: "POST",
-                      body: JSON.stringify({ title, goal, run: true }),
-                    },
-                  );
+                  const created = await api<{ job: { id: string } }>("/api/jobs", {
+                    method: "POST",
+                    body: JSON.stringify({ title, goal, run: true }),
+                  });
                   setNotice(`Job ${created.job.id} dispatched`);
                   refresh();
                 } catch (err) {
@@ -254,7 +260,6 @@ export function DashboardClient() {
                   setError(null);
                   const data = await api<{ job: { id: string; status: string } }>(
                     "/api/jobs/safe-zero",
-                    token,
                     { method: "POST" },
                   );
                   setNotice(`$0 loop ${data.job.status}: ${data.job.id}`);
@@ -276,7 +281,7 @@ export function DashboardClient() {
           disabled={pending}
           onClick={() =>
             startTransition(async () => {
-              await api("/api/autopilot", token, {
+              await api("/api/autopilot", {
                 method: "POST",
                 body: JSON.stringify({
                   state: dash?.autopilot === "paused" ? "running" : "paused",
@@ -290,10 +295,10 @@ export function DashboardClient() {
         </button>
         <button
           className="rounded-xl border border-alert/30 bg-red-50 px-3 py-3 text-sm font-semibold text-alert"
-          disabled={pending}
+          disabled={pending || dash?.envKillSwitch}
           onClick={() =>
             startTransition(async () => {
-              await api("/api/kill-switch", token, {
+              await api("/api/kill-switch", {
                 method: "POST",
                 body: JSON.stringify({ enabled: !dash?.killSwitch }),
               });
@@ -320,7 +325,7 @@ export function DashboardClient() {
                     className="rounded-lg bg-moss px-3 py-2 text-xs font-semibold text-white"
                     onClick={() =>
                       startTransition(async () => {
-                        await api(`/api/approvals/${a.id}`, token, {
+                        await api(`/api/approvals/${a.id}`, {
                           method: "POST",
                           body: JSON.stringify({ decision: "approved" }),
                         });
@@ -334,7 +339,7 @@ export function DashboardClient() {
                     className="rounded-lg border border-ink/20 px-3 py-2 text-xs font-semibold"
                     onClick={() =>
                       startTransition(async () => {
-                        await api(`/api/approvals/${a.id}`, token, {
+                        await api(`/api/approvals/${a.id}`, {
                           method: "POST",
                           body: JSON.stringify({ decision: "rejected" }),
                         });
@@ -368,7 +373,14 @@ export function DashboardClient() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-semibold">{job.title}</p>
-                  <p className="mt-1 text-xs text-ink/60">{job.workerBranch}</p>
+                  <p className="mt-1 text-xs text-ink/60">
+                    {job.workerBranchPolicy || job.workerBranch}
+                  </p>
+                  {!!job.observedBranches?.length && (
+                    <p className="mt-1 text-xs text-ink/50">
+                      observed: {job.observedBranches.join(", ")}
+                    </p>
+                  )}
                 </div>
                 <span
                   className={`rounded-full px-2 py-1 text-[11px] font-semibold ${
@@ -398,16 +410,19 @@ export function DashboardClient() {
                     Open agent
                   </a>
                 )}
-                {["running", "queued", "dispatching", "directing"].includes(
-                  job.status,
-                ) && (
+                {[
+                  "running",
+                  "queued",
+                  "dispatching",
+                  "dispatched",
+                  "directing",
+                  "cancel_pending",
+                ].includes(job.status) && (
                   <button
                     className="text-xs font-semibold text-alert"
                     onClick={() =>
                       startTransition(async () => {
-                        await api(`/api/jobs/${job.id}/cancel`, token, {
-                          method: "POST",
-                        });
+                        await api(`/api/jobs/${job.id}/cancel`, { method: "POST" });
                         refresh();
                       })
                     }
@@ -452,15 +467,18 @@ export function DashboardClient() {
           {String(dash?.allowPaidGpuLaunch)}
         </p>
         <p className="mt-2">
-          Protected: {(dash?.project?.protectedBranches || []).join(", ")}
+          Branch guarantee: prompt is not a security boundary. API enforces
+          workOnCurrentBranch=false + autoCreatePR=false + observed-branch checks.
         </p>
         <button
           className="mt-4 text-sm font-semibold text-ink underline"
-          onClick={() => {
-            window.localStorage.removeItem("ddp-cc-token");
-            setToken("");
-            setDash(null);
-          }}
+          onClick={() =>
+            startTransition(async () => {
+              await api("/api/auth/logout", { method: "POST" });
+              setAuthed(false);
+              setDash(null);
+            })
+          }
         >
           Sign out
         </button>
