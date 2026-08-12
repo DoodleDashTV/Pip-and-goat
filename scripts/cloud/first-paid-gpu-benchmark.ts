@@ -23,7 +23,13 @@ import { RunpodClient } from '../../packages/production/src/cloud/runpod-client'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const POD_NAME_PREFIX = 'ddp-first-gpu-bench';
-const GPU_TYPE_ID = 'NVIDIA GeForce RTX 4090';
+const GPU_TYPE_CANDIDATES = (
+  process.env.DDP_BENCH_GPU_TYPES ??
+  'NVIDIA GeForce RTX 4090,NVIDIA RTX A6000,NVIDIA GeForce RTX 5090'
+)
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 /** Public Runpod image (no private registry required). Bootstrap installs Blender. */
 const IMAGE_NAME =
   process.env.DDP_BENCH_IMAGE ??
