@@ -122,30 +122,10 @@ async function uploadBenchBundle(
   return { uploaded };
 }
 
-function buildStartCmd(bootstrapKey: string): string[] {
-  // Prefer dockerStartCmd argv form (overrides image CMD). Keep bootstrap fetch tiny.
-  const py = [
-    'import os,boto3',
-    'from botocore.client import Config',
-    's3=boto3.client("s3",endpoint_url=os.environ["R2_ENDPOINT"].strip().rstrip("/"),aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"].strip(),aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"].strip(),region_name=(os.environ.get("R2_REGION") or "auto").strip() or "auto",config=Config(signature_version="s3v4"))',
-    'bucket=os.environ["R2_BUCKET"].strip()',
-    'prefix=os.environ["BENCH_PREFIX"].rstrip("/")',
-    's3.put_object(Bucket=bucket,Key=prefix+"/results/BOOTSTRAP_START",Body=b"start\\n")',
-    `key=${JSON.stringify(bootstrapKey)}`,
-    's3.download_file(bucket,key,"/tmp/runpod-bench-bootstrap.sh")',
-    'print("DDP_BOOTSTRAP_FETCHED",flush=True)',
-  ].join(';');
-  const script = [
-    'set -euo pipefail',
-    'export DEBIAN_FRONTEND=noninteractive',
-    'apt-get update -qq',
-    'apt-get install -y -qq python3 python3-pip curl ca-certificates >/dev/null',
-    'python3 -m pip install -q --disable-pip-version-check boto3',
-    `python3 -c ${JSON.stringify(py)}`,
-    'chmod +x /tmp/runpod-bench-bootstrap.sh',
-    'exec bash /tmp/runpod-bench-bootstrap.sh',
-  ].join(' && ');
-  return ['/bin/bash', '-lc', script];
+function buildDockerArgs(): string {
+  // GraphQL only accepts dockerArgs (string). Decode bootstrap from env to avoid
+  // fragile nested quoting and an R2 round-trip before apt/python exist.
+  return "bash -c 'echo \"$DDP_BOOTSTRAP_B64\" | base64 -d > /tmp/runpod-bench-bootstrap.sh && chmod +x /tmp/runpod-bench-bootstrap.sh && exec bash /tmp/runpod-bench-bootstrap.sh'";
 }
 
 function estimateCostUsd(costPerHr: number | null | undefined, uptimeSec: number | null | undefined) {
@@ -240,7 +220,9 @@ async function main() {
   await uploadBenchBundle(storage, prefix);
 
   const bootstrapKey = `${prefix}/scripts/cloud/runpod-bench-bootstrap.sh`;
-  const dockerStartCmd = buildStartCmd(bootstrapKey);
+  const bootstrapBytes = await fs.readFile(join(ROOT, 'scripts/cloud/runpod-bench-bootstrap.sh'));
+  const bootstrapB64 = Buffer.from(bootstrapBytes).toString('base64');
+  const dockerArgs = buildDockerArgs();
   const podName = `${POD_NAME_PREFIX}-${runId.slice(0, 19)}`;
 
   const podEnv: Record<string, string> = {
@@ -252,11 +234,13 @@ async function main() {
     RUNPOD_API_KEY: (env.RUNPOD_API_KEY || '').trim(),
     BENCH_PREFIX: prefix,
     DDP_BENCH_ROOT: '/workspace/ddp-bench',
+    DDP_BOOTSTRAP_B64: bootstrapB64,
     CLOUD_RENDER_ENABLED: 'true',
     IDLE_SHUTDOWN_MINUTES: process.env.IDLE_SHUTDOWN_MINUTES || '2',
     MAX_JOB_RUNTIME_MINUTES: process.env.MAX_JOB_RUNTIME_MINUTES || '20',
   };
 
+  log(`BOOTSTRAP_B64_CHARS: ${bootstrapB64.length}`);
   log('CREATING_POD (paid)...');
   const { podId } = await client.createPodForBenchmark({
     name: podName,
@@ -266,8 +250,7 @@ async function main() {
     cloudType: 'COMMUNITY',
     containerDiskInGb: 40,
     volumeInGb: 0,
-    dockerArgs: '',
-    dockerStartCmd,
+    dockerArgs,
     ports: '8080/http',
     deployCost: Number(process.env.MAX_GPU_HOURLY_PRICE ?? '0.40'),
     env: podEnv,
@@ -315,8 +298,13 @@ async function main() {
         throw new Error(`Hard ceiling $${HARD_CEILING_USD} exceeded (est $${cost.toFixed(4)}).`);
       }
 
-      // Results marker?
+      // Progress / result markers
       if (storage.exists) {
+        const alive = await storage.exists(`${prefix}/results/BOOTSTRAP_ALIVE`);
+        const started = await storage.exists(`${prefix}/results/BOOTSTRAP_START`);
+        if (alive || started) {
+          log(`BOOTSTRAP_MARKER alive=${alive} start=${started}`);
+        }
         const complete = await storage.exists(`${prefix}/results/COMPLETE`);
         if (complete) {
           log('COMPLETE_MARKER_FOUND');

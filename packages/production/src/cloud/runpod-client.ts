@@ -162,7 +162,6 @@ export class RunpodClient {
     containerDiskInGb?: number;
     volumeInGb?: number;
     dockerArgs?: string;
-    dockerStartCmd?: string[];
     ports?: string;
     volumeMountPath?: string;
     /** Max $/hr accept for placement (Runpod deployCost filter). */
@@ -194,6 +193,7 @@ export class RunpodClient {
     const deployCost = input.deployCost ?? limits.maxGpuHourlyPrice;
 
     // Intentionally not auto-invoked. Mutation included for Phase 22 only after approval.
+    // GraphQL PodFindAndDeployOnDemandInput supports dockerArgs (string), not dockerStartCmd.
     const data = await this.graphql<{
       podFindAndDeployOnDemand?: { id?: string; costPerHr?: number } | null;
     }>(
@@ -211,7 +211,6 @@ export class RunpodClient {
           volumeInGb: input.volumeInGb ?? 0,
           volumeMountPath: input.volumeMountPath ?? '/workspace',
           dockerArgs: input.dockerArgs ?? '',
-          ...(input.dockerStartCmd ? { dockerStartCmd: input.dockerStartCmd } : {}),
           ports: input.ports ?? '8080/http',
           startSsh: false,
           deployCost,
