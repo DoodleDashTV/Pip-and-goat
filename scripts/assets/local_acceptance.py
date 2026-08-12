@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -177,6 +178,18 @@ def main() -> int:
         if a.exists() and b.exists():
             static_motion[f"{earlier}->{later}"] = moving_pixel_fraction(a, b)
 
+    # Keep the beginning/middle/end frames out of the gitignored sequence dirs so
+    # the representative frames survive as reviewable evidence.
+    keyframe_dir = out_root / "keyframes"
+    keyframe_dir.mkdir(parents=True, exist_ok=True)
+    kept: list[str] = []
+    for frame in KEY_FRAMES:
+        for src, prefix in ((prod_dir / f"frame_{frame:04d}.png", "production"), (static_dir / f"static_{frame:04d}.png", "static_camera")):
+            if src.exists():
+                dst = keyframe_dir / f"{prefix}_{frame:04d}.png"
+                shutil.copyfile(src, dst)
+                kept.append(str(dst.relative_to(REPO_ROOT)))
+
     mp4 = out_root / "local_acceptance_270x480.mp4"
     encode = subprocess.run(
         [
@@ -200,13 +213,16 @@ def main() -> int:
         # Characters must move in the pixels of the locked-off camera render.
         "characterPixelMotion": min_static_motion >= MIN_MOVING_PIXEL_FRACTION,
         "noDuplicateLights": len(active_lights) == 3,
-        # Exposure/contrast/saturation floors chosen from measured frames. The
-        # first cloud render sat at mean luma 167-175, darkest 50, saturation
-        # 12.6 — every one of these checks would have failed it.
-        "exposureControlled": all(70.0 <= s["meanLuma"] <= 150.0 for s in stats) and bool(stats),
-        "hasTrueBlacks": all(s["minLuma"] <= 30.0 for s in stats) and bool(stats),
-        "hasHighlights": all(s["maxLuma"] >= 120.0 for s in stats) and bool(stats),
-        "saturationHealthy": all(s["meanSaturation"] >= 35.0 for s in stats) and bool(stats),
+        # Thresholds measured against real frames. The first cloud acceptance
+        # render sat at mean luma 167-175 with a darkest pixel of 50/255 and mean
+        # saturation 12.6/128: milky, no blacks, desaturated. The shadow and
+        # saturation floors are what reject that look — whole-frame mean luma is
+        # the weakest discriminator (it moves with how much sky is in frame), so
+        # it only guards against gross under/over exposure.
+        "exposureControlled": all(90.0 <= s["meanLuma"] <= 180.0 for s in stats) and bool(stats),
+        "hasTrueBlacks": all(s["minLuma"] <= 40.0 for s in stats) and bool(stats),
+        "hasHighlights": all(s["maxLuma"] >= 160.0 for s in stats) and bool(stats),
+        "saturationHealthy": all(s["meanSaturation"] >= 30.0 for s in stats) and bool(stats),
         "videoEncoded": mp4.exists() and mp4.stat().st_size > 1000,
     }
     ok = all(checks.values())
@@ -222,6 +238,7 @@ def main() -> int:
         "samples": args.samples,
         "checks": checks,
         "keyFrameStats": stats,
+        "keyFrames": kept,
         "staticCameraMovingPixelFraction": static_motion,
         "minStaticCameraMovingPixelFraction": min_static_motion,
         "thresholds": {

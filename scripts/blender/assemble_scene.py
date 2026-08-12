@@ -251,32 +251,40 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
 # saturation 57.8 on the same shot.
 LIGHTING_STATES: dict[str, dict] = {
     "DAY_SOFT": {
-        "world": {"color": (0.42, 0.62, 0.85), "strength": 0.26},
+        "world": {"color": (0.42, 0.62, 0.85), "strength": 0.28},
         "look": "AgX - Punchy",
-        "key": {"type": "SUN", "energy": 4.8, "location": (4.0, -5.0, 9.0), "rotation": (0.72, 0.12, 0.5)},
-        "fill": {"type": "AREA", "energy": 11.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
-        "rim": {"type": "AREA", "energy": 16.0, "size": 3.0, "location": (1.6, 3.4, 3.6)},
+        "exposure": -2.2,
+        "sky": {"color": (0.38, 0.62, 0.95), "strength": 1.6},
+        "key": {"type": "SUN", "energy": 3.4, "location": (4.0, -5.0, 9.0), "rotation": (0.72, 0.12, 0.5)},
+        "fill": {"type": "AREA", "energy": 4.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
+        "rim": {"type": "AREA", "energy": 7.0, "size": 3.0, "location": (1.6, 3.4, 3.6)},
     },
     "DAY_KEY": {
-        "world": {"color": (0.40, 0.60, 0.84), "strength": 0.22},
+        "world": {"color": (0.40, 0.60, 0.84), "strength": 0.25},
         "look": "AgX - Punchy",
-        "key": {"type": "SUN", "energy": 7.0, "location": (3.4, -4.4, 9.0), "rotation": (0.66, 0.1, 0.42)},
-        "fill": {"type": "AREA", "energy": 7.7, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
-        "rim": {"type": "AREA", "energy": 23.4, "size": 2.6, "location": (1.2, 3.8, 4.0)},
+        "exposure": -2.2,
+        "sky": {"color": (0.35, 0.60, 0.95), "strength": 1.6},
+        "key": {"type": "SUN", "energy": 4.0, "location": (3.4, -4.4, 9.0), "rotation": (0.66, 0.1, 0.42)},
+        "fill": {"type": "AREA", "energy": 3.0, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
+        "rim": {"type": "AREA", "energy": 8.0, "size": 2.6, "location": (1.2, 3.8, 4.0)},
     },
     "GOLDEN_HOUR": {
         "world": {"color": (0.52, 0.42, 0.32), "strength": 0.22},
         "look": "AgX - Punchy",
-        "key": {"type": "SUN", "energy": 5.4, "location": (-5.5, -3.0, 3.2), "rotation": (1.18, 0.0, -0.75)},
-        "fill": {"type": "AREA", "energy": 5.5, "size": 6.0, "location": (3.0, -4.0, 2.4)},
-        "rim": {"type": "AREA", "energy": 27.0, "size": 2.4, "location": (2.2, 3.2, 3.2)},
+        "exposure": -2.0,
+        "sky": {"color": (0.95, 0.55, 0.30), "strength": 1.4},
+        "key": {"type": "SUN", "energy": 3.2, "location": (-5.5, -3.0, 3.2), "rotation": (1.18, 0.0, -0.75)},
+        "fill": {"type": "AREA", "energy": 2.2, "size": 6.0, "location": (3.0, -4.0, 2.4)},
+        "rim": {"type": "AREA", "energy": 9.0, "size": 2.4, "location": (2.2, 3.2, 3.2)},
     },
     "OVERCAST": {
-        "world": {"color": (0.55, 0.58, 0.62), "strength": 0.40},
+        "world": {"color": (0.55, 0.58, 0.62), "strength": 0.45},
         "look": "AgX - Base Contrast",
-        "key": {"type": "SUN", "energy": 2.4, "location": (2.0, -4.0, 10.0), "rotation": (0.5, 0.0, 0.2)},
-        "fill": {"type": "AREA", "energy": 10.0, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
-        "rim": {"type": "AREA", "energy": 7.0, "size": 4.0, "location": (0.0, 3.6, 3.4)},
+        "exposure": -2.0,
+        "sky": {"color": (0.68, 0.71, 0.75), "strength": 1.5},
+        "key": {"type": "SUN", "energy": 1.6, "location": (2.0, -4.0, 10.0), "rotation": (0.5, 0.0, 0.2)},
+        "fill": {"type": "AREA", "energy": 4.5, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
+        "rim": {"type": "AREA", "energy": 3.0, "size": 4.0, "location": (0.0, 3.6, 3.4)},
     },
 }
 DEFAULT_LIGHTING_STATE = "DAY_SOFT"
@@ -288,6 +296,48 @@ DDP_LIGHT_PREFIX = "DDP_"
 def resolve_lighting_state(requested: str | None) -> str:
     state = str(requested or "").strip().upper().replace("-", "_").replace(" ", "_")
     return state if state in LIGHTING_STATES else DEFAULT_LIGHTING_STATE
+
+
+def apply_sky_emission(spec: dict) -> list[str]:
+    """Make environment sky domes self-lit.
+
+    A sky dome is a plain diffuse mesh, so its brightness otherwise depends on
+    whichever lights happen to reach it: lowering the fill to get real shadows
+    turned the meadow's sky navy and the whole shot read as dusk. Driving it from
+    the lighting state keeps the sky bright and deterministic no matter how the
+    key/fill/rim rig is tuned.
+    """
+    import bpy
+
+    sky = spec.get("sky")
+    if not sky:
+        return []
+    material = bpy.data.materials.get("DDP_Sky") or bpy.data.materials.new("DDP_Sky")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
+    emission = nodes.new("ShaderNodeEmission")
+    emission.inputs[0].default_value = (*sky["color"], 1.0)
+    emission.inputs[1].default_value = sky["strength"]
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(emission.outputs[0], out.inputs[0])
+
+    applied = []
+    for obj in bpy.data.objects:
+        if obj.type != "MESH" or "sky" not in obj.name.lower():
+            continue
+        obj.data.materials.clear()
+        obj.data.materials.append(material)
+        # The meadow's sky is a radius-40 dome that ENCLOSES the whole set,
+        # including the lights. As a shadow caster it blocked the sun completely:
+        # measured with raytraced shadows on, driving the key light from 8.5 to
+        # 500 W/m2 changed mean frame luma by 0.01, because every ray was stopped
+        # by the dome overhead. A background dome must never occlude the key.
+        if hasattr(obj, "visible_shadow"):
+            obj.visible_shadow = False
+        applied.append(obj.name)
+    return applied
 
 
 def apply_lighting_state(scene, requested: str | None) -> dict:
@@ -330,6 +380,7 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
 
     # Filmic tone mapping. Without a look, AgX renders this palette flat and
     # desaturated, which is a large part of why the first render looked milky.
+    scene.view_settings.exposure = float(spec.get("exposure", 0.0))
     look = spec.get("look") or "None"
     look_applied = None
     try:
@@ -338,8 +389,11 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
     except (TypeError, ValueError):  # look unavailable in this build's OCIO config
         look_applied = scene.view_settings.look
 
+    sky_objects = apply_sky_emission(spec)
+
     total = [o.name for o in bpy.data.objects if o.type == "LIGHT"]
     return {
+        "skyObjects": sky_objects,
         "lightingState": state_name,
         "requested": requested or None,
         "created": created,
@@ -348,6 +402,7 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
         "worldStrength": spec["world"]["strength"],
         "look": look_applied,
         "lookRequested": look,
+        "exposure": scene.view_settings.exposure,
         "viewTransform": scene.view_settings.view_transform,
     }
 
