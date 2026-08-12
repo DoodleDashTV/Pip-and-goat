@@ -28,3 +28,8 @@ artifacts/acceptance/**/exports/*.jpg
 artifacts/acceptance/**/exports/*.png
 artifacts/acceptance/LATEST
 workers/runpod-blender/node_modules/
+__pycache__/
+# Local acceptance render output: keep the JSON reports, video and key frames,
+# not the full 90-frame PNG sequences.
+artifacts/local-acceptance/production/
+artifacts/local-acceptance/static-camera/

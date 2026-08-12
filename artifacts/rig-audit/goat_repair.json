@@ -1,0 +1,78 @@
+{
+  "role": "goat",
+  "blend": "production-library/characters/goat_production.blend",
+  "steps": {
+    "rotationMode": "XYZ",
+    "bindings": [
+      {
+        "mesh": "Goat_Character",
+        "armature": "Goat_Rig",
+        "vertexGroups": 18,
+        "unweighted": 0
+      },
+      {
+        "mesh": "Goat_Collar",
+        "armature": "Goat_Rig",
+        "rigidBone": "collar"
+      },
+      {
+        "mesh": "Goat_Tag",
+        "armature": "Goat_Rig",
+        "rigidBone": "collar"
+      },
+      {
+        "mesh": "Goat_Tag_Text",
+        "armature": "Goat_Rig",
+        "rigidBone": "collar"
+      }
+    ],
+    "reauthored": [
+      {
+        "action": "GOAT_HEAD_NOD",
+        "frames": 90,
+        "fcurves": 21,
+        "varyingFcurves": 12
+      }
+    ],
+    "motion": {
+      "framesSampled": [
+        1,
+        30,
+        60,
+        90
+      ],
+      "maxBoneDelta": 0.719718,
+      "maxVertexDelta": 0.219654,
+      "pairwiseVertexDeltas": {
+        "1->30": 0.129035,
+        "30->60": 0.32175,
+        "60->90": 0.168604
+      },
+      "minConsecutiveVertexDelta": 0.129035,
+      "movingBones": [
+        "chest",
+        "collar",
+        "ear_L",
+        "ear_R",
+        "head",
+        "hoof_BL",
+        "hoof_BR",
+        "hoof_FL",
+        "hoof_FR",
+        "leg_BL",
+        "leg_BR",
+        "leg_FL",
+        "leg_FR",
+        "neck",
+        "pelvis",
+        "root",
+        "spine",
+        "tail"
+      ],
+      "vertexCount": 5548
+    }
+  },
+  "failures": [],
+  "ok": true,
+  "status": "PASS"
+}
