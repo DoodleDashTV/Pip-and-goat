@@ -1,0 +1,14 @@
+===== docker push =====
+2c414d24779f: Pushed
+efe2b79b53de: Layer already exists
+47654eeadbc5: Layer already exists
+e0a9f5911802: Pushed
+b379053c6f95: Pushed
+4c3b7e275e92: Pushed
+320cd1abfa9a: Pushed
+bb52703: digest: sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27 size: 4303
+
+===== anonymous pullability (no credentials) =====
+anonymous ghcr token issued for repository:<org>/ddp-runpod-blender:pull -> yes
+GET https://ghcr.io/v2/<org>/ddp-runpod-blender/manifests/sha256:e80cf523... (anonymous token) -> HTTP 200
+DOCKER_CONFIG=<empty> docker pull ...@sha256:e80cf523... -> Status: Downloaded newer image
