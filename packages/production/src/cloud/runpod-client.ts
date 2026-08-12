@@ -165,6 +165,14 @@ export class RunpodClient {
     gpuTypeId: string;
     confirmPaidLaunch: true;
     cloudType?: 'SECURE' | 'COMMUNITY';
+    /**
+     * Number of GPUs for the on-demand finder. RunPod's
+     * `podFindAndDeployOnDemand` matches nothing (and returns the generic
+     * "no longer any instances available with the requested specifications"
+     * error, even when aggregate stockStatus is High) unless a positive
+     * gpuCount is supplied. Defaults to 1.
+     */
+    gpuCount?: number;
     containerDiskInGb?: number;
     volumeInGb?: number;
     env?: Record<string, string>;
@@ -216,6 +224,7 @@ export class RunpodClient {
           name: input.name,
           imageName: input.imageName,
           gpuTypeId: input.gpuTypeId,
+          gpuCount: input.gpuCount && input.gpuCount > 0 ? Math.floor(input.gpuCount) : 1,
           cloudType: input.cloudType ?? 'SECURE',
           containerDiskInGb: input.containerDiskInGb ?? 40,
           volumeInGb: input.volumeInGb ?? 20,
