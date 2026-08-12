@@ -13,11 +13,18 @@ import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { RunpodClient } from '../../../packages/production/src/cloud/runpod-client';
 import { validateRunpodWorkerImageRef } from '../../../packages/production/src/cloud/config';
+import {
+  computeRenderCodeFingerprint,
+  inspectGhcrImage,
+  verifyWorkerProvenance,
+} from '../../../packages/production/src/cloud/worker-provenance';
 import { estimateCloudRenderCost } from '../../../packages/production/src/cloud/cost-estimation';
 import { sha256Hex } from '@doodle-dash/shared';
 import { evaluateLocalQualityGates } from '../../../apps/web/src/lib/local-quality-gates';
 import {
   WORKER_IMAGE,
+  WORKER_IMAGE_SOURCE_COMMIT,
+  WORKER_IMAGE_RENDER_CODE_SHA256,
   HARD_CAP_USD,
   RESOLUTION,
   FPS,
@@ -43,49 +50,6 @@ const add = (id: string, name: string, status: Check['status'], detail: string) 
   const tag = status === 'PASS' ? 'PASS' : status === 'WARN' ? 'WARN' : 'FAIL';
   console.log(`[${tag}] ${id} ${name} — ${redact(detail)}`);
 };
-
-async function ghcrPullable(imageRef: string): Promise<{ ok: boolean; amd64: boolean; detail: string }> {
-  // Anonymous pull check against GHCR for the pinned digest.
-  const at = imageRef.indexOf('@');
-  const repoPart = imageRef.slice(imageRef.indexOf('/') + 1, at); // <org>/ddp-runpod-blender path segment
-  const digest = imageRef.slice(at + 1);
-  try {
-    const tokRes = await fetch(
-      `https://ghcr.io/token?scope=repository:${repoPart}:pull&service=ghcr.io`,
-    );
-    const tok = (await tokRes.json()) as { token?: string };
-    if (!tok.token) return { ok: false, amd64: false, detail: 'no anonymous token' };
-    const accept = [
-      'application/vnd.oci.image.index.v1+json',
-      'application/vnd.docker.distribution.manifest.list.v2+json',
-      'application/vnd.oci.image.manifest.v1+json',
-      'application/vnd.docker.distribution.manifest.v2+json',
-    ].join(', ');
-    const manRes = await fetch(`https://ghcr.io/v2/${repoPart}/manifests/${digest}`, {
-      headers: { Authorization: `Bearer ${tok.token}`, Accept: accept },
-    });
-    if (!manRes.ok) return { ok: false, amd64: false, detail: `manifest HTTP ${manRes.status}` };
-    const man = (await manRes.json()) as any;
-    let amd64 = false;
-    if (Array.isArray(man.manifests)) {
-      amd64 = man.manifests.some(
-        (m: any) => m?.platform?.architecture === 'amd64' && m?.platform?.os === 'linux',
-      );
-    } else if (man.config?.digest) {
-      // single image manifest -> fetch config blob to read architecture
-      const cfgRes = await fetch(`https://ghcr.io/v2/${repoPart}/blobs/${man.config.digest}`, {
-        headers: { Authorization: `Bearer ${tok.token}` },
-      });
-      if (cfgRes.ok) {
-        const cfg = (await cfgRes.json()) as any;
-        amd64 = cfg.architecture === 'amd64' && cfg.os === 'linux';
-      }
-    }
-    return { ok: true, amd64, detail: `manifest 200; linux/amd64=${amd64}` };
-  } catch (e) {
-    return { ok: false, amd64: false, detail: redact((e as Error).message) };
-  }
-}
 
 async function main() {
   ensureStateDir();
@@ -256,6 +220,8 @@ async function main() {
 
   // ---- Runpod ----
   let rate4090: number | null = null;
+  let secureRate4090: number | null = null;
+  let secureStock: string | null = null;
   let gpuTypeId: string | null = null;
   let cloudType: 'SECURE' | 'COMMUNITY' = 'SECURE';
   let client: RunpodClient | null = null;
@@ -269,8 +235,22 @@ async function main() {
       auth.gpuTypes.find((g) => g.displayName.toLowerCase().includes('4090'));
     if (g4090) {
       gpuTypeId = g4090.id;
-      rate4090 = g4090.uninterruptablePrice ?? null;
-      console.log(`  RTX 4090: id=${g4090.id} secure=${g4090.secureCloud} community=${g4090.communityCloud} secureOnDemand=$${g4090.uninterruptablePrice}/hr bid=$${g4090.minimumBidPrice}/hr`);
+      // The catalog's lowestPrice has no cloud filter, so it returns the
+      // cheapest offer across community AND secure. Launches are SECURE, so ask
+      // for the secure price explicitly; the unfiltered figure understated a
+      // real SECURE pod by ~2x ($0.34 quoted vs $0.74 billed).
+      const listRate = g4090.uninterruptablePrice ?? null;
+      try {
+        const secure = await client.getSecureOnDemandPrice(g4090.id);
+        secureRate4090 = secure.uninterruptablePrice ?? null;
+        secureStock = secure.stockStatus ?? null;
+      } catch (e) {
+        console.log(`  secure price query failed: ${redact((e as Error).message)}`);
+      }
+      rate4090 = secureRate4090 ?? listRate;
+      console.log(
+        `  RTX 4090: id=${g4090.id} secure=${g4090.secureCloud} community=${g4090.communityCloud} listLowest=$${listRate}/hr secureOnDemand=$${secureRate4090 ?? 'unavailable'}/hr stock=${secureStock ?? 'unknown'} bid=$${g4090.minimumBidPrice}/hr`,
+      );
     }
   } catch (e) {
     add('10', 'Runpod API auth', 'FAIL', redact((e as Error).message));
@@ -305,11 +285,12 @@ async function main() {
       gpuHourlyPriceUsd: rate4090 ?? 0.7,
     });
     estimatedCostUsd = est.estimatedCostUsd;
+    const rateSource = secureRate4090 ? 'secure-cloud on-demand' : 'catalog lowest (may understate SECURE)';
     add(
       '14',
       'Estimated cost <= $0.25',
-      est.estimatedCostUsd <= HARD_CAP_USD ? 'PASS' : 'FAIL',
-      `est=$${est.estimatedCostUsd} (rate=$${rate4090 ?? '0.7(assumed)'}/hr, runtime~${est.estimatedRuntimeMinutes}min, ${est.frameCount} frames)`,
+      est.estimatedCostUsd > HARD_CAP_USD ? 'FAIL' : secureRate4090 ? 'PASS' : 'WARN',
+      `est=$${est.estimatedCostUsd} (rate=$${rate4090 ?? '0.7(assumed)'}/hr from ${rateSource}, stock=${secureStock ?? 'unknown'}, runtime~${est.estimatedRuntimeMinutes}min, ${est.frameCount} frames); hard-kill still recomputed from the pod's ACTUAL costPerHr`,
     );
   } catch (e) {
     add('14', 'Estimated cost <= $0.25', 'FAIL', redact((e as Error).message));
@@ -325,12 +306,34 @@ async function main() {
 
   // ---- Worker image gate ----
   const imgCheck = validateRunpodWorkerImageRef(WORKER_IMAGE);
-  const pull = await ghcrPullable(WORKER_IMAGE);
+  const registry = await inspectGhcrImage(WORKER_IMAGE);
   add(
     'IMG',
     'Worker image resolves (digest-pinned, ghcr.io, anonymously pullable, linux/amd64)',
-    imgCheck.ok && pull.ok && pull.amd64 ? 'PASS' : imgCheck.ok && pull.ok ? 'WARN' : 'FAIL',
-    `validate ok=${imgCheck.ok} code=${imgCheck.code} registry=${imgCheck.registry} repo=${imgCheck.repository} digest=${imgCheck.digest}; ghcr ${pull.detail}`,
+    imgCheck.ok && registry.ok && registry.amd64 ? 'PASS' : imgCheck.ok && registry.ok ? 'WARN' : 'FAIL',
+    `validate ok=${imgCheck.ok} code=${imgCheck.code} registry=${imgCheck.registry} repo=${imgCheck.repository} digest=${imgCheck.digest}; ghcr ${registry.detail}`,
+  );
+
+  // ---- Worker image PROVENANCE gate (stale-image protection) ----
+  // The scene-assembly code is baked into the image, so "pullable" proves
+  // nothing about render behaviour. Require the image to prove, from its
+  // registry metadata alone, that it was built from the expected commit and
+  // contains byte-identical render code to this checkout.
+  const localFingerprint = computeRenderCodeFingerprint(REPO_ROOT);
+  const provenance = verifyWorkerProvenance({
+    imageRef: WORKER_IMAGE,
+    expectedSourceCommit: WORKER_IMAGE_SOURCE_COMMIT,
+    expectedRenderCodeSha256: WORKER_IMAGE_RENDER_CODE_SHA256,
+    localRenderCodeSha256: localFingerprint.fingerprint,
+    registry,
+  });
+  add(
+    'PROV',
+    'Worker image provenance (source commit + baked render code == this checkout)',
+    provenance.ok ? 'PASS' : 'FAIL',
+    provenance.ok
+      ? `code=OK imageCommit=${provenance.facts.imageSourceCommit} renderCode=${localFingerprint.fingerprint.slice(0, 16)}… builtAt=${provenance.facts.imageBuildTime} files=${localFingerprint.files.length}`
+      : `code=${provenance.code} — ${provenance.reasons.join('; ')}`,
   );
 
   // ---- Confirm paid-launch gate refuses while flag false ----
@@ -377,7 +380,10 @@ async function main() {
     gpuTypeId,
     cloudType,
     rate4090,
+    secureRate4090,
+    secureStock,
     estimatedCostUsd,
+    workerProvenance: { ...provenance.facts, code: provenance.code, ok: provenance.ok },
     assets: assets.map((a) => ({ role: a.role, r2Key: a.r2Key, sha256: a.sha256, bytes: a.bytes })),
     startupStatusKey: `jobs/${jobId}/startup-status.json`,
     statusKey: `jobs/${jobId}/status.json`,

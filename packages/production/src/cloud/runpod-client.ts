@@ -156,6 +156,53 @@ export class RunpodClient {
   }
 
   /**
+   * Read-only secure-cloud on-demand price for one GPU. Creates nothing.
+   *
+   * `verifyAuthAndListGpus` asks for `lowestPrice(gpuCount: 1)` without a cloud
+   * filter, so it returns the cheapest offer across community AND secure — for
+   * the RTX 4090 that quoted $0.34/hr while a SECURE pod actually billed
+   * $0.74/hr, understating a pre-launch estimate by ~2x. Launches are SECURE, so
+   * estimates must use the secure price. The pod's returned `costPerHr` remains
+   * authoritative for the hard-kill deadline after creation.
+   */
+  async getSecureOnDemandPrice(gpuTypeId: string): Promise<{
+    gpuTypeId: string;
+    uninterruptablePrice: number | null;
+    minimumBidPrice: number | null;
+    stockStatus: string | null;
+  }> {
+    const data = await this.graphql<{
+      gpuTypes?: Array<{
+        id?: string;
+        lowestPrice?: {
+          minimumBidPrice?: number;
+          uninterruptablePrice?: number;
+          stockStatus?: string | null;
+        } | null;
+      }>;
+    }>(
+      `query SecurePrice($id: String) {
+        gpuTypes(input: { id: $id }) {
+          id
+          lowestPrice(input: { gpuCount: 1, secureCloud: true }) {
+            minimumBidPrice
+            uninterruptablePrice
+            stockStatus
+          }
+        }
+      }`,
+      { id: gpuTypeId },
+    );
+    const g = (data.gpuTypes ?? []).find((x) => x.id === gpuTypeId) ?? (data.gpuTypes ?? [])[0];
+    return {
+      gpuTypeId,
+      uninterruptablePrice: g?.lowestPrice?.uninterruptablePrice ?? null,
+      minimumBidPrice: g?.lowestPrice?.minimumBidPrice ?? null,
+      stockStatus: g?.lowestPrice?.stockStatus ?? null,
+    };
+  }
+
+  /**
    * HARD SAFETY GATE — refuses unless ALLOW_PAID_GPU_LAUNCH=true and caller opts in.
    * Do not call from automatic flows after coding.
    */

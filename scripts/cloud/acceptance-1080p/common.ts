@@ -30,9 +30,18 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * The proven digest-pinned hardened worker image. This is a PUBLIC, non-secret
  * ghcr.io reference (anonymous pull verified). Its org segment coincidentally
  * equals the R2 bucket name, so the secret scanner may flag the line.
+ *
+ * WORKER_IMAGE_SOURCE_COMMIT / WORKER_IMAGE_RENDER_CODE_SHA256 are the build
+ * provenance the image is stamped with. Preflight reads the same values back
+ * from the registry and refuses a paid launch on any disagreement, because the
+ * Blender scene-assembly code is baked into the image: a pullable but stale
+ * image once rendered pre-repair 8-light lighting while every other gate passed.
+ * All three constants must be re-pinned together whenever the image is rebuilt.
  */
 export const WORKER_IMAGE =
   'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = 'PENDING_REBUILD';
+export const WORKER_IMAGE_RENDER_CODE_SHA256 = 'PENDING_REBUILD';
 
 export const HARD_CAP_USD = 0.25;
 
