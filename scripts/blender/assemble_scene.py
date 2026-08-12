@@ -35,6 +35,13 @@ def set_eevee(scene, samples: int = 32) -> None:
     scene.render.engine = eevee_engine_id(scene)
     if hasattr(scene, "eevee") and hasattr(scene.eevee, "taa_render_samples"):
         scene.eevee.taa_render_samples = max(1, samples)
+    # EEVEE-Next: raytraced shadows give real contact shadows and occlusion, so
+    # characters sit in the scene instead of looking pasted onto the grass. The
+    # legacy gtao switch is a no-op in this engine.
+    if hasattr(scene, "eevee"):
+        for attr in ("use_raytracing", "use_shadows", "use_soft_shadows"):
+            if hasattr(scene.eevee, attr):
+                setattr(scene.eevee, attr, True)
 
 
 def append_object(blend_path: str, names: list[str] | None = None):
@@ -64,24 +71,95 @@ def find_armature(objects):
     return None
 
 
-def apply_action(arm, action_name: str | None, frame_start: int, frame_end: int) -> None:
+def strip_imported_lights_and_cameras(objects) -> dict:
+    """Remove lights/cameras that ride along inside asset blends.
+
+    Every founding blend ships its own reference lighting rig and reference
+    camera. Appending four of them stacked 8 lights and 3 stray cameras into the
+    shot, which is what washed out the first 1080p acceptance render. The shot
+    owns its lighting and camera; assets only contribute geometry.
+    """
+    import bpy
+
+    # Snapshot names first: removing an object invalidates every Python handle to
+    # it, so the survivor list has to be rebuilt by name afterwards.
+    inventory = [(obj.name, obj.type) for obj in objects]
+    removed = {"lights": [], "cameras": []}
+    for name, kind in inventory:
+        if kind not in ("LIGHT", "CAMERA"):
+            continue
+        obj = bpy.data.objects.get(name)
+        if obj is None:
+            continue
+        removed["lights" if kind == "LIGHT" else "cameras"].append(name)
+        bpy.data.objects.remove(obj, do_unlink=True)
+    removed["survivors"] = [name for name, kind in inventory if kind not in ("LIGHT", "CAMERA")]
+    return removed
+
+
+def placement_root(role: str, objects):
+    """The single object to move so a whole multi-object asset travels together.
+
+    Moving "the first imported mesh" detached ``MapMark`` from ``AdventureMap``.
+    Prefer the armature, then an existing root parent, otherwise group the
+    asset's top-level objects under a fresh empty and move that, which preserves
+    every internal transform and parent/child relationship.
+    """
+    import bpy
+
+    arm = find_armature(objects)
+    if arm is not None:
+        return arm, "armature"
+
+    live = [o for o in objects if o.name in bpy.data.objects]
+    if not live:
+        return None, "none"
+
+    tops = [o for o in live if o.parent is None or o.parent not in live]
+    if len(tops) == 1:
+        return tops[0], "existing-root"
+
+    root = bpy.data.objects.new(f"{role}_Root", None)
+    bpy.context.collection.objects.link(root)
+    for obj in tops:
+        # keep_transform equivalent: preserve the world matrix across reparenting
+        world = obj.matrix_world.copy()
+        obj.parent = root
+        obj.matrix_world = world
+    # Reparenting leaves cached world matrices stale until the depsgraph runs.
+    bpy.context.view_layer.update()
+    return root, "created-root"
+
+
+def apply_action(arm, action_name: str | None, frame_start: int, frame_end: int) -> bool:
+    """Bind a named action to an armature. Returns False when it cannot be found.
+
+    Matching is exact (case-insensitive) rather than fuzzy substring: a loose
+    match silently binding the wrong action is worse than failing closed.
+    """
     import bpy
 
     if not arm or not action_name:
-        return
+        return False
     action = bpy.data.actions.get(action_name)
     if not action:
-        # fuzzy match
-        for a in bpy.data.actions:
-            if action_name.lower() in a.name.lower() or a.name.lower().endswith(action_name.lower()):
-                action = a
-                break
+        wanted = action_name.lower()
+        action = next((a for a in bpy.data.actions if a.name.lower() == wanted), None)
     if not action:
-        return
+        return False
     if not arm.animation_data:
         arm.animation_data_create()
     arm.animation_data.action = action
     arm.animation_data.action_extrapolation = "HOLD"
+
+    # An action shorter than the shot would otherwise freeze on its last pose for
+    # the remainder of the render. Repeat it instead so the character stays alive.
+    a_start, a_end = action.frame_range
+    if (a_end - a_start) > 0 and (a_end - a_start) < (frame_end - frame_start):
+        for fcurve in action.fcurves:
+            if not any(m.type == "CYCLES" for m in fcurve.modifiers):
+                fcurve.modifiers.new(type="CYCLES")
+    return True
 
 
 def apply_viseme_cues(mesh_obj, cues: list[dict], fps: int) -> None:
@@ -160,28 +238,118 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
     scene.render.film_transparent = False
 
 
-def ensure_lights(scene) -> None:
+# The authoritative lighting layer. One named key/fill/rim rig per state, with an
+# explicit world strength, so exposure is deterministic and never accumulates.
+#
+# Energies are tuned against measured frame statistics, not guessed. The first
+# 1080p acceptance render measured mean luma 167-175, darkest pixel 50/255 and
+# mean saturation 12.6/128 — milky and desaturated, because four appended blends
+# stacked 8 lights and nothing was ever in shadow. Each state below keeps one
+# bright key, a deliberately weak fill so the shadow side stays dark, a rim for
+# separation, and a low world strength; combined with EEVEE-Next raytraced
+# shadows and the AgX Punchy look this measures mean 111, darkest 12.7 and
+# saturation 57.8 on the same shot.
+LIGHTING_STATES: dict[str, dict] = {
+    "DAY_SOFT": {
+        "world": {"color": (0.42, 0.62, 0.85), "strength": 0.26},
+        "look": "AgX - Punchy",
+        "key": {"type": "SUN", "energy": 4.8, "location": (4.0, -5.0, 9.0), "rotation": (0.72, 0.12, 0.5)},
+        "fill": {"type": "AREA", "energy": 11.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
+        "rim": {"type": "AREA", "energy": 16.0, "size": 3.0, "location": (1.6, 3.4, 3.6)},
+    },
+    "DAY_KEY": {
+        "world": {"color": (0.40, 0.60, 0.84), "strength": 0.22},
+        "look": "AgX - Punchy",
+        "key": {"type": "SUN", "energy": 7.0, "location": (3.4, -4.4, 9.0), "rotation": (0.66, 0.1, 0.42)},
+        "fill": {"type": "AREA", "energy": 7.7, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
+        "rim": {"type": "AREA", "energy": 23.4, "size": 2.6, "location": (1.2, 3.8, 4.0)},
+    },
+    "GOLDEN_HOUR": {
+        "world": {"color": (0.52, 0.42, 0.32), "strength": 0.22},
+        "look": "AgX - Punchy",
+        "key": {"type": "SUN", "energy": 5.4, "location": (-5.5, -3.0, 3.2), "rotation": (1.18, 0.0, -0.75)},
+        "fill": {"type": "AREA", "energy": 5.5, "size": 6.0, "location": (3.0, -4.0, 2.4)},
+        "rim": {"type": "AREA", "energy": 27.0, "size": 2.4, "location": (2.2, 3.2, 3.2)},
+    },
+    "OVERCAST": {
+        "world": {"color": (0.55, 0.58, 0.62), "strength": 0.40},
+        "look": "AgX - Base Contrast",
+        "key": {"type": "SUN", "energy": 2.4, "location": (2.0, -4.0, 10.0), "rotation": (0.5, 0.0, 0.2)},
+        "fill": {"type": "AREA", "energy": 10.0, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
+        "rim": {"type": "AREA", "energy": 7.0, "size": 4.0, "location": (0.0, 3.6, 3.4)},
+    },
+}
+DEFAULT_LIGHTING_STATE = "DAY_SOFT"
+# Every light this layer owns carries this prefix, so re-running assembly
+# replaces its own rig instead of stacking a second one.
+DDP_LIGHT_PREFIX = "DDP_"
+
+
+def resolve_lighting_state(requested: str | None) -> str:
+    state = str(requested or "").strip().upper().replace("-", "_").replace(" ", "_")
+    return state if state in LIGHTING_STATES else DEFAULT_LIGHTING_STATE
+
+
+def apply_lighting_state(scene, requested: str | None) -> dict:
+    """Install exactly one deterministic key/fill/rim rig plus world strength."""
     import bpy
 
-    world = scene.world or bpy.data.worlds.new("MeadowWorld")
+    state_name = resolve_lighting_state(requested)
+    spec = LIGHTING_STATES[state_name]
+
+    world = scene.world or bpy.data.worlds.new("DDP_World")
     scene.world = world
     world.use_nodes = True
     nodes = world.node_tree.nodes
     links = world.node_tree.links
     nodes.clear()
     bg = nodes.new(type="ShaderNodeBackground")
-    bg.inputs[0].default_value = (0.45, 0.72, 0.95, 1.0)  # soft sky blue
-    bg.inputs[1].default_value = 1.0
+    bg.inputs[0].default_value = (*spec["world"]["color"], 1.0)
+    bg.inputs[1].default_value = spec["world"]["strength"]
     out = nodes.new(type="ShaderNodeOutputWorld")
     links.new(bg.outputs[0], out.inputs[0])
 
-    if any(o.type == "LIGHT" for o in bpy.data.objects):
-        return
-    bpy.ops.object.light_add(type="SUN", location=(4, -3, 10))
-    bpy.context.object.data.energy = 3.0
-    bpy.ops.object.light_add(type="AREA", location=(-3, -5, 4))
-    bpy.context.object.data.energy = 50
-    bpy.context.object.data.size = 6
+    # Idempotent: clear any rig this layer previously created.
+    for obj in [o for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(DDP_LIGHT_PREFIX)]:
+        bpy.data.objects.remove(obj, do_unlink=True)
+
+    created = []
+    for role in ("key", "fill", "rim"):
+        cfg = spec[role]
+        name = f"{DDP_LIGHT_PREFIX}{role.capitalize()}"
+        light_data = bpy.data.lights.new(name=name, type=cfg["type"])
+        light_data.energy = cfg["energy"]
+        if cfg["type"] == "AREA" and "size" in cfg:
+            light_data.size = cfg["size"]
+        light_obj = bpy.data.objects.new(name, light_data)
+        light_obj.location = cfg["location"]
+        if "rotation" in cfg:
+            light_obj.rotation_euler = cfg["rotation"]
+        bpy.context.collection.objects.link(light_obj)
+        created.append(name)
+
+    # Filmic tone mapping. Without a look, AgX renders this palette flat and
+    # desaturated, which is a large part of why the first render looked milky.
+    look = spec.get("look") or "None"
+    look_applied = None
+    try:
+        scene.view_settings.look = look
+        look_applied = scene.view_settings.look
+    except (TypeError, ValueError):  # look unavailable in this build's OCIO config
+        look_applied = scene.view_settings.look
+
+    total = [o.name for o in bpy.data.objects if o.type == "LIGHT"]
+    return {
+        "lightingState": state_name,
+        "requested": requested or None,
+        "created": created,
+        "activeLightCount": len(total),
+        "activeLights": sorted(total),
+        "worldStrength": spec["world"]["strength"],
+        "look": look_applied,
+        "lookRequested": look,
+        "viewTransform": scene.view_settings.view_transform,
+    }
 
 
 def parse_resolution(value: str) -> tuple[int, int]:
@@ -233,46 +401,24 @@ def main() -> None:
     end_frame = args.end_frame if args.end_frame > 0 else int(shot_meta.get("endFrame") or 45)
     start_frame = args.start_frame
 
-    bpy.ops.wm.read_factory_settings(use_empty=True)
+    built = build_scene(
+        assets=assets,
+        shot_meta=shot_meta,
+        width=width,
+        height=height,
+        fps=fps,
+        start_frame=start_frame,
+        end_frame=end_frame,
+        camera_preset=args.camera_preset or shot_meta.get("cameraPreset") or "WIDE",
+        engine=args.engine,
+        samples=args.samples,
+    )
     scene = bpy.context.scene
-    scene.render.fps = fps
-    scene.frame_start = start_frame
-    scene.frame_end = end_frame
-
-    imported_by_role: dict[str, list] = {}
-    for asset in assets:
-        role = str(asset.get("id") or asset.get("role") or "other")
-        local_path = asset["localPath"]
-        objs = append_object(local_path)
-        imported_by_role.setdefault(role, []).extend(objs)
-
-    # Position characters if metadata provides offsets
-    placements = shot_meta.get("placements") or {}
-    for role, objs in imported_by_role.items():
-        arm = find_armature(objs)
-        target = arm or next((o for o in objs if o.type == "MESH"), None)
-        if not target:
-            continue
-        place = placements.get(role) or {}
-        if "location" in place:
-            target.location = tuple(place["location"])
-        if "rotation" in place:
-            target.rotation_euler = tuple(place["rotation"])
-        action = place.get("action") or (shot_meta.get("actions") or {}).get(role)
-        apply_action(arm, action, start_frame, end_frame)
-        mesh = next((o for o in objs if o.type == "MESH" and "Character" in o.name), None)
-        if mesh is None:
-            mesh = next((o for o in objs if o.type == "MESH"), None)
-        cues = (shot_meta.get("lipSync") or {}).get(role) or []
-        if mesh and cues:
-            apply_viseme_cues(mesh, cues, fps)
-
-    ensure_lights(scene)
-    configure_camera(scene, args.camera_preset or shot_meta.get("cameraPreset") or "WIDE", width, height)
-    if args.engine.upper() == "EEVEE":
-        set_eevee(scene, args.samples)
-    else:
-        scene.render.engine = "CYCLES"
+    lighting = built["lighting"]
+    stripped = built["stripped"]
+    roots = built["placementRoots"]
+    applied_actions = built["appliedActions"]
+    imported_by_role = built["importedByRole"]
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -288,6 +434,10 @@ def main() -> None:
         engine=scene.render.engine,
         frames=[start_frame, end_frame],
         roles=sorted(imported_by_role.keys()),
+        lighting=lighting,
+        strippedFromAssets=stripped,
+        placementRoots=roots,
+        appliedActions=applied_actions,
     )
     bpy.ops.render.render(animation=True)
     frame_count = len(list(out_dir.glob("frame_*.png")))
@@ -299,9 +449,108 @@ def main() -> None:
         "engine": scene.render.engine,
         "frameCount": frame_count,
         "outputDir": str(out_dir),
+        "lighting": lighting,
+        "strippedFromAssets": stripped,
+        "placementRoots": roots,
+        "appliedActions": applied_actions,
     }
     (out_dir / "assemble_meta.json").write_text(json.dumps(meta, indent=2))
     emit("RENDER_OK", "Frames rendered.", **meta)
+
+
+def build_scene(
+    assets: list,
+    shot_meta: dict,
+    width: int,
+    height: int,
+    fps: int,
+    start_frame: int,
+    end_frame: int,
+    camera_preset: str,
+    engine: str = "EEVEE",
+    samples: int = 24,
+) -> dict:
+    """Construct the production shot. Shared by the renderer and the QC gates."""
+    import bpy
+
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    scene = bpy.context.scene
+    scene.render.fps = fps
+    scene.frame_start = start_frame
+    scene.frame_end = end_frame
+
+    imported_by_role: dict[str, list] = {}
+    for asset in assets:
+        role = str(asset.get("id") or asset.get("role") or "other")
+        local_path = asset["localPath"]
+        objs = append_object(local_path)
+        imported_by_role.setdefault(role, []).extend(objs)
+
+    keep_imported = bool(shot_meta.get("keepImportedLights"))
+    stripped = {"lights": [], "cameras": []}
+    if not keep_imported:
+        for role in list(imported_by_role):
+            result = strip_imported_lights_and_cameras(imported_by_role[role])
+            stripped["lights"].extend(result["lights"])
+            stripped["cameras"].extend(result["cameras"])
+            imported_by_role[role] = [
+                bpy.data.objects[name] for name in result["survivors"] if name in bpy.data.objects
+            ]
+
+    # Position characters if metadata provides offsets
+    placements = shot_meta.get("placements") or {}
+    missing_actions = []
+    applied_actions = {}
+    roots = {}
+    for role, objs in imported_by_role.items():
+        arm = find_armature(objs)
+        target, root_kind = placement_root(role, objs)
+        if not target:
+            continue
+        roots[role] = {"object": target.name, "kind": root_kind}
+        place = placements.get(role) or {}
+        if "location" in place:
+            target.location = tuple(place["location"])
+        if "rotation" in place:
+            target.rotation_euler = tuple(place["rotation"])
+        action = place.get("action") or (shot_meta.get("actions") or {}).get(role)
+        if action:
+            if apply_action(arm, action, start_frame, end_frame):
+                applied_actions[role] = action
+            else:
+                missing_actions.append({"role": role, "action": action})
+        mesh = next((o for o in objs if o.type == "MESH" and "Character" in o.name), None)
+        if mesh is None:
+            mesh = next((o for o in objs if o.type == "MESH"), None)
+        cues = (shot_meta.get("lipSync") or {}).get(role) or []
+        if mesh and cues:
+            apply_viseme_cues(mesh, cues, fps)
+
+    # Fail closed: silently dropping a requested action is what let the first
+    # acceptance render ship with a completely motionless goat.
+    if missing_actions:
+        emit(
+            "MISSING_ACTION",
+            "One or more requested actions do not exist in the supplied assets.",
+            missing=missing_actions,
+            available=sorted(a.name for a in bpy.data.actions),
+        )
+        raise SystemExit(2)
+
+    lighting = apply_lighting_state(scene, shot_meta.get("lightingState"))
+    configure_camera(scene, camera_preset, width, height)
+    if str(engine).upper() == "EEVEE":
+        set_eevee(scene, samples)
+    else:
+        scene.render.engine = "CYCLES"
+
+    return {
+        "importedByRole": imported_by_role,
+        "lighting": lighting,
+        "stripped": stripped,
+        "placementRoots": roots,
+        "appliedActions": applied_actions,
+    }
 
 
 if __name__ == "__main__":
