@@ -4,6 +4,9 @@ node_modules
 .env
 .env.local
 .env.*.local
+# Local-only push helper — may contain a pasted GitHub token
+scripts/ddp_github_push.local.sh
+**/ddp_github_push.local.sh
 dist
 .next
 coverage
