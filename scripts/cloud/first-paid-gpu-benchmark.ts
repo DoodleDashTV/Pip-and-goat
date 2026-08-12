@@ -70,6 +70,11 @@ async function uploadBundle(
       `${BENCH_PREFIX}/scripts/cloud/runpod-bench-bootstrap.sh`,
       'text/x-shellscript',
     ],
+    [
+      path.join(ROOT, 'scripts/cloud/fetch-bootstrap.py'),
+      `${BENCH_PREFIX}/scripts/cloud/fetch-bootstrap.py`,
+      'text/x-python',
+    ],
   ];
   for (const [local, key, ctype] of files) {
     if (!existsSync(local)) throw new Error(`Missing bundle file: ${local}`);
@@ -145,27 +150,12 @@ async function main() {
   }
   console.log('SELECTED_GPU', { id: gpu.id, displayName: gpu.displayName, hourly });
 
-  // Bootstrap: download shell from R2 then exec. dockerArgs is a single shell string.
-  const bootstrapPy =
-    'import boto3,os; from botocore.client import Config; ' +
-    's3=boto3.client("s3", endpoint_url=os.environ["R2_ENDPOINT"].strip(), ' +
-    'aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"].strip(), ' +
-    'aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"].strip(), ' +
-    'region_name=(os.environ.get("R2_REGION") or "auto").strip() or "auto", ' +
-    'config=Config(signature_version="s3v4")); ' +
-    'key=os.environ.get("BENCH_PREFIX","ddp-system-tests/first-gpu-benchmark").rstrip("/")' +
-    '+"/scripts/cloud/runpod-bench-bootstrap.sh"; ' +
-    's3.download_file(os.environ["R2_BUCKET"].strip(), key, "/tmp/runpod-bench-bootstrap.sh"); ' +
-    'print("BOOTSTRAP_FETCHED")';
-  const dockerArgs = `bash -c ${JSON.stringify(
-    [
-      'set -euo pipefail',
-      'python3 -m pip install -q boto3',
-      `python3 -c ${JSON.stringify(bootstrapPy)}`,
-      'chmod +x /tmp/runpod-bench-bootstrap.sh',
-      'exec bash /tmp/runpod-bench-bootstrap.sh',
-    ].join(' && '),
-  )}`;
+  // Tiny base64 launcher fetches full bootstrap from R2 (avoids huge env + quoting issues).
+  const fetchPyB64 = readFileSync(path.join(ROOT, 'scripts/cloud/fetch-bootstrap.py')).toString(
+    'base64',
+  );
+  const dockerArgs =
+    "bash -c 'set -euo pipefail; python3 -m pip install -q boto3; echo \"$DDP_FETCH_PY_B64\" | base64 -d > /tmp/fetch-bootstrap.py; exec python3 /tmp/fetch-bootstrap.py'";
 
   let podId: string | null = null;
   const startedAt = Date.now();
@@ -200,31 +190,51 @@ async function main() {
 
   try {
     console.log('=== CREATE PAID POD (explicit approval) ===');
-    const created = await client.createPodForBenchmark({
-      name: `ddp-first-gpu-bench-${Date.now()}`,
-      imageName: IMAGE,
-      gpuTypeId: GPU_TYPE,
-      confirmPaidLaunch: true,
-      cloudType: 'SECURE',
-      containerDiskInGb: 50,
-      volumeInGb: 20,
-      dockerArgs,
-      env: {
-        CLOUD_RENDER_ENABLED: 'true',
-        ALLOW_PAID_GPU_LAUNCH: 'true',
-        ALLOW_WORKER_SELF_TERMINATE: 'true',
-        IDLE_SHUTDOWN_MINUTES: String(limits.idleShutdownMinutes),
-        MAX_JOB_RUNTIME_MINUTES: String(limits.maxJobRuntimeMinutes),
-        BENCH_PREFIX,
-        R2_BUCKET: trimEnv('R2_BUCKET'),
-        R2_ENDPOINT: trimEnv('R2_ENDPOINT'),
-        R2_ACCESS_KEY_ID: trimEnv('R2_ACCESS_KEY_ID'),
-        R2_SECRET_ACCESS_KEY: trimEnv('R2_SECRET_ACCESS_KEY'),
-        R2_REGION: trimEnv('R2_REGION') || 'auto',
-        RUNPOD_API_KEY: trimEnv('RUNPOD_API_KEY'),
-        NVIDIA_DRIVER_CAPABILITIES: 'compute,utility,graphics',
-      },
-    });
+    let created: { podId: string } | null = null;
+    const cloudAttempts: Array<'SECURE' | 'COMMUNITY' | 'ALL'> = ['SECURE', 'ALL', 'COMMUNITY'];
+    let lastErr: unknown = null;
+    for (const cloudType of cloudAttempts) {
+      try {
+        console.log('CREATE_ATTEMPT', { cloudType, imageName: IMAGE, gpuTypeId: GPU_TYPE });
+        created = await client.createPodForBenchmark({
+          name: `ddp-first-gpu-bench-${Date.now()}`,
+          imageName: IMAGE,
+          gpuTypeId: GPU_TYPE,
+          confirmPaidLaunch: true,
+          cloudType,
+          containerDiskInGb: 50,
+          volumeInGb: 20,
+          dockerArgs,
+          env: {
+            CLOUD_RENDER_ENABLED: 'true',
+            ALLOW_PAID_GPU_LAUNCH: 'true',
+            ALLOW_WORKER_SELF_TERMINATE: 'true',
+            IDLE_SHUTDOWN_MINUTES: String(limits.idleShutdownMinutes),
+            MAX_JOB_RUNTIME_MINUTES: String(limits.maxJobRuntimeMinutes),
+            BENCH_PREFIX,
+            DDP_FETCH_PY_B64: fetchPyB64,
+            R2_BUCKET: trimEnv('R2_BUCKET'),
+            R2_ENDPOINT: trimEnv('R2_ENDPOINT'),
+            R2_ACCESS_KEY_ID: trimEnv('R2_ACCESS_KEY_ID'),
+            R2_SECRET_ACCESS_KEY: trimEnv('R2_SECRET_ACCESS_KEY'),
+            R2_REGION: trimEnv('R2_REGION') || 'auto',
+            RUNPOD_API_KEY: trimEnv('RUNPOD_API_KEY'),
+            NVIDIA_DRIVER_CAPABILITIES: 'compute,utility,graphics',
+          },
+        });
+        summary.cloudType = cloudType;
+        break;
+      } catch (e) {
+        lastErr = e;
+        const msg = String((e as Error).message || e);
+        console.error('CREATE_FAILED', { cloudType, message: msg.slice(0, 300) });
+        if (!/resources|capacity|try a different|no longer any/i.test(msg)) {
+          throw e;
+        }
+        await sleep(5000);
+      }
+    }
+    if (!created) throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
     podId = created.podId;
     summary.podId = podId;
     summary.paidGpuStarted = true;
@@ -233,6 +243,7 @@ async function main() {
     writeFileSync(path.join(OUT_DIR, 'launch.json'), JSON.stringify(summary, null, 2));
 
     let complete = false;
+    let missingPolls = 0;
     while (Date.now() - startedAt < MAX_WAIT_MS) {
       const uptimeSec = Math.max(1, Math.floor((Date.now() - startedAt) / 1000));
       const est = estimateCost(uptimeSec, hourly);
@@ -255,8 +266,16 @@ async function main() {
       const existsFn = (storage as { exists?: (k: string) => Promise<boolean> }).exists;
       if (existsFn) {
         complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
+        summary.heartbeat = await existsFn(`${BENCH_PREFIX}/results/heartbeat.txt`);
       }
-      console.log('POLL', { uptimeSec, est, podStatus, complete });
+      console.log('POLL', {
+        uptimeSec,
+        est,
+        podStatus,
+        complete,
+        heartbeat: summary.heartbeat,
+        missingPolls,
+      });
 
       if (est >= HARD_CEILING_USD) {
         await terminate('hard_ceiling');
@@ -268,10 +287,22 @@ async function main() {
         break;
       }
       if (podStatus === 'EXITED' || podStatus === 'TERMINATED') {
-        // Worker may have self-terminated after upload
         if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
         summary.selfTerminated = true;
         break;
+      }
+      if (podStatus === 'MISSING') {
+        missingPolls += 1;
+        // Pod list can lag briefly after create; only fail after sustained absence.
+        if (missingPolls >= 4) {
+          if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
+          summary.selfTerminated = true;
+          summary.failed = complete ? undefined : 'POD_DISAPPEARED_NO_RESULTS';
+          await terminate('pod_missing');
+          break;
+        }
+      } else {
+        missingPolls = 0;
       }
       await sleep(POLL_MS);
     }

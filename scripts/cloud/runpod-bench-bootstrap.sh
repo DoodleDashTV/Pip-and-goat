@@ -14,6 +14,37 @@ exec > >(tee -a "$LOG") 2>&1
 echo "DDP_BOOTSTRAP_START $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "DDP_POD_ID=${RUNPOD_POD_ID:-unknown}"
 
+heartbeat() {
+  local msg="$1"
+  python3 - "$msg" <<'PY' 2>/dev/null || true
+import os, sys
+msg = sys.argv[1] if len(sys.argv) > 1 else "ping"
+try:
+    import boto3
+    from botocore.client import Config
+except Exception:
+    raise SystemExit(0)
+bucket = os.environ.get("R2_BUCKET", "").strip()
+endpoint = os.environ.get("R2_ENDPOINT", "").strip()
+ak = os.environ.get("R2_ACCESS_KEY_ID", "").strip()
+sk = os.environ.get("R2_SECRET_ACCESS_KEY", "").strip()
+if not (bucket and endpoint and ak and sk):
+    raise SystemExit(0)
+prefix = os.environ.get("BENCH_PREFIX", "ddp-system-tests/first-gpu-benchmark").rstrip("/")
+s3 = boto3.client(
+    "s3",
+    endpoint_url=endpoint,
+    aws_access_key_id=ak,
+    aws_secret_access_key=sk,
+    region_name="auto",
+    config=Config(signature_version="s3v4"),
+)
+body = f"{os.environ.get('RUNPOD_POD_ID', 'unknown')} {msg}\n".encode()
+s3.put_object(Bucket=bucket, Key=f"{prefix}/results/heartbeat.txt", Body=body, ContentType="text/plain")
+print("DDP_HEARTBEAT_OK", msg, flush=True)
+PY
+}
+
 terminate_self() {
   local reason="${1:-done}"
   echo "DDP_TERMINATE reason=$reason"
@@ -31,12 +62,21 @@ terminate_self() {
 
 trap 'terminate_self trap_exit' EXIT
 
+# Ensure python/pip exist on slim CUDA images before heartbeat/boto3.
+if ! command -v python3 >/dev/null 2>&1; then
+  apt-get update -qq
+  apt-get install -y -qq python3 python3-pip >/dev/null
+fi
+python3 -m pip install -q --disable-pip-version-check boto3 || true
+heartbeat "bootstrap_entered"
+
 apt-get update -qq
 apt-get install -y -qq curl ca-certificates xz-utils ffmpeg python3 python3-pip \
   libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libgl1 libglib2.0-0 \
   libegl1 libglvnd0 libglx0 >/dev/null
 
 python3 -m pip install -q --disable-pip-version-check boto3
+heartbeat "deps_installed"
 
 # Install Blender 4.2.3 if missing
 if ! command -v blender >/dev/null 2>&1; then
