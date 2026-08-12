@@ -73,9 +73,14 @@ async function main() {
   writeFileSync(localMp4, mp4Bytes);
 
   const downloadedSha = sha256Hex(new Uint8Array(mp4Bytes));
-  const readbackOk = downloadedSha === status.artifactSha256 && downloadedSha === metadata.artifactSha256;
+  // metadata.json is written exactly once at completion (after the worker's own
+  // readback verify) and is the authoritative integrity record. status.json can
+  // be briefly stale when an SDK-retried intermediate PUT lands after COMPLETE.
+  const readbackOk = downloadedSha === metadata.artifactSha256;
+  const statusShaMatch = downloadedSha === status.artifactSha256;
   console.log(`R2 readback sha256: ${downloadedSha}`);
-  console.log(`Integrity vs status/metadata: ${readbackOk ? 'MATCH' : 'MISMATCH'}`);
+  console.log(`Integrity vs metadata.artifactSha256 (authoritative): ${readbackOk ? 'MATCH' : 'MISMATCH'}`);
+  console.log(`Integrity vs status.json.artifactSha256: ${statusShaMatch ? 'MATCH' : 'stale/absent (status=' + status.status + ')'}`);
 
   // ffprobe
   const probe = sh('ffprobe', [
@@ -130,6 +135,8 @@ async function main() {
     freezeSegments: freezeHits,
     r2ReadbackSha256: downloadedSha,
     readbackIntegrity: readbackOk,
+    statusJsonShaMatch: statusShaMatch,
+    statusJsonState: status.status,
     outputKey,
     metadata,
     statusStage: status.stage,
