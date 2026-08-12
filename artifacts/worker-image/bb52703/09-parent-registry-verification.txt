@@ -1,0 +1,17 @@
+pinned image:        ghcr.io/<org>/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27
+pinned commit:       bb5270372ad558e71673fe789260a12fb51a9c6d
+pinned render code:  c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+working tree code:   c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91 (30 files)
+
+registry: ok=true amd64=true digest=sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27 (config blob read; linux/amd64=true)
+  ddp.source.commit      = bb5270372ad558e71673fe789260a12fb51a9c6d
+  ddp.render.code.sha256 = c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+  ddp.worker.build.time  = 2026-08-12T22:25:23Z
+  env DDP_SOURCE_COMMIT  = bb5270372ad558e71673fe789260a12fb51a9c6d
+  env DDP_RENDER_CODE_SHA256 = c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+
+NEW PIN  -> ok=true code=OK :: image sha256:e80cf523b7cb… contains this checkout's render code (c4afa39c8c06…)
+OLD PIN  -> ok=false code=PROVENANCE_MISSING :: image carries no build provenance (ddp.source.commit=absent, ddp.render.code.sha256=absent); it predates provenance stamping and its render code cannot be established
+DRIFTED WORKING TREE -> ok=false code=RENDER_CODE_MISMATCH
+
+INDEPENDENT PIN VERIFICATION: PASS
