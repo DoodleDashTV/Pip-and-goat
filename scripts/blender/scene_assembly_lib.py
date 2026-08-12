@@ -20,21 +20,23 @@ from typing import Any
 # single key+fill+optional rim does not wash out founding meadow assets.
 LIGHTING_PRESETS: dict[str, dict[str, Any]] = {
     "MEADOW_DAY_SOFT": {
+        # Matches the pre-bug single-rig intent in assemble_scene.ensure_lights
+        # (SUN 3 + AREA 50) once imported asset lights are stripped.
         "worldColor": (0.45, 0.72, 0.95, 1.0),
-        "worldStrength": 0.35,
+        "worldStrength": 0.55,
         "lights": [
             {
                 "name": "DDP_KeySun",
                 "type": "SUN",
                 "location": (4.0, -3.0, 10.0),
                 "rotation": (0.7, 0.2, 0.4),
-                "energy": 2.2,
+                "energy": 3.0,
             },
             {
                 "name": "DDP_FillArea",
                 "type": "AREA",
                 "location": (-3.0, -5.0, 4.0),
-                "energy": 25.0,
+                "energy": 50.0,
                 "size": 6.0,
             },
         ],

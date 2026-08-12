@@ -117,6 +117,21 @@ Repeated assembly must not grow lights/cameras/roots (validated by `validate_sce
 - Cloud launch, paid GPU flags, secrets, DB schema  
 - Acceptance workaround that omits map placement  
 
+## Validation evidence (local only)
+
+| Gate | Result |
+| --- | --- |
+| `python scripts/blender/test_scene_assembly_lib.py` | PASS — 9/9 |
+| `validate_scene_lighting.py` (Blender 4.2.3) | PASS — 8 imported lights → 2 owned; MapMark attached; no growth on 2nd assemble |
+| `assemble_scene.py` 1-frame EEVEE diagnostic | PASS — `SCENE_ASSEMBLY_VALID` + `frame_0001.png` |
+| `workers/runpod-blender` `npm test` | PASS — 70/70 |
+| `pnpm test` (vitest) | PASS — 135/135 |
+| `pnpm typecheck` | PASS |
+| `pnpm lint` | PASS |
+| Paid GPU / R2 prod writes | NO / $0 |
+
+Technical render invariants are PASS. Visual quality of the tiny software-GL diagnostic frame is not claimed as production `VISUAL_QUALITY_PASS`.
+
 ## Integration instructions for DoodleDash Production
 
 1. Review branch `agent/lighting-repair` (do not auto-merge).  
