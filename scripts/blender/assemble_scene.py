@@ -14,8 +14,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _common import emit, parse_blender_args, require_asset  # noqa: E402
 
 
+def eevee_engine_id(scene) -> str:
+    """Return the EEVEE engine enum id for the running Blender version.
+
+    Blender 4.2+ renamed the real-time engine from ``BLENDER_EEVEE`` to
+    ``BLENDER_EEVEE_NEXT``. Pick whichever enum this build actually exposes so
+    the same production script renders on 3.x and 4.2+.
+    """
+    try:
+        prop = scene.render.bl_rna.properties["engine"]
+        available = {item.identifier for item in prop.enum_items}
+    except Exception:  # pragma: no cover - defensive
+        available = set()
+    if "BLENDER_EEVEE_NEXT" in available:
+        return "BLENDER_EEVEE_NEXT"
+    return "BLENDER_EEVEE"
+
+
 def set_eevee(scene, samples: int = 32) -> None:
-    scene.render.engine = "BLENDER_EEVEE"
+    scene.render.engine = eevee_engine_id(scene)
     if hasattr(scene, "eevee") and hasattr(scene.eevee, "taa_render_samples"):
         scene.eevee.taa_render_samples = max(1, samples)
 
