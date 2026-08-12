@@ -258,7 +258,76 @@ export class RunpodClient {
       { podId },
     );
   }
+
+  /**
+   * Read-only listing of the authenticated account's pods (never creates or
+   * mutates anything). Used to (a) read back the ACTUAL live $/hr of a pod after
+   * creation so the hard-kill budget is sized from the real rate, and (b) confirm
+   * a terminated pod is gone and NO billable GPU remains. Non-billable query.
+   */
+  async listMyPods(): Promise<RunpodPodStatus[]> {
+    const data = await this.graphql<{
+      myself?: {
+        pods?: Array<{
+          id?: string;
+          name?: string;
+          desiredStatus?: string;
+          costPerHr?: number | null;
+          gpuCount?: number | null;
+          machineId?: string | null;
+          lastStatusChange?: string | null;
+          runtime?: { uptimeInSeconds?: number | null } | null;
+          machine?: { gpuDisplayName?: string | null } | null;
+        }> | null;
+      } | null;
+    }>(
+      `query {
+        myself {
+          pods {
+            id
+            name
+            desiredStatus
+            costPerHr
+            gpuCount
+            machineId
+            lastStatusChange
+            runtime { uptimeInSeconds }
+            machine { gpuDisplayName }
+          }
+        }
+      }`,
+    );
+    return (data.myself?.pods ?? []).map((p) => ({
+      id: p.id ?? '',
+      name: p.name ?? null,
+      desiredStatus: p.desiredStatus ?? null,
+      costPerHr: typeof p.costPerHr === 'number' ? p.costPerHr : null,
+      gpuCount: typeof p.gpuCount === 'number' ? p.gpuCount : null,
+      machineId: p.machineId ?? null,
+      lastStatusChange: p.lastStatusChange ?? null,
+      uptimeInSeconds: p.runtime?.uptimeInSeconds ?? null,
+      gpuDisplayName: p.machine?.gpuDisplayName ?? null,
+    }));
+  }
+
+  /** Read-only fetch of a single pod by id via the account pod list. */
+  async getPod(podId: string): Promise<RunpodPodStatus | null> {
+    const pods = await this.listMyPods();
+    return pods.find((p) => p.id === podId) ?? null;
+  }
 }
+
+export type RunpodPodStatus = {
+  id: string;
+  name: string | null;
+  desiredStatus: string | null;
+  costPerHr: number | null;
+  gpuCount: number | null;
+  machineId: string | null;
+  lastStatusChange: string | null;
+  uptimeInSeconds: number | null;
+  gpuDisplayName: string | null;
+};
 
 export async function runpodAuthSelfTest(
   env: Record<string, string | undefined> = process.env,
