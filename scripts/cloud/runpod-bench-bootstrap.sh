@@ -81,13 +81,16 @@ heartbeat "deps_installed"
 # Install Blender 4.2.3 if missing
 if ! command -v blender >/dev/null 2>&1; then
   echo "DDP_INSTALL_BLENDER"
+  heartbeat "blender_download_start"
   mkdir -p /opt/blender
   curl -fsSL "https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz" -o /tmp/blender.tar.xz
   tar -xJf /tmp/blender.tar.xz -C /opt/blender --strip-components=1
   ln -sf /opt/blender/blender /usr/local/bin/blender
   rm -f /tmp/blender.tar.xz
+  heartbeat "blender_installed"
 fi
 blender --version | head -1
+heartbeat "assets_download_start"
 
 python3 - <<'PY'
 import os, sys
@@ -160,7 +163,9 @@ if "DDP_BENCH_OK" not in text or res.returncode != 0:
 print("DDP_TINY_EEVEE_OK")
 PY
 
+heartbeat "tiny_eevee_ok"
 echo "DDP_FINAL_RENDER_START $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+heartbeat "final_render_start"
 # Prefer vulkan/opengl backends when available
 set +e
 blender --background --factory-startup --python "$DDP_BENCH_ROOT/first_gpu_benchmark.py"
