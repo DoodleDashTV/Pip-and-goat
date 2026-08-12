@@ -141,6 +141,12 @@ export function buildAcceptanceManifest(jobId: string, assets: ResolvedAsset[]) 
   const shotMeta = {
     title: 'Meadow Map Mystery — FINAL_1080P acceptance',
     cameraPreset: 'PUSH_IN',
+    // assemble_scene.py reads the state name from here and falls back to
+    // DAY_SOFT when it is absent. Every local measurement this acceptance is
+    // judged against — the scene gates and the local CPU acceptance render —
+    // was taken on DAY_KEY, so name it explicitly rather than letting the cloud
+    // render a state no local evidence covers.
+    lightingState: 'DAY_KEY',
     // assemble_scene.py applies a placement to the role's armature, or failing that
     // to the FIRST mesh it imported. The map blend is a multi-object set
     // (AdventureMap + MapMark) with no armature, so placing it moves only one piece
