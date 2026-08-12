@@ -169,9 +169,22 @@ def ensure_armature(name, bones):
 
 
 def parent_with_armature(obj, arm):
-    obj.parent = arm
-    mod = obj.modifiers.new(name="Armature", type="ARMATURE")
-    mod.object = arm
+    """Parent + bind with automatic weights so armature deformation is usable."""
+    import bpy
+
+    for mod in list(obj.modifiers):
+        if mod.type == "ARMATURE":
+            obj.modifiers.remove(mod)
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.parent_set(type="ARMATURE_AUTO")
+    for mod in obj.modifiers:
+        if mod.type == "ARMATURE":
+            mod.object = arm
+            mod.use_vertex_groups = True
+            mod.use_bone_envelopes = False
 
 
 def add_shape_keys(obj, names):
@@ -204,10 +217,18 @@ def add_action(arm, name, frames, fn):
     if not arm.animation_data:
         arm.animation_data_create()
     arm.animation_data.action = action
+    # Actions key Euler channels; bones must evaluate in Euler mode (not Quaternion).
+    for pb in arm.pose.bones:
+        pb.rotation_mode = "XYZ"
     for f in range(1, frames + 1):
         t = (f - 1) / max(1, frames - 1)
+        for pb in arm.pose.bones:
+            pb.rotation_mode = "XYZ"
+            pb.location = (0.0, 0.0, 0.0)
+            pb.rotation_euler = (0.0, 0.0, 0.0)
         fn(arm, f, t)
         for pb in arm.pose.bones:
+            pb.rotation_mode = "XYZ"
             pb.keyframe_insert(data_path="location", frame=f)
             pb.keyframe_insert(data_path="rotation_euler", frame=f)
     arm.animation_data.action = None
@@ -555,8 +576,12 @@ def build_pip(path: Path) -> dict:
         a.pose.bones["head"].rotation_euler = (0.08, 0, 0.4 * math.sin(t * math.pi))
 
     def point(a, f, t):
-        a.pose.bones["wing_R"].rotation_euler = (0.15, -0.7, -0.35)
-        a.pose.bones["head"].rotation_euler = (0.05, 0, 0.15)
+        # Must have inter-frame motion; a static pointed pose reads as "no animation".
+        ease = min(1.0, t * 1.4)
+        wiggle = 0.12 * math.sin(t * math.pi * 2)
+        a.pose.bones["wing_R"].rotation_euler = (0.15 * ease, -0.7 * ease, -0.35 * ease + wiggle)
+        a.pose.bones["head"].rotation_euler = (0.05 * ease, 0, 0.15 * ease + 0.04 * math.sin(t * math.pi * 2))
+        a.pose.bones["wing_L"].rotation_euler = (0, 0, 0.15 * ease)
 
     def talk(a, f, t):
         a.pose.bones["head"].rotation_euler = (0.03 * math.sin(t * math.pi * 6), 0, 0)

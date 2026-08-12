@@ -1,0 +1,136 @@
+{
+  "targets": [
+    {
+      "path": "/tmp/ddp-rigging-repair/assets/characters/pip/pip_v1_1.blend",
+      "role": "pip",
+      "ok": true,
+      "rotationMode": "XYZ",
+      "bindings": [
+        {
+          "object": "Pip_Character",
+          "bound": true,
+          "weightedVerts": 3438
+        },
+        {
+          "object": "Pip_Backpack",
+          "bound": true,
+          "weightedVerts": 296
+        },
+        {
+          "object": "Pip_Backpack_Pouch",
+          "bound": true,
+          "weightedVerts": 128
+        },
+        {
+          "object": "Pip_StarCharm",
+          "bound": true,
+          "weightedVerts": 20
+        }
+      ],
+      "actionsRebuilt": [
+        "PIP_IDLE",
+        "PIP_IDLE_ALT",
+        "PIP_WALK",
+        "PIP_RUN",
+        "PIP_TURN_LEFT",
+        "PIP_TURN_RIGHT",
+        "PIP_LOOK_LEFT",
+        "PIP_LOOK_RIGHT",
+        "PIP_LOOK_UP",
+        "PIP_LOOK_DOWN",
+        "PIP_LOOK",
+        "PIP_POINT",
+        "PIP_WAVE",
+        "PIP_JUMP",
+        "PIP_CHEER",
+        "PIP_THINK",
+        "PIP_GREET",
+        "PIP_TALK",
+        "PIP_TALK_IDLE",
+        "PIP_LISTEN",
+        "PIP_LISTEN_IDLE",
+        "PIP_TURN",
+        "PIP_HAPPY",
+        "PIP_SURPRISED",
+        "PIP_WORRIED",
+        "PIP_EXCITED",
+        "PIP_SURPRISED_REACTION",
+        "PIP_WORRIED_REACTION",
+        "PIP_HAPPY_REACTION",
+        "PIP_FLAP_SMALL",
+        "PIP_FLAP_EXCITED"
+      ],
+      "assetId": "char_pip_v1",
+      "characterCode": "CHAR_PIP_001"
+    },
+    {
+      "path": "/tmp/ddp-rigging-repair/assets/characters/goat/goat_v1_1.blend",
+      "role": "goat",
+      "ok": true,
+      "rotationMode": "XYZ",
+      "bindings": [
+        {
+          "object": "Goat_Character",
+          "bound": true,
+          "weightedVerts": 3566
+        },
+        {
+          "object": "Goat_Collar",
+          "bound": true,
+          "weightedVerts": 768
+        },
+        {
+          "object": "Goat_Tag",
+          "bound": true,
+          "weightedVerts": 64
+        },
+        {
+          "object": "Goat_Tag_Text",
+          "bound": true,
+          "weightedVerts": 0
+        }
+      ],
+      "actionsRebuilt": [
+        "GOAT_IDLE",
+        "GOAT_IDLE_ALT",
+        "GOAT_WALK",
+        "GOAT_RUN",
+        "GOAT_TURN_LEFT",
+        "GOAT_TURN_RIGHT",
+        "GOAT_LOOK_LEFT",
+        "GOAT_LOOK_RIGHT",
+        "GOAT_LOOK_UP",
+        "GOAT_LOOK_DOWN",
+        "GOAT_LOOK",
+        "GOAT_POINT",
+        "GOAT_WAVE",
+        "GOAT_JUMP",
+        "GOAT_CHEER",
+        "GOAT_THINK",
+        "GOAT_GREET",
+        "GOAT_TALK",
+        "GOAT_TALK_IDLE",
+        "GOAT_LISTEN",
+        "GOAT_LISTEN_IDLE",
+        "GOAT_TURN",
+        "GOAT_HAPPY",
+        "GOAT_SURPRISED",
+        "GOAT_WORRIED",
+        "GOAT_EXCITED",
+        "GOAT_SURPRISED_REACTION",
+        "GOAT_WORRIED_REACTION",
+        "GOAT_HAPPY_REACTION",
+        "GOAT_HEAD_NOD",
+        "GOAT_HOOF_STEP",
+        "GOAT_EAR_REACT"
+      ],
+      "assetId": "char_goat_v1",
+      "characterCode": "CHAR_GOAT_001"
+    }
+  ],
+  "syncedProduction": [
+    "/tmp/ddp-rigging-repair/production-library/characters/pip_production.blend",
+    "/tmp/ddp-rigging-repair/production-library/characters/goat_production.blend"
+  ],
+  "status": "PASS"
+}
