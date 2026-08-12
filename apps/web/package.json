@@ -18,6 +18,7 @@
     "@doodle-dash/domain": "workspace:*",
     "@doodle-dash/production": "workspace:*",
     "@doodle-dash/providers": "workspace:*",
+    "@doodle-dash/qc-gates": "workspace:*",
     "@doodle-dash/rendering": "workspace:*",
     "@doodle-dash/shared": "workspace:*",
     "@doodle-dash/story": "workspace:*",
