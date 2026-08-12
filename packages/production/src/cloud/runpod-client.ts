@@ -151,18 +151,23 @@ export class RunpodClient {
 
   /**
    * HARD SAFETY GATE — refuses unless ALLOW_PAID_GPU_LAUNCH=true and caller opts in.
-   * Do not call from automatic flows after coding.
+   * Uses REST API so dockerEntrypoint can override image start scripts.
    */
   async createPodForBenchmark(input: {
     name: string;
     imageName: string;
     gpuTypeId: string;
     confirmPaidLaunch: true;
-    cloudType?: 'SECURE' | 'COMMUNITY';
+    cloudType?: 'SECURE' | 'COMMUNITY' | 'ALL';
     containerDiskInGb?: number;
     volumeInGb?: number;
+    dockerArgs?: string;
+    dockerEntrypoint?: string[];
+    dockerStartCmd?: string[];
+    ports?: string;
+    volumeMountPath?: string;
     env?: Record<string, string>;
-  }): Promise<{ podId: string }> {
+  }): Promise<{ podId: string; costPerHr: number | null }> {
     const limits = resolveCloudCostLimitsFromEnv();
     if (!limits.allowPaidGpuLaunch) {
       throw new AppError(
@@ -178,34 +183,169 @@ export class RunpodClient {
       throw new AppError('confirmPaidLaunch must be true.', 'PAID_GPU_NOT_CONFIRMED', 403);
     }
 
-    // Intentionally not auto-invoked. Mutation included for Phase 22 only after approval.
-    const data = await this.graphql<{
-      podFindAndDeployOnDemand?: { id?: string } | null;
-    }>(
-      `mutation ($input: PodFindAndDeployOnDemandInput!) {
-        podFindAndDeployOnDemand(input: $input) { id }
-      }`,
-      {
-        input: {
-          name: input.name,
-          imageName: input.imageName,
-          gpuTypeId: input.gpuTypeId,
-          cloudType: input.cloudType ?? 'SECURE',
-          containerDiskInGb: input.containerDiskInGb ?? 40,
-          volumeInGb: input.volumeInGb ?? 20,
-          env: Object.entries(input.env ?? {}).map(([key, value]) => ({ key, value })),
-        },
-      },
-    );
+    const cloudType =
+      input.cloudType === 'ALL' || !input.cloudType ? 'SECURE' : input.cloudType;
+    const dockerEntrypoint = input.dockerEntrypoint ?? ['/bin/bash', '-lc'];
+    const dockerStartCmd =
+      input.dockerStartCmd ??
+      (input.dockerArgs ? [input.dockerArgs.replace(/^bash -c\s+/, '').replace(/^'|'$/g, '')] : []);
 
-    const podId = data.podFindAndDeployOnDemand?.id;
-    if (!podId) {
-      throw new AppError('Runpod pod create returned no id.', 'RUNPOD_POD_CREATE_FAILED', 502);
+    const body = {
+      name: input.name,
+      imageName: input.imageName,
+      gpuTypeIds: [input.gpuTypeId],
+      cloudType,
+      computeType: 'GPU',
+      gpuCount: 1,
+      containerDiskInGb: input.containerDiskInGb ?? 40,
+      volumeInGb: input.volumeInGb ?? 0,
+      volumeMountPath: input.volumeMountPath ?? '/workspace',
+      ports: [input.ports ?? '8080/http'],
+      dockerEntrypoint,
+      dockerStartCmd,
+      env: input.env ?? {},
+    };
+
+    const res = await fetch('https://rest.runpod.io/v1/pods', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        'User-Agent': this.userAgent,
+      },
+      body: JSON.stringify(body),
+    });
+    const text = await res.text();
+    let parsed: {
+      id?: string;
+      costPerHr?: number;
+      message?: string;
+      error?: string;
+    };
+    try {
+      parsed = JSON.parse(text) as typeof parsed;
+    } catch {
+      throw new AppError(
+        redactSecrets(`Runpod REST non-JSON HTTP ${res.status}`),
+        'RUNPOD_BAD_RESPONSE',
+        502,
+      );
     }
-    return { podId };
+    if (!res.ok || !parsed.id) {
+      throw new AppError(
+        redactSecrets(
+          `Runpod REST create failed HTTP ${res.status}: ${parsed.message || parsed.error || text.slice(0, 300)}`,
+        ),
+        'RUNPOD_POD_CREATE_FAILED',
+        502,
+      );
+    }
+
+    const costPerHr = parsed.costPerHr ?? null;
+    if (costPerHr != null && costPerHr > limits.maxGpuHourlyPrice) {
+      try {
+        await this.terminatePod(parsed.id);
+      } catch {
+        /* still throw price error */
+      }
+      throw new AppError(
+        `Pod hourly price $${costPerHr} exceeds MAX_GPU_HOURLY_PRICE $${limits.maxGpuHourlyPrice}; terminated immediately.`,
+        'GPU_PRICE_EXCEEDED',
+        402,
+      );
+    }
+
+    return { podId: parsed.id, costPerHr };
+  }
+
+  async getPod(podId: string): Promise<{
+    id: string;
+    name: string | null;
+    desiredStatus: string | null;
+    runtime: { uptimeInSeconds?: number | null } | null;
+    machine: { gpuDisplayName?: string | null } | null;
+    costPerHr: number | null;
+  } | null> {
+    // Prefer REST get — GraphQL myself.pods can lag/omit Community pods mid-run.
+    try {
+      const res = await fetch(`https://rest.runpod.io/v1/pods/${encodeURIComponent(podId)}`, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'User-Agent': this.userAgent,
+        },
+      });
+      if (res.status === 404) return null;
+      if (res.ok) {
+        const pod = (await res.json()) as {
+          id?: string;
+          name?: string;
+          desiredStatus?: string;
+          costPerHr?: number;
+          runtime?: { uptimeInSeconds?: number } | null;
+          machine?: { gpuDisplayName?: string } | null;
+        };
+        if (pod.id) {
+          return {
+            id: pod.id,
+            name: pod.name ?? null,
+            desiredStatus: pod.desiredStatus ?? null,
+            runtime: pod.runtime ?? null,
+            machine: pod.machine ?? null,
+            costPerHr: pod.costPerHr ?? null,
+          };
+        }
+      }
+    } catch {
+      /* fall through to GraphQL */
+    }
+
+    const data = await this.graphql<{
+      myself?: {
+        pods?: Array<{
+          id?: string;
+          name?: string;
+          desiredStatus?: string;
+          costPerHr?: number;
+          runtime?: { uptimeInSeconds?: number } | null;
+          machine?: { gpuDisplayName?: string } | null;
+        }>;
+      } | null;
+    }>(
+      `query {
+        myself {
+          pods {
+            id
+            name
+            desiredStatus
+            costPerHr
+            runtime { uptimeInSeconds }
+            machine { gpuDisplayName }
+          }
+        }
+      }`,
+    );
+    const pod = (data.myself?.pods ?? []).find((p) => p.id === podId);
+    if (!pod?.id) return null;
+    return {
+      id: pod.id,
+      name: pod.name ?? null,
+      desiredStatus: pod.desiredStatus ?? null,
+      runtime: pod.runtime ?? null,
+      machine: pod.machine ?? null,
+      costPerHr: pod.costPerHr ?? null,
+    };
   }
 
   async terminatePod(podId: string): Promise<void> {
+    // Prefer REST delete; fall back to GraphQL terminate.
+    const res = await fetch(`https://rest.runpod.io/v1/pods/${encodeURIComponent(podId)}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${this.apiKey}`,
+        'User-Agent': this.userAgent,
+      },
+    });
+    if (res.ok || res.status === 404) return;
     await this.graphql(
       `mutation ($podId: String!) {
         podTerminate(input: { podId: $podId })

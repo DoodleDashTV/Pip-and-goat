@@ -14,6 +14,7 @@
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
+    "cloud:first-gpu-bench": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/first-paid-gpu-benchmark.ts",
     "db:generate": "pnpm --filter @doodle-dash/database generate",
     "db:migrate": "pnpm --filter @doodle-dash/database migrate",
     "db:push": "pnpm --filter @doodle-dash/database db:push",
