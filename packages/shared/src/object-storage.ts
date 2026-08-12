@@ -5,6 +5,7 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
+  ListBucketsCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -151,7 +152,8 @@ export function resolveObjectStorageConfig(
       'auto'
     ).trim();
     const endpointRaw = env.OBJECT_STORAGE_ENDPOINT || env.R2_ENDPOINT || undefined;
-    const endpoint = endpointRaw ? endpointRaw.trim() : undefined;
+    // R2 endpoints often include a trailing slash; strip it for cleaner signing.
+    const endpoint = endpointRaw ? endpointRaw.trim().replace(/\/+$/, '') : undefined;
     if (!bucket || !accessKeyId || !secretAccessKey) {
       throw new AppError(
         'OBJECT_STORAGE_PROVIDER is set to an S3-compatible mode, but OBJECT_STORAGE_BUCKET / ACCESS_KEY / SECRET_ACCESS_KEY (or R2_* aliases) are incomplete. Refusing silent local fallback.',
@@ -396,6 +398,91 @@ export function createObjectStorageFromConfig(config: ObjectStorageConfig): Obje
     return new S3CompatibleObjectStorage(config);
   }
   throw new AppError('Unsupported object storage config', 'STORAGE_MISCONFIGURED', 501);
+}
+
+/** S3/R2 DNS-compatible bucket name (no spaces/uppercase). */
+export function isValidS3BucketName(name: string): boolean {
+  return /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(name);
+}
+
+export type ResolvedR2Bucket = {
+  bucket: string;
+  autoResolved: boolean;
+  reason: string;
+};
+
+/**
+ * If injected R2_BUCKET is invalid (e.g. internal whitespace / placeholder text),
+ * and the credentials can ListBuckets to exactly one bucket, use that bucket.
+ * Never logs the bucket name.
+ */
+export async function resolveR2BucketWithFallback(
+  env: Record<string, string | undefined> = process.env,
+): Promise<ResolvedR2Bucket> {
+  const configured = (env.OBJECT_STORAGE_BUCKET || env.R2_BUCKET || '').trim();
+  if (configured && isValidS3BucketName(configured)) {
+    return {
+      bucket: configured,
+      autoResolved: false,
+      reason: 'configured_bucket_valid',
+    };
+  }
+
+  const accessKeyId = (
+    env.OBJECT_STORAGE_ACCESS_KEY_ID ||
+    env.R2_ACCESS_KEY_ID ||
+    env.AWS_ACCESS_KEY_ID ||
+    ''
+  ).trim();
+  const secretAccessKey = (
+    env.OBJECT_STORAGE_SECRET_ACCESS_KEY ||
+    env.R2_SECRET_ACCESS_KEY ||
+    env.AWS_SECRET_ACCESS_KEY ||
+    ''
+  ).trim();
+  const endpointRaw = env.OBJECT_STORAGE_ENDPOINT || env.R2_ENDPOINT || undefined;
+  const endpoint = endpointRaw ? endpointRaw.trim().replace(/\/+$/, '') : undefined;
+  const region = (
+    env.OBJECT_STORAGE_REGION ||
+    env.R2_REGION ||
+    env.AWS_REGION ||
+    env.AWS_DEFAULT_REGION ||
+    'auto'
+  ).trim();
+
+  if (!accessKeyId || !secretAccessKey || !endpoint) {
+    throw new AppError(
+      configured
+        ? `R2_BUCKET is not a valid S3 bucket name (len=${configured.length}, has_space=${/\s/.test(configured)}) and credentials/endpoint are incomplete for ListBuckets fallback.`
+        : 'R2_BUCKET missing and credentials/endpoint incomplete for ListBuckets fallback.',
+      'STORAGE_MISCONFIGURED',
+      501,
+    );
+  }
+
+  const client = new S3Client({
+    region,
+    endpoint,
+    forcePathStyle: true,
+    credentials: { accessKeyId, secretAccessKey },
+  });
+  const listed = await client.send(new ListBucketsCommand({}));
+  const names = (listed.Buckets ?? []).map((b) => b.Name).filter((n): n is string => Boolean(n));
+  if (names.length !== 1 || !isValidS3BucketName(names[0]!)) {
+    throw new AppError(
+      `R2_BUCKET invalid (len=${configured.length}, has_space=${/\s/.test(configured)}); ListBuckets returned ${names.length} usable bucket(s). Fix R2_BUCKET secret.`,
+      'STORAGE_MISCONFIGURED',
+      501,
+    );
+  }
+
+  return {
+    bucket: names[0]!,
+    autoResolved: true,
+    reason: configured
+      ? 'configured_bucket_invalid_listbuckets_unique'
+      : 'configured_bucket_missing_listbuckets_unique',
+  };
 }
 
 export function createDefaultObjectStorage(

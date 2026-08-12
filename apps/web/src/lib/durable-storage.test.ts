@@ -63,7 +63,7 @@ describe('durable S3-compatible object storage', () => {
     expect(cfg.provider).toBe('s3');
     if (cfg.provider === 's3') {
       expect(cfg.bucket).toBe('dd-prod');
-      expect(cfg.endpoint).toBe('https://example.r2.cloudflarestorage.com/');
+      expect(cfg.endpoint).toBe('https://example.r2.cloudflarestorage.com');
       expect(cfg.accessKeyId).toBe('akid');
       expect(cfg.secretAccessKey).toBe('secret');
     }

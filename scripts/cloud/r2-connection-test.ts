@@ -6,6 +6,7 @@
 import {
   createObjectStorageFromConfig,
   resolveObjectStorageConfig,
+  resolveR2BucketWithFallback,
   sha256Hex,
 } from '@doodle-dash/shared';
 
@@ -29,7 +30,17 @@ async function main() {
 
   try {
     const env = { ...process.env } as Record<string, string | undefined>;
-    if (!env.OBJECT_STORAGE_PROVIDER && env.R2_BUCKET) env.OBJECT_STORAGE_PROVIDER = 'r2';
+    if (!env.OBJECT_STORAGE_PROVIDER && (env.R2_BUCKET || env.R2_ENDPOINT)) {
+      env.OBJECT_STORAGE_PROVIDER = 'r2';
+    }
+    const resolved = await resolveR2BucketWithFallback(env);
+    env.R2_BUCKET = resolved.bucket;
+    console.log(
+      'R2_BUCKET_AUTORESOLVED:',
+      resolved.autoResolved ? 'YES' : 'NO',
+      'REASON:',
+      resolved.reason,
+    );
     const cfg = resolveObjectStorageConfig(env);
     if (cfg.provider !== 's3') throw new Error('R2/S3 provider not configured');
     const storage = createObjectStorageFromConfig(cfg);
