@@ -19,6 +19,10 @@ import { WORKER_IMAGE, HARD_CAP_USD, STATE_FILE, redact } from './common';
 import { makeStorage } from './common';
 
 const POLL_MS = 20_000;
+// Once the worker reports GPU-dependent work, poll fast so the pod is terminated
+// within seconds of COMPLETE rather than billing for a whole slow interval.
+const ACTIVE_POLL_MS = 4_000;
+const ACTIVE_STATUSES = new Set(['RENDERING', 'ENCODING', 'QC', 'UPLOADING', 'VERIFY_READBACK']);
 const NO_STARTUP_KILL_MS = 10 * 60 * 1000; // no startup-status.json within 10 min
 const STALL_MS = 8 * 60 * 1000; // no bootStage/status progress for 8 min
 
@@ -253,7 +257,7 @@ async function main() {
           break;
         }
 
-        await sleep(POLL_MS);
+        await sleep(ACTIVE_STATUSES.has(String(status?.status || '')) ? ACTIVE_POLL_MS : POLL_MS);
       }
     }
   } finally {

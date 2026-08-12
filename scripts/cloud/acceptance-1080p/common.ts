@@ -131,10 +131,13 @@ export function buildAcceptanceManifest(jobId: string, assets: ResolvedAsset[]) 
   const shotMeta = {
     title: 'Meadow Map Mystery — FINAL_1080P acceptance',
     cameraPreset: 'PUSH_IN',
+    // assemble_scene.py applies a placement to the role's armature, or failing that
+    // to the FIRST mesh it imported. The map blend is a multi-object set
+    // (AdventureMap + MapMark) with no armature, so placing it moves only one piece
+    // and detaches the marker from the paper: leave it at its authored transform.
     placements: {
       pip: { location: [-0.72, -1.5, 0.0], rotation: [0.0, 0.0, 0.34], action: 'PIP_POINT' },
       goat: { location: [0.72, -1.2, 0.0], rotation: [0.0, 0.0, -0.42], action: 'GOAT_HEAD_NOD' },
-      map: { location: [0.0, -0.8, 0.02], rotation: [-0.95, 0.0, 0.0] },
     },
   };
   const manifest = {
