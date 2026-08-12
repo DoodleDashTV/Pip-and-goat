@@ -53,6 +53,22 @@ describe('durable S3-compatible object storage', () => {
     }
   });
 
+  it('trims trailing whitespace from R2 alias secrets', () => {
+    const cfg = resolveObjectStorageConfig({
+      R2_BUCKET: 'dd-prod ',
+      R2_ENDPOINT: ' https://example.r2.cloudflarestorage.com/ ',
+      R2_ACCESS_KEY_ID: 'akid ',
+      R2_SECRET_ACCESS_KEY: ' secret ',
+    });
+    expect(cfg.provider).toBe('s3');
+    if (cfg.provider === 's3') {
+      expect(cfg.bucket).toBe('dd-prod');
+      expect(cfg.endpoint).toBe('https://example.r2.cloudflarestorage.com/');
+      expect(cfg.accessKeyId).toBe('akid');
+      expect(cfg.secretAccessKey).toBe('secret');
+    }
+  });
+
   it('runs write/read/delete self-test with hash verification on memory storage', async () => {
     const memory = new InMemoryObjectStorage();
     const result = await runObjectStorageSelfTest(memory);

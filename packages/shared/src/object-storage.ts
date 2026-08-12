@@ -129,20 +129,29 @@ export function resolveObjectStorageConfig(
     };
   }
   if (provider === 's3' || provider === 'r2' || provider === 'b2' || provider === 'minio') {
-    const bucket = env.OBJECT_STORAGE_BUCKET || env.R2_BUCKET || '';
-    const accessKeyId =
+    // Trim R2/OBJECT_STORAGE values — secret managers often inject trailing whitespace.
+    const bucket = (env.OBJECT_STORAGE_BUCKET || env.R2_BUCKET || '').trim();
+    const accessKeyId = (
       env.OBJECT_STORAGE_ACCESS_KEY_ID ||
       env.R2_ACCESS_KEY_ID ||
       env.AWS_ACCESS_KEY_ID ||
-      '';
-    const secretAccessKey =
+      ''
+    ).trim();
+    const secretAccessKey = (
       env.OBJECT_STORAGE_SECRET_ACCESS_KEY ||
       env.R2_SECRET_ACCESS_KEY ||
       env.AWS_SECRET_ACCESS_KEY ||
-      '';
-    const region =
-      env.OBJECT_STORAGE_REGION || env.R2_REGION || env.AWS_REGION || env.AWS_DEFAULT_REGION || 'auto';
-    const endpoint = env.OBJECT_STORAGE_ENDPOINT || env.R2_ENDPOINT || undefined;
+      ''
+    ).trim();
+    const region = (
+      env.OBJECT_STORAGE_REGION ||
+      env.R2_REGION ||
+      env.AWS_REGION ||
+      env.AWS_DEFAULT_REGION ||
+      'auto'
+    ).trim();
+    const endpointRaw = env.OBJECT_STORAGE_ENDPOINT || env.R2_ENDPOINT || undefined;
+    const endpoint = endpointRaw ? endpointRaw.trim() : undefined;
     if (!bucket || !accessKeyId || !secretAccessKey) {
       throw new AppError(
         'OBJECT_STORAGE_PROVIDER is set to an S3-compatible mode, but OBJECT_STORAGE_BUCKET / ACCESS_KEY / SECRET_ACCESS_KEY (or R2_* aliases) are incomplete. Refusing silent local fallback.',
@@ -157,7 +166,11 @@ export function resolveObjectStorageConfig(
       endpoint,
       accessKeyId,
       secretAccessKey,
-      publicBaseUrl: env.OBJECT_STORAGE_PUBLIC_BASE_URL || env.R2_PUBLIC_BASE_URL || undefined,
+      publicBaseUrl: (
+        env.OBJECT_STORAGE_PUBLIC_BASE_URL ||
+        env.R2_PUBLIC_BASE_URL ||
+        undefined
+      )?.trim(),
       forcePathStyle:
         String(env.OBJECT_STORAGE_FORCE_PATH_STYLE ?? '').toLowerCase() === 'true' ||
         Boolean(endpoint),
