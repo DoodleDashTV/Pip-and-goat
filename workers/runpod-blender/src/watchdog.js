@@ -103,8 +103,10 @@ class StartupWatchdog {
   constructor(opts = {}) {
     this.startupTimeoutMs = Number(opts.startupTimeoutMs) > 0 ? Number(opts.startupTimeoutMs) : 120_000;
     this.onTimeout = opts.onTimeout || (() => {});
-    this.setTimer = opts.setTimer || setTimeout;
-    this.clearTimer = opts.clearTimer || clearTimeout;
+    // Internal convention is setTimer(ms, fn); the real setTimeout is
+    // setTimeout(fn, ms), so wrap it to match (tests inject the (ms, fn) form).
+    this.setTimer = opts.setTimer || ((ms, fn) => setTimeout(fn, ms));
+    this.clearTimer = opts.clearTimer || ((t) => clearTimeout(t));
     this.startedAt = null;
     this.timer = null;
     this.fired = false;

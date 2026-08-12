@@ -57,6 +57,25 @@ test('StartupWatchdog fires onTimeout when milestone not reached', () => {
   assert.equal(wd.didFire, true);
 });
 
+test('StartupWatchdog works with the REAL setTimeout (arg order regression)', async () => {
+  let fired = null;
+  const wd = new StartupWatchdog({ startupTimeoutMs: 30, onTimeout: (info) => { fired = info; } });
+  wd.start(); // must not throw "callback must be a function"
+  wd.milestone('R2_CLIENT_CREATED');
+  await new Promise((r) => setTimeout(r, 80));
+  assert.ok(fired, 'watchdog should have fired via real timer');
+  assert.equal(fired.lastMilestone, 'R2_CLIENT_CREATED');
+});
+
+test('StartupWatchdog reached() with real timers prevents firing', async () => {
+  let fired = false;
+  const wd = new StartupWatchdog({ startupTimeoutMs: 30, onTimeout: () => { fired = true; } });
+  wd.start();
+  wd.reached('RENDER_STARTED');
+  await new Promise((r) => setTimeout(r, 80));
+  assert.equal(fired, false);
+});
+
 test('StartupWatchdog does not fire once reached() is called', () => {
   let fired = false;
   let cleared = false;
