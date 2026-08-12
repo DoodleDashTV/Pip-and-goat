@@ -15,6 +15,7 @@ import { RunpodClient } from '../../../packages/production/src/cloud/runpod-clie
 import { validateRunpodWorkerImageRef } from '../../../packages/production/src/cloud/config';
 import { estimateCloudRenderCost } from '../../../packages/production/src/cloud/cost-estimation';
 import { sha256Hex } from '@doodle-dash/shared';
+import { evaluateLocalQualityGates } from '../../../apps/web/src/lib/local-quality-gates';
 import {
   WORKER_IMAGE,
   HARD_CAP_USD,
@@ -24,6 +25,7 @@ import {
   FRAME_START,
   FINAL_SAMPLES,
   EPISODE_ID,
+  REPO_ROOT,
   resolveAssets,
   buildAcceptanceManifest,
   manifestKeyFor,
@@ -135,6 +137,33 @@ async function main() {
 
   const byRole: Record<string, ResolvedAsset> = {};
   for (const a of assets) byRole[a.role] = a;
+
+  // ---- Local quality gates must pass BEFORE any paid GPU work ----
+  // Produced by scripts/assets/scene_gates.py and local_acceptance.py. The gate
+  // report must also have been generated from exactly these asset bytes.
+  {
+    const gateDir = path.join(REPO_ROOT, 'artifacts/local-acceptance');
+    const readJson = (file: string): unknown => {
+      const full = path.join(gateDir, file);
+      if (!existsSync(full)) return null;
+      try {
+        return JSON.parse(readFileSync(full, 'utf8'));
+      } catch {
+        return null;
+      }
+    };
+    const expected: Record<string, string> = {};
+    for (const a of assets) expected[a.role] = a.sha256;
+    const evaluation = evaluateLocalQualityGates(
+      readJson('scene_gates.json'),
+      readJson('local_acceptance.json'),
+      assets.length === 4 ? expected : undefined,
+    );
+    const detail = evaluation.ok
+      ? `all ${Object.keys(evaluation.gates).length} gates PASS on current asset bytes`
+      : `blocked: ${evaluation.reasons.join('; ')}`;
+    add('0', 'Local quality gates (rig/motion/lighting/hierarchy/visual)', evaluation.ok ? 'PASS' : 'FAIL', detail);
+  }
 
   if (assets.length === 4) {
     // Upload if missing / checksum mismatch, then read back and verify sha256.
