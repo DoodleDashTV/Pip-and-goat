@@ -168,6 +168,13 @@ export class RunpodClient {
     containerDiskInGb?: number;
     volumeInGb?: number;
     env?: Record<string, string>;
+    /**
+     * Optional container command override (Runpod `dockerArgs`). Used by the
+     * single-pod benchmark to run the worker's single-shot mode twice in
+     * sequence (DRAFT_HD then one FINAL_1080P shot) on ONE pod. Must never
+     * contain secret values — secrets are passed via `env` only.
+     */
+    dockerArgs?: string;
   }): Promise<{ podId: string }> {
     const limits = resolveCloudCostLimitsFromEnv(this.env);
     if (!limits.allowPaidGpuLaunch) {
@@ -213,6 +220,7 @@ export class RunpodClient {
           containerDiskInGb: input.containerDiskInGb ?? 40,
           volumeInGb: input.volumeInGb ?? 20,
           env: Object.entries(input.env ?? {}).map(([key, value]) => ({ key, value })),
+          ...(input.dockerArgs ? { dockerArgs: input.dockerArgs } : {}),
         },
       },
     );

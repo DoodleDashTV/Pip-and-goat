@@ -142,4 +142,39 @@ describe('createPodForBenchmark image gate (no network on failure)', () => {
     const body = JSON.parse(String((fetchSpy.mock.calls[0]?.[1] as RequestInit)?.body ?? '{}'));
     expect(body.variables.input.imageName).toBe(VALID_IMAGE);
   });
+
+  it('forwards an optional dockerArgs command override verbatim (single-pod two-job benchmark)', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ data: { podFindAndDeployOnDemand: { id: 'pod_unit_test' } } }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const client = new RunpodClient({ apiKey: 'rpa_fake_test_key', env: paidEnv() });
+    const dockerArgs = "sh -c 'RENDER_JOB_ID=$J1 node src/worker.js && RENDER_JOB_ID=$J2 node src/worker.js'";
+    await client.createPodForBenchmark({
+      name: 'ddp-benchmark',
+      imageName: VALID_IMAGE,
+      gpuTypeId: 'NVIDIA GeForce RTX 4090',
+      confirmPaidLaunch: true,
+      dockerArgs,
+    });
+    const body = JSON.parse(String((fetchSpy.mock.calls[0]?.[1] as RequestInit)?.body ?? '{}'));
+    expect(body.variables.input.dockerArgs).toBe(dockerArgs);
+  });
+
+  it('does not forward dockerArgs when the image gate fails (no network)', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const client = new RunpodClient({ apiKey: 'rpa_fake_test_key', env: paidEnv() });
+    await expect(
+      client.createPodForBenchmark({
+        name: 'ddp-benchmark',
+        imageName: 'ghcr.io/example-org/ddp-runpod-blender:latest',
+        gpuTypeId: 'NVIDIA GeForce RTX 4090',
+        confirmPaidLaunch: true,
+        dockerArgs: "sh -c 'echo should-not-run'",
+      }),
+    ).rejects.toMatchObject({ code: 'WORKER_IMAGE_MUTABLE_TAG' });
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 });
