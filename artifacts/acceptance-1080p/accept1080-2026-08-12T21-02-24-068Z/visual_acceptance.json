@@ -1,0 +1,125 @@
+{
+  "jobId": "accept1080-2026-08-12T21-02-24-068Z",
+  "podId": "vypcyx1o5ox3hi",
+  "renderedAt": "2026-08-12T21:11:27.656Z",
+  "artifactSha256": "39cacc41bb4c420b45cfc8a2ad4067c7200b85b00aaa48af49b72fc47528aac0",
+  "verdicts": {
+    "TECHNICAL_FINAL_1080P": "PASS",
+    "VISUAL_FINAL_1080P": "FAIL",
+    "DDP_FINAL_1080P_ACCEPTANCE": "FAIL"
+  },
+  "technical": {
+    "resolution": "1080x1920",
+    "fps": 30,
+    "frameCount": 90,
+    "durationSec": 3.0,
+    "decodeErrorLines": 0,
+    "blackSegments": 0,
+    "freezeSegments": 0,
+    "bitIdenticalAdjacentFramePairs": 0,
+    "adjacentPairsCompared": 89,
+    "uniqueFrameHashes": 90,
+    "r2UploadOk": true,
+    "r2ReadbackOk": true,
+    "sha256IntegrityOk": true
+  },
+  "temporalStability": {
+    "method": "ffmpeg tblend=difference + signalstats YAVG per consecutive pair",
+    "minMeanAbsDelta": 0.1178,
+    "meanMeanAbsDelta": 0.356,
+    "maxMeanAbsDelta": 0.5518,
+    "maxOverMeanRatio": 1.55,
+    "zeroChangeFrames": 0,
+    "assessment": "smooth; no popping spikes, no frozen frames"
+  },
+  "characters": {
+    "pip": {
+      "visibleMotion": true,
+      "poseChanges": "head tilt, body lean and turn, wing raised, stance width changes",
+      "rigDeformation": "valid, smooth; no detached parts, no catastrophic deformation",
+      "appearance": "canonical yellow chick, pink/red comb, orange beak and feet (colours pale because of the exposure defect)",
+      "accessories": "Pip_Backpack, Pip_Backpack_Pouch, Pip_StarCharm bound with 0 unweighted vertices; not visible from the front/three-quarter camera angle in either the cloud or the local reference render"
+    },
+    "goat": {
+      "visibleMotion": true,
+      "poseChanges": "head and neck lower then raise, ears change angle, horns sweep back",
+      "rigDeformation": "valid, smooth; no detached parts",
+      "appearance": "canonical white goat, brown horns and hooves, pink nose",
+      "collarAndTag": "attached and following the neck through the nod; tag legible"
+    }
+  },
+  "cameraInvariantPose": {
+    "why": "the shot has a camera push-in, so every value below is a ratio measured WITHIN one character (relative to that character's own feet and own body span); a zoom or pan cannot change these",
+    "goatHeadHeightRatio": {
+      "frame_001": 0.7182,
+      "frame_023": 0.9583,
+      "frame_045": 0.955,
+      "frame_068": 0.9454,
+      "frame_090": 0.7189
+    },
+    "goatHornSpreadRatio": {
+      "frame_001": 0.1978,
+      "frame_023": 0.2674,
+      "frame_045": 0.2635,
+      "frame_068": 0.248,
+      "frame_090": 0.2008
+    },
+    "pipCombLateralRatio": {
+      "frame_001": -0.0348,
+      "frame_023": -0.046,
+      "frame_045": -0.0737,
+      "frame_068": -0.0644,
+      "frame_090": 0.0855
+    },
+    "pipFootSpreadRatio": {
+      "frame_001": 0.2718,
+      "frame_023": 0.2818,
+      "frame_045": 0.4049,
+      "frame_068": 0.3105,
+      "frame_090": 0.1881
+    },
+    "conclusion": "character motion is real and is NOT a camera-only false positive"
+  },
+  "lighting": {
+    "verdict": "FAIL",
+    "defect": "DUPLICATE_LIGHT_REGRESSION_AND_BLOWN_EXPOSURE",
+    "measuredCloud": [
+      { "frame": "frame_001.png", "meanLuma": 216.71, "minLuma": 122.78, "maxLuma": 252.65, "meanSaturation": 10.5 },
+      { "frame": "frame_023.png", "meanLuma": 217.35, "minLuma": 122.23, "maxLuma": 253.85, "meanSaturation": 10.4 },
+      { "frame": "frame_045.png", "meanLuma": 218.83, "minLuma": 121.82, "maxLuma": 253.21, "meanSaturation": 10.26 },
+      { "frame": "frame_068.png", "meanLuma": 220.26, "minLuma": 120.81, "maxLuma": 253.38, "meanSaturation": 10.19 },
+      { "frame": "frame_090.png", "meanLuma": 220.77, "minLuma": 124.04, "maxLuma": 254.81, "meanSaturation": 10.16 }
+    ],
+    "referenceRepairedLocal": { "meanLuma": "147-154", "minLuma": "9-12", "meanSaturation": "37-41" },
+    "referenceFailedFirstRender": { "meanLuma": "167-175", "minLuma": 50, "meanSaturation": 12.6 },
+    "localAcceptanceThresholds": {
+      "exposureControlled": "90 <= meanLuma <= 180 -> FAIL (217-221)",
+      "hasTrueBlacks": "minLuma <= 40 -> FAIL (121-124)",
+      "hasHighlights": "maxLuma >= 160 -> PASS",
+      "saturationHealthy": "meanSaturation >= 30 -> FAIL (10.2-10.5)"
+    },
+    "crossCheckSignalstats": {
+      "cloudMp4": { "YAVG": 167.7, "YMIN": "56-68", "SATAVG": 12.93 },
+      "localRepairedMp4": { "YAVG": 87.4, "YMIN": "15-17", "SATAVG": 21.6 },
+      "note": "identical measurement pipeline on both files; the cloud render is far brighter and flatter"
+    },
+    "castShadows": "absent — the darkest pixel in the entire frame is 121/255, so nothing in the shot is in shadow; no ground shadow under either character or under the tree",
+    "activeProductionLights": "NOT the three authoritative DDP_Key/DDP_Fill/DDP_Rim lights"
+  },
+  "rootCause": {
+    "summary": "the digest-pinned worker image predates the lighting repair, so the pod rendered with the old pre-repair assembly code",
+    "evidence": [
+      "workers/runpod-blender/Dockerfile bakes the assembly code into the image (COPY scripts/blender ./blender), and the worker only ever runs the baked-in copy (BLENDER_ASSEMBLE_SCRIPT default) — it never downloads the repaired script",
+      "the WORKER_IMAGE digest sha256:ea49b29c was pinned in commit 1cd6c62 at 18:21:33Z; the three lighting repairs landed afterwards in f3d40fa (19:21:13Z), cd30648 (19:40:15Z) and 1557415 (20:26:02Z)",
+      "assemble_scene.py at 1cd6c62 is 308 lines with no view_settings/look/exposure handling and no DDP_Key/DDP_Fill/DDP_Rim rig; its ensure_lights() returns early when any light already exists, so every imported asset light is kept",
+      "a light census of the exact uploaded asset bytes gives 8 lights (meadow 2, pip 3, goat 3) — matching the 8-light regression that failed the first acceptance render",
+      "the rig repair travelled to the pod because it lives in the .blend assets uploaded to R2, which is why character motion is correct while lighting is not"
+    ],
+    "inferenceNote": "the worker publishes no lighting result and the pod is terminated, so the 8-light figure is derived from the code baked into the pinned digest plus a census of the exact uploaded assets, corroborated by the measured exposure signature — it is not read from a render log"
+  },
+  "hierarchy": {
+    "mapMark": "attached — sits directly at the near edge of the map paper, consistent with the gate's measured paperToMarkDistance 0.115758 and sharedRoot true; not flung across the meadow",
+    "assetHierarchy": "intact",
+    "detachedComponents": "none observed"
+  }
+}

@@ -1,0 +1,69 @@
+=== PHASE C — POST-RUN SAFETY (independent) ===
+myself.pods empty: YES (count=0)
+Active billable GPU remaining: NO
+ALLOW_PAID_GPU_LAUNCH: (unset->false)
+CLOUD_RENDER_ENABLED: (unset->false)
+
+=== ACCEPTANCE QC (off-GPU) ===
+R2 readback sha256: 39cacc41bb4c420b45cfc8a2ad4067c7200b85b00aaa48af49b72fc47528aac0
+Integrity vs metadata.artifactSha256 (authoritative): MATCH
+Integrity vs status.json.artifactSha256: MATCH
+ffprobe: 1080x1920 frames=90 fps=30/1 dur=3.000000s codec=h264 pix=yuv420p
+blackdetect segments: 0; freezedetect segments: 0
+
+===== QC RESULT =====
+{
+  "resolution": "1080x1920",
+  "resolutionExact1080x1920": true,
+  "frameCount": 90,
+  "expectedFrames": 90,
+  "frameCountMatch": true,
+  "durationSec": 3,
+  "codec": "h264",
+  "pixFmt": "yuv420p",
+  "fps": "30/1",
+  "blackSegments": 0,
+  "freezeSegments": 0,
+  "r2ReadbackSha256": "39cacc41bb4c420b45cfc8a2ad4067c7200b85b00aaa48af49b72fc47528aac0",
+  "readbackIntegrity": true,
+  "statusJsonShaMatch": true,
+  "statusJsonState": "COMPLETE",
+  "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-12T21-02-24-068Z/final_1080p.mp4",
+  "metadata": {
+    "jobId": "accept1080-2026-08-12T21-02-24-068Z",
+    "episodeId": "meadow-map-mystery",
+    "renderMode": "FINAL_1080P",
+    "resolution": "1080x1920",
+    "fps": 30,
+    "frameRange": {
+      "start": 1,
+      "end": 90
+    },
+    "frameCount": 90,
+    "eevee": {
+      "engine": "EEVEE",
+      "samples": 24
+    },
+    "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-12T21-02-24-068Z/final_1080p.mp4",
+    "artifactSha256": "39cacc41bb4c420b45cfc8a2ad4067c7200b85b00aaa48af49b72fc47528aac0",
+    "outputBytes": 656205,
+    "outputResolution": "1080x1920",
+    "timings": {
+      "assetDownloadMs": 63449,
+      "renderMs": 71519,
+      "encodeMs": 2793,
+      "totalMs": 149668
+    },
+    "gpu": "NVIDIA+GeForce+RTX+4090",
+    "podId": "vypcyx1o5ox3hi",
+    "completedAt": "2026-08-12T21:11:27.656Z"
+  },
+  "statusStage": "COMPLETE"
+}
+
+Artifacts: /opt/cursor/artifacts/meadow_map_mystery_final_1080p.mp4
+  frame[begin] /opt/cursor/artifacts/acceptance_1080p_frame_begin.png
+  frame[mid_motion] /opt/cursor/artifacts/acceptance_1080p_frame_mid_motion.png
+  frame[middle] /opt/cursor/artifacts/acceptance_1080p_frame_middle.png
+  frame[end] /opt/cursor/artifacts/acceptance_1080p_frame_end.png
+R2 QC report: qc/accept1080-2026-08-12T21-02-24-068Z/acceptance_qc.json

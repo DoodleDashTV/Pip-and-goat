@@ -1,0 +1,292 @@
+{
+  "frame_001.png": {
+    "landmarks": {
+      "goatHorns": {
+        "n": 531,
+        "cx": 749.0527306967984,
+        "cy": 1001.1676082862524,
+        "top": 900.0,
+        "bottom": 1015.0,
+        "left": 704.0,
+        "right": 775.0
+      },
+      "goatHooves": {
+        "n": 310,
+        "cx": 798.7677419354839,
+        "cy": 1230.1096774193547,
+        "top": 1207.0,
+        "bottom": 1259.0,
+        "left": 760.0,
+        "right": 837.0
+      },
+      "goatCollar": {
+        "n": 400897,
+        "cx": 809.4381150270518,
+        "cy": 371.8152742475,
+        "top": 0.0,
+        "bottom": 1105.0,
+        "left": 540.0,
+        "right": 1079.0
+      },
+      "pipComb": {
+        "n": 375,
+        "cx": 281.3706666666667,
+        "cy": 1091.056,
+        "top": 1080.0,
+        "bottom": 1157.0,
+        "left": 264.0,
+        "right": 311.0
+      },
+      "pipFeet": {
+        "n": 80,
+        "cx": 288.15,
+        "cy": 1239.075,
+        "top": 1156.0,
+        "bottom": 1275.0,
+        "left": 268.0,
+        "right": 321.0
+      }
+    },
+    "poseRatios": {
+      "goatHeadHeightRatio": 0.7182,
+      "goatHeadLateralRatio": -0.1385,
+      "goatHornSpreadRatio": 0.1978,
+      "goatCollarToHoofPx": 887.2,
+      "pipCombHeightRatio": 0.9433,
+      "pipCombLateralRatio": -0.0348,
+      "pipFootSpreadRatio": 0.2718
+    }
+  },
+  "frame_023.png": {
+    "landmarks": {
+      "goatHorns": {
+        "n": 452,
+        "cx": 759.0044247787611,
+        "cy": 1015.3893805309734,
+        "top": 1004.0,
+        "bottom": 1025.0,
+        "left": 710.0,
+        "right": 783.0
+      },
+      "goatHooves": {
+        "n": 311,
+        "cx": 811.5144694533763,
+        "cy": 1246.122186495177,
+        "top": 1222.0,
+        "bottom": 1277.0,
+        "left": 770.0,
+        "right": 853.0
+      },
+      "goatCollar": {
+        "n": 399981,
+        "cx": 809.4842680027301,
+        "cy": 371.1530422695078,
+        "top": 0.0,
+        "bottom": 1117.0,
+        "left": 540.0,
+        "right": 1079.0
+      },
+      "pipComb": {
+        "n": 502,
+        "cx": 252.98605577689244,
+        "cy": 1124.9123505976095,
+        "top": 1112.0,
+        "bottom": 1205.0,
+        "left": 236.0,
+        "right": 273.0
+      },
+      "pipFeet": {
+        "n": 89,
+        "cx": 261.30337078651684,
+        "cy": 1213.629213483146,
+        "top": 1122.0,
+        "bottom": 1293.0,
+        "left": 240.0,
+        "right": 291.0
+      }
+    },
+    "poseRatios": {
+      "goatHeadHeightRatio": 0.9583,
+      "goatHeadLateralRatio": -0.1923,
+      "goatHornSpreadRatio": 0.2674,
+      "goatCollarToHoofPx": 905.8,
+      "pipCombHeightRatio": 0.9287,
+      "pipCombLateralRatio": -0.046,
+      "pipFootSpreadRatio": 0.2818
+    }
+  },
+  "frame_045.png": {
+    "landmarks": {
+      "goatHorns": {
+        "n": 569,
+        "cx": 787.091388400703,
+        "cy": 1026.165202108963,
+        "top": 1012.0,
+        "bottom": 1039.0,
+        "left": 728.0,
+        "right": 811.0
+      },
+      "goatHooves": {
+        "n": 413,
+        "cx": 845.8159806295399,
+        "cy": 1291.4164648910412,
+        "top": 1260.0,
+        "bottom": 1327.0,
+        "left": 798.0,
+        "right": 889.0
+      },
+      "goatCollar": {
+        "n": 398263,
+        "cx": 809.6386935266395,
+        "cy": 370.1016589540078,
+        "top": 0.0,
+        "bottom": 1146.0,
+        "left": 540.0,
+        "right": 1079.0
+      },
+      "pipComb": {
+        "n": 630,
+        "cx": 208.8904761904762,
+        "cy": 1155.0269841269842,
+        "top": 1142.0,
+        "bottom": 1170.0,
+        "left": 190.0,
+        "right": 233.0
+      },
+      "pipFeet": {
+        "n": 144,
+        "cx": 223.99305555555554,
+        "cy": 1283.263888888889,
+        "top": 1154.0,
+        "bottom": 1347.0,
+        "left": 192.0,
+        "right": 275.0
+      }
+    },
+    "poseRatios": {
+      "goatHeadHeightRatio": 0.955,
+      "goatHeadLateralRatio": -0.1864,
+      "goatHornSpreadRatio": 0.2635,
+      "goatCollarToHoofPx": 956.9,
+      "pipCombHeightRatio": 0.9365,
+      "pipCombLateralRatio": -0.0737,
+      "pipFootSpreadRatio": 0.4049
+    }
+  },
+  "frame_068.png": {
+    "landmarks": {
+      "goatHorns": {
+        "n": 752,
+        "cx": 811.7393617021277,
+        "cy": 1044.248670212766,
+        "top": 1024.0,
+        "bottom": 1063.0,
+        "left": 747.0,
+        "right": 839.0
+      },
+      "goatHooves": {
+        "n": 555,
+        "cx": 889.2810810810811,
+        "cy": 1350.3495495495495,
+        "top": 1312.0,
+        "bottom": 1395.0,
+        "left": 834.0,
+        "right": 941.0
+      },
+      "goatCollar": {
+        "n": 396002,
+        "cx": 809.9572451654285,
+        "cy": 368.8109757021429,
+        "top": 0.0,
+        "bottom": 1186.0,
+        "left": 540.0,
+        "right": 1079.0
+      },
+      "pipComb": {
+        "n": 860,
+        "cx": 156.6174418604651,
+        "cy": 1200.7197674418605,
+        "top": 1186.0,
+        "bottom": 1218.0,
+        "left": 134.0,
+        "right": 185.0
+      },
+      "pipFeet": {
+        "n": 269,
+        "cx": 172.59851301115242,
+        "cy": 1348.2416356877322,
+        "top": 1198.0,
+        "bottom": 1434.0,
+        "left": 138.0,
+        "right": 215.0
+      }
+    },
+    "poseRatios": {
+      "goatHeadHeightRatio": 0.9454,
+      "goatHeadLateralRatio": -0.209,
+      "goatHornSpreadRatio": 0.248,
+      "goatCollarToHoofPx": 1026.2,
+      "pipCombHeightRatio": 0.9406,
+      "pipCombLateralRatio": -0.0644,
+      "pipFootSpreadRatio": 0.3105
+    }
+  },
+  "frame_090.png": {
+    "landmarks": {
+      "goatHorns": {
+        "n": 754,
+        "cx": 829.6989389920425,
+        "cy": 1062.1870026525198,
+        "top": 918.0,
+        "bottom": 1081.0,
+        "left": 762.0,
+        "right": 865.0
+      },
+      "goatHooves": {
+        "n": 641,
+        "cx": 912.2480499219969,
+        "cy": 1380.5195007800312,
+        "top": 1338.0,
+        "bottom": 1431.0,
+        "left": 852.0,
+        "right": 967.0
+      },
+      "goatCollar": {
+        "n": 395883,
+        "cx": 810.322875698123,
+        "cy": 369.31915742782587,
+        "top": 0.0,
+        "bottom": 1207.0,
+        "left": 540.0,
+        "right": 1079.0
+      },
+      "pipComb": {
+        "n": 735,
+        "cx": 184.20544217687075,
+        "cy": 1190.9714285714285,
+        "top": 1172.0,
+        "bottom": 1206.0,
+        "left": 156.0,
+        "right": 207.0
+      },
+      "pipFeet": {
+        "n": 180,
+        "cx": 158.3,
+        "cy": 1451.7166666666667,
+        "top": 1442.0,
+        "bottom": 1475.0,
+        "left": 134.0,
+        "right": 191.0
+      }
+    },
+    "poseRatios": {
+      "goatHeadHeightRatio": 0.7189,
+      "goatHeadLateralRatio": -0.1609,
+      "goatHornSpreadRatio": 0.2008,
+      "goatCollarToHoofPx": 1061.7,
+      "pipCombHeightRatio": 0.9374,
+      "pipCombLateralRatio": 0.0855,
+      "pipFootSpreadRatio": 0.1881
+    }
+  }
+}

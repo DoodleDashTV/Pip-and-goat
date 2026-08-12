@@ -1,0 +1,57 @@
+[
+  {
+    "frame": "frame_001.png",
+    "height": 1920,
+    "width": 1080,
+    "meanLuma": 216.71,
+    "minLuma": 122.78,
+    "maxLuma": 252.65,
+    "meanSaturation": 10.5,
+    "p01Luma": 197.22,
+    "p99Luma": 243.8
+  },
+  {
+    "frame": "frame_023.png",
+    "height": 1920,
+    "width": 1080,
+    "meanLuma": 217.35,
+    "minLuma": 122.23,
+    "maxLuma": 253.85,
+    "meanSaturation": 10.4,
+    "p01Luma": 197.22,
+    "p99Luma": 244.03
+  },
+  {
+    "frame": "frame_045.png",
+    "height": 1920,
+    "width": 1080,
+    "meanLuma": 218.83,
+    "minLuma": 121.82,
+    "maxLuma": 253.21,
+    "meanSaturation": 10.26,
+    "p01Luma": 197.22,
+    "p99Luma": 244.27
+  },
+  {
+    "frame": "frame_068.png",
+    "height": 1920,
+    "width": 1080,
+    "meanLuma": 220.26,
+    "minLuma": 120.81,
+    "maxLuma": 253.38,
+    "meanSaturation": 10.19,
+    "p01Luma": 197.22,
+    "p99Luma": 244.27
+  },
+  {
+    "frame": "frame_090.png",
+    "height": 1920,
+    "width": 1080,
+    "meanLuma": 220.77,
+    "minLuma": 124.04,
+    "maxLuma": 254.81,
+    "meanSaturation": 10.16,
+    "p01Luma": 197.22,
+    "p99Luma": 244.41
+  }
+]

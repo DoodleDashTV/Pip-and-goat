@@ -1,0 +1,22 @@
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-12T21:03:40.312Z","event":"config","jobId":"accept1080-2026-08-12T21-02-24-068Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.34,"workerImage":"ghcr.io/[REDACTED_R2_BUCKET]/ddp-runpod-blender@sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882","hardCapUsd":0.25}
+{"ts":"2026-08-12T21:03:40.536Z","event":"creating_pod","podName":"ddp-accept1080-1786568620536","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":40,"volumeInGb":0}
+{"ts":"2026-08-12T21:03:41.121Z","event":"pod_created","podId":"vypcyx1o5ox3hi","at":"2026-08-12T21:03:41.121Z"}
+AUTHORIZATION CONSUMED: pod vypcyx1o5ox3hi created. Watchdog + HARD_KILL active.
+{"ts":"2026-08-12T21:03:43.225Z","event":"stage","elapsedSec":0,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":null,"renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-12T21:09:19.603Z","event":"stage","elapsedSec":337,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"ASSET_DOWNLOAD_START","renderStage":"MANIFEST","status":"PREPARING_ASSETS","uptimeSec":34}
+{"ts":"2026-08-12T21:10:24.019Z","event":"stage","elapsedSec":401,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"DOWNLOADING_ASSETS","status":"RENDERING","uptimeSec":94}
+{"ts":"2026-08-12T21:11:21.062Z","event":"stage","elapsedSec":459,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"RENDERING","status":"ENCODING","uptimeSec":154}
+{"ts":"2026-08-12T21:11:31.670Z","event":"stage","elapsedSec":469,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"COMPLETE","status":"COMPLETE","uptimeSec":154}
+{"ts":"2026-08-12T21:11:31.670Z","event":"render_complete","artifactKey":"renders/finals/meadow-map-mystery/accept1080-2026-08-12T21-02-24-068Z/final_1080p.mp4","artifactSha256":"39cacc41bb4c420b45cfc8a2ad4067c7200b85b00aaa48af49b72fc47528aac0"}
+{"ts":"2026-08-12T21:11:31.670Z","event":"terminating_pod","podId":"vypcyx1o5ox3hi"}
+{"ts":"2026-08-12T21:11:32.113Z","event":"post_terminate_poll","podPresent":false,"totalPods":0,"billableRemaining":false}
+
+===== PHASE B LIFECYCLE SUMMARY =====
+Pod ID: vypcyx1o5ox3hi
+Final status: COMPLETE
+Lifetime: 7.85 min @ $0.74/hr
+ACTUAL COST: $0.0968 (cap $0.25) — within cap: YES
+Pod absent after terminate: YES
+Billable GPU remaining: NO
+Authorization consumed: YES

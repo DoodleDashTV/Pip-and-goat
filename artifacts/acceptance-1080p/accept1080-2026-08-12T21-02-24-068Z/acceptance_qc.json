@@ -1,0 +1,48 @@
+{
+  "resolution": "1080x1920",
+  "resolutionExact1080x1920": true,
+  "frameCount": 90,
+  "expectedFrames": 90,
+  "frameCountMatch": true,
+  "durationSec": 3,
+  "codec": "h264",
+  "pixFmt": "yuv420p",
+  "fps": "30/1",
+  "blackSegments": 0,
+  "freezeSegments": 0,
+  "r2ReadbackSha256": "39cacc41bb4c420b45cfc8a2ad4067c7200b85b00aaa48af49b72fc47528aac0",
+  "readbackIntegrity": true,
+  "statusJsonShaMatch": true,
+  "statusJsonState": "COMPLETE",
+  "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-12T21-02-24-068Z/final_1080p.mp4",
+  "metadata": {
+    "jobId": "accept1080-2026-08-12T21-02-24-068Z",
+    "episodeId": "meadow-map-mystery",
+    "renderMode": "FINAL_1080P",
+    "resolution": "1080x1920",
+    "fps": 30,
+    "frameRange": {
+      "start": 1,
+      "end": 90
+    },
+    "frameCount": 90,
+    "eevee": {
+      "engine": "EEVEE",
+      "samples": 24
+    },
+    "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-12T21-02-24-068Z/final_1080p.mp4",
+    "artifactSha256": "39cacc41bb4c420b45cfc8a2ad4067c7200b85b00aaa48af49b72fc47528aac0",
+    "outputBytes": 656205,
+    "outputResolution": "1080x1920",
+    "timings": {
+      "assetDownloadMs": 63449,
+      "renderMs": 71519,
+      "encodeMs": 2793,
+      "totalMs": 149668
+    },
+    "gpu": "NVIDIA+GeForce+RTX+4090",
+    "podId": "vypcyx1o5ox3hi",
+    "completedAt": "2026-08-12T21:11:27.656Z"
+  },
+  "statusStage": "COMPLETE"
+}
