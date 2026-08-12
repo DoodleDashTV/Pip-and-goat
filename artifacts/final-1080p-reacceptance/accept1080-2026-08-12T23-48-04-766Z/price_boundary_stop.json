@@ -1,0 +1,141 @@
+{
+  "report": "FINAL_1080P visual re-acceptance — STOPPED AT PRICE BOUNDARY, $0.00 SPEND",
+  "outcome": "NO_POD_CREATED",
+  "recordedAt": "2026-08-12T23:48:40Z",
+  "jobId": "accept1080-2026-08-12T23-48-04-766Z",
+
+  "authorizationValues": {
+    "branch": { "expected": "cursor/canonical-ddp-baseline-ba2f", "actual": "cursor/canonical-ddp-baseline-ba2f", "verdict": "PASS" },
+    "head": { "expected": "6331a3f", "actual": "6331a3f6e26f520b3e05fc332b9d8ea49d4f0b8f", "workingTreeClean": true, "verdict": "PASS" },
+    "workerImageDigest": {
+      "expected": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+      "actual": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+      "digestPinned": true,
+      "tagReferenceAnywhere": false,
+      "registry": "ghcr.io",
+      "verdict": "PASS"
+    },
+    "workerImageSourceCommit": {
+      "expected": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+      "actual": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+      "verdict": "PASS"
+    },
+    "workerImageRenderCodeSha256": {
+      "expected": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+      "actual": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+      "verdict": "PASS"
+    },
+    "provenanceScriptFingerprint": {
+      "command": "node workers/runpod-blender/src/provenance.js --json",
+      "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+      "renderCodeFileCount": 30,
+      "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+      "matchesPinnedConstant": true,
+      "verdict": "PASS"
+    },
+    "lightingState": { "expected": "DAY_KEY", "actual": "DAY_KEY", "source": "buildAcceptanceManifest().shotMeta.lightingState", "verdict": "PASS" },
+    "hardCapUsd": { "expected": 0.25, "actual": 0.25, "verdict": "PASS" }
+  },
+
+  "preflight": {
+    "command": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/acceptance-1080p/preflight.ts",
+    "flags": { "ALLOW_PAID_GPU_LAUNCH": "unset->false", "CLOUD_RENDER_ENABLED": "unset->false" },
+    "exitCode": 0,
+    "overall": "PASS",
+    "failCount": 0,
+    "podCreated": false,
+    "gpuBillingStarted": false,
+    "checks": {
+      "1": { "name": "R2 authentication", "status": "PASS" },
+      "2": { "name": "R2 bucket read/write", "status": "PASS" },
+      "0": { "name": "Local quality gates (rig/motion/lighting/hierarchy/visual)", "status": "PASS", "detail": "all 8 gates PASS on current asset bytes" },
+      "3": { "name": "Required production assets exist (Pip/Goat/Meadow/Map r2Key)", "status": "PASS" },
+      "4": { "name": "PIP approved asset loads + sha256 match", "status": "PASS" },
+      "5": { "name": "GOAT approved asset loads + sha256 match", "status": "PASS" },
+      "6": { "name": "Scene/project builds (assemble_scene.py resolves)", "status": "PASS" },
+      "7": { "name": "Blender/EEVEE production config valid", "status": "PASS", "detail": "engine=EEVEE samples=24 blender=4.2.3" },
+      "8": { "name": "Output exactly 1080x1920 portrait", "status": "PASS" },
+      "9": { "name": "PRODUCTION render settings (FINAL_1080P samples, not draft)", "status": "PASS" },
+      "10": { "name": "Runpod API auth", "status": "PASS", "detail": "48 GPU types available. No pods created." },
+      "11": { "name": "NO existing/orphan Runpod pods", "status": "PASS", "detail": "no pods on account" },
+      "12": { "name": "myself.pods EMPTY before launch", "status": "PASS", "detail": "pods=0" },
+      "13": { "name": "No other billable GPU running", "status": "PASS", "detail": "billable pods=0" },
+      "14": { "name": "Estimated cost <= $0.25", "status": "PASS", "detail": "est=$0.1018 (rate=$0.74/hr from secure-cloud on-demand, stock=High, runtime~8.25min, 90 frames)" },
+      "15": { "name": "Hard timeout/cost-kill + startup watchdog active", "status": "PASS", "detail": "orchestrator HARD_KILL~18min from live rate" },
+      "IMG": { "name": "Worker image resolves (digest-pinned, ghcr.io, anonymously pullable, linux/amd64)", "status": "PASS", "detail": "validate ok=true code=OK; ghcr config blob read; linux/amd64=true" },
+      "PROV": { "name": "Worker image provenance (source commit + baked render code == this checkout)", "status": "PASS", "detail": "code=OK imageCommit=bb5270372ad558e71673fe789260a12fb51a9c6d renderCode=c4afa39c8c06b32d... builtAt=2026-08-12T22:25:23Z files=30" },
+      "GATE": { "name": "createPodForBenchmark refuses while ALLOW_PAID_GPU_LAUNCH=false", "status": "PASS", "detail": "threw PAID_GPU_NOT_APPROVED" },
+      "MANIFEST": { "name": "Upload shot manifest to R2", "status": "PASS", "detail": "readback=true" }
+    },
+    "rtx4090Line": "RTX 4090: id=NVIDIA GeForce RTX 4090 secure=true community=true listLowest=$0.34/hr secureOnDemand=$0.74/hr stock=High bid=$0.34/hr",
+    "check14EstimateLine": "[PASS] 14 Estimated cost <= $0.25 — est=$0.1018 (rate=$0.74/hr from secure-cloud on-demand, stock=High, runtime~8.25min, 90 frames); hard-kill still recomputed from the pod's ACTUAL costPerHr"
+  },
+
+  "priceBoundary": {
+    "authorizedMaximumQuotedGpuPriceUsdPerHr": 0.25,
+    "gpuThatWouldBeLaunched": "NVIDIA GeForce RTX 4090",
+    "cloudType": "SECURE",
+    "liveSecureOnDemandUsdPerHr": 0.74,
+    "liveSecureMinimumBidUsdPerHr": 0.74,
+    "liveSecureStockStatus": "High",
+    "ratioOverAuthorizedMaximum": 2.96,
+    "overageUsdPerHr": 0.49,
+    "verdict": "EXCEEDED",
+    "action": "STOPPED BEFORE POD CREATION — no pod created, $0.00 spend",
+    "independentConfirmation": {
+      "method": "direct read-only RunPod GraphQL query, lowestPrice(input: { gpuCount: 1, secureCloud: true })",
+      "queriedAt": "2026-08-12T23:48:40Z",
+      "secureUninterruptablePrice": 0.74,
+      "secureMinimumBidPrice": 0.74,
+      "secureStockStatus": "High",
+      "communityUninterruptablePrice": 0.34,
+      "communityStockStatus": "Low",
+      "note": "Community cloud is also above the $0.25/hr authorized maximum, and switching cloud type or GPU class was explicitly not authorized. No workaround attempted."
+    },
+    "contextForUser": "The parent agent believed the user most likely meant the $0.25 TOTAL spend cap (HARD_CAP_USD, which preflight check 14 enforces and which the $0.1018 estimate satisfies) rather than an hourly cap. That belief was NOT acted upon. The authorization text was applied literally: quoted secure hourly price $0.74/hr > $0.25/hr, therefore no pod."
+  },
+
+  "podLifecycle": {
+    "podCreated": false,
+    "podId": null,
+    "actualCostPerHr": null,
+    "lifetimeSeconds": 0,
+    "actualGpuCostUsd": 0.0,
+    "podsOnAccountBefore": 0,
+    "podsOnAccountAfter": 0,
+    "orphanOrAdditionalPods": "NONE",
+    "authorizationConsumed": false
+  },
+
+  "render": {
+    "produced": false,
+    "reason": "price boundary exceeded; Step 3 launch not executed",
+    "qcPerformed": false,
+    "note": "Steps 3-5 (launch, post-render safety, full QC) were intentionally not executed. No mp4, metadata.json, status.json or startup-status.json exists for this job because no pod ever ran."
+  },
+
+  "evidenceNotes": {
+    "orgSegmentRedacted": "In the committed copies of preflight-log.txt and run-state.json the ghcr.io org segment is replaced with <org>. That segment coincidentally equals the R2 bucket name, so the secret scanner blocks it; common.ts carries a pragma allowlist for the same reason. The image digest is preserved verbatim, so provenance remains fully verifiable.",
+    "liveStateNotCommitted": "artifacts/acceptance-1080p/run-state.json is deliberately left untracked and byte-unmodified on disk so a re-authorized launch reads the exact preflight state, including the unredacted image reference."
+  },
+
+  "preflightStatePreserved": {
+    "runStateFile": "artifacts/acceptance-1080p/run-state.json (untracked, left in place)",
+    "manifestKey": "jobs/accept1080-2026-08-12T23-48-04-766Z/manifest.json",
+    "manifestUploadedAndReadbackVerified": true,
+    "foundingAssetsUploadedAndVerified": 4,
+    "note": "Left in place so an appropriately re-authorized launch can proceed without redoing preflight."
+  },
+
+  "safetyInvariants": {
+    "gatesThresholdsCapsWatchdogsModified": false,
+    "imagePinModified": false,
+    "manifestModified": false,
+    "pipGoatAssetsRiggingAnimationLightingModified": false,
+    "allowPaidGpuLaunchWrittenToAnyCommittedFile": false,
+    "secretValuesPrintedOrCommitted": false,
+    "filesAddedByThisRun": "evidence/QC artifacts only"
+  },
+
+  "totalGpuSpendUsd": 0.0
+}

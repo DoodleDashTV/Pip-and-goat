@@ -1,0 +1,59 @@
+{
+  "jobId": "accept1080-2026-08-12T23-48-04-766Z",
+  "createdAt": "2026-08-12T23:48:04.766Z",
+  "episodeId": "meadow-map-mystery",
+  "manifestKey": "jobs/accept1080-2026-08-12T23-48-04-766Z/manifest.json",
+  "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-12T23-48-04-766Z/final_1080p.mp4",
+  "resolution": "1080x1920",
+  "fps": 30,
+  "frameStart": 1,
+  "frameEnd": 90,
+  "samples": 24,
+  "workerImage": "ghcr.io/<org>/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+  "gpuTypeId": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "rate4090": 0.74,
+  "secureRate4090": 0.74,
+  "secureStock": "High",
+  "estimatedCostUsd": 0.1018,
+  "workerProvenance": {
+    "imageDigest": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+    "imageSourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "imageRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "imageBuildTime": "2026-08-12T22:25:23Z",
+    "expectedSourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "expectedRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "localRenderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "code": "OK",
+    "ok": true
+  },
+  "assets": [
+    {
+      "role": "meadow",
+      "r2Key": "environments/env_meadow_v1/env_meadow_v1_2bf49aabad07/meadow_production.blend",
+      "sha256": "2bf49aabad0710b528294d6394b68b28075b522228fd10c6d2f8d893d64ad3c6",
+      "bytes": 717784
+    },
+    {
+      "role": "map",
+      "r2Key": "props/prop_map_001/prop_map_001_9f466176dab6/adventure_map.blend",
+      "sha256": "9f466176dab6f3fcacfa79838a5db3d30c7aef372a1ed2d57152c5761578f4f2",
+      "bytes": 441768
+    },
+    {
+      "role": "pip",
+      "r2Key": "characters/pip/char_pip_v1_dd0d1c03b662/pip_production.blend",
+      "sha256": "dd0d1c03b6625d69e9f96af087562aeecd0b14d401b280fe88b9f35418d005cb",
+      "bytes": 9581974
+    },
+    {
+      "role": "goat",
+      "r2Key": "characters/goat/char_goat_v1_a54d491264e0/goat_production.blend",
+      "sha256": "a54d491264e06ea52ffe9e2ba16e79d60be0d1900b1d369848774c9f9eac0ad5",
+      "bytes": 11847394
+    }
+  ],
+  "startupStatusKey": "jobs/accept1080-2026-08-12T23-48-04-766Z/startup-status.json",
+  "statusKey": "jobs/accept1080-2026-08-12T23-48-04-766Z/status.json",
+  "metadataKey": "jobs/accept1080-2026-08-12T23-48-04-766Z/metadata.json"
+}
