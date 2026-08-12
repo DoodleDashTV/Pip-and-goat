@@ -1,0 +1,17 @@
+{
+  "name": "Doodle Dash TV Studio",
+  "install": "bash .cursor/install.sh",
+  "start": "bash .cursor/start.sh",
+  "terminals": [
+    {
+      "name": "web",
+      "command": "set -a && . ./.env && set +a && NEXT_TELEMETRY_DISABLED=1 pnpm dev"
+    }
+  ],
+  "ports": [
+    {
+      "name": "web",
+      "port": 3000
+    }
+  ]
+}
