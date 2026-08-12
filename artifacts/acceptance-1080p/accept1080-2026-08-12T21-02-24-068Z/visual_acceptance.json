@@ -115,7 +115,16 @@
       "a light census of the exact uploaded asset bytes gives 8 lights (meadow 2, pip 3, goat 3) — matching the 8-light regression that failed the first acceptance render",
       "the rig repair travelled to the pod because it lives in the .blend assets uploaded to R2, which is why character motion is correct while lighting is not"
     ],
-    "inferenceNote": "the worker publishes no lighting result and the pod is terminated, so the 8-light figure is derived from the code baked into the pinned digest plus a census of the exact uploaded assets, corroborated by the measured exposure signature — it is not read from a render log"
+    "inferenceNote": "the worker publishes no lighting result and the pod is terminated, so the 8-light figure is derived from the code baked into the pinned digest plus a census of the exact uploaded assets, corroborated by the measured exposure signature — it is not read from a render log",
+    "localReproductionOfPinnedCode": {
+      "method": "checked out scripts/blender from the pinned commit 1cd6c62 and ran it locally on the same asset bytes with the same manifest arguments the worker builds (PUSH_IN, 90 frames, 24 samples), at zero cost",
+      "measured": [
+        { "frame": "frame_0001.png", "meanLuma": 217.43, "minLuma": 173.01, "meanSaturation": 10.28 },
+        { "frame": "frame_0045.png", "meanLuma": 219.56, "minLuma": 173.68, "meanSaturation": 10.02 },
+        { "frame": "frame_0090.png", "meanLuma": 221.51, "minLuma": 154.91, "meanSaturation": 9.9 }
+      ],
+      "conclusion": "the pinned code reproduces the cloud render's exposure signature and composition almost exactly (cloud: meanLuma 216.7-220.8, saturation 10.16-10.50), while the current repaired code on the same VM and the same assets measures meanLuma 147.5-153.5 and saturation 36.97-40.79 and passes all 10 local visual checks — confirming the defect is the stale worker image, not the assets"
+    }
   },
   "hierarchy": {
     "mapMark": "attached — sits directly at the near edge of the map paper, consistent with the gate's measured paperToMarkDistance 0.115758 and sharedRoot true; not flung across the meadow",
