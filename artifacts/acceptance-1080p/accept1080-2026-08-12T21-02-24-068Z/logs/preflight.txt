@@ -1,0 +1,54 @@
+=== PHASE A — FINAL_1080P ACCEPTANCE PREFLIGHT (no pod, flags false) ===
+ALLOW_PAID_GPU_LAUNCH=(unset->false)
+CLOUD_RENDER_ENABLED=(unset->false)
+[PASS] 1 R2 authentication — bucket reachable with provided credentials
+[PASS] 2 R2 bucket read/write — write+read checksum match=true, deleted=true
+[PASS] 0 Local quality gates (rig/motion/lighting/hierarchy/visual) — all 8 gates PASS on current asset bytes
+  [asset meadow] r2Key=environments/env_meadow_v1/env_meadow_v1_2bf49aabad07/meadow_production.blend sha256=2bf49aabad0710b528294d6394b68b28075b522228fd10c6d2f8d893d64ad3c6 bytes=717784 OK
+  [asset map] r2Key=props/prop_map_001/prop_map_001_9f466176dab6/adventure_map.blend sha256=9f466176dab6f3fcacfa79838a5db3d30c7aef372a1ed2d57152c5761578f4f2 bytes=441768 OK
+  [asset pip] r2Key=characters/pip/char_pip_v1_dd0d1c03b662/pip_production.blend sha256=dd0d1c03b6625d69e9f96af087562aeecd0b14d401b280fe88b9f35418d005cb bytes=9581974 OK
+  [asset goat] r2Key=characters/goat/char_goat_v1_a54d491264e0/goat_production.blend sha256=a54d491264e06ea52ffe9e2ba16e79d60be0d1900b1d369848774c9f9eac0ad5 bytes=11847394 OK
+[PASS] 3 Required production assets exist (Pip/Goat/Meadow/Map r2Key) — 4 founding assets present in R2 with r2Key + readback sha256 verified (uploadOk=true, readbackOk=true)
+[PASS] 4 PIP approved asset loads + sha256 match — blendHeader=true, sha256=dd0d1c03b6625d69e9f96af087562aeecd0b14d401b280fe88b9f35418d005cb, r2Readback=match (loadability confirmed by local Blender render)
+[PASS] 5 GOAT approved asset loads + sha256 match — blendHeader=true, sha256=a54d491264e06ea52ffe9e2ba16e79d60be0d1900b1d369848774c9f9eac0ad5, r2Readback=match (loadability confirmed by local Blender render)
+[PASS] 6 Scene/project builds (assemble_scene.py resolves) — assemble_scene.py + helpers present; validated by real local EEVEE render of this exact shot
+[PASS] 7 Blender/EEVEE production config valid — engine=EEVEE samples=24 blender=4.2.3
+[PASS] 8 Output exactly 1080x1920 portrait — resolution=1080x1920 fps=30
+[PASS] 9 PRODUCTION render settings (FINAL_1080P samples, not draft) — renderMode=FINAL_1080P samples=24 frames=1-90
+[PASS] 10 Runpod API auth — Authenticated. 48 GPU types available. No pods created. (gpuTypes=48)
+  RTX 4090: id=NVIDIA GeForce RTX 4090 secure=true community=true secureOnDemand=$0.34/hr bid=$0.34/hr
+[PASS] 11 NO existing/orphan Runpod pods — no pods on account
+[PASS] 12 myself.pods EMPTY before launch — pods=0
+[PASS] 13 No other billable GPU running — billable pods=0
+[PASS] 14 Estimated cost <= $0.25 — est=$0.0468 (rate=$0.34/hr, runtime~8.25min, 90 frames)
+[PASS] 15 Hard timeout/cost-kill + startup watchdog active — orchestrator HARD_KILL~39min (from live rate), worker STARTUP_WATCHDOG_MS + cost-aware runtime cap enabled
+[PASS] IMG Worker image resolves (digest-pinned, ghcr.io, anonymously pullable, linux/amd64) — validate ok=true code=OK registry=ghcr.io repo=[REDACTED_R2_BUCKET]/ddp-runpod-blender digest=sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882; ghcr manifest 200; linux/amd64=true
+[PASS] GATE createPodForBenchmark refuses while ALLOW_PAID_GPU_LAUNCH=false — threw PAID_GPU_NOT_APPROVED: Paid GPU launch blocked: ALLOW_PAID_GPU_LAUNCH is false. Waiting for explicit user approval.
+[PASS] MANIFEST Upload shot manifest to R2 — key=jobs/accept1080-2026-08-12T21-02-24-068Z/manifest.json readback=true
+
+run-state written to /workspace/artifacts/acceptance-1080p/run-state.json
+
+===== PHASE A SUMMARY =====
+PASS 1: R2 authentication
+PASS 2: R2 bucket read/write
+PASS 0: Local quality gates (rig/motion/lighting/hierarchy/visual)
+PASS 3: Required production assets exist (Pip/Goat/Meadow/Map r2Key)
+PASS 4: PIP approved asset loads + sha256 match
+PASS 5: GOAT approved asset loads + sha256 match
+PASS 6: Scene/project builds (assemble_scene.py resolves)
+PASS 7: Blender/EEVEE production config valid
+PASS 8: Output exactly 1080x1920 portrait
+PASS 9: PRODUCTION render settings (FINAL_1080P samples, not draft)
+PASS 10: Runpod API auth
+PASS 11: NO existing/orphan Runpod pods
+PASS 12: myself.pods EMPTY before launch
+PASS 13: No other billable GPU running
+PASS 14: Estimated cost <= $0.25
+PASS 15: Hard timeout/cost-kill + startup watchdog active
+PASS IMG: Worker image resolves (digest-pinned, ghcr.io, anonymously pullable, linux/amd64)
+PASS GATE: createPodForBenchmark refuses while ALLOW_PAID_GPU_LAUNCH=false
+PASS MANIFEST: Upload shot manifest to R2
+
+PREFLIGHT: PASS — cleared for ONE authorized launch
+PAID GPU CREATED: NO
+GPU BILLING STARTED: NO
