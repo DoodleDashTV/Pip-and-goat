@@ -267,20 +267,26 @@ async function main() {
         summary.podPollError = String((e as Error).message || e).slice(0, 200);
       }
 
-      const existsFn = (storage as { exists?: (k: string) => Promise<boolean> }).exists;
-      if (existsFn) {
-        complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
-        summary.heartbeat = await existsFn(`${BENCH_PREFIX}/results/heartbeat.txt`);
-        if (summary.heartbeat && storage.readObject) {
-          try {
-            const hb = Buffer.from(
-              await storage.readObject(`${BENCH_PREFIX}/results/heartbeat.txt`),
-            ).toString('utf8');
-            summary.heartbeatText = hb.trim().slice(0, 200);
-          } catch {
-            /* ignore */
-          }
-        }
+      let heartbeatAlive = false;
+      try {
+        const completeBody = await (storage as { readObject: (k: string) => Promise<Uint8Array> }).readObject(
+          `${BENCH_PREFIX}/results/COMPLETE`,
+        );
+        complete = Boolean(completeBody);
+      } catch {
+        complete = false;
+      }
+      try {
+        const hb = Buffer.from(
+          await (storage as { readObject: (k: string) => Promise<Uint8Array> }).readObject(
+            `${BENCH_PREFIX}/results/heartbeat.txt`,
+          ),
+        ).toString('utf8');
+        heartbeatAlive = true;
+        summary.heartbeat = true;
+        summary.heartbeatText = hb.trim().slice(0, 200);
+      } catch {
+        heartbeatAlive = Boolean(summary.heartbeat);
       }
       console.log('POLL', {
         uptimeSec,
@@ -302,20 +308,30 @@ async function main() {
         break;
       }
       if (podStatus === 'EXITED' || podStatus === 'TERMINATED') {
-        if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
         summary.selfTerminated = true;
-        // Give uploads a moment if worker just finished.
         if (!complete) await sleep(10_000);
-        if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
+        try {
+          await (storage as { readObject: (k: string) => Promise<Uint8Array> }).readObject(
+            `${BENCH_PREFIX}/results/COMPLETE`,
+          );
+          complete = true;
+        } catch {
+          /* still incomplete */
+        }
         break;
       }
       if (podStatus === 'MISSING') {
         missingPolls += 1;
-        // If R2 heartbeat is alive, keep waiting — GraphQL/REST can briefly omit pods.
-        const heartbeatAlive = Boolean(summary.heartbeat);
-        const missingLimit = heartbeatAlive ? 40 : 12; // ~10min with hb, ~3min without
+        const missingLimit = heartbeatAlive ? 40 : 20; // ~10min with hb, ~5min without
         if (missingPolls >= missingLimit) {
-          if (existsFn) complete = await existsFn(`${BENCH_PREFIX}/results/COMPLETE`);
+          try {
+            await (storage as { readObject: (k: string) => Promise<Uint8Array> }).readObject(
+              `${BENCH_PREFIX}/results/COMPLETE`,
+            );
+            complete = true;
+          } catch {
+            /* incomplete */
+          }
           summary.selfTerminated = true;
           summary.failed = complete ? undefined : 'POD_DISAPPEARED_NO_RESULTS';
           await terminate('pod_missing');
@@ -337,20 +353,28 @@ async function main() {
       const reportKey = `${BENCH_PREFIX}/results/gpu-benchmark-report.json`;
       const logKey = `${BENCH_PREFIX}/results/bootstrap.log`;
       const mp4Key = `${BENCH_PREFIX}/results/shot.mp4`;
-      const existsFn = (storage as { exists?: (k: string) => Promise<boolean> }).exists;
-      if (existsFn && (await existsFn(reportKey))) {
-        await downloadResult(storage as any, reportKey, path.join(OUT_DIR, 'gpu-benchmark-report.json'));
+      const reader = storage as {
+        readObject: (k: string) => Promise<Uint8Array>;
+      };
+      try {
+        await downloadResult(reader as any, reportKey, path.join(OUT_DIR, 'gpu-benchmark-report.json'));
         summary.reportDownloaded = true;
         const report = JSON.parse(readFileSync(path.join(OUT_DIR, 'gpu-benchmark-report.json'), 'utf8'));
         summary.gpuReport = report;
+      } catch {
+        /* no report yet */
       }
-      if (existsFn && (await existsFn(logKey))) {
-        await downloadResult(storage as any, logKey, path.join(OUT_DIR, 'bootstrap.log'));
+      try {
+        await downloadResult(reader as any, logKey, path.join(OUT_DIR, 'bootstrap.log'));
         summary.logDownloaded = true;
+      } catch {
+        /* no log */
       }
-      if (existsFn && (await existsFn(mp4Key))) {
-        await downloadResult(storage as any, mp4Key, path.join(OUT_DIR, 'shot.mp4'));
+      try {
+        await downloadResult(reader as any, mp4Key, path.join(OUT_DIR, 'shot.mp4'));
         summary.mp4Downloaded = true;
+      } catch {
+        /* no mp4 */
       }
     } catch (e) {
       summary.resultFetchError = String((e as Error).message || e).slice(0, 300);
