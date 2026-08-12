@@ -1,0 +1,49 @@
+{
+  "jobId": "accept1080-2026-08-12T20-41-12-708Z",
+  "createdAt": "2026-08-12T20:41:12.709Z",
+  "episodeId": "meadow-map-mystery",
+  "manifestKey": "jobs/accept1080-2026-08-12T20-41-12-708Z/manifest.json",
+  "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-12T20-41-12-708Z/final_1080p.mp4",
+  "resolution": "1080x1920",
+  "fps": 30,
+  "frameStart": 1,
+  "frameEnd": 90,
+  "samples": 24,
+  "workerImage": "ghcr.io/<ORG>/ddp-runpod-blender@sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882",
+  "gpuTypeId": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "rate4090": 0.34,
+  "estimatedCostUsd": 0.0468,
+  "assets": [
+    {
+      "role": "meadow",
+      "r2Key": "environments/env_meadow_v1/env_meadow_v1_2bf49aabad07/meadow_production.blend",
+      "sha256": "2bf49aabad0710b528294d6394b68b28075b522228fd10c6d2f8d893d64ad3c6",
+      "bytes": 717784
+    },
+    {
+      "role": "map",
+      "r2Key": "props/prop_map_001/prop_map_001_9f466176dab6/adventure_map.blend",
+      "sha256": "9f466176dab6f3fcacfa79838a5db3d30c7aef372a1ed2d57152c5761578f4f2",
+      "bytes": 441768
+    },
+    {
+      "role": "pip",
+      "r2Key": "characters/pip/char_pip_v1_dd0d1c03b662/pip_production.blend",
+      "sha256": "dd0d1c03b6625d69e9f96af087562aeecd0b14d401b280fe88b9f35418d005cb",
+      "bytes": 9581974
+    },
+    {
+      "role": "goat",
+      "r2Key": "characters/goat/char_goat_v1_a54d491264e0/goat_production.blend",
+      "sha256": "a54d491264e06ea52ffe9e2ba16e79d60be0d1900b1d369848774c9f9eac0ad5",
+      "bytes": 11847394
+    }
+  ],
+  "startupStatusKey": "jobs/accept1080-2026-08-12T20-41-12-708Z/startup-status.json",
+  "statusKey": "jobs/accept1080-2026-08-12T20-41-12-708Z/status.json",
+  "metadataKey": "jobs/accept1080-2026-08-12T20-41-12-708Z/metadata.json",
+  "finalStatus": "CREATE_FAILED",
+  "actualCostUsd": 0,
+  "authorizationConsumed": false
+}

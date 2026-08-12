@@ -1,0 +1,13 @@
+{
+  "jobId": "accept1080-2026-08-12T20-41-12-708Z",
+  "safety": {
+    "podsEmpty": true,
+    "billableRemaining": false,
+    "allowPaidGpuLaunch": "false",
+    "cloudRenderEnabled": "false",
+    "orphanResources": false
+  },
+  "qc": {
+    "note": "no artifact — finalStatus=CREATE_FAILED"
+  }
+}
