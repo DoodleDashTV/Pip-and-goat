@@ -17,11 +17,18 @@ ENV DEBIAN_FRONTEND=noninteractive \
     ALLOW_PAID_GPU_LAUNCH=false \
     BLENDER_ASSEMBLE_SCRIPT=/opt/ddp-worker/blender/assemble_scene.py
 
+# Runtime deps for headless Blender 4.2 EEVEE (GPU via CUDA + CPU via Mesa
+# llvmpipe fallback), ffmpeg/ffprobe encode+QC, CA certs for R2 TLS, and the
+# X/GL/EGL libraries + fonts a headless Blender needs to create a GL context.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates xz-utils \
     ffmpeg \
     python3 python3-pip \
-    libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libgl1 libglib2.0-0 \
+    libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libsm6 \
+    libxrandr2 libxinerama1 libxcursor1 libxdamage1 libxkbcommon0 \
+    libgl1 libglib2.0-0 libglu1-mesa libegl1 libgles2 \
+    libgl1-mesa-dri libgomp1 \
+    fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 
 # Blender (CPU/GPU EEVEE capable build)
@@ -40,9 +47,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 WORKDIR /opt/ddp-worker
 
 # Worker runtime dependencies (production only — includes @aws-sdk/client-s3).
+# npm ci against the standalone lockfile guarantees the full, reproducible
+# dependency tree is baked in (no pnpm workspace symlinks).
 COPY workers/runpod-blender/package.json ./
 COPY workers/runpod-blender/package-lock.json ./
-RUN npm install --omit=dev
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Worker source.
 COPY workers/runpod-blender/src ./src
