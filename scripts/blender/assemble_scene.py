@@ -247,14 +247,23 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
 # stacked 8 lights and nothing was ever in shadow. Each state below keeps one
 # bright key, a deliberately weak fill so the shadow side stays dark, a rim for
 # separation, and a low world strength; combined with EEVEE-Next raytraced
-# shadows and the AgX Punchy look this measures mean 111, darkest 12.7 and
-# saturation 57.8 on the same shot.
+# shadows and the AgX Punchy look this measures mean luma 147-154, darkest 9-12
+# and saturation 37-41 on the same shot, with the sky brighter than the ground.
+#
+# DAY_KEY is the measured reference state (it is what the acceptance shot uses);
+# the others follow the same shape. Sky emission was swept on the widest framing
+# of the shot, which shows the most sky and is the worst case for saturation:
+# strength 1.6 left the dome dimmer than the grass, and simply raising it washed
+# the sky toward white (AgX desaturates highlights) until the local acceptance
+# saturation floor tripped at 29.7/128. A deeper sky colour at higher strength
+# gives both, measured on frame 1: sky region 180 luma against 148 for the
+# ground, and mean saturation 37.0/128.
 LIGHTING_STATES: dict[str, dict] = {
     "DAY_SOFT": {
         "world": {"color": (0.42, 0.62, 0.85), "strength": 0.28},
         "look": "AgX - Punchy",
         "exposure": -2.2,
-        "sky": {"color": (0.38, 0.62, 0.95), "strength": 1.6},
+        "sky": {"color": (0.16, 0.48, 0.95), "strength": 3.2},
         "key": {"type": "SUN", "energy": 3.4, "location": (4.0, -5.0, 9.0), "rotation": (0.72, 0.12, 0.5)},
         "fill": {"type": "AREA", "energy": 4.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
         "rim": {"type": "AREA", "energy": 7.0, "size": 3.0, "location": (1.6, 3.4, 3.6)},
@@ -263,7 +272,7 @@ LIGHTING_STATES: dict[str, dict] = {
         "world": {"color": (0.40, 0.60, 0.84), "strength": 0.25},
         "look": "AgX - Punchy",
         "exposure": -2.2,
-        "sky": {"color": (0.35, 0.60, 0.95), "strength": 1.6},
+        "sky": {"color": (0.14, 0.45, 0.95), "strength": 3.5},
         "key": {"type": "SUN", "energy": 4.0, "location": (3.4, -4.4, 9.0), "rotation": (0.66, 0.1, 0.42)},
         "fill": {"type": "AREA", "energy": 3.0, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
         "rim": {"type": "AREA", "energy": 8.0, "size": 2.6, "location": (1.2, 3.8, 4.0)},
@@ -272,7 +281,7 @@ LIGHTING_STATES: dict[str, dict] = {
         "world": {"color": (0.52, 0.42, 0.32), "strength": 0.22},
         "look": "AgX - Punchy",
         "exposure": -2.0,
-        "sky": {"color": (0.95, 0.55, 0.30), "strength": 1.4},
+        "sky": {"color": (0.95, 0.42, 0.16), "strength": 3.0},
         "key": {"type": "SUN", "energy": 3.2, "location": (-5.5, -3.0, 3.2), "rotation": (1.18, 0.0, -0.75)},
         "fill": {"type": "AREA", "energy": 2.2, "size": 6.0, "location": (3.0, -4.0, 2.4)},
         "rim": {"type": "AREA", "energy": 9.0, "size": 2.4, "location": (2.2, 3.2, 3.2)},
@@ -281,7 +290,7 @@ LIGHTING_STATES: dict[str, dict] = {
         "world": {"color": (0.55, 0.58, 0.62), "strength": 0.45},
         "look": "AgX - Base Contrast",
         "exposure": -2.0,
-        "sky": {"color": (0.68, 0.71, 0.75), "strength": 1.5},
+        "sky": {"color": (0.60, 0.66, 0.74), "strength": 3.0},
         "key": {"type": "SUN", "energy": 1.6, "location": (2.0, -4.0, 10.0), "rotation": (0.5, 0.0, 0.2)},
         "fill": {"type": "AREA", "energy": 4.5, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
         "rim": {"type": "AREA", "energy": 3.0, "size": 4.0, "location": (0.0, 3.6, 3.4)},
