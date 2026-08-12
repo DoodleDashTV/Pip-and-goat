@@ -123,9 +123,16 @@ async function uploadBenchBundle(
 }
 
 function buildDockerArgs(): string {
-  // GraphQL only accepts dockerArgs (string). Decode bootstrap from env to avoid
-  // fragile nested quoting and an R2 round-trip before apt/python exist.
-  return "bash -c 'echo \"$DDP_BOOTSTRAP_B64\" | base64 -d > /tmp/runpod-bench-bootstrap.sh && chmod +x /tmp/runpod-bench-bootstrap.sh && exec bash /tmp/runpod-bench-bootstrap.sh'";
+  // GraphQL only accepts dockerArgs (string). Decode bootstrap from env using
+  // python3 (present on runpod/pytorch images) to avoid nested-quote hell.
+  return [
+    'bash -c ',
+    "'",
+    'python3 -c "import os,base64; open(\'/tmp/runpod-bench-bootstrap.sh\',\'wb\').write(base64.b64decode(os.environ[\'DDP_BOOTSTRAP_B64\']))" ',
+    '&& chmod +x /tmp/runpod-bench-bootstrap.sh ',
+    '&& exec bash /tmp/runpod-bench-bootstrap.sh',
+    "'",
+  ].join('');
 }
 
 function estimateCostUsd(costPerHr: number | null | undefined, uptimeSec: number | null | undefined) {
@@ -219,7 +226,6 @@ async function main() {
   log('UPLOADING_BENCH_BUNDLE...');
   await uploadBenchBundle(storage, prefix);
 
-  const bootstrapKey = `${prefix}/scripts/cloud/runpod-bench-bootstrap.sh`;
   const bootstrapBytes = await fs.readFile(join(ROOT, 'scripts/cloud/runpod-bench-bootstrap.sh'));
   const bootstrapB64 = Buffer.from(bootstrapBytes).toString('base64');
   const dockerArgs = buildDockerArgs();
@@ -242,19 +248,40 @@ async function main() {
 
   log(`BOOTSTRAP_B64_CHARS: ${bootstrapB64.length}`);
   log('CREATING_POD (paid)...');
-  const { podId } = await client.createPodForBenchmark({
-    name: podName,
-    imageName: IMAGE_NAME,
-    gpuTypeId: GPU_TYPE_ID,
-    confirmPaidLaunch: true,
-    cloudType: 'COMMUNITY',
-    containerDiskInGb: 40,
-    volumeInGb: 0,
-    dockerArgs,
-    ports: '8080/http',
-    deployCost: Number(process.env.MAX_GPU_HOURLY_PRICE ?? '0.40'),
-    env: podEnv,
-  });
+
+  const cloudTypes: Array<'COMMUNITY' | 'ALL' | 'SECURE'> = ['COMMUNITY', 'ALL', 'SECURE'];
+  let podId = '';
+  let lastCreateErr: Error | null = null;
+  for (const cloudType of cloudTypes) {
+    try {
+      log(`CREATE_ATTEMPT cloudType=${cloudType}`);
+      const created = await client.createPodForBenchmark({
+        name: podName,
+        imageName: IMAGE_NAME,
+        gpuTypeId: GPU_TYPE_ID,
+        confirmPaidLaunch: true,
+        cloudType,
+        containerDiskInGb: 40,
+        volumeInGb: 0,
+        dockerArgs,
+        ports: '8080/http',
+        deployCost: Number(process.env.MAX_GPU_HOURLY_PRICE ?? '0.80'),
+        env: podEnv,
+      });
+      podId = created.podId;
+      break;
+    } catch (e) {
+      lastCreateErr = e as Error;
+      const msg = redact(lastCreateErr.message);
+      log(`CREATE_FAIL cloudType=${cloudType} err=${msg}`);
+      if (!/resources to deploy|no longer any instances|out of capacity|GPU_PRICE_TOO_HIGH/i.test(msg)) {
+        throw lastCreateErr;
+      }
+    }
+  }
+  if (!podId) {
+    throw lastCreateErr ?? new Error('Pod create failed for all cloudTypes');
+  }
   log(`POD_CREATED id=${podId} name=${podName}`);
   log('GPU CREATED: YES');
   log('GPU BILLING STARTED: YES');
