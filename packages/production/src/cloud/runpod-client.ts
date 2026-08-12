@@ -4,7 +4,11 @@
  * Never logs API keys.
  */
 import { AppError } from '@doodle-dash/shared';
-import { PREFERRED_RUNPOD_GPU_TYPES, resolveCloudCostLimitsFromEnv } from './config';
+import {
+  PREFERRED_RUNPOD_GPU_TYPES,
+  resolveCloudCostLimitsFromEnv,
+  validateRunpodWorkerImageRef,
+} from './config';
 import { redactSecrets, stripTrailingSecretNoise } from './secret-safety';
 
 export type RunpodGpuType = {
@@ -34,6 +38,7 @@ export class RunpodClient {
   private readonly apiKey: string;
   private readonly endpoint: string;
   private readonly userAgent: string;
+  private readonly env: Record<string, string | undefined>;
 
   constructor(options?: {
     apiKey?: string;
@@ -42,6 +47,7 @@ export class RunpodClient {
     env?: Record<string, string | undefined>;
   }) {
     const env = options?.env ?? process.env;
+    this.env = env;
     this.apiKey = stripTrailingSecretNoise(options?.apiKey ?? env.RUNPOD_API_KEY);
     this.endpoint = options?.endpoint ?? env.RUNPOD_API_ENDPOINT ?? 'https://api.runpod.io/graphql';
     this.userAgent = options?.userAgent ?? 'DoodleDashProduction/1.0';
@@ -163,7 +169,7 @@ export class RunpodClient {
     volumeInGb?: number;
     env?: Record<string, string>;
   }): Promise<{ podId: string }> {
-    const limits = resolveCloudCostLimitsFromEnv();
+    const limits = resolveCloudCostLimitsFromEnv(this.env);
     if (!limits.allowPaidGpuLaunch) {
       throw new AppError(
         'Paid GPU launch blocked: ALLOW_PAID_GPU_LAUNCH is false. Waiting for explicit user approval.',
@@ -176,6 +182,19 @@ export class RunpodClient {
     }
     if (input.confirmPaidLaunch !== true) {
       throw new AppError('confirmPaidLaunch must be true.', 'PAID_GPU_NOT_CONFIRMED', 403);
+    }
+
+    // Fail-closed image gate: refuse to boot a paid pod unless the worker image
+    // is a trusted, immutable ghcr.io reference pinned by @sha256 digest. This
+    // check runs BEFORE any create-pod network request so a missing / malformed
+    // / mutable (:latest) image can never launch billable hardware.
+    const imageCheck = validateRunpodWorkerImageRef(input.imageName);
+    if (!imageCheck.ok) {
+      throw new AppError(
+        `Worker image rejected before pod creation: ${imageCheck.reason}`,
+        imageCheck.code,
+        403,
+      );
     }
 
     // Intentionally not auto-invoked. Mutation included for Phase 22 only after approval.
