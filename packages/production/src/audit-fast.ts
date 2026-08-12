@@ -81,19 +81,25 @@ async function withStall<T>(op: string, fn: () => Promise<T>): Promise<T> {
   }
 }
 
-function runConcurrent(tasks: Record<string, () => Promise<unknown> | unknown>) {
+type ConcurrentResult =
+  | { ok: true; value: unknown; ms: number }
+  | { ok: false; error: string; ms: number };
+
+function runConcurrent(
+  tasks: Record<string, () => Promise<unknown> | unknown>,
+): Promise<Record<string, ConcurrentResult>> {
   const entries = Object.entries(tasks);
   return Promise.all(
     entries.map(async ([k, fn]) => {
       const t0 = Date.now();
       try {
         const value = await Promise.resolve(fn());
-        return [k, { ok: true as const, value, ms: Date.now() - t0 }];
+        return [k, { ok: true as const, value, ms: Date.now() - t0 }] as const;
       } catch (e) {
-        return [k, { ok: false as const, error: String(e), ms: Date.now() - t0 }];
+        return [k, { ok: false as const, error: String(e), ms: Date.now() - t0 }] as const;
       }
     }),
-  ).then((pairs) => Object.fromEntries(pairs));
+  ).then((pairs) => Object.fromEntries(pairs) as Record<string, ConcurrentResult>);
 }
 
 type Daemon = {

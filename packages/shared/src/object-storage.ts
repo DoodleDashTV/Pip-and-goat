@@ -101,10 +101,24 @@ export function storageKeyFor(
   return [prefix, ...cleaned].join('/');
 }
 
+/**
+ * Resolve object storage config.
+ * Accepts classic OBJECT_STORAGE_* vars and Cloudflare R2 aliases:
+ * R2_BUCKET, R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY.
+ * When R2_* are present and provider is unset/local, auto-selects r2.
+ */
 export function resolveObjectStorageConfig(
   env: Record<string, string | undefined> = process.env,
 ): ObjectStorageConfig {
-  const provider = (env.OBJECT_STORAGE_PROVIDER ?? 'local').toLowerCase();
+  const hasR2Aliases = Boolean(
+    (env.R2_BUCKET && env.R2_BUCKET.trim()) ||
+      (env.R2_ENDPOINT && env.R2_ENDPOINT.trim()) ||
+      (env.R2_ACCESS_KEY_ID && env.R2_ACCESS_KEY_ID.trim()),
+  );
+  let provider = (env.OBJECT_STORAGE_PROVIDER ?? '').toLowerCase();
+  if (!provider) {
+    provider = hasR2Aliases ? 'r2' : 'local';
+  }
   if (provider === 'none' || provider === 'missing') {
     return { provider: provider as 'none' | 'missing' };
   }
@@ -115,16 +129,23 @@ export function resolveObjectStorageConfig(
     };
   }
   if (provider === 's3' || provider === 'r2' || provider === 'b2' || provider === 'minio') {
-    const bucket = env.OBJECT_STORAGE_BUCKET ?? '';
+    const bucket = env.OBJECT_STORAGE_BUCKET || env.R2_BUCKET || '';
     const accessKeyId =
-      env.OBJECT_STORAGE_ACCESS_KEY_ID ?? env.AWS_ACCESS_KEY_ID ?? '';
+      env.OBJECT_STORAGE_ACCESS_KEY_ID ||
+      env.R2_ACCESS_KEY_ID ||
+      env.AWS_ACCESS_KEY_ID ||
+      '';
     const secretAccessKey =
-      env.OBJECT_STORAGE_SECRET_ACCESS_KEY ?? env.AWS_SECRET_ACCESS_KEY ?? '';
+      env.OBJECT_STORAGE_SECRET_ACCESS_KEY ||
+      env.R2_SECRET_ACCESS_KEY ||
+      env.AWS_SECRET_ACCESS_KEY ||
+      '';
     const region =
-      env.OBJECT_STORAGE_REGION ?? env.AWS_REGION ?? env.AWS_DEFAULT_REGION ?? 'auto';
+      env.OBJECT_STORAGE_REGION || env.R2_REGION || env.AWS_REGION || env.AWS_DEFAULT_REGION || 'auto';
+    const endpoint = env.OBJECT_STORAGE_ENDPOINT || env.R2_ENDPOINT || undefined;
     if (!bucket || !accessKeyId || !secretAccessKey) {
       throw new AppError(
-        'OBJECT_STORAGE_PROVIDER is set to an S3-compatible mode, but OBJECT_STORAGE_BUCKET / ACCESS_KEY / SECRET_ACCESS_KEY are incomplete. Refusing silent local fallback.',
+        'OBJECT_STORAGE_PROVIDER is set to an S3-compatible mode, but OBJECT_STORAGE_BUCKET / ACCESS_KEY / SECRET_ACCESS_KEY (or R2_* aliases) are incomplete. Refusing silent local fallback.',
         'STORAGE_MISCONFIGURED',
         501,
       );
@@ -133,13 +154,13 @@ export function resolveObjectStorageConfig(
       provider: 's3',
       bucket,
       region,
-      endpoint: env.OBJECT_STORAGE_ENDPOINT || undefined,
+      endpoint,
       accessKeyId,
       secretAccessKey,
-      publicBaseUrl: env.OBJECT_STORAGE_PUBLIC_BASE_URL || undefined,
+      publicBaseUrl: env.OBJECT_STORAGE_PUBLIC_BASE_URL || env.R2_PUBLIC_BASE_URL || undefined,
       forcePathStyle:
         String(env.OBJECT_STORAGE_FORCE_PATH_STYLE ?? '').toLowerCase() === 'true' ||
-        Boolean(env.OBJECT_STORAGE_ENDPOINT),
+        Boolean(endpoint),
     };
   }
   throw new AppError(
@@ -416,6 +437,7 @@ export function describeObjectStorageStatus(options?: {
         requiredConfig: [
           'Set OBJECT_STORAGE_PROVIDER=s3 (or r2/b2/minio).',
           'Set OBJECT_STORAGE_BUCKET, OBJECT_STORAGE_ACCESS_KEY_ID, OBJECT_STORAGE_SECRET_ACCESS_KEY.',
+          'Or set R2_BUCKET, R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY.',
           'Set OBJECT_STORAGE_REGION (and OBJECT_STORAGE_ENDPOINT for R2/B2/MinIO).',
         ],
         lastSuccessfulWrite,

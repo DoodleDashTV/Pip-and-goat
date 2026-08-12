@@ -18,6 +18,21 @@ const BodySchema = z.object({
     .enum(['BEST_QUALITY_PER_DOLLAR', 'MAXIMUM_QUALITY', 'MINIMUM_COST'])
     .optional(),
   localComputeUsdPerMinute: z.coerce.number().nonnegative().optional(),
+  cloudRenderEnabled: z
+    .union([z.boolean(), z.enum(['true', 'false'])])
+    .optional()
+    .transform((v) => (typeof v === 'boolean' ? v : v === 'true')),
+  maxGpuHourlyPrice: z.coerce.number().positive().optional(),
+  maxSingleJobCost: z.coerce.number().positive().optional(),
+  maxDailyGpuCost: z.coerce.number().positive().optional(),
+  maxMonthlyGpuCost: z.coerce.number().positive().optional(),
+  idleShutdownMinutes: z.coerce.number().positive().optional(),
+  maxJobRuntimeMinutes: z.coerce.number().positive().optional(),
+  allowPaidGpuLaunch: z
+    .union([z.boolean(), z.enum(['true', 'false'])])
+    .optional()
+    .transform((v) => (typeof v === 'boolean' ? v : v === 'true')),
+  cloudFallbackPolicy: z.enum(['LOCAL_ONLY', 'FAIL_CLOSED', 'CLOUD_THEN_FAIL']).optional(),
 });
 
 export async function GET() {
