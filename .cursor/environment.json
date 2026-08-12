@@ -5,7 +5,7 @@
   "terminals": [
     {
       "name": "web",
-      "command": "set -a && . ./.env && set +a && NEXT_TELEMETRY_DISABLED=1 pnpm dev"
+      "command": "bash .cursor/start.sh; set -a && . ./.env && set +a && NEXT_TELEMETRY_DISABLED=1 pnpm dev"
     }
   ],
   "ports": [
