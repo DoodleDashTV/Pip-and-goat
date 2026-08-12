@@ -12,6 +12,12 @@ from pathlib import Path
 # Allow running both inside Blender (--python) and importing helpers.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _common import emit, parse_blender_args, require_asset  # noqa: E402
+from scene_assembly_lib import (  # noqa: E402
+    apply_lighting_ownership,
+    collect_assembly_invariants,
+    place_imported_asset,
+    purge_imported_cameras,
+)
 
 
 def eevee_engine_id(scene) -> str:
@@ -160,30 +166,6 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
     scene.render.film_transparent = False
 
 
-def ensure_lights(scene) -> None:
-    import bpy
-
-    world = scene.world or bpy.data.worlds.new("MeadowWorld")
-    scene.world = world
-    world.use_nodes = True
-    nodes = world.node_tree.nodes
-    links = world.node_tree.links
-    nodes.clear()
-    bg = nodes.new(type="ShaderNodeBackground")
-    bg.inputs[0].default_value = (0.45, 0.72, 0.95, 1.0)  # soft sky blue
-    bg.inputs[1].default_value = 1.0
-    out = nodes.new(type="ShaderNodeOutputWorld")
-    links.new(bg.outputs[0], out.inputs[0])
-
-    if any(o.type == "LIGHT" for o in bpy.data.objects):
-        return
-    bpy.ops.object.light_add(type="SUN", location=(4, -3, 10))
-    bpy.context.object.data.energy = 3.0
-    bpy.ops.object.light_add(type="AREA", location=(-3, -5, 4))
-    bpy.context.object.data.energy = 50
-    bpy.context.object.data.size = 6
-
-
 def parse_resolution(value: str) -> tuple[int, int]:
     w, h = value.lower().split("x")
     return int(w), int(h)
@@ -208,6 +190,16 @@ def main() -> None:
     parser.add_argument("--samples", type=int, default=24)
     parser.add_argument("--camera-preset", default="WIDE")
     parser.add_argument("--shot-meta-json", default="{}")
+    parser.add_argument(
+        "--lighting-state-json",
+        default="{}",
+        help="manifest.lightingState JSON; owns active lights after assembly.",
+    )
+    parser.add_argument(
+        "--assemble-only",
+        action="store_true",
+        help="Assemble + validate scene without rendering frames.",
+    )
     args = parse_blender_args(parser)
 
     assets = json.loads(args.assets_json)
@@ -228,6 +220,11 @@ def main() -> None:
         raise SystemExit(2)
 
     shot_meta = json.loads(args.shot_meta_json) if args.shot_meta_json else {}
+    try:
+        lighting_state = json.loads(args.lighting_state_json) if args.lighting_state_json else {}
+    except json.JSONDecodeError as exc:
+        emit("LIGHTING_STATE_INVALID", f"lighting-state-json is not valid JSON: {exc}")
+        raise SystemExit(2) from exc
     width, height = parse_resolution(args.resolution)
     fps = args.fps
     end_frame = args.end_frame if args.end_frame > 0 else int(shot_meta.get("endFrame") or 45)
@@ -246,18 +243,15 @@ def main() -> None:
         objs = append_object(local_path)
         imported_by_role.setdefault(role, []).extend(objs)
 
-    # Position characters if metadata provides offsets
+    # Position assets if metadata provides offsets. Multi-object props/envs use a
+    # role root so pieces like AdventureMap + MapMark move together.
     placements = shot_meta.get("placements") or {}
+    placement_reports: list[dict] = []
     for role, objs in imported_by_role.items():
         arm = find_armature(objs)
-        target = arm or next((o for o in objs if o.type == "MESH"), None)
-        if not target:
-            continue
         place = placements.get(role) or {}
-        if "location" in place:
-            target.location = tuple(place["location"])
-        if "rotation" in place:
-            target.rotation_euler = tuple(place["rotation"])
+        if place.get("location") is not None or place.get("rotation") is not None:
+            placement_reports.append(place_imported_asset(role, objs, place))
         action = place.get("action") or (shot_meta.get("actions") or {}).get(role)
         apply_action(arm, action, start_frame, end_frame)
         mesh = next((o for o in objs if o.type == "MESH" and "Character" in o.name), None)
@@ -267,8 +261,22 @@ def main() -> None:
         if mesh and cues:
             apply_viseme_cues(mesh, cues, fps)
 
-    ensure_lights(scene)
+    # Lighting ownership: strip imported lights, apply manifest.lightingState.
+    lighting_report = apply_lighting_ownership(scene, lighting_state)
+    camera_report = purge_imported_cameras()
     configure_camera(scene, args.camera_preset or shot_meta.get("cameraPreset") or "WIDE", width, height)
+    # Re-count cameras after ProdCam creation.
+    camera_report["remainingCameras"] = [o.name for o in bpy.data.objects if o.type == "CAMERA"]
+    camera_report["NO_DUPLICATE_CAMERAS"] = len(camera_report["remainingCameras"]) == 1
+    invariants = collect_assembly_invariants(lighting_report, camera_report, placement_reports)
+    if not invariants["SCENE_ASSEMBLY_VALID"]:
+        emit(
+            "SCENE_ASSEMBLY_INVALID",
+            "Scene assembly failed lighting/hierarchy invariants.",
+            **invariants,
+        )
+        raise SystemExit(3)
+
     if args.engine.upper() == "EEVEE":
         set_eevee(scene, args.samples)
     else:
@@ -281,16 +289,20 @@ def main() -> None:
 
     emit(
         "OK",
-        "Scene assembled; beginning EEVEE frame render.",
+        "Scene assembled; beginning EEVEE frame render." if not args.assemble_only else "Scene assembled (assemble-only).",
         sceneId=args.scene_id,
         resolution=args.resolution,
         fps=fps,
         engine=scene.render.engine,
         frames=[start_frame, end_frame],
         roles=sorted(imported_by_role.keys()),
+        lightingPreset=lighting_report.get("appliedPreset"),
+        activeLights=lighting_report.get("activeLightCount"),
     )
-    bpy.ops.render.render(animation=True)
-    frame_count = len(list(out_dir.glob("frame_*.png")))
+    frame_count = 0
+    if not args.assemble_only:
+        bpy.ops.render.render(animation=True)
+        frame_count = len(list(out_dir.glob("frame_*.png")))
     meta = {
         "ok": True,
         "sceneId": args.scene_id,
@@ -299,9 +311,11 @@ def main() -> None:
         "engine": scene.render.engine,
         "frameCount": frame_count,
         "outputDir": str(out_dir),
+        "assembleOnly": bool(args.assemble_only),
+        **invariants,
     }
     (out_dir / "assemble_meta.json").write_text(json.dumps(meta, indent=2))
-    emit("RENDER_OK", "Frames rendered.", **meta)
+    emit("RENDER_OK" if not args.assemble_only else "ASSEMBLE_OK", "Frames rendered." if not args.assemble_only else "Assembly validated.", **meta)
 
 
 if __name__ == "__main__":
