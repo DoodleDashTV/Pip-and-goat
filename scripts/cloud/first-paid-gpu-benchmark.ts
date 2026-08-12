@@ -19,7 +19,7 @@ const BENCH_PREFIX = process.env.BENCH_PREFIX || 'ddp-system-tests/first-gpu-ben
 const GPU_TYPE = process.env.DDP_BENCH_GPU_TYPE || 'NVIDIA GeForce RTX 4090';
 const IMAGE =
   process.env.DDP_BENCH_IMAGE ||
-  'runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04';
+  'runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04';
 const HARD_CEILING_USD = Number(process.env.MAX_SINGLE_JOB_COST || '0.50');
 const MAX_WAIT_MS = Number(process.env.DDP_BENCH_MAX_WAIT_MS || String(22 * 60 * 1000));
 const POLL_MS = 15_000;
@@ -207,7 +207,7 @@ async function main() {
       confirmPaidLaunch: true,
       cloudType: 'SECURE',
       containerDiskInGb: 50,
-      volumeInGb: 0,
+      volumeInGb: 20,
       dockerArgs,
       env: {
         CLOUD_RENDER_ENABLED: 'true',
