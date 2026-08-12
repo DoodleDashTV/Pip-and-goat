@@ -15,18 +15,33 @@ ENV DEBIAN_FRONTEND=noninteractive \
     MAX_JOB_RUNTIME_MINUTES=180 \
     CLOUD_RENDER_ENABLED=false \
     ALLOW_PAID_GPU_LAUNCH=false \
-    BLENDER_ASSEMBLE_SCRIPT=/opt/ddp-worker/blender/assemble_scene.py
+    BLENDER_ASSEMBLE_SCRIPT=/opt/ddp-worker/blender/assemble_scene.py \
+    STARTUP_WATCHDOG_MS=180000
 
-# Runtime deps for headless Blender 4.2 EEVEE (GPU via CUDA + CPU via Mesa
-# llvmpipe fallback), ffmpeg/ffprobe encode+QC, CA certs for R2 TLS, and the
+# Headless GL/EGL selection for Blender 4.2 EEVEE-Next, which needs a real
+# off-screen GL context even in --background. On a GPU pod the NVIDIA container
+# runtime injects libEGL_nvidia + /usr/share/glvnd/egl_vendor.d/10_nvidia.json;
+# libglvnd's dispatch (libglvnd0 + libegl1) then routes EGL to the NVIDIA
+# vendor. The worker (src/headless-gl.js) sets __GLX_VENDOR_LIBRARY_NAME=nvidia
+# and EGL_PLATFORM=surfaceless on GPU, and LIBGL_ALWAYS_SOFTWARE=1 +
+# GALLIUM_DRIVER=llvmpipe (Mesa) as a CPU software fallback. These GL vendor
+# hints are safe defaults; the worker overrides per detected hardware.
+ENV __GLX_VENDOR_LIBRARY_NAME=nvidia \
+    __EGL_VENDOR_LIBRARY_DIRS=/usr/share/glvnd/egl_vendor.d \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
+
+# Runtime deps for headless Blender 4.2 EEVEE (GPU via CUDA/NVIDIA-EGL + CPU via
+# Mesa llvmpipe fallback), ffmpeg/ffprobe encode+QC, CA certs for R2 TLS, and the
 # X/GL/EGL libraries + fonts a headless Blender needs to create a GL context.
+# libglvnd0 provides the GL/EGL vendor-neutral dispatch used to reach the
+# NVIDIA EGL vendor library on a GPU pod.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates xz-utils \
     ffmpeg \
     python3 python3-pip \
     libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libsm6 \
     libxrandr2 libxinerama1 libxcursor1 libxdamage1 libxkbcommon0 \
-    libgl1 libglib2.0-0 libglu1-mesa libegl1 libgles2 \
+    libglvnd0 libgl1 libglx0 libglib2.0-0 libglu1-mesa libegl1 libgles2 \
     libgl1-mesa-dri libgomp1 \
     fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*

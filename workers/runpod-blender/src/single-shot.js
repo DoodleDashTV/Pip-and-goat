@@ -23,6 +23,11 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 
 const core = require('./render-core');
+const { BOOT_STAGE, collectSystemInfo } = require('./boot-diagnostics');
+const { EXIT_CLASS, classifyCode } = require('./exit-codes');
+const { runBlenderPreflight } = require('./blender-preflight');
+const { computeCostAwareMaxRuntime } = require('./watchdog');
+const { resolveHeadlessGlConfig, applyHeadlessGlEnv } = require('./headless-gl');
 
 function redact(text) {
   return String(text || '')
@@ -40,15 +45,19 @@ async function runSingleShot(options = {}) {
   const jobId = String(env.RENDER_JOB_ID || '').trim();
   const manifestKey = String(env.RENDER_JOB_MANIFEST_KEY || (jobId ? `jobs/${jobId}/manifest.json` : '')).trim();
   const statusKey = `jobs/${jobId}/status.json`;
+  const startupStatusKey = `jobs/${jobId}/startup-status.json`;
   const workspaceRoot = env.RENDER_WORKSPACE_DIR || path.join(os.tmpdir(), 'ddp-runpod-worker');
   const assembleScript =
     env.BLENDER_ASSEMBLE_SCRIPT || path.resolve(__dirname, '../blender/assemble_scene.py');
+  const preflightEnabled = String(env.SKIP_BLENDER_PREFLIGHT || 'false').toLowerCase() !== 'true';
 
   const startedAt = now();
   const timings = {};
   let ctx = null;
   let manifest = null;
   let stage = 'INIT';
+  let bootStage = BOOT_STAGE.PROCESS_STARTED;
+  const systemInfo = collectSystemInfo(env);
 
   const writeStatus = async (status, extra = {}) => {
     if (!ctx) return;
@@ -66,25 +75,59 @@ async function runSingleShot(options = {}) {
     }
   };
 
+  // Early startup diagnostic, written to R2 as soon as R2 is up and UPDATED as
+  // boot progresses — so a death after R2-init but before render is diagnosable.
+  const writeStartupStatus = async (extra = {}) => {
+    if (!ctx) return;
+    const body = Buffer.from(
+      JSON.stringify(
+        { jobId, bootStage, stage, systemInfo, ...extra, at: new Date().toISOString() },
+        null,
+        2,
+      ),
+    );
+    try {
+      await r2.uploadBuffer(ctx, startupStatusKey, body, 'application/json');
+    } catch (e) {
+      log('startup_status_write_failed', { error: redact(e.message) });
+    }
+  };
+
+  const setBootStage = async (s, extra = {}) => {
+    bootStage = s;
+    log('boot_stage', { bootStage: s, ...extra });
+    await writeStartupStatus(extra);
+  };
+
   const fail = async (code, message, extra = {}) => {
-    log('job_failed', { stage, code, error: redact(message) });
-    await writeStatus('FAILED', { code, message: redact(message), timings, ...extra });
-    return { ok: false, code, stage, message: redact(message) };
+    const classification = classifyCode(code);
+    log('job_failed', { stage, bootStage, code, classification, error: redact(message) });
+    await writeStatus('FAILED', { code, classification, message: redact(message), timings, ...extra });
+    await writeStartupStatus({ result: 'FAILED', code, classification, error: redact(message) });
+    return { ok: false, code, classification, stage, bootStage, message: redact(message) };
   };
 
   try {
-    if (!jobId) return { ok: false, code: 'NO_JOB_ID', stage, message: 'RENDER_JOB_ID not set' };
+    log('boot_stage', { bootStage: BOOT_STAGE.PROCESS_STARTED, systemInfo });
+    stage = 'ENV_VALIDATION';
+    bootStage = BOOT_STAGE.ENV_VALIDATION_START;
+    if (!jobId) {
+      return { ok: false, code: 'NO_JOB_ID', classification: EXIT_CLASS.ENV_CONFIGURATION_FAILURE, stage, message: 'RENDER_JOB_ID not set' };
+    }
+    bootStage = BOOT_STAGE.ENV_VALIDATION_OK;
 
     stage = 'R2_CONNECT';
     try {
       ctx = r2.createR2Client(env);
     } catch (e) {
-      return { ok: false, code: 'R2_CONFIG_INCOMPLETE', stage, message: redact(e.message) };
+      return { ok: false, code: 'R2_CONFIG_INCOMPLETE', classification: EXIT_CLASS.ENV_CONFIGURATION_FAILURE, stage, message: redact(e.message) };
     }
+    await setBootStage(BOOT_STAGE.R2_CLIENT_CREATED, { timeouts: ctx.timeouts || null });
     log('single_shot_start', { jobId, manifestKey });
 
     // 1. Download + validate manifest
     stage = 'MANIFEST';
+    await setBootStage(BOOT_STAGE.MANIFEST_FETCH_START, { manifestKey });
     const workDir = path.join(workspaceRoot, jobId);
     await fsp.mkdir(workDir, { recursive: true });
     const manifestPath = path.join(workDir, 'manifest.json');
@@ -102,10 +145,29 @@ async function runSingleShot(options = {}) {
     if (manifest.jobId !== jobId) {
       return fail('JOB_ID_MISMATCH', `Manifest jobId ${manifest.jobId} != authorized ${jobId}`);
     }
+    await setBootStage(BOOT_STAGE.MANIFEST_FETCH_OK, { renderMode: manifest.renderMode, resolution: manifest.resolution });
     await writeStatus('PREPARING_ASSETS', { timings });
 
-    // Runtime budget from manifest limits
-    const maxRuntimeMs = manifest.limits.maxRuntimeMinutes * 60_000;
+    // Runtime budget: manifest limit, further tightened by a COST-AWARE cap
+    // derived from the ACTUAL live GPU hourly rate vs the job's hard USD cap so
+    // worst-case spend can never exceed the cap (never keep a paid GPU past it).
+    let maxRuntimeMs = manifest.limits.maxRuntimeMinutes * 60_000;
+    const liveRate = Number(env.RUNPOD_GPU_HOURLY_RATE || env.GPU_HOURLY_RATE_USD || 0);
+    if (liveRate > 0) {
+      const sizing = computeCostAwareMaxRuntime({
+        gpuHourlyRateUsd: liveRate,
+        hardCapUsd: manifest.limits.maxCostUsd,
+        manifestMaxRuntimeMinutes: manifest.limits.maxRuntimeMinutes,
+      });
+      maxRuntimeMs = Math.min(maxRuntimeMs, sizing.maxRuntimeMs);
+      log('cost_aware_runtime_sizing', {
+        gpuHourlyRateUsd: liveRate,
+        hardCapUsd: sizing.hardCapUsd,
+        maxRuntimeMinutes: sizing.maxRuntimeMinutes,
+        worstCaseCostUsd: sizing.worstCaseCostUsd,
+        cappedBy: sizing.cappedBy,
+      });
+    }
     const remainingMs = () => maxRuntimeMs - (now() - startedAt);
     const checkBudget = async (where) => {
       if (remainingMs() <= 0) throw core.tagged(`Runtime limit exceeded before ${where}`, 'TIMEOUT');
@@ -113,6 +175,7 @@ async function runSingleShot(options = {}) {
 
     // 2. Download + verify assets
     stage = 'DOWNLOADING_ASSETS';
+    await setBootStage(BOOT_STAGE.ASSET_DOWNLOAD_START, { assetCount: manifest.expectedAssets.length });
     await checkBudget('asset download');
     const assetsDir = path.join(workDir, 'assets');
     await fsp.mkdir(assetsDir, { recursive: true });
@@ -128,15 +191,49 @@ async function runSingleShot(options = {}) {
       assets.push({ id: asset.role, role: asset.role, kind: asset.kind, uri: `file://${dest}`, localPath: dest, checksum: asset.sha256 });
     }
     timings.assetDownloadMs = now() - startedAt;
+    await setBootStage(BOOT_STAGE.ASSETS_READY, { timings });
     await writeStatus('RENDERING', { timings });
+
+    // 2b. Blender headless preflight — verify Blender launches, EEVEE is
+    // available, and a minimal scene (camera+light+mesh) renders BEFORE
+    // committing the pod to the real render. Skipped when a runCommand is
+    // injected (unit tests) or SKIP_BLENDER_PREFLIGHT=true.
+    if (preflightEnabled && (options.forcePreflight || !options.runCommand)) {
+      stage = 'BLENDER_PREFLIGHT';
+      await setBootStage(BOOT_STAGE.BLENDER_PREFLIGHT_START, {});
+      await checkBudget('blender preflight');
+      const preflight = (options.runBlenderPreflight || runBlenderPreflight)({
+        env,
+        blenderBin: env.BLENDER_BIN || 'blender',
+        timeoutMs: Number(env.BLENDER_PREFLIGHT_TIMEOUT_MS || 90_000),
+      });
+      log('blender_preflight', {
+        ok: preflight.ok,
+        glMode: preflight.glMode,
+        engineUsed: preflight.engineUsed,
+        durationMs: preflight.durationMs,
+        code: preflight.code || null,
+      });
+      if (!preflight.ok) {
+        return fail(preflight.code || 'BLENDER_PREFLIGHT_FAILED', `Blender preflight failed: ${preflight.reason}`, { glMode: preflight.glMode });
+      }
+      await setBootStage(BOOT_STAGE.BLENDER_PREFLIGHT_OK, { glMode: preflight.glMode, engineUsed: preflight.engineUsed });
+    }
 
     // 3. Blender EEVEE render
     stage = 'RENDERING';
+    await setBootStage(BOOT_STAGE.RENDER_STARTED, {});
     await checkBudget('render');
     const outputDir = path.join(workDir, 'output');
     const argv = renderCore.buildBlenderArgv({ manifest, assets, outputDir, assembleScript });
+    // Apply the resolved headless GL/EGL config (NVIDIA EGL on GPU, llvmpipe on
+    // CPU) to the REAL render spawn — not just the preflight — so EEVEE gets a
+    // valid off-screen context. Never clobbers operator-set GL env.
+    const glConfig = resolveHeadlessGlConfig({ env });
+    const renderEnv = applyHeadlessGlEnv(env, glConfig);
+    log('render_gl_config', { glMode: glConfig.mode, gpuPresent: glConfig.gpuPresent });
     const budgetRunCommand = (bin, args, opts = {}) =>
-      renderCore.defaultRunCommand(bin, args, { timeout: Math.max(1000, remainingMs()), ...opts });
+      renderCore.defaultRunCommand(bin, args, { timeout: Math.max(1000, remainingMs()), env: renderEnv, ...opts });
     const renderStart = now();
     try {
       await renderCore.renderWithBlender({
@@ -238,8 +335,9 @@ async function runSingleShot(options = {}) {
       metadataKey,
       metadata,
     });
+    await writeStartupStatus({ result: 'COMPLETE' });
     log('single_shot_complete', { jobId, artifactKey: manifest.outputKey, artifactSha256: artifactSha, totalMs: metadata.timings.totalMs });
-    return { ok: true, artifactKey: manifest.outputKey, artifactSha256: artifactSha, metadataKey, metadata };
+    return { ok: true, classification: EXIT_CLASS.OK, artifactKey: manifest.outputKey, artifactSha256: artifactSha, metadataKey, metadata };
   } catch (e) {
     return fail(e.code || 'UNEXPECTED', e.message);
   }

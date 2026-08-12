@@ -22,11 +22,57 @@ const { RunawayRenderGuard } = require('./runaway');
 const r2 = require('./r2-client');
 const core = require('./render-core');
 const { runSingleShot, redact } = require('./single-shot');
+const {
+  BOOT_STAGE,
+  collectSystemInfo,
+  installGlobalHandlers,
+  redactMessage,
+} = require('./boot-diagnostics');
+const { EXIT_CLASS, exitCodeFor, classifyCode } = require('./exit-codes');
+const { StartupWatchdog } = require('./watchdog');
 
 const { strip } = r2;
 
 function log(event, detail = {}) {
   console.log(JSON.stringify({ ts: new Date().toISOString(), event, ...detail }));
+}
+
+/**
+ * Best-effort R2 diagnostic writer for the worker's own startup-status.json.
+ * Used by the global fatal handlers and the startup watchdog so a death anywhere
+ * during boot is still recorded to R2 (never reports COMPLETE).
+ */
+function makeDiagnosticPersister(env) {
+  const jobId = strip(env.RENDER_JOB_ID);
+  let ctx = null;
+  try {
+    if (jobId) ctx = r2.createR2Client(env);
+  } catch {
+    ctx = null;
+  }
+  return async function persist(classification, detail = {}) {
+    if (!ctx || !jobId) return;
+    const key = `jobs/${jobId}/startup-status.json`;
+    const body = Buffer.from(
+      JSON.stringify(
+        {
+          jobId,
+          result: 'FAILED',
+          classification,
+          systemInfo: collectSystemInfo(env),
+          detail,
+          at: new Date().toISOString(),
+        },
+        null,
+        2,
+      ),
+    );
+    try {
+      await r2.withTimeout(r2.uploadBuffer(ctx, key, body, 'application/json'), 8_000, 'diagnostic upload');
+    } catch (e) {
+      log('diagnostic_persist_failed', { error: redactMessage(e && e.message) });
+    }
+  };
 }
 
 async function terminateSelf(reason = 'done') {
@@ -51,15 +97,35 @@ async function terminateSelf(reason = 'done') {
 
 function healthGate() {
   const requireGpu = String(process.env.REQUIRE_GPU_HEALTH || 'true').toLowerCase() !== 'false';
-  if (requireGpu) {
-    const health = evaluateHealth();
-    log('gpu_health', { ok: health.ok, reason: health.reason });
-    return health.ok;
+  const allowCpuFallback =
+    String(process.env.ALLOW_CPU_DIAGNOSTIC_FALLBACK || 'false').toLowerCase() === 'true';
+  if (requireGpu || allowCpuFallback) {
+    const health = evaluateHealth({ allowCpuFallback: allowCpuFallback && !requireGpu ? true : allowCpuFallback });
+    log('gpu_health', {
+      ok: health.ok,
+      reason: health.reason,
+      glMode: health.report.glMode,
+      benchmarkOk: health.report.benchmarkOk,
+      eeveeContextFailed: health.eeveeContextFailed,
+      hardwareAcceleration: health.report.hardwareAcceleration,
+    });
+    return {
+      ok: health.ok,
+      classification: health.eeveeContextFailed
+        ? EXIT_CLASS.EEVEE_CONTEXT_FAILURE
+        : health.report.hardwareAcceleration
+          ? EXIT_CLASS.BLENDER_INITIALIZATION_FAILURE
+          : EXIT_CLASS.IMAGE_BOOT_FAILURE,
+    };
   }
   // Non-GPU mode: still require blender + ffmpeg binaries.
   const blender = core.defaultRunCommand(process.env.BLENDER_BIN || 'blender', ['--version']);
   const ffmpeg = core.defaultRunCommand('ffmpeg', ['-version']);
-  return blender.status === 0 && ffmpeg.status === 0;
+  const ok = blender.status === 0 && ffmpeg.status === 0;
+  return {
+    ok,
+    classification: blender.status !== 0 ? EXIT_CLASS.BLENDER_BINARY_FAILURE : EXIT_CLASS.FFMPEG_FAILURE,
+  };
 }
 
 // ── API claim-loop helpers (real render via shared core) ──
@@ -174,25 +240,61 @@ async function processApiJob(ctx, apiUrl, job) {
 }
 
 async function main() {
+  const env = process.env;
+  const systemInfo = collectSystemInfo(env);
+  log('boot_stage', { bootStage: BOOT_STAGE.PROCESS_STARTED, systemInfo });
   log('startup');
-  if (!healthGate()) {
-    log('worker_unhealthy_abort');
-    process.exitCode = 2;
+
+  // Global fatal handlers persist a diagnostic to R2 before exit (never COMPLETE).
+  const persist = makeDiagnosticPersister(env);
+  installGlobalHandlers({ log, persist });
+
+  // Startup watchdog: independent of the render-runtime guard. If boot does not
+  // reach a meaningful milestone within the (cost-aware) startup budget, tear the
+  // container down so a dead worker never keeps a paid GPU waiting.
+  const startupTimeoutMs = Number(env.STARTUP_WATCHDOG_MS || 180_000);
+  const startupWatchdog = new StartupWatchdog({
+    startupTimeoutMs,
+    onTimeout: async (info) => {
+      log('startup_watchdog_timeout', { ...info, startupTimeoutMs });
+      try {
+        await persist(EXIT_CLASS.TIMEOUT, { kind: 'STARTUP_TIMEOUT', ...info });
+      } finally {
+        await terminateSelf(`startup_timeout:${info.lastMilestone || 'none'}`);
+        process.exit(exitCodeFor(EXIT_CLASS.TIMEOUT));
+      }
+    },
+  }).start();
+
+  const health = healthGate();
+  if (!health.ok) {
+    startupWatchdog.reached('HEALTH_GATE_FAILED');
+    log('worker_unhealthy_abort', { classification: health.classification });
+    await persist(health.classification, { kind: 'HEALTH_GATE_FAILED' });
+    process.exitCode = exitCodeFor(health.classification);
     return;
   }
+  startupWatchdog.milestone('WORKER_READY');
   log('WORKER_READY');
 
-  const jobId = strip(process.env.RENDER_JOB_ID);
-  const apiUrl = strip(process.env.RENDER_API_URL);
+  const jobId = strip(env.RENDER_JOB_ID);
+  const apiUrl = strip(env.RENDER_API_URL);
 
   // Single-shot mode takes precedence and requires no ingress.
   if (jobId) {
-    const result = await runSingleShot({ env: process.env, log });
-    log('single_shot_result', { ok: result.ok, code: result.code || null, artifactKey: result.artifactKey || null });
-    process.exitCode = result.ok ? 0 : 1;
+    let result;
+    try {
+      result = await runSingleShot({ env, log });
+    } finally {
+      startupWatchdog.reached('SINGLE_SHOT_RETURNED');
+    }
+    const classification = result.ok ? EXIT_CLASS.OK : result.classification || classifyCode(result.code);
+    log('single_shot_result', { ok: result.ok, code: result.code || null, classification, artifactKey: result.artifactKey || null });
+    process.exitCode = result.ok ? 0 : exitCodeFor(classification);
     await terminateSelf(result.ok ? 'single_shot_complete' : `single_shot_failed:${result.code}`);
     return;
   }
+  startupWatchdog.reached('NO_SINGLE_SHOT');
 
   if (!apiUrl) {
     log('no_work_source', { hint: 'Set RENDER_JOB_ID (single-shot) or RENDER_API_URL (claim loop).' });
@@ -233,8 +335,9 @@ async function main() {
 
 if (require.main === module) {
   main().catch((e) => {
-    console.error(JSON.stringify({ event: 'fatal', error: redact(e.message) }));
-    process.exitCode = 1;
+    const classification = classifyCode(e && e.code);
+    console.error(JSON.stringify({ event: 'fatal', classification, error: redact(e && e.message) }));
+    process.exitCode = exitCodeFor(classification);
   });
 }
 
