@@ -154,8 +154,9 @@ async function main() {
   const fetchPyB64 = readFileSync(path.join(ROOT, 'scripts/cloud/fetch-bootstrap.py')).toString(
     'base64',
   );
-  const dockerArgs =
-    "bash -c 'set -euo pipefail; python3 -m pip install -q boto3; echo \"$DDP_FETCH_PY_B64\" | base64 -d > /tmp/fetch-bootstrap.py; exec python3 /tmp/fetch-bootstrap.py'";
+  const dockerStartCmd = [
+    'set -euo pipefail; python3 -m pip install -q boto3; echo "$DDP_FETCH_PY_B64" | base64 -d > /tmp/fetch-bootstrap.py; exec python3 /tmp/fetch-bootstrap.py',
+  ];
 
   let podId: string | null = null;
   const startedAt = Date.now();
@@ -190,8 +191,9 @@ async function main() {
 
   try {
     console.log('=== CREATE PAID POD (explicit approval) ===');
-    let created: { podId: string } | null = null;
-    const cloudAttempts: Array<'SECURE' | 'COMMUNITY' | 'ALL'> = ['SECURE', 'ALL', 'COMMUNITY'];
+    let created: { podId: string; costPerHr: number | null } | null = null;
+    // Prefer COMMUNITY for ~$0.34/hr 4090; fall back to SECURE if needed within hourly cap.
+    const cloudAttempts: Array<'COMMUNITY' | 'SECURE'> = ['COMMUNITY', 'SECURE'];
     let lastErr: unknown = null;
     for (const cloudType of cloudAttempts) {
       try {
@@ -204,7 +206,8 @@ async function main() {
           cloudType,
           containerDiskInGb: 50,
           volumeInGb: 20,
-          dockerArgs,
+          dockerEntrypoint: ['/bin/bash', '-lc'],
+          dockerStartCmd,
           env: {
             CLOUD_RENDER_ENABLED: 'true',
             ALLOW_PAID_GPU_LAUNCH: 'true',
@@ -223,12 +226,13 @@ async function main() {
           },
         });
         summary.cloudType = cloudType;
+        summary.costPerHrObserved = created.costPerHr;
         break;
       } catch (e) {
         lastErr = e;
         const msg = String((e as Error).message || e);
         console.error('CREATE_FAILED', { cloudType, message: msg.slice(0, 300) });
-        if (!/resources|capacity|try a different|no longer any/i.test(msg)) {
+        if (!/resources|capacity|try a different|no longer any|GPU_PRICE_EXCEEDED|exceeds MAX_GPU/i.test(msg)) {
           throw e;
         }
         await sleep(5000);
