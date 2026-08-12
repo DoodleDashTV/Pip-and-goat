@@ -25,6 +25,12 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scene_assembly_lib import (  # noqa: E402
+    apply_lighting_ownership,
+    collect_assembly_invariants,
+    place_imported_asset,
+    purge_imported_cameras,
+)
 
 STARTED_AT = time.time()
 BLENDER_STARTUPS = 1  # this process
@@ -128,25 +134,6 @@ def apply_viseme_cues(mesh_obj, cues, fps):
         kb.keyframe_insert(data_path="value", frame=f1 + 1)
 
 
-def ensure_sky(scene):
-    import bpy
-
-    world = scene.world or bpy.data.worlds.new("MeadowWorld")
-    scene.world = world
-    world.use_nodes = True
-    nodes = world.node_tree.nodes
-    links = world.node_tree.links
-    nodes.clear()
-    bg = nodes.new(type="ShaderNodeBackground")
-    bg.inputs[0].default_value = (0.45, 0.72, 0.95, 1.0)
-    bg.inputs[1].default_value = 1.0
-    out = nodes.new(type="ShaderNodeOutputWorld")
-    links.new(bg.outputs[0], out.inputs[0])
-    if not any(o.type == "LIGHT" for o in bpy.data.objects):
-        bpy.ops.object.light_add(type="SUN", location=(4, -3, 10))
-        bpy.context.object.data.energy = 3.0
-
-
 def configure_camera(scene, preset, width, height):
     import bpy
 
@@ -225,14 +212,12 @@ def handle_render(job: dict) -> dict:
 
     t2 = time.time()
     placements = shot_meta.get("placements") or {}
+    placement_reports = []
     for role, objs in imported_by_role.items():
         arm = find_armature(objs)
-        target = arm or next((o for o in objs if o.type == "MESH"), None)
-        if not target:
-            continue
         place = placements.get(role) or {}
-        if "location" in place:
-            target.location = tuple(place["location"])
+        if place.get("location") is not None or place.get("rotation") is not None:
+            placement_reports.append(place_imported_asset(role, objs, place))
         action = place.get("action") or (shot_meta.get("actions") or {}).get(role)
         apply_action(arm, action, start_frame, end_frame)
         mesh = next((o for o in objs if o.type == "MESH" and "Character" in o.name), None)
@@ -245,8 +230,15 @@ def handle_render(job: dict) -> dict:
     timings["facial_visemes_ms"] = timings["animation_application_ms"]  # combined for now
 
     t3 = time.time()
-    ensure_sky(scene)
+    lighting_state = meta.get("lightingState") or shot_meta.get("lightingState") or {}
+    lighting_report = apply_lighting_ownership(scene, lighting_state)
+    camera_report = purge_imported_cameras()
     configure_camera(scene, meta.get("cameraPreset") or shot_meta.get("cameraPreset") or "WIDE", w, h)
+    camera_report["remainingCameras"] = [o.name for o in bpy.data.objects if o.type == "CAMERA"]
+    camera_report["NO_DUPLICATE_CAMERAS"] = len(camera_report["remainingCameras"]) == 1
+    invariants = collect_assembly_invariants(lighting_report, camera_report, placement_reports)
+    if not invariants["SCENE_ASSEMBLY_VALID"]:
+        raise RuntimeError(f"SCENE_ASSEMBLY_INVALID: {json.dumps(invariants)}")
     set_eevee(scene, samples)
     scene.render.image_settings.file_format = "PNG"
     scene.render.filepath = str(output_dir / "frame_")
@@ -318,6 +310,7 @@ def handle_render(job: dict) -> dict:
         "outputDir": str(output_dir),
         "mp4": str(mp4) if mp4.exists() else None,
         "device": "CPU",
+        **invariants,
     }
     (output_dir / "assemble_meta.json").write_text(json.dumps(meta_out, indent=2))
     return meta_out

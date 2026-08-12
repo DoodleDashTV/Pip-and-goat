@@ -131,6 +131,8 @@ function buildBlenderArgv({ manifest, assets, outputDir, assembleScript }) {
     String((manifest.cameraState && manifest.cameraState.preset) || 'WIDE'),
     '--shot-meta-json',
     JSON.stringify(manifest.shotMeta || {}),
+    '--lighting-state-json',
+    JSON.stringify(manifest.lightingState || {}),
   ];
 }
 

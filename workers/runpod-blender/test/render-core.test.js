@@ -72,6 +72,15 @@ test('buildBlenderArgv includes resolution, frames, samples, engine', () => {
   assert.ok(argv.includes('--start-frame') && argv.includes('1') && argv.includes('--end-frame') && argv.includes('3'));
 });
 
+test('buildBlenderArgv forwards manifest.lightingState to Blender', () => {
+  const m = buildManifest(validManifestInput({ lightingState: { preset: 'MEADOW_DAY_SOFT' } }));
+  const argv = core.buildBlenderArgv({ manifest: m, assets: [], outputDir: '/out', assembleScript: '/s.py' });
+  const idx = argv.indexOf('--lighting-state-json');
+  assert.ok(idx >= 0, 'expected --lighting-state-json flag');
+  const payload = JSON.parse(argv[idx + 1]);
+  assert.equal(payload.preset, 'MEADOW_DAY_SOFT');
+});
+
 test('renderWithBlender fails closed when Blender missing', async () => {
   const dir = await tmpDir();
   const runCommand = (bin, args) => (args[0] === '--version' ? { status: 1, stdout: '' } : { status: 0 });

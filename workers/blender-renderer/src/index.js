@@ -326,6 +326,8 @@ function buildBlenderArgs(job, localAssets, outputDir) {
     String(meta.cameraPreset || 'WIDE'),
     '--shot-meta-json',
     JSON.stringify(meta.shotMeta || meta || {}),
+    '--lighting-state-json',
+    JSON.stringify(meta.lightingState || payload.lightingState || {}),
   ];
 }
 
