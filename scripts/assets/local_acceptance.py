@@ -188,7 +188,8 @@ def main() -> int:
             if src.exists():
                 dst = keyframe_dir / f"{prefix}_{frame:04d}.png"
                 shutil.copyfile(src, dst)
-                kept.append(str(dst.relative_to(REPO_ROOT)))
+                resolved = dst.resolve()
+                kept.append(str(resolved.relative_to(REPO_ROOT) if resolved.is_relative_to(REPO_ROOT) else resolved))
 
     mp4 = out_root / "local_acceptance_270x480.mp4"
     encode = subprocess.run(
