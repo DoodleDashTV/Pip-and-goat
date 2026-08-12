@@ -120,11 +120,15 @@ async function main() {
     description:
       'Pip and Goat together in the meadow beside the adventure map; slow vertical push-in.',
     cameraPreset: 'PUSH_IN',
+    // assemble_scene.py applies a placement to the role's armature, or failing
+    // that to the FIRST mesh it imported. The meadow is a multi-object set with
+    // no armature, so any placement here would move a single arbitrary mesh
+    // (e.g. Meadow_Trees) away from the rest of the environment: leave it at its
+    // authored transform. The map has the same shape (AdventureMap + MapMark),
+    // so its placement only ever moves one of the two pieces.
     placements: {
       pip: { location: [-0.75, -1.0, 0], rotation: [0, 0, 0.15], action: 'PIP_WAVE' },
       goat: { location: [0.8, -0.8, 0], rotation: [0, 0, -0.2], action: 'GOAT_HAPPY' },
-      meadow: { location: [0, 0, 0] },
-      map: { location: [0, 0.35, 0.05] },
     },
     actions: { pip: 'PIP_WAVE', goat: 'GOAT_HAPPY' },
   };

@@ -28,7 +28,13 @@ const GPU_TYPE_ID = 'NVIDIA GeForce RTX 4090';
 const CLOUD_TYPE: 'SECURE' | 'COMMUNITY' = (process.env.ACCEPT_CLOUD_TYPE as 'SECURE' | 'COMMUNITY') || 'SECURE';
 const NO_STARTUP_STATUS_LIMIT_MIN = 10; // kill if no startup-status.json within 10 min of creation
 const BOOT_STALL_MINUTES = Number(process.env.ACCEPT_BOOT_STALL_MIN || 8);
+// Slow cadence while the pod pulls the image and boots (nothing to react to),
+// fast cadence once the worker reports it is doing GPU work — so the pod is
+// terminated within a few seconds of status.json flipping to COMPLETE instead
+// of billing for up to a full slow poll interval.
 const POLL_MS = 20_000;
+const ACTIVE_POLL_MS = 4_000;
+const ACTIVE_STATUSES = new Set(['RENDERING', 'ENCODING', 'QC', 'UPLOADING', 'VERIFY_READBACK']);
 
 function nowIso() {
   return new Date().toISOString();
@@ -331,6 +337,7 @@ async function main() {
         break;
       }
 
+      const active = ACTIVE_STATUSES.has(curStatus);
       log('heartbeat', {
         elapsedMin: Number(elapsedMin.toFixed(2)),
         hardKillMinutes,
@@ -339,8 +346,9 @@ async function main() {
         uptimeSec: mine?.uptimeInSeconds ?? null,
         bootStage: lastBootStage || null,
         renderStatus: lastStatus || null,
+        pollMs: active ? ACTIVE_POLL_MS : POLL_MS,
       });
-      await sleep(POLL_MS);
+      await sleep(active ? ACTIVE_POLL_MS : POLL_MS);
     }
   } catch (e) {
     outcome = 'ORCHESTRATOR_ERROR';
