@@ -1,0 +1,7 @@
+=== PHASE C — POST-RUN SAFETY (independent) ===
+myself.pods empty: YES (count=0)
+Active billable GPU remaining: NO
+ALLOW_PAID_GPU_LAUNCH: (unset->false)
+CLOUD_RENDER_ENABLED: (unset->false)
+
+Render finalStatus=CREATE_FAILED (not COMPLETE). No artifact to QC.

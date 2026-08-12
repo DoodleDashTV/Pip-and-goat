@@ -1,0 +1,8 @@
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-12T20:42:01.777Z","event":"config","jobId":"accept1080-2026-08-12T20-41-12-708Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.34,"workerImage":"ghcr.io/<ORG>/ddp-runpod-blender@sha256:ea49b29c642063b2641a9c4f9a8ccbb724f97cc07d191ee6d4fb39d30a311882","hardCapUsd":0.25}
+{"ts":"2026-08-12T20:42:01.950Z","event":"creating_pod","podName":"ddp-accept1080-1786567321950","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":40,"volumeInGb":0}
+{"ts":"2026-08-12T20:42:02.468Z","event":"pod_create_failed","code":"RUNPOD_GRAPHQL_ERROR","error":"Something went wrong. Please try again later or contact support."}
+POD CREATE FAILED before any billable pod existed. Authorization NOT consumed. Spend $0. STOP (no retry).
+
+===== PHASE B — NO POD CREATED =====
+Authorization consumed: NO. Spend $0.
