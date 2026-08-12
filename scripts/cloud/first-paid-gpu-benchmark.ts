@@ -122,16 +122,18 @@ async function uploadBenchBundle(
   return { uploaded };
 }
 
-function buildDockerArgs(bootstrapKey: string): string {
-  // Short entry: fetch bootstrap from R2 using injected env, then exec.
-  // Avoid embedding secrets in the command string — only the object key is inlined.
+function buildStartCmd(bootstrapKey: string): string[] {
+  // Prefer dockerStartCmd argv form (overrides image CMD). Keep bootstrap fetch tiny.
   const py = [
     'import os,boto3',
     'from botocore.client import Config',
-    's3=boto3.client("s3",endpoint_url=os.environ["R2_ENDPOINT"].strip(),aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"].strip(),aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"].strip(),region_name=(os.environ.get("R2_REGION") or "auto").strip() or "auto",config=Config(signature_version="s3v4"))',
+    's3=boto3.client("s3",endpoint_url=os.environ["R2_ENDPOINT"].strip().rstrip("/"),aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"].strip(),aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"].strip(),region_name=(os.environ.get("R2_REGION") or "auto").strip() or "auto",config=Config(signature_version="s3v4"))',
+    'bucket=os.environ["R2_BUCKET"].strip()',
+    'prefix=os.environ["BENCH_PREFIX"].rstrip("/")',
+    's3.put_object(Bucket=bucket,Key=prefix+"/results/BOOTSTRAP_START",Body=b"start\\n")',
     `key=${JSON.stringify(bootstrapKey)}`,
-    's3.download_file(os.environ["R2_BUCKET"].strip(), key, "/tmp/runpod-bench-bootstrap.sh")',
-    'print("DDP_BOOTSTRAP_FETCHED", flush=True)',
+    's3.download_file(bucket,key,"/tmp/runpod-bench-bootstrap.sh")',
+    'print("DDP_BOOTSTRAP_FETCHED",flush=True)',
   ].join(';');
   const script = [
     'set -euo pipefail',
@@ -143,8 +145,7 @@ function buildDockerArgs(bootstrapKey: string): string {
     'chmod +x /tmp/runpod-bench-bootstrap.sh',
     'exec bash /tmp/runpod-bench-bootstrap.sh',
   ].join(' && ');
-  // Runpod treats dockerArgs as the container command override.
-  return `/bin/bash -lc ${JSON.stringify(script)}`;
+  return ['/bin/bash', '-lc', script];
 }
 
 function estimateCostUsd(costPerHr: number | null | undefined, uptimeSec: number | null | undefined) {
@@ -239,12 +240,12 @@ async function main() {
   await uploadBenchBundle(storage, prefix);
 
   const bootstrapKey = `${prefix}/scripts/cloud/runpod-bench-bootstrap.sh`;
-  const dockerArgs = buildDockerArgs(bootstrapKey);
+  const dockerStartCmd = buildStartCmd(bootstrapKey);
   const podName = `${POD_NAME_PREFIX}-${runId.slice(0, 19)}`;
 
   const podEnv: Record<string, string> = {
     R2_BUCKET: (env.R2_BUCKET || '').trim(),
-    R2_ENDPOINT: (env.R2_ENDPOINT || '').trim(),
+    R2_ENDPOINT: (env.R2_ENDPOINT || '').trim().replace(/\/+$/, ''),
     R2_ACCESS_KEY_ID: (env.R2_ACCESS_KEY_ID || '').trim(),
     R2_SECRET_ACCESS_KEY: (env.R2_SECRET_ACCESS_KEY || '').trim(),
     R2_REGION: (env.R2_REGION || 'auto').trim() || 'auto',
@@ -262,11 +263,13 @@ async function main() {
     imageName: IMAGE_NAME,
     gpuTypeId: GPU_TYPE_ID,
     confirmPaidLaunch: true,
-    cloudType: 'ALL',
+    cloudType: 'COMMUNITY',
     containerDiskInGb: 40,
     volumeInGb: 0,
-    dockerArgs,
+    dockerArgs: '',
+    dockerStartCmd,
     ports: '8080/http',
+    deployCost: Number(process.env.MAX_GPU_HOURLY_PRICE ?? '0.40'),
     env: podEnv,
   });
   log(`POD_CREATED id=${podId} name=${podName}`);

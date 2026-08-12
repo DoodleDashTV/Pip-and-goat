@@ -162,8 +162,11 @@ export class RunpodClient {
     containerDiskInGb?: number;
     volumeInGb?: number;
     dockerArgs?: string;
+    dockerStartCmd?: string[];
     ports?: string;
     volumeMountPath?: string;
+    /** Max $/hr accept for placement (Runpod deployCost filter). */
+    deployCost?: number;
     env?: Record<string, string>;
   }): Promise<{ podId: string }> {
     const limits = resolveCloudCostLimitsFromEnv();
@@ -188,26 +191,30 @@ export class RunpodClient {
       );
     }
 
+    const deployCost = input.deployCost ?? limits.maxGpuHourlyPrice;
+
     // Intentionally not auto-invoked. Mutation included for Phase 22 only after approval.
     const data = await this.graphql<{
-      podFindAndDeployOnDemand?: { id?: string } | null;
+      podFindAndDeployOnDemand?: { id?: string; costPerHr?: number } | null;
     }>(
       `mutation ($input: PodFindAndDeployOnDemandInput!) {
-        podFindAndDeployOnDemand(input: $input) { id imageName machineId }
+        podFindAndDeployOnDemand(input: $input) { id imageName machineId costPerHr }
       }`,
       {
         input: {
           name: input.name,
           imageName: input.imageName,
           gpuTypeId: input.gpuTypeId,
-          cloudType: input.cloudType ?? 'SECURE',
+          cloudType: input.cloudType ?? 'COMMUNITY',
           gpuCount: 1,
           containerDiskInGb: input.containerDiskInGb ?? 40,
           volumeInGb: input.volumeInGb ?? 0,
           volumeMountPath: input.volumeMountPath ?? '/workspace',
           dockerArgs: input.dockerArgs ?? '',
+          ...(input.dockerStartCmd ? { dockerStartCmd: input.dockerStartCmd } : {}),
           ports: input.ports ?? '8080/http',
           startSsh: false,
+          deployCost,
           env: Object.entries(input.env ?? {}).map(([key, value]) => ({ key, value })),
         },
       },
@@ -216,6 +223,19 @@ export class RunpodClient {
     const podId = data.podFindAndDeployOnDemand?.id;
     if (!podId) {
       throw new AppError('Runpod pod create returned no id.', 'RUNPOD_POD_CREATE_FAILED', 502);
+    }
+    const costPerHr = data.podFindAndDeployOnDemand?.costPerHr;
+    if (typeof costPerHr === 'number' && costPerHr > limits.maxGpuHourlyPrice + 1e-9) {
+      try {
+        await this.terminatePod(podId);
+      } catch {
+        /* still throw price error */
+      }
+      throw new AppError(
+        `Pod ${podId} costPerHr=${costPerHr} exceeds MAX_GPU_HOURLY_PRICE=${limits.maxGpuHourlyPrice}; terminated.`,
+        'GPU_PRICE_TOO_HIGH',
+        402,
+      );
     }
     return { podId };
   }

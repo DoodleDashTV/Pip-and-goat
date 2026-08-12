@@ -14,6 +14,32 @@ exec > >(tee -a "$LOG") 2>&1
 echo "DDP_BOOTSTRAP_START $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "DDP_POD_ID=${RUNPOD_POD_ID:-unknown}"
 
+# Best-effort early marker so orchestrator can see progress even if later steps fail.
+python3 - <<'PY' || true
+import os
+try:
+    import boto3
+    from botocore.client import Config
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=os.environ["R2_ENDPOINT"].strip().rstrip("/"),
+        aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"].strip(),
+        aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"].strip(),
+        region_name=(os.environ.get("R2_REGION") or "auto").strip() or "auto",
+        config=Config(signature_version="s3v4"),
+    )
+    prefix = os.environ["BENCH_PREFIX"].rstrip("/") + "/"
+    s3.put_object(
+        Bucket=os.environ["R2_BUCKET"].strip(),
+        Key=prefix + "results/BOOTSTRAP_ALIVE",
+        Body=b"alive\n",
+        ContentType="text/plain",
+    )
+    print("DDP_BOOTSTRAP_ALIVE_WRITTEN", flush=True)
+except Exception as e:
+    print("DDP_BOOTSTRAP_ALIVE_FAIL", type(e).__name__, flush=True)
+PY
+
 terminate_self() {
   local reason="${1:-done}"
   trap - EXIT
