@@ -15,7 +15,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { RunpodClient } from '../../../packages/production/src/cloud/runpod-client';
-import { WORKER_IMAGE, HARD_CAP_USD, STATE_FILE, redact } from './common';
+import { WORKER_IMAGE, HARD_CAP_USD, STATE_FILE, redact, metadataKeyFor } from './common';
 import { makeStorage } from './common';
 
 const POLL_MS = 20_000;
@@ -66,6 +66,7 @@ async function main() {
   const quotedRate: number = state.rate4090 ?? 0.7;
   const startupStatusKey: string = state.startupStatusKey;
   const statusKey: string = state.statusKey;
+  const metadataKey: string = metadataKeyFor(jobId);
 
   console.log('=== PHASE B — SINGLE AUTHORIZED LAUNCH ===');
   log('config', { jobId, gpuTypeId, quotedRate, workerImage: WORKER_IMAGE, hardCapUsd: HARD_CAP_USD });
@@ -221,6 +222,17 @@ async function main() {
           finalStatus = 'COMPLETE';
           lastArtifact = { artifactKey: status.artifactKey, artifactSha256: status.artifactSha256, metadata: status.metadata };
           log('render_complete', { artifactKey: status.artifactKey, artifactSha256: status.artifactSha256 });
+          break;
+        }
+        // status.json is mutated per stage, so a retried intermediate PUT can land
+        // after COMPLETE and hide it — which would bill until hard-kill. metadata.json
+        // is written once, after the upload is readback-verified, so its presence
+        // means the GPU work is finished no matter what status.json currently says.
+        const meta = await readJsonKey(storage, metadataKey);
+        if (meta?.artifactSha256) {
+          finalStatus = 'COMPLETE';
+          lastArtifact = { artifactKey: meta.artifactKey ?? status?.artifactKey, artifactSha256: meta.artifactSha256, metadata: meta };
+          log('render_complete_via_metadata', { artifactKey: lastArtifact.artifactKey, staleStatus: status?.status ?? null });
           break;
         }
         if (status?.status === 'FAILED') {
