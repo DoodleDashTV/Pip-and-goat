@@ -24,10 +24,15 @@
     "db:migrate": "pnpm --filter @doodle-dash/database migrate",
     "db:push": "pnpm --filter @doodle-dash/database db:push",
     "db:seed": "pnpm --filter @doodle-dash/database seed",
+    "control-center:dev": "pnpm --filter @doodle-dash/control-center-web dev",
+    "control-center:build": "pnpm --filter @doodle-dash/control-center-web build",
+    "control-center:test": "pnpm --filter @doodle-dash/control-center test",
+    "control-center:safe-zero": "tsx scripts/control-center/safe-zero-loop.ts",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   }
 }

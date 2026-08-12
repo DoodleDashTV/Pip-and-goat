@@ -4,6 +4,9 @@ node_modules
 .env
 .env.local
 .env.*.local
+apps/control-center/data/
+**/.control-center-data/
+.control-center-data/
 # Local-only push helper — may contain a pasted GitHub token
 scripts/ddp_github_push.local.sh
 **/ddp_github_push.local.sh
