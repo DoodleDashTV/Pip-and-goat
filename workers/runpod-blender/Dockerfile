@@ -1,5 +1,11 @@
 # DDP Runpod Blender GPU Worker
-# Build only — do not deploy paid GPUs until pre-deployment gate + explicit approval.
+#
+# Build from the REPOSITORY ROOT so the Blender scene scripts can be baked in:
+#   docker build -f workers/runpod-blender/Dockerfile -t <registry>/ddp-runpod-blender:<tag> .
+#
+# Secrets are NEVER baked into the image — R2 + Runpod credentials and the job
+# id are injected at runtime as environment variables. Paid GPU launch stays
+# gated (ALLOW_PAID_GPU_LAUNCH=false) until explicit approval.
 FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -8,7 +14,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     IDLE_SHUTDOWN_MINUTES=5 \
     MAX_JOB_RUNTIME_MINUTES=180 \
     CLOUD_RENDER_ENABLED=false \
-    ALLOW_PAID_GPU_LAUNCH=false
+    ALLOW_PAID_GPU_LAUNCH=false \
+    BLENDER_ASSEMBLE_SCRIPT=/opt/ddp-worker/blender/assemble_scene.py
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates xz-utils \
@@ -31,13 +38,22 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/ddp-worker
-COPY package.json ./
+
+# Worker runtime dependencies (production only — includes @aws-sdk/client-s3).
+COPY workers/runpod-blender/package.json ./
+COPY workers/runpod-blender/package-lock.json ./
 RUN npm install --omit=dev
-COPY src ./src
+
+# Worker source.
+COPY workers/runpod-blender/src ./src
+
+# Blender scene scripts (assemble_scene.py + helpers) baked in for offline render.
+COPY scripts/blender ./blender
 
 # Health endpoint / check
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD node ./src/health.js || exit 1
 
+# Default: single-shot mode when RENDER_JOB_ID is provided; otherwise idles.
 CMD ["node", "./src/worker.js"]
