@@ -74,6 +74,32 @@ COPY workers/runpod-blender/src ./src
 # Blender scene scripts (assemble_scene.py + helpers) baked in for offline render.
 COPY scripts/blender ./blender
 
+# ---- Build provenance -------------------------------------------------------
+# The render code above is baked in, so a pullable digest-pinned image can still
+# run stale scene assembly. Stamp the image with the commit it was built from and
+# a content fingerprint of the baked render code, then FAIL THE BUILD if the
+# declared fingerprint disagrees with what was actually copied in. That makes the
+# published label trustworthy from the registry alone, which is what preflight
+# checks before any paid launch.
+ARG DDP_SOURCE_COMMIT=unknown
+ARG DDP_WORKER_BUILD_TIME=unknown
+ARG DDP_RENDER_CODE_SHA256=unknown
+
+ENV DDP_SOURCE_COMMIT=${DDP_SOURCE_COMMIT} \
+    DDP_WORKER_BUILD_TIME=${DDP_WORKER_BUILD_TIME} \
+    DDP_RENDER_CODE_SHA256=${DDP_RENDER_CODE_SHA256} \
+    DDP_PROVENANCE_FILE=/opt/ddp-worker/provenance.json
+
+RUN node ./src/provenance.js --write "$DDP_PROVENANCE_FILE" --expect "$DDP_RENDER_CODE_SHA256"
+
+LABEL org.opencontainers.image.title="ddp-runpod-blender" \
+      org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat" \
+      org.opencontainers.image.revision="${DDP_SOURCE_COMMIT}" \
+      org.opencontainers.image.created="${DDP_WORKER_BUILD_TIME}" \
+      ddp.source.commit="${DDP_SOURCE_COMMIT}" \
+      ddp.worker.build.time="${DDP_WORKER_BUILD_TIME}" \
+      ddp.render.code.sha256="${DDP_RENDER_CODE_SHA256}"
+
 # Health endpoint / check
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \

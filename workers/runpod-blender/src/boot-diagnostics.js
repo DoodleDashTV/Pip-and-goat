@@ -15,6 +15,7 @@
 const os = require('node:os');
 const fs = require('node:fs');
 const { spawnSync } = require('node:child_process');
+const { collectProvenance } = require('./provenance');
 
 const BOOT_STAGE = Object.freeze({
   PROCESS_STARTED: 'PROCESS_STARTED',
@@ -70,11 +71,27 @@ function diskInfo(dir) {
 /**
  * Collect non-secret host/runtime facts. imageDigest is read from an env var
  * that CI/orchestrator can inject (RUNPOD_WORKER_IMAGE or DDP_IMAGE_DIGEST).
+ *
+ * sourceCommit / workerBuildTime / renderCodeSha256 come from the build stamps
+ * baked into the image, so every render records exactly which render code ran —
+ * the fact that was missing when a stale image silently produced a bad shot.
  */
 function collectSystemInfo(env = process.env) {
   const image = String(env.DDP_IMAGE_DIGEST || env.RUNPOD_WORKER_IMAGE || '');
   const digestMatch = image.match(/@(sha256:[0-9a-f]{64})/);
+  let provenance = null;
+  try {
+    provenance = collectProvenance(env);
+  } catch {
+    provenance = null;
+  }
   return {
+    sourceCommit: provenance ? provenance.sourceCommit : null,
+    workerBuildTime: provenance ? provenance.workerBuildTime : null,
+    renderCodeSha256: provenance ? provenance.renderCodeSha256 : null,
+    renderCodeSha256Declared: provenance ? provenance.renderCodeSha256Declared : null,
+    renderCodeMatch: provenance ? provenance.renderCodeMatch : null,
+    assembleScriptSha256: provenance ? provenance.assembleScriptSha256 : null,
     host: os.hostname(),
     pid: process.pid,
     node: process.version,

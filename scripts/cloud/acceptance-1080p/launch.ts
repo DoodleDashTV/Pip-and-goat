@@ -99,6 +99,11 @@ async function main() {
     RENDER_JOB_ID: jobId,
     RENDER_JOB_MANIFEST_KEY: manifestKey,
     RENDER_WORKER_ID: `ddp-accept1080-${jobId}`,
+    // The image cannot know its own digest; pass the pinned reference so the
+    // worker records which image actually booted. DDP_SOURCE_COMMIT and
+    // DDP_RENDER_CODE_SHA256 are deliberately NOT injected — they are baked into
+    // the image, and overriding them from outside would defeat the provenance.
+    DDP_IMAGE_DIGEST: WORKER_IMAGE,
     MAX_JOB_RUNTIME_MINUTES: '12',
     RUNPOD_GPU_HOURLY_RATE: String(quotedRate),
     STARTUP_WATCHDOG_MS: '300000',

@@ -320,6 +320,17 @@ async function runSingleShot(options = {}) {
       gpu: env.RUNPOD_GPU_NAME || null,
       podId: env.RUNPOD_POD_ID || null,
       completedAt: new Date().toISOString(),
+      // Which render code produced this artifact. Recorded per render so a shot
+      // can always be traced back to the exact baked scene-assembly code.
+      provenance: {
+        sourceCommit: systemInfo.sourceCommit,
+        imageDigest: systemInfo.imageDigest,
+        workerBuildTime: systemInfo.workerBuildTime,
+        renderCodeSha256: systemInfo.renderCodeSha256,
+        renderCodeMatch: systemInfo.renderCodeMatch,
+        assembleScriptSha256: systemInfo.assembleScriptSha256,
+        workerVersion: systemInfo.workerVersion,
+      },
     };
     const metadataKey = `jobs/${jobId}/metadata.json`;
     try {
