@@ -158,9 +158,12 @@ export class RunpodClient {
     imageName: string;
     gpuTypeId: string;
     confirmPaidLaunch: true;
-    cloudType?: 'SECURE' | 'COMMUNITY';
+    cloudType?: 'SECURE' | 'COMMUNITY' | 'ALL';
     containerDiskInGb?: number;
     volumeInGb?: number;
+    dockerArgs?: string;
+    ports?: string;
+    volumeMountPath?: string;
     env?: Record<string, string>;
   }): Promise<{ podId: string }> {
     const limits = resolveCloudCostLimitsFromEnv();
@@ -177,13 +180,20 @@ export class RunpodClient {
     if (input.confirmPaidLaunch !== true) {
       throw new AppError('confirmPaidLaunch must be true.', 'PAID_GPU_NOT_CONFIRMED', 403);
     }
+    if (limits.maxGpuHourlyPrice < 0.34) {
+      throw new AppError(
+        `MAX_GPU_HOURLY_PRICE ${limits.maxGpuHourlyPrice} is below preferred RTX 4090 rate.`,
+        'GPU_PRICE_CAP_TOO_LOW',
+        400,
+      );
+    }
 
     // Intentionally not auto-invoked. Mutation included for Phase 22 only after approval.
     const data = await this.graphql<{
       podFindAndDeployOnDemand?: { id?: string } | null;
     }>(
       `mutation ($input: PodFindAndDeployOnDemandInput!) {
-        podFindAndDeployOnDemand(input: $input) { id }
+        podFindAndDeployOnDemand(input: $input) { id imageName machineId }
       }`,
       {
         input: {
@@ -191,8 +201,13 @@ export class RunpodClient {
           imageName: input.imageName,
           gpuTypeId: input.gpuTypeId,
           cloudType: input.cloudType ?? 'SECURE',
+          gpuCount: 1,
           containerDiskInGb: input.containerDiskInGb ?? 40,
-          volumeInGb: input.volumeInGb ?? 20,
+          volumeInGb: input.volumeInGb ?? 0,
+          volumeMountPath: input.volumeMountPath ?? '/workspace',
+          dockerArgs: input.dockerArgs ?? '',
+          ports: input.ports ?? '8080/http',
+          startSsh: false,
           env: Object.entries(input.env ?? {}).map(([key, value]) => ({ key, value })),
         },
       },
@@ -203,6 +218,95 @@ export class RunpodClient {
       throw new AppError('Runpod pod create returned no id.', 'RUNPOD_POD_CREATE_FAILED', 502);
     }
     return { podId };
+  }
+
+  async getPod(podId: string): Promise<{
+    id: string;
+    name: string | null;
+    desiredStatus: string | null;
+    runtime: { uptimeInSeconds?: number | null } | null;
+    machine: { gpuDisplayName?: string | null } | null;
+    costPerHr: number | null;
+  } | null> {
+    const data = await this.graphql<{
+      pod?: {
+        id?: string;
+        name?: string;
+        desiredStatus?: string;
+        costPerHr?: number;
+        runtime?: { uptimeInSeconds?: number } | null;
+        machine?: { gpuDisplayName?: string } | null;
+      } | null;
+    }>(
+      `query ($podId: String!) {
+        pod(input: { podId: $podId }) {
+          id
+          name
+          desiredStatus
+          costPerHr
+          runtime { uptimeInSeconds }
+          machine { gpuDisplayName }
+        }
+      }`,
+      { podId },
+    );
+    if (!data.pod?.id) return null;
+    return {
+      id: data.pod.id,
+      name: data.pod.name ?? null,
+      desiredStatus: data.pod.desiredStatus ?? null,
+      runtime: data.pod.runtime ?? null,
+      machine: data.pod.machine ?? null,
+      costPerHr: data.pod.costPerHr ?? null,
+    };
+  }
+
+  /** Non-mutating inventory — used to avoid duplicate paid pods. */
+  async listMyselfPods(): Promise<
+    Array<{
+      id: string;
+      name: string | null;
+      desiredStatus: string | null;
+      costPerHr: number | null;
+      runtime: { uptimeInSeconds?: number | null } | null;
+      machine: { gpuDisplayName?: string | null } | null;
+    }>
+  > {
+    const data = await this.graphql<{
+      myself?: {
+        pods?: Array<{
+          id?: string;
+          name?: string;
+          desiredStatus?: string;
+          costPerHr?: number;
+          runtime?: { uptimeInSeconds?: number } | null;
+          machine?: { gpuDisplayName?: string } | null;
+        }> | null;
+      } | null;
+    }>(
+      `query {
+        myself {
+          pods {
+            id
+            name
+            desiredStatus
+            costPerHr
+            runtime { uptimeInSeconds }
+            machine { gpuDisplayName }
+          }
+        }
+      }`,
+    );
+    return (data.myself?.pods ?? [])
+      .filter((p): p is { id: string } & typeof p => Boolean(p?.id))
+      .map((p) => ({
+        id: p.id!,
+        name: p.name ?? null,
+        desiredStatus: p.desiredStatus ?? null,
+        costPerHr: p.costPerHr ?? null,
+        runtime: p.runtime ?? null,
+        machine: p.machine ?? null,
+      }));
   }
 
   async terminatePod(podId: string): Promise<void> {
