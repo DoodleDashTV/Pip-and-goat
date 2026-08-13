@@ -1,0 +1,12 @@
+{
+    "ddp.render.code.sha256": "f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207",
+    "ddp.source.commit": "1fbbdf2c9eb85e3c4aded99919e8602ff2165641",
+    "ddp.worker.build.time": "2026-08-13T15:43:19Z",
+    "maintainer": "NVIDIA CORPORATION <cudatools@nvidia.com>",
+    "org.opencontainers.image.created": "2026-08-13T15:43:19Z",
+    "org.opencontainers.image.ref.name": "ubuntu",
+    "org.opencontainers.image.revision": "1fbbdf2c9eb85e3c4aded99919e8602ff2165641",
+    "org.opencontainers.image.source": "https://github.com/DoodleDashTV/Pip-and-goat",
+    "org.opencontainers.image.title": "ddp-runpod-blender",
+    "org.opencontainers.image.version": "22.04"
+}

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
@@ -7,6 +8,7 @@ import {
   LABEL_BUILD_TIME,
   LABEL_RENDER_CODE_SHA256,
   LABEL_SOURCE_COMMIT,
+  computeRenderAssetFingerprint,
   computeRenderCodeFingerprint,
   inspectGhcrImage,
   verifyWorkerProvenance,
@@ -17,6 +19,7 @@ const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const IMAGE = 'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:' + 'a'.repeat(64);
 const COMMIT = '1234567890abcdef1234567890abcdef12345678';
 const RENDER_CODE = 'f'.repeat(64);
+const RENDER_ASSETS = 'e'.repeat(64);
 
 function registry(overrides: Partial<RegistryImageFacts> = {}): RegistryImageFacts {
   return {
@@ -39,6 +42,8 @@ function verify(overrides: {
   expectedSourceCommit?: string;
   expectedRenderCodeSha256?: string;
   localRenderCodeSha256?: string;
+  expectedRenderAssetSha256?: string;
+  localRenderAssetSha256?: string;
   registry?: RegistryImageFacts;
 } = {}) {
   return verifyWorkerProvenance({
@@ -46,6 +51,8 @@ function verify(overrides: {
     expectedSourceCommit: overrides.expectedSourceCommit ?? COMMIT,
     expectedRenderCodeSha256: overrides.expectedRenderCodeSha256 ?? RENDER_CODE,
     localRenderCodeSha256: overrides.localRenderCodeSha256 ?? RENDER_CODE,
+    expectedRenderAssetSha256: overrides.expectedRenderAssetSha256,
+    localRenderAssetSha256: overrides.localRenderAssetSha256,
     registry: overrides.registry ?? registry(),
   });
 }
@@ -182,6 +189,88 @@ describe('render code fingerprint', () => {
     const repoSide = computeRenderCodeFingerprint(REPO_ROOT);
     expect(workerSide.fingerprint).toBe(repoSide.fingerprint);
     expect(workerSide.files.length).toBe(repoSide.files.length);
+  });
+});
+
+describe('render asset fingerprint', () => {
+  it('covers every approved .blend the render can load', () => {
+    const a = computeRenderAssetFingerprint(REPO_ROOT);
+    const b = computeRenderAssetFingerprint(REPO_ROOT);
+    expect(a.fingerprint).toMatch(/^[0-9a-f]{64}$/);
+    expect(a.fingerprint).toBe(b.fingerprint);
+    const paths = a.files.map((f) => f.path);
+    expect(paths).toContain('assets/characters/pip_production.blend');
+    expect(paths).toContain('assets/characters/goat_production.blend');
+    expect(paths).toContain('assets/environments/meadow_production.blend');
+    expect(paths).toContain('assets/props/adventure_map.blend');
+  });
+
+  // Blender rewrites a .blend1 backup whenever anyone opens a file, and the .png
+  // contact sheets are not render inputs. Including either would make the pin
+  // depend on who last opened what.
+  it('ignores Blender backups and contact sheets', () => {
+    const files = computeRenderAssetFingerprint(REPO_ROOT).files;
+    expect(files.every((f) => !f.path.endsWith('.blend1'))).toBe(true);
+    expect(files.every((f) => !f.path.endsWith('.png'))).toBe(true);
+  });
+
+  it('is not the same fingerprint as the render code', () => {
+    expect(computeRenderAssetFingerprint(REPO_ROOT).fingerprint).not.toBe(
+      computeRenderCodeFingerprint(REPO_ROOT).fingerprint,
+    );
+  });
+});
+
+describe('changing a character model invalidates preflight', () => {
+  // Pip's model is downloaded from R2 rather than baked into the image, so the
+  // image's labels can say nothing about it: preflight has to hold the asset
+  // fingerprint itself. Edit Pip and the launch must stop until someone re-pins.
+  it('fails closed when the working tree assets differ from the pin', () => {
+    const result = verify({
+      expectedRenderAssetSha256: RENDER_ASSETS,
+      localRenderAssetSha256: 'd'.repeat(64),
+    });
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe('RENDER_ASSET_MISMATCH');
+    expect(result.reasons.join(' ')).toContain('re-pinned');
+  });
+
+  it('fails closed when a pin exists but nothing was measured', () => {
+    const result = verify({ expectedRenderAssetSha256: RENDER_ASSETS });
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe('RENDER_ASSET_MISMATCH');
+  });
+
+  it('accepts the launch when the assets match the pin', () => {
+    const result = verify({
+      expectedRenderAssetSha256: RENDER_ASSETS,
+      localRenderAssetSha256: RENDER_ASSETS,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.facts.localRenderAssetSha256).toBe(RENDER_ASSETS);
+  });
+
+  it('reports the real fingerprint of Pip’s current model, and a different one after an edit', () => {
+    const before = computeRenderAssetFingerprint(REPO_ROOT);
+    const pip = before.files.find((f) => f.path === 'assets/characters/pip_production.blend');
+    expect(pip?.sha256).toMatch(/^[0-9a-f]{64}$/);
+
+    // Simulate the edit by hashing the same file list with one byte changed, using
+    // the same aggregation the fingerprint uses, rather than writing to the asset.
+    const mutated = before.files.map((f) =>
+      f.path === 'assets/characters/pip_production.blend' ? { ...f, sha256: 'c'.repeat(64) } : f,
+    );
+    const hash = createHash('sha256');
+    for (const f of mutated) hash.update(`${f.path}\u0000${f.sha256}\n`);
+    const after = hash.digest('hex');
+    expect(after).not.toBe(before.fingerprint);
+
+    const result = verify({
+      expectedRenderAssetSha256: before.fingerprint,
+      localRenderAssetSha256: after,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe('RENDER_ASSET_MISMATCH');
   });
 });
 

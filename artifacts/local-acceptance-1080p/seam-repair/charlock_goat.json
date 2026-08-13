@@ -1,0 +1,220 @@
+{
+  "role": "goat",
+  "blendSha256": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8",
+  "proxiesCreated": [
+    "Goat_Character_ShadowProxy",
+    "Goat_Collar_ShadowProxy",
+    "Goat_Tag_ShadowProxy",
+    "Goat_Tag_Text_ShadowProxy"
+  ],
+  "visibleMeshes": 4,
+  "driftedMeshes": [],
+  "visibleMeshesStillCastingShadow": [],
+  "identityPreserved": true,
+  "inventory": {
+    "objects": [
+      "Goat_Character",
+      "Goat_Collar",
+      "Goat_Tag",
+      "Goat_Tag_Text"
+    ],
+    "armatures": [
+      "Goat_Rig"
+    ],
+    "bones": 18,
+    "materials": {
+      "GoatBody": {
+        "baseColor": [
+          0.97,
+          0.95,
+          0.9
+        ],
+        "identity": "yellow"
+      },
+      "GoatBrow": {
+        "baseColor": [
+          0.12,
+          0.07,
+          0.04
+        ],
+        "identity": "orange"
+      },
+      "GoatCatchlight": {
+        "baseColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "identity": "red"
+      },
+      "GoatCollar": {
+        "baseColor": [
+          0.15,
+          0.45,
+          0.9
+        ],
+        "identity": "other(h=0.600)"
+      },
+      "GoatEarInner": {
+        "baseColor": [
+          0.98,
+          0.58,
+          0.45
+        ],
+        "identity": "orange"
+      },
+      "GoatEarOuter": {
+        "baseColor": [
+          0.95,
+          0.92,
+          0.86
+        ],
+        "identity": "yellow"
+      },
+      "GoatEyeWhite": {
+        "baseColor": [
+          0.99,
+          0.99,
+          0.99
+        ],
+        "identity": "red"
+      },
+      "GoatHoof": {
+        "baseColor": [
+          0.2,
+          0.1,
+          0.06
+        ],
+        "identity": "orange"
+      },
+      "GoatHorn": {
+        "baseColor": [
+          0.5,
+          0.3,
+          0.14
+        ],
+        "identity": "orange"
+      },
+      "GoatIris": {
+        "baseColor": [
+          0.36,
+          0.18,
+          0.07
+        ],
+        "identity": "orange"
+      },
+      "GoatNose": {
+        "baseColor": [
+          0.98,
+          0.55,
+          0.4
+        ],
+        "identity": "orange"
+      },
+      "GoatPupil": {
+        "baseColor": [
+          0.04,
+          0.03,
+          0.03
+        ],
+        "identity": "red"
+      },
+      "GoatTag": {
+        "baseColor": [
+          0.98,
+          0.82,
+          0.2
+        ],
+        "identity": "yellow"
+      },
+      "GoatTagInk": {
+        "baseColor": [
+          0.05,
+          0.05,
+          0.07
+        ],
+        "identity": "other(h=0.667)"
+      }
+    },
+    "shapeKeys": [
+      "Basis",
+      "blink_left",
+      "blink_right",
+      "brow_down",
+      "brow_up",
+      "cheek_puff",
+      "expr_confused",
+      "expr_determined",
+      "expr_excited",
+      "expr_happy",
+      "expr_laughing",
+      "expr_listening",
+      "expr_neutral",
+      "expr_proud",
+      "expr_sad",
+      "expr_scared",
+      "expr_shy",
+      "expr_surprised",
+      "expr_talking",
+      "expr_thinking",
+      "expr_worried",
+      "eye_look_down",
+      "eye_look_left",
+      "eye_look_right",
+      "eye_look_up",
+      "jaw_open",
+      "mouth_frown",
+      "mouth_pucker",
+      "mouth_smile",
+      "mouth_wide",
+      "nose_wrinkle",
+      "viseme_A",
+      "viseme_E",
+      "viseme_FV",
+      "viseme_I",
+      "viseme_L",
+      "viseme_MBP",
+      "viseme_O",
+      "viseme_R",
+      "viseme_REST",
+      "viseme_S_Z",
+      "viseme_TH",
+      "viseme_U",
+      "viseme_WQ"
+    ],
+    "actions": [
+      "GOAT_CHEER",
+      "GOAT_EAR_REACT",
+      "GOAT_EXCITED",
+      "GOAT_GREET",
+      "GOAT_HAPPY",
+      "GOAT_HAPPY_REACTION",
+      "GOAT_HEAD_NOD",
+      "GOAT_HOOF_STEP",
+      "GOAT_IDLE",
+      "GOAT_IDLE_ALT",
+      "GOAT_JUMP",
+      "GOAT_LISTEN",
+      "GOAT_LISTEN_IDLE",
+      "GOAT_LOOK",
+      "GOAT_LOOK_DOWN",
+      "GOAT_LOOK_LEFT",
+      "GOAT_LOOK_RIGHT",
+      "GOAT_LOOK_UP",
+      "GOAT_POINT",
+      "GOAT_RUN",
+      "GOAT_SURPRISED",
+      "GOAT_SURPRISED_REACTION",
+      "GOAT_TALK",
+      "GOAT_TALK_IDLE",
+      "GOAT_THINK",
+      "GOAT_TURN",
+      "GOAT_TURN_LEFT",
+      "GOAT_TURN_RIGHT",
+      "GOAT_WALK",
+      "GOAT_WAVE",
+      "GOAT_WORRIED",
+      "GOAT_WORRIED_REACTION"
+    ]
+  }
+}

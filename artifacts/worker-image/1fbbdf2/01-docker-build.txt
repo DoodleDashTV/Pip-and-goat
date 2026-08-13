@@ -1,0 +1,89 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  3.057MB
+Step 1/21 : FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+ ---> a112cf8dd3c2
+Step 2/21 : ENV DEBIAN_FRONTEND=noninteractive     BLENDER_VERSION=4.2.3     PYTHONUNBUFFERED=1     IDLE_SHUTDOWN_MINUTES=5     MAX_JOB_RUNTIME_MINUTES=180     CLOUD_RENDER_ENABLED=false     ALLOW_PAID_GPU_LAUNCH=false     BLENDER_ASSEMBLE_SCRIPT=/opt/ddp-worker/blender/assemble_scene.py     STARTUP_WATCHDOG_MS=180000
+ ---> Using cache
+ ---> 51df8545b22c
+Step 3/21 : ENV __GLX_VENDOR_LIBRARY_NAME=nvidia     __EGL_VENDOR_LIBRARY_DIRS=/usr/share/glvnd/egl_vendor.d     NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
+ ---> Using cache
+ ---> 5d5caa327471
+Step 4/21 : RUN apt-get update && apt-get install -y --no-install-recommends     curl ca-certificates xz-utils     ffmpeg     python3 python3-pip     libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libsm6     libxrandr2 libxinerama1 libxcursor1 libxdamage1 libxkbcommon0     libglvnd0 libgl1 libglx0 libglib2.0-0 libglu1-mesa libegl1 libgles2     libgl1-mesa-dri libgomp1     fonts-dejavu-core     && rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 3d4d5a6ed926
+Step 5/21 : RUN mkdir -p /opt/blender &&     curl -fsSL "https://download.blender.org/release/Blender4.2/blender-${BLENDER_VERSION}-linux-x64.tar.xz"       -o /tmp/blender.tar.xz &&     tar -xJf /tmp/blender.tar.xz -C /opt/blender --strip-components=1 &&     rm /tmp/blender.tar.xz &&     ln -sf /opt/blender/blender /usr/local/bin/blender
+ ---> Using cache
+ ---> 53675906de22
+Step 6/21 : RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&     apt-get install -y --no-install-recommends nodejs &&     rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 277683da6bb2
+Step 7/21 : WORKDIR /opt/ddp-worker
+ ---> Using cache
+ ---> 2487f346ba70
+Step 8/21 : COPY workers/runpod-blender/package.json ./
+ ---> Using cache
+ ---> f700df52680d
+Step 9/21 : COPY workers/runpod-blender/package-lock.json ./
+ ---> Using cache
+ ---> 69d80510f2c5
+Step 10/21 : RUN npm ci --omit=dev && npm cache clean --force
+ ---> Using cache
+ ---> 5f2d1b208db8
+Step 11/21 : COPY workers/runpod-blender/src ./src
+ ---> Using cache
+ ---> b136199b4e5b
+Step 12/21 : COPY scripts/blender ./blender
+ ---> eb6be53f7801
+Step 13/21 : ARG DDP_SOURCE_COMMIT=unknown
+ ---> Running in fbca5ddc85fb
+ ---> Removed intermediate container fbca5ddc85fb
+ ---> 2afc30157237
+Step 14/21 : ARG DDP_WORKER_BUILD_TIME=unknown
+ ---> Running in c05c287a1795
+ ---> Removed intermediate container c05c287a1795
+ ---> 313edd932de3
+Step 15/21 : ARG DDP_RENDER_CODE_SHA256=unknown
+ ---> Running in 86103270bf12
+ ---> Removed intermediate container 86103270bf12
+ ---> 48ac664c8ee3
+Step 16/21 : ENV DDP_SOURCE_COMMIT=${DDP_SOURCE_COMMIT}     DDP_WORKER_BUILD_TIME=${DDP_WORKER_BUILD_TIME}     DDP_RENDER_CODE_SHA256=${DDP_RENDER_CODE_SHA256}     DDP_PROVENANCE_FILE=/opt/ddp-worker/provenance.json
+ ---> Running in 27147521b1fa
+ ---> Removed intermediate container 27147521b1fa
+ ---> 606453e35b38
+Step 17/21 : RUN node ./src/provenance.js --write "$DDP_PROVENANCE_FILE" --expect "$DDP_RENDER_CODE_SHA256"
+ ---> Running in 927724bcdc76
+{
+  "sourceCommit": "1fbbdf2c9eb85e3c4aded99919e8602ff2165641",
+  "workerBuildTime": "2026-08-13T15:43:19Z",
+  "imageDigest": null,
+  "renderCodeSha256": "f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207",
+  "renderCodeSha256Declared": "f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207",
+  "renderCodeMatch": true,
+  "assembleScriptSha256": "6ba991ba6957782aab98e8d3ba49e590f7b95e0bdf2fe601330a8d10a655c8ab",
+  "renderCodeFileCount": 30,
+  "workerVersion": "0.1.0"
+}
+RENDER_CODE_FINGERPRINT_OK f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207
+ ---> Removed intermediate container 927724bcdc76
+ ---> d1544ca7fb74
+Step 18/21 : LABEL org.opencontainers.image.title="ddp-runpod-blender"       org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat"       org.opencontainers.image.revision="${DDP_SOURCE_COMMIT}"       org.opencontainers.image.created="${DDP_WORKER_BUILD_TIME}"       ddp.source.commit="${DDP_SOURCE_COMMIT}"       ddp.worker.build.time="${DDP_WORKER_BUILD_TIME}"       ddp.render.code.sha256="${DDP_RENDER_CODE_SHA256}"
+ ---> Running in 887f33fad747
+ ---> Removed intermediate container 887f33fad747
+ ---> 3a339d530fb4
+Step 19/21 : EXPOSE 8080
+ ---> Running in 7bff856fa27d
+ ---> Removed intermediate container 7bff856fa27d
+ ---> 6734a2745b9b
+Step 20/21 : HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3   CMD node ./src/health.js || exit 1
+ ---> Running in 8aa45482f567
+ ---> Removed intermediate container 8aa45482f567
+ ---> c8d9488e3132
+Step 21/21 : CMD ["node", "./src/worker.js"]
+ ---> Running in e016965b3a5a
+ ---> Removed intermediate container e016965b3a5a
+ ---> 63f3959ba7ef
+Successfully built 63f3959ba7ef
+Successfully tagged ghcr.io/doodledashtv/ddp-runpod-blender:1fbbdf2

@@ -189,12 +189,324 @@ def apply_action(arm, action_name: str | None, frame_start: int, frame_end: int)
 
 #: How far inside its own surface a character's shadow caster sits.
 SHADOW_PROXY_SHRINK = 0.022
+#: No piece of the caster travels further inward than this share of its own
+#: half-thickness. A closed surface pushed in by more than half its thinnest
+#: dimension passes through its own middle and comes out inside out, and an
+#: inside-out caster throws a shadow that has nothing to do with the shape the
+#: camera sees. Pip's beak tip is 15 mm across: the flat 22 mm shrink turned it
+#: into a knob hanging in front of the face, and the knob's shadow was the band
+#: down Pip's chest.
+SHADOW_PROXY_SAFE_FRACTION = 0.5
+#: A part with less room than this to give away cannot be a caster at all: there
+#: is no inside for it to hide in. Flat decals - the star on Pip's backpack, the
+#: ink on the Goat's tag - are collapsed to a point instead, which casts nothing.
+SHADOW_PROXY_MIN_ROOM = 0.001
+#: Vertex group carrying the per-part share of the shrink, on the caster only.
+SHADOW_PROXY_VERTEX_GROUP = "DDP_ShadowShrink"
+#: How far a part's shadow may land from the part, as a multiple of the part's own
+#: width across the light, before that part stops casting.
+#:
+#: A shadow that lands further from the thing that cast it than that thing is wide
+#: is a mark the audience cannot attribute to anything on screen. Pip's beak is
+#: 75 mm across and points down at the chest; from the beak the sun leaves the body
+#: sphere within six degrees of tangent, so the beak's occlusion was drawn out into
+#: a 250 mm stripe down the front of the body - three and a third times the beak's
+#: own width, and the vertical seam below the beak. The mesh underneath it is clean:
+#: the stripe tracks the beak, not the geometry it falls on.
+#:
+#: One is not a tuned value. It is the point at which a part's shadow stops being
+#: next to the part. Measured over both founding characters, the parts that sit on
+#: a surface score 1.1 to 5.7 and the parts that make up the body score 0.1 to 0.9.
+SHADOW_PROXY_SELF_REACH = 1.0
+#: ...and only when that is where most of what the part blocks actually goes. A
+#: part whose shadow mostly reaches the set keeps casting however far it throws:
+#: Pip's wings and the Goat's horns shadow the body on the side away from the sun,
+#: but most of what they block lands on the meadow, and that is the shadow the
+#: audience reads as the character's.
+SHADOW_PROXY_SELF_SHARE = 0.5
+#: Rays per part for the measurement. The parts in question have 8-392 vertices.
+SHADOW_PROXY_SELF_SAMPLES = 64
+#: How far clear of the enclosing surface every point of a part must sit before the
+#: part counts as sealed inside it. A part that reaches the surface is seen at it:
+#: the Goat's tag letters are extruded rings whose inner wall is its own island,
+#: lies inside the outer wall and meets its front and back faces, and the letter is
+#: read through exactly that wall. Pip's buried beak tip clears the beak by 0.7 mm
+#: at its closest point, seven times over.
+SHADOW_PROXY_SEALED_CLEARANCE = 0.0001
 #: Suffix every shadow caster carries, so other tools can tell proxies apart
 #: from the geometry the camera actually sees.
 SHADOW_PROXY_SUFFIX = "_ShadowProxy"
 
 
-def install_shadow_proxy(objects) -> list[str]:
+def mesh_islands(mesh) -> list[list[int]]:
+    """Vertex indices of each connected piece of a mesh.
+
+    The founding characters are primitives welded into one mesh, so every sphere,
+    bar and disc that was joined is still its own island, and thickness has to be
+    judged per island rather than per mesh.
+    """
+    neighbours: dict[int, list[int]] = {v.index: [] for v in mesh.vertices}
+    for edge in mesh.edges:
+        a, b = edge.vertices
+        neighbours[a].append(b)
+        neighbours[b].append(a)
+    seen: set[int] = set()
+    islands = []
+    for start in range(len(mesh.vertices)):
+        if start in seen:
+            continue
+        stack, comp = [start], []
+        seen.add(start)
+        while stack:
+            current = stack.pop()
+            comp.append(current)
+            for other in neighbours[current]:
+                if other not in seen:
+                    seen.add(other)
+                    stack.append(other)
+        islands.append(comp)
+    return islands
+
+
+#: How many times the planner may halve its first guess before giving up on an
+#: island and collapsing it instead.
+SHADOW_PROXY_FIT_STEPS = 5
+#: Fixed direction for the inside/outside parity test. Any direction works; a
+#: constant one keeps the planner deterministic.
+_PARITY_RAY = (0.5773502691896258, 0.5773502691896258, 0.5773502691896258)
+
+
+def _inside(tree, point) -> bool:
+    """Is the point inside this island's shell? Counted by surface crossings."""
+    from mathutils import Vector
+
+    direction = Vector(_PARITY_RAY)
+    origin = point.copy()
+    crossings = 0
+    for _ in range(32):
+        hit = tree.ray_cast(origin, direction)
+        if hit[0] is None:
+            break
+        crossings += 1
+        origin = hit[0] + direction * 1e-6
+    return crossings % 2 == 1
+
+
+def island_room(mesh, comp: list[int], tree) -> float:
+    """How far inward every point of one island can travel and stay inside it.
+
+    The first guess is measured through the island rather than around it: from
+    each vertex, a ray straight into the surface reports how much material lies
+    behind that point, and half of the smallest reading is where the island's
+    middle is. A bounding box cannot answer this - the Goat's ears are thin discs
+    held at an angle, so their box is generous in all three axes while the ears
+    are 8 mm thick.
+
+    Thickness alone is not enough either, because offsetting a concave shape
+    inward makes it cross itself before it reaches its middle: the letters on the
+    Goat's tag have thickness to spare and still poked through their own faces.
+    So the guess is then checked by actually moving every vertex and asking
+    whether it is still inside, and halved until it is.
+    """
+    thinnest = None
+    for index in comp:
+        vertex = mesh.vertices[index]
+        normal = vertex.normal
+        if normal.length_squared < 1e-12:
+            continue
+        origin = vertex.co - normal * 1e-5
+        hit = tree.ray_cast(origin, -normal)
+        if hit[0] is None:
+            # Nothing behind this point: the island is a single-sided sheet and has
+            # no inside to hide a caster in.
+            return 0.0
+        through = (hit[0] - vertex.co).length
+        thinnest = through if thinnest is None else min(thinnest, through)
+    if thinnest is None:
+        return 0.0
+
+    room = SHADOW_PROXY_SAFE_FRACTION * thinnest / 2.0
+    for _ in range(SHADOW_PROXY_FIT_STEPS):
+        if room < SHADOW_PROXY_MIN_ROOM:
+            return 0.0
+        if all(
+            _inside(tree, mesh.vertices[i].co - mesh.vertices[i].normal * room)
+            for i in comp
+        ):
+            return room
+        room *= 0.5
+    return 0.0
+
+
+def buried_islands(islands, trees, coords) -> set[int]:
+    """Islands sealed inside another island of the same mesh.
+
+    A part the camera can never see still casts, and what it blocks is a mark the
+    audience has nothing on screen to attribute to. Pip's beak is a 45x99x37 mm
+    sphere with a second 20x31x15 mm sphere authored inside it - 0.7 mm clear of
+    its surface at the closest point, dead geometry that never reaches the
+    silhouette - and the faint vertical line below the beak was that sphere's
+    shadow. Both characters' pupils sit inside their irises the same way, and the
+    Goat's tag has ink inside ink.
+
+    Being sealed means every point of the part is inside the other one's surface
+    and clear of it; the boxes only decide which pairs are worth measuring, which
+    on these characters leaves a handful.
+    """
+    boxes = []
+    for comp in islands:
+        points = [coords[i] for i in comp]
+        boxes.append(
+            (
+                [min(p[a] for p in points) for a in range(3)],
+                [max(p[a] for p in points) for a in range(3)],
+            )
+        )
+
+    def sealed_in(comp, tree) -> bool:
+        for i in comp:
+            near = tree.find_nearest(coords[i])
+            if near[0] is None or (coords[i] - near[0]).length < SHADOW_PROXY_SEALED_CLEARANCE:
+                return False
+            if not _inside(tree, coords[i]):
+                return False
+        return True
+
+    buried = set()
+    for inner, comp in enumerate(islands):
+        low, high = boxes[inner]
+        for outer in range(len(islands)):
+            if outer == inner or trees[outer] is None:
+                continue
+            outer_low, outer_high = boxes[outer]
+            if any(low[a] < outer_low[a] or high[a] > outer_high[a] for a in range(3)):
+                continue
+            if sealed_in(comp, trees[outer]):
+                buried.add(inner)
+                break
+    return buried
+
+
+def island_self_shadow(mesh, comp, weights, tree, island_of_face, island, light):
+    """Where does one part's shadow land on the character that threw it?
+
+    Traces from the caster's surface along the light and asks what the shadow
+    falls on. Hits on the part itself are stepped through - the caster sits inside
+    the visible surface, so the ray has to leave that surface before it can land
+    anywhere - and the first hit on any other part of the character is recorded.
+
+    Returns the share of sampled light-facing rays that land on the character at
+    all, and how far the furthest of them travels as a multiple of the part's own
+    width across the light. A part is only as wide as its silhouette, so the width
+    is measured in the plane the light projects onto rather than as a bounding box.
+    """
+    lit = [
+        i
+        for i in comp
+        if mesh.vertices[i].normal.length_squared > 1e-12
+        and mesh.vertices[i].normal.dot(light) < 0.0
+    ]
+    if not lit:
+        return 0.0, 0.0
+    step = max(1, len(lit) // SHADOW_PROXY_SELF_SAMPLES)
+    sampled = lit[::step]
+
+    across_u = light.orthogonal().normalized()
+    across_v = light.cross(across_u).normalized()
+    us = [mesh.vertices[i].co.dot(across_u) for i in comp]
+    vs = [mesh.vertices[i].co.dot(across_v) for i in comp]
+    width = max(max(us) - min(us), max(vs) - min(vs))
+    if width <= 0.0:
+        return 0.0, 0.0
+
+    landed = 0
+    furthest = 0.0
+    for i in sampled:
+        vertex = mesh.vertices[i]
+        start = vertex.co - vertex.normal * (weights[i] * SHADOW_PROXY_SHRINK)
+        origin = start + light * 1e-5
+        for _ in range(8):
+            location, _normal, face, _distance = tree.ray_cast(origin, light)
+            if location is None or face is None:
+                break
+            if island_of_face[face] == island:
+                origin = location + light * 1e-5
+                continue
+            landed += 1
+            furthest = max(furthest, (location - start).length)
+            break
+    return landed / len(sampled), furthest / width
+
+
+def plan_shadow_shrink(mesh, light=None) -> tuple[list[float], list[list[int]]]:
+    """Per-vertex share of the shrink, and the islands that must not displace.
+
+    Returns the weight for every vertex and the islands to collapse instead. An
+    island is collapsed when it is sealed inside another island, when it has no
+    inside to hide a caster in, and - when a light direction is supplied - when it
+    is a part sitting on the character rather than one of its masses and the shadow
+    it throws lands on the character itself, further away than the part is wide.
+    """
+    from mathutils.bvhtree import BVHTree
+
+    weights = [0.0] * len(mesh.vertices)
+    collapse = []
+    coords = [v.co.copy() for v in mesh.vertices]
+    islands = mesh_islands(mesh)
+    island_of_vertex = {i: n for n, comp in enumerate(islands) for i in comp}
+    trees = []
+    for comp in islands:
+        member = set(comp)
+        polys = [list(p.vertices) for p in mesh.polygons if all(v in member for v in p.vertices)]
+        trees.append(
+            BVHTree.FromPolygons(coords, polys, all_triangles=False, epsilon=0.0)
+            if polys
+            else None
+        )
+
+    buried = buried_islands(islands, trees, coords)
+    for island, comp in enumerate(islands):
+        tree = trees[island]
+        if tree is None or island in buried:
+            collapse.append(comp)
+            continue
+        room = island_room(mesh, comp, tree)
+        if room < SHADOW_PROXY_MIN_ROOM:
+            collapse.append(comp)
+            continue
+        share = min(SHADOW_PROXY_SHRINK, room) / SHADOW_PROXY_SHRINK
+        for i in comp:
+            weights[i] = share
+
+    if light is None:
+        return weights, collapse
+
+    # One tree over the whole visible mesh, because the receiver of a part's
+    # shadow is the surface the camera sees, not the caster.
+    faces = [list(p.vertices) for p in mesh.polygons]
+    whole = BVHTree.FromPolygons(coords, faces, all_triangles=False, epsilon=0.0)
+    island_of_face = [island_of_vertex[face[0]] for face in faces]
+    already = {id(comp) for comp in collapse}
+    for island, comp in enumerate(islands):
+        if id(comp) in already:
+            continue
+        # A mass - a part with room for the whole shrink - always casts. These are
+        # the head and the body, the surfaces whose shadow is the character's, and
+        # they necessarily shadow the parts of themselves that face away from the
+        # sun. Only the parts that sit on them are candidates.
+        if weights[comp[0]] <= 0.0 or weights[comp[0]] >= 1.0:
+            continue
+        share, reach = island_self_shadow(
+            mesh, comp, weights, whole, island_of_face, island, light
+        )
+        if share >= SHADOW_PROXY_SELF_SHARE and reach > SHADOW_PROXY_SELF_REACH:
+            collapse.append(comp)
+            for i in comp:
+                weights[i] = 0.0
+    return weights, collapse
+
+
+def install_shadow_proxy(objects, light=None) -> list[str]:
     """Cast a character's shadow from a slightly shrunken copy of itself.
 
     The founding characters are three dozen interpenetrating primitives welded
@@ -208,10 +520,23 @@ def install_shadow_proxy(objects) -> list[str]:
 
     Switching shadows off is not an option — without them the cast loses contact
     with the ground and looks pasted on. So the visible mesh stops casting and an
-    invisible copy, pushed ``SHADOW_PROXY_SHRINK`` inside its own surface, casts
-    instead. The proxy can never shadow the surface it sits inside, while the
-    silhouette it throws on the ground is the character's own, a couple of
-    centimetres smaller.
+    invisible copy, pushed inside its own surface, casts instead. The proxy can
+    never shadow the surface it sits inside, while the silhouette it throws on the
+    ground is the character's own, a couple of centimetres smaller.
+
+    How far inward each part goes is its own business: a head has 25 mm of room
+    and takes the full shrink, a brow bar has 2.4 mm and takes that, and a flat
+    decal has none and is collapsed out of the caster entirely. A part sealed
+    inside another part is collapsed too, because the camera never sees it and its
+    shadow is a mark with nothing on screen behind it. The caster carries its own
+    copy of the mesh so the weights that express this never touch the asset the
+    camera renders.
+
+    ``light`` is the world-space direction the key light travels. Given it, a part
+    whose shadow lands on its own character close to tangent is collapsed out of
+    the caster too: that is where a small part's shadow stops reading as its shadow
+    and becomes a band across the surface. Pip's beak was throwing such a band down
+    the chest. Without it the caster is built on thickness alone, as before.
     """
     import bpy
 
@@ -219,16 +544,43 @@ def install_shadow_proxy(objects) -> list[str]:
     for obj in [o for o in objects if o.type == "MESH" and o.name in bpy.data.objects]:
         if obj.name.endswith(SHADOW_PROXY_SUFFIX):
             continue
-        proxy = obj.copy()  # shares mesh data, carries the armature modifier
+        proxy = obj.copy()  # carries the armature modifier and the vertex groups
         proxy.name = f"{obj.name}{SHADOW_PROXY_SUFFIX}"
+        proxy.data = obj.data.copy()
         bpy.context.collection.objects.link(proxy)
         if obj.parent is not None:
             proxy.parent = obj.parent
             proxy.matrix_parent_inverse = obj.matrix_parent_inverse.copy()
         proxy.matrix_world = obj.matrix_world.copy()
+
+        # The planner works in the mesh's own space, and the characters are placed
+        # with a rotation and a translation only, so the light rotates into that
+        # space and the angles it measures are the ones the renderer sees.
+        local_light = None
+        if light is not None:
+            local_light = (obj.matrix_world.to_3x3().inverted() @ light).normalized()
+        weights, collapse = plan_shadow_shrink(proxy.data, light=local_light)
+        group = proxy.vertex_groups.new(name=SHADOW_PROXY_VERTEX_GROUP)
+        for index, weight in enumerate(weights):
+            if weight > 0.0:
+                group.add([index], weight, "REPLACE")
+        from mathutils import Vector
+
+        for comp in collapse:
+            centre = sum((proxy.data.vertices[i].co for i in comp), Vector()) / len(comp)
+            for i in comp:
+                proxy.data.vertices[i].co = centre
+            # A shape key holds absolute positions, so the collapse has to hold in
+            # every one of them or the part springs back when a key is dialled in.
+            if proxy.data.shape_keys:
+                for block in proxy.data.shape_keys.key_blocks:
+                    for i in comp:
+                        block.data[i].co = centre
+
         shrink = proxy.modifiers.new("DDP_ShadowShrink", "DISPLACE")
         shrink.mid_level = 0.0
         shrink.strength = -SHADOW_PROXY_SHRINK
+        shrink.vertex_group = group.name
         proxy.visible_camera = False
         for attr in ("visible_diffuse", "visible_glossy", "visible_transmission", "visible_volume_scatter"):
             if hasattr(proxy, attr):
@@ -513,6 +865,22 @@ DDP_LIGHT_PREFIX = "DDP_"
 def resolve_lighting_state(requested: str | None) -> str:
     state = str(requested or "").strip().upper().replace("-", "_").replace(" ", "_")
     return state if state in LIGHTING_STATES else DEFAULT_LIGHTING_STATE
+
+
+def key_light_direction(requested: str | None):
+    """The world-space direction the key light of a lighting state travels.
+
+    Read from the state table rather than from the scene, because the shadow
+    casters are built while the characters are imported and the lights are
+    installed afterwards. A sun shines down its own -Z.
+    """
+    from mathutils import Euler, Vector
+
+    spec = LIGHTING_STATES[resolve_lighting_state(requested)]["key"]
+    rotation = Euler(tuple(spec.get("rotation", (0.0, 0.0, 0.0))), "XYZ")
+    direction = Vector((0.0, 0.0, -1.0))
+    direction.rotate(rotation)
+    return direction.normalized()
 
 
 def apply_sky_emission(spec: dict) -> list[str]:
@@ -940,6 +1308,7 @@ def build_scene(
     applied_actions = {}
     roots = {}
     shadow_proxies: list[str] = []
+    key_direction = key_light_direction(shot_meta.get("lightingState"))
     for role, objs in imported_by_role.items():
         arm = find_armature(objs)
         target, root_kind = placement_root(role, objs)
@@ -966,7 +1335,7 @@ def build_scene(
         # Only the characters need this: they are the assets built from stacked
         # primitives, and they are the ones the audience looks at.
         if arm is not None:
-            shadow_proxies.extend(install_shadow_proxy(objs))
+            shadow_proxies.extend(install_shadow_proxy(objs, light=key_direction))
 
     # Fail closed: silently dropping a requested action is what let the first
     # acceptance render ship with a completely motionless goat.

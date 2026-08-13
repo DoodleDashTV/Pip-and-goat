@@ -1,0 +1,7 @@
+export const WORKER_IMAGE =
+  'ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = 'da26bc16806513e7ba58ceb3408728df7712622f';
+export const WORKER_IMAGE_RENDER_CODE_SHA256 =
+  'a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a';
+export const WORKER_IMAGE_RENDER_ASSET_SHA256 =
+  '7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7';

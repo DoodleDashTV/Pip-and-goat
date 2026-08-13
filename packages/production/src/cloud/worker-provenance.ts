@@ -27,6 +27,28 @@ export const RENDER_CODE_ROOTS: ReadonlyArray<{ prefix: string; repoDir: string 
   { prefix: 'blender', repoDir: 'scripts/blender' },
 ];
 
+/**
+ * Directories holding the render's other half: the approved `.blend` assets.
+ *
+ * These are not baked into the image. The worker downloads them from R2 and
+ * checks each one against the sha256 in the job manifest, so a swapped file
+ * cannot reach Blender. What that does not catch is a *deliberate* local edit:
+ * change Pip's model, and preflight will happily upload the new geometry under a
+ * fresh content-addressed key and render it, because every hash agrees with
+ * itself. Pinning the asset fingerprint makes that change require a re-pin, the
+ * same way changing render code does.
+ */
+export const RENDER_ASSET_ROOTS: ReadonlyArray<{ prefix: string; repoDir: string }> = [
+  { prefix: 'assets', repoDir: 'production-library' },
+];
+
+/**
+ * Only files that reach the render count. Blender's `.blend1` backups and the
+ * `.png` contact sheets sit in the same folders and change when a machine merely
+ * opens a file, which would make the fingerprint depend on who ran what.
+ */
+export const RENDER_ASSET_EXTENSIONS: ReadonlyArray<string> = ['.blend'];
+
 export const LABEL_SOURCE_COMMIT = 'ddp.source.commit';
 export const LABEL_RENDER_CODE_SHA256 = 'ddp.render.code.sha256';
 export const LABEL_BUILD_TIME = 'ddp.worker.build.time';
@@ -50,7 +72,8 @@ export type ProvenanceCode =
   | 'PROVENANCE_MISSING'
   | 'SOURCE_COMMIT_MISMATCH'
   | 'BUILD_TIME_MISSING'
-  | 'RENDER_CODE_MISMATCH';
+  | 'RENDER_CODE_MISMATCH'
+  | 'RENDER_ASSET_MISMATCH';
 
 export type ProvenanceVerification = {
   ok: boolean;
@@ -64,6 +87,8 @@ export type ProvenanceVerification = {
     expectedSourceCommit: string;
     expectedRenderCodeSha256: string;
     localRenderCodeSha256: string;
+    expectedRenderAssetSha256: string | null;
+    localRenderAssetSha256: string | null;
   };
 };
 
@@ -71,15 +96,29 @@ function sha256(buf: Buffer | string): string {
   return createHash('sha256').update(buf).digest('hex');
 }
 
-function walk(dir: string, prefix: string, out: Array<{ path: string; sha256: string }>): void {
+function walk(
+  dir: string,
+  prefix: string,
+  out: Array<{ path: string; sha256: string }>,
+  keep?: (name: string) => boolean,
+): void {
   const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1));
   for (const entry of entries) {
     if (IGNORED_ENTRIES.has(entry.name) || entry.name.endsWith('.pyc')) continue;
     const abs = path.join(dir, entry.name);
     const rel = `${prefix}/${entry.name}`;
-    if (entry.isDirectory()) walk(abs, rel, out);
-    else if (entry.isFile()) out.push({ path: rel, sha256: sha256(readFileSync(abs)) });
+    if (entry.isDirectory()) walk(abs, rel, out, keep);
+    else if (entry.isFile() && (!keep || keep(entry.name))) {
+      out.push({ path: rel, sha256: sha256(readFileSync(abs)) });
+    }
   }
+}
+
+function aggregate(files: Array<{ path: string; sha256: string }>): string {
+  files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+  const hash = createHash('sha256');
+  for (const f of files) hash.update(`${f.path}\u0000${f.sha256}\n`);
+  return hash.digest('hex');
 }
 
 /**
@@ -96,10 +135,25 @@ export function computeRenderCodeFingerprint(repoRoot: string): {
     if (!existsSync(dir)) continue;
     walk(dir, root.prefix, files);
   }
-  files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
-  const hash = createHash('sha256');
-  for (const f of files) hash.update(`${f.path}\u0000${f.sha256}\n`);
-  return { fingerprint: hash.digest('hex'), files };
+  return { fingerprint: aggregate(files), files };
+}
+
+/**
+ * Content hash over every approved `.blend` the render can load, computed with
+ * the same scheme as the code fingerprint so the two read alike.
+ */
+export function computeRenderAssetFingerprint(repoRoot: string): {
+  fingerprint: string;
+  files: Array<{ path: string; sha256: string }>;
+} {
+  const files: Array<{ path: string; sha256: string }> = [];
+  const keep = (name: string) => RENDER_ASSET_EXTENSIONS.some((ext) => name.endsWith(ext));
+  for (const root of RENDER_ASSET_ROOTS) {
+    const dir = path.join(repoRoot, root.repoDir);
+    if (!existsSync(dir)) continue;
+    walk(dir, root.prefix, files, keep);
+  }
+  return { fingerprint: aggregate(files), files };
 }
 
 /**
@@ -175,9 +229,20 @@ export function verifyWorkerProvenance(input: {
   expectedSourceCommit: string;
   expectedRenderCodeSha256: string;
   localRenderCodeSha256: string;
+  /** Pinned fingerprint of the approved `.blend` assets, when one is pinned. */
+  expectedRenderAssetSha256?: string;
+  localRenderAssetSha256?: string;
   registry: RegistryImageFacts;
 }): ProvenanceVerification {
-  const { imageRef, expectedSourceCommit, expectedRenderCodeSha256, localRenderCodeSha256, registry } = input;
+  const {
+    imageRef,
+    expectedSourceCommit,
+    expectedRenderCodeSha256,
+    localRenderCodeSha256,
+    expectedRenderAssetSha256,
+    localRenderAssetSha256,
+    registry,
+  } = input;
 
   const imageSourceCommit =
     registry.labels[LABEL_SOURCE_COMMIT] ||
@@ -200,6 +265,8 @@ export function verifyWorkerProvenance(input: {
     expectedSourceCommit,
     expectedRenderCodeSha256,
     localRenderCodeSha256,
+    expectedRenderAssetSha256: expectedRenderAssetSha256 ?? null,
+    localRenderAssetSha256: localRenderAssetSha256 ?? null,
   };
   const fail = (code: ProvenanceCode, reason: string): ProvenanceVerification => ({
     ok: false,
@@ -243,10 +310,27 @@ export function verifyWorkerProvenance(input: {
       `working tree render code ${localRenderCodeSha256} != image render code ${expectedRenderCodeSha256} — the image is stale and would render different code than this checkout`,
     );
   }
+  if (expectedRenderAssetSha256) {
+    if (!localRenderAssetSha256) {
+      return fail(
+        'RENDER_ASSET_MISMATCH',
+        'an asset fingerprint is pinned but none was measured from this checkout',
+      );
+    }
+    if (localRenderAssetSha256 !== expectedRenderAssetSha256) {
+      return fail(
+        'RENDER_ASSET_MISMATCH',
+        `working tree render assets ${localRenderAssetSha256} != pinned assets ${expectedRenderAssetSha256} — an approved .blend changed and has not been re-pinned`,
+      );
+    }
+  }
+  const assetNote = localRenderAssetSha256 ? ` and its approved assets (${localRenderAssetSha256.slice(0, 12)}…)` : '';
   return {
     ok: true,
     code: 'OK',
-    reasons: [`image ${pinnedDigest.slice(0, 19)}… contains this checkout's render code (${localRenderCodeSha256.slice(0, 12)}…)`],
+    reasons: [
+      `image ${pinnedDigest.slice(0, 19)}… contains this checkout's render code (${localRenderCodeSha256.slice(0, 12)}…)${assetNote}`,
+    ],
     facts,
   };
 }

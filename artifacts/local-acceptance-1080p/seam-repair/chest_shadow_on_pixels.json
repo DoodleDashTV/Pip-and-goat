@@ -1,0 +1,30 @@
+{
+ "frame": "frame_0045 @ 1080x1920",
+ "window": {
+  "x0": 186,
+  "x1": 276,
+  "y0": 1240,
+  "y1": 1382
+ },
+ "shadowThresholdFractionOfLit": 0.75,
+ "chestMaskTakenFrom": "after_head (geometry and camera identical in both)",
+ "note": "Chest plumage pixels of the delivered frame, each plate normalised by its own 90th-percentile lit level. Ray-cast counterpart: chest_blockers_four_states.json.",
+ "before_a440d88": {
+  "chestPlumagePixels": 7438,
+  "litLevelP90": 186.41,
+  "shadowedPixels": 3020,
+  "shadowedFractionPct": 40.6,
+  "meanShadowDepthPctBelowLit": 42.81,
+  "maxShadowDepthPctBelowLit": 72.66
+ },
+ "after_head": {
+  "chestPlumagePixels": 7438,
+  "litLevelP90": 197.1,
+  "shadowedPixels": 2029,
+  "shadowedFractionPct": 27.28,
+  "meanShadowDepthPctBelowLit": 34.14,
+  "maxShadowDepthPctBelowLit": 52.16
+ },
+ "shadowedPixelsRemoved": 991,
+ "shadowedFractionRemovedPct": 13.32
+}

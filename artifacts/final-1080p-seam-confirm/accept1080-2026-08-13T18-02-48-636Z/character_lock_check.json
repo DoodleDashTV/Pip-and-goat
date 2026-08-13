@@ -1,0 +1,12 @@
+{
+ "pipBlendSha256": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0",
+ "goatBlendSha256": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8",
+ "pipMatchesCharlockEvidence": true,
+ "goatMatchesCharlockEvidence": true,
+ "pipIdentityPreservedEvidence": true,
+ "goatIdentityPreservedEvidence": true,
+ "assetFingerprintPinned": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+ "renderCodeSha256": "a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a",
+ "assembleSceneSha256": "6ba991ba6957782aab98e8d3ba49e590f7b95e0bdf2fe601330a8d10a655c8ab",
+ "verdict": "PASS"
+}

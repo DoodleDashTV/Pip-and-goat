@@ -1,0 +1,80 @@
+{
+  "label": "buried_only",
+  "before": "/tmp/seam/ab4/reach_normal_full_.png",
+  "after": "/tmp/seam/ab4/fixed_normal_full_.png",
+  "shape": [
+    1920,
+    1080,
+    3
+  ],
+  "changedPixels": 254,
+  "changedFraction": 0.000122,
+  "maxDelta": 50.0,
+  "meanDeltaWhereChanged": 12.957,
+  "changedBoundingBox": {
+    "y0": 1092,
+    "y1": 1378,
+    "x0": 223,
+    "x1": 802
+  },
+  "pipChest": {
+    "region": {
+      "x0": 130,
+      "x1": 310,
+      "y0": 1145,
+      "y1": 1395
+    },
+    "before": {
+      "meanLuma": 116.276,
+      "band": {
+        "worstColumn": 137,
+        "worstColumnTroughDepth": 7.0747,
+        "meanColumnTroughDepth": 1.6833,
+        "columnsAboveHalfOfWorst": 4
+      },
+      "speckle": 723,
+      "hueAreas": {
+        "yellow": 20619,
+        "orange": 331,
+        "red": 591,
+        "purple": 0
+      }
+    },
+    "after": {
+      "meanLuma": 116.322,
+      "band": {
+        "worstColumn": 137,
+        "worstColumnTroughDepth": 7.0787,
+        "meanColumnTroughDepth": 1.6782,
+        "columnsAboveHalfOfWorst": 4
+      },
+      "speckle": 721,
+      "hueAreas": {
+        "yellow": 20617,
+        "orange": 331,
+        "red": 591,
+        "purple": 0
+      }
+    }
+  },
+  "identityHueAreasWholeFrame": {
+    "before": {
+      "yellow": 345378,
+      "orange": 8672,
+      "red": 860,
+      "purple": 7
+    },
+    "after": {
+      "yellow": 345374,
+      "orange": 8673,
+      "red": 860,
+      "purple": 7
+    }
+  },
+  "wholeFrame": {
+    "beforeMeanLuma": 113.677,
+    "afterMeanLuma": 113.679,
+    "beforeSpeckle": 5095,
+    "afterSpeckle": 5096
+  }
+}

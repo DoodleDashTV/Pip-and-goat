@@ -12,10 +12,25 @@
  *    startup-status.json within 10 min of creation.
  *  - RUNPOD_API_KEY / ALLOW_PAID_GPU_LAUNCH are NEVER passed to the pod.
  *  - Restores ALLOW_PAID_GPU_LAUNCH=false + CLOUD_RENDER_ENABLED=false at end.
+ *  - Render code and approved assets must still match their pins, re-checked here
+ *    rather than trusted from preflight.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { RunpodClient } from '../../../packages/production/src/cloud/runpod-client';
-import { WORKER_IMAGE, HARD_CAP_USD, STATE_FILE, redact, metadataKeyFor } from './common';
+import {
+  computeRenderAssetFingerprint,
+  computeRenderCodeFingerprint,
+} from '../../../packages/production/src/cloud/worker-provenance';
+import {
+  WORKER_IMAGE,
+  WORKER_IMAGE_RENDER_ASSET_SHA256,
+  WORKER_IMAGE_RENDER_CODE_SHA256,
+  HARD_CAP_USD,
+  REPO_ROOT,
+  STATE_FILE,
+  redact,
+  metadataKeyFor,
+} from './common';
 import { makeStorage } from './common';
 
 const POLL_MS = 20_000;
@@ -23,8 +38,11 @@ const POLL_MS = 20_000;
 // within seconds of COMPLETE rather than billing for a whole slow interval.
 const ACTIVE_POLL_MS = 4_000;
 const ACTIVE_STATUSES = new Set(['RENDERING', 'ENCODING', 'QC', 'UPLOADING', 'VERIFY_READBACK']);
-const NO_STARTUP_KILL_MS = 10 * 60 * 1000; // no startup-status.json within 10 min
-const STALL_MS = 8 * 60 * 1000; // no bootStage/status progress for 8 min
+// Cold pulls of a ~2GB worker image have previously taken ~4.5 min before the
+// first startup-status.json. Give the pull + boot a full window; do not confuse
+// "image still pulling" with a mid-boot stall.
+const NO_STARTUP_KILL_MS = 15 * 60 * 1000; // no startup-status.json within 15 min of creation
+const STALL_MS = 8 * 60 * 1000; // no bootStage/status progress for 8 min AFTER first startup-status
 
 function log(event: string, detail: Record<string, unknown> = {}) {
   console.log(JSON.stringify({ ts: new Date().toISOString(), event, ...detail }));
@@ -70,6 +88,24 @@ async function main() {
 
   console.log('=== PHASE B — SINGLE AUTHORIZED LAUNCH ===');
   log('config', { jobId, gpuTypeId, quotedRate, workerImage: WORKER_IMAGE, hardCapUsd: HARD_CAP_USD });
+
+  // Preflight may have passed hours ago. Anything edited since - a scene script,
+  // a character - would be rendered here without ever having been reviewed, so
+  // the pins get the last word before any money is spent.
+  const localCode = computeRenderCodeFingerprint(REPO_ROOT).fingerprint;
+  const localAssets = computeRenderAssetFingerprint(REPO_ROOT).fingerprint;
+  if (localCode !== WORKER_IMAGE_RENDER_CODE_SHA256 || localAssets !== WORKER_IMAGE_RENDER_ASSET_SHA256) {
+    log('abort_fingerprint_drift', {
+      renderCodeMatches: localCode === WORKER_IMAGE_RENDER_CODE_SHA256,
+      renderAssetsMatch: localAssets === WORKER_IMAGE_RENDER_ASSET_SHA256,
+      localRenderCode: localCode,
+      pinnedRenderCode: WORKER_IMAGE_RENDER_CODE_SHA256,
+      localRenderAssets: localAssets,
+      pinnedRenderAssets: WORKER_IMAGE_RENDER_ASSET_SHA256,
+    });
+    console.log('ABORT: working tree no longer matches the pins — not launching. Spend $0.');
+    process.exit(2);
+  }
 
   const client = new RunpodClient();
   const storage = makeStorage();
@@ -140,7 +176,7 @@ async function main() {
   const stageLog: Array<{ ts: string; stage: string }> = [];
 
   try {
-    log('creating_pod', { podName, cloudType: 'SECURE', gpuTypeId, containerDiskInGb: 40, volumeInGb: 0 });
+    log('creating_pod', { podName, cloudType: 'SECURE', gpuTypeId, containerDiskInGb: 60, volumeInGb: 0 });
     let created: { podId: string } | null = null;
     try {
       created = await withTimeout(
@@ -151,7 +187,7 @@ async function main() {
           confirmPaidLaunch: true,
           cloudType: 'SECURE',
           gpuCount: 1,
-          containerDiskInGb: 40,
+          containerDiskInGb: 60,
           volumeInGb: 0,
           env: podEnv,
         }),
@@ -220,6 +256,15 @@ async function main() {
             status: status?.status ?? null,
             uptimeSec: pod?.runtime?.uptimeInSeconds ?? null,
           });
+        } else if (Math.round(elapsedMs / 1000) % 60 < Math.round(POLL_MS / 1000) + 1) {
+          // Heartbeat once a minute while still waiting: distinguishes a stuck
+          // image pull (uptime null) from a running container with no R2 yet.
+          log('wait', {
+            elapsedSec: Math.round(elapsedMs / 1000),
+            desiredStatus: pod?.desiredStatus ?? null,
+            uptimeSec: pod?.runtime?.uptimeInSeconds ?? null,
+            sawStartupStatus,
+          });
         }
 
         // Terminal states.
@@ -245,7 +290,9 @@ async function main() {
           log('render_failed', { code: status.code, classification: status.classification, message: redact(status.message || '') });
           break;
         }
-        if (startup?.result === 'FAILED') {
+        // Early boot heartbeats use result:'RUNNING' + classification:'BOOTING'.
+        // Only a real failure classification is terminal.
+        if (startup?.result === 'FAILED' && startup?.classification !== 'BOOTING') {
           finalStatus = 'FAILED';
           log('startup_failed', { classification: startup.classification, code: startup.code });
           break;
@@ -262,7 +309,11 @@ async function main() {
           log('no_startup_status_kill', { elapsedSec: Math.round(elapsedMs / 1000) });
           break;
         }
-        if (Date.now() - lastProgressTs >= STALL_MS) {
+        // Stall only applies once the worker has written startup-status.json.
+        // Before that, the empty stage key would otherwise look like "progress"
+        // on the first poll and then trip STALL_MS while the image is still
+        // pulling — which is exactly what NO_STARTUP_KILL_MS covers.
+        if (sawStartupStatus && Date.now() - lastProgressTs >= STALL_MS) {
           finalStatus = 'STARTUP_STALL';
           log('stall_kill', { sinceProgressSec: Math.round((Date.now() - lastProgressTs) / 1000) });
           break;

@@ -100,10 +100,15 @@ LABEL org.opencontainers.image.title="ddp-runpod-blender" \
       ddp.worker.build.time="${DDP_WORKER_BUILD_TIME}" \
       ddp.render.code.sha256="${DDP_RENDER_CODE_SHA256}"
 
-# Health endpoint / check
+# Health endpoint / check.
+# Force REQUIRE_GPU_HEALTH=false for the Docker HEALTHCHECK: the pod sets
+# REQUIRE_GPU_HEALTH=true for the real worker, and without this override the
+# HEALTHCHECK would inherit that and run a multi-minute EEVEE benchmark under a
+# 10s Docker probe timeout — marking the container unhealthy and restarting it
+# before single-shot can write startup-status.json.
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD node ./src/health.js || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD env REQUIRE_GPU_HEALTH=false node ./src/health.js || exit 1
 
 # Default: single-shot mode when RENDER_JOB_ID is provided; otherwise idles.
 CMD ["node", "./src/worker.js"]

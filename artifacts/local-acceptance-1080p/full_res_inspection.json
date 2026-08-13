@@ -1,116 +1,179 @@
 {
-  "frames": 90,
-  "resolution": "1080x1920",
-  "allFrames": {
-    "meanLumaPct": {
-      "min": 0.4745,
-      "max": 0.4911
-    },
-    "p01": {
-      "min": 47.9628,
-      "max": 49.6058
-    },
-    "p99": {
-      "min": 209.7342,
-      "max": 221.7794
-    },
-    "tonalRange": {
-      "min": 160.1284,
-      "max": 172.8652
-    },
-    "clippedHighlightFraction": {
-      "min": 0.0,
-      "max": 0.0
-    },
-    "clippedShadowFraction": {
-      "min": 0.0,
-      "max": 0.0
-    },
-    "saturation": {
-      "min": 60.286,
-      "max": 62.6667
-    }
+ "frames": 90,
+ "resolution": "1080x1920",
+ "allFrames": {
+  "meanLumaPct": {
+   "min": 0.4747,
+   "max": 0.4914
   },
-  "allFramesPassAcceptanceThresholds": {
-    "exposureInBand": true,
-    "highlightsPresent": true,
-    "noHighlightClipping": true,
-    "shadowsLifted": true,
-    "shadowDepthRetained": true,
-    "saturationHealthy": true,
-    "tonalRangeHealthy": true
+  "p01": {
+   "min": 48.2375,
+   "max": 49.5924
   },
-  "temporalStability": {
-    "meanLumaRangeAcrossShot": 4.247,
-    "frameToFrameMeanLumaStep": {
-      "mean": 0.0482,
-      "max": 0.0876,
-      "signChanges": 4
-    },
-    "perPixelAbsDelta": {
-      "avg": 3.761,
-      "max": 5.199
-    },
-    "perPixelP999Delta": {
-      "avg": 147.2,
-      "max": 168.0
-    },
-    "outlierFrames": []
+  "p99": {
+   "min": 209.7342,
+   "max": 221.8736
   },
-  "separation": {
+  "tonalRange": {
+   "min": 160.1418,
+   "max": 172.8972
+  },
+  "clippedHighlightFraction": {
+   "min": 0.0,
+   "max": 0.0
+  },
+  "clippedShadowFraction": {
+   "min": 0.0,
+   "max": 0.0
+  },
+  "saturation": {
+   "min": 60.2687,
+   "max": 62.6612
+  }
+ },
+ "allFramesPassAcceptanceThresholds": {
+  "exposureInBand": true,
+  "highlightsPresent": true,
+  "noHighlightClipping": true,
+  "shadowsLifted": true,
+  "shadowDepthRetained": true,
+  "saturationHealthy": true,
+  "tonalRangeHealthy": true
+ },
+ "temporalStability": {
+  "meanLumaRangeAcrossShot": 4.27,
+  "frameToFrameMeanLumaStep": {
+   "mean": 0.048,
+   "max": 0.0861,
+   "signChanges": 1
+  },
+  "perPixelAbsDelta": {
+   "avg": 3.738,
+   "max": 5.141
+  },
+  "perPixelP999Delta": {
+   "avg": 147.4,
+   "max": 169.0
+  },
+  "outlierFrames": []
+ },
+ "maskSolidAlpha": 229.0,
+ "perMaskFrame": {
+  "frame_0001": {
+   "separation": {
     "pip": {
-      "screenCoveragePct": 1.2,
-      "subjectMeanLuma": 154.92,
-      "localBackgroundMeanLuma": 126.33,
-      "lumaSeparation": 28.59,
-      "weberContrast": 0.226,
-      "subjectMeanSaturation": 93.42,
-      "localBackgroundMeanSaturation": 59.51,
-      "subjectMaxLuma": 251.72,
-      "specularFractionOfSubject": 0.25048,
-      "subjectClippedFraction": 0.0,
-      "subjectLumaSpread": 188.43
+     "screenCoveragePct": 0.86,
+     "subjectMeanLuma": 164.08,
+     "localBackgroundMeanLuma": 122.75,
+     "lumaSeparation": 41.33,
+     "weberContrast": 0.337,
+     "subjectMeanSaturation": 88.66,
+     "localBackgroundMeanSaturation": 60.98,
+     "subjectMaxLuma": 252.0,
+     "specularFractionOfSubject": 0.25003,
+     "subjectClippedFraction": 0.0,
+     "subjectLumaSpread": 226.9
     },
     "goat": {
-      "screenCoveragePct": 3.19,
-      "subjectMeanLuma": 159.02,
-      "localBackgroundMeanLuma": 127.17,
-      "lumaSeparation": 31.85,
-      "weberContrast": 0.25,
-      "subjectMeanSaturation": 26.17,
-      "localBackgroundMeanSaturation": 56.44,
-      "subjectMaxLuma": 251.72,
-      "specularFractionOfSubject": 0.34697,
-      "subjectClippedFraction": 0.0,
-      "subjectLumaSpread": 208.87
+     "screenCoveragePct": 2.23,
+     "subjectMeanLuma": 161.28,
+     "localBackgroundMeanLuma": 126.53,
+     "lumaSeparation": 34.75,
+     "weberContrast": 0.275,
+     "subjectMeanSaturation": 26.42,
+     "localBackgroundMeanSaturation": 57.04,
+     "subjectMaxLuma": 250.0,
+     "specularFractionOfSubject": 0.25002,
+     "subjectClippedFraction": 0.0,
+     "subjectLumaSpread": 244.07
     },
     "map": {
-      "screenCoveragePct": 7.65,
-      "subjectMeanLuma": 181.62,
-      "localBackgroundMeanLuma": 145.6,
-      "lumaSeparation": 36.02,
-      "weberContrast": 0.247,
-      "subjectMeanSaturation": 31.38,
-      "localBackgroundMeanSaturation": 46.64,
-      "subjectMaxLuma": 211.73,
-      "specularFractionOfSubject": 0.4937,
-      "subjectClippedFraction": 0.0,
-      "subjectLumaSpread": 128.69
+     "screenCoveragePct": 4.76,
+     "subjectMeanLuma": 180.97,
+     "localBackgroundMeanLuma": 142.99,
+     "lumaSeparation": 37.98,
+     "weberContrast": 0.266,
+     "subjectMeanSaturation": 31.62,
+     "localBackgroundMeanSaturation": 48.35,
+     "subjectMaxLuma": 211.73,
+     "specularFractionOfSubject": 0.25087,
+     "subjectClippedFraction": 0.0,
+     "subjectLumaSpread": 168.19
     }
-  },
-  "screenSpaceOverlapPx": {
-    "pip_goat": 0,
-    "pip_map": 0,
-    "goat_map": 97
-  },
-  "mapReadability": {
-    "screenCoveragePct": 7.65,
-    "meanLuma": 181.62,
-    "lumaStdDev": 34.94,
-    "p05": 88.61,
-    "p95": 209.02,
-    "inkToPaperRange": 120.41,
+   },
+   "screenSpaceOverlapPx": {
+    "goat_map": 0,
+    "goat_pip": 0,
+    "map_pip": 0
+   },
+   "mapReadability": {
+    "screenCoveragePct": 4.76,
+    "meanLuma": 180.97,
+    "lumaStdDev": 35.54,
+    "p05": 87.61,
+    "p95": 209.66,
+    "inkToPaperRange": 122.05,
     "populatedToneBucketsOf32": 22,
-    "darkInkFraction": 0.1241
+    "darkInkFraction": 0.0908
+   }
+  },
+  "frame_0090": {
+   "separation": {
+    "pip": {
+     "screenCoveragePct": 2.02,
+     "subjectMeanLuma": 165.96,
+     "localBackgroundMeanLuma": 123.07,
+     "lumaSeparation": 42.89,
+     "weberContrast": 0.349,
+     "subjectMeanSaturation": 87.51,
+     "localBackgroundMeanSaturation": 61.31,
+     "subjectMaxLuma": 253.0,
+     "specularFractionOfSubject": 0.25004,
+     "subjectClippedFraction": 0.0,
+     "subjectLumaSpread": 226.19
+    },
+    "goat": {
+     "screenCoveragePct": 5.01,
+     "subjectMeanLuma": 157.1,
+     "localBackgroundMeanLuma": 120.12,
+     "lumaSeparation": 36.98,
+     "weberContrast": 0.308,
+     "subjectMeanSaturation": 25.14,
+     "localBackgroundMeanSaturation": 60.3,
+     "subjectMaxLuma": 252.0,
+     "specularFractionOfSubject": 0.25035,
+     "subjectClippedFraction": 0.0,
+     "subjectLumaSpread": 246.93
+    },
+    "map": {
+     "screenCoveragePct": 14.44,
+     "subjectMeanLuma": 181.3,
+     "localBackgroundMeanLuma": 133.95,
+     "lumaSeparation": 47.35,
+     "weberContrast": 0.353,
+     "subjectMeanSaturation": 30.79,
+     "localBackgroundMeanSaturation": 50.92,
+     "subjectMaxLuma": 210.81,
+     "specularFractionOfSubject": 0.27557,
+     "subjectClippedFraction": 0.0,
+     "subjectLumaSpread": 181.19
+    }
+   },
+   "screenSpaceOverlapPx": {
+    "goat_map": 999,
+    "goat_pip": 0,
+    "map_pip": 0
+   },
+   "mapReadability": {
+    "screenCoveragePct": 14.44,
+    "meanLuma": 181.3,
+    "lumaStdDev": 34.38,
+    "p05": 88.68,
+    "p95": 208.02,
+    "inkToPaperRange": 119.33,
+    "populatedToneBucketsOf32": 24,
+    "darkInkFraction": 0.0876
+   }
   }
+ }
 }
