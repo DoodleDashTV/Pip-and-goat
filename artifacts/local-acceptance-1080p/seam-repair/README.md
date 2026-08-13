@@ -119,6 +119,25 @@ character did not.
 to fix this; the whole repair is in `scripts/blender/assemble_scene.py`, which is
 why the render *code* fingerprint moved and the render *asset* fingerprint did not.
 
+## One thing a viewer will ask about: the purple backpack
+
+An independent review of the 1080x1920 clip reported every part of Pip's approved
+identity except the purple backpack, which it could not see. It is there and it is
+correct; the camera is in front of him and the backpack is on his back.
+
+`backpack_present_but_occluded.png`, and the isolation renders behind it, settle
+it. `Pip_Backpack`, `Pip_Backpack_Pouch` and `Pip_StarCharm` are all in the
+assembled scene with `hide_render=False` and their approved materials
+(`PipBackpack` purple `0.48, 0.28, 0.78`, `PipStrap`, `PipStar`). Rendered alone
+from the production camera at frame 45 they cover 3599 pixels, 3542 of them purple.
+Rendered as part of the whole character, Pip covers 24,913 pixels and **not one**
+is purple: his body is between the backpack and the lens.
+
+This is a property of the shot's framing, not of the repair or the asset —
+`production-library/` is byte-identical to `a440d88` — and it is unchanged from
+what the shot has always delivered. Recorded rather than fixed, because reframing
+the shot to show the backpack is a design change and out of scope here.
+
 ## Evidence
 
 | File | What it holds |
@@ -130,6 +149,7 @@ why the render *code* fingerprint moved and the render *asset* fingerprint did n
 | `chest_shadow_on_pixels.json` | The shadowed fraction of the chest measured on those pixels, both plates through one mask. |
 | `regression_by_subject.json` | Frame 45 either side of the repair, per subject, inside each subject's own coverage mask. |
 | `goat_closecrop_frame45_1080p.png` | The Goat at 3x on the same frame, shipped against this branch. |
+| `backpack_present_but_occluded.png` | The backpack rendered alone against Pip rendered whole, same camera, same frame. |
 | `chest_blockers_four_states.json` | The table above, with every blocker named, sized and counted. |
 | `chest_surface_inspection.png` | The chest surface under normals-as-colour, one colour per material slot, and matte white under a raking light. |
 | `causation_pip_stops_casting.png` | Shipped, Pip casting no shadow, no shadow proxy at all, and this branch — the same frame four ways. |
