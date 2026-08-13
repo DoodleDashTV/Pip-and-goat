@@ -86,8 +86,11 @@ packages/direction/src/
 ├── vfx/               Step 7
 ├── sound/             Step 8
 ├── director/          Step 1 — composes all of the above
+├── bridge.ts          projection into shot_meta + CloudJobManifest state bags
+├── ffmpeg.ts          sound plan → FFmpeg argv (pure string building)
 ├── overrides.ts       human overrides + override provenance
 ├── cache.ts           cache keys, targeted invalidation
+├── fixtures.ts        regression fixtures + the local validation scene
 └── index.ts
 ```
 
@@ -157,8 +160,13 @@ so existing projects show TivvleJoy Studios without a data migration. See
 ## 5. Persistence
 
 One additive migration, `20260813190000_ddp_steps_1_8_direction_layer`: two new
-tables (`production_blueprint`, `director_override`). No column is dropped, renamed,
+tables (`production_blueprints`, `director_overrides`). No column is dropped, renamed,
 or retyped; no existing row is rewritten. Rolling back is dropping two tables.
+
+`episode_id` is TEXT rather than a foreign key to `episodes`. A blueprint is planned
+from an approved scene plan, which names its episode logically, and planning has to be
+possible before an Episode row exists — constraining it would make the planning layer
+depend on production state it is supposed to precede.
 
 ## 6. Risk register
 
@@ -205,4 +213,24 @@ Taken from committed, already-accepted evidence — no new renders:
 Blender is **not installed** in this environment, so Blender-dependent gates
 (`test:blender`, `gates:scene`, `qc:caster`) cannot execute here. They are unchanged
 and their prior committed results remain valid; the validation harness reports the
-Blender stage as `SKIPPED_NO_BLENDER` rather than claiming a pass.
+Blender stage as `SKIPPED` rather than claiming a pass.
+
+## 9. What changed after implementation
+
+Three things the plan above did not anticipate, recorded because they are the parts a
+reviewer would otherwise have to rediscover:
+
+1. **The render-code fingerprint moved.** The opt-in `apply_direction_camera()` hook in
+   `assemble_scene.py` changed the fingerprint from `a4018c0e…` to `d3820820…`, so the
+   published worker image is now stale and preflight fails closed with
+   `RENDER_CODE_MISMATCH`. The pin was deliberately left alone — re-pinning would claim
+   the image contains code it does not — and a test asserts the refusal. A rebuild and
+   re-pin is required before the next authorized paid launch. The approved asset
+   fingerprint `7876ac73…` is unchanged, so the accepted artifact is unaffected.
+2. **Loudness normalisation had to become two-pass.** Single-pass `loudnorm` is adaptive
+   and cannot converge on a 2.5-second shot; mixes came out up to 2.8 LU hot. Measuring
+   first and applying one fixed linear correction is both accurate and deterministic.
+3. **`episode_id` is not a foreign key.** See §5.
+
+Working guide: [`DDP_STEPS_1_8.md`](DDP_STEPS_1_8.md). Brand policy:
+[`BRAND_COMPATIBILITY.md`](BRAND_COMPATIBILITY.md).
