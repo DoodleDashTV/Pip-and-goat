@@ -87,11 +87,15 @@ echo "baked assemble_scene.py matches: $IMAGE_ASSEMBLE"
 
 step "5. push and read the digest back"
 docker push "$BUILD_TAG" 2>&1 | tee "$EVIDENCE/03-docker-push.txt"
-DIGEST="$(docker buildx imagetools inspect "$BUILD_TAG" --format '{{.Manifest.Digest}}' 2>/dev/null || true)"
+# Prefer the digest docker push itself prints. `buildx imagetools inspect --format`
+# is not reliable across docker versions (some ignore --format and dump the
+# whole inspect text, which is not a valid @sha256 pin).
+DIGEST="$(grep -oE 'sha256:[0-9a-f]{64}' "$EVIDENCE/03-docker-push.txt" | tail -1 || true)"
 if [ -z "$DIGEST" ]; then
-  DIGEST="$(grep -oE 'sha256:[0-9a-f]{64}' "$EVIDENCE/03-docker-push.txt" | tail -1 || true)"
+  DIGEST="$(docker buildx imagetools inspect "$BUILD_TAG" 2>/dev/null \
+    | awk '/^Digest:/{print $2; exit}')"
 fi
-[ -n "$DIGEST" ] || die "could not determine the published digest"
+[[ "$DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || die "could not determine the published digest (got: ${DIGEST:-empty})"
 IMAGE_REF="$IMAGE_REPO@$DIGEST"
 echo "published: $IMAGE_REF"
 

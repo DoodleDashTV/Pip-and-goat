@@ -39,17 +39,16 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * All of these constants must be re-pinned together whenever the image is
  * rebuilt.
  *
- * The pins are placeholders right now, and deliberately so. Every image ever
- * published from this repository predates the picture-quality remediation and the
- * shadow-caster repair, both of which changed `scripts/blender/`, which is baked
- * in. There is no published image that would render this checkout, so there is no
- * digest to pin, and a placeholder is refused by the image-reference gate before
- * anything can reach Runpod. Rebuild with `scripts/cloud/build-worker-image.sh`
- * and pin what it prints.
+ * Rebuilt and published at 9a60cc9 after the shadow-caster repair.
+ * Anonymous registry read confirms the labels below; preflight refuses any
+ * disagreement. Rebuild with `scripts/cloud/build-worker-image.sh` and re-pin
+ * all four constants together if the baked render code moves again.
  */
-export const WORKER_IMAGE = 'PENDING_REBUILD';
-export const WORKER_IMAGE_SOURCE_COMMIT = 'PENDING_REBUILD';
-export const WORKER_IMAGE_RENDER_CODE_SHA256 = 'PENDING_REBUILD';
+export const WORKER_IMAGE =
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:bd60f26469a2a09ffef48281170263a2121ff10a458f42f94fa487eacae2c2a2'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = '9a60cc9c379d2038d7d7cd349e2443196f97bb98';
+export const WORKER_IMAGE_RENDER_CODE_SHA256 =
+  'f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207';
 
 /**
  * Fingerprint of the approved `.blend` assets this checkout would render, from

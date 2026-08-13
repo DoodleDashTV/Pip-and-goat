@@ -82,21 +82,16 @@ an estimate taken at the community price understates by about half.
 
 ## Current state
 
-The pins in `common.ts` are `PENDING_REBUILD`. That is not an oversight: every
-image ever published from this repository predates the picture-quality remediation
-and the shadow-caster repair, both of which changed `scripts/blender/`, which is
-baked in. There is no published image that would render this checkout, so there is
-no digest to pin, and the placeholder is refused by gate 1 before anything reaches
-Runpod.
+The pins in `common.ts` point at the published image built from `9a60cc9`, which
+contains this checkout's shadow-caster repair (`f30e6dc0…` render-code fingerprint).
+Anonymous registry verify and the credential-free preflight both PASS (14/14).
 
-To move forward, rebuild and publish:
+To rebuild after further render-code changes:
 
 ```bash
-echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+scripts/cloud/ghcr-login.sh
 pnpm cloud:build-worker-image      # builds, verifies in-image, pushes, prints the pins
 ```
 
 That needs a GHCR credential with `write:packages` on the `ddp-runpod-blender`
-package. A read-only token gets
-`permission_denied: installation not allowed to Write organization package` from
-`POST /v2/.../blobs/uploads/`, which is the whole publish step.
+package.
