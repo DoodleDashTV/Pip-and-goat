@@ -1,0 +1,203 @@
+{
+  "shotId": "VALIDATION_STEPS_1_8_s002",
+  "mixConfigKey": "abcfd1f1262233d89b16588a75ae7a7c",
+  "mixBusTrimDb": -4.81,
+  "durationMs": 3000,
+  "loudness": {
+    "targetLufs": -16,
+    "truePeakDb": -1.5,
+    "dialogueToMusicDb": 10
+  },
+  "ducking": [
+    {
+      "startMs": 60,
+      "endMs": 1580,
+      "attenuationDb": -9
+    }
+  ],
+  "tracks": [
+    {
+      "trackId": "amb_VALIDATION_STEPS_1_8_s002",
+      "kind": "AMBIENCE",
+      "startMs": 0,
+      "durationMs": 3000,
+      "offsetMs": 0,
+      "gainDb": -26.81,
+      "fadeInMs": 200,
+      "fadeOutMs": 300,
+      "duckPriority": 4,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "amb_meadow_midday_v1",
+        "provider": "mock",
+        "cacheKey": "6c1d208512df0db99128bac8",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "mus_VALIDATION_STEPS_1_8_s002",
+      "kind": "MUSIC",
+      "startMs": 0,
+      "durationMs": 3000,
+      "offsetMs": 0,
+      "gainDb": -20.81,
+      "fadeInMs": 400,
+      "fadeOutMs": 600,
+      "duckPriority": 3,
+      "source": {
+        "kind": "MUSIC_LIBRARY",
+        "ref": "mus_wonder_glockenspiel_v1",
+        "provider": "mock",
+        "cacheKey": "5e1bd2316325bb91f178cc82",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "vfx_VALIDATION_STEPS_1_8_s002_vfx_map_glow_v1",
+      "kind": "VFX",
+      "startMs": 0,
+      "durationMs": 1400,
+      "offsetMs": 0,
+      "gainDb": -22.31,
+      "fadeInMs": 20,
+      "fadeOutMs": 180,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_warm_hum_v1",
+        "provider": "mock",
+        "cacheKey": "5d69e28738f46fbcd0aea79d",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "dlg_L2",
+      "kind": "DIALOGUE",
+      "startMs": 180,
+      "durationMs": 1140,
+      "offsetMs": 0,
+      "gainDb": -3.91,
+      "fadeInMs": 15,
+      "fadeOutMs": 40,
+      "duckPriority": 0,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "VOICE_SYNTHESIS",
+        "ref": "goat_default_v1",
+        "provider": "local-espeak",
+        "cacheKey": "d7760e5e8c1b1a87ef626953e567bc4b",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "text": "It is glowing!",
+      "cached": false
+    },
+    {
+      "trackId": "foley_CHAR_GOAT_001",
+      "kind": "FOLEY",
+      "startMs": 750,
+      "durationMs": 900,
+      "offsetMs": 0,
+      "gainDb": -27.31,
+      "fadeInMs": 60,
+      "fadeOutMs": 160,
+      "duckPriority": 6,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_collar_tag_jingle_v1",
+        "provider": "mock",
+        "cacheKey": "b6a203778ac85e3948f9897b",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "foley_CHAR_PIP_001",
+      "kind": "FOLEY",
+      "startMs": 750,
+      "durationMs": 900,
+      "offsetMs": 0,
+      "gainDb": -28.04,
+      "fadeInMs": 60,
+      "fadeOutMs": 160,
+      "duckPriority": 6,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_feather_ruffle_v1",
+        "provider": "mock",
+        "cacheKey": "9603ed269a3a8bc5f736b3cf",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "prop_PROP_MAP_001",
+      "kind": "PROP",
+      "startMs": 900,
+      "durationMs": 420,
+      "offsetMs": 0,
+      "gainDb": -23.81,
+      "fadeInMs": 20,
+      "fadeOutMs": 120,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_prop_prop_map_001_v1",
+        "provider": "mock",
+        "cacheKey": "55a619daf54bfa30fa852e4c",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "vfx_VALIDATION_STEPS_1_8_s002_vfx_discovery_burst_v1",
+      "kind": "VFX",
+      "startMs": 1050,
+      "durationMs": 1100,
+      "offsetMs": 0,
+      "gainDb": -21.71,
+      "fadeInMs": 20,
+      "fadeOutMs": 180,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_discovery_chime_v1",
+        "provider": "mock",
+        "cacheKey": "6cf8dc4225425c1dd981c062",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    }
+  ],
+  "dialogueTiming": [
+    {
+      "lineId": "L2",
+      "characterCode": "CHAR_GOAT_001",
+      "startMs": 180,
+      "durationMs": 1140,
+      "text": "It is glowing!",
+      "words": 3,
+      "syllables": 4
+    }
+  ],
+  "voiceRequests": [
+    {
+      "characterCode": "CHAR_GOAT_001",
+      "voiceId": "goat_default_v1",
+      "lineId": "L2",
+      "text": "It is glowing!",
+      "prosody": {
+        "pitchSemitones": 0.975,
+        "rate": 1.09,
+        "gainDb": 0.9,
+        "brightness": 0.763
+      },
+      "cacheKey": "d7760e5e8c1b1a87ef626953e567bc4b",
+      "requiresPaidProvider": false
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "note": "Two independent planning runs of the same scene plan, hashed.",
+  "contentHash": "5dda53147d67a4e4a03eca9c9196fd7560b56ae4396c1ef3cf60d8cc6568ce0a",
+  "run1": "2b96a01f383b52913d904d8ac9bf4b0c0ef5d6fabb924eb15b12bc429112d249",
+  "run2": "2b96a01f383b52913d904d8ac9bf4b0c0ef5d6fabb924eb15b12bc429112d249",
+  "projectionRun1": "6fb05d9521d019606a89269016e4411525ec5b0fa2224a8ff1488d547c32853d",
+  "projectionRun2": "6fb05d9521d019606a89269016e4411525ec5b0fa2224a8ff1488d547c32853d",
+  "identical": true
+}

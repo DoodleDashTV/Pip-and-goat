@@ -1,0 +1,280 @@
+{
+  "title": "The mark glows and both of them react with delight",
+  "cameraPreset": "PUSH_IN",
+  "lightingState": "DAY_KEY",
+  "placements": {
+    "goat": {
+      "location": [
+        -0.689,
+        -1.405,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.5
+      ],
+      "action": "GOAT_IDLE"
+    },
+    "pip": {
+      "location": [
+        0.778,
+        -1.621,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.56
+      ],
+      "action": "PIP_IDLE"
+    }
+  },
+  "endFrame": 90,
+  "lipSync": {
+    "goat": [
+      {
+        "viseme": "I",
+        "startMs": 180,
+        "endMs": 342,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 307,
+        "endMs": 468,
+        "weight": 0.716
+      },
+      {
+        "viseme": "I",
+        "startMs": 433,
+        "endMs": 595,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 560,
+        "endMs": 722,
+        "weight": 0.716
+      },
+      {
+        "viseme": "L",
+        "startMs": 687,
+        "endMs": 848,
+        "weight": 0.716
+      },
+      {
+        "viseme": "O",
+        "startMs": 813,
+        "endMs": 975,
+        "weight": 0.716
+      },
+      {
+        "viseme": "U",
+        "startMs": 940,
+        "endMs": 1102,
+        "weight": 0.716
+      },
+      {
+        "viseme": "I",
+        "startMs": 1067,
+        "endMs": 1228,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 1193,
+        "endMs": 1355,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 2569,
+        "endMs": 3000,
+        "weight": 1
+      }
+    ],
+    "pip": [
+      {
+        "viseme": "REST",
+        "startMs": 2612,
+        "endMs": 3000,
+        "weight": 1
+      }
+    ]
+  },
+  "direction": {
+    "version": "1.0.0",
+    "camera": {
+      "composition": "MEDIUM",
+      "move": "PUSH_IN",
+      "lensMm": 35,
+      "geometry": {
+        "location": [
+          0.047,
+          -4.6,
+          1.7
+        ],
+        "rotationDegrees": [
+          80.13,
+          0,
+          0
+        ],
+        "endLocation": [
+          0.047,
+          -2.95,
+          1.403
+        ]
+      },
+      "focusDistanceMeters": 4.6,
+      "endFocusDistanceMeters": 2.95
+    },
+    "lighting": {
+      "recipe": "MEADOW_DAY_KEY",
+      "exposure": 0.026,
+      "viewTransform": "Khronos PBR Neutral",
+      "look": "None",
+      "practicals": [
+        {
+          "source": "map_glow",
+          "relativeEnergy": 0.283,
+          "motivation": "the map is the beat’s subject; a soft practical draws the eye to it"
+        }
+      ]
+    },
+    "facial": {
+      "goat": [
+        {
+          "channel": "brow_up",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.375,
+          "source": "BROW"
+        },
+        {
+          "channel": "ear_perk",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.288,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "mouth_open",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.275,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.625,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 1553,
+          "endMs": 1676,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ],
+      "pip": [
+        {
+          "channel": "beak_open",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.395,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "brow_inner_up",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.302,
+          "source": "BROW"
+        },
+        {
+          "channel": "brow_up",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.69,
+          "source": "BROW"
+        },
+        {
+          "channel": "cheek_puff",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.247,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.143,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 1473,
+          "endMs": 1596,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ]
+    },
+    "vfx": [
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_discovery_burst_v1",
+        "presetId": "vfx_discovery_burst_v1",
+        "presetVersion": "1.0.0",
+        "seed": 1262048815,
+        "startMs": 1050,
+        "durationMs": 1100,
+        "intensity": 0.62,
+        "particleCount": 236,
+        "anchor": {
+          "kind": "PROP",
+          "ref": "PROP_MAP_001"
+        },
+        "boundsMeters": {
+          "x": 1.102,
+          "y": 1.102,
+          "z": 1.102
+        },
+        "palette": [
+          "#FFE9A8",
+          "#FFCFA0"
+        ],
+        "layer": "AROUND_SUBJECT"
+      },
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_map_glow_v1",
+        "presetId": "vfx_map_glow_v1",
+        "presetVersion": "1.0.0",
+        "seed": 3136308156,
+        "startMs": 0,
+        "durationMs": 3000,
+        "intensity": 0.5,
+        "particleCount": 0,
+        "anchor": {
+          "kind": "PROP",
+          "ref": "PROP_MAP_001"
+        },
+        "boundsMeters": {
+          "x": 0.64,
+          "y": 0.48,
+          "z": 0.16
+        },
+        "palette": [
+          "#FFD98A",
+          "#FFF0C4"
+        ],
+        "layer": "BEHIND_SUBJECT"
+      }
+    ],
+    "shotHash": "58930bae318372dc"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "note": "A lighting override on one shot must invalidate that shot and no other.",
+  "override": {
+    "path": "lighting.recipe",
+    "shotId": "VALIDATION_STEPS_1_8_s002",
+    "value": "DAY_SOFT",
+    "by": "validation-harness",
+    "reason": "prove a one-shot lighting change invalidates one shot"
+  },
+  "invalidatedShotIds": [
+    "VALIDATION_STEPS_1_8_s002"
+  ],
+  "reusableShotIds": [
+    "VALIDATION_STEPS_1_8_s001",
+    "VALIDATION_STEPS_1_8_s003",
+    "VALIDATION_STEPS_1_8_s004"
+  ],
+  "changedSystems": {
+    "VALIDATION_STEPS_1_8_s002": [
+      "lighting",
+      "shotMeta"
+    ]
+  },
+  "episodeKeyChanged": true
+}

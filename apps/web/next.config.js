@@ -7,6 +7,7 @@ const nextConfig = {
     '@doodle-dash/universe',
     '@doodle-dash/characters',
     '@doodle-dash/story',
+    '@doodle-dash/direction',
     '@doodle-dash/production',
     '@doodle-dash/rendering',
     '@doodle-dash/audio',

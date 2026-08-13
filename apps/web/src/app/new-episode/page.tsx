@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@doodle-dash/database';
-import { PRODUCT_DISPLAY_NAME } from '@doodle-dash/domain';
+import { STUDIO_DISPLAY_NAME } from '@doodle-dash/domain';
 import { StudioActionForm } from '../../components/StudioActionForm';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,7 @@ export default async function NewEpisodePage() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-sun-400">Normal workflow</p>
         <h1 className="mt-2 font-display text-4xl font-bold text-mist-100">New Episode</h1>
         <p className="mt-2 max-w-3xl text-sm text-[var(--muted)]">
-          {PRODUCT_DISPLAY_NAME} path: idea → duration → story → storyboard → BUILD EPISODE → cheap EEVEE
+          {STUDIO_DISPLAY_NAME} path: idea → duration → story → storyboard → BUILD EPISODE → cheap EEVEE
           draft → review → changed-shot rerender → approve → 1080×1920 EEVEE final → YouTube package. Paid
           AI video is never required.
         </p>

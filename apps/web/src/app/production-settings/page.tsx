@@ -3,7 +3,7 @@ import {
   costOptimizedWorkflowService,
   productionSettingsService,
 } from '@doodle-dash/production';
-import { PRODUCT_DISPLAY_NAME } from '@doodle-dash/domain';
+import { STUDIO_DISPLAY_NAME } from '@doodle-dash/domain';
 import { StudioActionForm } from '../../components/StudioActionForm';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +18,7 @@ export default async function ProductionSettingsPage() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-sun-400">Configuration</p>
         <h1 className="mt-2 font-display text-4xl font-bold text-mist-100">Production Settings</h1>
         <p className="mt-2 max-w-3xl text-sm text-[var(--muted)]">
-          Defaults for {PRODUCT_DISPLAY_NAME}: Blender-first, EEVEE final 1080×1920 @ 30 FPS, caches on, AI
+          Defaults for {STUDIO_DISPLAY_NAME}: Blender-first, EEVEE final 1080×1920 @ 30 FPS, caches on, AI
           video off.
         </p>
       </div>

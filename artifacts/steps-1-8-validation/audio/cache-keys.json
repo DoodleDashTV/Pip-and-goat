@@ -1,0 +1,7 @@
+{
+  "note": "A shared source cache key must always mean a byte-identical artifact.",
+  "trackCount": 48,
+  "distinctSourceKeys": 40,
+  "reusedArtifacts": 8,
+  "collidingKeys": []
+}

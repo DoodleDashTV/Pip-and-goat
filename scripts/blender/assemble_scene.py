@@ -667,6 +667,77 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
     scene.render.film_transparent = False
 
 
+def apply_direction_camera(scene, direction: dict | None) -> dict:
+    """Apply an explicit camera solve from the direction layer, when one is supplied.
+
+    Strictly opt-in. `shot_meta["direction"]` is written only by the Steps 1-8
+    direction layer; without it this returns immediately and `configure_camera`'s
+    preset behaviour is what runs, unchanged. That is what lets this land alongside
+    a closed acceptance: every existing caller emits no `direction` block and so
+    renders exactly as before.
+
+    The direction layer has already scored this framing against vertical-safe
+    constraints, so what arrives here is a decision, not a suggestion. Applying it
+    keeps the planned framing and the rendered framing the same thing, which is the
+    only way the camera QC measurements mean anything.
+    """
+    import bpy
+
+    if not direction:
+        return {"applied": False, "reason": "no direction block"}
+    camera = (direction or {}).get("camera") or {}
+    geometry = camera.get("geometry") or {}
+    location = geometry.get("location")
+    rotation = geometry.get("rotationDegrees")
+    if not location or not rotation:
+        return {"applied": False, "reason": "direction block carries no explicit geometry"}
+
+    cam = scene.camera
+    if cam is None:
+        return {"applied": False, "reason": "no scene camera"}
+
+    # Clear the preset's own push keyframes before writing ours, or the two animate
+    # the same channel and the preset wins on whichever frame it keyed last.
+    if cam.animation_data and cam.animation_data.action:
+        cam.animation_data_clear()
+
+    cam.location = tuple(float(v) for v in location)
+    cam.rotation_euler = tuple(math.radians(float(v)) for v in rotation)
+    lens = camera.get("lensMm")
+    if lens:
+        cam.data.lens = float(lens)
+
+    end_location = geometry.get("endLocation")
+    focus_start = camera.get("focusDistanceMeters")
+    focus_end = camera.get("endFocusDistanceMeters")
+
+    if end_location:
+        cam.keyframe_insert(data_path="location", frame=scene.frame_start)
+        cam.location = tuple(float(v) for v in end_location)
+        cam.keyframe_insert(data_path="location", frame=scene.frame_end)
+
+    # Focus pull. A dolly move changes the camera-to-subject distance, so a single
+    # static focus distance is wrong at one end of it; the planner emits both ends
+    # and they are keyed here.
+    if focus_start:
+        cam.data.dof.focus_distance = float(focus_start)
+        if focus_end and abs(float(focus_end) - float(focus_start)) > 1e-6:
+            cam.data.dof.keyframe_insert(data_path="focus_distance", frame=scene.frame_start)
+            cam.data.dof.focus_distance = float(focus_end)
+            cam.data.dof.keyframe_insert(data_path="focus_distance", frame=scene.frame_end)
+
+    return {
+        "applied": True,
+        "composition": camera.get("composition"),
+        "move": camera.get("move"),
+        "lensMm": cam.data.lens,
+        "location": list(cam.location),
+        "focusDistanceMeters": focus_start,
+        "endFocusDistanceMeters": focus_end,
+        "animated": bool(end_location),
+    }
+
+
 # The authoritative lighting layer. One named key/fill/rim rig per state, with an
 # explicit world strength, so exposure is deterministic and never accumulates.
 #
@@ -1351,6 +1422,8 @@ def build_scene(
     lighting = apply_lighting_state(scene, shot_meta.get("lightingState"))
     materials = apply_material_polish()
     configure_camera(scene, camera_preset, width, height)
+    # Opt-in override, after the preset so it refines rather than competes with it.
+    direction_camera = apply_direction_camera(scene, shot_meta.get("direction"))
     if str(engine).upper() == "EEVEE":
         set_eevee(scene, samples)
     else:
@@ -1364,6 +1437,7 @@ def build_scene(
         "stripped": stripped,
         "placementRoots": roots,
         "appliedActions": applied_actions,
+        "directionCamera": direction_camera,
     }
 
 

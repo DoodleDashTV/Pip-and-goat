@@ -1,0 +1,133 @@
+{
+  "harness": "ddp-steps-1-8-local-validation",
+  "isAcceptanceRender": false,
+  "disclaimer": "Draft-resolution capability fixture for DDP Steps 1-8. NOT a FINAL_1080P acceptance render. The closed FINAL_1080P acceptance is separate, historical and untouched by this harness.",
+  "scene": {
+    "episodeId": "VALIDATION_STEPS_1_8",
+    "episodeTitle": "Steps 1-8 Validation — Meadow Map Glimmer",
+    "seed": "tivvlejoy-steps-1-8-validation-seed-v1",
+    "shots": 4,
+    "durationSeconds": 12,
+    "resolution": "360x640",
+    "fps": 30
+  },
+  "contentHash": "5dda53147d67a4e4a03eca9c9196fd7560b56ae4396c1ef3cf60d8cc6568ce0a",
+  "cacheKey": "e6a53172daaf1ca19ce1b3431db89dc8006e0118c30f9ae66a57603a23482365",
+  "subsystemVersions": {
+    "director": "1.0.0",
+    "acting": "1.0.0",
+    "emotion": "1.0.0",
+    "face": "1.0.0",
+    "camera": "1.0.0",
+    "lighting": "1.0.0",
+    "vfx": "1.0.0",
+    "sound": "1.0.0",
+    "locks": "1.0.0"
+  },
+  "estimatedCloudCostUsdIfEverAuthorized": 0.02245,
+  "paidProviderUsed": false,
+  "gpuLaunched": false,
+  "environment": {
+    "ffmpeg": true,
+    "blender": false,
+    "cloudRenderEnabled": false,
+    "paidGpuLaunchAllowed": false
+  },
+  "checks": [
+    {
+      "name": "plan validates",
+      "status": "PASS",
+      "detail": "PASS: 0 error(s), 0 warning(s) across 4 shot(s)"
+    },
+    {
+      "name": "scene is 10-15s at draft resolution",
+      "status": "PASS",
+      "detail": "12s at 360x640 (9:16, 30fps)"
+    },
+    {
+      "name": "all eight systems contributed",
+      "status": "PASS",
+      "detail": "director=4 emotion=8 acting=8 face=8 camera=4 lighting=4 vfx=8 sound=48"
+    },
+    {
+      "name": "both locked characters are present in every shot",
+      "status": "PASS",
+      "detail": "Pip and Goat planned in all 4 shots"
+    },
+    {
+      "name": "projects to shot_meta and manifest state bags",
+      "status": "PASS",
+      "detail": "4 shot_meta + manifest state documents written"
+    },
+    {
+      "name": "motion, facial and sound QC",
+      "status": "PASS",
+      "detail": "176 measurements, all within tolerance"
+    },
+    {
+      "name": "deterministic output for identical input",
+      "status": "PASS",
+      "detail": "blueprint and projection hashes identical across two runs (2b96a01f383b5291…)"
+    },
+    {
+      "name": "seed actually drives the plan",
+      "status": "PASS",
+      "detail": "a different seed produces a different blueprint"
+    },
+    {
+      "name": "targeted invalidation",
+      "status": "PASS",
+      "detail": "lighting override invalidated 1 of 4 shots (VALIDATION_STEPS_1_8_s002), 3 reusable"
+    },
+    {
+      "name": "FFmpeg assembly executes",
+      "status": "PASS",
+      "detail": "4 shot mixes assembled from synthetic sources"
+    },
+    {
+      "name": "assembled mix does not clip",
+      "status": "PASS",
+      "detail": "every mix measured at or below its true-peak ceiling"
+    },
+    {
+      "name": "assembled mix hits its loudness target",
+      "status": "PASS",
+      "detail": "every mix within 2 LU of target (EBU R128 integrated)"
+    },
+    {
+      "name": "individual tracks are independently replaceable",
+      "status": "PASS",
+      "detail": "48 tracks addressable by unique id within their shot; 40 distinct artifacts, 8 reused across shots, 0 key collisions"
+    },
+    {
+      "name": "no paid provider required",
+      "status": "PASS",
+      "detail": "4 voice requests, none requiring a paid provider"
+    },
+    {
+      "name": "cloud render remains unauthorized",
+      "status": "PASS",
+      "detail": "CLOUD_RENDER_ENABLED and ALLOW_PAID_GPU_LAUNCH are not \"true\""
+    },
+    {
+      "name": "approved Pip/Goat assets unchanged",
+      "status": "PASS",
+      "detail": "7876ac737de60257… matches the accepted pin"
+    },
+    {
+      "name": "production-library untouched",
+      "status": "PASS",
+      "detail": "no modifications"
+    },
+    {
+      "name": "draft Blender render",
+      "status": "SKIPPED",
+      "detail": "not requested; pass --render to attempt it"
+    }
+  ],
+  "totals": {
+    "passed": 17,
+    "failed": 0,
+    "skipped": 1
+  }
+}

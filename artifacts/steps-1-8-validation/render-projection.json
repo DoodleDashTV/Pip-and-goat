@@ -1,0 +1,4111 @@
+{
+  "episodeId": "VALIDATION_STEPS_1_8",
+  "schemaVersion": "ddp-production-blueprint-v1",
+  "contentHash": "5dda53147d67a4e4a03eca9c9196fd7560b56ae4396c1ef3cf60d8cc6568ce0a",
+  "cacheKey": "e6a53172daaf1ca19ce1b3431db89dc8006e0118c30f9ae66a57603a23482365",
+  "shots": [
+    {
+      "shotId": "VALIDATION_STEPS_1_8_s001",
+      "beatId": "B1_HOOK",
+      "index": 0,
+      "frameRange": {
+        "start": 1,
+        "end": 75
+      },
+      "resolution": "360x640",
+      "shotMeta": {
+        "title": "Pip spots a faint glimmer at the edge of the map and leans in to study it",
+        "cameraPreset": "PUSH_IN",
+        "lightingState": "DAY_KEY",
+        "placements": {
+          "goat": {
+            "location": [
+              -0.716,
+              -1.418,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0.5
+            ],
+            "action": "GOAT_IDLE"
+          },
+          "pip": {
+            "location": [
+              0.79,
+              -1.615,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              -0.56
+            ],
+            "action": "PIP_IDLE"
+          }
+        },
+        "endFrame": 75,
+        "lipSync": {
+          "goat": [
+            {
+              "viseme": "REST",
+              "startMs": 2203,
+              "endMs": 2500,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "O",
+              "startMs": 240,
+              "endMs": 374,
+              "weight": 0.654
+            },
+            {
+              "viseme": "A",
+              "startMs": 339,
+              "endMs": 474,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 439,
+              "endMs": 573,
+              "weight": 0.654
+            },
+            {
+              "viseme": "L",
+              "startMs": 538,
+              "endMs": 672,
+              "weight": 0.654
+            },
+            {
+              "viseme": "O",
+              "startMs": 637,
+              "endMs": 772,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 737,
+              "endMs": 871,
+              "weight": 0.654
+            },
+            {
+              "viseme": "A",
+              "startMs": 836,
+              "endMs": 971,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 936,
+              "endMs": 1070,
+              "weight": 0.654
+            },
+            {
+              "viseme": "TH",
+              "startMs": 1035,
+              "endMs": 1169,
+              "weight": 0.654
+            },
+            {
+              "viseme": "I",
+              "startMs": 1134,
+              "endMs": 1269,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1234,
+              "endMs": 1368,
+              "weight": 0.654
+            },
+            {
+              "viseme": "L",
+              "startMs": 1333,
+              "endMs": 1467,
+              "weight": 0.654
+            },
+            {
+              "viseme": "I",
+              "startMs": 1432,
+              "endMs": 1567,
+              "weight": 0.654
+            },
+            {
+              "viseme": "L",
+              "startMs": 1532,
+              "endMs": 1666,
+              "weight": 0.654
+            },
+            {
+              "viseme": "E",
+              "startMs": 1631,
+              "endMs": 1766,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1731,
+              "endMs": 1865,
+              "weight": 0.654
+            },
+            {
+              "viseme": "M_B_P",
+              "startMs": 1830,
+              "endMs": 1964,
+              "weight": 0.654
+            },
+            {
+              "viseme": "A",
+              "startMs": 1929,
+              "endMs": 2064,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2029,
+              "endMs": 2163,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2198,
+              "endMs": 2500,
+              "weight": 1
+            }
+          ]
+        },
+        "direction": {
+          "version": "1.0.0",
+          "camera": {
+            "composition": "MEDIUM",
+            "move": "PUSH_IN",
+            "lensMm": 35,
+            "geometry": {
+              "location": [
+                -0.118,
+                -4.6,
+                1.7
+              ],
+              "rotationDegrees": [
+                80.13,
+                0,
+                0
+              ],
+              "endLocation": [
+                -0.118,
+                -3.225,
+                1.453
+              ]
+            },
+            "focusDistanceMeters": 4.6,
+            "endFocusDistanceMeters": 3.225
+          },
+          "lighting": {
+            "recipe": "MEADOW_DAY_KEY",
+            "exposure": 0.02,
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "practicals": [
+              {
+                "source": "map_glow",
+                "relativeEnergy": 0.261,
+                "motivation": "the map is the beat’s subject; a soft practical draws the eye to it"
+              }
+            ]
+          },
+          "facial": {
+            "goat": [
+              {
+                "channel": "brow_inner_up",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.103,
+                "source": "BROW"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.233,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.143,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.086,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.152,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 983,
+                "endMs": 1114,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ],
+            "pip": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.097,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_inner_up",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.134,
+                "source": "BROW"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.302,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.184,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.167,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1244,
+                "endMs": 1362,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "vfx": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s001_vfx_environment_particles_v1",
+              "presetId": "vfx_environment_particles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 3744882162,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.35,
+              "particleCount": 77,
+              "anchor": {
+                "kind": "WORLD",
+                "ref": "LOC_MEADOW_001"
+              },
+              "boundsMeters": {
+                "x": 4.44,
+                "y": 2.96,
+                "z": 2.22
+              },
+              "palette": [
+                "#FFF6DA"
+              ],
+              "layer": "BEHIND_SUBJECT"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s001_vfx_map_glow_v1",
+              "presetId": "vfx_map_glow_v1",
+              "presetVersion": "1.0.0",
+              "seed": 2074590113,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.5,
+              "particleCount": 0,
+              "anchor": {
+                "kind": "PROP",
+                "ref": "PROP_MAP_001"
+              },
+              "boundsMeters": {
+                "x": 0.64,
+                "y": 0.48,
+                "z": 0.16
+              },
+              "palette": [
+                "#FFD98A",
+                "#FFF0C4"
+              ],
+              "layer": "BEHIND_SUBJECT"
+            }
+          ],
+          "shotHash": "2b5952c51a09d158"
+        }
+      },
+      "manifestState": {
+        "cameraState": {
+          "directionVersion": "1.0.0",
+          "composition": "MEDIUM",
+          "preset": "PUSH_IN",
+          "move": "PUSH_IN",
+          "lensMm": 35,
+          "resolution": "360x640",
+          "subject": "CHAR_PIP_001",
+          "framing": {
+            "subjectHeightFraction": 0.62,
+            "headroomFraction": 0.126,
+            "footRoomFraction": 0.254,
+            "leadRoomFraction": -0.09,
+            "eyelineFraction": 0.24
+          },
+          "depth": {
+            "layers": 3,
+            "parallaxMeters": 0.481,
+            "focusDistanceMeters": 4.6,
+            "endFocusDistanceMeters": 3.225
+          },
+          "safeRegions": {
+            "topCaptionFraction": 0.12,
+            "bottomCaptionFraction": 0.18,
+            "actionSafeInsetFraction": 0.05
+          },
+          "screenDirection": "NEUTRAL",
+          "geometry": {
+            "location": [
+              -0.118,
+              -4.6,
+              1.7
+            ],
+            "rotationDegrees": [
+              80.13,
+              0,
+              0
+            ],
+            "endLocation": [
+              -0.118,
+              -3.225,
+              1.453
+            ]
+          }
+        },
+        "lightingState": {
+          "directionVersion": "1.0.0",
+          "recipe": "MEADOW_DAY_KEY",
+          "state": "DAY_KEY",
+          "key": {
+            "role": "key",
+            "relativeEnergy": 1,
+            "softness": 0.55,
+            "azimuthDegrees": 135
+          },
+          "fill": {
+            "role": "fill",
+            "relativeEnergy": 0.32,
+            "softness": 0.85
+          },
+          "rim": {
+            "role": "rim",
+            "relativeEnergy": 0.45,
+            "coneDegrees": 42
+          },
+          "practicals": [
+            {
+              "source": "map_glow",
+              "relativeEnergy": 0.261,
+              "motivation": "the map is the beat’s subject; a soft practical draws the eye to it"
+            }
+          ],
+          "palette": {
+            "name": "MEADOW_WARM",
+            "warmthKelvinBias": 250
+          },
+          "colorManagement": {
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.02
+          },
+          "samplesHint": 24
+        },
+        "vfxState": {
+          "directionVersion": "1.0.0",
+          "totalCostWeight": 1.4,
+          "instances": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s001_vfx_environment_particles_v1",
+              "presetId": "vfx_environment_particles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 3744882162,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.35,
+              "particleCount": 77,
+              "anchor": {
+                "kind": "WORLD",
+                "ref": "LOC_MEADOW_001"
+              },
+              "boundsMeters": {
+                "x": 4.44,
+                "y": 2.96,
+                "z": 2.22
+              },
+              "palette": [
+                "#FFF6DA"
+              ],
+              "layer": "BEHIND_SUBJECT",
+              "cacheKey": "578d2cecbd8db838c03a9c0b"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s001_vfx_map_glow_v1",
+              "presetId": "vfx_map_glow_v1",
+              "presetVersion": "1.0.0",
+              "seed": 2074590113,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.5,
+              "particleCount": 0,
+              "anchor": {
+                "kind": "PROP",
+                "ref": "PROP_MAP_001"
+              },
+              "boundsMeters": {
+                "x": 0.64,
+                "y": 0.48,
+                "z": 0.16
+              },
+              "palette": [
+                "#FFD98A",
+                "#FFF0C4"
+              ],
+              "layer": "BEHIND_SUBJECT",
+              "cacheKey": "1ba30207248eba3dc1280c59"
+            }
+          ]
+        },
+        "expressionStates": {
+          "goat": {
+            "directionVersion": "1.0.0",
+            "expression": "curious",
+            "weights": {
+              "brow_inner_up": 0.103,
+              "brow_up": 0.233,
+              "ear_perk": 0.143,
+              "mouth_open": 0.086,
+              "smile": 0.152
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 1550,
+                "target": "PROP_MAP_001",
+                "eyeLeadMs": 100,
+                "headFollow": 0.632
+              },
+              {
+                "startMs": 1550,
+                "endMs": 2500,
+                "target": "CHAR_PIP_001",
+                "eyeLeadMs": 100,
+                "headFollow": 0.56
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 983,
+                "durationMs": 131
+              }
+            ],
+            "asymmetry": 0.07,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 2203,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "brow_inner_up",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.103,
+                "source": "BROW"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.233,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.143,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.086,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2203,
+                "weight": 0.152,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 983,
+                "endMs": 1114,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "pip": {
+            "directionVersion": "1.0.0",
+            "expression": "curious",
+            "weights": {
+              "beak_open": 0.097,
+              "brow_inner_up": 0.134,
+              "brow_up": 0.302,
+              "cheek_puff": 0.184,
+              "smile": 0.167
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 1550,
+                "target": "PROP_MAP_001",
+                "eyeLeadMs": 133,
+                "headFollow": 0.42
+              },
+              {
+                "startMs": 1550,
+                "endMs": 2500,
+                "target": "CHAR_GOAT_001",
+                "eyeLeadMs": 133,
+                "headFollow": 0.36
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 1244,
+                "durationMs": 118
+              }
+            ],
+            "asymmetry": 0.035,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 2198,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.097,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_inner_up",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.134,
+                "source": "BROW"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.302,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.184,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2198,
+                "weight": 0.167,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1244,
+                "endMs": 1362,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          }
+        },
+        "visemeData": {
+          "goat": [
+            {
+              "viseme": "REST",
+              "startMs": 2203,
+              "endMs": 2500,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "O",
+              "startMs": 240,
+              "endMs": 374,
+              "weight": 0.654
+            },
+            {
+              "viseme": "A",
+              "startMs": 339,
+              "endMs": 474,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 439,
+              "endMs": 573,
+              "weight": 0.654
+            },
+            {
+              "viseme": "L",
+              "startMs": 538,
+              "endMs": 672,
+              "weight": 0.654
+            },
+            {
+              "viseme": "O",
+              "startMs": 637,
+              "endMs": 772,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 737,
+              "endMs": 871,
+              "weight": 0.654
+            },
+            {
+              "viseme": "A",
+              "startMs": 836,
+              "endMs": 971,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 936,
+              "endMs": 1070,
+              "weight": 0.654
+            },
+            {
+              "viseme": "TH",
+              "startMs": 1035,
+              "endMs": 1169,
+              "weight": 0.654
+            },
+            {
+              "viseme": "I",
+              "startMs": 1134,
+              "endMs": 1269,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1234,
+              "endMs": 1368,
+              "weight": 0.654
+            },
+            {
+              "viseme": "L",
+              "startMs": 1333,
+              "endMs": 1467,
+              "weight": 0.654
+            },
+            {
+              "viseme": "I",
+              "startMs": 1432,
+              "endMs": 1567,
+              "weight": 0.654
+            },
+            {
+              "viseme": "L",
+              "startMs": 1532,
+              "endMs": 1666,
+              "weight": 0.654
+            },
+            {
+              "viseme": "E",
+              "startMs": 1631,
+              "endMs": 1766,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1731,
+              "endMs": 1865,
+              "weight": 0.654
+            },
+            {
+              "viseme": "M_B_P",
+              "startMs": 1830,
+              "endMs": 1964,
+              "weight": 0.654
+            },
+            {
+              "viseme": "A",
+              "startMs": 1929,
+              "endMs": 2064,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2029,
+              "endMs": 2163,
+              "weight": 0.654
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2198,
+              "endMs": 2500,
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "audio": {
+        "shotId": "VALIDATION_STEPS_1_8_s001",
+        "mixConfigKey": "57584e63408b6646c3e174b887fa6c3f",
+        "mixBusTrimDb": -3.73,
+        "durationMs": 2500,
+        "loudness": {
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "dialogueToMusicDb": 10
+        },
+        "ducking": [
+          {
+            "startMs": 120,
+            "endMs": 2388,
+            "attenuationDb": -9
+          }
+        ],
+        "tracks": [
+          {
+            "trackId": "amb_VALIDATION_STEPS_1_8_s001",
+            "kind": "AMBIENCE",
+            "startMs": 0,
+            "durationMs": 2500,
+            "offsetMs": 0,
+            "gainDb": -25.73,
+            "fadeInMs": 200,
+            "fadeOutMs": 300,
+            "duckPriority": 4,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "amb_meadow_midday_v1",
+              "provider": "mock",
+              "cacheKey": "6c1d208512df0db99128bac8",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "mus_VALIDATION_STEPS_1_8_s001",
+            "kind": "MUSIC",
+            "startMs": 0,
+            "durationMs": 2500,
+            "offsetMs": 0,
+            "gainDb": -19.73,
+            "fadeInMs": 400,
+            "fadeOutMs": 600,
+            "duckPriority": 3,
+            "source": {
+              "kind": "MUSIC_LIBRARY",
+              "ref": "mus_curious_pizzicato_v1",
+              "provider": "mock",
+              "cacheKey": "b2cae27b1a75f33212115c16",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "vfx_VALIDATION_STEPS_1_8_s001_vfx_map_glow_v1",
+            "kind": "VFX",
+            "startMs": 0,
+            "durationMs": 1400,
+            "offsetMs": 0,
+            "gainDb": -21.23,
+            "fadeInMs": 20,
+            "fadeOutMs": 180,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_warm_hum_v1",
+              "provider": "mock",
+              "cacheKey": "5d69e28738f46fbcd0aea79d",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "dlg_L1",
+            "kind": "DIALOGUE",
+            "startMs": 240,
+            "durationMs": 1888,
+            "offsetMs": 0,
+            "gainDb": -3.73,
+            "fadeInMs": 15,
+            "fadeOutMs": 40,
+            "duckPriority": 0,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "VOICE_SYNTHESIS",
+              "ref": "pip_default_v1",
+              "provider": "local-espeak",
+              "cacheKey": "0d7b4d0aa75e641905a9292b249c1881",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "text": "Goat, look at this little mark.",
+            "cached": false
+          },
+          {
+            "trackId": "foley_CHAR_GOAT_001",
+            "kind": "FOLEY",
+            "startMs": 625,
+            "durationMs": 900,
+            "offsetMs": 0,
+            "gainDb": -26.92,
+            "fadeInMs": 60,
+            "fadeOutMs": 160,
+            "duckPriority": 6,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_collar_tag_jingle_v1",
+              "provider": "mock",
+              "cacheKey": "b6a203778ac85e3948f9897b",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "foley_CHAR_PIP_001",
+            "kind": "FOLEY",
+            "startMs": 625,
+            "durationMs": 900,
+            "offsetMs": 0,
+            "gainDb": -26.86,
+            "fadeInMs": 60,
+            "fadeOutMs": 160,
+            "duckPriority": 6,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_feather_ruffle_v1",
+              "provider": "mock",
+              "cacheKey": "9603ed269a3a8bc5f736b3cf",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "prop_PROP_MAP_001",
+            "kind": "PROP",
+            "startMs": 750,
+            "durationMs": 420,
+            "offsetMs": 0,
+            "gainDb": -22.73,
+            "fadeInMs": 20,
+            "fadeOutMs": 120,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_prop_prop_map_001_v1",
+              "provider": "mock",
+              "cacheKey": "55a619daf54bfa30fa852e4c",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          }
+        ],
+        "dialogueTiming": [
+          {
+            "lineId": "L1",
+            "characterCode": "CHAR_PIP_001",
+            "startMs": 240,
+            "durationMs": 1888,
+            "text": "Goat, look at this little mark.",
+            "words": 6,
+            "syllables": 6
+          }
+        ],
+        "voiceRequests": [
+          {
+            "characterCode": "CHAR_PIP_001",
+            "voiceId": "pip_default_v1",
+            "lineId": "L1",
+            "text": "Goat, look at this little mark.",
+            "prosody": {
+              "pitchSemitones": 0.571,
+              "rate": 0.987,
+              "gainDb": 0,
+              "brightness": 0.567
+            },
+            "cacheKey": "0d7b4d0aa75e641905a9292b249c1881",
+            "requiresPaidProvider": false
+          }
+        ]
+      },
+      "requiredAssets": [
+        "LOC_MEADOW_001",
+        "PROP_MAP_001",
+        "goat",
+        "pip",
+        "vfx_environment_particles_v1",
+        "vfx_map_glow_v1"
+      ],
+      "cacheKey": "d382856a648d29441aa1a8f6cfc66855bd16c822f6fb1d08daf1390cf0c24056",
+      "cost": {
+        "frameCount": 75,
+        "estimatedLocalMinutes": 4.5,
+        "estimatedCloudGpuMinutes": 0.825,
+        "estimatedCloudCostUsd": 0.00468,
+        "vfxCostWeight": 1.4,
+        "cacheHit": false
+      },
+      "qcStatus": "PASS",
+      "roles": [
+        "goat",
+        "pip"
+      ]
+    },
+    {
+      "shotId": "VALIDATION_STEPS_1_8_s002",
+      "beatId": "B2_DISCOVERY",
+      "index": 1,
+      "frameRange": {
+        "start": 76,
+        "end": 165
+      },
+      "resolution": "360x640",
+      "shotMeta": {
+        "title": "The mark glows and both of them react with delight",
+        "cameraPreset": "PUSH_IN",
+        "lightingState": "DAY_KEY",
+        "placements": {
+          "goat": {
+            "location": [
+              -0.689,
+              -1.405,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0.5
+            ],
+            "action": "GOAT_IDLE"
+          },
+          "pip": {
+            "location": [
+              0.778,
+              -1.621,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              -0.56
+            ],
+            "action": "PIP_IDLE"
+          }
+        },
+        "endFrame": 90,
+        "lipSync": {
+          "goat": [
+            {
+              "viseme": "I",
+              "startMs": 180,
+              "endMs": 342,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 307,
+              "endMs": 468,
+              "weight": 0.716
+            },
+            {
+              "viseme": "I",
+              "startMs": 433,
+              "endMs": 595,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 560,
+              "endMs": 722,
+              "weight": 0.716
+            },
+            {
+              "viseme": "L",
+              "startMs": 687,
+              "endMs": 848,
+              "weight": 0.716
+            },
+            {
+              "viseme": "O",
+              "startMs": 813,
+              "endMs": 975,
+              "weight": 0.716
+            },
+            {
+              "viseme": "U",
+              "startMs": 940,
+              "endMs": 1102,
+              "weight": 0.716
+            },
+            {
+              "viseme": "I",
+              "startMs": 1067,
+              "endMs": 1228,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1193,
+              "endMs": 1355,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2569,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "REST",
+              "startMs": 2612,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ]
+        },
+        "direction": {
+          "version": "1.0.0",
+          "camera": {
+            "composition": "MEDIUM",
+            "move": "PUSH_IN",
+            "lensMm": 35,
+            "geometry": {
+              "location": [
+                0.047,
+                -4.6,
+                1.7
+              ],
+              "rotationDegrees": [
+                80.13,
+                0,
+                0
+              ],
+              "endLocation": [
+                0.047,
+                -2.95,
+                1.403
+              ]
+            },
+            "focusDistanceMeters": 4.6,
+            "endFocusDistanceMeters": 2.95
+          },
+          "lighting": {
+            "recipe": "MEADOW_DAY_KEY",
+            "exposure": 0.026,
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "practicals": [
+              {
+                "source": "map_glow",
+                "relativeEnergy": 0.283,
+                "motivation": "the map is the beat’s subject; a soft practical draws the eye to it"
+              }
+            ]
+          },
+          "facial": {
+            "goat": [
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.375,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.288,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.275,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.625,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1553,
+                "endMs": 1676,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ],
+            "pip": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.395,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_inner_up",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.302,
+                "source": "BROW"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.69,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.247,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.143,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1473,
+                "endMs": 1596,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "vfx": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_discovery_burst_v1",
+              "presetId": "vfx_discovery_burst_v1",
+              "presetVersion": "1.0.0",
+              "seed": 1262048815,
+              "startMs": 1050,
+              "durationMs": 1100,
+              "intensity": 0.62,
+              "particleCount": 236,
+              "anchor": {
+                "kind": "PROP",
+                "ref": "PROP_MAP_001"
+              },
+              "boundsMeters": {
+                "x": 1.102,
+                "y": 1.102,
+                "z": 1.102
+              },
+              "palette": [
+                "#FFE9A8",
+                "#FFCFA0"
+              ],
+              "layer": "AROUND_SUBJECT"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_map_glow_v1",
+              "presetId": "vfx_map_glow_v1",
+              "presetVersion": "1.0.0",
+              "seed": 3136308156,
+              "startMs": 0,
+              "durationMs": 3000,
+              "intensity": 0.5,
+              "particleCount": 0,
+              "anchor": {
+                "kind": "PROP",
+                "ref": "PROP_MAP_001"
+              },
+              "boundsMeters": {
+                "x": 0.64,
+                "y": 0.48,
+                "z": 0.16
+              },
+              "palette": [
+                "#FFD98A",
+                "#FFF0C4"
+              ],
+              "layer": "BEHIND_SUBJECT"
+            }
+          ],
+          "shotHash": "58930bae318372dc"
+        }
+      },
+      "manifestState": {
+        "cameraState": {
+          "directionVersion": "1.0.0",
+          "composition": "MEDIUM",
+          "preset": "PUSH_IN",
+          "move": "PUSH_IN",
+          "lensMm": 35,
+          "resolution": "360x640",
+          "subject": "CHAR_PIP_001",
+          "framing": {
+            "subjectHeightFraction": 0.62,
+            "headroomFraction": 0.126,
+            "footRoomFraction": 0.254,
+            "leadRoomFraction": -0.09,
+            "eyelineFraction": 0.24
+          },
+          "depth": {
+            "layers": 3,
+            "parallaxMeters": 0.577,
+            "focusDistanceMeters": 4.6,
+            "endFocusDistanceMeters": 2.95
+          },
+          "safeRegions": {
+            "topCaptionFraction": 0.12,
+            "bottomCaptionFraction": 0.18,
+            "actionSafeInsetFraction": 0.05
+          },
+          "screenDirection": "NEUTRAL",
+          "geometry": {
+            "location": [
+              0.047,
+              -4.6,
+              1.7
+            ],
+            "rotationDegrees": [
+              80.13,
+              0,
+              0
+            ],
+            "endLocation": [
+              0.047,
+              -2.95,
+              1.403
+            ]
+          }
+        },
+        "lightingState": {
+          "directionVersion": "1.0.0",
+          "recipe": "MEADOW_DAY_KEY",
+          "state": "DAY_KEY",
+          "key": {
+            "role": "key",
+            "relativeEnergy": 1,
+            "softness": 0.55,
+            "azimuthDegrees": 135
+          },
+          "fill": {
+            "role": "fill",
+            "relativeEnergy": 0.32,
+            "softness": 0.85
+          },
+          "rim": {
+            "role": "rim",
+            "relativeEnergy": 0.45,
+            "coneDegrees": 42
+          },
+          "practicals": [
+            {
+              "source": "map_glow",
+              "relativeEnergy": 0.283,
+              "motivation": "the map is the beat’s subject; a soft practical draws the eye to it"
+            }
+          ],
+          "palette": {
+            "name": "MEADOW_WARM",
+            "warmthKelvinBias": 250
+          },
+          "colorManagement": {
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.026
+          },
+          "samplesHint": 24
+        },
+        "vfxState": {
+          "directionVersion": "1.0.0",
+          "totalCostWeight": 1.8,
+          "instances": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_discovery_burst_v1",
+              "presetId": "vfx_discovery_burst_v1",
+              "presetVersion": "1.0.0",
+              "seed": 1262048815,
+              "startMs": 1050,
+              "durationMs": 1100,
+              "intensity": 0.62,
+              "particleCount": 236,
+              "anchor": {
+                "kind": "PROP",
+                "ref": "PROP_MAP_001"
+              },
+              "boundsMeters": {
+                "x": 1.102,
+                "y": 1.102,
+                "z": 1.102
+              },
+              "palette": [
+                "#FFE9A8",
+                "#FFCFA0"
+              ],
+              "layer": "AROUND_SUBJECT",
+              "cacheKey": "89fe884c71a5dcc0d921cea1"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_map_glow_v1",
+              "presetId": "vfx_map_glow_v1",
+              "presetVersion": "1.0.0",
+              "seed": 3136308156,
+              "startMs": 0,
+              "durationMs": 3000,
+              "intensity": 0.5,
+              "particleCount": 0,
+              "anchor": {
+                "kind": "PROP",
+                "ref": "PROP_MAP_001"
+              },
+              "boundsMeters": {
+                "x": 0.64,
+                "y": 0.48,
+                "z": 0.16
+              },
+              "palette": [
+                "#FFD98A",
+                "#FFF0C4"
+              ],
+              "layer": "BEHIND_SUBJECT",
+              "cacheKey": "1496f40d86ea19710e00c5b1"
+            }
+          ]
+        },
+        "expressionStates": {
+          "goat": {
+            "directionVersion": "1.0.0",
+            "expression": "happy",
+            "weights": {
+              "brow_up": 0.375,
+              "ear_perk": 0.288,
+              "mouth_open": 0.275,
+              "smile": 0.625
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 1860,
+                "target": "PROP_MAP_001",
+                "eyeLeadMs": 100,
+                "headFollow": 0.655
+              },
+              {
+                "startMs": 1860,
+                "endMs": 3000,
+                "target": "CHAR_PIP_001",
+                "eyeLeadMs": 100,
+                "headFollow": 0.56
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 1553,
+                "durationMs": 123
+              }
+            ],
+            "asymmetry": 0.051,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 2569,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.375,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.288,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.275,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2569,
+                "weight": 0.625,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1553,
+                "endMs": 1676,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "pip": {
+            "directionVersion": "1.0.0",
+            "expression": "surprised",
+            "weights": {
+              "beak_open": 0.395,
+              "brow_inner_up": 0.302,
+              "brow_up": 0.69,
+              "cheek_puff": 0.247,
+              "smile": 0.143
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 1860,
+                "target": "PROP_MAP_001",
+                "eyeLeadMs": 133,
+                "headFollow": 0.329
+              },
+              {
+                "startMs": 1860,
+                "endMs": 3000,
+                "target": "CHAR_GOAT_001",
+                "eyeLeadMs": 133,
+                "headFollow": 0.36
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 1473,
+                "durationMs": 123
+              }
+            ],
+            "asymmetry": 0.056,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 2612,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.395,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_inner_up",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.302,
+                "source": "BROW"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.69,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.247,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2612,
+                "weight": 0.143,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1473,
+                "endMs": 1596,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          }
+        },
+        "visemeData": {
+          "goat": [
+            {
+              "viseme": "I",
+              "startMs": 180,
+              "endMs": 342,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 307,
+              "endMs": 468,
+              "weight": 0.716
+            },
+            {
+              "viseme": "I",
+              "startMs": 433,
+              "endMs": 595,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 560,
+              "endMs": 722,
+              "weight": 0.716
+            },
+            {
+              "viseme": "L",
+              "startMs": 687,
+              "endMs": 848,
+              "weight": 0.716
+            },
+            {
+              "viseme": "O",
+              "startMs": 813,
+              "endMs": 975,
+              "weight": 0.716
+            },
+            {
+              "viseme": "U",
+              "startMs": 940,
+              "endMs": 1102,
+              "weight": 0.716
+            },
+            {
+              "viseme": "I",
+              "startMs": 1067,
+              "endMs": 1228,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1193,
+              "endMs": 1355,
+              "weight": 0.716
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2569,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "REST",
+              "startMs": 2612,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "audio": {
+        "shotId": "VALIDATION_STEPS_1_8_s002",
+        "mixConfigKey": "abcfd1f1262233d89b16588a75ae7a7c",
+        "mixBusTrimDb": -4.81,
+        "durationMs": 3000,
+        "loudness": {
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "dialogueToMusicDb": 10
+        },
+        "ducking": [
+          {
+            "startMs": 60,
+            "endMs": 1580,
+            "attenuationDb": -9
+          }
+        ],
+        "tracks": [
+          {
+            "trackId": "amb_VALIDATION_STEPS_1_8_s002",
+            "kind": "AMBIENCE",
+            "startMs": 0,
+            "durationMs": 3000,
+            "offsetMs": 0,
+            "gainDb": -26.81,
+            "fadeInMs": 200,
+            "fadeOutMs": 300,
+            "duckPriority": 4,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "amb_meadow_midday_v1",
+              "provider": "mock",
+              "cacheKey": "6c1d208512df0db99128bac8",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "mus_VALIDATION_STEPS_1_8_s002",
+            "kind": "MUSIC",
+            "startMs": 0,
+            "durationMs": 3000,
+            "offsetMs": 0,
+            "gainDb": -20.81,
+            "fadeInMs": 400,
+            "fadeOutMs": 600,
+            "duckPriority": 3,
+            "source": {
+              "kind": "MUSIC_LIBRARY",
+              "ref": "mus_wonder_glockenspiel_v1",
+              "provider": "mock",
+              "cacheKey": "5e1bd2316325bb91f178cc82",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "vfx_VALIDATION_STEPS_1_8_s002_vfx_map_glow_v1",
+            "kind": "VFX",
+            "startMs": 0,
+            "durationMs": 1400,
+            "offsetMs": 0,
+            "gainDb": -22.31,
+            "fadeInMs": 20,
+            "fadeOutMs": 180,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_warm_hum_v1",
+              "provider": "mock",
+              "cacheKey": "5d69e28738f46fbcd0aea79d",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "dlg_L2",
+            "kind": "DIALOGUE",
+            "startMs": 180,
+            "durationMs": 1140,
+            "offsetMs": 0,
+            "gainDb": -3.91,
+            "fadeInMs": 15,
+            "fadeOutMs": 40,
+            "duckPriority": 0,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "VOICE_SYNTHESIS",
+              "ref": "goat_default_v1",
+              "provider": "local-espeak",
+              "cacheKey": "d7760e5e8c1b1a87ef626953e567bc4b",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "text": "It is glowing!",
+            "cached": false
+          },
+          {
+            "trackId": "foley_CHAR_GOAT_001",
+            "kind": "FOLEY",
+            "startMs": 750,
+            "durationMs": 900,
+            "offsetMs": 0,
+            "gainDb": -27.31,
+            "fadeInMs": 60,
+            "fadeOutMs": 160,
+            "duckPriority": 6,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_collar_tag_jingle_v1",
+              "provider": "mock",
+              "cacheKey": "b6a203778ac85e3948f9897b",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "foley_CHAR_PIP_001",
+            "kind": "FOLEY",
+            "startMs": 750,
+            "durationMs": 900,
+            "offsetMs": 0,
+            "gainDb": -28.04,
+            "fadeInMs": 60,
+            "fadeOutMs": 160,
+            "duckPriority": 6,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_feather_ruffle_v1",
+              "provider": "mock",
+              "cacheKey": "9603ed269a3a8bc5f736b3cf",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "prop_PROP_MAP_001",
+            "kind": "PROP",
+            "startMs": 900,
+            "durationMs": 420,
+            "offsetMs": 0,
+            "gainDb": -23.81,
+            "fadeInMs": 20,
+            "fadeOutMs": 120,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_prop_prop_map_001_v1",
+              "provider": "mock",
+              "cacheKey": "55a619daf54bfa30fa852e4c",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "vfx_VALIDATION_STEPS_1_8_s002_vfx_discovery_burst_v1",
+            "kind": "VFX",
+            "startMs": 1050,
+            "durationMs": 1100,
+            "offsetMs": 0,
+            "gainDb": -21.71,
+            "fadeInMs": 20,
+            "fadeOutMs": 180,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_discovery_chime_v1",
+              "provider": "mock",
+              "cacheKey": "6cf8dc4225425c1dd981c062",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          }
+        ],
+        "dialogueTiming": [
+          {
+            "lineId": "L2",
+            "characterCode": "CHAR_GOAT_001",
+            "startMs": 180,
+            "durationMs": 1140,
+            "text": "It is glowing!",
+            "words": 3,
+            "syllables": 4
+          }
+        ],
+        "voiceRequests": [
+          {
+            "characterCode": "CHAR_GOAT_001",
+            "voiceId": "goat_default_v1",
+            "lineId": "L2",
+            "text": "It is glowing!",
+            "prosody": {
+              "pitchSemitones": 0.975,
+              "rate": 1.09,
+              "gainDb": 0.9,
+              "brightness": 0.763
+            },
+            "cacheKey": "d7760e5e8c1b1a87ef626953e567bc4b",
+            "requiresPaidProvider": false
+          }
+        ]
+      },
+      "requiredAssets": [
+        "LOC_MEADOW_001",
+        "PROP_MAP_001",
+        "goat",
+        "pip",
+        "vfx_discovery_burst_v1",
+        "vfx_map_glow_v1"
+      ],
+      "cacheKey": "65a86fae7c89414f0e8716beaa76e943f48c10467cc9df08cb6df174fbd767f7",
+      "cost": {
+        "frameCount": 90,
+        "estimatedLocalMinutes": 5.4,
+        "estimatedCloudGpuMinutes": 0.99,
+        "estimatedCloudCostUsd": 0.00561,
+        "vfxCostWeight": 1.8,
+        "cacheHit": false
+      },
+      "qcStatus": "PASS",
+      "roles": [
+        "goat",
+        "pip"
+      ]
+    },
+    {
+      "shotId": "VALIDATION_STEPS_1_8_s003",
+      "beatId": "B3_TURN",
+      "index": 2,
+      "frameRange": {
+        "start": 166,
+        "end": 270
+      },
+      "resolution": "360x640",
+      "shotMeta": {
+        "title": "They walk together toward the creek the glowing mark points to",
+        "cameraPreset": "FOLLOW",
+        "lightingState": "DAY_KEY",
+        "placements": {
+          "goat": {
+            "location": [
+              -0.719,
+              -1.419,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0.5
+            ],
+            "action": "GOAT_WALK"
+          },
+          "pip": {
+            "location": [
+              0.807,
+              -1.607,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              -0.56
+            ],
+            "action": "PIP_WALK"
+          }
+        },
+        "endFrame": 105,
+        "lipSync": {
+          "goat": [
+            {
+              "viseme": "REST",
+              "startMs": 3168,
+              "endMs": 3500,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "O",
+              "startMs": 180,
+              "endMs": 325,
+              "weight": 0.638
+            },
+            {
+              "viseme": "M_B_P",
+              "startMs": 290,
+              "endMs": 434,
+              "weight": 0.638
+            },
+            {
+              "viseme": "E",
+              "startMs": 399,
+              "endMs": 544,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 509,
+              "endMs": 653,
+              "weight": 0.638
+            },
+            {
+              "viseme": "O",
+              "startMs": 618,
+              "endMs": 763,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 728,
+              "endMs": 873,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 838,
+              "endMs": 982,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 947,
+              "endMs": 1092,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 1057,
+              "endMs": 1201,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1166,
+              "endMs": 1311,
+              "weight": 0.638
+            },
+            {
+              "viseme": "TH",
+              "startMs": 1276,
+              "endMs": 1420,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 1385,
+              "endMs": 1530,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1495,
+              "endMs": 1640,
+              "weight": 0.638
+            },
+            {
+              "viseme": "U",
+              "startMs": 1605,
+              "endMs": 1749,
+              "weight": 0.638
+            },
+            {
+              "viseme": "A",
+              "startMs": 1714,
+              "endMs": 1859,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 1824,
+              "endMs": 1968,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1933,
+              "endMs": 2078,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 3163,
+              "endMs": 3500,
+              "weight": 1
+            }
+          ]
+        },
+        "direction": {
+          "version": "1.0.0",
+          "camera": {
+            "composition": "MEDIUM",
+            "move": "FOLLOW",
+            "lensMm": 35,
+            "geometry": {
+              "location": [
+                -0.121,
+                -4.6,
+                1.7
+              ],
+              "rotationDegrees": [
+                80.13,
+                0,
+                0
+              ]
+            },
+            "focusDistanceMeters": 4.6,
+            "endFocusDistanceMeters": 4.6
+          },
+          "lighting": {
+            "recipe": "MEADOW_DAY_KEY",
+            "exposure": 0.022,
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "practicals": []
+          },
+          "facial": {
+            "goat": [
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.145,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.2,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.137,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.476,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 2137,
+                "endMs": 2257,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ],
+            "pip": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.05,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_down",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.15,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.26,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.137,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "squint",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.243,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1588,
+                "endMs": 1695,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "vfx": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s003_vfx_dust_puff_v1",
+              "presetId": "vfx_dust_puff_v1",
+              "presetVersion": "1.0.0",
+              "seed": 868160216,
+              "startMs": 1225,
+              "durationMs": 1200,
+              "intensity": 0.55,
+              "particleCount": 143,
+              "anchor": {
+                "kind": "CHARACTER",
+                "ref": "CHAR_GOAT_001"
+              },
+              "boundsMeters": {
+                "x": 0.574,
+                "y": 0.574,
+                "z": 0.369
+              },
+              "palette": [
+                "#D8C7A6",
+                "#EFE4CD"
+              ],
+              "layer": "BEHIND_SUBJECT"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s003_vfx_magic_sparkles_v1",
+              "presetId": "vfx_magic_sparkles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 3988436819,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.7,
+              "particleCount": 294,
+              "anchor": {
+                "kind": "CHARACTER",
+                "ref": "CHAR_PIP_001"
+              },
+              "boundsMeters": {
+                "x": 0.792,
+                "y": 0.792,
+                "z": 1.056
+              },
+              "palette": [
+                "#FFE9A8",
+                "#FFF6DA"
+              ],
+              "layer": "AROUND_SUBJECT"
+            }
+          ],
+          "shotHash": "38bf903dd10e368f"
+        }
+      },
+      "manifestState": {
+        "cameraState": {
+          "directionVersion": "1.0.0",
+          "composition": "MEDIUM",
+          "preset": "FOLLOW",
+          "move": "FOLLOW",
+          "lensMm": 35,
+          "resolution": "360x640",
+          "subject": "CHAR_PIP_001",
+          "framing": {
+            "subjectHeightFraction": 0.62,
+            "headroomFraction": 0.126,
+            "footRoomFraction": 0.254,
+            "leadRoomFraction": -0.09,
+            "eyelineFraction": 0.24
+          },
+          "depth": {
+            "layers": 3,
+            "parallaxMeters": 0.56,
+            "focusDistanceMeters": 4.6,
+            "endFocusDistanceMeters": 4.6
+          },
+          "safeRegions": {
+            "topCaptionFraction": 0.12,
+            "bottomCaptionFraction": 0.18,
+            "actionSafeInsetFraction": 0.05
+          },
+          "screenDirection": "LEFT_TO_RIGHT",
+          "geometry": {
+            "location": [
+              -0.121,
+              -4.6,
+              1.7
+            ],
+            "rotationDegrees": [
+              80.13,
+              0,
+              0
+            ]
+          }
+        },
+        "lightingState": {
+          "directionVersion": "1.0.0",
+          "recipe": "MEADOW_DAY_KEY",
+          "state": "DAY_KEY",
+          "key": {
+            "role": "key",
+            "relativeEnergy": 1,
+            "softness": 0.55,
+            "azimuthDegrees": 135
+          },
+          "fill": {
+            "role": "fill",
+            "relativeEnergy": 0.32,
+            "softness": 0.85
+          },
+          "rim": {
+            "role": "rim",
+            "relativeEnergy": 0.45,
+            "coneDegrees": 42
+          },
+          "practicals": [],
+          "palette": {
+            "name": "MEADOW_WARM",
+            "warmthKelvinBias": 250
+          },
+          "colorManagement": {
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.022
+          },
+          "samplesHint": 24
+        },
+        "vfxState": {
+          "directionVersion": "1.0.0",
+          "totalCostWeight": 2,
+          "instances": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s003_vfx_dust_puff_v1",
+              "presetId": "vfx_dust_puff_v1",
+              "presetVersion": "1.0.0",
+              "seed": 868160216,
+              "startMs": 1225,
+              "durationMs": 1200,
+              "intensity": 0.55,
+              "particleCount": 143,
+              "anchor": {
+                "kind": "CHARACTER",
+                "ref": "CHAR_GOAT_001"
+              },
+              "boundsMeters": {
+                "x": 0.574,
+                "y": 0.574,
+                "z": 0.369
+              },
+              "palette": [
+                "#D8C7A6",
+                "#EFE4CD"
+              ],
+              "layer": "BEHIND_SUBJECT",
+              "cacheKey": "669fd1557a08304b264d24cf"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s003_vfx_magic_sparkles_v1",
+              "presetId": "vfx_magic_sparkles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 3988436819,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.7,
+              "particleCount": 294,
+              "anchor": {
+                "kind": "CHARACTER",
+                "ref": "CHAR_PIP_001"
+              },
+              "boundsMeters": {
+                "x": 0.792,
+                "y": 0.792,
+                "z": 1.056
+              },
+              "palette": [
+                "#FFE9A8",
+                "#FFF6DA"
+              ],
+              "layer": "AROUND_SUBJECT",
+              "cacheKey": "9b620acd4d4d1c69207558ae"
+            }
+          ]
+        },
+        "expressionStates": {
+          "goat": {
+            "directionVersion": "1.0.0",
+            "expression": "happy",
+            "weights": {
+              "brow_up": 0.145,
+              "ear_perk": 0.2,
+              "mouth_open": 0.137,
+              "smile": 0.476
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 3500,
+                "target": "CHAR_PIP_001",
+                "eyeLeadMs": 100,
+                "headFollow": 0.6
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 2137,
+                "durationMs": 120
+              }
+            ],
+            "asymmetry": 0.077,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 3168,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.145,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.2,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.137,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 3168,
+                "weight": 0.476,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 2137,
+                "endMs": 2257,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "pip": {
+            "directionVersion": "1.0.0",
+            "expression": "determined",
+            "weights": {
+              "beak_open": 0.05,
+              "brow_down": 0.15,
+              "cheek_puff": 0.26,
+              "smile": 0.137,
+              "squint": 0.243
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 3500,
+                "target": "CHAR_GOAT_001",
+                "eyeLeadMs": 133,
+                "headFollow": 0.441
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 1588,
+                "durationMs": 107
+              }
+            ],
+            "asymmetry": 0.077,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 3163,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.05,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_down",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.15,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.26,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.137,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "squint",
+                "startMs": 0,
+                "endMs": 3163,
+                "weight": 0.243,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1588,
+                "endMs": 1695,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          }
+        },
+        "visemeData": {
+          "goat": [
+            {
+              "viseme": "REST",
+              "startMs": 3168,
+              "endMs": 3500,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "O",
+              "startMs": 180,
+              "endMs": 325,
+              "weight": 0.638
+            },
+            {
+              "viseme": "M_B_P",
+              "startMs": 290,
+              "endMs": 434,
+              "weight": 0.638
+            },
+            {
+              "viseme": "E",
+              "startMs": 399,
+              "endMs": 544,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 509,
+              "endMs": 653,
+              "weight": 0.638
+            },
+            {
+              "viseme": "O",
+              "startMs": 618,
+              "endMs": 763,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 728,
+              "endMs": 873,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 838,
+              "endMs": 982,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 947,
+              "endMs": 1092,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 1057,
+              "endMs": 1201,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1166,
+              "endMs": 1311,
+              "weight": 0.638
+            },
+            {
+              "viseme": "TH",
+              "startMs": 1276,
+              "endMs": 1420,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 1385,
+              "endMs": 1530,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1495,
+              "endMs": 1640,
+              "weight": 0.638
+            },
+            {
+              "viseme": "U",
+              "startMs": 1605,
+              "endMs": 1749,
+              "weight": 0.638
+            },
+            {
+              "viseme": "A",
+              "startMs": 1714,
+              "endMs": 1859,
+              "weight": 0.638
+            },
+            {
+              "viseme": "I",
+              "startMs": 1824,
+              "endMs": 1968,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1933,
+              "endMs": 2078,
+              "weight": 0.638
+            },
+            {
+              "viseme": "REST",
+              "startMs": 3163,
+              "endMs": 3500,
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "audio": {
+        "shotId": "VALIDATION_STEPS_1_8_s003",
+        "mixConfigKey": "bbbd1609616a6334071d61b9ed2a0bd3",
+        "mixBusTrimDb": -4.8,
+        "durationMs": 3500,
+        "loudness": {
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "dialogueToMusicDb": 10
+        },
+        "ducking": [
+          {
+            "startMs": 60,
+            "endMs": 2303,
+            "attenuationDb": -9
+          }
+        ],
+        "tracks": [
+          {
+            "trackId": "amb_VALIDATION_STEPS_1_8_s003",
+            "kind": "AMBIENCE",
+            "startMs": 0,
+            "durationMs": 3500,
+            "offsetMs": 0,
+            "gainDb": -26.8,
+            "fadeInMs": 200,
+            "fadeOutMs": 300,
+            "duckPriority": 4,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "amb_meadow_afternoon_v1",
+              "provider": "mock",
+              "cacheKey": "c7dea77edfadfd77462c9dee",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "mus_VALIDATION_STEPS_1_8_s003",
+            "kind": "MUSIC",
+            "startMs": 0,
+            "durationMs": 3500,
+            "offsetMs": 0,
+            "gainDb": -20.8,
+            "fadeInMs": 400,
+            "fadeOutMs": 600,
+            "duckPriority": 3,
+            "source": {
+              "kind": "MUSIC_LIBRARY",
+              "ref": "mus_playful_marimba_v1",
+              "provider": "mock",
+              "cacheKey": "89126af07c590d147ed9a6d6",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "vfx_VALIDATION_STEPS_1_8_s003_vfx_magic_sparkles_v1",
+            "kind": "VFX",
+            "startMs": 0,
+            "durationMs": 1400,
+            "offsetMs": 0,
+            "gainDb": -21.3,
+            "fadeInMs": 20,
+            "fadeOutMs": 180,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_sparkle_shimmer_v1",
+              "provider": "mock",
+              "cacheKey": "32d4c0b4db970d683ed95b70",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "dlg_L3",
+            "kind": "DIALOGUE",
+            "startMs": 180,
+            "durationMs": 1863,
+            "offsetMs": 0,
+            "gainDb": -4.35,
+            "fadeInMs": 15,
+            "fadeOutMs": 40,
+            "duckPriority": 0,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "VOICE_SYNTHESIS",
+              "ref": "pip_default_v1",
+              "provider": "local-espeak",
+              "cacheKey": "1f12ca26fefd2e3ee6b822b2fb66d92d",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "text": "Come on, it is this way.",
+            "cached": false
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_1",
+            "kind": "FOOTSTEPS",
+            "startMs": 269,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.91,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "51aaaa268da73fd5dfbb762a",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_1",
+            "kind": "FOOTSTEPS",
+            "startMs": 350,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.97,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "5eb8a0c5784a8b9b6ca7261b",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_2",
+            "kind": "FOOTSTEPS",
+            "startMs": 538,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.93,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "66a6ad034c25eb6718250dbc",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_2",
+            "kind": "FOOTSTEPS",
+            "startMs": 700,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -21.55,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "c4e5c1d1c7fff674848ad352",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_3",
+            "kind": "FOOTSTEPS",
+            "startMs": 808,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -19.76,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "d1cc46ffe900c452e0c3904a",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "foley_CHAR_GOAT_001",
+            "kind": "FOLEY",
+            "startMs": 875,
+            "durationMs": 900,
+            "offsetMs": 0,
+            "gainDb": -28.08,
+            "fadeInMs": 60,
+            "fadeOutMs": 160,
+            "duckPriority": 6,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_collar_tag_jingle_v1",
+              "provider": "mock",
+              "cacheKey": "b6a203778ac85e3948f9897b",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_3",
+            "kind": "FOOTSTEPS",
+            "startMs": 1050,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.61,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "c001bd059a1ea7973ec5c5fa",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_4",
+            "kind": "FOOTSTEPS",
+            "startMs": 1077,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.46,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "94f2fe1ee9d6eb922edc3c91",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "vfx_VALIDATION_STEPS_1_8_s003_vfx_dust_puff_v1",
+            "kind": "VFX",
+            "startMs": 1225,
+            "durationMs": 1200,
+            "offsetMs": 0,
+            "gainDb": -22.05,
+            "fadeInMs": 20,
+            "fadeOutMs": 180,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_dust_puff_v1",
+              "provider": "mock",
+              "cacheKey": "d6cd2be0cca69eb980420992",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_5",
+            "kind": "FOOTSTEPS",
+            "startMs": 1346,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.84,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "40ec12517db5b4e80b6b3c22",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_4",
+            "kind": "FOOTSTEPS",
+            "startMs": 1400,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.37,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "e962a35d437bfebf07027d7d",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_6",
+            "kind": "FOOTSTEPS",
+            "startMs": 1615,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -19.75,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "9b2e2d3f58135fbc0f3d8381",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_5",
+            "kind": "FOOTSTEPS",
+            "startMs": 1750,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.66,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "86b91dc3314c86bba24fb474",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_7",
+            "kind": "FOOTSTEPS",
+            "startMs": 1885,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -19.61,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "4905ddfa1d15083d4885b1e8",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_6",
+            "kind": "FOOTSTEPS",
+            "startMs": 2100,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.51,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "0ec933174a37133b5404c498",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_8",
+            "kind": "FOOTSTEPS",
+            "startMs": 2154,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -19.9,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "97d36e8298a561a77cc40e4f",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_9",
+            "kind": "FOOTSTEPS",
+            "startMs": 2423,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.77,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "cb7775077227b3eb48a06127",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_7",
+            "kind": "FOOTSTEPS",
+            "startMs": 2450,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -21.49,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "c3e7507085895a831bf1e344",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_10",
+            "kind": "FOOTSTEPS",
+            "startMs": 2692,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.49,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "151f39e751658e615f5127b0",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_8",
+            "kind": "FOOTSTEPS",
+            "startMs": 2800,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -21.04,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "0482d6384cf17758527641ff",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_11",
+            "kind": "FOOTSTEPS",
+            "startMs": 2962,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.1,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "479cac67a9fb616b430245d9",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "trans_VALIDATION_STEPS_1_8_s003",
+            "kind": "TRANSITION",
+            "startMs": 3000,
+            "durationMs": 500,
+            "offsetMs": 0,
+            "gainDb": -22.8,
+            "fadeInMs": 60,
+            "fadeOutMs": 220,
+            "duckPriority": 4,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_transition_swish_v1",
+              "provider": "mock",
+              "cacheKey": "6c61351f1bf734554002c93e",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_GOAT_001_9",
+            "kind": "FOOTSTEPS",
+            "startMs": 3150,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -21.93,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_hoofstep_goat_soil_v1",
+              "provider": "mock",
+              "cacheKey": "b0aa4ae76e1297493385e258",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "step_CHAR_PIP_001_12",
+            "kind": "FOOTSTEPS",
+            "startMs": 3231,
+            "durationMs": 180,
+            "offsetMs": 0,
+            "gainDb": -20.63,
+            "fadeInMs": 0,
+            "fadeOutMs": 60,
+            "duckPriority": 5,
+            "characterCode": "CHAR_PIP_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_footstep_chick_soil_v1",
+              "provider": "mock",
+              "cacheKey": "72367fb02d56ddd215acd279",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          }
+        ],
+        "dialogueTiming": [
+          {
+            "lineId": "L3",
+            "characterCode": "CHAR_PIP_001",
+            "startMs": 180,
+            "durationMs": 1863,
+            "text": "Come on, it is this way.",
+            "words": 6,
+            "syllables": 6
+          }
+        ],
+        "voiceRequests": [
+          {
+            "characterCode": "CHAR_PIP_001",
+            "voiceId": "pip_default_v1",
+            "lineId": "L3",
+            "text": "Come on, it is this way.",
+            "prosody": {
+              "pitchSemitones": 0.037,
+              "rate": 1,
+              "gainDb": 0.45,
+              "brightness": 0.537
+            },
+            "cacheKey": "1f12ca26fefd2e3ee6b822b2fb66d92d",
+            "requiresPaidProvider": false
+          }
+        ]
+      },
+      "requiredAssets": [
+        "LOC_MEADOW_001",
+        "goat",
+        "pip",
+        "vfx_dust_puff_v1",
+        "vfx_magic_sparkles_v1"
+      ],
+      "cacheKey": "5864b3a212badfac88b9e6e89d4b058dff16ced6de1ee1bbcf1645331490e24c",
+      "cost": {
+        "frameCount": 105,
+        "estimatedLocalMinutes": 6.3,
+        "estimatedCloudGpuMinutes": 1.155,
+        "estimatedCloudCostUsd": 0.00655,
+        "vfxCostWeight": 2,
+        "cacheHit": false
+      },
+      "qcStatus": "PASS",
+      "roles": [
+        "goat",
+        "pip"
+      ]
+    },
+    {
+      "shotId": "VALIDATION_STEPS_1_8_s004",
+      "beatId": "B4_PAYOFF",
+      "index": 3,
+      "frameRange": {
+        "start": 271,
+        "end": 360
+      },
+      "resolution": "360x640",
+      "shotMeta": {
+        "title": "They arrive and share a quiet, pleased look at what they found",
+        "cameraPreset": "TWO_SHOT",
+        "lightingState": "GOLDEN_HOUR",
+        "placements": {
+          "goat": {
+            "location": [
+              -0.686,
+              -1.403,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0.5
+            ],
+            "action": "GOAT_IDLE"
+          },
+          "pip": {
+            "location": [
+              0.779,
+              -1.62,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              -0.56
+            ],
+            "action": "PIP_IDLE"
+          }
+        },
+        "endFrame": 90,
+        "lipSync": {
+          "goat": [
+            {
+              "viseme": "U",
+              "startMs": 180,
+              "endMs": 340,
+              "weight": 0.773
+            },
+            {
+              "viseme": "E",
+              "startMs": 305,
+              "endMs": 466,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 431,
+              "endMs": 591,
+              "weight": 0.773
+            },
+            {
+              "viseme": "F_V",
+              "startMs": 556,
+              "endMs": 716,
+              "weight": 0.773
+            },
+            {
+              "viseme": "O",
+              "startMs": 681,
+              "endMs": 842,
+              "weight": 0.773
+            },
+            {
+              "viseme": "U",
+              "startMs": 807,
+              "endMs": 967,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 932,
+              "endMs": 1093,
+              "weight": 0.773
+            },
+            {
+              "viseme": "I",
+              "startMs": 1058,
+              "endMs": 1218,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1183,
+              "endMs": 1343,
+              "weight": 0.773
+            },
+            {
+              "viseme": "O",
+              "startMs": 1308,
+              "endMs": 1469,
+              "weight": 0.773
+            },
+            {
+              "viseme": "E",
+              "startMs": 1434,
+              "endMs": 1594,
+              "weight": 0.773
+            },
+            {
+              "viseme": "TH",
+              "startMs": 1559,
+              "endMs": 1719,
+              "weight": 0.773
+            },
+            {
+              "viseme": "E",
+              "startMs": 1684,
+              "endMs": 1845,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1810,
+              "endMs": 1970,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2553,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "REST",
+              "startMs": 2641,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ]
+        },
+        "direction": {
+          "version": "1.0.0",
+          "camera": {
+            "composition": "TWO_SHOT",
+            "move": "STATIC",
+            "lensMm": 35,
+            "geometry": {
+              "location": [
+                0.086,
+                -5.2,
+                1.8
+              ],
+              "rotationDegrees": [
+                80.18,
+                0,
+                0
+              ]
+            },
+            "focusDistanceMeters": 5.2,
+            "endFocusDistanceMeters": 5.2
+          },
+          "lighting": {
+            "recipe": "DISCOVERY_GOLDEN",
+            "exposure": -0.026,
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "practicals": []
+          },
+          "facial": {
+            "goat": [
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.272,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.294,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.378,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.622,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "squint",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.427,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1336,
+                "endMs": 1458,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ],
+            "pip": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.05,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.12,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.213,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.539,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "squint",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.16,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1792,
+                "endMs": 1901,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "vfx": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s004_vfx_environment_particles_v1",
+              "presetId": "vfx_environment_particles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 1114053680,
+              "startMs": 0,
+              "durationMs": 3000,
+              "intensity": 0.35,
+              "particleCount": 77,
+              "anchor": {
+                "kind": "WORLD",
+                "ref": "LOC_CREEK_001"
+              },
+              "boundsMeters": {
+                "x": 4.44,
+                "y": 2.96,
+                "z": 2.22
+              },
+              "palette": [
+                "#FFF6DA"
+              ],
+              "layer": "BEHIND_SUBJECT"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s004_vfx_magic_sparkles_v1",
+              "presetId": "vfx_magic_sparkles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 1945567998,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.7,
+              "particleCount": 294,
+              "anchor": {
+                "kind": "CHARACTER",
+                "ref": "CHAR_PIP_001"
+              },
+              "boundsMeters": {
+                "x": 0.792,
+                "y": 0.792,
+                "z": 1.056
+              },
+              "palette": [
+                "#FFE9A8",
+                "#FFF6DA"
+              ],
+              "layer": "AROUND_SUBJECT"
+            }
+          ],
+          "shotHash": "ed77453ab3b980f5"
+        }
+      },
+      "manifestState": {
+        "cameraState": {
+          "directionVersion": "1.0.0",
+          "composition": "TWO_SHOT",
+          "preset": "TWO_SHOT",
+          "move": "STATIC",
+          "lensMm": 35,
+          "resolution": "360x640",
+          "subject": "CHAR_PIP_001",
+          "framing": {
+            "subjectHeightFraction": 0.55,
+            "headroomFraction": 0.14,
+            "footRoomFraction": 0.31,
+            "leadRoomFraction": -0.09,
+            "eyelineFraction": 0.24
+          },
+          "depth": {
+            "layers": 3,
+            "parallaxMeters": 0,
+            "focusDistanceMeters": 5.2,
+            "endFocusDistanceMeters": 5.2
+          },
+          "safeRegions": {
+            "topCaptionFraction": 0.12,
+            "bottomCaptionFraction": 0.18,
+            "actionSafeInsetFraction": 0.05
+          },
+          "screenDirection": "LEFT_TO_RIGHT",
+          "geometry": {
+            "location": [
+              0.086,
+              -5.2,
+              1.8
+            ],
+            "rotationDegrees": [
+              80.18,
+              0,
+              0
+            ]
+          }
+        },
+        "lightingState": {
+          "directionVersion": "1.0.0",
+          "recipe": "DISCOVERY_GOLDEN",
+          "state": "GOLDEN_HOUR",
+          "key": {
+            "role": "key",
+            "relativeEnergy": 0.92,
+            "softness": 0.45,
+            "azimuthDegrees": 165
+          },
+          "fill": {
+            "role": "fill",
+            "relativeEnergy": 0.28,
+            "softness": 0.8
+          },
+          "rim": {
+            "role": "rim",
+            "relativeEnergy": 0.62,
+            "coneDegrees": 36
+          },
+          "practicals": [],
+          "palette": {
+            "name": "GOLDEN_WARM",
+            "warmthKelvinBias": 900
+          },
+          "colorManagement": {
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": -0.026
+          },
+          "samplesHint": 28
+        },
+        "vfxState": {
+          "directionVersion": "1.0.0",
+          "totalCostWeight": 2.1,
+          "instances": [
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s004_vfx_environment_particles_v1",
+              "presetId": "vfx_environment_particles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 1114053680,
+              "startMs": 0,
+              "durationMs": 3000,
+              "intensity": 0.35,
+              "particleCount": 77,
+              "anchor": {
+                "kind": "WORLD",
+                "ref": "LOC_CREEK_001"
+              },
+              "boundsMeters": {
+                "x": 4.44,
+                "y": 2.96,
+                "z": 2.22
+              },
+              "palette": [
+                "#FFF6DA"
+              ],
+              "layer": "BEHIND_SUBJECT",
+              "cacheKey": "4cbded8ed94ee869a7a7a52e"
+            },
+            {
+              "instanceId": "VALIDATION_STEPS_1_8_s004_vfx_magic_sparkles_v1",
+              "presetId": "vfx_magic_sparkles_v1",
+              "presetVersion": "1.0.0",
+              "seed": 1945567998,
+              "startMs": 0,
+              "durationMs": 2500,
+              "intensity": 0.7,
+              "particleCount": 294,
+              "anchor": {
+                "kind": "CHARACTER",
+                "ref": "CHAR_PIP_001"
+              },
+              "boundsMeters": {
+                "x": 0.792,
+                "y": 0.792,
+                "z": 1.056
+              },
+              "palette": [
+                "#FFE9A8",
+                "#FFF6DA"
+              ],
+              "layer": "AROUND_SUBJECT",
+              "cacheKey": "f6a2cd966db28427514e781a"
+            }
+          ]
+        },
+        "expressionStates": {
+          "goat": {
+            "directionVersion": "1.0.0",
+            "expression": "laughing",
+            "weights": {
+              "brow_up": 0.272,
+              "ear_perk": 0.294,
+              "mouth_open": 0.378,
+              "smile": 0.622,
+              "squint": 0.427
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 3000,
+                "target": "CHAR_PIP_001",
+                "eyeLeadMs": 100,
+                "headFollow": 0.604
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 1336,
+                "durationMs": 122
+              }
+            ],
+            "asymmetry": 0.038,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 2553,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.272,
+                "source": "BROW"
+              },
+              {
+                "channel": "ear_perk",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.294,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "mouth_open",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.378,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.622,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "squint",
+                "startMs": 0,
+                "endMs": 2553,
+                "weight": 0.427,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1336,
+                "endMs": 1458,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          },
+          "pip": {
+            "directionVersion": "1.0.0",
+            "expression": "happy",
+            "weights": {
+              "beak_open": 0.05,
+              "brow_up": 0.12,
+              "cheek_puff": 0.213,
+              "smile": 0.539,
+              "squint": 0.16
+            },
+            "gaze": [
+              {
+                "startMs": 0,
+                "endMs": 3000,
+                "target": "CHAR_GOAT_001",
+                "eyeLeadMs": 133,
+                "headFollow": 0.382
+              }
+            ],
+            "blinks": [
+              {
+                "atMs": 1792,
+                "durationMs": 109
+              }
+            ],
+            "asymmetry": 0.078,
+            "restRecovery": {
+              "channel": "viseme_REST",
+              "atMs": 2641,
+              "weight": 1
+            },
+            "cues": [
+              {
+                "channel": "beak_open",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.05,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "brow_up",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.12,
+                "source": "BROW"
+              },
+              {
+                "channel": "cheek_puff",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.213,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "smile",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.539,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "squint",
+                "startMs": 0,
+                "endMs": 2641,
+                "weight": 0.16,
+                "source": "EXPRESSION"
+              },
+              {
+                "channel": "blink",
+                "startMs": 1792,
+                "endMs": 1901,
+                "weight": 1,
+                "source": "BLINK"
+              }
+            ]
+          }
+        },
+        "visemeData": {
+          "goat": [
+            {
+              "viseme": "U",
+              "startMs": 180,
+              "endMs": 340,
+              "weight": 0.773
+            },
+            {
+              "viseme": "E",
+              "startMs": 305,
+              "endMs": 466,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 431,
+              "endMs": 591,
+              "weight": 0.773
+            },
+            {
+              "viseme": "F_V",
+              "startMs": 556,
+              "endMs": 716,
+              "weight": 0.773
+            },
+            {
+              "viseme": "O",
+              "startMs": 681,
+              "endMs": 842,
+              "weight": 0.773
+            },
+            {
+              "viseme": "U",
+              "startMs": 807,
+              "endMs": 967,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 932,
+              "endMs": 1093,
+              "weight": 0.773
+            },
+            {
+              "viseme": "I",
+              "startMs": 1058,
+              "endMs": 1218,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1183,
+              "endMs": 1343,
+              "weight": 0.773
+            },
+            {
+              "viseme": "O",
+              "startMs": 1308,
+              "endMs": 1469,
+              "weight": 0.773
+            },
+            {
+              "viseme": "E",
+              "startMs": 1434,
+              "endMs": 1594,
+              "weight": 0.773
+            },
+            {
+              "viseme": "TH",
+              "startMs": 1559,
+              "endMs": 1719,
+              "weight": 0.773
+            },
+            {
+              "viseme": "E",
+              "startMs": 1684,
+              "endMs": 1845,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 1810,
+              "endMs": 1970,
+              "weight": 0.773
+            },
+            {
+              "viseme": "REST",
+              "startMs": 2553,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ],
+          "pip": [
+            {
+              "viseme": "REST",
+              "startMs": 2641,
+              "endMs": 3000,
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "audio": {
+        "shotId": "VALIDATION_STEPS_1_8_s004",
+        "mixConfigKey": "3dc4a6d36160f78a485b20254d7df23e",
+        "mixBusTrimDb": -4,
+        "durationMs": 3000,
+        "loudness": {
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "dialogueToMusicDb": 10
+        },
+        "ducking": [
+          {
+            "startMs": 60,
+            "endMs": 2195,
+            "attenuationDb": -9
+          }
+        ],
+        "tracks": [
+          {
+            "trackId": "amb_VALIDATION_STEPS_1_8_s004",
+            "kind": "AMBIENCE",
+            "startMs": 0,
+            "durationMs": 3000,
+            "offsetMs": 0,
+            "gainDb": -26,
+            "fadeInMs": 200,
+            "fadeOutMs": 300,
+            "duckPriority": 4,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "amb_meadow_golden_v1",
+              "provider": "mock",
+              "cacheKey": "917ac2e3d82ccea9081ad9d4",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "mus_VALIDATION_STEPS_1_8_s004",
+            "kind": "MUSIC",
+            "startMs": 0,
+            "durationMs": 3000,
+            "offsetMs": 0,
+            "gainDb": -20,
+            "fadeInMs": 400,
+            "fadeOutMs": 600,
+            "duckPriority": 3,
+            "source": {
+              "kind": "MUSIC_LIBRARY",
+              "ref": "mus_triumph_brightbrass_v1",
+              "provider": "mock",
+              "cacheKey": "51256d642b84d4b4b44a6897",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "vfx_VALIDATION_STEPS_1_8_s004_vfx_magic_sparkles_v1",
+            "kind": "VFX",
+            "startMs": 0,
+            "durationMs": 1400,
+            "offsetMs": 0,
+            "gainDb": -20.5,
+            "fadeInMs": 20,
+            "fadeOutMs": 180,
+            "duckPriority": 5,
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_sparkle_shimmer_v1",
+              "provider": "mock",
+              "cacheKey": "32d4c0b4db970d683ed95b70",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          },
+          {
+            "trackId": "dlg_L4",
+            "kind": "DIALOGUE",
+            "startMs": 180,
+            "durationMs": 1755,
+            "offsetMs": 0,
+            "gainDb": -3.22,
+            "fadeInMs": 15,
+            "fadeOutMs": 40,
+            "duckPriority": 0,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "VOICE_SYNTHESIS",
+              "ref": "goat_default_v1",
+              "provider": "local-espeak",
+              "cacheKey": "94084c6ff2e14ececa49041a70c04b9a",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "text": "We found it together.",
+            "cached": false
+          },
+          {
+            "trackId": "foley_CHAR_GOAT_001",
+            "kind": "FOLEY",
+            "startMs": 750,
+            "durationMs": 900,
+            "offsetMs": 0,
+            "gainDb": -26.31,
+            "fadeInMs": 60,
+            "fadeOutMs": 160,
+            "duckPriority": 6,
+            "characterCode": "CHAR_GOAT_001",
+            "source": {
+              "kind": "SOUND_LIBRARY",
+              "ref": "sfx_collar_tag_jingle_v1",
+              "provider": "mock",
+              "cacheKey": "b6a203778ac85e3948f9897b",
+              "license": "Proprietary — TivvleJoy Studios internal use"
+            },
+            "cached": true
+          }
+        ],
+        "dialogueTiming": [
+          {
+            "lineId": "L4",
+            "characterCode": "CHAR_GOAT_001",
+            "startMs": 180,
+            "durationMs": 1755,
+            "text": "We found it together.",
+            "words": 4,
+            "syllables": 6
+          }
+        ],
+        "voiceRequests": [
+          {
+            "characterCode": "CHAR_GOAT_001",
+            "voiceId": "goat_default_v1",
+            "lineId": "L4",
+            "text": "We found it together.",
+            "prosody": {
+              "pitchSemitones": 0.855,
+              "rate": 1.062,
+              "gainDb": 0.78,
+              "brightness": 0.733
+            },
+            "cacheKey": "94084c6ff2e14ececa49041a70c04b9a",
+            "requiresPaidProvider": false
+          }
+        ]
+      },
+      "requiredAssets": [
+        "LOC_CREEK_001",
+        "goat",
+        "pip",
+        "vfx_environment_particles_v1",
+        "vfx_magic_sparkles_v1"
+      ],
+      "cacheKey": "18a6daee092ed25775ddcffe8f4e4745edf3c254a31018a53afd27c848e9edd9",
+      "cost": {
+        "frameCount": 90,
+        "estimatedLocalMinutes": 5.4,
+        "estimatedCloudGpuMinutes": 0.99,
+        "estimatedCloudCostUsd": 0.00561,
+        "vfxCostWeight": 2.1,
+        "cacheHit": false
+      },
+      "qcStatus": "PASS",
+      "roles": [
+        "goat",
+        "pip"
+      ]
+    }
+  ]
+}

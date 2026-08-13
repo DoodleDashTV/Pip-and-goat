@@ -15,6 +15,7 @@
     "@doodle-dash/audio": "workspace:*",
     "@doodle-dash/characters": "workspace:*",
     "@doodle-dash/database": "workspace:*",
+    "@doodle-dash/direction": "workspace:*",
     "@doodle-dash/domain": "workspace:*",
     "@doodle-dash/production": "workspace:*",
     "@doodle-dash/providers": "workspace:*",

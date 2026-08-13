@@ -1,0 +1,305 @@
+{
+  "title": "They arrive and share a quiet, pleased look at what they found",
+  "cameraPreset": "TWO_SHOT",
+  "lightingState": "GOLDEN_HOUR",
+  "placements": {
+    "goat": {
+      "location": [
+        -0.686,
+        -1.403,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.5
+      ],
+      "action": "GOAT_IDLE"
+    },
+    "pip": {
+      "location": [
+        0.779,
+        -1.62,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.56
+      ],
+      "action": "PIP_IDLE"
+    }
+  },
+  "endFrame": 90,
+  "lipSync": {
+    "goat": [
+      {
+        "viseme": "U",
+        "startMs": 180,
+        "endMs": 340,
+        "weight": 0.773
+      },
+      {
+        "viseme": "E",
+        "startMs": 305,
+        "endMs": 466,
+        "weight": 0.773
+      },
+      {
+        "viseme": "REST",
+        "startMs": 431,
+        "endMs": 591,
+        "weight": 0.773
+      },
+      {
+        "viseme": "F_V",
+        "startMs": 556,
+        "endMs": 716,
+        "weight": 0.773
+      },
+      {
+        "viseme": "O",
+        "startMs": 681,
+        "endMs": 842,
+        "weight": 0.773
+      },
+      {
+        "viseme": "U",
+        "startMs": 807,
+        "endMs": 967,
+        "weight": 0.773
+      },
+      {
+        "viseme": "REST",
+        "startMs": 932,
+        "endMs": 1093,
+        "weight": 0.773
+      },
+      {
+        "viseme": "I",
+        "startMs": 1058,
+        "endMs": 1218,
+        "weight": 0.773
+      },
+      {
+        "viseme": "REST",
+        "startMs": 1183,
+        "endMs": 1343,
+        "weight": 0.773
+      },
+      {
+        "viseme": "O",
+        "startMs": 1308,
+        "endMs": 1469,
+        "weight": 0.773
+      },
+      {
+        "viseme": "E",
+        "startMs": 1434,
+        "endMs": 1594,
+        "weight": 0.773
+      },
+      {
+        "viseme": "TH",
+        "startMs": 1559,
+        "endMs": 1719,
+        "weight": 0.773
+      },
+      {
+        "viseme": "E",
+        "startMs": 1684,
+        "endMs": 1845,
+        "weight": 0.773
+      },
+      {
+        "viseme": "REST",
+        "startMs": 1810,
+        "endMs": 1970,
+        "weight": 0.773
+      },
+      {
+        "viseme": "REST",
+        "startMs": 2553,
+        "endMs": 3000,
+        "weight": 1
+      }
+    ],
+    "pip": [
+      {
+        "viseme": "REST",
+        "startMs": 2641,
+        "endMs": 3000,
+        "weight": 1
+      }
+    ]
+  },
+  "direction": {
+    "version": "1.0.0",
+    "camera": {
+      "composition": "TWO_SHOT",
+      "move": "STATIC",
+      "lensMm": 35,
+      "geometry": {
+        "location": [
+          0.086,
+          -5.2,
+          1.8
+        ],
+        "rotationDegrees": [
+          80.18,
+          0,
+          0
+        ]
+      },
+      "focusDistanceMeters": 5.2,
+      "endFocusDistanceMeters": 5.2
+    },
+    "lighting": {
+      "recipe": "DISCOVERY_GOLDEN",
+      "exposure": -0.026,
+      "viewTransform": "Khronos PBR Neutral",
+      "look": "None",
+      "practicals": []
+    },
+    "facial": {
+      "goat": [
+        {
+          "channel": "brow_up",
+          "startMs": 0,
+          "endMs": 2553,
+          "weight": 0.272,
+          "source": "BROW"
+        },
+        {
+          "channel": "ear_perk",
+          "startMs": 0,
+          "endMs": 2553,
+          "weight": 0.294,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "mouth_open",
+          "startMs": 0,
+          "endMs": 2553,
+          "weight": 0.378,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 2553,
+          "weight": 0.622,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "squint",
+          "startMs": 0,
+          "endMs": 2553,
+          "weight": 0.427,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 1336,
+          "endMs": 1458,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ],
+      "pip": [
+        {
+          "channel": "beak_open",
+          "startMs": 0,
+          "endMs": 2641,
+          "weight": 0.05,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "brow_up",
+          "startMs": 0,
+          "endMs": 2641,
+          "weight": 0.12,
+          "source": "BROW"
+        },
+        {
+          "channel": "cheek_puff",
+          "startMs": 0,
+          "endMs": 2641,
+          "weight": 0.213,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 2641,
+          "weight": 0.539,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "squint",
+          "startMs": 0,
+          "endMs": 2641,
+          "weight": 0.16,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 1792,
+          "endMs": 1901,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ]
+    },
+    "vfx": [
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s004_vfx_environment_particles_v1",
+        "presetId": "vfx_environment_particles_v1",
+        "presetVersion": "1.0.0",
+        "seed": 1114053680,
+        "startMs": 0,
+        "durationMs": 3000,
+        "intensity": 0.35,
+        "particleCount": 77,
+        "anchor": {
+          "kind": "WORLD",
+          "ref": "LOC_CREEK_001"
+        },
+        "boundsMeters": {
+          "x": 4.44,
+          "y": 2.96,
+          "z": 2.22
+        },
+        "palette": [
+          "#FFF6DA"
+        ],
+        "layer": "BEHIND_SUBJECT"
+      },
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s004_vfx_magic_sparkles_v1",
+        "presetId": "vfx_magic_sparkles_v1",
+        "presetVersion": "1.0.0",
+        "seed": 1945567998,
+        "startMs": 0,
+        "durationMs": 2500,
+        "intensity": 0.7,
+        "particleCount": 294,
+        "anchor": {
+          "kind": "CHARACTER",
+          "ref": "CHAR_PIP_001"
+        },
+        "boundsMeters": {
+          "x": 0.792,
+          "y": 0.792,
+          "z": 1.056
+        },
+        "palette": [
+          "#FFE9A8",
+          "#FFF6DA"
+        ],
+        "layer": "AROUND_SUBJECT"
+      }
+    ],
+    "shotHash": "ed77453ab3b980f5"
+  }
+}

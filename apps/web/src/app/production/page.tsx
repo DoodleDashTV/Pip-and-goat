@@ -6,7 +6,7 @@ import {
   productionProfileService,
   costOptimizedWorkflowService,
 } from '@doodle-dash/production';
-import { DEFAULT_PRODUCTION_MODE, PRODUCT_DISPLAY_NAME } from '@doodle-dash/domain';
+import { DEFAULT_PRODUCTION_MODE, STUDIO_DISPLAY_NAME } from '@doodle-dash/domain';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +44,7 @@ export default async function ProductionPage() {
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">{PRODUCT_DISPLAY_NAME}</p>
+        <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">{STUDIO_DISPLAY_NAME}</p>
         <h1 className="mt-2 font-display text-4xl font-bold">Continue Episode</h1>
         <p className="mt-3 text-[var(--muted)]">
           Default final {DEFAULT_PRODUCTION_SETTINGS.defaultFinalResolution} @{' '}

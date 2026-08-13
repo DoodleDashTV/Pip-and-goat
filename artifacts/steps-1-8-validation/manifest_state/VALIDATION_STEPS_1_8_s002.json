@@ -1,0 +1,373 @@
+{
+  "cameraState": {
+    "directionVersion": "1.0.0",
+    "composition": "MEDIUM",
+    "preset": "PUSH_IN",
+    "move": "PUSH_IN",
+    "lensMm": 35,
+    "resolution": "360x640",
+    "subject": "CHAR_PIP_001",
+    "framing": {
+      "subjectHeightFraction": 0.62,
+      "headroomFraction": 0.126,
+      "footRoomFraction": 0.254,
+      "leadRoomFraction": -0.09,
+      "eyelineFraction": 0.24
+    },
+    "depth": {
+      "layers": 3,
+      "parallaxMeters": 0.577,
+      "focusDistanceMeters": 4.6,
+      "endFocusDistanceMeters": 2.95
+    },
+    "safeRegions": {
+      "topCaptionFraction": 0.12,
+      "bottomCaptionFraction": 0.18,
+      "actionSafeInsetFraction": 0.05
+    },
+    "screenDirection": "NEUTRAL",
+    "geometry": {
+      "location": [
+        0.047,
+        -4.6,
+        1.7
+      ],
+      "rotationDegrees": [
+        80.13,
+        0,
+        0
+      ],
+      "endLocation": [
+        0.047,
+        -2.95,
+        1.403
+      ]
+    }
+  },
+  "lightingState": {
+    "directionVersion": "1.0.0",
+    "recipe": "MEADOW_DAY_KEY",
+    "state": "DAY_KEY",
+    "key": {
+      "role": "key",
+      "relativeEnergy": 1,
+      "softness": 0.55,
+      "azimuthDegrees": 135
+    },
+    "fill": {
+      "role": "fill",
+      "relativeEnergy": 0.32,
+      "softness": 0.85
+    },
+    "rim": {
+      "role": "rim",
+      "relativeEnergy": 0.45,
+      "coneDegrees": 42
+    },
+    "practicals": [
+      {
+        "source": "map_glow",
+        "relativeEnergy": 0.283,
+        "motivation": "the map is the beat’s subject; a soft practical draws the eye to it"
+      }
+    ],
+    "palette": {
+      "name": "MEADOW_WARM",
+      "warmthKelvinBias": 250
+    },
+    "colorManagement": {
+      "viewTransform": "Khronos PBR Neutral",
+      "look": "None",
+      "exposure": 0.026
+    },
+    "samplesHint": 24
+  },
+  "vfxState": {
+    "directionVersion": "1.0.0",
+    "totalCostWeight": 1.8,
+    "instances": [
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_discovery_burst_v1",
+        "presetId": "vfx_discovery_burst_v1",
+        "presetVersion": "1.0.0",
+        "seed": 1262048815,
+        "startMs": 1050,
+        "durationMs": 1100,
+        "intensity": 0.62,
+        "particleCount": 236,
+        "anchor": {
+          "kind": "PROP",
+          "ref": "PROP_MAP_001"
+        },
+        "boundsMeters": {
+          "x": 1.102,
+          "y": 1.102,
+          "z": 1.102
+        },
+        "palette": [
+          "#FFE9A8",
+          "#FFCFA0"
+        ],
+        "layer": "AROUND_SUBJECT",
+        "cacheKey": "89fe884c71a5dcc0d921cea1"
+      },
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_map_glow_v1",
+        "presetId": "vfx_map_glow_v1",
+        "presetVersion": "1.0.0",
+        "seed": 3136308156,
+        "startMs": 0,
+        "durationMs": 3000,
+        "intensity": 0.5,
+        "particleCount": 0,
+        "anchor": {
+          "kind": "PROP",
+          "ref": "PROP_MAP_001"
+        },
+        "boundsMeters": {
+          "x": 0.64,
+          "y": 0.48,
+          "z": 0.16
+        },
+        "palette": [
+          "#FFD98A",
+          "#FFF0C4"
+        ],
+        "layer": "BEHIND_SUBJECT",
+        "cacheKey": "1496f40d86ea19710e00c5b1"
+      }
+    ]
+  },
+  "expressionStates": {
+    "goat": {
+      "directionVersion": "1.0.0",
+      "expression": "happy",
+      "weights": {
+        "brow_up": 0.375,
+        "ear_perk": 0.288,
+        "mouth_open": 0.275,
+        "smile": 0.625
+      },
+      "gaze": [
+        {
+          "startMs": 0,
+          "endMs": 1860,
+          "target": "PROP_MAP_001",
+          "eyeLeadMs": 100,
+          "headFollow": 0.655
+        },
+        {
+          "startMs": 1860,
+          "endMs": 3000,
+          "target": "CHAR_PIP_001",
+          "eyeLeadMs": 100,
+          "headFollow": 0.56
+        }
+      ],
+      "blinks": [
+        {
+          "atMs": 1553,
+          "durationMs": 123
+        }
+      ],
+      "asymmetry": 0.051,
+      "restRecovery": {
+        "channel": "viseme_REST",
+        "atMs": 2569,
+        "weight": 1
+      },
+      "cues": [
+        {
+          "channel": "brow_up",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.375,
+          "source": "BROW"
+        },
+        {
+          "channel": "ear_perk",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.288,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "mouth_open",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.275,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 2569,
+          "weight": 0.625,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 1553,
+          "endMs": 1676,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ]
+    },
+    "pip": {
+      "directionVersion": "1.0.0",
+      "expression": "surprised",
+      "weights": {
+        "beak_open": 0.395,
+        "brow_inner_up": 0.302,
+        "brow_up": 0.69,
+        "cheek_puff": 0.247,
+        "smile": 0.143
+      },
+      "gaze": [
+        {
+          "startMs": 0,
+          "endMs": 1860,
+          "target": "PROP_MAP_001",
+          "eyeLeadMs": 133,
+          "headFollow": 0.329
+        },
+        {
+          "startMs": 1860,
+          "endMs": 3000,
+          "target": "CHAR_GOAT_001",
+          "eyeLeadMs": 133,
+          "headFollow": 0.36
+        }
+      ],
+      "blinks": [
+        {
+          "atMs": 1473,
+          "durationMs": 123
+        }
+      ],
+      "asymmetry": 0.056,
+      "restRecovery": {
+        "channel": "viseme_REST",
+        "atMs": 2612,
+        "weight": 1
+      },
+      "cues": [
+        {
+          "channel": "beak_open",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.395,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "brow_inner_up",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.302,
+          "source": "BROW"
+        },
+        {
+          "channel": "brow_up",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.69,
+          "source": "BROW"
+        },
+        {
+          "channel": "cheek_puff",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.247,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 2612,
+          "weight": 0.143,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 1473,
+          "endMs": 1596,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ]
+    }
+  },
+  "visemeData": {
+    "goat": [
+      {
+        "viseme": "I",
+        "startMs": 180,
+        "endMs": 342,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 307,
+        "endMs": 468,
+        "weight": 0.716
+      },
+      {
+        "viseme": "I",
+        "startMs": 433,
+        "endMs": 595,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 560,
+        "endMs": 722,
+        "weight": 0.716
+      },
+      {
+        "viseme": "L",
+        "startMs": 687,
+        "endMs": 848,
+        "weight": 0.716
+      },
+      {
+        "viseme": "O",
+        "startMs": 813,
+        "endMs": 975,
+        "weight": 0.716
+      },
+      {
+        "viseme": "U",
+        "startMs": 940,
+        "endMs": 1102,
+        "weight": 0.716
+      },
+      {
+        "viseme": "I",
+        "startMs": 1067,
+        "endMs": 1228,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 1193,
+        "endMs": 1355,
+        "weight": 0.716
+      },
+      {
+        "viseme": "REST",
+        "startMs": 2569,
+        "endMs": 3000,
+        "weight": 1
+      }
+    ],
+    "pip": [
+      {
+        "viseme": "REST",
+        "startMs": 2612,
+        "endMs": 3000,
+        "weight": 1
+      }
+    ]
+  }
+}

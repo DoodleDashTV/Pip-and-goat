@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { STUDIO_SHORT_NAME } from '@doodle-dash/domain';
 
 const NAV = [
   { href: '/', label: 'Dashboard' },
   { href: '/production-setup', label: 'Production Setup' },
   { href: '/new-episode', label: 'New Episode' },
   { href: '/production', label: 'Continue Episode' },
+  { href: '/direction', label: 'Direction' },
   { href: '/asset-intake', label: 'Assets' },
   { href: '/animations', label: 'Animations' },
   { href: '/render-queue', label: 'Render Queue' },
@@ -51,10 +53,10 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
         <aside className="mb-6 w-full shrink-0 lg:mb-0 lg:w-60">
           <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-5 shadow-studio backdrop-blur-md">
             <p className="font-display text-2xl font-bold tracking-tight text-leaf-300">
-              Doodle Dash
+              {STUDIO_SHORT_NAME}
             </p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-sun-400">
-              Production
+              Studios
             </p>
             <p className="mt-3 text-sm text-[var(--muted)]">
               Create once. Validate. Version. Lock. Reuse. Assemble. Render.
