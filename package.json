@@ -26,6 +26,7 @@
     "cloud:fingerprints": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/print-fingerprints.ts",
     "cloud:verify-image": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/verify-worker-image.ts",
     "cloud:faults": "bash scripts/cloud/fault-injection.sh",
+    "cloud:accept1080p:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/acceptance-1080p/preflight.ts",
     "cloud:build-worker-image": "bash scripts/cloud/build-worker-image.sh",
     "db:generate": "pnpm --filter @doodle-dash/database generate",
     "db:migrate": "pnpm --filter @doodle-dash/database migrate",
