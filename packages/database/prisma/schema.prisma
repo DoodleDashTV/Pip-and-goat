@@ -2244,3 +2244,64 @@ model CloudRenderSession {
 
   @@map("cloud_render_sessions")
 }
+
+// ---------------------------------------------------------------------------
+// DDP Steps 1-8 — direction layer persistence.
+//
+// Purely additive: two new tables, no column on an existing table changed or
+// dropped, so an existing database migrates forward without touching a single
+// historical row and a rollback is a DROP TABLE of things nothing else references.
+// ---------------------------------------------------------------------------
+
+/// A stored production blueprint. `content` is the deterministic document whose
+/// hash is `contentHash`; `meta` holds the non-deterministic envelope and is never
+/// hashed. Versioned by `schemaVersion` so `upgradeBlueprint()` can migrate it.
+model ProductionBlueprintRecord {
+  id             String   @id @default(uuid()) @db.Uuid
+  episodeId      String   @map("episode_id") @db.Uuid
+  schemaVersion  String   @map("schema_version")
+  /// Content hash. Two rows with the same hash describe the same episode exactly.
+  contentHash    String   @map("content_hash")
+  cacheKey       String   @map("cache_key")
+  seed           String
+  status         String   @default("DRAFT")
+  validationStatus String @default("PASS") @map("validation_status")
+  errorCount     Int      @default(0) @map("error_count")
+  warningCount   Int      @default(0) @map("warning_count")
+  shotCount      Int      @default(0) @map("shot_count")
+  durationSeconds Float   @default(0) @map("duration_seconds")
+  estimatedCloudCostUsd Float @default(0) @map("estimated_cloud_cost_usd")
+  content        Json
+  meta           Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  overrides      DirectorOverrideRecord[]
+
+  @@unique([episodeId, contentHash])
+  @@index([episodeId, createdAt])
+  @@map("production_blueprints")
+}
+
+/// A human override of one blueprint field, with provenance. Refused overrides are
+/// stored too — `refusedBecause` non-null — because an attempt to loosen a
+/// character lock is exactly the thing a reviewer needs to be able to see.
+model DirectorOverrideRecord {
+  id             String   @id @default(uuid()) @db.Uuid
+  blueprintId    String?  @map("blueprint_id") @db.Uuid
+  episodeId      String   @map("episode_id") @db.Uuid
+  /// Dot path into the blueprint content, e.g. `shots.0.lighting.recipe`.
+  path           String
+  fromValue      Json?    @map("from_value")
+  toValue        Json?    @map("to_value")
+  createdBy      String   @map("created_by")
+  reason         String
+  refusedBecause String?  @map("refused_because")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  blueprint      ProductionBlueprintRecord? @relation(fields: [blueprintId], references: [id], onDelete: SetNull)
+
+  @@index([episodeId, createdAt])
+  @@index([blueprintId])
+  @@map("director_overrides")
+}

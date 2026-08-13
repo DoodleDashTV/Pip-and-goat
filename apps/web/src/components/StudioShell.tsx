@@ -9,6 +9,7 @@ const NAV = [
   { href: '/production-setup', label: 'Production Setup' },
   { href: '/new-episode', label: 'New Episode' },
   { href: '/production', label: 'Continue Episode' },
+  { href: '/direction', label: 'Direction' },
   { href: '/asset-intake', label: 'Assets' },
   { href: '/animations', label: 'Animations' },
   { href: '/render-queue', label: 'Render Queue' },
