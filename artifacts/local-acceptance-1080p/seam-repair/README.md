@@ -20,10 +20,25 @@ there". It is dead geometry: `polish_character_v1_1.py` adds it to make the beak
 to the picture and only ever contributed a shadow. Both characters' pupils sit
 inside their irises the same way and were doing the same thing on a smaller scale.
 
-The mesh under the mark is clean. It has no duplicate or loose vertices, no
-non-manifold edges, no flipped normals, no mirror seam, no material boundary and
-no smoothing or triangulation artifact along the line; the line tracked the beak
-rather than the geometry it fell on, and it moved with the sun.
+## What it was not
+
+The mesh under the mark is clean. Read straight off the approved asset
+(`mesh_topology_pip.json`), `Pip_Character` has 3800 vertices in 29 islands and
+**0** duplicate vertex groups, **0** loose vertices, **0** non-manifold edges,
+**0** wire edges, **0** sharp edges, **0** flat-shaded faces and no custom split
+normals. There is no mirror seam, because there is no mirror: the islands are 29
+separate primitives, and 38 pairs of them interpenetrate by design.
+
+`chest_surface_inspection.png` shows the same surface with the world normal
+written to emission, with one flat colour per material slot, and under one matte
+white material with a raking light. The only feature anywhere on the chest is the
+horizontal line where the head sphere enters the body sphere. Nothing vertical
+appears in the normals, the materials or the shading — and the mark was vertical.
+
+`causation_pip_stops_casting.png` closes it: stop Pip casting a shadow and the
+mark goes, on unchanged geometry under unchanged light. Remove the shadow proxy
+instead and the self-shadow acne the proxy exists to prevent comes straight back,
+which is why the answer had to be a better caster rather than no caster.
 
 ## What is left casting on the chest
 
@@ -52,6 +67,10 @@ by the beak, the beak tip, a pupil, an iris, a catchlight or a foot.
 | `chest_before_after_daykey.png` | Head and chest at 3x under DAY_KEY, as shipped at `a440d88` and as this branch renders it. |
 | `chest_before_after_revealing.png` | The same two, relit with a single hard point sun eight degrees off the chest, which is the harshest thing that can be pointed at a shadow. |
 | `chest_blockers_four_states.json` | The table above, with every blocker named, sized and counted. |
+| `chest_surface_inspection.png` | The chest surface under normals-as-colour, one colour per material slot, and matte white under a raking light. |
+| `causation_pip_stops_casting.png` | Shipped, Pip casting no shadow, no shadow proxy at all, and this branch — the same frame four ways. |
+| `mesh_topology_pip.json` | Every topology count for `Pip_Character`, with the asset's sha256. |
+| `fault_injection.txt` | A stale image, a byte appended to Pip's model, a line added to the baked scene assembly, and the launch-time pin check — each refusing. Re-run with `pnpm cloud:faults`. |
 | `caster_geometry_before_after.json` | Signed volume and containment per island. Before: 15 of Pip's 34 islands and 23 of the Goat's 50 were inside out, and 16 and 20 protruded, the worst by the full 22 mm. After: none inverted, none protruding, on either character. |
 | `sealed_parts_cross_check.json` | The planner's sealed-part answer against an independent six-ray containment test, mesh by mesh. |
 | `frame45_change_from_sealed_rule.json` | What the sealed-part rule alone changed in the whole 1080x1920 frame: 254 pixels of 2,073,600. |
