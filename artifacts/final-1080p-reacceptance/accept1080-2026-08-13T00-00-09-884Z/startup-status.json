@@ -1,0 +1,34 @@
+{
+  "jobId": "accept1080-2026-08-13T00-00-09-884Z",
+  "bootStage": "RENDER_STARTED",
+  "stage": "COMPLETE",
+  "systemInfo": {
+    "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "workerBuildTime": "2026-08-12T22:25:23Z",
+    "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "renderCodeSha256Declared": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "renderCodeMatch": true,
+    "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+    "host": "4aa7812f516d",
+    "pid": 20,
+    "node": "v20.20.2",
+    "arch": "x64",
+    "platform": "linux",
+    "cpuCount": 96,
+    "totalMemMb": 257564,
+    "freeMemMb": 207370,
+    "disk": {
+      "totalGb": 42.95,
+      "freeGb": 42.9
+    },
+    "blenderVersion": "Blender 4.2.3 LTS",
+    "ffmpegVersion": "ffmpeg version 4.4.2-0ubuntu0.22.04.1 Copyright (c) 2000-2021 the FFmpeg developers",
+    "workerVersion": "0.1.0",
+    "imageDigest": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+    "gpuVisible": "GPU-f768d7e5-c8b4-5d01-0727-43612ea9c32f",
+    "requireGpuHealth": "true",
+    "startedAt": "2026-08-13T00:05:25.797Z"
+  },
+  "result": "COMPLETE",
+  "at": "2026-08-13T00:08:19.263Z"
+}
