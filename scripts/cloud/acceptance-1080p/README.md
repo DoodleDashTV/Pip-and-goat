@@ -60,10 +60,25 @@ pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/acceptance-1080
 pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/acceptance-1080p/postrun.ts
 ```
 
-`cloud:preflight-offline` covers the 13 checks that read local files and the
-public registry. It does not cover R2 authentication, the bucket read/write, the
-asset upload and readback, the pod inventory, the live GPU quote or the manifest
+`cloud:preflight-offline` covers the 14 checks that need no credentials: local
+files, the public registry, and the GPU price, which Runpod's `gpuTypes` query
+answers unauthenticated. It does not cover R2 authentication, the bucket
+read/write, the asset upload and readback, the pod inventory or the manifest
 upload, all of which need credentials and are checked by the full preflight.
+
+The rate and the total are separate checks, because the cap is on the total. A
+rate above $0.25/hr is not by itself a problem; 20 minutes of it would be.
+
+| | |
+| --- | --- |
+| `RATE` | the live SECURE on-demand quote for the RTX 4090, read now |
+| `14` | 90 frames at that rate against the unchanged $0.25 total cap |
+| `15` | where the hard kill would arm at that rate — 90% of the cap, in minutes |
+
+The quote asks for `secureCloud: true` explicitly. Without that filter the API
+returns the cheapest offer across community and secure both, which for the RTX
+4090 quoted $0.34/hr while a secure pod billed $0.74/hr. Launches are SECURE, so
+an estimate taken at the community price understates by about half.
 
 ## Current state
 

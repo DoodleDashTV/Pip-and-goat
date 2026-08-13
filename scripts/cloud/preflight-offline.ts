@@ -11,7 +11,8 @@
  *
  * What is NOT covered here, and needs the real preflight with R2 and Runpod
  * credentials: R2 auth and bucket read/write, the asset upload and readback, pod
- * inventory, the live GPU quote, and the manifest upload.
+ * inventory, and the manifest upload. The GPU quote IS covered — Runpod answers a
+ * price lookup unauthenticated.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -49,8 +50,50 @@ function add(id: string, name: string, status: Status, detail: string): void {
   console.log(`[${status}] ${id} ${name} — ${detail}`);
 }
 
-/** The rate the last live quote returned, used only to show the cost arithmetic. */
+/** Falls back to the last live quote only when the anonymous quote cannot be read. */
 const LAST_QUOTED_SECURE_RATE_USD_PER_HR = 0.74;
+
+const GPU_TYPE_ID = 'NVIDIA GeForce RTX 4090';
+
+/**
+ * Live secure-cloud on-demand rate, quoted without a Runpod API key.
+ *
+ * `gpuTypes` answers unauthenticated, so the rate a launch would actually be
+ * billed at can be read here rather than carried around as a constant that ages.
+ * It is a price lookup: it creates no pod and costs nothing.
+ *
+ * `secureCloud: true` in the filter matters. Without it the API returns the
+ * cheapest offer across community and secure both, which for the RTX 4090 quoted
+ * $0.34/hr while a secure pod billed $0.74/hr — understating an estimate twofold.
+ * Launches are SECURE, so the estimate has to use the secure price.
+ */
+async function quoteSecureRate(): Promise<{ rate: number; live: boolean; detail: string }> {
+  const fallback = { rate: LAST_QUOTED_SECURE_RATE_USD_PER_HR, live: false };
+  try {
+    const res = await fetch(process.env.RUNPOD_API_ENDPOINT ?? 'https://api.runpod.io/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query:
+          'query GpuTypes($id: String) { gpuTypes(input: { id: $id }) { id displayName secureCloud lowestPrice(input: { gpuCount: 1, secureCloud: true }) { uninterruptablePrice } } }',
+        variables: { id: GPU_TYPE_ID },
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!res.ok) return { ...fallback, detail: `quote HTTP ${res.status}; using last live quote` };
+    const body = (await res.json()) as {
+      data?: { gpuTypes?: Array<{ id?: string; lowestPrice?: { uninterruptablePrice?: number } }> };
+    };
+    const found = (body.data?.gpuTypes ?? []).find((g) => g.id === GPU_TYPE_ID);
+    const rate = found?.lowestPrice?.uninterruptablePrice;
+    if (typeof rate !== 'number' || !(rate > 0)) {
+      return { ...fallback, detail: 'quote returned no secure on-demand price; using last live quote' };
+    }
+    return { rate, live: true, detail: `quoted live, anonymously, for ${GPU_TYPE_ID}` };
+  } catch (e) {
+    return { ...fallback, detail: `${(e as Error).message}; using last live quote` };
+  }
+}
 
 async function main(): Promise<number> {
   console.log('=== FINAL_1080P PREFLIGHT — credential-free checks (no pod, no spend) ===');
@@ -102,24 +145,35 @@ async function main(): Promise<number> {
   add('8', 'Output exactly 1080x1920 portrait', RESOLUTION === '1080x1920' ? 'PASS' : 'FAIL', `resolution=${RESOLUTION} fps=${FPS}`);
   add('9', 'PRODUCTION render settings, not draft', FINAL_SAMPLES >= 16 ? 'PASS' : 'FAIL', `samples=${FINAL_SAMPLES} frames=${FRAME_START}-${FRAME_END}`);
 
-  // 14. The cost arithmetic against the cap, from the last live quote.
+  // RATE. The hourly price, quoted now. Reported separately from the total,
+  // because the cap is on the total: a rate above $0.25/hr is fine while 8 minutes
+  // of it is not.
+  const quote = await quoteSecureRate();
+  add(
+    'RATE',
+    'Live SECURE hourly quote for the RTX 4090',
+    quote.rate > 0 ? 'PASS' : 'FAIL',
+    `$${quote.rate}/hr secure on-demand — ${quote.detail}`,
+  );
+
+  // 14. The cost arithmetic against the cap, at that rate.
   const est = estimateCloudRenderCost({
     frameCount: FRAME_END - FRAME_START + 1,
     resolution: RESOLUTION,
     profile: 'FINAL_1080P',
     gpuType: 'RTX 4090',
-    gpuHourlyPriceUsd: LAST_QUOTED_SECURE_RATE_USD_PER_HR,
+    gpuHourlyPriceUsd: quote.rate,
   });
   add(
     '14',
-    `Estimated cost <= $${HARD_CAP_USD}`,
+    `Estimated total cost <= $${HARD_CAP_USD}`,
     est.estimatedCostUsd <= HARD_CAP_USD ? 'PASS' : 'FAIL',
-    `est=$${est.estimatedCostUsd} at $${LAST_QUOTED_SECURE_RATE_USD_PER_HR}/hr secure (last live quote, NOT re-quoted here), runtime~${est.estimatedRuntimeMinutes}min, ${est.frameCount} frames`,
+    `est=$${est.estimatedCostUsd} total at $${quote.rate}/hr${quote.live ? '' : ' (last live quote)'}, runtime~${est.estimatedRuntimeMinutes}min, ${est.frameCount} frames`,
   );
 
   // 15. The hard kill the orchestrator would arm at that rate.
-  const hardKillMin = Math.floor((HARD_CAP_USD / LAST_QUOTED_SECURE_RATE_USD_PER_HR) * 60 * 0.9);
-  add('15', 'Hard cost-kill arms from the actual pod rate', hardKillMin > 0 ? 'PASS' : 'FAIL', `at $${LAST_QUOTED_SECURE_RATE_USD_PER_HR}/hr the kill would arm at ${hardKillMin} min (90% of the cap); recomputed from the pod's real costPerHr at launch`);
+  const hardKillMin = Math.floor((HARD_CAP_USD / quote.rate) * 60 * 0.9);
+  add('15', 'Hard cost-kill arms from the actual pod rate', hardKillMin > 0 ? 'PASS' : 'FAIL', `at $${quote.rate}/hr the kill would arm at ${hardKillMin} min (90% of the cap); recomputed from the pod's real costPerHr at launch`);
 
   // IMG. The pinned reference itself.
   const ref = validateRunpodWorkerImageRef(WORKER_IMAGE);
@@ -148,7 +202,7 @@ async function main(): Promise<number> {
   console.log('');
   console.log(`PREFLIGHT (credential-free subset): ${failed.length === 0 ? 'PASS' : `FAIL (${failed.length})`} — ${results.length} checks run`);
   for (const f of failed) console.log(`  FAIL ${f.id} ${f.name}`);
-  console.log('Not covered here (needs R2 + Runpod credentials): R2 auth, bucket read/write, asset upload + readback, pod inventory, live GPU quote, manifest upload.');
+  console.log('Not covered here (needs R2 + Runpod credentials): R2 auth, bucket read/write, asset upload + readback, pod inventory, manifest upload.');
   return failed.length === 0 ? 0 : 1;
 }
 
