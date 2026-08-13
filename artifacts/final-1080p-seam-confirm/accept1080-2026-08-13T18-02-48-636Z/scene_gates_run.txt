@@ -1,0 +1,2 @@
+Blender 4.2.3 LTS (hash 0e22e4fcea03 built 2024-10-14 23:31:34)
+DDP_SCENE_GATES:{"status": "PASS", "gates": {"RIG_BINDING_VALID": true, "PIP_MOTION_VALID": true, "GOAT_MOTION_VALID": true, "ANIMATION_CHANNELS_VALID": true, "LIGHTING_STATE_VALID": true, "NO_DUPLICATE_LIGHTS": true, "ASSET_HIERARCHY_VALID": true, "PROP_CLEARANCE_VALID": true}, "fault": null}

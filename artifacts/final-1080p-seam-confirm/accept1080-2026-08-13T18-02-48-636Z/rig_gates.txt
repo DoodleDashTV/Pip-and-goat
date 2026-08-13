@@ -1,0 +1,49 @@
+test_bind_skin_creates_groups_for_deform_bones (__main__.SkinningTests.test_bind_skin_creates_groups_for_deform_bones) ... ok
+test_missing_vertex_groups_are_detected (__main__.SkinningTests.test_missing_vertex_groups_are_detected) ... ok
+test_rigid_accessory_binds_to_one_declared_bone (__main__.SkinningTests.test_rigid_accessory_binds_to_one_declared_bone) ... ok
+test_rigid_bind_rejects_unknown_bone (__main__.SkinningTests.test_rigid_bind_rejects_unknown_bone) ... ok
+test_authored_channels_match_bone_rotation_mode (__main__.AnimationTests.test_authored_channels_match_bone_rotation_mode) ... ok
+test_camera_motion_alone_is_not_character_motion (__main__.AnimationTests.test_camera_motion_alone_is_not_character_motion) ... ok
+test_constant_action_is_rejected (__main__.AnimationTests.test_constant_action_is_rejected) ... ok
+test_euler_channels_on_quaternion_bones_are_rejected (__main__.AnimationTests.test_euler_channels_on_quaternion_bones_are_rejected) ... ok
+test_object_placement_alone_is_not_character_motion (__main__.AnimationTests.test_object_placement_alone_is_not_character_motion) ... ok
+test_varying_action_is_accepted (__main__.AnimationTests.test_varying_action_is_accepted) ... ok
+test_visible_character_motion_is_measured (__main__.AnimationTests.test_visible_character_motion_is_measured) ... ok
+test_imported_lights_and_cameras_are_stripped (__main__.LightingTests.test_imported_lights_and_cameras_are_stripped) ... ok
+test_lighting_state_actually_changes_configuration (__main__.LightingTests.test_lighting_state_actually_changes_configuration) ... ok
+test_lighting_state_installs_exactly_three_lights (__main__.LightingTests.test_lighting_state_installs_exactly_three_lights) ... ok
+test_repeated_assembly_does_not_duplicate_lights (__main__.LightingTests.test_repeated_assembly_does_not_duplicate_lights) ... ok
+test_unknown_lighting_state_falls_back_deterministically (__main__.LightingTests.test_unknown_lighting_state_falls_back_deterministically) ... ok
+test_armature_is_preferred_as_placement_root (__main__.HierarchyTests.test_armature_is_preferred_as_placement_root) ... ok
+test_multi_object_placement_preserves_hierarchy (__main__.HierarchyTests.test_multi_object_placement_preserves_hierarchy) ... ok
+test_placing_only_the_first_mesh_detaches_the_prop (__main__.HierarchyTests.test_placing_only_the_first_mesh_detaches_the_prop) ... ok
+test_single_root_asset_uses_its_existing_root (__main__.HierarchyTests.test_single_root_asset_uses_its_existing_root) ... ok
+test_existing_action_binds (__main__.ActionBindingTests.test_existing_action_binds) ... ok
+test_missing_action_is_reported_not_silently_ignored (__main__.ActionBindingTests.test_missing_action_is_reported_not_silently_ignored) ... ok
+test_short_action_is_looped_to_cover_a_longer_shot (__main__.ActionBindingTests.test_short_action_is_looped_to_cover_a_longer_shot) ... ok
+test_a_mass_keeps_casting_however_far_its_shadow_reaches (__main__.ShadowCasterTests.test_a_mass_keeps_casting_however_far_its_shadow_reaches) ... ok
+test_caster_carries_its_own_mesh_and_leaves_the_asset_alone (__main__.ShadowCasterTests.test_caster_carries_its_own_mesh_and_leaves_the_asset_alone) ... ok
+test_caster_of_a_thin_part_stays_inside_the_visible_surface (__main__.ShadowCasterTests.test_caster_of_a_thin_part_stays_inside_the_visible_surface) ... ok
+test_collapsed_part_holds_its_collapse_in_every_shape_key (__main__.ShadowCasterTests.test_collapsed_part_holds_its_collapse_in_every_shape_key) ... ok
+test_each_island_is_measured_on_its_own (__main__.ShadowCasterTests.test_each_island_is_measured_on_its_own) ... ok
+test_facial_detail_leaves_the_caster_and_the_feet_stay_in_it (__main__.ShadowCasterTests.test_facial_detail_leaves_the_caster_and_the_feet_stay_in_it) ... ok
+test_flat_part_is_collapsed_rather_than_displaced (__main__.ShadowCasterTests.test_flat_part_is_collapsed_rather_than_displaced) ... ok
+test_key_light_direction_comes_from_the_lighting_state (__main__.ShadowCasterTests.test_key_light_direction_comes_from_the_lighting_state) ... ok
+test_part_sealed_inside_another_part_is_not_a_caster (__main__.ShadowCasterTests.test_part_sealed_inside_another_part_is_not_a_caster) ... ok
+test_part_thinner_than_the_shrink_is_not_turned_inside_out (__main__.ShadowCasterTests.test_part_thinner_than_the_shrink_is_not_turned_inside_out) ... ok
+test_part_whose_shadow_lands_far_across_the_character_stops_casting (__main__.ShadowCasterTests.test_part_whose_shadow_lands_far_across_the_character_stops_casting) ... ok
+test_part_whose_shadow_reaches_the_set_keeps_casting (__main__.ShadowCasterTests.test_part_whose_shadow_reaches_the_set_keeps_casting) ... ok
+test_pips_buried_parts_are_the_beak_tip_and_the_pupils (__main__.ShadowCasterTests.test_pips_buried_parts_are_the_beak_tip_and_the_pupils) ... ok
+test_that_part_measures_as_a_far_landing_self_shadow (__main__.ShadowCasterTests.test_that_part_measures_as_a_far_landing_self_shadow) ... ok
+test_the_inner_wall_of_a_hollow_part_keeps_casting (__main__.ShadowCasterTests.test_the_inner_wall_of_a_hollow_part_keeps_casting) ... ok
+test_thick_part_still_receives_the_full_shrink (__main__.ShadowCasterTests.test_thick_part_still_receives_the_full_shrink) ... ok
+test_unlit_planning_is_thickness_only (__main__.ShadowCasterTests.test_unlit_planning_is_thickness_only) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 1.717s
+
+OK
+Blender 4.2.3 LTS (hash 0e22e4fcea03 built 2024-10-14 23:31:34)
+Read blend: "/workspace/production-library/characters/pip_production.blend"
+Read blend: "/workspace/production-library/characters/pip_production.blend"
+DDP_RIG_TESTS:{"tests": 40, "failures": 0, "errors": 0}

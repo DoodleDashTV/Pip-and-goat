@@ -1,0 +1,38 @@
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-13T18:02:56.191Z","event":"config","jobId":"accept1080-2026-08-13T18-02-48-636Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.74,"workerImage":"ghcr.io/<redacted>/ddp-runpod-blender@sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830","hardCapUsd":0.25}
+{"ts":"2026-08-13T18:02:56.439Z","event":"creating_pod","podName":"ddp-accept1080-1786644176439","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":60,"volumeInGb":0}
+{"ts":"2026-08-13T18:02:57.064Z","event":"pod_created","podId":"yw9efy9ylhc5ww","at":"2026-08-13T18:02:57.064Z"}
+AUTHORIZATION CONSUMED: pod yw9efy9ylhc5ww created. Watchdog + HARD_KILL active.
+{"ts":"2026-08-13T18:02:57.843Z","event":"stage","elapsedSec":0,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":null,"renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T18:04:01.508Z","event":"wait","elapsedSec":63,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:05:04.328Z","event":"wait","elapsedSec":126,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:06:06.856Z","event":"wait","elapsedSec":189,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:07:09.930Z","event":"wait","elapsedSec":252,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:08:13.592Z","event":"wait","elapsedSec":314,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:09:17.535Z","event":"wait","elapsedSec":380,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:09:58.903Z","event":"wait","elapsedSec":421,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:11:03.076Z","event":"wait","elapsedSec":485,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:12:05.180Z","event":"wait","elapsedSec":547,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:13:08.205Z","event":"wait","elapsedSec":611,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:14:10.616Z","event":"wait","elapsedSec":673,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T18:15:16.241Z","event":"stage","elapsedSec":738,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"PROCESS_STARTED","renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T18:15:58.321Z","event":"stage","elapsedSec":780,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"BLENDER_PREFLIGHT_START","renderStage":"DOWNLOADING_ASSETS","status":"RENDERING","uptimeSec":24}
+{"ts":"2026-08-13T18:16:05.024Z","event":"stage","elapsedSec":785,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"DOWNLOADING_ASSETS","status":"RENDERING","uptimeSec":null}
+{"ts":"2026-08-13T18:16:10.366Z","event":"wait","elapsedSec":792,"desiredStatus":"RUNNING","uptimeSec":53,"sawStartupStatus":true}
+{"ts":"2026-08-13T18:16:15.469Z","event":"wait","elapsedSec":797,"desiredStatus":"RUNNING","uptimeSec":53,"sawStartupStatus":true}
+{"ts":"2026-08-13T18:17:02.146Z","event":"wait","elapsedSec":844,"desiredStatus":"RUNNING","uptimeSec":84,"sawStartupStatus":true}
+{"ts":"2026-08-13T18:17:07.026Z","event":"wait","elapsedSec":849,"desiredStatus":"RUNNING","uptimeSec":113,"sawStartupStatus":true}
+{"ts":"2026-08-13T18:17:13.558Z","event":"wait","elapsedSec":854,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":true}
+{"ts":"2026-08-13T18:17:25.411Z","event":"stage","elapsedSec":867,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"RENDERING","status":"ENCODING","uptimeSec":113}
+{"ts":"2026-08-13T18:17:41.895Z","event":"render_complete_via_metadata","staleStatus":"ENCODING"}
+{"ts":"2026-08-13T18:17:41.895Z","event":"terminating_pod","podId":"yw9efy9ylhc5ww"}
+{"ts":"2026-08-13T18:17:42.377Z","event":"post_terminate_poll","podPresent":false,"totalPods":0,"billableRemaining":false}
+
+===== PHASE B LIFECYCLE SUMMARY =====
+Pod ID: yw9efy9ylhc5ww
+Final status: COMPLETE
+Lifetime: 14.76 min @ $0.74/hr
+ACTUAL COST: $0.182 (cap $0.25) — within cap: YES
+Pod absent after terminate: YES
+Billable GPU remaining: NO
+Authorization consumed: YES
