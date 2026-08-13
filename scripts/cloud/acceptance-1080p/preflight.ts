@@ -14,6 +14,7 @@ import path from 'node:path';
 import { RunpodClient } from '../../../packages/production/src/cloud/runpod-client';
 import { validateRunpodWorkerImageRef } from '../../../packages/production/src/cloud/config';
 import {
+  computeRenderAssetFingerprint,
   computeRenderCodeFingerprint,
   inspectGhcrImage,
   verifyWorkerProvenance,
@@ -25,6 +26,7 @@ import {
   WORKER_IMAGE,
   WORKER_IMAGE_SOURCE_COMMIT,
   WORKER_IMAGE_RENDER_CODE_SHA256,
+  WORKER_IMAGE_RENDER_ASSET_SHA256,
   HARD_CAP_USD,
   RESOLUTION,
   FPS,
@@ -320,11 +322,14 @@ async function main() {
   // registry metadata alone, that it was built from the expected commit and
   // contains byte-identical render code to this checkout.
   const localFingerprint = computeRenderCodeFingerprint(REPO_ROOT);
+  const localAssets = computeRenderAssetFingerprint(REPO_ROOT);
   const provenance = verifyWorkerProvenance({
     imageRef: WORKER_IMAGE,
     expectedSourceCommit: WORKER_IMAGE_SOURCE_COMMIT,
     expectedRenderCodeSha256: WORKER_IMAGE_RENDER_CODE_SHA256,
     localRenderCodeSha256: localFingerprint.fingerprint,
+    expectedRenderAssetSha256: WORKER_IMAGE_RENDER_ASSET_SHA256,
+    localRenderAssetSha256: localAssets.fingerprint,
     registry,
   });
   add(
@@ -334,6 +339,20 @@ async function main() {
     provenance.ok
       ? `code=OK imageCommit=${provenance.facts.imageSourceCommit} renderCode=${localFingerprint.fingerprint.slice(0, 16)}… builtAt=${provenance.facts.imageBuildTime} files=${localFingerprint.files.length}`
       : `code=${provenance.code} — ${provenance.reasons.join('; ')}`,
+  );
+
+  // ---- Approved-asset gate ----
+  // The characters and props are not baked into the image, so the provenance
+  // labels cannot speak for them. Their fingerprint is pinned in the repository
+  // instead: edit Pip's model and this refuses until the pin is updated.
+  const assetsPinned = localAssets.fingerprint === WORKER_IMAGE_RENDER_ASSET_SHA256;
+  add(
+    'ASSETFP',
+    'Approved render assets match the pinned asset fingerprint',
+    assetsPinned ? 'PASS' : 'FAIL',
+    assetsPinned
+      ? `assets=${localAssets.fingerprint.slice(0, 16)}… files=${localAssets.files.length}`
+      : `working tree assets ${localAssets.fingerprint.slice(0, 16)}… != pinned ${WORKER_IMAGE_RENDER_ASSET_SHA256.slice(0, 16)}… (${localAssets.files.map((f) => f.path).join(', ')})`,
   );
 
   // ---- Confirm paid-launch gate refuses while flag false ----

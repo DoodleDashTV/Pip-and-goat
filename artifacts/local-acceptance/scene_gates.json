@@ -113,7 +113,7 @@
     },
     {
       "mesh": "Goat_Character_ShadowProxy",
-      "vertexGroups": 18,
+      "vertexGroups": 19,
       "unweighted": 0,
       "ok": true
     },
@@ -125,7 +125,7 @@
     },
     {
       "mesh": "Goat_Collar_ShadowProxy",
-      "vertexGroups": 1,
+      "vertexGroups": 2,
       "unweighted": 0,
       "ok": true
     },
@@ -137,7 +137,7 @@
     },
     {
       "mesh": "Goat_Tag_ShadowProxy",
-      "vertexGroups": 1,
+      "vertexGroups": 2,
       "unweighted": 0,
       "ok": true
     },
@@ -149,7 +149,7 @@
     },
     {
       "mesh": "Goat_Tag_Text_ShadowProxy",
-      "vertexGroups": 1,
+      "vertexGroups": 2,
       "unweighted": 0,
       "ok": true
     },
@@ -167,13 +167,13 @@
     },
     {
       "mesh": "Pip_Backpack_Pouch_ShadowProxy",
-      "vertexGroups": 1,
+      "vertexGroups": 2,
       "unweighted": 0,
       "ok": true
     },
     {
       "mesh": "Pip_Backpack_ShadowProxy",
-      "vertexGroups": 1,
+      "vertexGroups": 2,
       "unweighted": 0,
       "ok": true
     },
@@ -185,7 +185,7 @@
     },
     {
       "mesh": "Pip_Character_ShadowProxy",
-      "vertexGroups": 14,
+      "vertexGroups": 15,
       "unweighted": 0,
       "ok": true
     },
@@ -197,7 +197,7 @@
     },
     {
       "mesh": "Pip_StarCharm_ShadowProxy",
-      "vertexGroups": 1,
+      "vertexGroups": 2,
       "unweighted": 0,
       "ok": true
     }

@@ -27,21 +27,49 @@ export const STATE_DIR = path.join(REPO_ROOT, 'artifacts/acceptance-1080p');
 export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
 
 /**
- * The proven digest-pinned hardened worker image. This is a PUBLIC, non-secret
- * ghcr.io reference (anonymous pull verified). Its org segment coincidentally
- * equals the R2 bucket name, so the secret scanner may flag the line.
+ * The digest-pinned hardened worker image. This is a PUBLIC, non-secret ghcr.io
+ * reference (anonymous pull verified). Its org segment coincidentally equals the
+ * R2 bucket name, so the secret scanner may flag the line.
  *
  * WORKER_IMAGE_SOURCE_COMMIT / WORKER_IMAGE_RENDER_CODE_SHA256 are the build
  * provenance the image is stamped with. Preflight reads the same values back
  * from the registry and refuses a paid launch on any disagreement, because the
  * Blender scene-assembly code is baked into the image: a pullable but stale
  * image once rendered pre-repair 8-light lighting while every other gate passed.
- * All three constants must be re-pinned together whenever the image is rebuilt.
+ * All of these constants must be re-pinned together whenever the image is
+ * rebuilt.
+ *
+ * The pins are placeholders right now, and deliberately so. Every image ever
+ * published from this repository predates the picture-quality remediation and the
+ * shadow-caster repair, both of which changed `scripts/blender/`, which is baked
+ * in. There is no published image that would render this checkout, so there is no
+ * digest to pin, and a placeholder is refused by the image-reference gate before
+ * anything can reach Runpod. Rebuild with `scripts/cloud/build-worker-image.sh`
+ * and pin what it prints.
  */
-export const WORKER_IMAGE =
+export const WORKER_IMAGE = 'PENDING_REBUILD';
+export const WORKER_IMAGE_SOURCE_COMMIT = 'PENDING_REBUILD';
+export const WORKER_IMAGE_RENDER_CODE_SHA256 = 'PENDING_REBUILD';
+
+/**
+ * Fingerprint of the approved `.blend` assets this checkout would render, from
+ * `computeRenderAssetFingerprint`. Unlike the render code it is not baked into
+ * the image (the worker downloads assets from R2 and checks each against the
+ * manifest), so it is pinned here: editing a character or prop then has to be
+ * re-pinned deliberately rather than silently uploaded under a fresh key.
+ */
+export const WORKER_IMAGE_RENDER_ASSET_SHA256 =
+  '7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7';
+
+/**
+ * The image the cloud re-acceptance render actually ran, kept for the provenance
+ * record. Superseded: its baked render code is c4afa39c…, this checkout is
+ * elsewhere, and the two must agree before a paid launch.
+ */
+export const PREVIOUS_WORKER_IMAGE =
   'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27'; // pragma: allowlist secret
-export const WORKER_IMAGE_SOURCE_COMMIT = 'bb5270372ad558e71673fe789260a12fb51a9c6d';
-export const WORKER_IMAGE_RENDER_CODE_SHA256 =
+export const PREVIOUS_WORKER_IMAGE_SOURCE_COMMIT = 'bb5270372ad558e71673fe789260a12fb51a9c6d';
+export const PREVIOUS_WORKER_IMAGE_RENDER_CODE_SHA256 =
   'c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91';
 
 export const HARD_CAP_USD = 0.25;
