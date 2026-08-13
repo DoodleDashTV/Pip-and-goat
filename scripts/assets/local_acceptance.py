@@ -260,7 +260,7 @@ def main() -> int:
                 resolved = dst.resolve()
                 kept.append(str(resolved.relative_to(REPO_ROOT) if resolved.is_relative_to(REPO_ROOT) else resolved))
 
-    mp4 = out_root / "local_acceptance_270x480.mp4"
+    mp4 = out_root / f"local_acceptance_{args.resolution}.mp4"
     encode = subprocess.run(
         [
             "ffmpeg", "-y", "-framerate", str(FPS),

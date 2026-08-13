@@ -362,7 +362,7 @@ LIGHTING_STATES: dict[str, dict] = {
         "world": {"color": (0.40, 0.60, 0.84), "strength": 0.25},
         "viewTransform": "Khronos PBR Neutral",
         "look": "None",
-        "exposure": -3.1,
+        "exposure": -2.9,
         # Measured on the widest framing, which shows the most sky and is the
         # worst case for saturation: a near-white horizon band looks like haze but
         # costs 3 points of frame saturation and 5% of mean luma, so the ramp stays
@@ -384,7 +384,12 @@ LIGHTING_STATES: dict[str, dict] = {
             "rotation": (0.66, 0.1, 0.42),
         },
         "fill": {"type": "AREA", "energy": 200.0, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
-        "rim": {"type": "AREA", "energy": 900.0, "size": 2.0, "location": (0.8, 2.2, 2.8)},
+        # Close behind the characters rather than far back over the field. A rim
+        # lights whatever is behind them too, so pulling it in trades field
+        # brightness for edge brightness: measured on frame 45, moving it from
+        # (0.8, 2.2, 2.8) to here lifted the goat from 1.5 luma BELOW the grass
+        # touching its silhouette to 10 above it, and Pip to 22 above.
+        "rim": {"type": "AREA", "energy": 900.0, "size": 1.6, "location": (0.8, 1.6, 2.6)},
     },
     "GOLDEN_HOUR": {
         "world": {"color": (0.52, 0.42, 0.32), "strength": 0.22},

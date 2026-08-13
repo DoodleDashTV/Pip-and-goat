@@ -609,6 +609,34 @@ MEADOW_PATH_HALF_WIDTH = 0.55
 MEADOW_PATH_LENGTH = 11.0
 MEADOW_PATH_HEIGHT = 0.006
 
+# Ground albedo. The meadow was authored at 0.70 green, roughly three times what
+# grass reflects, and under a properly exposed key that made the field as bright
+# as the characters standing on it: measured on frame 45, the goat's mean luma was
+# 130.6 against 132.1 for the grass touching its silhouette, so the characters
+# separated by hue alone. Deeper, more saturated ground both restores the tonal
+# gap and gives the meadow a richer green than the pale wash it had.
+MEADOW_GRASS_COLOR = (0.16, 0.40, 0.14)
+#: The sunlit trail is deliberately the brightest large surface in the shot: it
+#: is what carries the top of the tonal range now that the grass no longer does.
+MEADOW_PATH_COLOR = (0.58, 0.46, 0.30)
+
+
+def retint_ground(grass=MEADOW_GRASS_COLOR, dirt=MEADOW_PATH_COLOR) -> dict:
+    """Set the ground albedo on an already-built meadow, by material name."""
+    import bpy
+
+    applied = {}
+    for name, color in (("MeadowGrass", grass), ("MeadowPath", dirt)):
+        material = bpy.data.materials.get(name)
+        if material is None or not material.use_nodes:
+            continue
+        bsdf = material.node_tree.nodes.get("Principled BSDF")
+        if bsdf is None:
+            continue
+        bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+        applied[name] = [round(c, 4) for c in color]
+    return applied
+
 
 def build_meadow_path(material):
     """Replace/create ``Meadow_Path`` as a flat worn trail on the ground."""
@@ -650,8 +678,8 @@ def build_meadow(path: Path) -> dict:
     import bpy
 
     reset_scene()
-    grass = mat("MeadowGrass", (0.35, 0.7, 0.28), 0.85)
-    path_mat = mat("MeadowPath", (0.62, 0.5, 0.32), 0.7)
+    grass = mat("MeadowGrass", MEADOW_GRASS_COLOR, 0.85)
+    path_mat = mat("MeadowPath", MEADOW_PATH_COLOR, 0.7)
     flower_a = mat("FlowerA", (0.95, 0.45, 0.7), 0.4)
     flower_b = mat("FlowerB", (0.95, 0.85, 0.25), 0.4)
     bark = mat("TreeBark", (0.35, 0.22, 0.12), 0.7)

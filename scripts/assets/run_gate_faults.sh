@@ -9,7 +9,7 @@ set -uo pipefail
 
 cd "$(dirname "$0")/../.."
 
-FAULTS=(camera-only keep-imported-lights map-detach quaternion-bones unbind-skin)
+FAULTS=(camera-only keep-imported-lights map-detach map-sunk quaternion-bones unbind-skin)
 OUT_DIR="artifacts/local-acceptance"
 mkdir -p "$OUT_DIR"
 

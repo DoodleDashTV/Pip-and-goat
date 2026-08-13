@@ -73,11 +73,18 @@ def upgrade_meadow(blend: Path) -> dict:
 
     bpy.ops.wm.open_mainfile(filepath=str(blend))
     before = next((o for o in describe_objects() if o["name"] == "Meadow_Path"), None)
-    material = bpy.data.materials.get("MeadowPath") or L.mat("MeadowPath", (0.62, 0.5, 0.32), 0.7)
+    material = bpy.data.materials.get("MeadowPath") or L.mat("MeadowPath", L.MEADOW_PATH_COLOR, 0.7)
     L.build_meadow_path(material)
+    retinted = L.retint_ground()
     bpy.ops.wm.save_as_mainfile(filepath=str(blend))
     after = next((o for o in describe_objects() if o["name"] == "Meadow_Path"), None)
-    return {"blend": str(blend), "pathBefore": before, "pathAfter": after, "sha256": sha256(blend)}
+    return {
+        "blend": str(blend),
+        "pathBefore": before,
+        "pathAfter": after,
+        "groundAlbedo": retinted,
+        "sha256": sha256(blend),
+    }
 
 
 def main() -> int:

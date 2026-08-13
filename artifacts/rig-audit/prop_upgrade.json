@@ -26,7 +26,7 @@
       "MapMark",
       "MapMark_B"
     ],
-    "sha256": "2e959d99343a56a5a042626b9c00f272915100073dd0ee364ff1e89b5ae5b120"
+    "sha256": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea"
   },
   "meadow": {
     "blend": "production-library/environments/meadow_production.blend",
@@ -58,7 +58,19 @@
         0.006
       ]
     },
-    "sha256": "f98a61ec9a6efd90a204bf81c16ba244dd7d313febbf5f150d3dbe928ff0dc3d"
+    "groundAlbedo": {
+      "MeadowGrass": [
+        0.16,
+        0.4,
+        0.14
+      ],
+      "MeadowPath": [
+        0.58,
+        0.46,
+        0.3
+      ]
+    },
+    "sha256": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015"
   },
   "ok": true,
   "failures": []
