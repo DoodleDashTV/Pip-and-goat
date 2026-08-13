@@ -1,0 +1,966 @@
+{
+ "question": "Is the shadow caster a valid inward offset of the surface the camera sees?",
+ "method": "Both tests run on the evaluated modifier result, island by island, because the characters are interpenetrating primitives welded into one mesh. Signed volume: a closed surface pushed past its own middle comes out inside out and its signed volume flips sign. Containment: every caster vertex must be inside its own island's shell, decided by counting surface crossings along a fixed ray; when it is outside, the distance to the surface is reported. A light direction is deliberately not supplied here, so what is measured is the geometry rule alone.",
+ "characters": {
+  "pip": {
+   "before": {
+    "commit": "a440d88",
+    "role": "pip",
+    "shrink": 0.022,
+    "safeFraction": null,
+    "islands": 34,
+    "invertedIslands": 15,
+    "protrudingIslands": 16,
+    "collapsedIslands": 0,
+    "worstProtrusionMm": 22.0
+   },
+   "after": {
+    "commit": "HEAD",
+    "role": "pip",
+    "shrink": 0.022,
+    "safeFraction": 0.5,
+    "islands": 34,
+    "invertedIslands": 0,
+    "protrudingIslands": 0,
+    "collapsedIslands": 4,
+    "worstProtrusionMm": 0.0
+   },
+   "collapsedAfter": [
+    "Pip_Character#8 (86 verts)",
+    "Pip_Character#13 (86 verts)",
+    "Pip_Character#16 (86 verts)",
+    "Pip_StarCharm#0 (20 verts)"
+   ],
+   "invertedBefore": [
+    "Pip_Character#8 (86 verts)",
+    "Pip_Character#9 (52 verts)",
+    "Pip_Character#13 (86 verts)",
+    "Pip_Character#14 (52 verts)",
+    "Pip_Character#16 (86 verts)",
+    "Pip_Character#17 (262 verts)",
+    "Pip_Character#18 (262 verts)",
+    "Pip_Character#20 (86 verts)",
+    "Pip_Character#21 (52 verts)",
+    "Pip_Character#22 (52 verts)",
+    "Pip_Character#23 (52 verts)",
+    "Pip_Character#25 (86 verts)",
+    "Pip_Character#26 (52 verts)",
+    "Pip_Character#27 (52 verts)",
+    "Pip_Character#28 (52 verts)"
+   ],
+   "worstProtrusionBeforeMm": 22.0,
+   "rowsAfter": [
+    {
+     "object": "Pip_Backpack",
+     "island": 0,
+     "verts": 200,
+     "originalVolume": 0.0014385962309114335,
+     "casterVolume": 0.0004317802666111703,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Backpack",
+     "island": 1,
+     "verts": 48,
+     "originalVolume": 2.782834802180408e-05,
+     "casterVolume": 6.589216361929648e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Backpack",
+     "island": 2,
+     "verts": 48,
+     "originalVolume": 2.782832240200152e-05,
+     "casterVolume": 6.589442972900386e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Backpack_Pouch",
+     "island": 0,
+     "verts": 128,
+     "originalVolume": 6.550618076772709e-05,
+     "casterVolume": 1.062097748594225e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 0,
+     "verts": 200,
+     "originalVolume": 7.513533915926017e-05,
+     "casterVolume": 1.9712827174019527e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 1,
+     "verts": 392,
+     "originalVolume": 0.011395373120948751,
+     "casterVolume": 0.006819180992256504,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 2,
+     "verts": 392,
+     "originalVolume": 0.01520767697977991,
+     "casterVolume": 0.009602220579077784,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 3,
+     "verts": 178,
+     "originalVolume": 5.2813224421891915e-05,
+     "casterVolume": 1.2069289829478684e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 4,
+     "verts": 178,
+     "originalVolume": 7.393945745567043e-05,
+     "casterVolume": 2.4046842639791e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 5,
+     "verts": 178,
+     "originalVolume": 5.281367168663567e-05,
+     "casterVolume": 1.2069101449500397e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 6,
+     "verts": 200,
+     "originalVolume": 0.0006439357483808786,
+     "casterVolume": 0.00017814361192347583,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 7,
+     "verts": 200,
+     "originalVolume": 0.00010632286694089992,
+     "casterVolume": 1.303593795280258e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 8,
+     "verts": 86,
+     "originalVolume": 8.251345188152001e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 9,
+     "verts": 52,
+     "originalVolume": 1.827593718436069e-06,
+     "casterVolume": 2.2991008089926957e-07,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 10,
+     "verts": 8,
+     "originalVolume": 4.246544032563783e-06,
+     "casterVolume": 1.1890652634368378e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 11,
+     "verts": 200,
+     "originalVolume": 0.0005109260029237572,
+     "casterVolume": 0.0001319240182008723,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 12,
+     "verts": 200,
+     "originalVolume": 0.0001063237347267432,
+     "casterVolume": 1.3035543600399997e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 13,
+     "verts": 86,
+     "originalVolume": 8.252220690489295e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 14,
+     "verts": 52,
+     "originalVolume": 1.827661795535581e-06,
+     "casterVolume": 2.2959061910891399e-07,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 15,
+     "verts": 8,
+     "originalVolume": 4.246512010771169e-06,
+     "casterVolume": 1.1890294141873384e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 16,
+     "verts": 86,
+     "originalVolume": 4.364545618843848e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 17,
+     "verts": 262,
+     "originalVolume": 0.00044881865090795587,
+     "casterVolume": 0.00018424153260780186,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 18,
+     "verts": 262,
+     "originalVolume": 0.00045326328391529907,
+     "casterVolume": 0.00018532391344609322,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 19,
+     "verts": 48,
+     "originalVolume": 8.746012909322485e-05,
+     "casterVolume": 1.892452050841512e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 20,
+     "verts": 86,
+     "originalVolume": 5.6444404470094384e-05,
+     "casterVolume": 2.1282548400947114e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 21,
+     "verts": 52,
+     "originalVolume": 4.37816633761893e-06,
+     "casterVolume": 1.2661816815979186e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 22,
+     "verts": 52,
+     "originalVolume": 4.378163180650141e-06,
+     "casterVolume": 1.2661824967596948e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 23,
+     "verts": 52,
+     "originalVolume": 4.378162869282201e-06,
+     "casterVolume": 1.2661837547155827e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 24,
+     "verts": 48,
+     "originalVolume": 8.746013024222147e-05,
+     "casterVolume": 1.892452060805123e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 25,
+     "verts": 86,
+     "originalVolume": 5.644440129752108e-05,
+     "casterVolume": 2.1282552004397995e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 26,
+     "verts": 52,
+     "originalVolume": 4.378160922996826e-06,
+     "casterVolume": 1.2661895778990813e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 27,
+     "verts": 52,
+     "originalVolume": 4.37815757032312e-06,
+     "casterVolume": 1.2661906247764733e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_Character",
+     "island": 28,
+     "verts": 52,
+     "originalVolume": 4.378157809580482e-06,
+     "casterVolume": 1.2661896671327512e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Pip_StarCharm",
+     "island": 0,
+     "verts": 20,
+     "originalVolume": -1.4539702771919602e-11,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    }
+   ]
+  },
+  "goat": {
+   "before": {
+    "commit": "a440d88",
+    "role": "goat",
+    "shrink": 0.022,
+    "safeFraction": null,
+    "islands": 50,
+    "invertedIslands": 23,
+    "protrudingIslands": 20,
+    "collapsedIslands": 0,
+    "worstProtrusionMm": 22.0
+   },
+   "after": {
+    "commit": "HEAD",
+    "role": "goat",
+    "shrink": 0.022,
+    "safeFraction": 0.5,
+    "islands": 50,
+    "invertedIslands": 0,
+    "protrudingIslands": 0,
+    "collapsedIslands": 16,
+    "worstProtrusionMm": 0.0
+   },
+   "collapsedAfter": [
+    "Goat_Character#12 (86 verts)",
+    "Goat_Character#17 (86 verts)",
+    "Goat_Tag_Text#0 (8 verts)",
+    "Goat_Tag_Text#1 (11 verts)",
+    "Goat_Tag_Text#2 (96 verts)",
+    "Goat_Tag_Text#3 (102 verts)",
+    "Goat_Tag_Text#4 (8 verts)",
+    "Goat_Tag_Text#5 (11 verts)",
+    "Goat_Tag_Text#6 (96 verts)",
+    "Goat_Tag_Text#7 (102 verts)",
+    "Goat_Tag_Text#8 (204 verts)",
+    "Goat_Tag_Text#9 (96 verts)",
+    "Goat_Tag_Text#10 (96 verts)",
+    "Goat_Tag_Text#11 (16 verts)",
+    "Goat_Tag_Text#12 (6 verts)",
+    "Goat_Tag_Text#13 (16 verts)"
+   ],
+   "invertedBefore": [
+    "Goat_Character#0 (128 verts)",
+    "Goat_Character#4 (236 verts)",
+    "Goat_Character#5 (236 verts)",
+    "Goat_Character#7 (128 verts)",
+    "Goat_Character#9 (128 verts)",
+    "Goat_Character#12 (86 verts)",
+    "Goat_Character#13 (52 verts)",
+    "Goat_Character#16 (200 verts)",
+    "Goat_Character#17 (86 verts)",
+    "Goat_Character#18 (52 verts)",
+    "Goat_Character#22 (8 verts)",
+    "Goat_Character#23 (8 verts)",
+    "Goat_Character#25 (8 verts)",
+    "Goat_Character#26 (8 verts)",
+    "Goat_Character#28 (8 verts)",
+    "Goat_Character#29 (8 verts)",
+    "Goat_Character#31 (8 verts)",
+    "Goat_Character#32 (8 verts)",
+    "Goat_Tag#0 (64 verts)",
+    "Goat_Tag_Text#4 (8 verts)",
+    "Goat_Tag_Text#8 (204 verts)",
+    "Goat_Tag_Text#11 (16 verts)",
+    "Goat_Tag_Text#13 (16 verts)"
+   ],
+   "worstProtrusionBeforeMm": 22.0,
+   "rowsAfter": [
+    {
+     "object": "Goat_Character",
+     "island": 0,
+     "verts": 128,
+     "originalVolume": 0.00010542095725914683,
+     "casterVolume": 3.646974319811615e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 1,
+     "verts": 392,
+     "originalVolume": 0.047639357038816686,
+     "casterVolume": 0.0348902990791202,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 2,
+     "verts": 392,
+     "originalVolume": 0.03578564944014322,
+     "casterVolume": 0.025489020298891794,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 3,
+     "verts": 262,
+     "originalVolume": 0.001753417993645218,
+     "casterVolume": 0.0006147522156384857,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 4,
+     "verts": 236,
+     "originalVolume": 0.0006444913611668798,
+     "casterVolume": 0.00034976422549940856,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 5,
+     "verts": 236,
+     "originalVolume": 0.000691982549148187,
+     "casterVolume": 0.00038302202758207503,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 6,
+     "verts": 178,
+     "originalVolume": 0.001214658957906066,
+     "casterVolume": 0.0005308767470069141,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 7,
+     "verts": 128,
+     "originalVolume": 0.00015520923197224562,
+     "casterVolume": 7.051460731114865e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 8,
+     "verts": 178,
+     "originalVolume": 0.0013539555557902838,
+     "casterVolume": 0.0006215705354103804,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 9,
+     "verts": 128,
+     "originalVolume": 0.00016836173264778156,
+     "casterVolume": 7.849320877539863e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 10,
+     "verts": 200,
+     "originalVolume": 0.0008376609631355328,
+     "casterVolume": 0.0002557184264067769,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 11,
+     "verts": 200,
+     "originalVolume": 0.00017615225345934965,
+     "casterVolume": 1.4822294057618524e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 12,
+     "verts": 86,
+     "originalVolume": 1.2928509824631568e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 13,
+     "verts": 52,
+     "originalVolume": 2.651758687003776e-06,
+     "casterVolume": 3.4044045567801134e-07,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 14,
+     "verts": 8,
+     "originalVolume": 6.6242985970651065e-06,
+     "casterVolume": 1.8555347196524963e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 15,
+     "verts": 200,
+     "originalVolume": 0.0007832403683979775,
+     "casterVolume": 0.00023526412673409916,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 16,
+     "verts": 200,
+     "originalVolume": 0.00015604637892844658,
+     "casterVolume": 7.034556308423579e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 17,
+     "verts": 86,
+     "originalVolume": 1.2929476836731624e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 18,
+     "verts": 52,
+     "originalVolume": 2.65385060060908e-06,
+     "casterVolume": 3.403346185611648e-07,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 19,
+     "verts": 8,
+     "originalVolume": 6.626324344930851e-06,
+     "casterVolume": 1.8539394659455798e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 20,
+     "verts": 178,
+     "originalVolume": 0.00021116450658098553,
+     "casterVolume": 2.55080488689904e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 21,
+     "verts": 32,
+     "originalVolume": 0.0014695045877791252,
+     "casterVolume": 0.0004609483923376303,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 22,
+     "verts": 8,
+     "originalVolume": 3.1477254500108146e-05,
+     "casterVolume": 7.480498728303547e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 23,
+     "verts": 8,
+     "originalVolume": 3.147724358617173e-05,
+     "casterVolume": 7.480513280218778e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 24,
+     "verts": 32,
+     "originalVolume": 0.0014695043140212334,
+     "casterVolume": 0.0004609482750405427,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 25,
+     "verts": 8,
+     "originalVolume": 3.147723873553332e-05,
+     "casterVolume": 7.480506004261163e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 26,
+     "verts": 8,
+     "originalVolume": 3.147726662670418e-05,
+     "casterVolume": 7.4805229814955965e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 27,
+     "verts": 32,
+     "originalVolume": 0.0016005575737931092,
+     "casterVolume": 0.0005183939093917899,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 28,
+     "verts": 8,
+     "originalVolume": 3.1477285329796496e-05,
+     "casterVolume": 7.480485995377725e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 29,
+     "verts": 8,
+     "originalVolume": 3.147724895000843e-05,
+     "casterVolume": 7.480499334633352e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 30,
+     "verts": 32,
+     "originalVolume": 0.0013570362561589411,
+     "casterVolume": 0.00038525305174275115,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 31,
+     "verts": 8,
+     "originalVolume": 3.147727213023815e-05,
+     "casterVolume": 7.480522375165794e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 32,
+     "verts": 8,
+     "originalVolume": 3.147729764265556e-05,
+     "casterVolume": 7.4805396550794036e-06,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Character",
+     "island": 33,
+     "verts": 128,
+     "originalVolume": 0.0003269936968285,
+     "casterVolume": 6.2956790981635e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Collar",
+     "island": 0,
+     "verts": 768,
+     "originalVolume": 0.0016572206020254764,
+     "casterVolume": 0.00041563923315853435,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag",
+     "island": 0,
+     "verts": 64,
+     "originalVolume": 0.00010500605554379198,
+     "casterVolume": 4.780912601720691e-05,
+     "inverted": false,
+     "collapsed": false,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 0,
+     "verts": 8,
+     "originalVolume": 1.8389646432600177e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 1,
+     "verts": 11,
+     "originalVolume": 2.5485810468239833e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 2,
+     "verts": 96,
+     "originalVolume": 3.188833682680562e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 3,
+     "verts": 102,
+     "originalVolume": 2.9393111598589414e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 4,
+     "verts": 8,
+     "originalVolume": -1.7550523807585705e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 5,
+     "verts": 11,
+     "originalVolume": -2.432273720387457e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 6,
+     "verts": 96,
+     "originalVolume": -3.0433628324999528e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 7,
+     "verts": 102,
+     "originalVolume": -2.8050785047639692e-05,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 8,
+     "verts": 204,
+     "originalVolume": 2.678459390429771e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 9,
+     "verts": 96,
+     "originalVolume": 6.301630512221367e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 10,
+     "verts": 96,
+     "originalVolume": -3.390639217097186e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 11,
+     "verts": 16,
+     "originalVolume": 2.7317953232852696e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 12,
+     "verts": 6,
+     "originalVolume": -4.0554374436396756e-07,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    },
+    {
+     "object": "Goat_Tag_Text",
+     "island": 13,
+     "verts": 16,
+     "originalVolume": 1.6783637117138583e-06,
+     "casterVolume": 0.0,
+     "inverted": false,
+     "collapsed": true,
+     "outsideSurfaceByMm": 0.0
+    }
+   ]
+  }
+ }
+}
