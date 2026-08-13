@@ -1,0 +1,95 @@
+{
+  "lighting": "pre-remediation DAY_KEY (frontal 9 W sun, area rim 1.6 m behind)",
+  "resolution": "270x480",
+  "wholeFramePictureQuality": {
+    "exposureInBand": true,
+    "highlightsPresent": true,
+    "shadowsLifted": true,
+    "saturationHealthy": true,
+    "tonalRangeHealthy": true
+  },
+  "subjectSeparation": {
+    "threshold": 20.0,
+    "measured": [
+      22.41,
+      0.86,
+      29.86,
+      -0.2
+    ],
+    "pass": false
+  },
+  "groundContact": {
+    "threshold": 2.0,
+    "measured": [
+      0.68,
+      -0.88,
+      1.69,
+      4.14
+    ],
+    "pass": false
+  },
+  "perSubject": {
+    "frame_0001": {
+      "pip": {
+        "coveragePct": 0.789,
+        "bodyMeanLuma": 119.2,
+        "litSideMeanLuma": 145.14,
+        "adjacentGrassLuma": 122.73,
+        "groundUnderSubjectLuma": 105.75,
+        "openGrassLuma": 106.43,
+        "litSideVsAdjacentGrass": 22.41,
+        "contactDarkening": 0.68
+      },
+      "goat": {
+        "coveragePct": 2.05,
+        "bodyMeanLuma": 115.13,
+        "litSideMeanLuma": 148.81,
+        "adjacentGrassLuma": 147.95,
+        "groundUnderSubjectLuma": 129.33,
+        "openGrassLuma": 128.45,
+        "litSideVsAdjacentGrass": 0.86,
+        "contactDarkening": -0.88
+      }
+    },
+    "frame_0090": {
+      "pip": {
+        "coveragePct": 1.885,
+        "bodyMeanLuma": 121.03,
+        "litSideMeanLuma": 148.21,
+        "adjacentGrassLuma": 118.35,
+        "groundUnderSubjectLuma": 104.71,
+        "openGrassLuma": 106.4,
+        "litSideVsAdjacentGrass": 29.86,
+        "contactDarkening": 1.69
+      },
+      "goat": {
+        "coveragePct": 4.758,
+        "bodyMeanLuma": 110.68,
+        "litSideMeanLuma": 145.66,
+        "adjacentGrassLuma": 145.86,
+        "groundUnderSubjectLuma": 119.84,
+        "openGrassLuma": 123.98,
+        "litSideVsAdjacentGrass": -0.2,
+        "contactDarkening": 4.14
+      }
+    }
+  },
+  "frameStats": [
+    {
+      "frame": "frame_0001.png",
+      "meanLumaPct": 0.4523,
+      "p01Luma": 49.88,
+      "p99Luma": 210.08,
+      "meanSaturation": 62.33,
+      "tonalRange": 160.2
+    },
+    {
+      "frame": "frame_0090.png",
+      "meanLumaPct": 0.4759,
+      "p01Luma": 46.97,
+      "p99Luma": 216.01,
+      "meanSaturation": 58.74,
+      "tonalRange": 169.03
+    }
+  ]
+}

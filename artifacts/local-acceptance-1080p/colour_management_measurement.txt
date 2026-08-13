@@ -1,0 +1,64 @@
+[
+  {
+    "frame": "BEFORE  FINAL_1080P cloud re-acceptance frame 45",
+    "file": "/tmp/insp/baseline_cloud_f45.png",
+    "colourDeclaration": "sRGB (PNG default, no colour chunk)",
+    "honestStoredPixels": {
+      "meanLuma": 83.7,
+      "meanLumaPctOfRange": 0.3282,
+      "p01": 12.02,
+      "p99": 117.55,
+      "tonalRange": 105.53,
+      "meanSaturation": 65.98,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.000642
+    },
+    "oldDoubleEncodedLoader": {
+      "meanLuma": 150.24,
+      "meanLumaPctOfRange": 0.5892,
+      "p01": 54.25,
+      "p99": 179.57,
+      "tonalRange": 125.32,
+      "meanSaturation": 39.84,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 8.4e-05
+    },
+    "inflationFactor": 1.795
+  },
+  {
+    "frame": "AFTER   local remediation frame 45",
+    "file": "/tmp/acc1080/production/frame_0045.png",
+    "colourDeclaration": "sRGB (PNG default, no colour chunk)",
+    "honestStoredPixels": {
+      "meanLuma": 122.66,
+      "meanLumaPctOfRange": 0.481,
+      "p01": 49.12,
+      "p99": 211.85,
+      "tonalRange": 162.74,
+      "meanSaturation": 61.87,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0
+    },
+    "oldDoubleEncodedLoader": {
+      "meanLuma": 180.8,
+      "meanLumaPctOfRange": 0.709,
+      "p01": 118.06,
+      "p99": 234.66,
+      "tonalRange": 116.6,
+      "meanSaturation": 34.93,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0
+    },
+    "inflationFactor": 1.474
+  }
+]
+
+HONEST STORED-PIXEL MEASUREMENT (what the gates now use)
+frame                                                  mean%     p01     p99   tonal    sat
+BEFORE  FINAL_1080P cloud re-acceptance frame 45       32.82   12.02  117.55  105.53  65.98
+AFTER   local remediation frame 45                     48.10   49.12  211.85  162.74  61.87
+
+SAME FILES THROUGH THE OLD DOUBLE-ENCODING LOADER (the bug)
+frame                                                  mean%     p01     p99   tonal    sat
+BEFORE  FINAL_1080P cloud re-acceptance frame 45       58.92   54.25  179.57  125.32  39.84   inflation x1.795
+AFTER   local remediation frame 45                     70.90  118.06  234.66  116.60  34.93   inflation x1.474
