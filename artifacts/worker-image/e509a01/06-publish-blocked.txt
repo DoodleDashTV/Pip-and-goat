@@ -1,0 +1,13 @@
+=== GHCR write-permission probe @ 2026-08-13T14:54:05Z ===
+identity: ✓ Logged in to github.com account cursor (/home/ubuntu/.config/gh/hosts.yml)
+token type: ghs_ (GitHub App installation token)
+
+$ POST https://ghcr.io/v2/doodledashtv/ddp-runpod-blender/blobs/uploads/
+HTTP 403
+{"errors":[{"code":"DENIED","message":"permission_denied: installation not allowed to Write organization package"}]}
+
+
+Starting an upload session publishes nothing and leaves nothing behind; it is
+the smallest request that establishes whether a push could succeed. Anonymous
+PULL from the same repository works (see 06-registry-verification of the
+previous build), so the block is write scope, not reachability.
