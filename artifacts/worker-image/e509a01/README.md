@@ -65,6 +65,21 @@ a manifest digest, and pinning it would be meaningless: `WORKER_IMAGE` stays
 `PENDING_REBUILD`, which the image-reference gate rejects before anything can
 reach Runpod.
 
+## This image is still current, but its commit label is not
+
+Commits after `e509a01` on this branch touched `artifacts/`,
+`scripts/cloud/preflight-offline.ts` and documentation. None of them is under
+`scripts/blender/` or `workers/runpod-blender/src/`, so the render-code fingerprint
+is still `f30e6dc0…` and the code baked into this image is still exactly what this
+checkout would render.
+
+What has moved on is `ddp.source.commit`, which says `e509a01` while HEAD is
+elsewhere. `verifyWorkerProvenance` compares that label against
+`WORKER_IMAGE_SOURCE_COMMIT` and fails on any disagreement, which is the intended
+strictness: the image should name the commit it was built from. Rebuild before
+publishing and the label is correct again by construction — the build script refuses
+a dirty tree and takes the commit from `git rev-parse HEAD`.
+
 ## To finish this
 
 Provide a GHCR credential with `write:packages` on `doodledashtv`, as
