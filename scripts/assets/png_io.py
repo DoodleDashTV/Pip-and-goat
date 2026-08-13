@@ -163,11 +163,8 @@ def describe_png(path: Path) -> dict:
     return header
 
 
-def read_stored_srgb(path: Path):
-    """Return the stored pixels as an HxWx3 float array of 0-255 sRGB values.
-
-    No colour transform of any kind is applied: these are the bytes in the file.
-    """
+def _read_channels(path: Path):
+    """Decode a PNG to its stored bytes as an HxWxC uint8 array."""
     import numpy as np
 
     path = Path(path)
@@ -179,8 +176,30 @@ def read_stored_srgb(path: Path):
         raise UnsupportedPng("no image data")
     raw = zlib.decompress(idat)
     flat = _unfilter(raw, info["width"], info["height"], channels)
-    arr = np.frombuffer(bytes(flat), dtype=np.uint8).reshape(info["height"], info["width"], channels)
-    return arr[:, :, :3].astype(np.float64)
+    return np.frombuffer(bytes(flat), dtype=np.uint8).reshape(info["height"], info["width"], channels)
+
+
+def read_stored_srgb(path: Path):
+    """Return the stored pixels as an HxWx3 float array of 0-255 sRGB values.
+
+    No colour transform of any kind is applied: these are the bytes in the file.
+    """
+    import numpy as np
+
+    return _read_channels(path)[:, :, :3].astype(np.float64)
+
+
+def read_stored_alpha(path: Path):
+    """Return the stored alpha channel as an HxW float array of 0-255 values.
+
+    Used to measure a subject against its own background: a pass rendered with a
+    transparent film records exactly which pixels that subject covers, which is a
+    fact about the render rather than a guess from the colours in it.
+    """
+    arr = _read_channels(path)
+    if arr.shape[2] != 4:
+        raise UnsupportedPng("file has no alpha channel to read")
+    return arr[:, :, 3].astype(float)
 
 
 def write_stored_srgb(path: Path, pixels, colorspace_chunk: bytes | None = None, chunk_type: str = "") -> Path:

@@ -7,6 +7,8 @@ logic, then proves from the pixels that:
   * Pip and Goat visibly move (measured on a SECOND render with a locked-off
     camera, so camera movement cannot account for any pixel change);
   * exposure is controlled rather than washed out;
+  * both characters read against the green field and cast a shadow onto it
+    (measured against coverage masks from a THIRD render, one subject at a time);
   * the map hierarchy survives assembly and only the authoritative lights exist.
 
 Run:
@@ -28,7 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "scripts" / "blender"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import assemble_scene as A  # noqa: E402
-from png_io import describe_png, read_stored_srgb  # noqa: E402
+from png_io import describe_png, read_stored_alpha, read_stored_srgb  # noqa: E402
 from scene_gates import ASSETS, SHOT_META  # noqa: E402
 
 # Reduced resolution for CPU speed; identical 9:16 aspect to FINAL_1080P.
@@ -96,6 +98,46 @@ SATURATION_MIN = 45.0
 #: look (104-109) and is the honest version of "not milky".
 TONAL_RANGE_MIN = 140.0
 
+# ---------------------------------------------------------------------------
+# Subject separation and ground contact.
+#
+# A frame can hit every figure above and still look wrong, because those are all
+# whole-frame statistics: they cannot tell whether the characters stand out from
+# the field or sit on the ground. Both were measured by eye until the eye was
+# checked, and both were wrong.
+#
+# The measurement compares each character with the grass it is actually touching,
+# using the pixels that character covers. Coverage comes from a pass rendered with
+# a transparent film and only that character visible, so it is the render's own
+# answer rather than a colour guess.
+#
+# Measured on the render this remediation replaces, whose rim was a close area
+# light pouring onto the grass the characters stand on:
+#   * lit side vs adjacent grass: Pip +26.3, goat +2.2 (the goat's whole body
+#     measured 31 luma BELOW the grass around it);
+#   * ground contact: Pip -0.9, goat -15.4 — the ground under them was BRIGHTER
+#     than open grass, which is the opposite of a shadow.
+# ---------------------------------------------------------------------------
+#: The subjects whose separation is measured, and which of them are characters.
+MASK_ROLES = ("pip", "goat", "map")
+SEPARATION_ROLES = ("pip", "goat")
+#: The lit half of a character must clear the grass touching its silhouette by
+#: this much. Rejects the pre-remediation goat at +2.2.
+SEPARATION_MIN = 20.0
+#: The ground under a character must be darker than open grass at the same depth.
+#: Rejects both pre-remediation characters, which sat in a pool of rim light.
+CONTACT_MIN = 2.0
+#: Ring and band radii as a fraction of frame height, so the same measurement
+#: means the same thing at 270x480 and at 1080x1920.
+RING_OUTER = 0.031
+RING_INNER = 0.004
+CONTACT_OUTER = 0.036
+OPEN_GRASS_OUTER = 0.050
+OPEN_GRASS_INNER = 0.024
+#: Alpha above which a pixel counts as the subject's body rather than its
+#: antialiased edge, where the background is mixed in.
+MASK_SOLID_ALPHA = 229.0
+
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Local CPU acceptance render.")
@@ -156,6 +198,86 @@ def frame_stats(path: Path) -> dict:
         "clippedShadowFraction": round(float((mx <= 1.0).mean()), 6),
         "meanSaturation": round(float(saturation.mean()), 2),
     }
+
+
+def _dilate(mask, radius: int):
+    """Grow a boolean mask by ``radius`` pixels, four-connected."""
+    out = mask.copy()
+    for _ in range(max(0, radius)):
+        grown = out.copy()
+        grown[1:, :] |= out[:-1, :]
+        grown[:-1, :] |= out[1:, :]
+        grown[:, 1:] |= out[:, :-1]
+        grown[:, :-1] |= out[:, 1:]
+        out = grown
+    return out
+
+
+def separation_stats(frame: Path, masks: dict[str, Path]) -> dict:
+    """Measure each character against the grass it stands in.
+
+    Returns, per character, how far its lit half sits above the grass touching
+    its silhouette, and how much darker the ground directly under it is than open
+    grass at a comparable depth.
+    """
+    import numpy as np
+
+    rgb = read_stored_srgb(frame)
+    height = rgb.shape[0]
+    luma = 0.2126 * rgb[:, :, 0] + 0.7152 * rgb[:, :, 1] + 0.0722 * rgb[:, :, 2]
+    red, green, blue = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
+    # Green-dominant pixels: the field, and nothing tan, blue or white.
+    grass = (green > red + 12) & (green > blue + 12)
+
+    solid = {}
+    for role, path in masks.items():
+        solid[role] = read_stored_alpha(path) > MASK_SOLID_ALPHA
+    subjects = np.zeros_like(grass)
+    for mask in solid.values():
+        subjects |= mask
+
+    def px(fraction: float) -> int:
+        return max(1, int(round(height * fraction)))
+
+    out = {}
+    for role in SEPARATION_ROLES:
+        body_mask = solid.get(role)
+        if body_mask is None or not body_mask.any():
+            continue
+        rows = np.nonzero(body_mask.any(axis=1))[0]
+        below_centre = np.zeros_like(body_mask)
+        below_centre[(rows.min() + rows.max()) // 2 :, :] = True
+        ring = _dilate(body_mask, px(RING_OUTER)) & ~_dilate(body_mask, px(RING_INNER)) & grass & ~subjects
+        contact = _dilate(body_mask, px(CONTACT_OUTER)) & ~body_mask & grass & ~subjects & below_centre
+        open_grass = (
+            _dilate(body_mask, px(OPEN_GRASS_OUTER))
+            & ~_dilate(body_mask, px(OPEN_GRASS_INNER))
+            & grass
+            & ~subjects
+            & below_centre
+        )
+        body = luma[body_mask]
+        lit = body[body >= np.percentile(body, 50)]
+        entry = {
+            "coveragePct": round(float(body_mask.mean()) * 100.0, 3),
+            "bodyMeanLuma": round(float(body.mean()), 2),
+            "litSideMeanLuma": round(float(lit.mean()), 2),
+            "adjacentGrassLuma": round(float(luma[ring].mean()), 2) if ring.any() else None,
+            "groundUnderSubjectLuma": round(float(luma[contact].mean()), 2) if contact.any() else None,
+            "openGrassLuma": round(float(luma[open_grass].mean()), 2) if open_grass.any() else None,
+        }
+        entry["litSideVsAdjacentGrass"] = (
+            round(entry["litSideMeanLuma"] - entry["adjacentGrassLuma"], 2)
+            if entry["adjacentGrassLuma"] is not None
+            else None
+        )
+        entry["contactDarkening"] = (
+            round(entry["openGrassLuma"] - entry["groundUnderSubjectLuma"], 2)
+            if None not in (entry["openGrassLuma"], entry["groundUnderSubjectLuma"])
+            else None
+        )
+        out[role] = entry
+    return out
 
 
 def moving_pixel_fraction(path_a: Path, path_b: Path) -> float:
@@ -220,6 +342,64 @@ def render_key_frames(out_dir: Path, shot_meta: dict, args, camera_preset: str) 
     return built
 
 
+def render_subject_masks(out_dir: Path, shot_meta: dict, args, camera_preset: str, frames: list[int]) -> dict:
+    """Render each subject's exact screen coverage, one role at a time.
+
+    Same scene, same camera, same frames as the shot; everything but one role is
+    hidden and the film is transparent, so the alpha channel is that role's
+    coverage. Sample count is irrelevant to coverage, so it stays low.
+    """
+    import bpy
+
+    width, height = A.parse_resolution(args.resolution)
+    built = A.build_scene(
+        assets=ASSETS,
+        shot_meta=shot_meta,
+        width=width,
+        height=height,
+        fps=FPS,
+        start_frame=1,
+        end_frame=args.frames,
+        camera_preset=camera_preset,
+        engine="EEVEE",
+        samples=4,
+    )
+    by_role = built["importedByRole"]
+
+    def family(objects) -> set[str]:
+        names: set[str] = set()
+        stack = list(objects)
+        while stack:
+            obj = stack.pop()
+            if obj.name in names:
+                continue
+            names.add(obj.name)
+            stack.extend(obj.children)
+        return names
+
+    scene = bpy.context.scene
+    out_dir.mkdir(parents=True, exist_ok=True)
+    scene.render.film_transparent = True
+    scene.render.image_settings.file_format = "PNG"
+    scene.render.image_settings.color_mode = "RGBA"
+    renderable = {"MESH", "CURVE", "SURFACE", "FONT"}
+    written: dict[str, dict[int, Path]] = {}
+    for role in MASK_ROLES:
+        keep = family(by_role.get(role, []))
+        if not keep:
+            continue
+        for obj in bpy.data.objects:
+            if obj.type in renderable:
+                obj.hide_render = obj.name not in keep
+        for frame in frames:
+            scene.frame_set(frame)
+            path = out_dir / f"mask_{role}_{frame:04d}.png"
+            scene.render.filepath = str(path.with_suffix(""))
+            bpy.ops.render.render(write_still=True)
+            written.setdefault(role, {})[frame] = path
+    return written
+
+
 def main() -> int:
     import bpy
 
@@ -238,6 +418,17 @@ def main() -> int:
     # character motion, because the camera does not move at all.
     render_key_frames(static_dir, shot_meta, args, "TWO_SHOT")
     static_frames = sorted(static_dir.glob("static_*.png"))
+
+    # Pass 3 — coverage masks for the widest and closest framing, so separation
+    # and ground contact are measured on the subjects themselves.
+    separation_frames = [KEY_FRAMES[0], KEY_FRAMES[-1]]
+    masks = render_subject_masks(out_root / "masks", shot_meta, args, shot_meta["cameraPreset"], separation_frames)
+    separation = {}
+    for frame in separation_frames:
+        frame_path = prod_dir / f"frame_{frame:04d}.png"
+        available = {role: paths[frame] for role, paths in masks.items() if frame in paths}
+        if frame_path.exists() and available:
+            separation[f"frame_{frame:04d}"] = separation_stats(frame_path, available)
 
     stats = [frame_stats(f) for f in frames if f.name in {f"frame_{n:04d}.png" for n in KEY_FRAMES}]
     static_motion = {}
@@ -300,6 +491,22 @@ def main() -> int:
         and bool(stats),
         "saturationHealthy": all(s["meanSaturation"] >= SATURATION_MIN for s in stats) and bool(stats),
         "tonalRangeHealthy": all(s["tonalRange"] >= TONAL_RANGE_MIN for s in stats) and bool(stats),
+        # Both characters must read against the field, and must sit on it.
+        "subjectsMeasured": bool(separation)
+        and all(set(SEPARATION_ROLES) <= set(per_frame) for per_frame in separation.values()),
+        "subjectSeparation": bool(separation)
+        and all(
+            entry["litSideVsAdjacentGrass"] is not None
+            and entry["litSideVsAdjacentGrass"] >= SEPARATION_MIN
+            for per_frame in separation.values()
+            for entry in per_frame.values()
+        ),
+        "groundContact": bool(separation)
+        and all(
+            entry["contactDarkening"] is not None and entry["contactDarkening"] >= CONTACT_MIN
+            for per_frame in separation.values()
+            for entry in per_frame.values()
+        ),
         "videoEncoded": mp4.exists() and mp4.stat().st_size > 1000,
     }
     ok = all(checks.values())
@@ -315,6 +522,7 @@ def main() -> int:
         "samples": args.samples,
         "checks": checks,
         "keyFrameStats": stats,
+        "subjectSeparation": separation,
         "keyFrames": kept,
         "staticCameraMovingPixelFraction": static_motion,
         "minStaticCameraMovingPixelFraction": min_static_motion,
@@ -329,6 +537,8 @@ def main() -> int:
             "shadowDepthMaxRatio": SHADOW_DEPTH_MAX_RATIO,
             "saturationMin": SATURATION_MIN,
             "tonalRangeMin": TONAL_RANGE_MIN,
+            "separationMin": SEPARATION_MIN,
+            "contactMin": CONTACT_MIN,
         },
         # Recorded so a report can never be read as if it described a different
         # measurement convention than the one that produced it.

@@ -29,11 +29,18 @@ sys.path.insert(0, str(REPO_ROOT / "scripts" / "blender"))
 
 import numpy as np  # noqa: E402
 
-from local_acceptance import frame_stats  # noqa: E402
+from local_acceptance import (  # noqa: E402
+    CONTACT_MIN,
+    SEPARATION_MIN,
+    _dilate,
+    frame_stats,
+    separation_stats,
+)
 from png_io import (  # noqa: E402
     SIGNATURE,
     UnsupportedPng,
     describe_png,
+    read_stored_alpha,
     read_stored_srgb,
     write_stored_srgb,
 )
@@ -88,6 +95,23 @@ def write_filtered_png(path: Path, pixels: np.ndarray, filter_type: int) -> Path
     data = bytearray(SIGNATURE)
     data += chunk("IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
     data += chunk("IDAT", zlib.compress(bytes(out), 6))
+    data += chunk("IEND", b"")
+    path.write_bytes(bytes(data))
+    return path
+
+
+def write_rgba_png(path: Path, pixels: np.ndarray) -> Path:
+    """Write an 8-bit RGBA PNG, unfiltered, for the coverage-mask fixtures."""
+    arr = np.asarray(pixels, dtype=np.uint8)
+    height, width, channels = arr.shape
+    assert channels == 4
+    rows = bytearray()
+    for row in arr:
+        rows.append(0)
+        rows.extend(row.tobytes())
+    data = bytearray(SIGNATURE)
+    data += chunk("IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+    data += chunk("IDAT", zlib.compress(bytes(rows), 6))
     data += chunk("IEND", b"")
     path.write_bytes(bytes(data))
     return path
@@ -235,6 +259,100 @@ class ColourManagementTests(unittest.TestCase):
         path = write_stored_srgb(self.tmp / "plain.png", self.known)
         self.assertEqual(describe_png(path)["colorspace"], "sRGB (PNG default, no colour chunk)")
 
+    def test_alpha_channel_reads_back_exactly(self):
+        pixels = np.zeros((8, 8, 4), dtype=np.uint8)
+        pixels[..., 3] = 17
+        pixels[2:5, 3:6, 3] = 255
+        path = write_rgba_png(self.tmp / "mask.png", pixels)
+        np.testing.assert_array_equal(read_stored_alpha(path), pixels[..., 3].astype(float))
+
+    def test_alpha_read_refuses_a_file_without_alpha(self):
+        path = write_stored_srgb(self.tmp / "noalpha.png", self.known)
+        with self.assertRaises(UnsupportedPng):
+            read_stored_alpha(path)
+
+
+class SubjectSeparationTests(unittest.TestCase):
+    """A subject that reads against the field, and one that does not.
+
+    The picture-quality figures are whole-frame statistics and cannot see either
+    case: the render this remediation replaced hit all of them while the goat
+    measured darker than the grass around it and stood in a pool of rim light
+    instead of a shadow.
+    """
+
+    HEIGHT, WIDTH = 400, 200
+    GRASS = (40, 110, 40)
+    SUBJECT_BOX = (slice(150, 250), slice(80, 120))
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+        self.subject = np.zeros((self.HEIGHT, self.WIDTH), dtype=bool)
+        self.subject[self.SUBJECT_BOX] = True
+        below_centre = np.zeros_like(self.subject)
+        below_centre[200:, :] = True
+        # Kept inside the 10px halo so it cannot reach the open-grass reference
+        # annulus, which starts beyond it.
+        self.under = _dilate(self.subject, 10) & ~self.subject & below_centre
+
+        mask = np.zeros((self.HEIGHT, self.WIDTH, 4), dtype=np.uint8)
+        mask[self.subject, 3] = 255
+        self.mask_path = write_rgba_png(self.tmp / "mask_pip_0001.png", mask)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _frame(self, name: str, subject_rgb, under_rgb) -> Path:
+        frame = np.zeros((self.HEIGHT, self.WIDTH, 3), dtype=np.uint8)
+        frame[:, :] = self.GRASS
+        frame[self.under] = under_rgb
+        frame[self.subject] = subject_rgb
+        return write_stored_srgb(self.tmp / name, frame)
+
+    def test_a_lit_subject_over_its_own_shadow_passes(self):
+        frame = self._frame("good.png", (230, 230, 230), (24, 66, 24))
+        stats = separation_stats(frame, {"pip": self.mask_path})
+        entry = stats["pip"]
+        self.assertGreaterEqual(entry["litSideVsAdjacentGrass"], SEPARATION_MIN)
+        self.assertGreaterEqual(entry["contactDarkening"], CONTACT_MIN)
+        self.assertAlmostEqual(entry["openGrassLuma"], 90.06, places=1)
+
+    def test_a_subject_in_a_pool_of_light_fails_both_ways(self):
+        """The measured shape of the defect: dim subject, bright ground."""
+        frame = self._frame("bad.png", (96, 96, 96), (60, 165, 60))
+        entry = separation_stats(frame, {"pip": self.mask_path})["pip"]
+        self.assertLess(entry["litSideVsAdjacentGrass"], SEPARATION_MIN)
+        self.assertLess(entry["contactDarkening"], CONTACT_MIN)
+        # The ground under the subject is brighter than open grass, which is the
+        # opposite of contact.
+        self.assertGreater(entry["groundUnderSubjectLuma"], entry["openGrassLuma"])
+
+    def test_measurement_scales_with_frame_height(self):
+        """The same picture measures the same at a different resolution."""
+        big = np.zeros((self.HEIGHT * 2, self.WIDTH * 2), dtype=bool)
+        big[300:500, 160:240] = True
+        below = np.zeros_like(big)
+        below[400:, :] = True
+        under = _dilate(big, 20) & ~big & below
+        frame = np.zeros((self.HEIGHT * 2, self.WIDTH * 2, 3), dtype=np.uint8)
+        frame[:, :] = self.GRASS
+        frame[under] = (24, 66, 24)
+        frame[big] = (230, 230, 230)
+        frame_path = write_stored_srgb(self.tmp / "big.png", frame)
+        mask = np.zeros((self.HEIGHT * 2, self.WIDTH * 2, 4), dtype=np.uint8)
+        mask[big, 3] = 255
+        mask_path = write_rgba_png(self.tmp / "mask_big.png", mask)
+
+        small = separation_stats(self._frame("small.png", (230, 230, 230), (24, 66, 24)), {"pip": self.mask_path})
+        large = separation_stats(frame_path, {"pip": mask_path})
+        self.assertAlmostEqual(
+            small["pip"]["litSideVsAdjacentGrass"], large["pip"]["litSideVsAdjacentGrass"], delta=6.0
+        )
+        self.assertAlmostEqual(small["pip"]["contactDarkening"], large["pip"]["contactDarkening"], delta=6.0)
+
+
+class IndependentDecoderTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg not available")
     def test_matches_an_independent_decoder(self):
         """Parity with ffmpeg on a real render, including libpng's adaptive filters."""
