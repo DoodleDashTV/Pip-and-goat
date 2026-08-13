@@ -85,7 +85,7 @@ an estimate taken at the community price understates by about half.
 Cloud confirmation render **PASS** on pod `72pluxljut3dtf` ($0.1111):
 `artifacts/final-1080p-seam-confirm/accept1080-2026-08-13T17-25-42-044Z/`.
 
-The pins in `common.ts` point at `sha256:9496498c…` (built from `e831d85`,
+The pins in `common.ts` point at `sha256:8204d4bf…` (built from `da26bc1`,
 render-code `a4018c0e…`) — the shadow-caster repair plus boot-diagnostic fixes.
 Anonymous registry verify and full preflight PASS.
 

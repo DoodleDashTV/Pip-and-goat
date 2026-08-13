@@ -1,0 +1,69 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 5.53kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/nvidia/cuda:12.4.1-runtime-ubuntu22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 911B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM docker.io/nvidia/cuda:12.4.1-runtime-ubuntu22.04@sha256:517da2300c184c9999ec203c2665244bdebd3578d12fcc7065e83667932643d9
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 1.97kB done
+#5 DONE 0.0s
+
+#6 [ 7/11] COPY workers/runpod-blender/package-lock.json ./
+#6 CACHED
+
+#7 [ 4/11] RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&     apt-get install -y --no-install-recommends nodejs &&     rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [ 8/11] RUN npm ci --omit=dev && npm cache clean --force
+#8 CACHED
+
+#9 [ 9/11] COPY workers/runpod-blender/src ./src
+#9 CACHED
+
+#10 [ 3/11] RUN mkdir -p /opt/blender &&     curl -fsSL "https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz"       -o /tmp/blender.tar.xz &&     tar -xJf /tmp/blender.tar.xz -C /opt/blender --strip-components=1 &&     rm /tmp/blender.tar.xz &&     ln -sf /opt/blender/blender /usr/local/bin/blender
+#10 CACHED
+
+#11 [ 5/11] WORKDIR /opt/ddp-worker
+#11 CACHED
+
+#12 [ 2/11] RUN apt-get update && apt-get install -y --no-install-recommends     curl ca-certificates xz-utils     ffmpeg     python3 python3-pip     libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libsm6     libxrandr2 libxinerama1 libxcursor1 libxdamage1 libxkbcommon0     libglvnd0 libgl1 libglx0 libglib2.0-0 libglu1-mesa libegl1 libgles2     libgl1-mesa-dri libgomp1     fonts-dejavu-core     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [ 6/11] COPY workers/runpod-blender/package.json ./
+#13 CACHED
+
+#14 [10/11] COPY scripts/blender ./blender
+#14 CACHED
+
+#15 [11/11] RUN node ./src/provenance.js --write "/opt/ddp-worker/provenance.json" --expect "a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a"
+#15 8.707 {
+#15 8.707   "sourceCommit": "da26bc16806513e7ba58ceb3408728df7712622f",
+#15 8.707   "workerBuildTime": "2026-08-13T17:37:00Z",
+#15 8.707   "imageDigest": null,
+#15 8.707   "renderCodeSha256": "a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a",
+#15 8.707   "renderCodeSha256Declared": "a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a",
+#15 8.707   "renderCodeMatch": true,
+#15 8.707   "assembleScriptSha256": "6ba991ba6957782aab98e8d3ba49e590f7b95e0bdf2fe601330a8d10a655c8ab",
+#15 8.707   "renderCodeFileCount": 30,
+#15 8.707   "workerVersion": "0.1.0"
+#15 8.707 }
+#15 8.708 RENDER_CODE_FINGERPRINT_OK a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a
+#15 DONE 8.7s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.5s done
+#16 writing image sha256:b89711a797d130cc8a0c155301a48946bd5b37a103dcb1ddcb387d58aada7c7c done
+#16 naming to ghcr.io/<ghcr-owner>/ddp-runpod-blender:da26bc1 done
+#16 DONE 0.5s
+# pragma: allowlist secret — public image path
