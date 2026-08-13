@@ -19,6 +19,7 @@
     "qc:caster": "blender -b -noaudio --python scripts/assets/shadow_caster_report.py -- --out artifacts/local-acceptance-1080p/shadow_caster_report.json",
     "gates:faults": "bash scripts/assets/run_gate_faults.sh",
     "gates:local": "LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe blender -b -noaudio --python scripts/assets/local_acceptance.py -- --out artifacts/local-acceptance",
+    "validate:steps1-8": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/direction/validate-scene.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",

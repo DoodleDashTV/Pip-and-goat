@@ -252,7 +252,7 @@ describe('cloud spend stays fail-closed', () => {
       const status = readProviderStatus({
         CLOUD_RENDER_ENABLED: value,
         ALLOW_PAID_GPU_LAUNCH: value,
-      } as NodeJS.ProcessEnv);
+      } as unknown as NodeJS.ProcessEnv);
       expect(status.requiresAuthorization).toBe(true);
     }
   });

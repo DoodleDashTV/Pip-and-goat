@@ -1,0 +1,1566 @@
+[
+  {
+    "shotId": "VALIDATION_STEPS_1_8_s001",
+    "beatId": "B1_HOOK",
+    "status": "PASS",
+    "motion": [
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 1 or reduce travel to 0 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0 s or reduce travel below 12 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.092,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.794,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 3,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "PROP_INTERSECTION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1.136,
+        "tolerance": 0.12,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Offset the character or the prop; a shared root is not a shared volume."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      },
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 1 or reduce travel to 0 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0 s or reduce travel below 8.01 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.102,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.848,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 4,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "CHARACTER_COLLISION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1.5188,
+        "tolerance": 0.35,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Widen the stance separation or restage to different depths."
+      },
+      {
+        "check": "PROP_INTERSECTION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1.0456,
+        "tolerance": 0.12,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Offset the character or the prop; a shared root is not a shared volume."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      }
+    ],
+    "facial": [
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 55,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1386,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1975,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 5,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.238,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.07,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 99,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1244,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1985,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 5,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.264,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.035,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      }
+    ],
+    "sound": [
+      {
+        "check": "MISSING_AUDIO",
+        "measured": 7,
+        "tolerance": 1,
+        "unit": "tracks",
+        "status": "PASS",
+        "repair": "Every shot needs at least an ambience bed."
+      },
+      {
+        "check": "DURATION_OVERRUN",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Trim the offending track or lengthen the shot; audio past the cut is discarded."
+      },
+      {
+        "check": "SILENCE_DROPOUT",
+        "measured": 0,
+        "tolerance": 1200,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Extend the ambience bed to cover the whole shot."
+      },
+      {
+        "check": "CLIPPING_RISK",
+        "measured": -2,
+        "tolerance": -1.5,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the loudest overlapping tracks or increase ducking."
+      },
+      {
+        "check": "CHILD_SAFE_LOUDNESS",
+        "measured": -16,
+        "tolerance": -14,
+        "unit": "LUFS",
+        "status": "PASS",
+        "repair": "Lower the loudness target; children listen close and often on speakers with no limiter."
+      },
+      {
+        "check": "DIALOGUE_INTELLIGIBILITY",
+        "measured": 19.73,
+        "tolerance": 10,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the music bed or raise the dialogue; children cannot follow words buried under a score."
+      },
+      {
+        "check": "DUCKING_COVERAGE",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "lines",
+        "status": "PASS",
+        "repair": "Add a ducking region covering every dialogue line."
+      },
+      {
+        "check": "NO_PAID_PROVIDER",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "requests",
+        "status": "PASS",
+        "repair": "Route the request through the local or cached provider."
+      }
+    ]
+  },
+  {
+    "shotId": "VALIDATION_STEPS_1_8_s002",
+    "beatId": "B2_DISCOVERY",
+    "status": "PASS",
+    "motion": [
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 1 or reduce travel to 0 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0 s or reduce travel below 20.41 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.18,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.959,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 3,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "PROP_INTERSECTION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1.1295,
+        "tolerance": 0.12,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Offset the character or the prop; a shared root is not a shared volume."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      },
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 1 or reduce travel to 0 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0 s or reduce travel below 13.21 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.145,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.936,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 4,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "CHARACTER_COLLISION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1.4828,
+        "tolerance": 0.35,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Widen the stance separation or restage to different depths."
+      },
+      {
+        "check": "PROP_INTERSECTION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1.0326,
+        "tolerance": 0.12,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Offset the character or the prop; a shared root is not a shared volume."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      }
+    ],
+    "facial": [
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 126,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1553,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 2034,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 4,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.9,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.051,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 55,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1473,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 2226,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 5,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.538,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.056,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      }
+    ],
+    "sound": [
+      {
+        "check": "MISSING_AUDIO",
+        "measured": 8,
+        "tolerance": 1,
+        "unit": "tracks",
+        "status": "PASS",
+        "repair": "Every shot needs at least an ambience bed."
+      },
+      {
+        "check": "DURATION_OVERRUN",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Trim the offending track or lengthen the shot; audio past the cut is discarded."
+      },
+      {
+        "check": "SILENCE_DROPOUT",
+        "measured": 0,
+        "tolerance": 1200,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Extend the ambience bed to cover the whole shot."
+      },
+      {
+        "check": "CLIPPING_RISK",
+        "measured": -2,
+        "tolerance": -1.5,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the loudest overlapping tracks or increase ducking."
+      },
+      {
+        "check": "CHILD_SAFE_LOUDNESS",
+        "measured": -16,
+        "tolerance": -14,
+        "unit": "LUFS",
+        "status": "PASS",
+        "repair": "Lower the loudness target; children listen close and often on speakers with no limiter."
+      },
+      {
+        "check": "DIALOGUE_INTELLIGIBILITY",
+        "measured": 20.81,
+        "tolerance": 10,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the music bed or raise the dialogue; children cannot follow words buried under a score."
+      },
+      {
+        "check": "DUCKING_COVERAGE",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "lines",
+        "status": "PASS",
+        "repair": "Add a ducking region covering every dialogue line."
+      },
+      {
+        "check": "NO_PAID_PROVIDER",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "requests",
+        "status": "PASS",
+        "repair": "Route the request through the local or cached provider."
+      }
+    ]
+  },
+  {
+    "shotId": "VALIDATION_STEPS_1_8_s003",
+    "beatId": "B3_TURN",
+    "status": "PASS",
+    "motion": [
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 9 or reduce travel to 3.06 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1.61,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0.081 s or reduce travel below 25.2 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.113,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.826,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 3,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      },
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 12 or reduce travel to 2.64 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1.9284,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0.07 s or reduce travel below 18.19 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.18,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.91,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 4,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "CHARACTER_COLLISION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1.5375,
+        "tolerance": 0.35,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Widen the stance separation or restage to different depths."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      }
+    ],
+    "facial": [
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 55,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 2137,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 2753,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 4,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.613,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.077,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 109,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1805,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 2765,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 5,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.187,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.077,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      }
+    ],
+    "sound": [
+      {
+        "check": "MISSING_AUDIO",
+        "measured": 28,
+        "tolerance": 1,
+        "unit": "tracks",
+        "status": "PASS",
+        "repair": "Every shot needs at least an ambience bed."
+      },
+      {
+        "check": "DURATION_OVERRUN",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Trim the offending track or lengthen the shot; audio past the cut is discarded."
+      },
+      {
+        "check": "SILENCE_DROPOUT",
+        "measured": 0,
+        "tolerance": 1200,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Extend the ambience bed to cover the whole shot."
+      },
+      {
+        "check": "CLIPPING_RISK",
+        "measured": -2,
+        "tolerance": -1.5,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the loudest overlapping tracks or increase ducking."
+      },
+      {
+        "check": "CHILD_SAFE_LOUDNESS",
+        "measured": -16,
+        "tolerance": -14,
+        "unit": "LUFS",
+        "status": "PASS",
+        "repair": "Lower the loudness target; children listen close and often on speakers with no limiter."
+      },
+      {
+        "check": "DIALOGUE_INTELLIGIBILITY",
+        "measured": 20.8,
+        "tolerance": 10,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the music bed or raise the dialogue; children cannot follow words buried under a score."
+      },
+      {
+        "check": "DUCKING_COVERAGE",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "lines",
+        "status": "PASS",
+        "repair": "Add a ducking region covering every dialogue line."
+      },
+      {
+        "check": "NO_PAID_PROVIDER",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "requests",
+        "status": "PASS",
+        "repair": "Route the request through the local or cached provider."
+      }
+    ]
+  },
+  {
+    "shotId": "VALIDATION_STEPS_1_8_s004",
+    "beatId": "B4_PAYOFF",
+    "status": "PASS",
+    "motion": [
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 1 or reduce travel to 0 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0 s or reduce travel below 20.41 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.174,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.947,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 3,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      },
+      {
+        "check": "FOOT_SLIDE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.02,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Adjust step count to 1 or reduce travel to 0 m."
+      },
+      {
+        "check": "GROUND_PENETRATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.002,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "FLOAT",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0.005,
+        "unit": "m",
+        "status": "PASS"
+      },
+      {
+        "check": "EXCESSIVE_ACCELERATION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "m/s^2",
+        "status": "PASS",
+        "repair": "Lengthen the anticipation window past 0 s or reduce travel below 11.99 m."
+      },
+      {
+        "check": "FROZEN",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 12,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "Add a breathing or secondary-motion layer, or insert an intermediate key."
+      },
+      {
+        "check": "MECHANICAL_SYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.141,
+        "tolerance": 0.05,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Offset one side of the body or stagger the overlap lag."
+      },
+      {
+        "check": "SILHOUETTE_READABILITY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.84,
+        "tolerance": 0.55,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Open the gesture away from the body or change the camera angle for this beat."
+      },
+      {
+        "check": "EYE_LEAD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 4,
+        "tolerance": 1,
+        "unit": "frames",
+        "status": "PASS",
+        "repair": "The eyes must reach the target before the head; raise eyeLeadFrames."
+      },
+      {
+        "check": "CHARACTER_COLLISION",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1.481,
+        "tolerance": 0.35,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Widen the stance separation or restage to different depths."
+      },
+      {
+        "check": "OUT_OF_FRAME_PERFORMANCE",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "m",
+        "status": "PASS",
+        "repair": "Restage toward centre or widen the shot."
+      }
+    ],
+    "facial": [
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 125,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1542,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 2158,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 5,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 0.038,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_GOAT_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "LIPSYNC_CHATTER",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 55,
+        "tolerance": 55,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Shorten the dialogue or lengthen the shot."
+      },
+      {
+        "check": "BLINK_TWITCH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 700,
+        "tolerance": 700,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Reduce the blink rate for this emotion."
+      },
+      {
+        "check": "GLASS_EYES",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1792,
+        "tolerance": 6000,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Add a blink; eyes that never close read as glass."
+      },
+      {
+        "check": "EXPRESSION_HOLD",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 2111,
+        "tolerance": 180,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Lengthen the shot or shorten the transition."
+      },
+      {
+        "check": "CHANNEL_MUSH",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 5,
+        "tolerance": 6,
+        "unit": "channels",
+        "status": "PASS",
+        "repair": "Drop the weakest expression channels; more than six at once reads as no expression at all."
+      },
+      {
+        "check": "MOUTH_CLIPPING",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.589,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS",
+        "repair": "Reduce mouth-group weights; stacked open+smile drives the mouth through the face."
+      },
+      {
+        "check": "ASYMMETRY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 0.078,
+        "tolerance": 0.02,
+        "unit": "unit",
+        "status": "PASS"
+      },
+      {
+        "check": "REST_RECOVERY",
+        "characterCode": "CHAR_PIP_001",
+        "measured": 1,
+        "tolerance": 1,
+        "unit": "unit",
+        "status": "PASS"
+      }
+    ],
+    "sound": [
+      {
+        "check": "MISSING_AUDIO",
+        "measured": 5,
+        "tolerance": 1,
+        "unit": "tracks",
+        "status": "PASS",
+        "repair": "Every shot needs at least an ambience bed."
+      },
+      {
+        "check": "DURATION_OVERRUN",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Trim the offending track or lengthen the shot; audio past the cut is discarded."
+      },
+      {
+        "check": "SILENCE_DROPOUT",
+        "measured": 0,
+        "tolerance": 1200,
+        "unit": "ms",
+        "status": "PASS",
+        "repair": "Extend the ambience bed to cover the whole shot."
+      },
+      {
+        "check": "CLIPPING_RISK",
+        "measured": -2,
+        "tolerance": -1.5,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the loudest overlapping tracks or increase ducking."
+      },
+      {
+        "check": "CHILD_SAFE_LOUDNESS",
+        "measured": -16,
+        "tolerance": -14,
+        "unit": "LUFS",
+        "status": "PASS",
+        "repair": "Lower the loudness target; children listen close and often on speakers with no limiter."
+      },
+      {
+        "check": "DIALOGUE_INTELLIGIBILITY",
+        "measured": 20,
+        "tolerance": 10,
+        "unit": "dB",
+        "status": "PASS",
+        "repair": "Lower the music bed or raise the dialogue; children cannot follow words buried under a score."
+      },
+      {
+        "check": "DUCKING_COVERAGE",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "lines",
+        "status": "PASS",
+        "repair": "Add a ducking region covering every dialogue line."
+      },
+      {
+        "check": "NO_PAID_PROVIDER",
+        "measured": 0,
+        "tolerance": 0,
+        "unit": "requests",
+        "status": "PASS",
+        "repair": "Route the request through the local or cached provider."
+      }
+    ]
+  }
+]

@@ -1,0 +1,603 @@
+{
+  "shotId": "VALIDATION_STEPS_1_8_s003",
+  "mixConfigKey": "bbbd1609616a6334071d61b9ed2a0bd3",
+  "mixBusTrimDb": -4.8,
+  "durationMs": 3500,
+  "loudness": {
+    "targetLufs": -16,
+    "truePeakDb": -1.5,
+    "dialogueToMusicDb": 10
+  },
+  "ducking": [
+    {
+      "startMs": 60,
+      "endMs": 2303,
+      "attenuationDb": -9
+    }
+  ],
+  "tracks": [
+    {
+      "trackId": "amb_VALIDATION_STEPS_1_8_s003",
+      "kind": "AMBIENCE",
+      "startMs": 0,
+      "durationMs": 3500,
+      "offsetMs": 0,
+      "gainDb": -26.8,
+      "fadeInMs": 200,
+      "fadeOutMs": 300,
+      "duckPriority": 4,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "amb_meadow_afternoon_v1",
+        "provider": "mock",
+        "cacheKey": "c7dea77edfadfd77462c9dee",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "mus_VALIDATION_STEPS_1_8_s003",
+      "kind": "MUSIC",
+      "startMs": 0,
+      "durationMs": 3500,
+      "offsetMs": 0,
+      "gainDb": -20.8,
+      "fadeInMs": 400,
+      "fadeOutMs": 600,
+      "duckPriority": 3,
+      "source": {
+        "kind": "MUSIC_LIBRARY",
+        "ref": "mus_playful_marimba_v1",
+        "provider": "mock",
+        "cacheKey": "89126af07c590d147ed9a6d6",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "vfx_VALIDATION_STEPS_1_8_s003_vfx_magic_sparkles_v1",
+      "kind": "VFX",
+      "startMs": 0,
+      "durationMs": 1400,
+      "offsetMs": 0,
+      "gainDb": -21.3,
+      "fadeInMs": 20,
+      "fadeOutMs": 180,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_sparkle_shimmer_v1",
+        "provider": "mock",
+        "cacheKey": "32d4c0b4db970d683ed95b70",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "dlg_L3",
+      "kind": "DIALOGUE",
+      "startMs": 180,
+      "durationMs": 1863,
+      "offsetMs": 0,
+      "gainDb": -4.35,
+      "fadeInMs": 15,
+      "fadeOutMs": 40,
+      "duckPriority": 0,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "VOICE_SYNTHESIS",
+        "ref": "pip_default_v1",
+        "provider": "local-espeak",
+        "cacheKey": "1f12ca26fefd2e3ee6b822b2fb66d92d",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "text": "Come on, it is this way.",
+      "cached": false
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_1",
+      "kind": "FOOTSTEPS",
+      "startMs": 269,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.91,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "51aaaa268da73fd5dfbb762a",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_1",
+      "kind": "FOOTSTEPS",
+      "startMs": 350,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.97,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "5eb8a0c5784a8b9b6ca7261b",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_2",
+      "kind": "FOOTSTEPS",
+      "startMs": 538,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.93,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "66a6ad034c25eb6718250dbc",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_2",
+      "kind": "FOOTSTEPS",
+      "startMs": 700,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -21.55,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "c4e5c1d1c7fff674848ad352",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_3",
+      "kind": "FOOTSTEPS",
+      "startMs": 808,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -19.76,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "d1cc46ffe900c452e0c3904a",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "foley_CHAR_GOAT_001",
+      "kind": "FOLEY",
+      "startMs": 875,
+      "durationMs": 900,
+      "offsetMs": 0,
+      "gainDb": -28.08,
+      "fadeInMs": 60,
+      "fadeOutMs": 160,
+      "duckPriority": 6,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_collar_tag_jingle_v1",
+        "provider": "mock",
+        "cacheKey": "b6a203778ac85e3948f9897b",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_3",
+      "kind": "FOOTSTEPS",
+      "startMs": 1050,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.61,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "c001bd059a1ea7973ec5c5fa",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_4",
+      "kind": "FOOTSTEPS",
+      "startMs": 1077,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.46,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "94f2fe1ee9d6eb922edc3c91",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "vfx_VALIDATION_STEPS_1_8_s003_vfx_dust_puff_v1",
+      "kind": "VFX",
+      "startMs": 1225,
+      "durationMs": 1200,
+      "offsetMs": 0,
+      "gainDb": -22.05,
+      "fadeInMs": 20,
+      "fadeOutMs": 180,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_dust_puff_v1",
+        "provider": "mock",
+        "cacheKey": "d6cd2be0cca69eb980420992",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_5",
+      "kind": "FOOTSTEPS",
+      "startMs": 1346,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.84,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "40ec12517db5b4e80b6b3c22",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_4",
+      "kind": "FOOTSTEPS",
+      "startMs": 1400,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.37,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "e962a35d437bfebf07027d7d",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_6",
+      "kind": "FOOTSTEPS",
+      "startMs": 1615,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -19.75,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "9b2e2d3f58135fbc0f3d8381",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_5",
+      "kind": "FOOTSTEPS",
+      "startMs": 1750,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.66,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "86b91dc3314c86bba24fb474",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_7",
+      "kind": "FOOTSTEPS",
+      "startMs": 1885,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -19.61,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "4905ddfa1d15083d4885b1e8",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_6",
+      "kind": "FOOTSTEPS",
+      "startMs": 2100,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.51,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "0ec933174a37133b5404c498",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_8",
+      "kind": "FOOTSTEPS",
+      "startMs": 2154,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -19.9,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "97d36e8298a561a77cc40e4f",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_9",
+      "kind": "FOOTSTEPS",
+      "startMs": 2423,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.77,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "cb7775077227b3eb48a06127",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_7",
+      "kind": "FOOTSTEPS",
+      "startMs": 2450,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -21.49,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "c3e7507085895a831bf1e344",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_10",
+      "kind": "FOOTSTEPS",
+      "startMs": 2692,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.49,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "151f39e751658e615f5127b0",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_8",
+      "kind": "FOOTSTEPS",
+      "startMs": 2800,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -21.04,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "0482d6384cf17758527641ff",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_11",
+      "kind": "FOOTSTEPS",
+      "startMs": 2962,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.1,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "479cac67a9fb616b430245d9",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "trans_VALIDATION_STEPS_1_8_s003",
+      "kind": "TRANSITION",
+      "startMs": 3000,
+      "durationMs": 500,
+      "offsetMs": 0,
+      "gainDb": -22.8,
+      "fadeInMs": 60,
+      "fadeOutMs": 220,
+      "duckPriority": 4,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_transition_swish_v1",
+        "provider": "mock",
+        "cacheKey": "6c61351f1bf734554002c93e",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_GOAT_001_9",
+      "kind": "FOOTSTEPS",
+      "startMs": 3150,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -21.93,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_hoofstep_goat_soil_v1",
+        "provider": "mock",
+        "cacheKey": "b0aa4ae76e1297493385e258",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "step_CHAR_PIP_001_12",
+      "kind": "FOOTSTEPS",
+      "startMs": 3231,
+      "durationMs": 180,
+      "offsetMs": 0,
+      "gainDb": -20.63,
+      "fadeInMs": 0,
+      "fadeOutMs": 60,
+      "duckPriority": 5,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_footstep_chick_soil_v1",
+        "provider": "mock",
+        "cacheKey": "72367fb02d56ddd215acd279",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    }
+  ],
+  "dialogueTiming": [
+    {
+      "lineId": "L3",
+      "characterCode": "CHAR_PIP_001",
+      "startMs": 180,
+      "durationMs": 1863,
+      "text": "Come on, it is this way.",
+      "words": 6,
+      "syllables": 6
+    }
+  ],
+  "voiceRequests": [
+    {
+      "characterCode": "CHAR_PIP_001",
+      "voiceId": "pip_default_v1",
+      "lineId": "L3",
+      "text": "Come on, it is this way.",
+      "prosody": {
+        "pitchSemitones": 0.037,
+        "rate": 1,
+        "gainDb": 0.45,
+        "brightness": 0.537
+      },
+      "cacheKey": "1f12ca26fefd2e3ee6b822b2fb66d92d",
+      "requiresPaidProvider": false
+    }
+  ]
+}

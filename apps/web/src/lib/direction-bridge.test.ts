@@ -15,10 +15,15 @@ import {
   FAULTY_SCENE_PLAN_INPUT,
   GOAT_LOCK,
   MEADOW_MAP_MYSTERY_ACCEPTED_SHOT_META,
+  NULL_SINK,
   PIP_LOCK,
   ScenePlanSchema,
   VALIDATION_SCENE_PLAN,
+  buildFfmpegAnalysisCommand,
+  buildFfmpegMixCommand,
+  dbToLinear,
   direct,
+  parseLoudnormMeasurement,
   projectAudioAssembly,
   projectBlueprintForRender,
   projectManifestState,
@@ -291,10 +296,143 @@ describe('accepted evidence remains valid', () => {
     const directionSrc = path.join(repoRoot, 'packages/direction/src');
     const files = readFileSync(path.join(directionSrc, 'index.ts'), 'utf8');
     expect(files).not.toContain('node:fs');
-    for (const module of ['director/index.ts', 'acting/index.ts', 'vfx/index.ts', 'sound/index.ts']) {
-      const source = readFileSync(path.join(directionSrc, module), 'utf8');
-      expect(source, module).not.toContain('node:fs');
-      expect(source, module).not.toContain('production-library');
+    for (const relative of ['director/index.ts', 'acting/index.ts', 'vfx/index.ts', 'sound/index.ts']) {
+      const source = readFileSync(path.join(directionSrc, relative), 'utf8');
+      expect(source, relative).not.toContain('node:fs');
+      expect(source, relative).not.toContain('production-library');
     }
+  });
+});
+
+/**
+ * The FFmpeg compiler.
+ *
+ * Step 8 claims FFmpeg-compatible assembly, and the harness proves it by executing
+ * the command. These tests cover the properties an execution cannot show: that the
+ * graph is deterministic, that it fails closed on a missing artifact, and that the
+ * planner's gain staging survives compilation.
+ */
+describe('sound plan compiles to an FFmpeg command', () => {
+  const audio = projectAudioAssembly(shots[0]);
+
+  it('emits one input per track and one filter chain per track', () => {
+    const command = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' });
+    expect(command.inputs.length).toBe(audio.tracks.length);
+    for (let index = 0; index < audio.tracks.length; index += 1) {
+      expect(command.filterGraph).toContain(`[${index}:a]`);
+      expect(command.filterGraph).toContain(`[t${index}]`);
+    }
+    expect(command.filterGraph).toContain(`amix=inputs=${audio.tracks.length}`);
+    expect(command.args).toContain('/tmp/out.wav');
+  });
+
+  it('is deterministic: the same plan compiles to the same argv', () => {
+    const a = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' });
+    const b = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' });
+    expect(a.args.join(' ')).toBe(b.args.join(' '));
+  });
+
+  // The bus trim is the planner's headroom budget. If compilation dropped it, the
+  // mix would clip exactly as it did before gain staging was added.
+  it('folds the planner’s bus trim into every track gain', () => {
+    const command = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' });
+    for (const track of audio.tracks) {
+      const expected = (track.gainDb + audio.mixBusTrimDb).toFixed(2);
+      expect(command.filterGraph).toContain(`volume=${expected}dB`);
+    }
+  });
+
+  it('never ducks dialogue, and ducks everything else for the planned windows', () => {
+    const withDucking = projectAudioAssembly(
+      shots.find((shot) => shot.audio.ducking.length > 0) ?? shots[0],
+    );
+    const command = buildFfmpegMixCommand(withDucking, { outputPath: '/tmp/out.wav' });
+    const chains = command.filterGraph.split(';');
+    const tracks = [...withDucking.tracks].sort((a, b) => a.trackId.localeCompare(b.trackId));
+    tracks.forEach((track, index) => {
+      const chain = chains.find((c) => c.startsWith(`[${index}:a]`)) ?? '';
+      if (track.duckPriority === 0) {
+        expect(chain, track.trackId).not.toContain('enable=');
+      }
+    });
+    if (withDucking.ducking.length > 0) {
+      expect(command.filterGraph).toContain('enable=');
+    }
+  });
+
+  it('pads every branch to the shot length so the mix cannot end early', () => {
+    const command = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' });
+    const seconds = (audio.durationMs / 1000).toFixed(3);
+    expect(command.filterGraph.match(new RegExp(`apad=whole_dur=${seconds}`, 'g'))?.length).toBe(
+      audio.tracks.length,
+    );
+    expect(command.args).toContain(seconds);
+  });
+
+  // Missing-audio detection. A real assembly with an unresolved artifact must stop:
+  // mixing a shorter film is the failure mode that ships silently.
+  it('fails closed when a real assembly has no artifact for a track', () => {
+    expect(() =>
+      buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav', sourceMode: 'real' }),
+    ).toThrow(/no resolved source/);
+  });
+
+  it('accepts a real assembly when every track resolves', () => {
+    const resolvedSources = Object.fromEntries(
+      audio.tracks.map((track) => [track.trackId, `/cache/${track.source.cacheKey}.wav`]),
+    );
+    const command = buildFfmpegMixCommand(audio, {
+      outputPath: '/tmp/out.wav',
+      sourceMode: 'real',
+      resolvedSources,
+    });
+    expect(command.inputs.every((input) => input.source.startsWith('/cache/'))).toBe(true);
+    expect(command.filterGraph).not.toContain('lavfi');
+  });
+
+  it('measures with the same graph it writes with', () => {
+    const analysis = buildFfmpegAnalysisCommand(audio);
+    const write = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' });
+    // Same chains; only the sink differs, so the correction cannot be measured on a
+    // different mix than the one it is applied to.
+    expect(analysis.filterGraph).toBe(write.filterGraph);
+    expect(analysis.outputPath).toBe(NULL_SINK);
+    expect(analysis.args).toContain('null');
+  });
+
+  // Two-pass normalisation: adaptive single-pass cannot converge on a 2.5s shot, and
+  // a fixed measured correction is also the only deterministic option.
+  it('applies a measured correction linearly on the second pass', () => {
+    const measurement = {
+      input_i: '-13.20',
+      input_tp: '-9.90',
+      input_lra: '5.10',
+      input_thresh: '-23.40',
+      target_offset: '-0.10',
+    };
+    const command = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav', measurement });
+    expect(command.filterGraph).toContain('linear=true');
+    expect(command.filterGraph).toContain('measured_I=-13.20');
+    expect(command.filterGraph).toContain('offset=-0.10');
+    expect(buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' }).filterGraph).not.toContain(
+      'linear=true',
+    );
+  });
+
+  it('limits to the planned true peak, expressed linearly', () => {
+    const command = buildFfmpegMixCommand(audio, { outputPath: '/tmp/out.wav' });
+    expect(command.filterGraph).toContain(
+      `alimiter=limit=${dbToLinear(audio.loudness.truePeakDb).toFixed(6)}`,
+    );
+    expect(command.filterGraph).toContain(`I=${audio.loudness.targetLufs}`);
+  });
+
+  it('parses a loudnorm measurement, and refuses a partial one', () => {
+    const stderr =
+      'stuff\n{\n"input_i" : "-13.20",\n"input_tp" : "-9.90",\n"input_lra" : "5.10",\n' +
+      '"input_thresh" : "-23.40",\n"target_offset" : "-0.10"\n}\n';
+    expect(parseLoudnormMeasurement(stderr)?.input_i).toBe('-13.20');
+    expect(parseLoudnormMeasurement('no json here')).toBeNull();
+    expect(parseLoudnormMeasurement('{"input_i":"-13.2"}')).toBeNull();
   });
 });

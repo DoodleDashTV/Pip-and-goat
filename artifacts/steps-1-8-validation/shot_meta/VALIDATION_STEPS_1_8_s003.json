@@ -1,0 +1,317 @@
+{
+  "title": "They walk together toward the creek the glowing mark points to",
+  "cameraPreset": "FOLLOW",
+  "lightingState": "DAY_KEY",
+  "placements": {
+    "goat": {
+      "location": [
+        -0.719,
+        -1.419,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.5
+      ],
+      "action": "GOAT_WALK"
+    },
+    "pip": {
+      "location": [
+        0.807,
+        -1.607,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.56
+      ],
+      "action": "PIP_WALK"
+    }
+  },
+  "endFrame": 105,
+  "lipSync": {
+    "goat": [
+      {
+        "viseme": "REST",
+        "startMs": 3168,
+        "endMs": 3500,
+        "weight": 1
+      }
+    ],
+    "pip": [
+      {
+        "viseme": "O",
+        "startMs": 180,
+        "endMs": 325,
+        "weight": 0.638
+      },
+      {
+        "viseme": "M_B_P",
+        "startMs": 290,
+        "endMs": 434,
+        "weight": 0.638
+      },
+      {
+        "viseme": "E",
+        "startMs": 399,
+        "endMs": 544,
+        "weight": 0.638
+      },
+      {
+        "viseme": "REST",
+        "startMs": 509,
+        "endMs": 653,
+        "weight": 0.638
+      },
+      {
+        "viseme": "O",
+        "startMs": 618,
+        "endMs": 763,
+        "weight": 0.638
+      },
+      {
+        "viseme": "REST",
+        "startMs": 728,
+        "endMs": 873,
+        "weight": 0.638
+      },
+      {
+        "viseme": "I",
+        "startMs": 838,
+        "endMs": 982,
+        "weight": 0.638
+      },
+      {
+        "viseme": "REST",
+        "startMs": 947,
+        "endMs": 1092,
+        "weight": 0.638
+      },
+      {
+        "viseme": "I",
+        "startMs": 1057,
+        "endMs": 1201,
+        "weight": 0.638
+      },
+      {
+        "viseme": "REST",
+        "startMs": 1166,
+        "endMs": 1311,
+        "weight": 0.638
+      },
+      {
+        "viseme": "TH",
+        "startMs": 1276,
+        "endMs": 1420,
+        "weight": 0.638
+      },
+      {
+        "viseme": "I",
+        "startMs": 1385,
+        "endMs": 1530,
+        "weight": 0.638
+      },
+      {
+        "viseme": "REST",
+        "startMs": 1495,
+        "endMs": 1640,
+        "weight": 0.638
+      },
+      {
+        "viseme": "U",
+        "startMs": 1605,
+        "endMs": 1749,
+        "weight": 0.638
+      },
+      {
+        "viseme": "A",
+        "startMs": 1714,
+        "endMs": 1859,
+        "weight": 0.638
+      },
+      {
+        "viseme": "I",
+        "startMs": 1824,
+        "endMs": 1968,
+        "weight": 0.638
+      },
+      {
+        "viseme": "REST",
+        "startMs": 1933,
+        "endMs": 2078,
+        "weight": 0.638
+      },
+      {
+        "viseme": "REST",
+        "startMs": 3163,
+        "endMs": 3500,
+        "weight": 1
+      }
+    ]
+  },
+  "direction": {
+    "version": "1.0.0",
+    "camera": {
+      "composition": "MEDIUM",
+      "move": "FOLLOW",
+      "lensMm": 35,
+      "geometry": {
+        "location": [
+          -0.121,
+          -4.6,
+          1.7
+        ],
+        "rotationDegrees": [
+          80.13,
+          0,
+          0
+        ]
+      },
+      "focusDistanceMeters": 4.6,
+      "endFocusDistanceMeters": 4.6
+    },
+    "lighting": {
+      "recipe": "MEADOW_DAY_KEY",
+      "exposure": 0.022,
+      "viewTransform": "Khronos PBR Neutral",
+      "look": "None",
+      "practicals": []
+    },
+    "facial": {
+      "goat": [
+        {
+          "channel": "brow_up",
+          "startMs": 0,
+          "endMs": 3168,
+          "weight": 0.145,
+          "source": "BROW"
+        },
+        {
+          "channel": "ear_perk",
+          "startMs": 0,
+          "endMs": 3168,
+          "weight": 0.2,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "mouth_open",
+          "startMs": 0,
+          "endMs": 3168,
+          "weight": 0.137,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 3168,
+          "weight": 0.476,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 2137,
+          "endMs": 2257,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ],
+      "pip": [
+        {
+          "channel": "beak_open",
+          "startMs": 0,
+          "endMs": 3163,
+          "weight": 0.05,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "brow_down",
+          "startMs": 0,
+          "endMs": 3163,
+          "weight": 0.15,
+          "source": "BROW"
+        },
+        {
+          "channel": "cheek_puff",
+          "startMs": 0,
+          "endMs": 3163,
+          "weight": 0.26,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "smile",
+          "startMs": 0,
+          "endMs": 3163,
+          "weight": 0.137,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "squint",
+          "startMs": 0,
+          "endMs": 3163,
+          "weight": 0.243,
+          "source": "EXPRESSION"
+        },
+        {
+          "channel": "blink",
+          "startMs": 1588,
+          "endMs": 1695,
+          "weight": 1,
+          "source": "BLINK"
+        }
+      ]
+    },
+    "vfx": [
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s003_vfx_dust_puff_v1",
+        "presetId": "vfx_dust_puff_v1",
+        "presetVersion": "1.0.0",
+        "seed": 868160216,
+        "startMs": 1225,
+        "durationMs": 1200,
+        "intensity": 0.55,
+        "particleCount": 143,
+        "anchor": {
+          "kind": "CHARACTER",
+          "ref": "CHAR_GOAT_001"
+        },
+        "boundsMeters": {
+          "x": 0.574,
+          "y": 0.574,
+          "z": 0.369
+        },
+        "palette": [
+          "#D8C7A6",
+          "#EFE4CD"
+        ],
+        "layer": "BEHIND_SUBJECT"
+      },
+      {
+        "instanceId": "VALIDATION_STEPS_1_8_s003_vfx_magic_sparkles_v1",
+        "presetId": "vfx_magic_sparkles_v1",
+        "presetVersion": "1.0.0",
+        "seed": 3988436819,
+        "startMs": 0,
+        "durationMs": 2500,
+        "intensity": 0.7,
+        "particleCount": 294,
+        "anchor": {
+          "kind": "CHARACTER",
+          "ref": "CHAR_PIP_001"
+        },
+        "boundsMeters": {
+          "x": 0.792,
+          "y": 0.792,
+          "z": 1.056
+        },
+        "palette": [
+          "#FFE9A8",
+          "#FFF6DA"
+        ],
+        "layer": "AROUND_SUBJECT"
+      }
+    ],
+    "shotHash": "38bf903dd10e368f"
+  }
+}

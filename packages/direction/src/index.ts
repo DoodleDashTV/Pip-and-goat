@@ -31,6 +31,7 @@ export * from './vfx';
 export * from './sound';
 export * from './director';
 export * from './bridge';
+export * from './ffmpeg';
 export * from './overrides';
 export * from './cache';
 export * from './fixtures';

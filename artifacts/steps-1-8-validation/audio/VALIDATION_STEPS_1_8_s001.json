@@ -1,0 +1,184 @@
+{
+  "shotId": "VALIDATION_STEPS_1_8_s001",
+  "mixConfigKey": "57584e63408b6646c3e174b887fa6c3f",
+  "mixBusTrimDb": -3.73,
+  "durationMs": 2500,
+  "loudness": {
+    "targetLufs": -16,
+    "truePeakDb": -1.5,
+    "dialogueToMusicDb": 10
+  },
+  "ducking": [
+    {
+      "startMs": 120,
+      "endMs": 2388,
+      "attenuationDb": -9
+    }
+  ],
+  "tracks": [
+    {
+      "trackId": "amb_VALIDATION_STEPS_1_8_s001",
+      "kind": "AMBIENCE",
+      "startMs": 0,
+      "durationMs": 2500,
+      "offsetMs": 0,
+      "gainDb": -25.73,
+      "fadeInMs": 200,
+      "fadeOutMs": 300,
+      "duckPriority": 4,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "amb_meadow_midday_v1",
+        "provider": "mock",
+        "cacheKey": "6c1d208512df0db99128bac8",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "mus_VALIDATION_STEPS_1_8_s001",
+      "kind": "MUSIC",
+      "startMs": 0,
+      "durationMs": 2500,
+      "offsetMs": 0,
+      "gainDb": -19.73,
+      "fadeInMs": 400,
+      "fadeOutMs": 600,
+      "duckPriority": 3,
+      "source": {
+        "kind": "MUSIC_LIBRARY",
+        "ref": "mus_curious_pizzicato_v1",
+        "provider": "mock",
+        "cacheKey": "b2cae27b1a75f33212115c16",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "vfx_VALIDATION_STEPS_1_8_s001_vfx_map_glow_v1",
+      "kind": "VFX",
+      "startMs": 0,
+      "durationMs": 1400,
+      "offsetMs": 0,
+      "gainDb": -21.23,
+      "fadeInMs": 20,
+      "fadeOutMs": 180,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_warm_hum_v1",
+        "provider": "mock",
+        "cacheKey": "5d69e28738f46fbcd0aea79d",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "dlg_L1",
+      "kind": "DIALOGUE",
+      "startMs": 240,
+      "durationMs": 1888,
+      "offsetMs": 0,
+      "gainDb": -3.73,
+      "fadeInMs": 15,
+      "fadeOutMs": 40,
+      "duckPriority": 0,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "VOICE_SYNTHESIS",
+        "ref": "pip_default_v1",
+        "provider": "local-espeak",
+        "cacheKey": "0d7b4d0aa75e641905a9292b249c1881",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "text": "Goat, look at this little mark.",
+      "cached": false
+    },
+    {
+      "trackId": "foley_CHAR_GOAT_001",
+      "kind": "FOLEY",
+      "startMs": 625,
+      "durationMs": 900,
+      "offsetMs": 0,
+      "gainDb": -26.92,
+      "fadeInMs": 60,
+      "fadeOutMs": 160,
+      "duckPriority": 6,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_collar_tag_jingle_v1",
+        "provider": "mock",
+        "cacheKey": "b6a203778ac85e3948f9897b",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "foley_CHAR_PIP_001",
+      "kind": "FOLEY",
+      "startMs": 625,
+      "durationMs": 900,
+      "offsetMs": 0,
+      "gainDb": -26.86,
+      "fadeInMs": 60,
+      "fadeOutMs": 160,
+      "duckPriority": 6,
+      "characterCode": "CHAR_PIP_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_feather_ruffle_v1",
+        "provider": "mock",
+        "cacheKey": "9603ed269a3a8bc5f736b3cf",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "prop_PROP_MAP_001",
+      "kind": "PROP",
+      "startMs": 750,
+      "durationMs": 420,
+      "offsetMs": 0,
+      "gainDb": -22.73,
+      "fadeInMs": 20,
+      "fadeOutMs": 120,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_prop_prop_map_001_v1",
+        "provider": "mock",
+        "cacheKey": "55a619daf54bfa30fa852e4c",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    }
+  ],
+  "dialogueTiming": [
+    {
+      "lineId": "L1",
+      "characterCode": "CHAR_PIP_001",
+      "startMs": 240,
+      "durationMs": 1888,
+      "text": "Goat, look at this little mark.",
+      "words": 6,
+      "syllables": 6
+    }
+  ],
+  "voiceRequests": [
+    {
+      "characterCode": "CHAR_PIP_001",
+      "voiceId": "pip_default_v1",
+      "lineId": "L1",
+      "text": "Goat, look at this little mark.",
+      "prosody": {
+        "pitchSemitones": 0.571,
+        "rate": 0.987,
+        "gainDb": 0,
+        "brightness": 0.567
+      },
+      "cacheKey": "0d7b4d0aa75e641905a9292b249c1881",
+      "requiresPaidProvider": false
+    }
+  ]
+}

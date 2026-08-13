@@ -1,0 +1,145 @@
+{
+  "shotId": "VALIDATION_STEPS_1_8_s004",
+  "mixConfigKey": "3dc4a6d36160f78a485b20254d7df23e",
+  "mixBusTrimDb": -4,
+  "durationMs": 3000,
+  "loudness": {
+    "targetLufs": -16,
+    "truePeakDb": -1.5,
+    "dialogueToMusicDb": 10
+  },
+  "ducking": [
+    {
+      "startMs": 60,
+      "endMs": 2195,
+      "attenuationDb": -9
+    }
+  ],
+  "tracks": [
+    {
+      "trackId": "amb_VALIDATION_STEPS_1_8_s004",
+      "kind": "AMBIENCE",
+      "startMs": 0,
+      "durationMs": 3000,
+      "offsetMs": 0,
+      "gainDb": -26,
+      "fadeInMs": 200,
+      "fadeOutMs": 300,
+      "duckPriority": 4,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "amb_meadow_golden_v1",
+        "provider": "mock",
+        "cacheKey": "917ac2e3d82ccea9081ad9d4",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "mus_VALIDATION_STEPS_1_8_s004",
+      "kind": "MUSIC",
+      "startMs": 0,
+      "durationMs": 3000,
+      "offsetMs": 0,
+      "gainDb": -20,
+      "fadeInMs": 400,
+      "fadeOutMs": 600,
+      "duckPriority": 3,
+      "source": {
+        "kind": "MUSIC_LIBRARY",
+        "ref": "mus_triumph_brightbrass_v1",
+        "provider": "mock",
+        "cacheKey": "51256d642b84d4b4b44a6897",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "vfx_VALIDATION_STEPS_1_8_s004_vfx_magic_sparkles_v1",
+      "kind": "VFX",
+      "startMs": 0,
+      "durationMs": 1400,
+      "offsetMs": 0,
+      "gainDb": -20.5,
+      "fadeInMs": 20,
+      "fadeOutMs": 180,
+      "duckPriority": 5,
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_sparkle_shimmer_v1",
+        "provider": "mock",
+        "cacheKey": "32d4c0b4db970d683ed95b70",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    },
+    {
+      "trackId": "dlg_L4",
+      "kind": "DIALOGUE",
+      "startMs": 180,
+      "durationMs": 1755,
+      "offsetMs": 0,
+      "gainDb": -3.22,
+      "fadeInMs": 15,
+      "fadeOutMs": 40,
+      "duckPriority": 0,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "VOICE_SYNTHESIS",
+        "ref": "goat_default_v1",
+        "provider": "local-espeak",
+        "cacheKey": "94084c6ff2e14ececa49041a70c04b9a",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "text": "We found it together.",
+      "cached": false
+    },
+    {
+      "trackId": "foley_CHAR_GOAT_001",
+      "kind": "FOLEY",
+      "startMs": 750,
+      "durationMs": 900,
+      "offsetMs": 0,
+      "gainDb": -26.31,
+      "fadeInMs": 60,
+      "fadeOutMs": 160,
+      "duckPriority": 6,
+      "characterCode": "CHAR_GOAT_001",
+      "source": {
+        "kind": "SOUND_LIBRARY",
+        "ref": "sfx_collar_tag_jingle_v1",
+        "provider": "mock",
+        "cacheKey": "b6a203778ac85e3948f9897b",
+        "license": "Proprietary — TivvleJoy Studios internal use"
+      },
+      "cached": true
+    }
+  ],
+  "dialogueTiming": [
+    {
+      "lineId": "L4",
+      "characterCode": "CHAR_GOAT_001",
+      "startMs": 180,
+      "durationMs": 1755,
+      "text": "We found it together.",
+      "words": 4,
+      "syllables": 6
+    }
+  ],
+  "voiceRequests": [
+    {
+      "characterCode": "CHAR_GOAT_001",
+      "voiceId": "goat_default_v1",
+      "lineId": "L4",
+      "text": "We found it together.",
+      "prosody": {
+        "pitchSemitones": 0.855,
+        "rate": 1.062,
+        "gainDb": 0.78,
+        "brightness": 0.733
+      },
+      "cacheKey": "94084c6ff2e14ececa49041a70c04b9a",
+      "requiresPaidProvider": false
+    }
+  ]
+}

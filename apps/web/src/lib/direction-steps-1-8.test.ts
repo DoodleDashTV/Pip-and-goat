@@ -101,7 +101,10 @@ describe('Step 1 — Director AI', () => {
   });
 
   it('excludes the non-deterministic envelope from the content hash', () => {
-    const withMeta = direct(VALIDATION_SCENE_PLAN, { generatedBy: 'someone-else' });
+    const withMeta = direct(VALIDATION_SCENE_PLAN, {
+      meta: { generatedBy: 'someone-else', generatedAt: '2020-01-01T00:00:00.000Z' },
+    });
+    expect(withMeta.blueprint.meta.generatedBy).toBe('someone-else');
     expect(withMeta.blueprint.content.contentHash).toBe(planned.blueprint.content.contentHash);
   });
 
