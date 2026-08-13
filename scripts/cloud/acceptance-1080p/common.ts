@@ -45,10 +45,10 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * all four constants together if the baked render code moves again.
  */
 export const WORKER_IMAGE =
-  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:32a0e34fde92c90acb3a6b7d6e880216ef162483cd4f6ada8a538b106a388adb'; // pragma: allowlist secret
-export const WORKER_IMAGE_SOURCE_COMMIT = '324ce5ceaa798ee62d3450e95a64084d0d867912';
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:9496498c8dfddccd67e9dd87b696135765d50a3a3f44898f6abdc298a94736cd'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = 'e831d85d6ed05f5a9514cc880174477bd9771890';
 export const WORKER_IMAGE_RENDER_CODE_SHA256 =
-  'cbd8061f83492bc967994b22dcfb21bbd6b52e341ddf9b60fa956d5738806a29';
+  'a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a';
 
 /**
  * Fingerprint of the approved `.blend` assets this checkout would render, from
