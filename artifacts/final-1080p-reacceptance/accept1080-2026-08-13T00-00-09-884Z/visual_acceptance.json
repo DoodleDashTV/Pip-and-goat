@@ -1,0 +1,891 @@
+{
+  "job": {
+    "jobId": "accept1080-2026-08-13T00-00-09-884Z",
+    "podId": "8l0zvhp9p44lu0",
+    "gpu": "NVIDIA+GeForce+RTX+4090",
+    "cloudType": "SECURE",
+    "completedAt": "2026-08-13T00:08:16.919Z",
+    "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-13T00-00-09-884Z/final_1080p.mp4",
+    "timingsMs": {
+      "assetDownloadMs": 86809,
+      "renderMs": 73906,
+      "encodeMs": 2476,
+      "totalMs": 171662
+    }
+  },
+  "workerProvenance": {
+    "recordedByRender": {
+      "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+      "imageDigest": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+      "workerBuildTime": "2026-08-12T22:25:23Z",
+      "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+      "renderCodeMatch": true,
+      "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+      "workerVersion": "0.1.0"
+    },
+    "expected": {
+      "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+      "imageDigest": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+      "workerBuildTime": "2026-08-12T22:25:23Z",
+      "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91"
+    },
+    "verdict": "MATCH - all four values identical; the pod provably ran the rebuilt image"
+  },
+  "technical": {
+    "resolution": "1080x1920",
+    "resolutionExact": true,
+    "codec": "h264",
+    "profile": "High",
+    "level": 40,
+    "pixFmt": "yuv420p",
+    "fps": "30/1",
+    "frameCount": 90,
+    "durationSec": 3.0,
+    "fullDecodeExitCode": 0,
+    "fullDecodeErrors": 0,
+    "decodeZeroErrors": true,
+    "blackFrames": 0,
+    "minPerFrameMeanLuma8bit": 80.64,
+    "ffmpegBlackdetectSegments": 0,
+    "ffmpegFreezedetectSegments": 0,
+    "uniqueFrameHashes": 90,
+    "adjacentDuplicateFramePairs": 0,
+    "r2ReadbackSha256": "03c45cf28b3bb95b34e99dd787bc7981da2a9ef2cadac317a2cf697f21162145",
+    "metadataArtifactSha256": "03c45cf28b3bb95b34e99dd787bc7981da2a9ef2cadac317a2cf697f21162145",
+    "shaMatch": true,
+    "outputBytes": 715646,
+    "verdict": "PASS"
+  },
+  "temporal": {
+    "method": "ffmpeg tblend=all_mode=difference + signalstats YAVG, per consecutive pair",
+    "pairs": 89,
+    "yavgMin": 0.1648,
+    "yavgMean": 0.4159,
+    "yavgMax": 0.6539,
+    "yavgMaxOverMean": 1.57,
+    "frozenPairs": 0,
+    "poppingPairsOver3xMean": 0,
+    "crossCheckNumpyMeanAbsDelta": {
+      "min": 0.2119,
+      "mean": 0.5132,
+      "max": 0.8033
+    },
+    "verdict": "PASS - continuous smooth motion, no frozen span, no popping"
+  },
+  "lighting": {
+    "measurementSpace": "replicates local_acceptance.py::load_srgb + frame_stats exactly",
+    "replicationValidation": {
+      "recomputedLocalKeyframes": [
+        {
+          "frame": 1,
+          "recorded": {
+            "meanLuma": 153.53,
+            "minLuma": 11.79,
+            "maxLuma": 183.89,
+            "meanSaturation": 36.97
+          },
+          "replicated": {
+            "meanLuma": 153.53,
+            "minLuma": 11.79,
+            "maxLuma": 183.89,
+            "meanSaturation": 36.97
+          },
+          "absDiff": {
+            "meanLuma": 0.0,
+            "minLuma": 0.0,
+            "maxLuma": 0.0,
+            "meanSaturation": 0.0
+          }
+        },
+        {
+          "frame": 30,
+          "recorded": {
+            "meanLuma": 152.4,
+            "minLuma": 11.79,
+            "maxLuma": 182.1,
+            "meanSaturation": 37.77
+          },
+          "replicated": {
+            "meanLuma": 152.4,
+            "minLuma": 11.79,
+            "maxLuma": 182.1,
+            "meanSaturation": 37.77
+          },
+          "absDiff": {
+            "meanLuma": 0.0,
+            "minLuma": 0.0,
+            "maxLuma": 0.0,
+            "meanSaturation": 0.0
+          }
+        },
+        {
+          "frame": 60,
+          "recorded": {
+            "meanLuma": 149.42,
+            "minLuma": 11.79,
+            "maxLuma": 182.1,
+            "meanSaturation": 39.65
+          },
+          "replicated": {
+            "meanLuma": 149.42,
+            "minLuma": 11.79,
+            "maxLuma": 182.1,
+            "meanSaturation": 39.65
+          },
+          "absDiff": {
+            "meanLuma": 0.0,
+            "minLuma": 0.0,
+            "maxLuma": 0.0,
+            "meanSaturation": 0.0
+          }
+        },
+        {
+          "frame": 90,
+          "recorded": {
+            "meanLuma": 147.48,
+            "minLuma": 9.09,
+            "maxLuma": 188.74,
+            "meanSaturation": 40.79
+          },
+          "replicated": {
+            "meanLuma": 147.48,
+            "minLuma": 9.09,
+            "maxLuma": 188.74,
+            "meanSaturation": 40.79
+          },
+          "absDiff": {
+            "meanLuma": 0.0,
+            "minLuma": 0.0,
+            "maxLuma": 0.0,
+            "meanSaturation": 0.0
+          }
+        }
+      ],
+      "maxAbsDiffVsRecorded": 0.0,
+      "note": "0.00 difference on all 16 recorded values, so the cloud numbers are directly comparable"
+    },
+    "cloudKeyFrameStats": [
+      {
+        "frame": "cloud_f_0001.png",
+        "meanLuma": 152.73,
+        "minLuma": 0.0,
+        "maxLuma": 213.9,
+        "meanSaturation": 38.22
+      },
+      {
+        "frame": "cloud_f_0023.png",
+        "meanLuma": 152.04,
+        "minLuma": 0.0,
+        "maxLuma": 207.97,
+        "meanSaturation": 38.6
+      },
+      {
+        "frame": "cloud_f_0045.png",
+        "meanLuma": 150.31,
+        "minLuma": 0.0,
+        "maxLuma": 217.46,
+        "meanSaturation": 39.91
+      },
+      {
+        "frame": "cloud_f_0068.png",
+        "meanLuma": 147.87,
+        "minLuma": 0.0,
+        "maxLuma": 204.6,
+        "meanSaturation": 41.53
+      },
+      {
+        "frame": "cloud_f_0090.png",
+        "meanLuma": 146.63,
+        "minLuma": 0.0,
+        "maxLuma": 218.27,
+        "meanSaturation": 42.49
+      }
+    ],
+    "bands": {
+      "DAY_KEY_reference": {
+        "meanLuma": [
+          147.0,
+          154.0
+        ],
+        "minLuma": [
+          9.0,
+          12.0
+        ],
+        "meanSaturation": [
+          37.0,
+          41.0
+        ]
+      },
+      "REJECTED_stale_signature": {
+        "meanLuma": [
+          217.0,
+          222.0
+        ],
+        "minLuma": [
+          121.0,
+          155.0
+        ],
+        "meanSaturation": [
+          8.0,
+          12.0
+        ]
+      }
+    },
+    "inDayKeyBandAllMetrics": false,
+    "inRejectedStaleBand": false,
+    "pairedSameFrameVsLocal": [
+      {
+        "frame": 1,
+        "cloud": {
+          "meanLuma": 152.73,
+          "meanSat": 38.22
+        },
+        "local": {
+          "meanLuma": 153.53,
+          "meanSat": 36.97
+        },
+        "diffMeanLuma": -0.8,
+        "diffMeanSat": 1.25,
+        "pctDiffMeanLuma": -0.52
+      },
+      {
+        "frame": 30,
+        "cloud": {
+          "meanLuma": 151.59,
+          "meanSat": 38.91
+        },
+        "local": {
+          "meanLuma": 152.4,
+          "meanSat": 37.77
+        },
+        "diffMeanLuma": -0.8,
+        "diffMeanSat": 1.13,
+        "pctDiffMeanLuma": -0.53
+      },
+      {
+        "frame": 60,
+        "cloud": {
+          "meanLuma": 148.61,
+          "meanSat": 41.01
+        },
+        "local": {
+          "meanLuma": 149.42,
+          "meanSat": 39.65
+        },
+        "diffMeanLuma": -0.81,
+        "diffMeanSat": 1.36,
+        "pctDiffMeanLuma": -0.55
+      },
+      {
+        "frame": 90,
+        "cloud": {
+          "meanLuma": 146.63,
+          "meanSat": 42.49
+        },
+        "local": {
+          "meanLuma": 147.48,
+          "meanSat": 40.79
+        },
+        "diffMeanLuma": -0.84,
+        "diffMeanSat": 1.7,
+        "pctDiffMeanLuma": -0.57
+      }
+    ],
+    "lowEndDistribution": [
+      {
+        "frame": 1,
+        "cloudPixels": 2073600,
+        "localPixels": 129600,
+        "cloudPercentiles": {
+          "0.001": 0.0,
+          "0.01": 11.13,
+          "0.1": 20.19,
+          "0.5": 46.56,
+          "1.0": 58.15,
+          "5.0": 87.24
+        },
+        "localPercentiles": {
+          "0.001": 12.06,
+          "0.01": 18.19,
+          "0.1": 27.11,
+          "0.5": 51.65,
+          "1.0": 60.17,
+          "5.0": 91.34
+        },
+        "cloudMin": 0.0,
+        "localMin": 11.792,
+        "cloudFracExactlyZero": 2.17e-05,
+        "cloudCountExactlyZero": 45,
+        "cloudFracBelow9": 4.6e-05,
+        "localFracBelow9": 0.0,
+        "cloudFracBelow12": 0.000125,
+        "localFracBelow12": 1.5e-05
+      },
+      {
+        "frame": 30,
+        "cloudPixels": 2073600,
+        "localPixels": 129600,
+        "cloudPercentiles": {
+          "0.001": 0.0,
+          "0.01": 9.09,
+          "0.1": 20.1,
+          "0.5": 45.64,
+          "1.0": 56.46,
+          "5.0": 84.15
+        },
+        "localPercentiles": {
+          "0.001": 11.79,
+          "0.01": 16.26,
+          "0.1": 25.71,
+          "0.5": 47.43,
+          "1.0": 58.15,
+          "5.0": 85.93
+        },
+        "cloudMin": 0.0,
+        "localMin": 11.792,
+        "cloudFracExactlyZero": 4.581e-05,
+        "cloudCountExactlyZero": 95,
+        "cloudFracBelow9": 9.9e-05,
+        "localFracBelow9": 0.0,
+        "cloudFracBelow12": 0.000234,
+        "localFracBelow12": 2.3e-05
+      },
+      {
+        "frame": 60,
+        "cloudPixels": 2073600,
+        "localPixels": 129600,
+        "cloudPercentiles": {
+          "0.001": 0.0,
+          "0.01": 2.04,
+          "0.1": 17.06,
+          "0.5": 33.9,
+          "1.0": 51.63,
+          "5.0": 68.66
+        },
+        "localPercentiles": {
+          "0.001": 11.79,
+          "0.01": 12.71,
+          "0.1": 21.44,
+          "0.5": 42.0,
+          "1.0": 54.48,
+          "5.0": 72.29
+        },
+        "cloudMin": 0.0,
+        "localMin": 11.792,
+        "cloudFracExactlyZero": 8.632e-05,
+        "cloudCountExactlyZero": 179,
+        "cloudFracBelow9": 0.000163,
+        "localFracBelow9": 0.0,
+        "cloudFracBelow12": 0.000299,
+        "localFracBelow12": 4.6e-05
+      },
+      {
+        "frame": 90,
+        "cloudPixels": 2073600,
+        "localPixels": 129600,
+        "cloudPercentiles": {
+          "0.001": 0.0,
+          "0.01": 0.0,
+          "0.1": 12.71,
+          "0.5": 26.08,
+          "1.0": 46.56,
+          "5.0": 63.41
+        },
+        "localPercentiles": {
+          "0.001": 11.79,
+          "0.01": 11.79,
+          "0.1": 19.11,
+          "0.5": 34.57,
+          "1.0": 49.85,
+          "5.0": 66.16
+        },
+        "cloudMin": 0.0,
+        "localMin": 9.09,
+        "cloudFracExactlyZero": 0.00014709,
+        "cloudCountExactlyZero": 305,
+        "cloudFracBelow9": 0.000239,
+        "localFracBelow9": 0.0,
+        "cloudFracBelow12": 0.00048,
+        "localFracBelow12": 0.000108
+      }
+    ],
+    "darkestPixelLocation": {
+      "count": 45,
+      "fractionOfFrame": 2.17e-05,
+      "rowMin": 941,
+      "rowMax": 1267,
+      "rowMeanAsFractionOfHeight": 0.565,
+      "allInLowerHalf": false,
+      "interpretation": "lower frame region => ground/contact shadow, not a crushed sky or a dead region"
+    },
+    "skyVsGround": [
+      {
+        "frame": 1,
+        "skyMeanLuma": 117.05,
+        "groundMeanLuma": 75.84,
+        "skyBrighter": true,
+        "ratio": 1.543
+      },
+      {
+        "frame": 23,
+        "skyMeanLuma": 117.05,
+        "groundMeanLuma": 75.88,
+        "skyBrighter": true,
+        "ratio": 1.542
+      },
+      {
+        "frame": 45,
+        "skyMeanLuma": 117.05,
+        "groundMeanLuma": 76.17,
+        "skyBrighter": true,
+        "ratio": 1.537
+      },
+      {
+        "frame": 68,
+        "skyMeanLuma": 117.04,
+        "groundMeanLuma": 76.84,
+        "skyBrighter": true,
+        "ratio": 1.523
+      },
+      {
+        "frame": 90,
+        "skyMeanLuma": 117.04,
+        "groundMeanLuma": 76.68,
+        "skyBrighter": true,
+        "ratio": 1.526
+      }
+    ],
+    "shadowEvidence": [
+      {
+        "frame": 1,
+        "lowerHalfMeanLuma": 72.14,
+        "lowerHalfMinLuma": 0.0,
+        "fracBelow40pctOfLowerMean": 0.05954,
+        "fracBelow60pctOfLowerMean": 0.08139
+      },
+      {
+        "frame": 23,
+        "lowerHalfMeanLuma": 71.57,
+        "lowerHalfMinLuma": 0.0,
+        "fracBelow40pctOfLowerMean": 0.06667,
+        "fracBelow60pctOfLowerMean": 0.09146
+      },
+      {
+        "frame": 45,
+        "lowerHalfMeanLuma": 70.23,
+        "lowerHalfMinLuma": 0.0,
+        "fracBelow40pctOfLowerMean": 0.08448,
+        "fracBelow60pctOfLowerMean": 0.1172
+      },
+      {
+        "frame": 68,
+        "lowerHalfMeanLuma": 68.18,
+        "lowerHalfMinLuma": 0.0,
+        "fracBelow40pctOfLowerMean": 0.11001,
+        "fracBelow60pctOfLowerMean": 0.15367
+      },
+      {
+        "frame": 90,
+        "lowerHalfMeanLuma": 67.16,
+        "lowerHalfMinLuma": 0.0,
+        "fracBelow40pctOfLowerMean": 0.12248,
+        "fracBelow60pctOfLowerMean": 0.16939
+      }
+    ],
+    "outOfBandMetrics": [
+      {
+        "metric": "minLuma",
+        "cloud": 0.0,
+        "band": "9-12",
+        "explanation": "45-305 pure-black pixels per frame = 0.002-0.015% of a 2,073,600-pixel frame, located in the ground contact shadow. The 270x480 reference has 16x fewer pixels and cannot sample that tail; its minimum sits at the 8-bit quantisation floor. Direction is DEEPER blacks, the opposite of the washed-out failure the band guards against (rejected stale min was 121-155).",
+        "assessment": "explained, benign - not a defect"
+      },
+      {
+        "metric": "meanSaturation",
+        "cloud": "38.22-42.49",
+        "band": "37-41",
+        "explanation": "frames 68 and 90 sit 0.5-1.5 above the band ceiling; the paired same-frame diff vs the local reference is only +1.13 to +1.70 (about +3-4%), consistent with less pixel averaging at 16x resolution.",
+        "assessment": "explained, benign - not a defect"
+      },
+      {
+        "metric": "meanLuma frame 90",
+        "cloud": 146.63,
+        "band": "147-154",
+        "explanation": "0.37 below the band floor, but the band floor IS the local frame-90 value (147.48). The paired same-frame diff is -0.84 (-0.57%), the same constant offset seen on every frame, so this is a uniform resolution offset and not a frame-90 anomaly.",
+        "assessment": "explained, benign - not a defect"
+      }
+    ],
+    "castShadowsPresent": true,
+    "skyBrighterThanGround": true,
+    "verdict": "PASS - DAY_KEY confirmed; decisively NOT the rejected stale signature"
+  },
+  "charactersAnimationRigging": {
+    "method": "all pose metrics normalised by each character's OWN bounding box, which cancels the uniform camera scale of the PUSH_IN. Trajectory SHAPE over all 90 frames separates rig animation (non-monotonic, oscillating) from camera perspective drift (monotonic).",
+    "pip": {
+      "landmark": "comb (crown) lateral offset from body centroid, in units of Pip's own body width",
+      "values5Frames": [
+        0.4783,
+        0.2959,
+        0.2383,
+        0.2674,
+        0.6149
+      ],
+      "full90FrameRange": 0.35205,
+      "min": -0.21113,
+      "max": 0.14092,
+      "monotonic": false,
+      "trajectoryEvery5th": [
+        -0.0228,
+        -0.0146,
+        -0.043,
+        -0.0447,
+        -0.1424,
+        -0.175,
+        -0.1824,
+        -0.1923,
+        -0.2016,
+        -0.207,
+        -0.2051,
+        -0.2077,
+        -0.2104,
+        -0.1979,
+        -0.0813,
+        0.019,
+        0.0792,
+        0.1243
+      ],
+      "interpretation": "the crown sweeps 35.2% of Pip's own body width in a smooth non-monotonic arc (negative to -0.211 by frame 64, then positive to +0.141 by frame 90). A camera push-in cannot move a landmark relative to the body it belongs to.",
+      "verdict": "MOVES - unambiguous"
+    },
+    "goat": {
+      "landmark": "vertical gap between head-blob centroid and torso-blob centroid, in units of the Goat's own body span",
+      "healthyFrames": 85,
+      "excludedFrames": [
+        55,
+        66,
+        67,
+        68,
+        69
+      ],
+      "excludedReason": "segmentation of MY analysis mask, not a render defect - frames 54/55/56/67 were visually inspected and show a complete, intact Goat",
+      "min": 0.4049,
+      "max": 0.4412,
+      "range": 0.0363,
+      "trajectoryEvery2nd": [
+        0.413,
+        0.406,
+        0.413,
+        0.426,
+        0.427,
+        0.427,
+        0.426,
+        0.427,
+        0.427,
+        0.414,
+        0.414,
+        0.416,
+        0.417,
+        0.423,
+        0.429,
+        0.439,
+        0.439,
+        0.441,
+        0.437,
+        0.429,
+        0.425,
+        0.419,
+        0.413,
+        0.413,
+        0.415,
+        0.419,
+        0.424,
+        0.42,
+        0.419,
+        0.423,
+        0.411,
+        0.406,
+        0.412,
+        0.426,
+        0.429,
+        0.433,
+        0.435,
+        0.435,
+        0.431,
+        0.425,
+        0.417,
+        0.413,
+        0.407
+      ],
+      "interpretation": "traces a periodic oscillation (0.413 -> 0.406 -> 0.427 -> 0.441 -> 0.406 -> 0.435 -> 0.407): the head rises and lowers relative to the torso twice across the shot, an excursion of 3.6% of the Goat's own body span (~16px). A linear dolly push-in produces monotonic drift and cannot produce a periodic signal.",
+      "supportingHeadVsTorsoNormalisedPatch": 1.33,
+      "verdict": "MOVES - GOAT_HEAD_NOD confirmed, subtler than Pip's action"
+    },
+    "sourceRigEvidence": {
+      "note": "scene_gates.json, generated from these byte-identical assets, independently reports PIP_MOTION_VALID and GOAT_MOTION_VALID with 14 moving bones for Pip and 18 for the Goat"
+    },
+    "structuralIntegrity": {
+      "pipMaskConnectedComponentsAllFrames": {
+        "min": 1,
+        "max": 1,
+        "mode": 1
+      },
+      "goatMaskConnectedComponentsAllFrames": {
+        "min": 1,
+        "max": 1,
+        "mode": 1
+      },
+      "detachedParts": "NONE - each character is exactly ONE connected component in all 90 frames",
+      "catastrophicDeformation": "NONE observed in frames 1/23/35/45/54/55/56/67/68/90",
+      "accessories": "Goat collar + 'GOAT' tag attached at the neck and following the head/neck through the nod; Pip backpack strap follows the body. Visually confirmed."
+    },
+    "canonicalColours": {
+      "measured": [
+        {
+          "part": "pip_body_yellow",
+          "pixels": 7334,
+          "medianRGB": [
+            106,
+            101,
+            14
+          ]
+        },
+        {
+          "part": "pip_comb",
+          "pixels": 254,
+          "medianRGB": [
+            87,
+            4,
+            9
+          ]
+        },
+        {
+          "part": "pip_beak_feet_orange",
+          "pixels": 450,
+          "medianRGB": [
+            101,
+            74,
+            5
+          ]
+        },
+        {
+          "part": "goat_body_white",
+          "pixels": 20498,
+          "medianRGB": [
+            96,
+            98,
+            95
+          ]
+        },
+        {
+          "part": "goat_horns_brown",
+          "pixels": 4941,
+          "medianRGB": [
+            57,
+            39,
+            17
+          ]
+        },
+        {
+          "part": "goat_collar_blue",
+          "pixels": 632,
+          "medianRGB": [
+            1,
+            54,
+            70
+          ]
+        },
+        {
+          "part": "goat_nose_pink",
+          "pixels": 736,
+          "medianRGB": [
+            95,
+            73,
+            60
+          ]
+        }
+      ],
+      "parityWithLocalReference": {
+        "pipYellow": {
+          "cloud": [
+            105,
+            98,
+            14
+          ],
+          "local": [
+            106,
+            99,
+            15
+          ]
+        },
+        "pipComb": {
+          "cloud": [
+            93,
+            5,
+            13
+          ],
+          "local": [
+            92,
+            5,
+            14
+          ]
+        },
+        "pipOrangeBeakFeet": {
+          "cloud": [
+            106,
+            78,
+            6
+          ],
+          "local": [
+            98,
+            68,
+            2
+          ]
+        },
+        "goatWhite": {
+          "cloud": [
+            95,
+            97,
+            94
+          ],
+          "local": [
+            94,
+            95,
+            94
+          ]
+        },
+        "goatHornBrown": {
+          "cloud": [
+            58,
+            40,
+            18
+          ],
+          "local": [
+            59,
+            41,
+            19
+          ]
+        },
+        "note": "frame 90, identical pipeline; medians agree within 1-2 levels on every part"
+      },
+      "verdict": "Pip yellow body, red-pink comb, orange beak/feet; Goat white body, brown horns/hooves, pink nose, blue collar with tag - all canonical and colour-identical to the approved local DAY_KEY reference. The comb reads crimson rather than pastel pink under AgX Punchy at exposure -2.2, exactly as it does in the approved reference."
+    },
+    "verdict": "PASS"
+  },
+  "camera": {
+    "method": "horizon row (sky/ground boundary) tracked across all 90 frames",
+    "horizonFirst5": [
+      739,
+      739,
+      739,
+      739,
+      739
+    ],
+    "horizonLast5": [
+      703,
+      701,
+      701,
+      699,
+      699
+    ],
+    "totalTravelPx": -40,
+    "monotonic": true,
+    "meanStepPx": -0.4494,
+    "maxAbsSecondDifferencePx": 2.0,
+    "meanAbsSecondDifferencePx": 0.5455,
+    "skyFraction": [
+      0.35298,
+      0.31643
+    ],
+    "subjectScaleGrowth": {
+      "pipSpanPx": [
+        179,
+        173,
+        196,
+        233,
+        278
+      ],
+      "goatSpanPx": [
+        361,
+        381,
+        431,
+        503,
+        541
+      ]
+    },
+    "verdict": "PASS - PUSH_IN present and smooth; monotonic horizon travel, peak frame-to-frame acceleration 2px, no snap or jitter"
+  },
+  "continuity": {
+    "colourClassPixelsPerFrame": {
+      "yellow": {
+        "min": 9910,
+        "max": 23133,
+        "first": 9923,
+        "last": 23127,
+        "anyZeroFrames": 0,
+        "monotonicGrowth": true
+      },
+      "red": {
+        "min": 431,
+        "max": 1136,
+        "first": 474,
+        "last": 1126,
+        "anyZeroFrames": 0,
+        "monotonicGrowth": true
+      },
+      "orange": {
+        "min": 658,
+        "max": 2222,
+        "first": 659,
+        "last": 2222,
+        "anyZeroFrames": 0,
+        "monotonicGrowth": false
+      },
+      "neutral": {
+        "min": 27969,
+        "max": 59446,
+        "first": 30147,
+        "last": 59446,
+        "anyZeroFrames": 0,
+        "monotonicGrowth": true
+      },
+      "brown": {
+        "min": 5472,
+        "max": 13226,
+        "first": 5472,
+        "last": 13226,
+        "anyZeroFrames": 0,
+        "monotonicGrowth": true
+      },
+      "blue": {
+        "min": 657961,
+        "max": 733188,
+        "first": 733188,
+        "last": 657961,
+        "anyZeroFrames": 0,
+        "monotonicGrowth": true
+      },
+      "pink": {
+        "min": 745,
+        "max": 3087,
+        "first": 3087,
+        "last": 1258,
+        "anyZeroFrames": 0,
+        "monotonicGrowth": false
+      }
+    },
+    "anyClassDisappears": false,
+    "mapMarkAttachedToAdventureMap": {
+      "sourceEvidence": "scene_gates.json: map objects ['AdventureMap','MapMark'], sharedRoot true, paperToMarkDistance 0.115758; the manifest deliberately leaves the map at its authored transform so the marker is never separated from the paper",
+      "renderedEvidence": "the map body is present and stable in every frame; no separation, no pop"
+    },
+    "observation": "the AdventureMap renders as a large untextured tan slab standing upright behind the characters rather than a map laid out being examined, and no distinct MapMark is legible at this camera angle. This is IDENTICAL to the approved local DAY_KEY reference, so it is a staging/art characteristic of the approved shot, not a regression in this cloud render.",
+    "verdict": "PASS - reads as one continuous take, nothing pops in or out"
+  },
+  "audio": {
+    "streamCount": 1,
+    "audioStreams": 0,
+    "statement": "The artifact contains NO audio stream. This render is video-only by design, so there is no audio verdict to give."
+  },
+  "overallVerdict": "PASS",
+  "remainingDefects": "NONE that are attributable to this render. Three lighting metrics sit marginally outside a zero-tolerance band derived from four 270x480 local values; each is quantified above, explained by the 16x resolution difference, and points away from the failure mode the band exists to catch."
+}
