@@ -11,6 +11,8 @@ that must pass before any FINAL_1080P cloud acceptance render is allowed:
   LIGHTING_STATE_VALID     manifest lightingState selected the intended rig
   NO_DUPLICATE_LIGHTS      exactly the authoritative key/fill/rim rig is active
   ASSET_HIERARCHY_VALID    multi-object assets stayed intact (MapMark attached)
+  PROP_CLEARANCE_VALID     nothing sinks through the ground and no prop, character
+                           or piece of foliage intersects another
 
 Character motion is measured in each character's own local space, so neither
 camera movement nor object placement can satisfy a motion gate.
@@ -41,6 +43,28 @@ MIN_TOTAL_MOTION = 0.01
 MIN_INTERVAL_MOTION = 0.002
 EXPECTED_LIGHT_COUNT = 3
 
+# ---------------------------------------------------------------------------
+# Prop clearance.
+#
+# Two different defects have to be caught, and they need different tests.
+#
+# "Sunk through the floor" is geometric: no visible mesh may reach below the
+# ground plane by more than a tolerance. This is what catches a prop dropped
+# into the turf, and it cannot be expressed as an intersection test, because a
+# prop RESTING on flat ground legitimately touches it.
+#
+# "Passes through something" is topological: evaluated geometry from two
+# different assets must not overlap at all. Overlap WITHIN one asset is normal
+# here — the characters are unions of interpenetrating primitives and the map's
+# ink sits embedded in its paper — so the test is between roles.
+#
+# The flat surfaces props rest on are excluded from the overlap half of the test
+# and covered by the depth half instead.
+# ---------------------------------------------------------------------------
+GROUND_REST_SURFACES = {"Meadow_Ground", "Meadow_Path"}
+#: Metres a mesh may reach below the ground plane before it counts as sunk.
+GROUND_TOLERANCE = 0.002
+
 LIB = REPO_ROOT / "production-library"
 ASSETS = [
     {"id": "meadow", "role": "meadow", "localPath": str(LIB / "environments/meadow_production.blend")},
@@ -54,8 +78,11 @@ SHOT_META = {
     "cameraPreset": "PUSH_IN",
     "lightingState": "DAY_KEY",
     "placements": {
-        "pip": {"location": [-0.72, -1.5, 0.0], "rotation": [0.0, 0.0, 0.34], "action": "PIP_POINT"},
-        "goat": {"location": [0.72, -1.2, 0.0], "rotation": [0.0, 0.0, -0.42], "action": "GOAT_HEAD_NOD"},
+        # The map is the subject of the shot, so it is staged first: downstage of
+        # both characters, centred between them, leaning toward the lens.
+        "map": {"location": [0.0, -2.3, 0.0], "rotation": [0.0, 0.0, 0.0]},
+        "pip": {"location": [-0.72, -1.62, 0.0], "rotation": [0.0, 0.0, 0.50], "action": "PIP_POINT"},
+        "goat": {"location": [0.78, -1.42, 0.0], "rotation": [0.0, 0.0, -0.56], "action": "GOAT_HEAD_NOD"},
     },
 }
 
@@ -66,6 +93,7 @@ FAULTS = {
     "camera-only": "PIP_MOTION_VALID",
     "keep-imported-lights": "NO_DUPLICATE_LIGHTS",
     "map-detach": "ASSET_HIERARCHY_VALID",
+    "map-sunk": "PROP_CLEARANCE_VALID",
     "quaternion-bones": "ANIMATION_CHANNELS_VALID",
     "unbind-skin": "RIG_BINDING_VALID",
 }
@@ -99,11 +127,23 @@ def inject_fault(fault: str, by_role: dict) -> None:
             if arm is not None and arm.animation_data:
                 arm.animation_data.action = None
     elif fault == "map-detach":
-        # The original bug: a placement moved only the first imported mesh.
-        paper = bpy.data.objects.get("AdventureMap")
-        if paper is not None:
-            paper.parent = None
-            paper.location = (0.0, -0.8, 0.02)
+        # The original bug: a placement moved one piece of a multi-object prop and
+        # left the rest of it behind. Detaching the marker from the paper it is
+        # drawn on is that defect, whichever piece assembly happens to move.
+        mark = bpy.data.objects.get("MapMark")
+        if mark is not None:
+            mark.parent = None
+            mark.location = (0.0, -0.8, 0.02)
+    elif fault == "map-sunk":
+        # The staging defect: the prop pushed down through the turf and back into
+        # the character beside it, which is how it looked before remediation.
+        root = bpy.data.objects.get("AdventureMap")
+        while root is not None and root.parent is not None:
+            root = root.parent
+        if root is not None:
+            root.location.z -= 0.12
+            root.location.x -= 0.55
+            root.location.y += 0.55
     elif fault == "quaternion-bones":
         for role in ("pip", "goat"):
             arm = A.find_armature(by_role.get(role, []))
@@ -118,6 +158,70 @@ def inject_fault(fault: str, by_role: dict) -> None:
                 continue
             for vg in list(obj.vertex_groups):
                 obj.vertex_groups.remove(vg)
+
+
+def evaluate_clearance(by_role: dict, frames: list[int]) -> dict:
+    """Report ground penetration and cross-asset intersections over the shot."""
+    import bpy
+    from mathutils.bvhtree import BVHTree
+
+    role_of = {obj.name: role for role, objects in by_role.items() for obj in objects}
+
+    def gather(frame: int):
+        bpy.context.scene.frame_set(frame)
+        bpy.context.view_layer.update()
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        out = {}
+        for obj in bpy.data.objects:
+            if obj.type != "MESH" or not obj.visible_get():
+                continue
+            # Shadow proxies are invisible stand-ins that deliberately sit inside
+            # the mesh they shadow; sky domes enclose the entire set.
+            if obj.name.endswith(A.SHADOW_PROXY_SUFFIX) or "sky" in obj.name.lower():
+                continue
+            evaluated = obj.evaluated_get(depsgraph)
+            mesh = evaluated.to_mesh()
+            matrix = evaluated.matrix_world
+            verts = [matrix @ v.co for v in mesh.vertices]
+            polys = [list(p.vertices) for p in mesh.polygons]
+            out[obj.name] = {
+                "role": role_of.get(obj.name, "scene"),
+                "zmin": min((v.z for v in verts), default=0.0),
+                "tree": BVHTree.FromPolygons(verts, polys, all_triangles=False, epsilon=0.0),
+            }
+            evaluated.to_mesh_clear()
+        return out
+
+    sunk: list[dict] = []
+    intersections: list[dict] = []
+    lowest = 0.0
+    for frame in frames:
+        meshes = gather(frame)
+        lowest = min([lowest] + [m["zmin"] for m in meshes.values()])
+        for name, entry in meshes.items():
+            if entry["zmin"] < -GROUND_TOLERANCE:
+                sunk.append({"frame": frame, "mesh": name, "zmin": round(entry["zmin"], 5)})
+        names = sorted(meshes)
+        for index, first in enumerate(names):
+            for second in names[index + 1 :]:
+                if meshes[first]["role"] == meshes[second]["role"]:
+                    continue
+                if first in GROUND_REST_SURFACES or second in GROUND_REST_SURFACES:
+                    continue
+                overlap = meshes[first]["tree"].overlap(meshes[second]["tree"])
+                if overlap:
+                    intersections.append(
+                        {"frame": frame, "a": first, "b": second, "facePairs": len(overlap)}
+                    )
+    return {
+        "ok": not sunk and not intersections,
+        "frames": frames,
+        "lowestPoint": round(lowest, 5),
+        "groundTolerance": GROUND_TOLERANCE,
+        "groundRestSurfaces": sorted(GROUND_REST_SURFACES),
+        "sunkMeshes": sunk,
+        "intersections": intersections,
+    }
 
 
 def character_motion(role: str, objects) -> dict:
@@ -236,6 +340,8 @@ def main() -> int:
         and motions["goat"].get("minConsecutiveVertexDelta", 0.0) >= MIN_INTERVAL_MOTION
     )
 
+    clearance = evaluate_clearance(by_role, SAMPLE_FRAMES)
+
     gates = {
         "RIG_BINDING_VALID": rig_binding_valid,
         "PIP_MOTION_VALID": pip_motion_ok,
@@ -244,6 +350,7 @@ def main() -> int:
         "LIGHTING_STATE_VALID": lighting_state_valid,
         "NO_DUPLICATE_LIGHTS": no_duplicate_lights,
         "ASSET_HIERARCHY_VALID": hierarchy_valid,
+        "PROP_CLEARANCE_VALID": clearance["ok"],
     }
     report = {
         "ok": all(gates.values()),
@@ -273,6 +380,7 @@ def main() -> int:
             "paperToMarkDistance": separation,
             "sharedRoot": shared_root,
         },
+        "clearance": clearance,
         # Hashes let the cloud preflight refuse a gate report produced from
         # different assets than the ones it is about to upload and render.
         "assetSha256": {

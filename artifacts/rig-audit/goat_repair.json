@@ -42,13 +42,13 @@
         90
       ],
       "maxBoneDelta": 0.719718,
-      "maxVertexDelta": 0.219654,
+      "maxVertexDelta": 0.212603,
       "pairwiseVertexDeltas": {
-        "1->30": 0.129035,
-        "30->60": 0.32175,
-        "60->90": 0.168604
+        "1->30": 0.129232,
+        "30->60": 0.321585,
+        "60->90": 0.161304
       },
-      "minConsecutiveVertexDelta": 0.129035,
+      "minConsecutiveVertexDelta": 0.129232,
       "movingBones": [
         "chest",
         "collar",

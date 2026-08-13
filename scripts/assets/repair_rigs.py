@@ -83,6 +83,14 @@ def _smoothstep(edge0: float, edge1: float, x: float) -> float:
     return t * t * (3.0 - 2.0 * t)
 
 
+# Both characters are staged around a map lying downstage of them, so both carry
+# a constant forward-and-down bias on the neck and head: without it they read as
+# looking past the prop at the lens. It is a constant offset, so the animation
+# either side of it is untouched and every frame-to-frame delta is unchanged.
+PIP_GAZE = {"head": 0.06, "neck": 0.06, "chest": 0.05}
+GOAT_GAZE = {"head": 0.12, "neck": 0.10, "chest": 0.05}
+
+
 def pip_point(p, frame: int, t: float) -> None:
     """Pip lifts a wing toward the map, holds the point, then turns to the goat.
 
@@ -97,9 +105,9 @@ def pip_point(p, frame: int, t: float) -> None:
     bob = math.sin(math.pi * 2 * 2.0 * t)
     p.rot("wing_R", 0.25 * point, -1.20 * point, -0.55 * point)
     p.rot("wing_L", 0.0, 0.22 * point, 0.16 * point + 0.05 * sway)
-    p.rot("head", 0.28 * point + 0.04 * sway, 0.0, 0.26 * point - 0.38 * release + 0.06 * t)
-    p.rot("neck", 0.12 * point, 0.0, 0.09 * point - 0.12 * release)
-    p.rot("chest", 0.13 * point, 0.0, 0.05 * t)
+    p.rot("head", PIP_GAZE["head"] + 0.28 * point + 0.04 * sway, 0.0, 0.26 * point - 0.38 * release + 0.06 * t)
+    p.rot("neck", PIP_GAZE["neck"] + 0.12 * point, 0.0, 0.09 * point - 0.12 * release)
+    p.rot("chest", PIP_GAZE["chest"] + 0.13 * point, 0.0, 0.05 * t)
     p.rot("comb", -0.16 * point + 0.05 * sway, 0.0, 0.0)
     p.loc("root", 0.0, 0.0, 0.03 * bob)
 
@@ -112,12 +120,12 @@ def goat_head_nod(p, frame: int, t: float) -> None:
     """
     nod = math.sin(math.pi * 2 * 2.0 * t)
     sway = math.sin(math.pi * 2 * 1.5 * t + math.pi / 3)
-    p.rot("head", 0.38 * nod, 0.0, 0.18 * t + 0.05 * sway)
-    p.rot("neck", 0.18 * nod, 0.0, 0.08 * t)
+    p.rot("head", GOAT_GAZE["head"] + 0.38 * nod, 0.0, 0.18 * t + 0.05 * sway)
+    p.rot("neck", GOAT_GAZE["neck"] + 0.18 * nod, 0.0, 0.08 * t)
     p.rot("ear_L", -0.30 * nod, 0.16 * sway, 0.0)
     p.rot("ear_R", -0.30 * nod, -0.16 * sway, 0.0)
     p.rot("tail", 0.0, 0.0, 0.42 * sway)
-    p.rot("chest", 0.06 * nod, 0.0, 0.04 * t)
+    p.rot("chest", GOAT_GAZE["chest"] + 0.06 * nod, 0.0, 0.04 * t)
     p.loc("root", 0.0, 0.0, 0.022 * abs(nod))
 
 

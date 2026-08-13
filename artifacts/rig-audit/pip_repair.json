@@ -41,14 +41,14 @@
         60,
         90
       ],
-      "maxBoneDelta": 1.048021,
-      "maxVertexDelta": 0.126589,
+      "maxBoneDelta": 1.072084,
+      "maxVertexDelta": 0.124915,
       "pairwiseVertexDeltas": {
-        "1->30": 0.126096,
-        "30->60": 0.052141,
-        "60->90": 0.159992
+        "1->30": 0.124915,
+        "30->60": 0.052475,
+        "60->90": 0.160151
       },
-      "minConsecutiveVertexDelta": 0.052141,
+      "minConsecutiveVertexDelta": 0.052475,
       "movingBones": [
         "backpack",
         "chest",
