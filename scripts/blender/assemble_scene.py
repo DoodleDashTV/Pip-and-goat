@@ -46,7 +46,17 @@ def set_eevee(scene, samples: int = 32) -> None:
         # which speckles curved low-poly surfaces with shadow acne — visible on
         # the goat's flank as dirt that no amount of extra render samples
         # removes, because it is a bias artefact rather than noise.
-        for attr, value in (("shadow_ray_count", 2), ("shadow_step_count", 8)):
+        #
+        # 2 rays / 8 steps was enough while the sun was weak. With a key strong
+        # enough to throw a readable ground shadow, the same artefact returns as
+        # dark stipple across Pip's belly, where a wing sits a couple of
+        # centimetres from the body. Measured against a 48-sample reference, the
+        # error inside Pip's silhouette falls from 4.09 RMS (60.6 peak) at 2/8 to
+        # 2.06 RMS (16.3 peak) at 4/16, and neither raising render samples nor
+        # pushing the shadow caster deeper inside the mesh fixes it: a deeper
+        # caster self-intersects and stamps craters on the head instead. The
+        # frame costs about 73% more to render, which is the price of the shadow.
+        for attr, value in (("shadow_ray_count", 4), ("shadow_step_count", 16)):
             if hasattr(scene.eevee, attr):
                 setattr(scene.eevee, attr, value)
 
@@ -317,28 +327,39 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
 # What the numbers below are for:
 #   * A SUN key at a widened angle, so the terminator is soft enough for a
 #     children's short instead of stamping an ear onto a head as a hard patch.
+#     It is strong enough to be the source of the picture: the sunlit trail
+#     carries the top of the tonal range and every object throws a shadow the
+#     audience can see, which is what puts the cast on the ground.
 #   * An AREA fill from camera left at a real level. AgX crushed everything the
 #     key missed toward black, and the old fill was two orders of magnitude too
-#     weak to lift it; 200 W raises the darkest 1% of the frame from 14 to ~40.
-#   * An AREA rim behind and above the characters. This is what separates white
-#     fur from a green field, and it is the single biggest contributor to the
-#     highlight end: it carries p99 to ~220 with no clipped pixels.
+#     weak to lift it; the fill raises the darkest 1% of the frame off the floor.
+#   * A SPOT rim behind and above the characters, aimed at them. This is what
+#     separates white fur from a green field. It was an area light until it was
+#     measured: an area light behind the characters lights the field behind them
+#     just as well, and pulling it close enough to rim them poured a bright pool
+#     onto the grass they stand on. The ground around the goat measured 15 luma
+#     BRIGHTER than open grass, its lit side sat 2 luma above the grass touching
+#     its silhouette, and no ground shadow could read against the pool. Confining
+#     the same light to a cone put the goat 86 luma above the grass, put 8 luma of
+#     contact shadow under both characters, and cost the frame nothing it had any
+#     business keeping.
 #   * A low world strength, so nothing is lit by an untracked ambient term.
 #   * "Khronos PBR Neutral" rather than AgX. AgX desaturates as it rolls off, so
 #     every attempt to reach a 45-50% mean under it either washed the sky white
-#     or tripped the saturation floor; PBR Neutral holds 63/128 mean saturation
+#     or tripped the saturation floor; PBR Neutral holds 60/128 mean saturation
 #     at the same exposure.
 #
 # DAY_KEY is the measured reference state (it is what the acceptance shot uses)
-# and lands mean luma 47-49% of range, p01 ~40, p99 ~220, zero clipped
-# highlights, mean saturation ~63/128. The others follow the same shape and
-# scale; only DAY_KEY is gated.
+# and lands mean luma 48-49% of range, p01 ~48, p99 209-218, zero clipped
+# highlights, mean saturation ~62/128, both characters 75-87 luma above the grass
+# touching them and 8-16 luma of shadow on the ground under them. The others
+# follow the same shape and scale; only DAY_KEY is gated.
 LIGHTING_STATES: dict[str, dict] = {
     "DAY_SOFT": {
-        "world": {"color": (0.42, 0.62, 0.85), "strength": 0.28},
+        "world": {"color": (0.42, 0.62, 0.85), "strength": 0.20},
         "viewTransform": "Khronos PBR Neutral",
         "look": "None",
-        "exposure": -2.9,
+        "exposure": -3.1,
         "sky": {
             "color": (0.18, 0.47, 0.93),
             "midColor": (0.36, 0.64, 0.96),
@@ -346,27 +367,41 @@ LIGHTING_STATES: dict[str, dict] = {
             "horizonAt": 0.46,
             "midAt": 0.60,
             "zenithAt": 0.90,
-            "strength": 3.2,
+            "strength": 2.4,
         },
         "key": {
             "type": "SUN",
-            "energy": 7.0,
+            "energy": 19.0,
             "angle": 0.20,
             "location": (4.0, -5.0, 9.0),
             "rotation": (0.72, 0.12, 0.5),
         },
-        "fill": {"type": "AREA", "energy": 260.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
-        "rim": {"type": "AREA", "energy": 800.0, "size": 2.4, "location": (1.0, 2.4, 2.8)},
+        "fill": {"type": "AREA", "energy": 165.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
+        "rim": {
+            "type": "SPOT",
+            "energy": 800.0,
+            "spotSize": 0.85,
+            "spotBlend": 0.55,
+            "radius": 0.5,
+            "location": (0.7, 1.4, 2.9),
+            "target": (0.05, -1.5, 0.55),
+        },
     },
     "DAY_KEY": {
-        "world": {"color": (0.40, 0.60, 0.84), "strength": 0.25},
+        "world": {"color": (0.40, 0.60, 0.84), "strength": 0.18},
         "viewTransform": "Khronos PBR Neutral",
         "look": "None",
-        "exposure": -2.9,
+        "exposure": -3.1,
         # Measured on the widest framing, which shows the most sky and is the
         # worst case for saturation: a near-white horizon band looks like haze but
         # costs 3 points of frame saturation and 5% of mean luma, so the ramp stays
         # a saturated blue that only lightens toward the horizon.
+        #
+        # Sky strength is also how the frame mean is centred. The sky covers about
+        # 40% of this framing and sits below the frame mean, so it moves the mean
+        # without touching the top of the range: dropping it from 3.2 to 2.6 took
+        # mean luma from 49.3% to 48.1% of range and gained 1.7 points of frame
+        # saturation, while the 99th percentile did not move at all.
         "sky": {
             "color": (0.11, 0.36, 0.90),
             "midColor": (0.22, 0.52, 0.95),
@@ -374,28 +409,39 @@ LIGHTING_STATES: dict[str, dict] = {
             "horizonAt": 0.46,
             "midAt": 0.60,
             "zenithAt": 0.90,
-            "strength": 3.6,
+            "strength": 2.6,
         },
+        # Sunlight, at the level where it does the job a sun does. At 9 W/m2 the
+        # field was lit mostly by the rim and nothing cast a shadow worth seeing:
+        # the ground under the goat's hooves darkened by 1.9 luma over 7% of the
+        # area, against 9.2 over 31% at the base of the tree. Raising the sun is
+        # what makes the trail the brightest large surface in frame, and it is why
+        # the shadow sample budget in set_eevee had to go up with it.
         "key": {
             "type": "SUN",
-            "energy": 9.0,
+            "energy": 25.0,
             "angle": 0.14,
             "location": (3.4, -4.4, 9.0),
             "rotation": (0.66, 0.1, 0.42),
         },
-        "fill": {"type": "AREA", "energy": 200.0, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
-        # Close behind the characters rather than far back over the field. A rim
-        # lights whatever is behind them too, so pulling it in trades field
-        # brightness for edge brightness: measured on frame 45, moving it from
-        # (0.8, 2.2, 2.8) to here lifted the goat from 1.5 luma BELOW the grass
-        # touching its silhouette to 10 above it, and Pip to 22 above.
-        "rim": {"type": "AREA", "energy": 900.0, "size": 1.6, "location": (0.8, 1.6, 2.6)},
+        "fill": {"type": "AREA", "energy": 130.0, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
+        # A cone from behind and above, aimed between the characters at the
+        # height of their shoulders, wide enough to hold both of them and no more.
+        "rim": {
+            "type": "SPOT",
+            "energy": 900.0,
+            "spotSize": 0.72,
+            "spotBlend": 0.4,
+            "radius": 0.4,
+            "location": (0.6, 1.2, 2.8),
+            "target": (0.05, -1.5, 0.55),
+        },
     },
     "GOLDEN_HOUR": {
-        "world": {"color": (0.52, 0.42, 0.32), "strength": 0.22},
+        "world": {"color": (0.52, 0.42, 0.32), "strength": 0.16},
         "viewTransform": "Khronos PBR Neutral",
         "look": "None",
-        "exposure": -2.8,
+        "exposure": -3.0,
         "sky": {
             "color": (0.72, 0.40, 0.30),
             "midColor": (0.95, 0.52, 0.24),
@@ -403,23 +449,31 @@ LIGHTING_STATES: dict[str, dict] = {
             "horizonAt": 0.46,
             "midAt": 0.60,
             "zenithAt": 0.90,
-            "strength": 3.0,
+            "strength": 2.2,
         },
         "key": {
             "type": "SUN",
-            "energy": 7.5,
+            "energy": 20.0,
             "angle": 0.16,
             "location": (-5.5, -3.0, 3.2),
             "rotation": (1.18, 0.0, -0.75),
         },
-        "fill": {"type": "AREA", "energy": 150.0, "size": 6.0, "location": (3.0, -4.0, 2.4)},
-        "rim": {"type": "AREA", "energy": 1000.0, "size": 2.2, "location": (1.0, 2.4, 2.6)},
+        "fill": {"type": "AREA", "energy": 100.0, "size": 6.0, "location": (3.0, -4.0, 2.4)},
+        "rim": {
+            "type": "SPOT",
+            "energy": 950.0,
+            "spotSize": 0.78,
+            "spotBlend": 0.45,
+            "radius": 0.45,
+            "location": (0.8, 1.3, 2.7),
+            "target": (0.05, -1.5, 0.55),
+        },
     },
     "OVERCAST": {
-        "world": {"color": (0.55, 0.58, 0.62), "strength": 0.45},
+        "world": {"color": (0.55, 0.58, 0.62), "strength": 0.34},
         "viewTransform": "Khronos PBR Neutral",
         "look": "None",
-        "exposure": -2.7,
+        "exposure": -2.9,
         "sky": {
             "color": (0.60, 0.66, 0.74),
             "midColor": (0.70, 0.75, 0.80),
@@ -427,17 +481,27 @@ LIGHTING_STATES: dict[str, dict] = {
             "horizonAt": 0.46,
             "midAt": 0.60,
             "zenithAt": 0.90,
-            "strength": 3.0,
+            "strength": 2.4,
         },
         "key": {
             "type": "SUN",
-            "energy": 3.6,
+            "energy": 9.5,
             "angle": 0.35,
             "location": (2.0, -4.0, 10.0),
             "rotation": (0.5, 0.0, 0.2),
         },
-        "fill": {"type": "AREA", "energy": 320.0, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
-        "rim": {"type": "AREA", "energy": 340.0, "size": 4.0, "location": (0.0, 2.8, 3.0)},
+        "fill": {"type": "AREA", "energy": 210.0, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
+        # Overcast has no sun to rim against, so the cone is wide and gentle: just
+        # enough edge to keep the characters off the background.
+        "rim": {
+            "type": "SPOT",
+            "energy": 400.0,
+            "spotSize": 1.05,
+            "spotBlend": 0.7,
+            "radius": 0.8,
+            "location": (0.4, 1.6, 3.0),
+            "target": (0.05, -1.5, 0.55),
+        },
     },
 }
 DEFAULT_LIGHTING_STATE = "DAY_SOFT"
@@ -549,6 +613,16 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
         # terminator into something a children's short can use.
         if cfg["type"] == "SUN" and "angle" in cfg:
             light_data.angle = cfg["angle"]
+        # A cone, for a rim that has to stay on the characters. An area light
+        # behind them lights whatever else is behind them just as well, so the
+        # field it spills onto rises with the edge it is meant to separate.
+        if cfg["type"] == "SPOT":
+            if "spotSize" in cfg:
+                light_data.spot_size = cfg["spotSize"]
+            if "spotBlend" in cfg:
+                light_data.spot_blend = cfg["spotBlend"]
+            if "radius" in cfg:
+                light_data.shadow_soft_size = cfg["radius"]
         # Only the key casts. The characters and props are joined primitives, so
         # spheres intersect inside the silhouette; every extra shadow map stipples
         # those intersections with self-shadow acne that reads as dirt on white
@@ -562,6 +636,14 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
         light_obj.location = cfg["location"]
         if "rotation" in cfg:
             light_obj.rotation_euler = cfg["rotation"]
+        # Aiming beats hand-written Euler angles for anything that has to hit a
+        # specific place in the set: move the light and it still points at the
+        # characters, so a tuning pass cannot silently leave it facing the field.
+        if "target" in cfg:
+            import mathutils
+
+            direction = mathutils.Vector(cfg["target"]) - mathutils.Vector(cfg["location"])
+            light_obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
         bpy.context.collection.objects.link(light_obj)
         created.append(name)
 
