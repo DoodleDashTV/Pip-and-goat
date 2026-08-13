@@ -1,0 +1,44 @@
+{
+ "frame": "frame_0045 @ 1080x1920",
+ "before": "/tmp/seam/fullres_prefix_frame45.png",
+ "after": "artifacts/local-acceptance-1080p/production/frame_0045.png",
+ "note": "Each subject measured inside its own coverage mask. Shadow proxies are installed only where an armature was imported, so the map has none; this is that claim measured rather than asserted.",
+ "wholeFrame": {
+  "pixels": 2073600,
+  "changedOver8": 8079,
+  "changedOver8Pct": 0.3896,
+  "maxDelta": 172
+ },
+ "bySubject": {
+  "pip": {
+   "coveragePx": 24913,
+   "coveragePct": 1.201,
+   "changedOver8Px": 3023,
+   "changedOver8PctOfSubject": 12.134,
+   "maxDelta": 172,
+   "meanLumaBefore": 154.92,
+   "meanLumaAfter": 161.98,
+   "meanLumaShift": 7.06
+  },
+  "goat": {
+   "coveragePx": 66110,
+   "coveragePct": 3.188,
+   "changedOver8Px": 3276,
+   "changedOver8PctOfSubject": 4.955,
+   "maxDelta": 144,
+   "meanLumaBefore": 158.94,
+   "meanLumaAfter": 159.88,
+   "meanLumaShift": 0.94
+  },
+  "map": {
+   "coveragePx": 158347,
+   "coveragePct": 7.636,
+   "changedOver8Px": 0,
+   "changedOver8PctOfSubject": 0.0,
+   "maxDelta": 1,
+   "meanLumaBefore": 181.58,
+   "meanLumaAfter": 181.58,
+   "meanLumaShift": 0.0
+  }
+ }
+}

@@ -90,6 +90,35 @@ and the same figure high-passed along x (still dominated by the silhouette until
 background grass was excluded, after which only 53 columns survived, too few to
 high-pass against).
 
+## What else moved
+
+`assemble_scene.py` installs a shadow proxy only where it imported an armature, so
+the change cannot reach the AdventureMap, which has none. That is an argument, so
+`regression_by_subject.json` measures it: frame 45 either side of the repair, each
+subject inside its own coverage mask, masks rendered at this branch and applied to
+both plates.
+
+| Subject | Own pixels | Changed >8 | Largest change | Mean luma shift |
+| --- | --- | --- | --- | --- |
+| AdventureMap | 158,347 | **0** | 1 | 0.00 |
+| Goat | 66,110 | 3,276 (4.96%) | 144 | +0.94 |
+| Pip | 24,913 | 3,023 (12.1%) | 172 | +7.06 |
+
+The map is untouched: not one of its pixels moved, and its largest disagreement of
+1 is PNG rounding. 8,079 pixels of 2,073,600 changed in the whole frame, 0.39%.
+
+The Goat moved because his caster was wrong in the same two ways Pip's was — 23 of
+his 50 islands were being turned inside out by the flat shrink, and his pupils sit
+sealed inside his irises exactly as Pip's beak tip sits inside his beak.
+`goat_closecrop_frame45_1080p.png` is what that looks like: the smudges on his
+muzzle, cheeks and under the collar are gone. His mean luma moves less than one
+level, so nothing about how he reads has changed — the artefacts left and the
+character did not.
+
+`production-library/` is byte-identical to `a440d88`. No approved asset was edited
+to fix this; the whole repair is in `scripts/blender/assemble_scene.py`, which is
+why the render *code* fingerprint moved and the render *asset* fingerprint did not.
+
 ## Evidence
 
 | File | What it holds |
@@ -99,6 +128,8 @@ high-pass against).
 | `chest_before_after_revealing.png` | The same two, relit with a single hard point sun eight degrees off the chest, which is the harshest thing that can be pointed at a shadow. |
 | `chest_closecrop_frame45_1080p.png` | Frame 45 of the acceptance shot itself at 1080x1920, cropped to Pip at 6x, shipped against this branch. Not a test render: these are the delivered pixels. |
 | `chest_shadow_on_pixels.json` | The shadowed fraction of the chest measured on those pixels, both plates through one mask. |
+| `regression_by_subject.json` | Frame 45 either side of the repair, per subject, inside each subject's own coverage mask. |
+| `goat_closecrop_frame45_1080p.png` | The Goat at 3x on the same frame, shipped against this branch. |
 | `chest_blockers_four_states.json` | The table above, with every blocker named, sized and counted. |
 | `chest_surface_inspection.png` | The chest surface under normals-as-colour, one colour per material slot, and matte white under a raking light. |
 | `causation_pip_stops_casting.png` | Shipped, Pip casting no shadow, no shadow proxy at all, and this branch — the same frame four ways. |
