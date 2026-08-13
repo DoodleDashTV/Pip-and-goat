@@ -249,6 +249,16 @@ async function main() {
   const persist = makeDiagnosticPersister(env);
   installGlobalHandlers({ log, persist });
 
+  // Record PROCESS_STARTED to R2 BEFORE the GPU health gate. Two confirmation
+  // pods previously burned 8–15 min with no startup-status.json at all; without
+  // this early write we cannot tell image-pull failure from a hung EEVEE probe.
+  // Best-effort: never block boot if R2 is briefly unreachable.
+  try {
+    await persist('BOOTING', { kind: 'PROCESS_STARTED', bootStage: BOOT_STAGE.PROCESS_STARTED });
+  } catch (e) {
+    log('early_startup_status_failed', { error: redactMessage(e && e.message) });
+  }
+
   // Startup watchdog: independent of the render-runtime guard. If boot does not
   // reach a meaningful milestone within the (cost-aware) startup budget, tear the
   // container down so a dead worker never keeps a paid GPU waiting.
@@ -266,6 +276,10 @@ async function main() {
     },
   }).start();
 
+  // healthGate() is synchronous (spawnSync Blender). Yield once so the watchdog
+  // timer and the early R2 write above can settle before we block the event loop.
+  await new Promise((r) => setImmediate(r));
+
   const health = healthGate();
   if (!health.ok) {
     startupWatchdog.reached('HEALTH_GATE_FAILED');
@@ -276,6 +290,11 @@ async function main() {
   }
   startupWatchdog.milestone('WORKER_READY');
   log('WORKER_READY');
+  try {
+    await persist('BOOTING', { kind: 'WORKER_READY', bootStage: 'WORKER_READY' });
+  } catch (e) {
+    log('ready_startup_status_failed', { error: redactMessage(e && e.message) });
+  }
 
   const jobId = strip(env.RENDER_JOB_ID);
   const apiUrl = strip(env.RENDER_API_URL);

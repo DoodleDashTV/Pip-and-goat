@@ -187,7 +187,7 @@ async function main() {
           confirmPaidLaunch: true,
           cloudType: 'SECURE',
           gpuCount: 1,
-          containerDiskInGb: 40,
+          containerDiskInGb: 60,
           volumeInGb: 0,
           env: podEnv,
         }),
@@ -255,6 +255,15 @@ async function main() {
             renderStage: status?.stage ?? null,
             status: status?.status ?? null,
             uptimeSec: pod?.runtime?.uptimeInSeconds ?? null,
+          });
+        } else if (Math.round(elapsedMs / 1000) % 60 < Math.round(POLL_MS / 1000) + 1) {
+          // Heartbeat once a minute while still waiting: distinguishes a stuck
+          // image pull (uptime null) from a running container with no R2 yet.
+          log('wait', {
+            elapsedSec: Math.round(elapsedMs / 1000),
+            desiredStatus: pod?.desiredStatus ?? null,
+            uptimeSec: pod?.runtime?.uptimeInSeconds ?? null,
+            sawStartupStatus,
           });
         }
 
