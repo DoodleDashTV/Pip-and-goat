@@ -35,3 +35,6 @@ __pycache__/
 artifacts/local-acceptance/production/
 artifacts/local-acceptance/static-camera/
 artifacts/local-acceptance/gates_fault_*.json
+
+# Blender rewrites these backups on every save; they are pure churn in a diff.
+*.blend1
