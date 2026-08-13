@@ -43,6 +43,17 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * Anonymous registry read confirms the labels below; preflight refuses any
  * disagreement. Rebuild with `scripts/cloud/build-worker-image.sh` and re-pin
  * all four constants together if the baked render code moves again.
+ *
+ * STALE AS OF THE STEPS 1-8 TRANCHE, DELIBERATELY NOT RE-PINNED.
+ * `assemble_scene.py` gained an opt-in `apply_direction_camera()` hook, so this
+ * checkout's render code is now
+ * d38208206093ccd1b67d6d02f996d1057ae7f5520989a2830cd9450a4113834f and no longer
+ * matches the code baked into the image above. Preflight therefore fails closed
+ * with RENDER_CODE_MISMATCH, which is the intended outcome: Steps 1-8 is a
+ * planning tranche with no authorized paid render, and the accepted FINAL_1080P
+ * artifact is historical evidence that this drift cannot alter. Re-pinning would
+ * mean claiming an image contains code it does not. Before the next authorized
+ * paid launch, rebuild and re-pin all four constants together.
  */
 export const WORKER_IMAGE =
   'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830'; // pragma: allowlist secret

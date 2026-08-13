@@ -2258,7 +2258,9 @@ model CloudRenderSession {
 /// hashed. Versioned by `schemaVersion` so `upgradeBlueprint()` can migrate it.
 model ProductionBlueprintRecord {
   id             String   @id @default(uuid()) @db.Uuid
-  episodeId      String   @map("episode_id") @db.Uuid
+  /// Logical episode identifier from the approved scene plan, not an Episode row id:
+  /// planning precedes production, so this cannot be a foreign key.
+  episodeId      String   @map("episode_id")
   schemaVersion  String   @map("schema_version")
   /// Content hash. Two rows with the same hash describe the same episode exactly.
   contentHash    String   @map("content_hash")
@@ -2289,7 +2291,7 @@ model ProductionBlueprintRecord {
 model DirectorOverrideRecord {
   id             String   @id @default(uuid()) @db.Uuid
   blueprintId    String?  @map("blueprint_id") @db.Uuid
-  episodeId      String   @map("episode_id") @db.Uuid
+  episodeId      String   @map("episode_id")
   /// Dot path into the blueprint content, e.g. `shots.0.lighting.recipe`.
   path           String
   fromValue      Json?    @map("from_value")

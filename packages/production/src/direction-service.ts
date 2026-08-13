@@ -155,11 +155,17 @@ export class DirectionService {
     return this.toStored(record);
   }
 
-  /** Latest stored blueprint for an episode, migrated forward if it is older. */
+  /**
+   * Latest stored blueprint for an episode, migrated forward if it is older.
+   *
+   * Ordered by `updatedAt`, not `createdAt`: replanning an identical plan upserts an
+   * existing row rather than inserting one, and that row is the current plan even
+   * though it was first created earlier.
+   */
   async latestForEpisode(episodeId: string): Promise<StoredBlueprint | null> {
     const record = await prisma.productionBlueprintRecord.findFirst({
       where: { episodeId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { updatedAt: 'desc' },
     });
     return record ? this.toStored(record) : null;
   }

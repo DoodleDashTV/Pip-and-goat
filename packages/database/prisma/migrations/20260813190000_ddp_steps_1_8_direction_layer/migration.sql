@@ -4,9 +4,14 @@
 -- altered or dropped, so an existing database migrates forward without touching a
 -- historical row and the rollback is a DROP TABLE of things nothing else references.
 
+-- `episode_id` is TEXT, not a UUID foreign key. A blueprint is planned from an
+-- approved scene plan, which names its episode logically (`VALIDATION_STEPS_1_8`),
+-- and planning has to be possible before an Episode row exists. Constraining it to
+-- the episodes table would make the planning layer depend on production state it is
+-- supposed to precede.
 CREATE TABLE "production_blueprints" (
     "id" UUID NOT NULL,
-    "episode_id" UUID NOT NULL,
+    "episode_id" TEXT NOT NULL,
     "schema_version" TEXT NOT NULL,
     "content_hash" TEXT NOT NULL,
     "cache_key" TEXT NOT NULL,
@@ -34,7 +39,7 @@ CREATE INDEX "production_blueprints_episode_id_created_at_idx" ON "production_bl
 CREATE TABLE "director_overrides" (
     "id" UUID NOT NULL,
     "blueprint_id" UUID,
-    "episode_id" UUID NOT NULL,
+    "episode_id" TEXT NOT NULL,
     "path" TEXT NOT NULL,
     "from_value" JSONB,
     "to_value" JSONB,
