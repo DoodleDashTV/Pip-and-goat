@@ -21,6 +21,7 @@
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
+    "cloud:preflight-offline": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-offline.ts",
     "cloud:fingerprints": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/print-fingerprints.ts",
     "cloud:verify-image": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/verify-worker-image.ts",
     "cloud:build-worker-image": "bash scripts/cloud/build-worker-image.sh",

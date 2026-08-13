@@ -12,10 +12,25 @@
  *    startup-status.json within 10 min of creation.
  *  - RUNPOD_API_KEY / ALLOW_PAID_GPU_LAUNCH are NEVER passed to the pod.
  *  - Restores ALLOW_PAID_GPU_LAUNCH=false + CLOUD_RENDER_ENABLED=false at end.
+ *  - Render code and approved assets must still match their pins, re-checked here
+ *    rather than trusted from preflight.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { RunpodClient } from '../../../packages/production/src/cloud/runpod-client';
-import { WORKER_IMAGE, HARD_CAP_USD, STATE_FILE, redact, metadataKeyFor } from './common';
+import {
+  computeRenderAssetFingerprint,
+  computeRenderCodeFingerprint,
+} from '../../../packages/production/src/cloud/worker-provenance';
+import {
+  WORKER_IMAGE,
+  WORKER_IMAGE_RENDER_ASSET_SHA256,
+  WORKER_IMAGE_RENDER_CODE_SHA256,
+  HARD_CAP_USD,
+  REPO_ROOT,
+  STATE_FILE,
+  redact,
+  metadataKeyFor,
+} from './common';
 import { makeStorage } from './common';
 
 const POLL_MS = 20_000;
@@ -70,6 +85,24 @@ async function main() {
 
   console.log('=== PHASE B — SINGLE AUTHORIZED LAUNCH ===');
   log('config', { jobId, gpuTypeId, quotedRate, workerImage: WORKER_IMAGE, hardCapUsd: HARD_CAP_USD });
+
+  // Preflight may have passed hours ago. Anything edited since - a scene script,
+  // a character - would be rendered here without ever having been reviewed, so
+  // the pins get the last word before any money is spent.
+  const localCode = computeRenderCodeFingerprint(REPO_ROOT).fingerprint;
+  const localAssets = computeRenderAssetFingerprint(REPO_ROOT).fingerprint;
+  if (localCode !== WORKER_IMAGE_RENDER_CODE_SHA256 || localAssets !== WORKER_IMAGE_RENDER_ASSET_SHA256) {
+    log('abort_fingerprint_drift', {
+      renderCodeMatches: localCode === WORKER_IMAGE_RENDER_CODE_SHA256,
+      renderAssetsMatch: localAssets === WORKER_IMAGE_RENDER_ASSET_SHA256,
+      localRenderCode: localCode,
+      pinnedRenderCode: WORKER_IMAGE_RENDER_CODE_SHA256,
+      localRenderAssets: localAssets,
+      pinnedRenderAssets: WORKER_IMAGE_RENDER_ASSET_SHA256,
+    });
+    console.log('ABORT: working tree no longer matches the pins — not launching. Spend $0.');
+    process.exit(2);
+  }
 
   const client = new RunpodClient();
   const storage = makeStorage();
