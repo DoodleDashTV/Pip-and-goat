@@ -42,6 +42,13 @@ def set_eevee(scene, samples: int = 32) -> None:
         for attr in ("use_raytracing", "use_shadows", "use_soft_shadows"):
             if hasattr(scene.eevee, attr):
                 setattr(scene.eevee, attr, True)
+        # EEVEE-Next traces shadows with very few rays and steps by default,
+        # which speckles curved low-poly surfaces with shadow acne — visible on
+        # the goat's flank as dirt that no amount of extra render samples
+        # removes, because it is a bias artefact rather than noise.
+        for attr, value in (("shadow_ray_count", 2), ("shadow_step_count", 8)):
+            if hasattr(scene.eevee, attr):
+                setattr(scene.eevee, attr, value)
 
 
 def append_object(blend_path: str, names: list[str] | None = None):
@@ -115,6 +122,14 @@ def placement_root(role: str, objects):
     if not live:
         return None, "none"
 
+    # Freshly appended objects have no evaluated transform yet, and reading
+    # matrix_world in that state hands back a matrix with the object's scale
+    # missing. Baking that into the reparent quietly reset every scaled object in
+    # the meadow to scale 1: the sky dome inflated from a squashed dome to a full
+    # sphere, and the flat dirt path became the 1 m cube that stood in the middle
+    # of the acceptance render looking like an untextured slab.
+    bpy.context.view_layer.update()
+
     tops = [o for o in live if o.parent is None or o.parent not in live]
     if len(tops) == 1:
         return tops[0], "existing-root"
@@ -160,6 +175,58 @@ def apply_action(arm, action_name: str | None, frame_start: int, frame_end: int)
             if not any(m.type == "CYCLES" for m in fcurve.modifiers):
                 fcurve.modifiers.new(type="CYCLES")
     return True
+
+
+#: How far inside its own surface a character's shadow caster sits.
+SHADOW_PROXY_SHRINK = 0.022
+#: Suffix every shadow caster carries, so other tools can tell proxies apart
+#: from the geometry the camera actually sees.
+SHADOW_PROXY_SUFFIX = "_ShadowProxy"
+
+
+def install_shadow_proxy(objects) -> list[str]:
+    """Cast a character's shadow from a slightly shrunken copy of itself.
+
+    The founding characters are three dozen interpenetrating primitives welded
+    into one mesh, so wherever the head passes through the neck or an ear through
+    the skull, two surfaces sit within a shadow-map texel of each other and the
+    sun stipples the white fur with self-shadow acne. It reads as dirt, it is
+    fixed to the model, and no shadow setting removes it: it survived ray and
+    step counts, filter radius, jitter, resolution scale, bias, high bit depth
+    and a hard-edged sun, and disappeared only when shadows were switched off
+    entirely.
+
+    Switching shadows off is not an option — without them the cast loses contact
+    with the ground and looks pasted on. So the visible mesh stops casting and an
+    invisible copy, pushed ``SHADOW_PROXY_SHRINK`` inside its own surface, casts
+    instead. The proxy can never shadow the surface it sits inside, while the
+    silhouette it throws on the ground is the character's own, a couple of
+    centimetres smaller.
+    """
+    import bpy
+
+    created = []
+    for obj in [o for o in objects if o.type == "MESH" and o.name in bpy.data.objects]:
+        if obj.name.endswith(SHADOW_PROXY_SUFFIX):
+            continue
+        proxy = obj.copy()  # shares mesh data, carries the armature modifier
+        proxy.name = f"{obj.name}{SHADOW_PROXY_SUFFIX}"
+        bpy.context.collection.objects.link(proxy)
+        if obj.parent is not None:
+            proxy.parent = obj.parent
+            proxy.matrix_parent_inverse = obj.matrix_parent_inverse.copy()
+        proxy.matrix_world = obj.matrix_world.copy()
+        shrink = proxy.modifiers.new("DDP_ShadowShrink", "DISPLACE")
+        shrink.mid_level = 0.0
+        shrink.strength = -SHADOW_PROXY_SHRINK
+        proxy.visible_camera = False
+        for attr in ("visible_diffuse", "visible_glossy", "visible_transmission", "visible_volume_scatter"):
+            if hasattr(proxy, attr):
+                setattr(proxy, attr, False)
+        proxy.visible_shadow = True
+        obj.visible_shadow = False
+        created.append(proxy.name)
+    return created
 
 
 def apply_viseme_cues(mesh_obj, cues: list[dict], fps: int) -> None:
@@ -241,59 +308,131 @@ def configure_camera(scene, preset: str, width: int, height: int) -> None:
 # The authoritative lighting layer. One named key/fill/rim rig per state, with an
 # explicit world strength, so exposure is deterministic and never accumulates.
 #
-# Energies are tuned against measured frame statistics, not guessed. The first
-# 1080p acceptance render measured mean luma 167-175, darkest pixel 50/255 and
-# mean saturation 12.6/128 — milky and desaturated, because four appended blends
-# stacked 8 lights and nothing was ever in shadow. Each state below keeps one
-# bright key, a deliberately weak fill so the shadow side stays dark, a rim for
-# separation, and a low world strength; combined with EEVEE-Next raytraced
-# shadows and the AgX Punchy look this measures mean luma 147-154, darkest 9-12
-# and saturation 37-41 on the same shot, with the sky brighter than the ground.
+# Energies are tuned against frame statistics measured on the bytes stored in the
+# rendered PNG (see scripts/assets/png_io.py). Earlier tunings were steered by a
+# loader that encoded already-encoded sRGB a second time and so over-reported
+# brightness by ~1.77x: the rig this replaces measured "mean luma 147-154" but
+# really stored 86-88/255, a third of range, which reads as overcast.
 #
-# DAY_KEY is the measured reference state (it is what the acceptance shot uses);
-# the others follow the same shape. Sky emission was swept on the widest framing
-# of the shot, which shows the most sky and is the worst case for saturation:
-# strength 1.6 left the dome dimmer than the grass, and simply raising it washed
-# the sky toward white (AgX desaturates highlights) until the local acceptance
-# saturation floor tripped at 29.7/128. A deeper sky colour at higher strength
-# gives both, measured on frame 1: sky region 180 luma against 148 for the
-# ground, and mean saturation 37.0/128.
+# What the numbers below are for:
+#   * A SUN key at a widened angle, so the terminator is soft enough for a
+#     children's short instead of stamping an ear onto a head as a hard patch.
+#   * An AREA fill from camera left at a real level. AgX crushed everything the
+#     key missed toward black, and the old fill was two orders of magnitude too
+#     weak to lift it; 200 W raises the darkest 1% of the frame from 14 to ~40.
+#   * An AREA rim behind and above the characters. This is what separates white
+#     fur from a green field, and it is the single biggest contributor to the
+#     highlight end: it carries p99 to ~220 with no clipped pixels.
+#   * A low world strength, so nothing is lit by an untracked ambient term.
+#   * "Khronos PBR Neutral" rather than AgX. AgX desaturates as it rolls off, so
+#     every attempt to reach a 45-50% mean under it either washed the sky white
+#     or tripped the saturation floor; PBR Neutral holds 63/128 mean saturation
+#     at the same exposure.
+#
+# DAY_KEY is the measured reference state (it is what the acceptance shot uses)
+# and lands mean luma 47-49% of range, p01 ~40, p99 ~220, zero clipped
+# highlights, mean saturation ~63/128. The others follow the same shape and
+# scale; only DAY_KEY is gated.
 LIGHTING_STATES: dict[str, dict] = {
     "DAY_SOFT": {
         "world": {"color": (0.42, 0.62, 0.85), "strength": 0.28},
-        "look": "AgX - Punchy",
-        "exposure": -2.2,
-        "sky": {"color": (0.16, 0.48, 0.95), "strength": 3.2},
-        "key": {"type": "SUN", "energy": 3.4, "location": (4.0, -5.0, 9.0), "rotation": (0.72, 0.12, 0.5)},
-        "fill": {"type": "AREA", "energy": 4.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
-        "rim": {"type": "AREA", "energy": 7.0, "size": 3.0, "location": (1.6, 3.4, 3.6)},
+        "viewTransform": "Khronos PBR Neutral",
+        "look": "None",
+        "exposure": -2.9,
+        "sky": {
+            "color": (0.18, 0.47, 0.93),
+            "midColor": (0.36, 0.64, 0.96),
+            "horizonColor": (0.74, 0.86, 0.98),
+            "horizonAt": 0.46,
+            "midAt": 0.60,
+            "zenithAt": 0.90,
+            "strength": 3.2,
+        },
+        "key": {
+            "type": "SUN",
+            "energy": 7.0,
+            "angle": 0.20,
+            "location": (4.0, -5.0, 9.0),
+            "rotation": (0.72, 0.12, 0.5),
+        },
+        "fill": {"type": "AREA", "energy": 260.0, "size": 6.0, "location": (-3.2, -4.6, 3.4)},
+        "rim": {"type": "AREA", "energy": 800.0, "size": 2.4, "location": (1.0, 2.4, 2.8)},
     },
     "DAY_KEY": {
         "world": {"color": (0.40, 0.60, 0.84), "strength": 0.25},
-        "look": "AgX - Punchy",
-        "exposure": -2.2,
-        "sky": {"color": (0.14, 0.45, 0.95), "strength": 3.5},
-        "key": {"type": "SUN", "energy": 4.0, "location": (3.4, -4.4, 9.0), "rotation": (0.66, 0.1, 0.42)},
-        "fill": {"type": "AREA", "energy": 3.0, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
-        "rim": {"type": "AREA", "energy": 8.0, "size": 2.6, "location": (1.2, 3.8, 4.0)},
+        "viewTransform": "Khronos PBR Neutral",
+        "look": "None",
+        "exposure": -3.1,
+        # Measured on the widest framing, which shows the most sky and is the
+        # worst case for saturation: a near-white horizon band looks like haze but
+        # costs 3 points of frame saturation and 5% of mean luma, so the ramp stays
+        # a saturated blue that only lightens toward the horizon.
+        "sky": {
+            "color": (0.11, 0.36, 0.90),
+            "midColor": (0.22, 0.52, 0.95),
+            "horizonColor": (0.40, 0.68, 0.98),
+            "horizonAt": 0.46,
+            "midAt": 0.60,
+            "zenithAt": 0.90,
+            "strength": 3.6,
+        },
+        "key": {
+            "type": "SUN",
+            "energy": 9.0,
+            "angle": 0.14,
+            "location": (3.4, -4.4, 9.0),
+            "rotation": (0.66, 0.1, 0.42),
+        },
+        "fill": {"type": "AREA", "energy": 200.0, "size": 5.0, "location": (-3.4, -4.2, 3.0)},
+        "rim": {"type": "AREA", "energy": 900.0, "size": 2.0, "location": (0.8, 2.2, 2.8)},
     },
     "GOLDEN_HOUR": {
         "world": {"color": (0.52, 0.42, 0.32), "strength": 0.22},
-        "look": "AgX - Punchy",
-        "exposure": -2.0,
-        "sky": {"color": (0.95, 0.42, 0.16), "strength": 3.0},
-        "key": {"type": "SUN", "energy": 3.2, "location": (-5.5, -3.0, 3.2), "rotation": (1.18, 0.0, -0.75)},
-        "fill": {"type": "AREA", "energy": 2.2, "size": 6.0, "location": (3.0, -4.0, 2.4)},
-        "rim": {"type": "AREA", "energy": 9.0, "size": 2.4, "location": (2.2, 3.2, 3.2)},
+        "viewTransform": "Khronos PBR Neutral",
+        "look": "None",
+        "exposure": -2.8,
+        "sky": {
+            "color": (0.72, 0.40, 0.30),
+            "midColor": (0.95, 0.52, 0.24),
+            "horizonColor": (1.0, 0.78, 0.46),
+            "horizonAt": 0.46,
+            "midAt": 0.60,
+            "zenithAt": 0.90,
+            "strength": 3.0,
+        },
+        "key": {
+            "type": "SUN",
+            "energy": 7.5,
+            "angle": 0.16,
+            "location": (-5.5, -3.0, 3.2),
+            "rotation": (1.18, 0.0, -0.75),
+        },
+        "fill": {"type": "AREA", "energy": 150.0, "size": 6.0, "location": (3.0, -4.0, 2.4)},
+        "rim": {"type": "AREA", "energy": 1000.0, "size": 2.2, "location": (1.0, 2.4, 2.6)},
     },
     "OVERCAST": {
         "world": {"color": (0.55, 0.58, 0.62), "strength": 0.45},
-        "look": "AgX - Base Contrast",
-        "exposure": -2.0,
-        "sky": {"color": (0.60, 0.66, 0.74), "strength": 3.0},
-        "key": {"type": "SUN", "energy": 1.6, "location": (2.0, -4.0, 10.0), "rotation": (0.5, 0.0, 0.2)},
-        "fill": {"type": "AREA", "energy": 4.5, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
-        "rim": {"type": "AREA", "energy": 3.0, "size": 4.0, "location": (0.0, 3.6, 3.4)},
+        "viewTransform": "Khronos PBR Neutral",
+        "look": "None",
+        "exposure": -2.7,
+        "sky": {
+            "color": (0.60, 0.66, 0.74),
+            "midColor": (0.70, 0.75, 0.80),
+            "horizonColor": (0.86, 0.88, 0.90),
+            "horizonAt": 0.46,
+            "midAt": 0.60,
+            "zenithAt": 0.90,
+            "strength": 3.0,
+        },
+        "key": {
+            "type": "SUN",
+            "energy": 3.6,
+            "angle": 0.35,
+            "location": (2.0, -4.0, 10.0),
+            "rotation": (0.5, 0.0, 0.2),
+        },
+        "fill": {"type": "AREA", "energy": 320.0, "size": 8.0, "location": (-2.0, -4.0, 4.0)},
+        "rim": {"type": "AREA", "energy": 340.0, "size": 4.0, "location": (0.0, 2.8, 3.0)},
     },
 }
 DEFAULT_LIGHTING_STATE = "DAY_SOFT"
@@ -327,10 +466,30 @@ def apply_sky_emission(spec: dict) -> list[str]:
     links = material.node_tree.links
     nodes.clear()
     emission = nodes.new("ShaderNodeEmission")
-    emission.inputs[0].default_value = (*sky["color"], 1.0)
     emission.inputs[1].default_value = sky["strength"]
     out = nodes.new("ShaderNodeOutputMaterial")
     links.new(emission.outputs[0], out.inputs[0])
+
+    # A single flat colour across the whole dome is the giveaway of an unlit
+    # background: real sky lightens and warms toward the horizon, and that
+    # gradient is what separates a green field from the air above it.
+    horizon = sky.get("horizonColor")
+    if horizon:
+        coords = nodes.new("ShaderNodeTexCoord")
+        split = nodes.new("ShaderNodeSeparateXYZ")
+        ramp = nodes.new("ShaderNodeValToRGB")
+        links.new(coords.outputs["Generated"], split.inputs[0])
+        links.new(split.outputs["Z"], ramp.inputs[0])
+        elements = ramp.color_ramp.elements
+        elements[0].position = float(sky.get("horizonAt", 0.48))
+        elements[0].color = (*horizon, 1.0)
+        elements[1].position = float(sky.get("zenithAt", 0.92))
+        elements[1].color = (*sky["color"], 1.0)
+        mid = ramp.color_ramp.elements.new(float(sky.get("midAt", 0.62)))
+        mid.color = (*sky.get("midColor", sky["color"]), 1.0)
+        links.new(ramp.outputs["Color"], emission.inputs[0])
+    else:
+        emission.inputs[0].default_value = (*sky["color"], 1.0)
 
     applied = []
     for obj in bpy.data.objects:
@@ -380,6 +539,20 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
         light_data.energy = cfg["energy"]
         if cfg["type"] == "AREA" and "size" in cfg:
             light_data.size = cfg["size"]
+        # A sun at its default 0.5-degree angle throws razor-sharp shadows, so an
+        # ear reads as a painted patch on the head. Widening it softens the
+        # terminator into something a children's short can use.
+        if cfg["type"] == "SUN" and "angle" in cfg:
+            light_data.angle = cfg["angle"]
+        # Only the key casts. The characters and props are joined primitives, so
+        # spheres intersect inside the silhouette; every extra shadow map stipples
+        # those intersections with self-shadow acne that reads as dirt on white
+        # fur and survives any number of render samples. Fill and rim stand in for
+        # bounce light, which does not cast in the first place.
+        if hasattr(light_data, "use_shadow"):
+            light_data.use_shadow = bool(cfg.get("shadow", role == "key"))
+        if hasattr(light_data, "shadow_buffer_bias") and "shadowBias" in cfg:
+            light_data.shadow_buffer_bias = cfg["shadowBias"]
         light_obj = bpy.data.objects.new(name, light_data)
         light_obj.location = cfg["location"]
         if "rotation" in cfg:
@@ -387,9 +560,17 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
         bpy.context.collection.objects.link(light_obj)
         created.append(name)
 
-    # Filmic tone mapping. Without a look, AgX renders this palette flat and
-    # desaturated, which is a large part of why the first render looked milky.
+    # Tone mapping is part of the lighting state, not a default inherited from
+    # whatever Blender happens to ship: the view transform decides how much
+    # colour survives, and leaving it implicit is how a shot ends up graded
+    # differently from the one that was approved.
     scene.view_settings.exposure = float(spec.get("exposure", 0.0))
+    view_transform = spec.get("viewTransform")
+    if view_transform:
+        try:
+            scene.view_settings.view_transform = view_transform
+        except (TypeError, ValueError):  # not in this build's OCIO config
+            pass
     look = spec.get("look") or "None"
     look_applied = None
     try:
@@ -414,6 +595,111 @@ def apply_lighting_state(scene, requested: str | None) -> dict:
         "exposure": scene.view_settings.exposure,
         "viewTransform": scene.view_settings.view_transform,
     }
+
+
+# Surface response, applied by the shot rather than baked into each asset so the
+# whole cast and set stay consistent and one edit fixes all of them.
+#
+# The founding assets were authored as flat matte shaders at roughness 0.4-0.85
+# with the specular input near zero, which is why the acceptance render read as
+# untextured plastic: nothing anywhere in frame returned a highlight, so there
+# was no cue for shape or material. These values are deliberately restrained —
+# eyes and wet surfaces glint, fur and foliage stay soft — and every entry is
+# keyed on a substring of the material name.
+MATERIAL_POLISH: list[tuple[tuple[str, ...], dict]] = [
+    (("catchlight",), {"roughness": 0.08, "specular": 1.0, "emission": (1.0, 1.0, 1.0), "emissionStrength": 2.6}),
+    (("pupil",), {"roughness": 0.12, "specular": 0.85}),
+    (("iris",), {"roughness": 0.16, "specular": 0.8}),
+    (("eyewhite",), {"roughness": 0.22, "specular": 0.7}),
+    (("nose", "beak"), {"roughness": 0.30, "specular": 0.6}),
+    (("horn", "hoof"), {"roughness": 0.42, "specular": 0.45}),
+    (("tag", "charm"), {"roughness": 0.28, "specular": 0.7}),
+    (("collar", "backpack", "pouch"), {"roughness": 0.55, "specular": 0.35}),
+    (("comb", "brow", "ear"), {"roughness": 0.52, "specular": 0.35}),
+    (("body", "feet"), {"roughness": 0.62, "specular": 0.32}),
+    # Bump scales are in object-space cycles per metre: paper fibre is sub-
+    # millimetre, dirt and rock are a few centimetres.
+    (("mappaper", "mapfold"), {"roughness": 0.66, "specular": 0.28, "bump": (260.0, 0.06)}),
+    (("mapwater",), {"roughness": 0.18, "specular": 0.9}),
+    (("mapink", "mapcoast", "maptrail", "mapaccent"), {"roughness": 0.48, "specular": 0.35}),
+    (("mapstone", "bark"), {"roughness": 0.82, "specular": 0.18, "bump": (18.0, 0.28)}),
+    (("grass", "path"), {"roughness": 0.88, "specular": 0.16, "bump": (22.0, 0.14)}),
+    (("leaf",), {"roughness": 0.74, "specular": 0.22, "bump": (14.0, 0.16)}),
+    (("flower",), {"roughness": 0.45, "specular": 0.4}),
+]
+
+
+def _principled(material):
+    if not material.use_nodes:
+        return None
+    return next((n for n in material.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+
+
+def _set_input(node, names: tuple[str, ...], value) -> bool:
+    for name in names:
+        if name in node.inputs:
+            node.inputs[name].default_value = value
+            return True
+    return False
+
+
+def _add_bump(material, bsdf, scale: float, strength: float) -> None:
+    """Break up a flat shader with fine procedural relief.
+
+    Cheap in EEVEE and it is what stops grass, paper and rock from reading as
+    coloured plastic under a highlight.
+
+    The noise is driven from object coordinates, not the default generated ones.
+    Generated coordinates normalise to each object's bounding box, so the same
+    noise stretched along whatever axis an object happened to be longest: on the
+    dirt path and the map's paper it drew centimetre-wide streaks down the length
+    of the mesh and both read as varnished wood at full resolution.
+    """
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    if any(n.name == "DDP_Bump" for n in nodes):
+        return
+    coords = nodes.new("ShaderNodeTexCoord")
+    coords.name = "DDP_BumpCoords"
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.name = "DDP_BumpNoise"
+    noise.inputs["Scale"].default_value = scale
+    links.new(coords.outputs["Object"], noise.inputs["Vector"])
+    if "Detail" in noise.inputs:
+        noise.inputs["Detail"].default_value = 4.0
+    bump = nodes.new("ShaderNodeBump")
+    bump.name = "DDP_Bump"
+    bump.inputs["Strength"].default_value = strength
+    links.new(noise.outputs["Fac"], bump.inputs["Height"])
+    links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+
+
+def apply_material_polish() -> dict:
+    """Give every material a deliberate, restrained surface response."""
+    import bpy
+
+    touched: dict[str, str] = {}
+    for material in bpy.data.materials:
+        if material.name.startswith("DDP_"):
+            continue  # owned by the lighting layer
+        bsdf = _principled(material)
+        if bsdf is None:
+            continue
+        lowered = material.name.lower()
+        spec = next((cfg for keys, cfg in MATERIAL_POLISH if any(k in lowered for k in keys)), None)
+        if spec is None:
+            continue
+        _set_input(bsdf, ("Roughness",), spec["roughness"])
+        _set_input(bsdf, ("Specular IOR Level", "Specular"), spec["specular"])
+        if "emission" in spec:
+            _set_input(bsdf, ("Emission Color", "Emission"), (*spec["emission"], 1.0))
+            _set_input(bsdf, ("Emission Strength",), spec["emissionStrength"])
+        if "bump" in spec:
+            _add_bump(material, bsdf, *spec["bump"])
+        touched[material.name] = f"roughness={spec['roughness']} specular={spec['specular']}" + (
+            " +bump" if "bump" in spec else ""
+        ) + (" +emission" if "emission" in spec else "")
+    return {"count": len(touched), "materials": touched}
 
 
 def parse_resolution(value: str) -> tuple[int, int]:
@@ -566,6 +852,7 @@ def build_scene(
     missing_actions = []
     applied_actions = {}
     roots = {}
+    shadow_proxies: list[str] = []
     for role, objs in imported_by_role.items():
         arm = find_armature(objs)
         target, root_kind = placement_root(role, objs)
@@ -589,6 +876,10 @@ def build_scene(
         cues = (shot_meta.get("lipSync") or {}).get(role) or []
         if mesh and cues:
             apply_viseme_cues(mesh, cues, fps)
+        # Only the characters need this: they are the assets built from stacked
+        # primitives, and they are the ones the audience looks at.
+        if arm is not None:
+            shadow_proxies.extend(install_shadow_proxy(objs))
 
     # Fail closed: silently dropping a requested action is what let the first
     # acceptance render ship with a completely motionless goat.
@@ -602,6 +893,7 @@ def build_scene(
         raise SystemExit(2)
 
     lighting = apply_lighting_state(scene, shot_meta.get("lightingState"))
+    materials = apply_material_polish()
     configure_camera(scene, camera_preset, width, height)
     if str(engine).upper() == "EEVEE":
         set_eevee(scene, samples)
@@ -611,6 +903,8 @@ def build_scene(
     return {
         "importedByRole": imported_by_role,
         "lighting": lighting,
+        "materials": materials,
+        "shadowProxies": shadow_proxies,
         "stripped": stripped,
         "placementRoots": roots,
         "appliedActions": applied_actions,
