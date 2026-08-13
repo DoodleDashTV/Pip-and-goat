@@ -39,16 +39,16 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * All of these constants must be re-pinned together whenever the image is
  * rebuilt.
  *
- * Rebuilt and published at 9a60cc9 after the shadow-caster repair.
+ * Rebuilt and published at 324ce5c with early R2 boot diagnostics.
  * Anonymous registry read confirms the labels below; preflight refuses any
  * disagreement. Rebuild with `scripts/cloud/build-worker-image.sh` and re-pin
  * all four constants together if the baked render code moves again.
  */
 export const WORKER_IMAGE =
-  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:bd60f26469a2a09ffef48281170263a2121ff10a458f42f94fa487eacae2c2a2'; // pragma: allowlist secret
-export const WORKER_IMAGE_SOURCE_COMMIT = '9a60cc9c379d2038d7d7cd349e2443196f97bb98';
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:32a0e34fde92c90acb3a6b7d6e880216ef162483cd4f6ada8a538b106a388adb'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = '324ce5ceaa798ee62d3450e95a64084d0d867912';
 export const WORKER_IMAGE_RENDER_CODE_SHA256 =
-  'f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207';
+  'cbd8061f83492bc967994b22dcfb21bbd6b52e341ddf9b60fa956d5738806a29';
 
 /**
  * Fingerprint of the approved `.blend` assets this checkout would render, from
