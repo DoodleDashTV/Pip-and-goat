@@ -8,7 +8,8 @@
     "ANIMATION_CHANNELS_VALID": true,
     "LIGHTING_STATE_VALID": true,
     "NO_DUPLICATE_LIGHTS": true,
-    "ASSET_HIERARCHY_VALID": true
+    "ASSET_HIERARCHY_VALID": true,
+    "PROP_CLEARANCE_VALID": true
   },
   "injectedFault": null,
   "faultExpectedGate": null,
@@ -33,14 +34,14 @@
         60,
         90
       ],
-      "maxBoneDelta": 1.048021,
-      "maxVertexDelta": 0.126589,
+      "maxBoneDelta": 1.072084,
+      "maxVertexDelta": 0.124915,
       "pairwiseVertexDeltas": {
-        "1->30": 0.126096,
-        "30->60": 0.052141,
-        "60->90": 0.159992
+        "1->30": 0.124915,
+        "30->60": 0.052475,
+        "60->90": 0.160151
       },
-      "minConsecutiveVertexDelta": 0.052141,
+      "minConsecutiveVertexDelta": 0.052475,
       "movingBones": [
         "backpack",
         "chest",
@@ -70,13 +71,13 @@
         90
       ],
       "maxBoneDelta": 0.719718,
-      "maxVertexDelta": 0.219655,
+      "maxVertexDelta": 0.212603,
       "pairwiseVertexDeltas": {
-        "1->30": 0.129035,
-        "30->60": 0.32175,
-        "60->90": 0.168605
+        "1->30": 0.129232,
+        "30->60": 0.321585,
+        "60->90": 0.161304
       },
-      "minConsecutiveVertexDelta": 0.129035,
+      "minConsecutiveVertexDelta": 0.129232,
       "movingBones": [
         "chest",
         "collar",
@@ -111,7 +112,19 @@
       "ok": true
     },
     {
+      "mesh": "Goat_Character_ShadowProxy",
+      "vertexGroups": 18,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
       "mesh": "Goat_Collar",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Goat_Collar_ShadowProxy",
       "vertexGroups": 1,
       "unweighted": 0,
       "ok": true
@@ -123,7 +136,19 @@
       "ok": true
     },
     {
+      "mesh": "Goat_Tag_ShadowProxy",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
       "mesh": "Goat_Tag_Text",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Goat_Tag_Text_ShadowProxy",
       "vertexGroups": 1,
       "unweighted": 0,
       "ok": true
@@ -141,13 +166,37 @@
       "ok": true
     },
     {
+      "mesh": "Pip_Backpack_Pouch_ShadowProxy",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Pip_Backpack_ShadowProxy",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
       "mesh": "Pip_Character",
       "vertexGroups": 14,
       "unweighted": 0,
       "ok": true
     },
     {
+      "mesh": "Pip_Character_ShadowProxy",
+      "vertexGroups": 14,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
       "mesh": "Pip_StarCharm",
+      "vertexGroups": 1,
+      "unweighted": 0,
+      "ok": true
+    },
+    {
+      "mesh": "Pip_StarCharm_ShadowProxy",
       "vertexGroups": 1,
       "unweighted": 0,
       "ok": true
@@ -172,10 +221,10 @@
       "DDP_Rim"
     ],
     "worldStrength": 0.25,
-    "look": "AgX - Punchy",
-    "lookRequested": "AgX - Punchy",
-    "exposure": -2.200000047683716,
-    "viewTransform": "AgX"
+    "look": "None",
+    "lookRequested": "None",
+    "exposure": -2.9000000953674316,
+    "viewTransform": "Khronos PBR Neutral"
   },
   "activeLights": [
     "DDP_Fill",
@@ -224,20 +273,59 @@
   "map": {
     "objects": [
       "AdventureMap",
-      "MapMark"
+      "MapBorder_E",
+      "MapBorder_N",
+      "MapBorder_S",
+      "MapBorder_W",
+      "MapCoast",
+      "MapCompass_E",
+      "MapCompass_N",
+      "MapCrease_H",
+      "MapCrease_V",
+      "MapMark",
+      "MapMark_B",
+      "MapStand",
+      "MapTrail_0_0",
+      "MapTrail_0_1",
+      "MapTrail_1_0",
+      "MapTrail_1_1",
+      "MapTrail_2_0",
+      "MapTrail_2_1",
+      "MapTrail_3_0",
+      "MapTrail_3_1",
+      "MapTrail_4_0",
+      "MapTrail_4_1",
+      "MapWater"
     ],
     "root": {
       "object": "map_Root",
       "kind": "created-root"
     },
-    "paperToMarkDistance": 0.115758,
+    "paperToMarkDistance": 0.0,
     "sharedRoot": true
   },
+  "clearance": {
+    "ok": true,
+    "frames": [
+      1,
+      30,
+      60,
+      90
+    ],
+    "lowestPoint": 0.0,
+    "groundTolerance": 0.002,
+    "groundRestSurfaces": [
+      "Meadow_Ground",
+      "Meadow_Path"
+    ],
+    "sunkMeshes": [],
+    "intersections": []
+  },
   "assetSha256": {
-    "meadow": "2bf49aabad0710b528294d6394b68b28075b522228fd10c6d2f8d893d64ad3c6",
-    "map": "9f466176dab6f3fcacfa79838a5db3d30c7aef372a1ed2d57152c5761578f4f2",
-    "pip": "dd0d1c03b6625d69e9f96af087562aeecd0b14d401b280fe88b9f35418d005cb",
-    "goat": "a54d491264e06ea52ffe9e2ba16e79d60be0d1900b1d369848774c9f9eac0ad5"
+    "meadow": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015",
+    "map": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea",
+    "pip": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0",
+    "goat": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8"
   },
   "blenderVersion": "4.2.3 LTS"
 }

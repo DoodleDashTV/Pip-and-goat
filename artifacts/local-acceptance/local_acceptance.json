@@ -15,10 +15,13 @@
     "staticCameraFramesRendered": true,
     "characterPixelMotion": true,
     "noDuplicateLights": true,
-    "exposureControlled": true,
-    "hasTrueBlacks": true,
-    "hasHighlights": true,
+    "exposureInBand": true,
+    "highlightsPresent": true,
+    "noHighlightClipping": true,
+    "shadowsLifted": true,
+    "shadowDepthRetained": true,
     "saturationHealthy": true,
+    "tonalRangeHealthy": true,
     "videoEncoded": true
   },
   "keyFrameStats": [
@@ -26,37 +29,85 @@
       "frame": "frame_0001.png",
       "height": 480,
       "width": 270,
-      "meanLuma": 153.53,
-      "minLuma": 11.79,
-      "maxLuma": 183.89,
-      "meanSaturation": 36.97
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 115.35,
+      "meanLumaPct": 0.4523,
+      "minLuma": 13.93,
+      "maxLuma": 235.99,
+      "p01Luma": 49.25,
+      "p05Luma": 79.34,
+      "p50Luma": 113.78,
+      "p95Luma": 164.45,
+      "p99Luma": 210.08,
+      "p999Luma": 221.01,
+      "contrast": 85.11,
+      "tonalRange": 160.83,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 62.3
     },
     {
       "frame": "frame_0030.png",
       "height": 480,
       "width": 270,
-      "meanLuma": 152.4,
-      "minLuma": 11.79,
-      "maxLuma": 182.1,
-      "meanSaturation": 37.77
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 116.74,
+      "meanLumaPct": 0.4578,
+      "minLuma": 14.28,
+      "maxLuma": 235.99,
+      "p01Luma": 49.65,
+      "p05Luma": 79.19,
+      "p50Luma": 114.93,
+      "p95Luma": 168.0,
+      "p99Luma": 212.08,
+      "p999Luma": 221.16,
+      "contrast": 88.8,
+      "tonalRange": 162.43,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 61.71
     },
     {
       "frame": "frame_0060.png",
       "height": 480,
       "width": 270,
-      "meanLuma": 149.42,
-      "minLuma": 11.79,
-      "maxLuma": 182.1,
-      "meanSaturation": 39.65
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 119.69,
+      "meanLumaPct": 0.4694,
+      "minLuma": 10.85,
+      "maxLuma": 235.28,
+      "p01Luma": 47.66,
+      "p05Luma": 78.27,
+      "p50Luma": 117.33,
+      "p95Luma": 175.59,
+      "p99Luma": 215.08,
+      "p999Luma": 221.77,
+      "contrast": 97.32,
+      "tonalRange": 167.42,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 60.1
     },
     {
       "frame": "frame_0090.png",
       "height": 480,
       "width": 270,
-      "meanLuma": 147.48,
-      "minLuma": 9.09,
-      "maxLuma": 188.74,
-      "meanSaturation": 40.79
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 121.4,
+      "meanLumaPct": 0.4761,
+      "minLuma": 4.0,
+      "maxLuma": 235.63,
+      "p01Luma": 46.97,
+      "p05Luma": 77.48,
+      "p50Luma": 118.63,
+      "p95Luma": 180.66,
+      "p99Luma": 216.01,
+      "p999Luma": 221.29,
+      "contrast": 103.18,
+      "tonalRange": 169.03,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 58.71
     }
   ],
   "keyFrames": [
@@ -70,14 +121,31 @@
     "artifacts/local-acceptance/keyframes/static_camera_0090.png"
   ],
   "staticCameraMovingPixelFraction": {
-    "1->30": 0.036667,
-    "30->60": 0.042539,
-    "60->90": 0.042639
+    "1->30": 0.039059,
+    "30->60": 0.041304,
+    "60->90": 0.044468
   },
-  "minStaticCameraMovingPixelFraction": 0.036667,
+  "minStaticCameraMovingPixelFraction": 0.039059,
   "thresholds": {
     "pixelDelta": 8.0,
-    "minMovingPixelFraction": 0.005
+    "minMovingPixelFraction": 0.005,
+    "exposurePctBand": [
+      0.43,
+      0.53
+    ],
+    "highlightP99Min": 200.0,
+    "highlightClipMax": 0.002,
+    "shadowP01Min": 6.0,
+    "shadowClipMax": 0.0005,
+    "shadowDepthMaxRatio": 0.55,
+    "saturationMin": 45.0,
+    "tonalRangeMin": 140.0
+  },
+  "measurement": {
+    "source": "stored PNG bytes (scripts/assets/png_io.py)",
+    "colorspace": [
+      "sRGB (PNG default, no colour chunk)"
+    ]
   },
   "activeLights": [
     "DDP_Fill",
@@ -102,10 +170,10 @@
       "DDP_Rim"
     ],
     "worldStrength": 0.25,
-    "look": "AgX - Punchy",
-    "lookRequested": "AgX - Punchy",
-    "exposure": -2.200000047683716,
-    "viewTransform": "AgX"
+    "look": "None",
+    "lookRequested": "None",
+    "exposure": -2.9000000953674316,
+    "viewTransform": "Khronos PBR Neutral"
   },
   "placementRoots": {
     "meadow": {
