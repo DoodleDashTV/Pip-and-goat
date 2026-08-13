@@ -59,6 +59,37 @@ from the sun. That is the character's own form shadow and it is what makes Pip
 read as round; nothing else on the chest is in shadow at all. No pixel is blocked
 by the beak, the beak tip, a pupil, an iris, a catchlight or a foot.
 
+## The same question asked of the delivered pixels
+
+The table above is the planner's own view of the scene, traced by ray. Asking the
+rendered frame instead, in `chest_shadow_on_pixels.json`: on frame 45 at
+1080x1920 — the frame and angle the mark was visible on — Pip's chest is 7438
+plumage pixels, and
+
+| | Shadowed | Deepest shadow |
+| --- | --- | --- |
+| `a440d88` as shipped | 3020 (40.6%) | 72.7% below the lit level |
+| this branch | 2029 (27.3%) | 52.2% below the lit level |
+
+991 pixels of shadow gone, and what is left is 20 points shallower: the hard dark
+edge of the mark has become the soft roll-off of the body's own form shadow.
+
+One mask, taken from the repaired frame, is measured on both plates. A colour test
+for plumage is also a brightness test, so run separately on each plate it drops
+the very pixels in question — the shipped frame's deepest seam pixels fell outside
+it, and its chest came out 1199 pixels smaller than the repaired one, which
+flattered the shipped frame. Pip's geometry and the camera are identical between
+the two, so his silhouette is too, and one mask is the correct treatment.
+
+Two simpler measurements were tried first and are recorded here as discarded,
+because a chest that curves away from the sun is legitimately dark at one end and
+both of them scored that rather than the mark: how far the darkest column of the
+chest sits below the chest's general level (30.8 luma before, 30.4 after — no
+signal, because in the repaired frame the darkest column is the body's own edge),
+and the same figure high-passed along x (still dominated by the silhouette until
+background grass was excluded, after which only 53 columns survived, too few to
+high-pass against).
+
 ## Evidence
 
 | File | What it holds |
@@ -66,6 +97,8 @@ by the beak, the beak tip, a pupil, an iris, a catchlight or a foot.
 | `chest_mark_three_states.png` | The chest at 12x, in three states of the caster planner: the 22 mm band, the residual sealed-part mark, and clean. |
 | `chest_before_after_daykey.png` | Head and chest at 3x under DAY_KEY, as shipped at `a440d88` and as this branch renders it. |
 | `chest_before_after_revealing.png` | The same two, relit with a single hard point sun eight degrees off the chest, which is the harshest thing that can be pointed at a shadow. |
+| `chest_closecrop_frame45_1080p.png` | Frame 45 of the acceptance shot itself at 1080x1920, cropped to Pip at 6x, shipped against this branch. Not a test render: these are the delivered pixels. |
+| `chest_shadow_on_pixels.json` | The shadowed fraction of the chest measured on those pixels, both plates through one mask. |
 | `chest_blockers_four_states.json` | The table above, with every blocker named, sized and counted. |
 | `chest_surface_inspection.png` | The chest surface under normals-as-colour, one colour per material slot, and matte white under a raking light. |
 | `causation_pip_stops_casting.png` | Shipped, Pip casting no shadow, no shadow proxy at all, and this branch — the same frame four ways. |
