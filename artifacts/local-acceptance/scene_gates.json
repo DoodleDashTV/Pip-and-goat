@@ -220,10 +220,10 @@
       "DDP_Key",
       "DDP_Rim"
     ],
-    "worldStrength": 0.25,
+    "worldStrength": 0.18,
     "look": "None",
     "lookRequested": "None",
-    "exposure": -2.9000000953674316,
+    "exposure": -3.0999999046325684,
     "viewTransform": "Khronos PBR Neutral"
   },
   "activeLights": [
