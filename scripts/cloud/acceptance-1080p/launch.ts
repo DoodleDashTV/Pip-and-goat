@@ -38,8 +38,11 @@ const POLL_MS = 20_000;
 // within seconds of COMPLETE rather than billing for a whole slow interval.
 const ACTIVE_POLL_MS = 4_000;
 const ACTIVE_STATUSES = new Set(['RENDERING', 'ENCODING', 'QC', 'UPLOADING', 'VERIFY_READBACK']);
-const NO_STARTUP_KILL_MS = 10 * 60 * 1000; // no startup-status.json within 10 min
-const STALL_MS = 8 * 60 * 1000; // no bootStage/status progress for 8 min
+// Cold pulls of a ~2GB worker image have previously taken ~4.5 min before the
+// first startup-status.json. Give the pull + boot a full window; do not confuse
+// "image still pulling" with a mid-boot stall.
+const NO_STARTUP_KILL_MS = 15 * 60 * 1000; // no startup-status.json within 15 min of creation
+const STALL_MS = 8 * 60 * 1000; // no bootStage/status progress for 8 min AFTER first startup-status
 
 function log(event: string, detail: Record<string, unknown> = {}) {
   console.log(JSON.stringify({ ts: new Date().toISOString(), event, ...detail }));
@@ -295,7 +298,11 @@ async function main() {
           log('no_startup_status_kill', { elapsedSec: Math.round(elapsedMs / 1000) });
           break;
         }
-        if (Date.now() - lastProgressTs >= STALL_MS) {
+        // Stall only applies once the worker has written startup-status.json.
+        // Before that, the empty stage key would otherwise look like "progress"
+        // on the first poll and then trip STALL_MS while the image is still
+        // pulling — which is exactly what NO_STARTUP_KILL_MS covers.
+        if (sawStartupStatus && Date.now() - lastProgressTs >= STALL_MS) {
           finalStatus = 'STARTUP_STALL';
           log('stall_kill', { sinceProgressSec: Math.round((Date.now() - lastProgressTs) / 1000) });
           break;

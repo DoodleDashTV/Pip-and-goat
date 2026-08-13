@@ -1,0 +1,22 @@
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-13T16:47:42.509Z","event":"config","jobId":"accept1080-2026-08-13T16-47-14-153Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.74,"workerImage":"ghcr.io/<redacted>/ddp-runpod-blender@sha256:bd60f26469a2a09ffef48281170263a2121ff10a458f42f94fa487eacae2c2a2","hardCapUsd":0.25}
+{"ts":"2026-08-13T16:47:42.754Z","event":"creating_pod","podName":"ddp-accept1080-1786639662754","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":40,"volumeInGb":0}
+{"ts":"2026-08-13T16:47:43.315Z","event":"pod_created","podId":"j80g7m89y4fema","at":"2026-08-13T16:47:43.315Z"}
+AUTHORIZATION CONSUMED: pod j80g7m89y4fema created. Watchdog + HARD_KILL active.
+{"ts":"2026-08-13T16:47:45.618Z","event":"stage","elapsedSec":0,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":null,"renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T16:55:53.990Z","event":"stall_kill","sinceProgressSec":488}
+{"ts":"2026-08-13T16:55:53.990Z","event":"terminating_pod","podId":"j80g7m89y4fema"}
+{"ts":"2026-08-13T16:55:54.462Z","event":"post_terminate_poll","podPresent":false,"totalPods":0,"billableRemaining":false}
+
+===== PHASE B LIFECYCLE SUMMARY =====
+Pod ID: j80g7m89y4fema
+Final status: STARTUP_STALL
+Lifetime: 8.19 min @ $0.74/hr
+ACTUAL COST: $0.101 (cap $0.25) — within cap: YES
+Pod absent after terminate: YES
+Billable GPU remaining: NO
+Authorization consumed: YES
+
+# Diagnosis: orchestrator STALL_MS fired at 8min while image was still
+# pulling / before any startup-status.json. Prior success needed 272s to first
+# status. Fix: stall only after sawStartupStatus; NO_STARTUP window 15min.
