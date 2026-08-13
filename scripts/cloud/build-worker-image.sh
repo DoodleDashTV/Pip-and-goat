@@ -19,7 +19,7 @@
 #
 # Requires: docker (linux/amd64 capable), and a GHCR login with packages:write.
 #
-#   echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+#   scripts/cloud/ghcr-login.sh
 #   scripts/cloud/build-worker-image.sh
 #
 # Nothing here creates a GPU pod or costs anything beyond registry storage.
