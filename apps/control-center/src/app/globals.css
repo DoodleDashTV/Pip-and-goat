@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #10231c;
+  --moss: #1f6b4a;
+  --meadow: #c8e6c0;
+  --sand: #f3efe4;
+  --alert: #b23a2f;
+  --panel: rgba(255, 255, 255, 0.72);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #d9f2cf 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #efe4c8 0%, transparent 50%),
+    linear-gradient(180deg, #f7f4ec 0%, #e7f0e4 45%, #f3efe4 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}

@@ -54,10 +54,18 @@ Open http://localhost:3000
 | `pnpm typecheck` | Typecheck packages |
 | `pnpm lint` | Lint web app |
 | `pnpm build` | Production build |
+| `pnpm control-center:dev` | DDP Control Center dashboard (:3100) |
+| `pnpm control-center:test` | Control Center unit/integration tests |
+| `pnpm control-center:safe-zero` | $0 orchestration loop (mock if no API keys) |
+
+## DDP Control Center
+
+Isolated orchestration dashboard (`apps/control-center` + `packages/control-center`) for OpenAI director + Cursor Cloud Agent dispatch. Canonical production owner remains **DoodleDash Production**. See `docs/DDP_CONTROL_CENTER.md`.
 
 ## Docs
 
 - `docs/DOODLE_DASH_PRODUCTION.md`
+- `docs/DDP_CONTROL_CENTER.md`
 - `docs/LOW_COST_HIGH_QUALITY_STRATEGY.md`
 - `docs/ANIMATION_LIBRARY.md`
 - `docs/RENDER_PROFILES.md`
