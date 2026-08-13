@@ -141,6 +141,29 @@ class ColourManagementTests(unittest.TestCase):
         self.assertAlmostEqual(double_encoded, 157.8, delta=0.5)  # what the bug produced
         self.assertGreater(double_encoded - float(got.mean()), 70.0)
 
+    def test_known_linear_fixture_is_measured_once_encoded(self):
+        """A linear ramp encoded to sRGB once must read back as that encoding.
+
+        This is the round trip the render pipeline performs: Blender tone-maps and
+        encodes linear render output, then writes 8-bit sRGB. The loader's job is
+        to hand back exactly those stored values. Measuring the same file as if it
+        still needed encoding is the defect, and on this fixture it lands 43 luma
+        too high in the midtones.
+        """
+        linear = np.linspace(0.0, 1.0, 256, dtype=np.float64).reshape(16, 16)
+        linear = np.repeat(linear[:, :, None], 3, axis=2)
+        encoded_once = np.rint(srgb_encode(linear) * 255.0).astype(np.uint8)
+        path = write_stored_srgb(self.tmp / "linear_ramp.png", encoded_once)
+
+        got = read_stored_srgb(path)
+        np.testing.assert_array_equal(got, encoded_once.astype(np.float64))
+        # The stored file is NOT the linear values it came from...
+        self.assertGreater(float(got.mean()) - float(linear.mean() * 255.0), 40.0)
+        # ...and encoding it a second time inflates it again by about as much.
+        twice = srgb_encode(encoded_once.astype(np.float64) / 255.0) * 255.0
+        self.assertGreater(float(twice.mean()) - float(got.mean()), 30.0)
+        self.assertAlmostEqual(float(got[8, 8, 0]), float(encoded_once[8, 8, 0]), places=6)
+
     def test_frame_stats_reports_stored_values(self):
         """The reported statistics are the stored pixels, not a transform of them."""
         grey = np.full((8, 8, 3), 87, dtype=np.uint8)
