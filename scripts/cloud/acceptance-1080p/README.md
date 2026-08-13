@@ -82,9 +82,12 @@ an estimate taken at the community price understates by about half.
 
 ## Current state
 
-The pins in `common.ts` point at the published image built from `9a60cc9`, which
-contains this checkout's shadow-caster repair (`f30e6dc0…` render-code fingerprint).
-Anonymous registry verify and the credential-free preflight both PASS (14/14).
+Cloud confirmation render **PASS** on pod `72pluxljut3dtf` ($0.1111):
+`artifacts/final-1080p-seam-confirm/accept1080-2026-08-13T17-25-42-044Z/`.
+
+The pins in `common.ts` point at `sha256:9496498c…` (built from `e831d85`,
+render-code `a4018c0e…`) — the shadow-caster repair plus boot-diagnostic fixes.
+Anonymous registry verify and full preflight PASS.
 
 To rebuild after further render-code changes:
 
