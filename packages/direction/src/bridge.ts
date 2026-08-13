@@ -23,6 +23,7 @@
 import type { ShotBlueprint } from './schema/blueprint';
 import type { ProductionBlueprint } from './schema/blueprint';
 import { BLUEPRINT_SCHEMA_VERSION, SUBSYSTEM_VERSIONS } from './versions';
+import { rigProfile, type Viseme } from './rig';
 
 /** The Blender role names the approved assets use. Lowercase, and not renamed. */
 export const BLENDER_ROLE_BY_CHARACTER: Readonly<Record<string, string>> = {
@@ -37,10 +38,39 @@ export type ManifestDirectionState = {
   readonly vfxState: Record<string, unknown>;
   readonly expressionStates: Record<string, unknown>;
   readonly visemeData: Record<string, unknown>;
+  /**
+   * Render tier, engine, samples, passes, comp and grade, for the manifest's
+   * existing `renderSettings` bag.
+   *
+   * `renderSettings` is already `record(unknown)` and already hashed into the
+   * cloud cache key, so a Cycles FINAL and an EEVEE DRAFT of the same plan stop
+   * colliding without any manifest schema change.
+   */
+  readonly renderSettings: Record<string, unknown>;
+  /** Groom and simulation caches the render depends on. */
+  readonly simulationState: Record<string, unknown>;
 };
 
 function roleFor(characterCode: string): string {
   return BLENDER_ROLE_BY_CHARACTER[characterCode] ?? characterCode.toLowerCase();
+}
+
+/**
+ * The rig's viseme channels, and the reverse map back to the structured viseme.
+ *
+ * The manifest's `visemeData` speaks structured visemes (`A`, `M_B_P`), and the
+ * face plan speaks rig channel names. Reverse-mapping through the rig is what lets
+ * a rig that names its channels anything at all still produce the same manifest —
+ * where the old `channel.startsWith('viseme_')` test would have silently emitted
+ * nothing.
+ */
+function visemeLookup(rigId: string): { channels: Set<string>; visemeOf: Map<string, Viseme> } {
+  const rig = rigProfile(rigId);
+  const visemeOf = new Map<string, Viseme>();
+  for (const [viseme, channel] of Object.entries(rig.visemeChannels)) {
+    visemeOf.set(channel, viseme as Viseme);
+  }
+  return { channels: new Set(visemeOf.keys()), visemeOf };
 }
 
 /**
@@ -107,6 +137,7 @@ export function projectManifestState(shot: ShotBlueprint): ManifestDirectionStat
   const visemeData: Record<string, unknown> = {};
   for (const facePlan of [...shot.face].sort((a, b) => a.characterCode.localeCompare(b.characterCode))) {
     const role = roleFor(facePlan.characterCode);
+    const { channels, visemeOf } = visemeLookup(facePlan.rig.rigId);
     expressionStates[role] = {
       directionVersion: SUBSYSTEM_VERSIONS.face,
       expression: facePlan.expression,
@@ -115,14 +146,20 @@ export function projectManifestState(shot: ShotBlueprint): ManifestDirectionStat
       blinks: facePlan.blinks,
       asymmetry: facePlan.asymmetry,
       restRecovery: facePlan.restRecovery,
+      // Which rig authored these channel names, so a renderer bound to a different
+      // rig version can refuse rather than drive channels that no longer exist.
+      rig: facePlan.rig,
       // Non-viseme cues: brows, blinks, gaze. Visemes travel separately below so
       // that a dialogue change and an expression change invalidate independently.
-      cues: facePlan.cues.filter((cue) => !cue.channel.startsWith('viseme_')),
+      cues: facePlan.cues.filter((cue) => !channels.has(cue.channel)),
     };
-    const visemes = facePlan.cues.filter((cue) => cue.channel.startsWith('viseme_'));
+    const visemes = facePlan.cues.filter((cue) => channels.has(cue.channel));
     if (visemes.length > 0) {
       visemeData[role] = visemes.map((cue) => ({
-        viseme: cue.channel.replace('viseme_', ''),
+        viseme: visemeOf.get(cue.channel),
+        // The rig's own channel name, alongside the structured viseme, so the
+        // Blender layer does not have to reconstruct it from a naming convention.
+        channel: cue.channel,
         startMs: cue.startMs,
         endMs: cue.endMs,
         weight: cue.weight,
@@ -130,7 +167,96 @@ export function projectManifestState(shot: ShotBlueprint): ManifestDirectionStat
     }
   }
 
-  return { cameraState, lightingState, vfxState, expressionStates, visemeData };
+  const renderSettings: Record<string, unknown> = {
+    directionVersion: SUBSYSTEM_VERSIONS.render,
+    tier: shot.render.tier,
+    engine: shot.render.engine,
+    resolution: shot.render.resolution,
+    samples: shot.render.samples,
+    adaptiveSampling: shot.render.adaptiveSampling,
+    denoise: shot.render.denoise,
+    motionBlur: shot.render.motionBlur,
+    depthOfField: shot.render.depthOfField,
+    passes: shot.render.passes,
+    compositing: shot.render.compositing,
+    colorGrade: shot.render.colorGrade,
+    groomValidation: shot.render.groomValidation,
+    atmosphere: shot.render.atmosphere,
+    // Never `true` for a prototype asset or a draft tier. A consumer reading this
+    // to label output knows from one field whether it may say "master".
+    isMasterCandidate: shot.render.isMasterCandidate,
+    cloudRenderProfile: shot.render.cloudRenderProfile,
+    cacheKey: shot.render.cacheKey,
+  };
+
+  const simulationState: Record<string, unknown> = {
+    directionVersion: SUBSYSTEM_VERSIONS.simulation,
+    groom: shot.simulation.groom,
+    secondaryMotion: shot.simulation.secondaryMotion,
+    environment: shot.simulation.environment,
+    // Caches the render must find already baked. Empty on prototype assets, which
+    // is why nothing waits on a bake today.
+    requiredCaches: shot.simulation.requiredCaches,
+    costWeight: shot.simulation.costWeight,
+  };
+
+  return { cameraState, lightingState, vfxState, expressionStates, visemeData, renderSettings, simulationState };
+}
+
+/**
+ * Asset bindings as `AssetRef`-shaped records for the manifest.
+ *
+ * `CloudJobManifestSchema` already has `characters: { pip, goat }`,
+ * `environments` and `props`, each an `AssetRef` with `assetId`, `version` and
+ * `checksum` — and the direction layer has never filled them. Filling them is what
+ * makes a mesh version reach the worker, and it needs no schema change.
+ *
+ * `checksum` requires eight characters, so a binding without a published
+ * fingerprint falls back to its own cache key, which is a real content hash of the
+ * component versions rather than a placeholder.
+ */
+export type ManifestAssetRefs = {
+  readonly characters: Record<string, Record<string, unknown>>;
+  readonly environments: Array<Record<string, unknown>>;
+  readonly props: Array<Record<string, unknown>>;
+};
+
+export function projectManifestAssetRefs(shot: ShotBlueprint): ManifestAssetRefs {
+  const characters: Record<string, Record<string, unknown>> = {};
+  const environments: Array<Record<string, unknown>> = [];
+  const props: Array<Record<string, unknown>> = [];
+
+  for (const binding of [...shot.assetBindings].sort((a, b) => a.logicalId.localeCompare(b.logicalId))) {
+    const ref = {
+      assetId: binding.logicalId,
+      version: binding.assetVersion,
+      checksum: binding.sourceFingerprint ?? binding.cacheKey,
+      role:
+        binding.kind === 'CHARACTER'
+          ? 'character'
+          : binding.kind === 'ENVIRONMENT'
+            ? 'environment'
+            : binding.kind === 'PROP'
+              ? 'prop'
+              : 'other',
+      required: true,
+      // Component versions and LOD travel too. Without them the worker knows which
+      // asset but not which of its parts, and a groom-only change would look
+      // identical to no change at all.
+      components: binding.components,
+      lod: binding.lod,
+      quality: binding.quality,
+    };
+    if (binding.kind === 'CHARACTER' && binding.characterCode) {
+      characters[roleFor(binding.characterCode)] = ref;
+    } else if (binding.kind === 'ENVIRONMENT') {
+      environments.push(ref);
+    } else if (binding.kind === 'PROP') {
+      props.push(ref);
+    }
+  }
+
+  return { characters, environments, props };
 }
 
 /** Audio assembly plan for one shot, in the shape the FFmpeg stage consumes. */
@@ -177,11 +303,21 @@ export type ShotRenderProjection = {
   readonly resolution: string;
   readonly shotMeta: Record<string, unknown>;
   readonly manifestState: ManifestDirectionState;
+  readonly assetRefs: ManifestAssetRefs;
   readonly audio: ShotAudioAssembly;
   readonly requiredAssets: readonly string[];
   readonly cacheKey: string;
   readonly cost: ShotBlueprint['cost'];
+  /** Technical measurement verdict. Not a statement about how the shot looks. */
   readonly qcStatus: 'PASS' | 'FAIL';
+  /** Technical result and artistic approval. What a release decision should read. */
+  readonly acceptance: ShotBlueprint['acceptance'];
+  /** Render tier and engine, so a caller never has to infer them from resolution. */
+  readonly renderTier: ShotBlueprint['render']['tier'];
+  readonly renderEngine: ShotBlueprint['render']['engine'];
+  readonly cloudRenderProfile: ShotBlueprint['render']['cloudRenderProfile'];
+  /** True only for a Cycles FINAL of theatrical assets with comp and grade. */
+  readonly isMasterCandidate: boolean;
   /** Roles present in this shot, in the naming the approved .blend files use. */
   readonly roles: readonly string[];
 };
@@ -195,11 +331,17 @@ export function projectShotForRender(shot: ShotBlueprint): ShotRenderProjection 
     resolution: shot.camera.resolution,
     shotMeta: shot.shotMeta,
     manifestState: projectManifestState(shot),
+    assetRefs: projectManifestAssetRefs(shot),
     audio: projectAudioAssembly(shot),
     requiredAssets: shot.requiredAssets,
     cacheKey: shot.cacheKey,
     cost: shot.cost,
     qcStatus: shot.qc.status,
+    acceptance: shot.acceptance,
+    renderTier: shot.render.tier,
+    renderEngine: shot.render.engine,
+    cloudRenderProfile: shot.render.cloudRenderProfile,
+    isMasterCandidate: shot.render.isMasterCandidate,
     roles: [...shot.acting].map((plan) => roleFor(plan.characterCode)).sort(),
   };
 }
@@ -218,6 +360,8 @@ export function projectBlueprintForRender(blueprint: ProductionBlueprint): {
   readonly contentHash: string;
   readonly cacheKey: string;
   readonly shots: readonly ShotRenderProjection[];
+  readonly qualityContext: ProductionBlueprint['content']['qualityContext'];
+  readonly acceptance: ProductionBlueprint['content']['acceptance'];
 } {
   if (blueprint.content.schemaVersion !== BLUEPRINT_SCHEMA_VERSION) {
     throw new Error(
@@ -240,5 +384,7 @@ export function projectBlueprintForRender(blueprint: ProductionBlueprint): {
     contentHash: blueprint.content.contentHash,
     cacheKey: blueprint.content.cacheKey,
     shots: blueprint.content.shots.map((shot) => projectShotForRender(shot)),
+    qualityContext: blueprint.content.qualityContext,
+    acceptance: blueprint.content.acceptance,
   };
 }

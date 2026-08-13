@@ -1,5 +1,5 @@
 /**
- * `ddp-production-blueprint-v1` — the Director AI's output contract.
+ * `ddp-production-blueprint-v2` — the Director AI's output contract.
  *
  * One document per episode that every downstream system reads: the Blender bridge,
  * the render cache, the cost estimator, and the studio UI. Its `content` is fully
@@ -15,11 +15,15 @@ import {
   UnitScalarSchema,
 } from './common';
 import { BLUEPRINT_SCHEMA_VERSION } from '../versions';
+import { AcceptanceSchema } from '../acceptance';
 import { ActingPlanSchema, MotionMeasurementSchema } from '../acting';
+import { ShotAssetBindingSchema } from '../assets';
 import { CameraPlanSchema } from '../camera';
 import { EmotionPlanSchema } from '../emotion';
 import { FacialMeasurementSchema, FacialPlanSchema } from '../face';
 import { LightingPlanSchema } from '../lighting';
+import { RenderPlanSchema } from '../quality';
+import { SimulationPlanSchema } from '../simulation';
 import { SoundMeasurementSchema, SoundPlanSchema } from '../sound';
 import { VfxPlanSchema } from '../vfx';
 import { BeatPurposeSchema } from './scene-plan';
@@ -66,6 +70,10 @@ export const ShotBlueprintSchema = z.object({
   lighting: LightingPlanSchema,
   vfx: VfxPlanSchema,
   audio: SoundPlanSchema,
+  /** Groom, simulation caches and secondary motion. Prototype-empty, not absent. */
+  simulation: SimulationPlanSchema,
+  /** Engine, samples, passes, compositing and grade for this shot's render tier. */
+  render: RenderPlanSchema,
   continuity: z.object({
     /** Beats this shot must remain continuous with. */
     references: z.array(NonEmptyStringSchema).default([]),
@@ -73,15 +81,32 @@ export const ShotBlueprintSchema = z.object({
     /** Previous shot id, for exposure and staging continuity. */
     previousShotId: z.string().optional(),
   }),
-  /** Reusable assets this shot needs, by logical id. */
+  /**
+   * Reusable assets this shot needs, by logical id.
+   *
+   * Kept unchanged alongside `assetBindings`. The logical ids are what the Blender
+   * layer and the manifest already speak, and every stored blueprint has them;
+   * the bindings add which *version* of each, without breaking either.
+   */
   requiredAssets: z.array(NonEmptyStringSchema).min(1),
+  /** Exactly which mesh, rig, groom, shaders and LOD this shot binds. */
+  assetBindings: z.array(ShotAssetBindingSchema).default([]),
   cost: ShotCostEstimateSchema,
   qc: z.object({
     motion: z.array(MotionMeasurementSchema),
     facial: z.array(FacialMeasurementSchema),
     sound: z.array(SoundMeasurementSchema),
+    /**
+     * Technical status only.
+     *
+     * Every measurement in tolerance and no validator error. Says nothing about
+     * whether the shot looks good — see `acceptance`, which is the field a release
+     * decision reads.
+     */
     status: z.enum(['PASS', 'FAIL']),
   }),
+  /** Technical result and artistic approval, kept separate. See `acceptance.ts`. */
+  acceptance: AcceptanceSchema,
   /** Everything that can change this shot's output, hashed. */
   cacheKey: NonEmptyStringSchema,
   /** Blender-ready projection: exactly what `--shot-meta-json` receives. */
@@ -126,9 +151,27 @@ export const BlueprintContentSchema = z.object({
   issues: z.array(PlanIssueSchema),
   overrides: z.array(AppliedOverrideSchema).default([]),
   validation: z.object({
+    /** Technical validation only. Not a statement about how the episode looks. */
     status: z.enum(['PASS', 'FAIL']),
     errorCount: z.number().int().min(0),
     warningCount: z.number().int().min(0),
+  }),
+  /**
+   * Episode-level acceptance: technical result, artistic approval, and what blocks
+   * it from being called final.
+   *
+   * The weakest shot governs. One shot pending review keeps the episode pending,
+   * because an episode is only as approved as its least-approved shot.
+   */
+  acceptance: AcceptanceSchema,
+  /** Which asset quality and render tier this blueprint was planned for. */
+  qualityContext: z.object({
+    assetQuality: z.enum(['PROTOTYPE', 'THEATRICAL']),
+    renderTier: z.enum(['DRAFT', 'REVIEW', 'FINAL']),
+    /** False whenever the plan may not be described as a master. */
+    isMasterCandidate: z.boolean(),
+    /** Golden reference in force, absent until one is approved. */
+    goldenReferenceId: z.string().optional(),
   }),
   /** Hash of everything above except this field. */
   contentHash: NonEmptyStringSchema,

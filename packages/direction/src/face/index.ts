@@ -25,6 +25,7 @@ import {
 } from '../schema/common';
 import { boundedUnit, clampQuantize, createRng, deriveSeed, quantize } from '../determinism';
 import { characterLock, checkCharacterLock } from '../locks';
+import { defaultRigFor, semanticChannel, visemeChannel, type RigProfile, type Viseme } from '../rig';
 import { SUBSYSTEM_VERSIONS } from '../versions';
 import type { EmotionPlan } from '../emotion';
 import type { ScenePlanDialogueLine, StoryBeat } from '../schema/scene-plan';
@@ -76,10 +77,19 @@ export const FacialPlanSchema = z.object({
   cues: z.array(FacialCueSchema),
   /** Asymmetry within approved bounds; a perfectly symmetrical face reads dead. */
   asymmetry: UnitScalarSchema,
-  /** Rest pose the face returns to. Always present, so recovery is guaranteed. */
-  restRecovery: z.object({ channel: z.literal('viseme_REST'), atMs: z.number().int().min(0), weight: z.literal(1) }),
+  /**
+   * Rest pose the face returns to. Always present, so recovery is guaranteed.
+   *
+   * The channel is resolved from the bound rig rather than named literally: a
+   * theatrical rig's rest may be an action-unit reset rather than a shape key
+   * called `viseme_REST`, and hard-coding the prototype's name here would make
+   * this schema unusable by the rig that replaces it.
+   */
+  restRecovery: z.object({ channel: NonEmptyStringSchema, atMs: z.number().int().min(0), weight: z.literal(1) }),
   /** True when planned without dialogue — reaction acting. */
   dialogueFree: z.boolean(),
+  /** The rig this plan was authored against. Part of the shot's cache identity. */
+  rig: z.object({ rigId: NonEmptyStringSchema, rigVersion: NonEmptyStringSchema, controlScheme: NonEmptyStringSchema }),
   provenance: z.object({ system: z.literal('face'), version: NonEmptyStringSchema, seed: z.number().int() }),
 });
 export type FacialPlan = z.infer<typeof FacialPlanSchema>;
@@ -117,9 +127,24 @@ export const FACIAL_TOLERANCES = {
  *
  * The planner normalises against this predicate and the QC pass measures against it,
  * so a rig gaining a new mouth channel cannot end up counted by one and not the other.
+ *
+ * Name-based, which is a heuristic and admits it. `mouthGroupChannels()` is the
+ * rig-aware version and is what the planner uses; this remains for callers that
+ * only have a channel name in hand.
  */
 export function isMouthGroupChannel(channel: string): boolean {
-  return /open|smile/.test(channel);
+  return /open|smile|lips|jaw/.test(channel);
+}
+
+/**
+ * The mouth group as the *rig* defines it.
+ *
+ * Asking the rig rather than pattern-matching a name is what lets a FACS rig whose
+ * mouth controls are called `AU25_lips_part` and `AU12_lip_corner_puller` share one
+ * travel budget without teaching this file about action units.
+ */
+export function mouthGroupChannels(rig: RigProfile): string[] {
+  return [semanticChannel(rig, 'MOUTH_OPEN'), semanticChannel(rig, 'SMILE')].sort();
 }
 
 /** Emotion → expression name, within `REQUIRED_EXPRESSIONS`. */
@@ -141,29 +166,27 @@ const EMOTION_EXPRESSION: Readonly<Record<string, string>> = {
 };
 
 /**
- * Per-character facial profile. Pip is a beak; Goat is a muzzle with ears.
- * The channel names differ because the approved rigs differ.
+ * How a character performs, as opposed to what its rig is called.
+ *
+ * Only the traits that belong to the *character* live here: a quadruped turns its
+ * whole head more than a chick does, and a chick blinks faster. Everything that
+ * belongs to the *rig* — which channel opens the mouth, how far it may open — is
+ * resolved from the rig profile, so replacing the rig does not touch this table.
  */
-type FacialProfile = {
-  /** The channel that opens the mouth for this species. */
-  mouthChannel: string;
-  /** Extra channel this character animates that the other does not. */
-  signatureChannel: string;
+type PerformanceProfile = {
   /** How much the head follows the eyes. Quadrupeds turn more. */
   headFollow: number;
   /** Blink duration in ms. */
   blinkMs: number;
-  /** Ceiling on the mouth channel, from the lock's deformation tolerance. */
-  mouthCeiling: number;
 };
 
-const FACIAL_PROFILES: Readonly<Record<CharacterCode, FacialProfile>> = {
-  CHAR_PIP_001: { mouthChannel: 'beak_open', signatureChannel: 'cheek_puff', headFollow: 0.45, blinkMs: 110, mouthCeiling: 0.85 },
-  CHAR_GOAT_001: { mouthChannel: 'mouth_open', signatureChannel: 'ear_perk', headFollow: 0.7, blinkMs: 130, mouthCeiling: 0.8 },
+const PERFORMANCE_PROFILES: Readonly<Record<CharacterCode, PerformanceProfile>> = {
+  CHAR_PIP_001: { headFollow: 0.45, blinkMs: 110 },
+  CHAR_GOAT_001: { headFollow: 0.7, blinkMs: 130 },
 };
 
 /** Grapheme → viseme, matching `REQUIRED_VISEMES`. Deterministic and rule-based. */
-const VISEME_RULES: ReadonlyArray<{ pattern: RegExp; viseme: string }> = [
+const VISEME_RULES: ReadonlyArray<{ pattern: RegExp; viseme: Viseme }> = [
   { pattern: /^(m|b|p)/, viseme: 'M_B_P' },
   { pattern: /^(f|v)/, viseme: 'F_V' },
   { pattern: /^(th)/, viseme: 'TH' },
@@ -188,6 +211,14 @@ export type FacialInput = {
   /** Head-follow amount comes from the acting plan so face and body agree. */
   readonly eyeLeadFrames: number;
   readonly gazeTarget?: string;
+  /**
+   * Rig to plan against.
+   *
+   * Defaults to the character's default rig, which is the prototype today, so
+   * every existing caller is unaffected. A shot that binds a theatrical rig passes
+   * it and the planner emits that rig's channel names instead.
+   */
+  readonly rig?: RigProfile;
 };
 
 export type FacialResult = {
@@ -200,7 +231,20 @@ export type FacialResult = {
 export function planFace(input: FacialInput): FacialResult {
   const { beat, characterCode, emotion, rootSeed, shotId, fps, durationSeconds, dialogue } = input;
   const lock = characterLock(characterCode);
-  const profile = FACIAL_PROFILES[characterCode];
+  const rig = input.rig ?? defaultRigFor(characterCode);
+  const profile = PERFORMANCE_PROFILES[characterCode];
+  // Channel names come from the rig, never from a literal in this file.
+  const channel = {
+    mouth: semanticChannel(rig, 'MOUTH_OPEN'),
+    smile: semanticChannel(rig, 'SMILE'),
+    blink: semanticChannel(rig, 'BLINK'),
+    browUp: semanticChannel(rig, 'BROW_UP'),
+    browDown: semanticChannel(rig, 'BROW_DOWN'),
+    browInnerUp: semanticChannel(rig, 'BROW_INNER_UP'),
+    squint: semanticChannel(rig, 'SQUINT'),
+    signature: semanticChannel(rig, 'SIGNATURE'),
+    rest: semanticChannel(rig, 'REST'),
+  };
   const seed = deriveSeed(rootSeed, shotId, 'face', characterCode);
   const rng = createRng(seed);
   const issues: PlanIssue[] = [];
@@ -213,27 +257,27 @@ export function planFace(input: FacialInput): FacialResult {
   // channels this rig actually has and then bounded by the lock. This is the only
   // place expression weights are produced, so there is one ceiling to audit.
   const raw: Record<string, number> = {
-    brow_up: Math.max(0, emotion.effects.face.browRaise),
-    brow_down: Math.max(0, -emotion.effects.face.browRaise),
-    brow_inner_up: emotion.effects.face.browInnerUp,
-    smile: Math.max(0, emotion.effects.face.smile),
-    squint: emotion.effects.face.squint + Math.max(0, -emotion.effects.face.eyeWiden) * 0.5,
-    [profile.mouthChannel]: Math.min(profile.mouthCeiling, emotion.effects.face.mouthOpen),
-    [profile.signatureChannel]: boundedUnit(emotion.effects.body.energy * 0.4 + rng.float(0, 0.08)),
+    [channel.browUp]: Math.max(0, emotion.effects.face.browRaise),
+    [channel.browDown]: Math.max(0, -emotion.effects.face.browRaise),
+    [channel.browInnerUp]: emotion.effects.face.browInnerUp,
+    [channel.smile]: Math.max(0, emotion.effects.face.smile),
+    [channel.squint]: emotion.effects.face.squint + Math.max(0, -emotion.effects.face.eyeWiden) * 0.5,
+    [channel.mouth]: Math.min(rig.limits.mouthOpen, emotion.effects.face.mouthOpen),
+    [channel.signature]: boundedUnit(emotion.effects.body.energy * 0.4 + rng.float(0, 0.08)),
   };
 
   const expressionWeights: Record<string, number> = {};
   const unsupported: string[] = [];
-  for (const [channel, weight] of Object.entries(raw).sort(([a], [b]) => a.localeCompare(b))) {
+  for (const [name, weight] of Object.entries(raw).sort(([a], [b]) => a.localeCompare(b))) {
     if (weight <= 0.001) continue;
-    if (!lock.facialChannels.includes(channel)) {
-      unsupported.push(channel);
+    if (!rig.channels.includes(name)) {
+      unsupported.push(name);
       continue;
     }
-    // Protected features get the lock's own tolerance as their ceiling.
-    const isProtected = lock.protectedFeatures.some((feature) => channel.toLowerCase().includes(feature.toLowerCase()));
-    const ceiling = isProtected ? Math.min(1, lock.maxDeformUnit * 8) : 1;
-    expressionWeights[channel] = boundedUnit(Math.min(weight, ceiling), 3);
+    // Protected features get the rig's own deformation tolerance as their ceiling.
+    const isProtected = lock.protectedFeatures.some((feature) => name.toLowerCase().includes(feature.toLowerCase()));
+    const ceiling = isProtected ? Math.min(1, rig.limits.protectedFeatureDeform * 8) : 1;
+    expressionWeights[name] = boundedUnit(Math.min(weight, ceiling), 3);
   }
   // Mouth-group normalisation. `smile` and the open channel drive the same piece of
   // geometry from different directions, so weighting each on its own merits and then
@@ -242,12 +286,14 @@ export function planFace(input: FacialInput): FacialResult {
   // while preserving the ratio between its channels, and the ratio is what carries
   // the read: a delighted gasp is mostly-open-slightly-smiling, and it still is
   // after scaling, just within what the rig can actually do.
-  const mouthChannels = Object.keys(expressionWeights).filter(isMouthGroupChannel).sort();
-  const mouthTotal = mouthChannels.reduce((sum, channel) => sum + expressionWeights[channel], 0);
-  if (mouthTotal > FACIAL_TOLERANCES.maxMouthGroupWeight) {
-    const scale = FACIAL_TOLERANCES.maxMouthGroupWeight / mouthTotal;
-    for (const channel of mouthChannels) {
-      expressionWeights[channel] = boundedUnit(expressionWeights[channel] * scale, 3);
+  const mouthGroup = mouthGroupChannels(rig);
+  const mouthCeiling = rig.limits.mouthGroupWeight;
+  const mouthChannels = Object.keys(expressionWeights).filter((name) => mouthGroup.includes(name)).sort();
+  const mouthTotal = mouthChannels.reduce((sum, name) => sum + expressionWeights[name], 0);
+  if (mouthTotal > mouthCeiling) {
+    const scale = mouthCeiling / mouthTotal;
+    for (const name of mouthChannels) {
+      expressionWeights[name] = boundedUnit(expressionWeights[name] * scale, 3);
     }
     decisions.push({
       system: 'face',
@@ -255,7 +301,7 @@ export function planFace(input: FacialInput): FacialResult {
       characterCode,
       decision: 'mouth-group-normalisation',
       chose: `scaled ${mouthChannels.join('+')} by ${quantize(scale, 3)}`,
-      because: `combined mouth travel was ${quantize(mouthTotal, 3)} against a ${FACIAL_TOLERANCES.maxMouthGroupWeight} limit; proportional scaling keeps the expression's shape without pushing the mouth through the face`,
+      because: `combined mouth travel was ${quantize(mouthTotal, 3)} against a ${mouthCeiling} limit on rig ${rig.rigId}@${rig.rigVersion}; proportional scaling keeps the expression's shape without pushing the mouth through the face`,
       alternatives: [
         {
           option: 'clamp the open channel alone',
@@ -274,7 +320,7 @@ export function planFace(input: FacialInput): FacialResult {
       system: 'face',
       shotId,
       characterCode,
-      message: `${lock.name}'s approved rig has no channel(s): ${unsupported.sort().join(', ')}.`,
+      message: `Rig ${rig.rigId}@${rig.rigVersion} for ${lock.name} has no channel(s): ${unsupported.sort().join(', ')}.`,
     });
   }
 
@@ -296,23 +342,24 @@ export function planFace(input: FacialInput): FacialResult {
   const blinks = planBlinks(totalMs, emotion.effects.face.blinkRatePerMinute, profile.blinkMs, rng);
   const eyeDarts = planEyeDarts(totalMs, emotion.effects.face.gazeDartsPerSecond, rng);
   const gaze = planGaze(input, profile, totalMs, fps);
-  const visemeResult = planVisemes(input, profile, lock.facialChannels);
+  const visemeResult = planVisemes(input, rig);
   issues.push(...visemeResult.issues);
 
   const asymmetry = boundedUnit(FACIAL_TOLERANCES.minAsymmetry + rng.float(0.01, 0.06), 3);
 
+  const browChannels = [channel.browUp, channel.browDown, channel.browInnerUp];
   const cues: FacialCue[] = [
     ...Object.entries(expressionWeights)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([channel, weight]): FacialCue => ({
-        channel,
+      .map(([name, weight]): FacialCue => ({
+        channel: name,
         startMs: 0,
         endMs: Math.min(totalMs, transitionInMs + holdMs),
         weight,
-        source: channel.startsWith('brow') ? 'BROW' : 'EXPRESSION',
+        source: browChannels.includes(name) ? 'BROW' : 'EXPRESSION',
       })),
     ...blinks.map<FacialCue>((blink) => ({
-      channel: 'blink',
+      channel: channel.blink,
       startMs: blink.atMs,
       endMs: blink.atMs + blink.durationMs,
       weight: 1,
@@ -322,7 +369,7 @@ export function planFace(input: FacialInput): FacialResult {
     // Rest recovery is always the last cue. A face that never returns to rest is a
     // face frozen mid-expression on the cut.
     {
-      channel: 'viseme_REST',
+      channel: channel.rest,
       startMs: Math.max(0, totalMs - releaseMs),
       endMs: totalMs,
       weight: 1,
@@ -344,8 +391,9 @@ export function planFace(input: FacialInput): FacialResult {
     coarticulationMs: visemeResult.coarticulationMs,
     cues,
     asymmetry,
-    restRecovery: { channel: 'viseme_REST', atMs: Math.max(0, totalMs - releaseMs), weight: 1 },
+    restRecovery: { channel: channel.rest, atMs: Math.max(0, totalMs - releaseMs), weight: 1 },
     dialogueFree: dialogue.length === 0,
+    rig: { rigId: rig.rigId, rigVersion: rig.rigVersion, controlScheme: rig.controlScheme },
     provenance: { system: 'face', version: SUBSYSTEM_VERSIONS.face, seed },
   });
 
@@ -353,10 +401,14 @@ export function planFace(input: FacialInput): FacialResult {
     ...checkCharacterLock(
       characterCode,
       {
+        rig,
         facialChannels: Object.keys(expressionWeights).sort(),
         deformations: Object.entries(expressionWeights)
-          .filter(([channel]) => lock.protectedFeatures.some((f) => channel.toLowerCase().includes(f.toLowerCase())))
-          .map(([channel, weight]) => ({ feature: channel, amountUnit: quantize(weight * lock.maxDeformUnit, 4) })),
+          .filter(([name]) => lock.protectedFeatures.some((f) => name.toLowerCase().includes(f.toLowerCase())))
+          .map(([name, weight]) => ({
+            feature: name,
+            amountUnit: quantize(weight * rig.limits.protectedFeatureDeform, 4),
+          })),
       },
       { system: 'face', shotId },
     ),
@@ -373,7 +425,7 @@ export function planFace(input: FacialInput): FacialResult {
     seed,
   });
 
-  const measurements = measureFace(plan, totalMs);
+  const measurements = measureFace(plan, totalMs, { mouthGroup, mouthCeiling });
   for (const measurement of measurements) {
     if (measurement.status === 'FAIL') {
       issues.push({
@@ -431,7 +483,7 @@ function planEyeDarts(
   return darts;
 }
 
-function planGaze(input: FacialInput, profile: FacialProfile, totalMs: number, fps: number): GazeTarget[] {
+function planGaze(input: FacialInput, profile: PerformanceProfile, totalMs: number, fps: number): GazeTarget[] {
   const { beat, characterCode, emotion } = input;
   const eyeLeadMs = Math.round((input.eyeLeadFrames / fps) * 1000);
   const explicit = input.gazeTarget;
@@ -476,8 +528,7 @@ function planGaze(input: FacialInput, profile: FacialProfile, totalMs: number, f
  */
 function planVisemes(
   input: FacialInput,
-  profile: FacialProfile,
-  availableChannels: readonly string[],
+  rig: RigProfile,
 ): { cues: FacialCue[]; coarticulationMs: number; issues: PlanIssue[] } {
   const { dialogue, characterCode, shotId, emotion } = input;
   const issues: PlanIssue[] = [];
@@ -502,8 +553,8 @@ function planVisemes(
       });
     }
     visemes.forEach((viseme, index) => {
-      const channel = `viseme_${viseme}`;
-      if (!availableChannels.includes(channel)) return;
+      const channel = visemeChannel(rig, viseme);
+      if (!rig.channels.includes(channel)) return;
       const startMs = Math.round(entry.startMs + index * per);
       const endMs = Math.round(entry.startMs + (index + 1) * per + coarticulationMs);
       cues.push({
@@ -511,7 +562,7 @@ function planVisemes(
         startMs,
         endMs,
         // Mouth openness rides the emotion: an excited line is a wider mouth.
-        weight: boundedUnit(Math.min(profile.mouthCeiling, 0.62 + emotion.effects.face.mouthOpen * 0.35), 3),
+        weight: boundedUnit(Math.min(rig.limits.mouthOpen, 0.62 + emotion.effects.face.mouthOpen * 0.35), 3),
         source: 'VISEME',
       });
     });
@@ -520,8 +571,8 @@ function planVisemes(
 }
 
 /** Deterministic text → viseme sequence. Same input, same cues, always. */
-export function textToVisemes(text: string): string[] {
-  const out: string[] = [];
+export function textToVisemes(text: string): Viseme[] {
+  const out: Viseme[] = [];
   const words = text.toLowerCase().replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(Boolean);
   for (const word of words) {
     let index = 0;
@@ -544,7 +595,18 @@ export function textToVisemes(text: string): string[] {
   return out;
 }
 
-export function measureFace(plan: FacialPlan, totalMs: number): FacialMeasurement[] {
+export function measureFace(
+  plan: FacialPlan,
+  totalMs: number,
+  /**
+   * The rig's mouth group and its ceiling.
+   *
+   * Passed in rather than re-derived so the planner and the measurement agree by
+   * construction: a rig that renames a mouth channel cannot end up normalised by
+   * one and measured by the other.
+   */
+  mouth?: { readonly mouthGroup: readonly string[]; readonly mouthCeiling: number },
+): FacialMeasurement[] {
   const out: FacialMeasurement[] = [];
   const add = (check: string, measured: number, tolerance: number, unit: string, pass: boolean, repair?: string) =>
     out.push({ check, characterCode: plan.characterCode, measured: quantize(measured, 3), tolerance, unit, status: pass ? 'PASS' : 'FAIL', repair });
@@ -606,15 +668,18 @@ export function measureFace(plan: FacialPlan, totalMs: number): FacialMeasuremen
     'Drop the weakest expression channels; more than six at once reads as no expression at all.',
   );
 
+  const mouthCeiling = mouth?.mouthCeiling ?? FACIAL_TOLERANCES.maxMouthGroupWeight;
+  const inMouthGroup = (name: string) =>
+    mouth ? mouth.mouthGroup.includes(name) : isMouthGroupChannel(name);
   const mouthWeight = Object.entries(plan.expressionWeights)
-    .filter(([channel]) => isMouthGroupChannel(channel))
+    .filter(([name]) => inMouthGroup(name))
     .reduce((sum, [, weight]) => sum + weight, 0);
   add(
     'MOUTH_CLIPPING',
     mouthWeight,
-    FACIAL_TOLERANCES.maxMouthGroupWeight,
+    mouthCeiling,
     'unit',
-    mouthWeight <= FACIAL_TOLERANCES.maxMouthGroupWeight,
+    mouthWeight <= mouthCeiling,
     'Reduce mouth-group weights; stacked open+smile drives the mouth through the face.',
   );
 

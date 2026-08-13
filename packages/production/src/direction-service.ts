@@ -13,18 +13,30 @@
 import { prisma } from '@doodle-dash/database';
 import { AppError } from '@doodle-dash/shared';
 import {
+  ARTISTIC_REVIEW_ITEMS,
   BLUEPRINT_SCHEMA_VERSION,
   CHILD_SAFE_POLICY,
   DirectorOverrideSchema,
   GOAT_LOCK,
   PIP_LOCK,
+  QUALITY_BASELINES,
+  ROADMAP,
   ScenePlanSchema,
   SUBSYSTEM_VERSIONS,
+  THEATRICAL_GOLDEN_SCENE,
+  currentStage,
+  deriveOverall,
   diffBlueprints,
   direct,
+  evaluateTheatricalGate,
   parseBlueprint,
   projectBlueprintForRender,
+  recordArtisticReview,
   upgradeBlueprint,
+  weakestArtisticStatus,
+  type Acceptance,
+  type ArtisticReviewItem,
+  type ArtisticStatus,
   type DirectorOverride,
   type ProductionBlueprint,
   type ScenePlan,
@@ -245,31 +257,7 @@ export class DirectionService {
    * Deliberately shaped for a phone: per-shot validation status, the cost estimate
    * *before* anything is generated, and the provider authorization state.
    */
-  async controlSurface(episodeId: string): Promise<{
-    readonly studioName: string;
-    readonly provider: ProviderStatus;
-    readonly blueprint: StoredBlueprint | null;
-    readonly shots: ReadonlyArray<{
-      readonly shotId: string;
-      readonly index: number;
-      readonly beatPurpose: string;
-      readonly durationSeconds: number;
-      readonly composition: string;
-      readonly move: string;
-      readonly lightingRecipe: string;
-      readonly vfxPresets: readonly string[];
-      readonly trackCount: number;
-      readonly qcStatus: string;
-      readonly failedChecks: readonly string[];
-      readonly estimatedCloudCostUsd: number;
-      readonly cacheHit: boolean;
-    }>;
-    readonly issues: ProductionBlueprint['content']['issues'];
-    readonly overrideBounds: {
-      readonly emotionIntensityMax: number;
-      readonly voiceIds: Readonly<Record<string, string>>;
-    };
-  }> {
+  async controlSurface(episodeId: string) {
     const stored = await this.latestForEpisode(episodeId);
     const shots = (stored?.blueprint.content.shots ?? []).map((shot) => ({
       shotId: shot.shotId,
@@ -287,13 +275,40 @@ export class DirectionService {
         .map((measurement) => measurement.check),
       estimatedCloudCostUsd: shot.cost.estimatedCloudCostUsd,
       cacheHit: shot.cost.cacheHit,
+      renderTier: shot.render.tier,
+      renderEngine: shot.render.engine,
+      // The two statuses side by side, because showing only the first is how a
+      // green dashboard gets read as a creative sign-off.
+      technicalStatus: shot.acceptance.technical,
+      artisticStatus: shot.acceptance.artistic,
+      acceptance: shot.acceptance.overall,
+      isMasterCandidate: shot.render.isMasterCandidate,
+      assetQuality: shot.assetBindings[0]?.quality ?? 'PROTOTYPE',
     }));
+    const gate = evaluateTheatricalGate();
     return {
       studioName: STUDIO_DISPLAY_NAME,
       provider: readProviderStatus(),
       blueprint: stored,
       shots,
       issues: stored?.blueprint.content.issues ?? [],
+      /** Episode-level acceptance and what blocks it from being called final. */
+      acceptance: stored?.blueprint.content.acceptance ?? null,
+      qualityContext: stored?.blueprint.content.qualityContext ?? null,
+      /** The review checklist, so the UI enumerates gaps rather than a thumbs-up. */
+      artisticReviewItems: [...ARTISTIC_REVIEW_ITEMS],
+      /** Roadmap position and the Steps 9-16 gate, reported read-only. */
+      roadmap: {
+        currentStage: currentStage(),
+        stages: ROADMAP.map((stage) => ({ order: stage.order, id: stage.id, name: stage.name, status: stage.status })),
+        theatricalGate: gate,
+        baselines: QUALITY_BASELINES.map((baseline) => ({
+          id: baseline.id,
+          kind: baseline.kind,
+          status: baseline.status,
+          establishesVisualStandard: baseline.establishesVisualStandard,
+        })),
+      },
       overrideBounds: {
         emotionIntensityMax: CHILD_SAFE_POLICY.maxIntensity,
         voiceIds: {
@@ -301,6 +316,92 @@ export class DirectionService {
           [GOAT_LOCK.characterCode]: GOAT_LOCK.voice.voiceId,
         },
       },
+    };
+  }
+
+  /**
+   * Record one human artistic review against a stored blueprint.
+   *
+   * Written to the blueprint's stored content rather than derived, because it is the
+   * one field in the document that no computation may produce. The review is
+   * attributed and timestamped; an approval without a reviewer, or against DRAFT
+   * frames, is refused by `recordArtisticReview()` before it reaches the database.
+   *
+   * Approving every item still does not make the episode a theatrical pass on its
+   * own — the golden reference does not exist yet, so
+   * `GOLDEN_REFERENCE_COMPARISON` cannot honestly be approved and the episode stays
+   * out of `ACCEPTED`. That is the intended behaviour, not a gap.
+   */
+  async recordReview(params: {
+    episodeId: string;
+    item: ArtisticReviewItem;
+    status: ArtisticStatus;
+    reviewer: string;
+    renderTier: 'DRAFT' | 'REVIEW' | 'FINAL';
+    notes?: string;
+  }): Promise<StoredBlueprint> {
+    const stored = await this.latestForEpisode(params.episodeId);
+    if (!stored) throw new AppError('No blueprint stored for episode', 'BLUEPRINT_REQUIRED', 404);
+
+    const acceptance = recordArtisticReview(stored.blueprint.content.acceptance, {
+      item: params.item,
+      status: params.status,
+      reviewer: params.reviewer,
+      reviewedAt: new Date().toISOString(),
+      renderTier: params.renderTier,
+      notes: params.notes,
+    });
+
+    // Shots inherit the episode-level review: these items are judgements about the
+    // cut, and recording them per shot from one review would be inventing detail
+    // that the reviewer did not give.
+    const content = {
+      ...stored.blueprint.content,
+      acceptance,
+      shots: stored.blueprint.content.shots.map((shot) => ({
+        ...shot,
+        acceptance: this.mergeShotAcceptance(shot.acceptance, acceptance),
+      })),
+    };
+
+    const record = await prisma.productionBlueprintRecord.update({
+      where: { id: stored.id },
+      data: { content: content as unknown as object },
+    });
+    return this.toStored(record);
+  }
+
+  /**
+   * Fold an episode review into a shot's acceptance.
+   *
+   * The shot keeps its own technical status — that is its own measurements — and
+   * takes the episode's artistic verdict, because the review was of the cut.
+   */
+  private mergeShotAcceptance(shot: Acceptance, episode: Acceptance): Acceptance {
+    const artisticReviews = episode.artisticReviews;
+    const artistic = weakestArtisticStatus(artisticReviews);
+    return {
+      ...shot,
+      artistic,
+      artisticReviews,
+      reviewedRenderTier: episode.reviewedRenderTier,
+      overall: deriveOverall(shot.technical, artistic),
+      blockedBy: episode.blockedBy,
+    };
+  }
+
+  /**
+   * Whether a roadmap stage may begin.
+   *
+   * Reported rather than enforced here — the enforcement is `assertStageAllowed()`
+   * in the direction package, which throws. This exists so the control surface can
+   * show why Steps 9-16 is not startable without having to catch an exception.
+   */
+  theatricalGate() {
+    return {
+      ...evaluateTheatricalGate(),
+      goldenScene: THEATRICAL_GOLDEN_SCENE,
+      currentStage: currentStage(),
     };
   }
 

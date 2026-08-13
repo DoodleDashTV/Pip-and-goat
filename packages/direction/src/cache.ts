@@ -21,7 +21,9 @@ import type { ProductionBlueprint, ShotBlueprint } from './schema/blueprint';
  * fields", so adding a field to `ShotBlueprint` does not silently join the cache
  * key — and the "every output-affecting field changes the key" test is meaningful.
  */
-export function shotCacheInputs(shot: Omit<ShotBlueprint, 'cacheKey' | 'cost' | 'qc'>): Record<string, unknown> {
+export function shotCacheInputs(
+  shot: Omit<ShotBlueprint, 'cacheKey' | 'cost' | 'qc' | 'acceptance'>,
+): Record<string, unknown> {
   return {
     durationSeconds: shot.durationSeconds,
     frameRange: shot.frameRange,
@@ -34,14 +36,27 @@ export function shotCacheInputs(shot: Omit<ShotBlueprint, 'cacheKey' | 'cost' | 
     lighting: shot.lighting,
     vfx: shot.vfx,
     audio: shot.audio,
+    // Groom, sim caches and secondary motion change pixels, so they change the key.
+    // Reserved now while the values are all empty, because adding them later would
+    // mean every cached theatrical shot had been keyed without its groom version.
+    simulation: shot.simulation,
+    // Engine, samples, passes, comp and grade. Without this a DRAFT EEVEE render
+    // and a FINAL Cycles render of the same plan share a cache key, and the cheap
+    // one gets served in place of the master.
+    render: shot.render,
     continuity: shot.continuity,
     requiredAssets: shot.requiredAssets,
+    // Which mesh, rig, groom and LOD. This is what makes swapping Pip's mesh
+    // re-render exactly the shots Pip is in, and rolling back re-use the old ones.
+    assetBindings: shot.assetBindings,
     shotMeta: shot.shotMeta,
     systemVersions: SUBSYSTEM_VERSIONS,
   };
 }
 
-export function computeShotCacheKey(shot: Omit<ShotBlueprint, 'cacheKey' | 'cost' | 'qc'>): string {
+export function computeShotCacheKey(
+  shot: Omit<ShotBlueprint, 'cacheKey' | 'cost' | 'qc' | 'acceptance'>,
+): string {
   return stableHash(shotCacheInputs(shot));
 }
 
@@ -108,7 +123,18 @@ export function diffBlueprints(previous: ProductionBlueprint, next: ProductionBl
     }
     invalidatedShotIds.push(shotId);
     const systems: string[] = [];
-    for (const system of ['emotion', 'acting', 'face', 'camera', 'lighting', 'vfx', 'audio'] as const) {
+    for (const system of [
+      'emotion',
+      'acting',
+      'face',
+      'camera',
+      'lighting',
+      'vfx',
+      'audio',
+      'simulation',
+      'render',
+      'assetBindings',
+    ] as const) {
       if (shortHash(previousShot[system]) !== shortHash(nextShot[system])) systems.push(system);
     }
     if (previousShot.durationSeconds !== nextShot.durationSeconds) systems.push('duration');

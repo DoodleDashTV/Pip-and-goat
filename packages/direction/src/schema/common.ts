@@ -36,6 +36,22 @@ export const DeliverySchema = z.object({
    * aspect, so framing decisions are resolution-independent.
    */
   targetDurationSeconds: z.number().positive().max(600).default(30),
+  /**
+   * Which render tier this plan is for: DRAFT (EEVEE, local, free), REVIEW
+   * (representative look for approval) or FINAL (Cycles master with passes,
+   * compositing and grade).
+   *
+   * Defaults to DRAFT. That default is a cost decision as much as a correctness
+   * one — a plan that did not say what it was for used to be rendered at whatever
+   * the caller happened to pass, and the cheapest tier is the safe assumption.
+   */
+  renderTier: z.enum(['DRAFT', 'REVIEW', 'FINAL']).default('DRAFT'),
+  /**
+   * Asset quality this plan expects. `PROTOTYPE` is the current library;
+   * `THEATRICAL` is the rebuilt one, and asking for it before it exists fails
+   * closed rather than quietly substituting a prototype.
+   */
+  assetQuality: z.enum(['PROTOTYPE', 'THEATRICAL']).default('PROTOTYPE'),
 });
 export type Delivery = z.infer<typeof DeliverySchema>;
 

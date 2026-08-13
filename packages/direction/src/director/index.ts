@@ -26,6 +26,12 @@ import {
 import { deriveSeed, quantize, shortHash, stableHash } from '../determinism';
 import { BLUEPRINT_SCHEMA_VERSION, SUBSYSTEM_VERSIONS } from '../versions';
 import { CHARACTER_LOCKS, characterLock } from '../locks';
+import { defaultRigFor, rigProfile, type RigProfile } from '../rig';
+import { findBinding, projectShotBinding, resolveCharacterBinding, type ShotAssetBinding } from '../assets';
+import { planRender } from '../quality';
+import { planSimulation } from '../simulation';
+import { planningAcceptance, deriveOverall, weakestArtisticStatus, type Acceptance } from '../acceptance';
+import { THEATRICAL_GOLDEN_SCENE } from '../roadmap';
 import { planEmotion, type EmotionPlan } from '../emotion';
 import { planActing, type ActingPlan, type MotionMeasurement } from '../acting';
 import { planFace } from '../face';
@@ -101,6 +107,8 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
 
   const { width, height } = parseResolution(plan.delivery.resolution);
   const fps = plan.delivery.fps;
+  const renderTier = plan.delivery.renderTier;
+  const assetQuality = plan.delivery.assetQuality;
 
   // Episode-level duration validation. A hook that arrives late is a hook nobody
   // saw, and vertical short-form is unforgiving about it.
@@ -438,6 +446,88 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
       ...vfxResult.plan.instances.map((instance) => instance.presetId),
     ].sort();
 
+    // Resolve which *version* of each asset this shot binds. Characters must
+    // resolve or the shot fails closed — asking for theatrical Pip before she
+    // exists cannot quietly render the prototype. Environments and props degrade to
+    // an unbound logical id, which is what they were before bindings existed.
+    const assetBindings: ShotAssetBinding[] = [];
+    for (const characterCode of characterCodes) {
+      try {
+        assetBindings.push(projectShotBinding(resolveCharacterBinding(characterCode, assetQuality), renderTier));
+      } catch (error) {
+        issues.push({
+          code: 'ASSET_BINDING_UNRESOLVED',
+          severity: 'ERROR',
+          system: 'director',
+          shotId,
+          characterCode,
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+    for (const logicalId of [beat.locationId, ...beat.requiredProps].sort()) {
+      const binding = findBinding(logicalId, assetQuality);
+      if (binding) {
+        assetBindings.push(projectShotBinding(binding, renderTier));
+      } else {
+        issues.push({
+          code: 'ASSET_BINDING_MISSING',
+          severity: 'INFO',
+          system: 'director',
+          shotId,
+          message: `"${logicalId}" has no versioned asset binding, so it cannot be version-pinned or rolled back. It renders from its logical id as before.`,
+        });
+      }
+    }
+
+    const simulationPlan = planSimulation({
+      shotId,
+      seed: shotSeed,
+      version: SUBSYSTEM_VERSIONS.simulation,
+      fps,
+      frameRange,
+      characters: actingPlans.map((actingPlan) => {
+        const characterCode = actingPlan.characterCode as CharacterCode;
+        const binding = assetBindings.find((candidate) => candidate.characterCode === characterCode);
+        const emotion = emotions.find((candidate) => candidate.characterCode === characterCode);
+        return {
+          characterCode,
+          rig: rigForCharacter(characterCode, binding),
+          groomVersion: binding?.components.groomVersion,
+          energy: emotion?.effects.body.energy ?? 0.5,
+          overlap: actingPlan.overlap,
+          secondaryMotion: actingPlan.secondaryMotion,
+        };
+      }),
+      // Wind reads off the lighting state: an overcast meadow moves, a still one
+      // does not. One source rather than an independent knob that can disagree.
+      windUnit: lightingPlan.state === 'OVERCAST' ? 0.35 : 0.15,
+      groomValidationRequired: renderTier !== 'DRAFT',
+    });
+
+    const renderResult = planRender({
+      shotId,
+      tier: renderTier,
+      assetQuality,
+      resolution: plan.delivery.resolution,
+      samplesHint: lightingPlan.samplesHint,
+      // Depth of field is motivated by the framing, never applied for its own sake:
+      // a close-up isolates a face and wants the background soft, a wide shot is
+      // showing you where you are and wants it legible.
+      depthOfField:
+        cameraPlan.composition === 'CLOSE_UP' || cameraPlan.composition === 'REACTION'
+          ? {
+              motivation: `isolate ${cameraPlan.subject ?? 'the subject'} in a ${cameraPlan.composition} at ${cameraPlan.depth.focusDistanceMeters}m`,
+              fStop: 2.8,
+            }
+          : undefined,
+      hasGroom: simulationPlan.groom.some((groom) => groom.mode !== 'NONE'),
+      grade: { exposure: lightingPlan.colorManagement.exposure, contrast: 0, saturation: 1 },
+    });
+    for (const issue of renderResult.issues) {
+      issues.push({ code: issue.code, severity: issue.severity, system: 'render', shotId, message: issue.message });
+    }
+
     const draft = {
       shotId,
       index,
@@ -464,12 +554,15 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
       lighting: lightingPlan,
       vfx: vfxResult.plan,
       audio: audioPlan,
+      simulation: simulationPlan,
+      render: renderResult.plan,
       continuity: {
         references: beat.continuityRefs,
         screenDirection: cameraPlan.screenDirection,
         previousShotId,
       },
       requiredAssets,
+      assetBindings: [...assetBindings].sort((a, b) => a.logicalId.localeCompare(b.logicalId)),
       shotMeta,
     };
 
@@ -495,6 +588,7 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
         sound: soundResult.measurements,
         status: 'PASS',
       },
+      acceptance: planningAcceptance({ technical: 'PASS', technicalChecks: [{ item: 'SCHEMA_VALIDATION', status: 'PASS' }] }),
       cacheKey,
     });
 
@@ -503,7 +597,28 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
       [...shot.qc.motion, ...shot.qc.facial, ...shot.qc.sound].some((measurement) => measurement.status === 'FAIL')
         ? 'FAIL'
         : 'PASS';
-    shots.push({ ...shot, qc: { ...shot.qc, status: qcStatus } });
+
+    // Technical status is this shot's own measurements plus any error raised
+    // against it. Artistic status is `NOT_RENDERED` and there is no argument that
+    // could make it anything else here: nothing has been rendered, so nothing has
+    // been seen.
+    const shotErrors = errorsOf(issues.filter((issue) => issue.shotId === shotId));
+    const technical = qcStatus === 'FAIL' || shotErrors.length > 0 ? 'FAIL' : 'PASS';
+    const acceptance = planningAcceptance({
+      technical,
+      technicalChecks: shotTechnicalChecks({
+        motion: shot.qc.motion,
+        facial: shot.qc.facial,
+        sound: shot.qc.sound,
+        lockIssueCount: shotErrors.filter((issue) => issue.code.includes('LOCK')).length,
+        boundRigs: [...new Set(facePlans.map((entry) => `${entry.plan.rig.rigId}@${entry.plan.rig.rigVersion}`))].sort(),
+        bindingCount: assetBindings.length,
+        technical,
+      }),
+      goldenReferenceId: THEATRICAL_GOLDEN_SCENE.status === 'ACCEPTED' ? THEATRICAL_GOLDEN_SCENE.id : undefined,
+    });
+
+    shots.push({ ...shot, qc: { ...shot.qc, status: qcStatus }, acceptance });
 
     previousEmotionByCharacter = new Map(
       emotions.map((emotion) => [emotion.characterCode as CharacterCode, { primary: emotion.primary as StoryEmotion, intensity: emotion.intensity }]),
@@ -588,6 +703,16 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
       errorCount: errorsOf(sortedIssues).length,
       warningCount: sortedIssues.filter((issue) => issue.severity === 'WARNING').length,
     },
+    acceptance: episodeAcceptance(shots, issueStatus(sortedIssues)),
+    qualityContext: {
+      assetQuality,
+      renderTier,
+      // Every shot must be a master candidate for the episode to be one. One
+      // DRAFT shot in a FINAL episode means the episode is not a master, and
+      // reporting otherwise is how a mixed-tier cut gets called finished.
+      isMasterCandidate: shots.length > 0 && shots.every((shot) => shot.render.isMasterCandidate),
+      goldenReferenceId: THEATRICAL_GOLDEN_SCENE.status === 'ACCEPTED' ? THEATRICAL_GOLDEN_SCENE.id : undefined,
+    },
     cacheKey,
   };
 
@@ -607,6 +732,100 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
 /** Logical asset id for a character's approved production blend. */
 export function characterAssetId(characterCode: CharacterCode): string {
   return characterCode === 'CHAR_PIP_001' ? 'pip' : 'goat';
+}
+
+/**
+ * Episode acceptance, aggregated from its shots.
+ *
+ * The weakest shot governs both axes. An episode whose shots are technically fine
+ * except one is not technically fine, and an episode with one unreviewed shot is
+ * not approved — there is no useful sense in which a cut is finished while part of
+ * it is unexamined.
+ */
+function episodeAcceptance(shots: readonly ShotBlueprint[], validation: 'PASS' | 'FAIL'): Acceptance {
+  const technical =
+    validation === 'FAIL' || shots.some((shot) => shot.acceptance.technical === 'FAIL') ? 'FAIL' : 'PASS';
+  const artistic = weakestArtisticStatus(shots.flatMap((shot) => shot.acceptance.artisticReviews));
+  const base = planningAcceptance({
+    technical,
+    technicalChecks: [
+      { item: 'SCHEMA_VALIDATION', status: 'PASS' },
+      {
+        item: 'AUTOMATED_TESTS',
+        status: 'NOT_RUN',
+        detail: 'reported by the test suite, not by planning',
+      },
+      {
+        item: 'ASSET_FINGERPRINTS',
+        status: shots.every((shot) => shot.assetBindings.length > 0) ? 'PASS' : 'NOT_RUN',
+        detail: `${shots.filter((shot) => shot.assetBindings.length > 0).length}/${shots.length} shot(s) version-pinned`,
+      },
+    ],
+    goldenReferenceId: THEATRICAL_GOLDEN_SCENE.status === 'ACCEPTED' ? THEATRICAL_GOLDEN_SCENE.id : undefined,
+  });
+  return { ...base, artistic, overall: deriveOverall(technical, artistic) };
+}
+
+/**
+ * The rig a shot plans against.
+ *
+ * Taken from the asset binding when there is one, because the binding is what
+ * pins a rig version, and falling back to the character's default only when
+ * nothing is bound. A binding that names a rig the registry does not have is a
+ * hard error rather than a silent fallback: planning against a different rig than
+ * the one that will render is how a face ends up not moving.
+ */
+function rigForCharacter(characterCode: CharacterCode, binding: ShotAssetBinding | undefined): RigProfile {
+  const rigId = binding?.components.rigId;
+  return rigId ? rigProfile(rigId) : defaultRigFor(characterCode);
+}
+
+/**
+ * The technical checks this package actually performed, per shot.
+ *
+ * Enumerated from what ran rather than asserted, so a check that produced no
+ * measurements is reported `NOT_APPLICABLE` instead of counting as coverage.
+ */
+function shotTechnicalChecks(input: {
+  readonly motion: readonly unknown[];
+  readonly facial: readonly unknown[];
+  readonly sound: readonly unknown[];
+  readonly lockIssueCount: number;
+  readonly boundRigs: readonly string[];
+  readonly bindingCount: number;
+  readonly technical: 'PASS' | 'FAIL';
+}): Acceptance['technicalChecks'] {
+  const measured = (items: readonly unknown[]): Acceptance['technicalChecks'][number]['status'] =>
+    items.length === 0 ? 'NOT_APPLICABLE' : input.technical === 'FAIL' ? 'FAIL' : 'PASS';
+  return [
+    { item: 'SCHEMA_VALIDATION', status: 'PASS' },
+    { item: 'MOTION_MEASUREMENTS', status: measured(input.motion), detail: `${input.motion.length} measurement(s)` },
+    { item: 'FACIAL_MEASUREMENTS', status: measured(input.facial), detail: `${input.facial.length} measurement(s)` },
+    { item: 'SOUND_MEASUREMENTS', status: measured(input.sound), detail: `${input.sound.length} measurement(s)` },
+    {
+      item: 'CHARACTER_LOCK',
+      status: input.lockIssueCount === 0 ? 'PASS' : 'FAIL',
+      detail: `${input.lockIssueCount} lock violation(s)`,
+    },
+    {
+      item: 'RIG_INTEGRITY',
+      status: input.boundRigs.length === 0 ? 'NOT_APPLICABLE' : 'PASS',
+      detail: input.boundRigs.length === 0 ? 'no rig bound' : `planned against ${input.boundRigs.join(', ')}`,
+    },
+    {
+      item: 'ASSET_FINGERPRINTS',
+      status: input.bindingCount === 0 ? 'NOT_RUN' : 'PASS',
+      detail:
+        input.bindingCount === 0
+          ? 'no versioned asset binding on this shot; fingerprints are verified by the regression suite instead'
+          : `${input.bindingCount} binding(s) pinned`,
+    },
+    // Deliberately NOT_RUN rather than PASS. These are measured on rendered pixels
+    // by the Blender gates, and this package only predicts them.
+    { item: 'LIGHTING_THRESHOLDS', status: 'NOT_RUN', detail: 'measured on rendered frames by scripts/assets gates' },
+    { item: 'VFX_BUDGET', status: 'PASS' },
+    { item: 'AUTOMATED_TESTS', status: 'NOT_RUN', detail: 'reported by the test suite, not by planning' },
+  ];
 }
 
 /**

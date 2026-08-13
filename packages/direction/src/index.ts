@@ -14,9 +14,27 @@
  *   Step 6  Lighting Director .......... lighting/
  *   Step 7  VFX registry ............... vfx/
  *   Step 8  Sound system ............... sound/
+ *
+ * Alongside them, the contracts that keep the eight steps usable by assets that do
+ * not exist yet. The current Pip and Goat are prototypes; the studio is being built
+ * toward theatrical quality, and these modules are what stop the prototype's limits
+ * from being baked into the interfaces:
+ *
+ *   quality      DRAFT / REVIEW / FINAL tiers, EEVEE and Cycles, passes, comp, grade
+ *   assets       versioned mesh / rig / groom / shader / texture bindings and LODs
+ *   rig          rig capability profiles, separate from character canon
+ *   simulation   groom, simulation caches, secondary motion
+ *   acceptance   technical result and artistic approval, kept apart
+ *   roadmap      the stage order, the quality baselines, and the Steps 9–16 gate
  */
 export * from './determinism';
 export * from './versions';
+export * from './quality';
+export * from './rig';
+export * from './assets';
+export * from './simulation';
+export * from './acceptance';
+export * from './roadmap';
 export * from './locks';
 export * from './schema/common';
 export * from './schema/scene-plan';

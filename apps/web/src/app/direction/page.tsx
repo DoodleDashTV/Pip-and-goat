@@ -10,11 +10,14 @@ import { directionService, readProviderStatus } from '@doodle-dash/production';
 import { STUDIO_DISPLAY_NAME } from '@doodle-dash/domain';
 import {
   CHILD_SAFE_POLICY,
+  FINAL_1080P_TECHNICAL_BASELINE,
   GOAT_LOCK,
   PIP_LOCK,
+  ROADMAP,
   VALIDATION_SCENE_PLAN,
   VFX_REGISTRY,
   direct,
+  evaluateTheatricalGate,
 } from '@doodle-dash/direction';
 
 export const dynamic = 'force-dynamic';
@@ -34,6 +37,7 @@ export default async function DirectionPage() {
   const content = planned.blueprint.content;
   const errors = content.issues.filter((issue) => issue.severity === 'ERROR');
   const warnings = content.issues.filter((issue) => issue.severity === 'WARNING');
+  const gate = evaluateTheatricalGate();
 
   return (
     <div className="space-y-6 overflow-x-hidden">
@@ -49,6 +53,87 @@ export default async function DirectionPage() {
           emotion, face, camera, lighting, VFX and sound. Same inputs, same blueprint, every time.
         </p>
       </header>
+
+      <section className="rounded-[1.5rem] border border-sun-400/40 bg-sun-500/10 p-5 text-sm text-mist-100">
+        <h2 className="font-semibold">Prototype assets — not the final visual standard</h2>
+        <p className="mt-2 text-[var(--muted)]">
+          Pip, Goat, the meadow and the props are functional baseline assets kept unchanged for
+          regression testing, rollback and provenance. The accepted{' '}
+          <span className="font-mono text-xs">{FINAL_1080P_TECHNICAL_BASELINE.id}</span> render
+          proves the pipeline executes end to end; it establishes no visual standard. TivvleJoy
+          Studios&apos; visual standard is set by an approved theatrical golden scene, which does not
+          exist yet.
+        </p>
+      </section>
+
+      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-mist-100">
+          Technical result is not artistic approval
+        </h2>
+        <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div>
+            <dt className="text-xs uppercase text-leaf-300">Technical</dt>
+            <dd className={content.acceptance.technical === 'PASS' ? 'text-leaf-300' : 'text-sun-300'}>
+              {content.acceptance.technical}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-leaf-300">Artistic</dt>
+            <dd className="text-sun-300">{content.acceptance.artistic.replace(/_/g, ' ')}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-leaf-300">Overall</dt>
+            <dd className="text-sun-300">{content.acceptance.overall.replace(/_/g, ' ')}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-leaf-300">Asset quality</dt>
+            <dd>{content.qualityContext.assetQuality}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-leaf-300">Render tier</dt>
+            <dd>{content.qualityContext.renderTier}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-leaf-300">May be called a master</dt>
+            <dd>{content.qualityContext.isMasterCandidate ? 'yes' : 'no'}</dd>
+          </div>
+        </dl>
+        <p className="mt-3 text-xs uppercase tracking-wider text-leaf-300">Blocked by</p>
+        <ul className="mt-1 space-y-1 text-[var(--muted)]">
+          {content.acceptance.blockedBy.map((blocker, index) => (
+            <li key={`blocker-${index}`}>{blocker}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-mist-100">Roadmap</h2>
+        <ol className="mt-3 space-y-1">
+          {ROADMAP.map((stage) => (
+            <li
+              key={stage.id}
+              className={
+                stage.status === 'COMPLETE'
+                  ? 'text-leaf-300'
+                  : stage.status === 'CURRENT'
+                    ? 'text-mist-100'
+                    : 'text-[var(--muted)]'
+              }
+            >
+              {stage.order}. {stage.name} — {stage.status}
+              {stage.requiresHumanApproval ? ' · needs human approval' : ''}
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-xs uppercase tracking-wider text-leaf-300">
+          DDP Steps 9–16 gate: {gate.allowed ? 'OPEN' : 'BLOCKED'}
+        </p>
+        <ul className="mt-1 space-y-1 text-[var(--muted)]">
+          {gate.blockers.map((blocker, index) => (
+            <li key={`gate-${index}`}>{blocker}</li>
+          ))}
+        </ul>
+      </section>
 
       <section
         className={`rounded-[1.5rem] border p-5 text-sm ${
@@ -201,6 +286,48 @@ export default async function DirectionPage() {
                       {shot.audio.mixBusTrimDb}dB bus trim
                     </dd>
                   </div>
+                  <div>
+                    <dt className="text-xs uppercase text-leaf-300">Render</dt>
+                    <dd>
+                      {shot.render.tier} · {shot.render.engine} · {shot.render.samples} samples ·{' '}
+                      {shot.render.passes.length} pass(es) ·{' '}
+                      {shot.render.compositing.enabled ? 'comp' : 'no comp'} ·{' '}
+                      {shot.render.colorGrade.enabled ? 'graded' : 'ungraded'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase text-leaf-300">Assets bound</dt>
+                    <dd>
+                      {shot.assetBindings.length === 0
+                        ? 'none pinned'
+                        : shot.assetBindings
+                            .map(
+                              (binding) =>
+                                `${binding.logicalId}@${binding.assetVersion} (mesh ${binding.components.meshVersion}${
+                                  binding.components.rigVersion ? `, rig ${binding.components.rigVersion}` : ''
+                                }${binding.components.groomVersion ? `, groom ${binding.components.groomVersion}` : ''}, ${binding.lod})`,
+                            )
+                            .join(' · ')}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase text-leaf-300">Groom / simulation</dt>
+                    <dd>
+                      {shot.simulation.groom.every((groom) => groom.mode === 'NONE')
+                        ? 'no groom on prototype assets'
+                        : shot.simulation.groom.map((groom) => `${groom.characterCode} ${groom.mode}`).join(' · ')}
+                      {shot.simulation.requiredCaches.length > 0
+                        ? ` · ${shot.simulation.requiredCaches.length} cache(s) to bake`
+                        : ''}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase text-leaf-300">Acceptance</dt>
+                    <dd>
+                      technical {shot.acceptance.technical} · artistic{' '}
+                      {shot.acceptance.artistic.replace(/_/g, ' ')}
+                    </dd>
+                  </div>
                 </dl>
                 {failed.length > 0 ? (
                   <ul className="mt-3 space-y-1 text-xs text-sun-300">
@@ -283,12 +410,16 @@ export default async function DirectionPage() {
         <h2 className="font-display text-xl font-semibold text-mist-100">Controls</h2>
         <p className="mt-2 text-[var(--muted)]">
           The API accepts <code className="font-mono text-xs">plan</code>,{' '}
-          <code className="font-mono text-xs">override</code> and{' '}
-          <code className="font-mono text-xs">preview-invalidation</code> at{' '}
+          <code className="font-mono text-xs">override</code>,{' '}
+          <code className="font-mono text-xs">preview-invalidation</code> and{' '}
+          <code className="font-mono text-xs">record-review</code> at{' '}
           <code className="font-mono text-xs">/api/direction</code>. Overrides are bounded: a change
           that would breach a character or voice lock is refused and the refusal is recorded with its
           reason. <code className="font-mono text-xs">preview-invalidation</code> answers which shots
-          a change would re-render before anything is spent.
+          a change would re-render before anything is spent.{' '}
+          <code className="font-mono text-xs">record-review</code> records one human artistic
+          judgement against a named reviewer; it refuses to attach an approval to draft frames, and
+          nothing else in the system can set an artistic status to approved.
         </p>
       </section>
     </div>

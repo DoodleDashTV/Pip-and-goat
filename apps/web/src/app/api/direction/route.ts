@@ -3,17 +3,25 @@
  *
  * `GET  /api/direction?episodeId=…` — blueprint inspection, per-shot validation
  *   status, cost estimate before generation, and provider authorization state.
- * `POST /api/direction` — plan or replan an episode, optionally with overrides, or
- *   ask what a replan would invalidate without storing anything.
+ * `POST /api/direction` — plan or replan an episode, optionally with overrides, ask
+ *   what a replan would invalidate without storing anything, or record a human
+ *   artistic review.
  *
  * Nothing here can start a paid render. `readProviderStatus()` reports the
  * authorization state and cannot grant it, so a client may find out that a paid GPU
  * needs authorizing but cannot authorize one.
+ *
+ * Nothing here can approve a look either, except `record-review`, which requires a
+ * named reviewer and refuses to attach an approval to DRAFT frames.
  */
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { directionService, readProviderStatus } from '@doodle-dash/production';
-import { VALIDATION_SCENE_PLAN } from '@doodle-dash/direction';
+import {
+  ARTISTIC_REVIEW_ITEMS,
+  ARTISTIC_STATUSES,
+  VALIDATION_SCENE_PLAN,
+} from '@doodle-dash/direction';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,6 +44,22 @@ const ActionSchema = z.discriminatedUnion('action', [
     action: z.literal('preview-invalidation'),
     episodeId: z.string().min(1),
     scenePlan: z.unknown().optional(),
+  }),
+  /**
+   * Record one human artistic review.
+   *
+   * `reviewer` is required and unfudgeable at this layer: there is no default and no
+   * "system" value, because an unattributed approval is the thing this endpoint
+   * exists to make impossible.
+   */
+  z.object({
+    action: z.literal('record-review'),
+    episodeId: z.string().min(1),
+    item: z.enum(ARTISTIC_REVIEW_ITEMS),
+    status: z.enum(ARTISTIC_STATUSES),
+    reviewer: z.string().trim().min(1),
+    renderTier: z.enum(['DRAFT', 'REVIEW', 'FINAL']),
+    notes: z.string().optional(),
   }),
 ]);
 
@@ -97,6 +121,11 @@ export async function POST(request: Request) {
         shotCount: stored.shotCount,
         estimatedCloudCostUsd: stored.estimatedCloudCostUsd,
         issues: stored.blueprint.content.issues,
+        // Technical validation and artistic approval, never collapsed into one
+        // field. A client that reads only `validationStatus` above still cannot
+        // truthfully print "final" without also reading this.
+        acceptance: stored.blueprint.content.acceptance,
+        qualityContext: stored.blueprint.content.qualityContext,
         provider: readProviderStatus(),
       });
     }
@@ -116,6 +145,24 @@ export async function POST(request: Request) {
         contentHash: result.blueprint.contentHash,
         validationStatus: result.blueprint.validationStatus,
         issues: result.blueprint.blueprint.content.issues,
+      });
+    }
+
+    if (command.action === 'record-review') {
+      const stored = await directionService.recordReview({
+        episodeId: command.episodeId,
+        item: command.item,
+        status: command.status,
+        reviewer: command.reviewer,
+        renderTier: command.renderTier,
+        notes: command.notes,
+      });
+      return NextResponse.json({
+        acceptance: stored.blueprint.content.acceptance,
+        // What still stands between this and being callable final. Returned on every
+        // review so the answer to "is it done" never has to be assembled by a client.
+        blockedBy: stored.blueprint.content.acceptance.blockedBy,
+        theatricalGate: directionService.theatricalGate(),
       });
     }
 

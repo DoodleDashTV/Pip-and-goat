@@ -9,10 +9,19 @@
  * Sourced from docs/CHARACTERS/PIP.md and docs/CHARACTERS/GOAT.md plus the
  * approved v1.1 visual sign-off. Changing anything here is a canon change and
  * must go through character approval, not a code review.
+ *
+ * What is *canon* and what is *this rig* are separate concerns, and they are
+ * separated: identity, colour, personality, voice and protected features live
+ * here permanently, while channel names, authored actions and deformation limits
+ * live in `rig.ts` and are expected to be replaced wholesale when the theatrical
+ * assets land. The rig-shaped fields below are re-exported from the prototype rig
+ * profiles rather than duplicated, so there is exactly one place to change each
+ * fact and today's plans are unchanged by the split.
  */
 import { FOUNDING_CODES } from '@doodle-dash/domain';
 import type { CharacterCode } from './schema/common';
 import type { PlanIssue } from './schema/common';
+import { GOAT_PROTOTYPE_RIG, PIP_PROTOTYPE_RIG, defaultRigFor, type RigProfile } from './rig';
 
 export type VoiceLock = {
   /** Permanent voice identity. Never regenerated, never swapped per episode. */
@@ -43,10 +52,24 @@ export type CharacterLock = {
    * audience recognises the character by.
    */
   readonly protectedFeatures: readonly string[];
+  /**
+   * Deformation ceiling on protected features.
+   *
+   * A rig property, not a canon one: a better rig deforms a beak further without
+   * breaking its silhouette. Mirrored from the character's default rig profile so
+   * existing callers keep working, and superseded by `rig.limits` once a shot
+   * binds a specific rig.
+   */
   readonly maxDeformUnit: number;
   /** Squash/stretch ceiling for the whole character, as a scale multiplier delta. */
   readonly maxSquashStretch: number;
-  /** Blend-shape channels the character's approved rig exposes. */
+  /**
+   * Blend-shape channels the character's default rig exposes.
+   *
+   * Mirrors `rig.ts`. Prefer resolving channels through `semanticChannel()` on the
+   * bound rig profile; this list is the default rig's view of the same data and
+   * exists so pre-existing callers do not break.
+   */
   readonly facialChannels: readonly string[];
   /** Gesture vocabulary this character performs, by semantic code. */
   readonly gestureCodes: readonly string[];
@@ -80,30 +103,11 @@ export const PIP_LOCK: CharacterLock = {
     forbidden: ['squeaky', 'shrill', 'adult', 'breathy-whisper', 'gravelly'],
   },
   protectedFeatures: ['beak', 'eyes', 'crest'],
-  maxDeformUnit: 0.12,
-  maxSquashStretch: 0.08,
-  facialChannels: [
-    'viseme_A',
-    'viseme_E',
-    'viseme_I',
-    'viseme_O',
-    'viseme_U',
-    'viseme_M_B_P',
-    'viseme_F_V',
-    'viseme_L',
-    'viseme_TH',
-    'viseme_REST',
-    'blink',
-    'brow_up',
-    'brow_down',
-    'brow_inner_up',
-    'smile',
-    'beak_open',
-    'cheek_puff',
-    'squint',
-  ],
-  gestureCodes: ['POINT', 'WAVE', 'NOD', 'SHAKE_HEAD', 'LOOK', 'THINK', 'CELEBRATE', 'PICK_UP', 'HOLD'],
-  authoredActions: ['PIP_IDLE', 'PIP_WALK', 'PIP_RUN', 'PIP_POINT', 'PIP_WAVE', 'PIP_NOD', 'PIP_LOOK'],
+  maxDeformUnit: PIP_PROTOTYPE_RIG.limits.protectedFeatureDeform,
+  maxSquashStretch: PIP_PROTOTYPE_RIG.limits.squashStretch,
+  facialChannels: PIP_PROTOTYPE_RIG.channels,
+  gestureCodes: PIP_PROTOTYPE_RIG.gestureCodes,
+  authoredActions: PIP_PROTOTYPE_RIG.authoredActions,
   foleySignature: 'light patter on soil',
 };
 
@@ -126,30 +130,11 @@ export const GOAT_LOCK: CharacterLock = {
     forbidden: ['deep', 'babyish', 'growling', 'adult-authoritative'],
   },
   protectedFeatures: ['muzzle', 'horns', 'eyes', 'tag'],
-  maxDeformUnit: 0.1,
-  maxSquashStretch: 0.07,
-  facialChannels: [
-    'viseme_A',
-    'viseme_E',
-    'viseme_I',
-    'viseme_O',
-    'viseme_U',
-    'viseme_M_B_P',
-    'viseme_F_V',
-    'viseme_L',
-    'viseme_TH',
-    'viseme_REST',
-    'blink',
-    'brow_up',
-    'brow_down',
-    'brow_inner_up',
-    'smile',
-    'mouth_open',
-    'ear_perk',
-    'squint',
-  ],
-  gestureCodes: ['NOD', 'SHAKE_HEAD', 'LOOK', 'LISTEN', 'THINK', 'CELEBRATE', 'PUSH', 'STAND'],
-  authoredActions: ['GOAT_IDLE', 'GOAT_WALK', 'GOAT_RUN', 'GOAT_HEAD_NOD', 'GOAT_LOOK', 'GOAT_EAT'],
+  maxDeformUnit: GOAT_PROTOTYPE_RIG.limits.protectedFeatureDeform,
+  maxSquashStretch: GOAT_PROTOTYPE_RIG.limits.squashStretch,
+  facialChannels: GOAT_PROTOTYPE_RIG.channels,
+  gestureCodes: GOAT_PROTOTYPE_RIG.gestureCodes,
+  authoredActions: GOAT_PROTOTYPE_RIG.authoredActions,
   foleySignature: 'cloven hoof clop on soil',
 };
 
@@ -217,10 +202,21 @@ export function checkCharacterLock(
     readonly deformations?: ReadonlyArray<{ feature: string; amountUnit: number }>;
     readonly facialChannels?: readonly string[];
     readonly squashStretch?: number;
+    /**
+     * The rig this plan targets.
+     *
+     * Channel support and deformation ceilings are checked against it rather than
+     * against the lock, so a theatrical rig with action-unit controls validates
+     * against its own vocabulary instead of the prototype's shape-key names.
+     * Defaults to the character's default rig, which is the prototype today, so
+     * omitting it reproduces the previous behaviour exactly.
+     */
+    readonly rig?: RigProfile;
   },
   context: LockViolationContext,
 ): PlanIssue[] {
   const lock = characterLock(characterCode);
+  const rig = claim.rig ?? defaultRigFor(characterCode);
   const issues: PlanIssue[] = [];
   const fail = (code: string, message: string, measured?: PlanIssue['measured']) =>
     issues.push({ code, severity: 'ERROR', system: context.system, message, shotId: context.shotId, characterCode, measured });
@@ -259,31 +255,32 @@ export function checkCharacterLock(
       `${lock.name}'s permanent voice is ${lock.voice.voiceId}; plan asked for "${claim.voiceId}".`,
     );
   }
+  const deformLimit = rig.limits.protectedFeatureDeform;
   for (const deformation of claim.deformations ?? []) {
     const protectedFeature = lock.protectedFeatures.find((feature) =>
       deformation.feature.toLowerCase().includes(feature.toLowerCase()),
     );
-    if (protectedFeature && deformation.amountUnit > lock.maxDeformUnit) {
+    if (protectedFeature && deformation.amountUnit > deformLimit) {
       fail(
         'CHARACTER_LOCK_DEFORMATION',
-        `${lock.name}'s ${protectedFeature} may deform at most ${lock.maxDeformUnit}; plan asked for ${deformation.amountUnit}.`,
-        { limit: lock.maxDeformUnit, requested: deformation.amountUnit },
+        `${lock.name}'s ${protectedFeature} may deform at most ${deformLimit} on rig ${rig.rigId}@${rig.rigVersion}; plan asked for ${deformation.amountUnit}.`,
+        { limit: deformLimit, requested: deformation.amountUnit },
       );
     }
   }
   for (const channel of claim.facialChannels ?? []) {
-    if (!lock.facialChannels.includes(channel)) {
+    if (!rig.channels.includes(channel)) {
       fail(
         'FACIAL_CHANNEL_UNSUPPORTED',
-        `${lock.name}'s approved rig has no "${channel}" channel; planning it would deform geometry the rig does not drive.`,
+        `Rig ${rig.rigId}@${rig.rigVersion} for ${lock.name} has no "${channel}" channel; planning it would deform geometry the rig does not drive.`,
       );
     }
   }
-  if (claim.squashStretch !== undefined && Math.abs(claim.squashStretch) > lock.maxSquashStretch) {
+  if (claim.squashStretch !== undefined && Math.abs(claim.squashStretch) > rig.limits.squashStretch) {
     fail(
       'CHARACTER_LOCK_SQUASH',
-      `${lock.name} allows ${lock.maxSquashStretch} squash/stretch; plan asked for ${claim.squashStretch}.`,
-      { limit: lock.maxSquashStretch, requested: claim.squashStretch },
+      `${lock.name} on rig ${rig.rigId} allows ${rig.limits.squashStretch} squash/stretch; plan asked for ${claim.squashStretch}.`,
+      { limit: rig.limits.squashStretch, requested: claim.squashStretch },
     );
   }
   return issues;
