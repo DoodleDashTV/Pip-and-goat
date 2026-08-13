@@ -787,6 +787,7 @@ export function projectShotMeta(input: {
       lensMm: input.camera.lensMm,
       geometry: input.camera.geometry,
       focusDistanceMeters: input.camera.depth.focusDistanceMeters,
+      endFocusDistanceMeters: input.camera.depth.endFocusDistanceMeters,
     },
     lighting: {
       recipe: input.lighting.recipe,
