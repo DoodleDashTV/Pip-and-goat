@@ -189,9 +189,151 @@ def apply_action(arm, action_name: str | None, frame_start: int, frame_end: int)
 
 #: How far inside its own surface a character's shadow caster sits.
 SHADOW_PROXY_SHRINK = 0.022
+#: No piece of the caster travels further inward than this share of its own
+#: half-thickness. A closed surface pushed in by more than half its thinnest
+#: dimension passes through its own middle and comes out inside out, and an
+#: inside-out caster throws a shadow that has nothing to do with the shape the
+#: camera sees. Pip's beak tip is 15 mm across: the flat 22 mm shrink turned it
+#: into a knob hanging in front of the face, and the knob's shadow was the band
+#: down Pip's chest.
+SHADOW_PROXY_SAFE_FRACTION = 0.5
+#: A part with less room than this to give away cannot be a caster at all: there
+#: is no inside for it to hide in. Flat decals - the star on Pip's backpack, the
+#: ink on the Goat's tag - are collapsed to a point instead, which casts nothing.
+SHADOW_PROXY_MIN_ROOM = 0.001
+#: Vertex group carrying the per-part share of the shrink, on the caster only.
+SHADOW_PROXY_VERTEX_GROUP = "DDP_ShadowShrink"
 #: Suffix every shadow caster carries, so other tools can tell proxies apart
 #: from the geometry the camera actually sees.
 SHADOW_PROXY_SUFFIX = "_ShadowProxy"
+
+
+def mesh_islands(mesh) -> list[list[int]]:
+    """Vertex indices of each connected piece of a mesh.
+
+    The founding characters are primitives welded into one mesh, so every sphere,
+    bar and disc that was joined is still its own island, and thickness has to be
+    judged per island rather than per mesh.
+    """
+    neighbours: dict[int, list[int]] = {v.index: [] for v in mesh.vertices}
+    for edge in mesh.edges:
+        a, b = edge.vertices
+        neighbours[a].append(b)
+        neighbours[b].append(a)
+    seen: set[int] = set()
+    islands = []
+    for start in range(len(mesh.vertices)):
+        if start in seen:
+            continue
+        stack, comp = [start], []
+        seen.add(start)
+        while stack:
+            current = stack.pop()
+            comp.append(current)
+            for other in neighbours[current]:
+                if other not in seen:
+                    seen.add(other)
+                    stack.append(other)
+        islands.append(comp)
+    return islands
+
+
+#: How many times the planner may halve its first guess before giving up on an
+#: island and collapsing it instead.
+SHADOW_PROXY_FIT_STEPS = 5
+#: Fixed direction for the inside/outside parity test. Any direction works; a
+#: constant one keeps the planner deterministic.
+_PARITY_RAY = (0.5773502691896258, 0.5773502691896258, 0.5773502691896258)
+
+
+def _inside(tree, point) -> bool:
+    """Is the point inside this island's shell? Counted by surface crossings."""
+    from mathutils import Vector
+
+    direction = Vector(_PARITY_RAY)
+    origin = point.copy()
+    crossings = 0
+    for _ in range(32):
+        hit = tree.ray_cast(origin, direction)
+        if hit[0] is None:
+            break
+        crossings += 1
+        origin = hit[0] + direction * 1e-6
+    return crossings % 2 == 1
+
+
+def island_room(mesh, comp: list[int], tree) -> float:
+    """How far inward every point of one island can travel and stay inside it.
+
+    The first guess is measured through the island rather than around it: from
+    each vertex, a ray straight into the surface reports how much material lies
+    behind that point, and half of the smallest reading is where the island's
+    middle is. A bounding box cannot answer this - the Goat's ears are thin discs
+    held at an angle, so their box is generous in all three axes while the ears
+    are 8 mm thick.
+
+    Thickness alone is not enough either, because offsetting a concave shape
+    inward makes it cross itself before it reaches its middle: the letters on the
+    Goat's tag have thickness to spare and still poked through their own faces.
+    So the guess is then checked by actually moving every vertex and asking
+    whether it is still inside, and halved until it is.
+    """
+    thinnest = None
+    for index in comp:
+        vertex = mesh.vertices[index]
+        normal = vertex.normal
+        if normal.length_squared < 1e-12:
+            continue
+        origin = vertex.co - normal * 1e-5
+        hit = tree.ray_cast(origin, -normal)
+        if hit[0] is None:
+            # Nothing behind this point: the island is a single-sided sheet and has
+            # no inside to hide a caster in.
+            return 0.0
+        through = (hit[0] - vertex.co).length
+        thinnest = through if thinnest is None else min(thinnest, through)
+    if thinnest is None:
+        return 0.0
+
+    room = SHADOW_PROXY_SAFE_FRACTION * thinnest / 2.0
+    for _ in range(SHADOW_PROXY_FIT_STEPS):
+        if room < SHADOW_PROXY_MIN_ROOM:
+            return 0.0
+        if all(
+            _inside(tree, mesh.vertices[i].co - mesh.vertices[i].normal * room)
+            for i in comp
+        ):
+            return room
+        room *= 0.5
+    return 0.0
+
+
+def plan_shadow_shrink(mesh) -> tuple[list[float], list[list[int]]]:
+    """Per-vertex share of the shrink, and the islands with no room to give.
+
+    Returns the weight for every vertex and the islands that must be collapsed
+    rather than displaced.
+    """
+    from mathutils.bvhtree import BVHTree
+
+    weights = [0.0] * len(mesh.vertices)
+    collapse = []
+    coords = [v.co.copy() for v in mesh.vertices]
+    for comp in mesh_islands(mesh):
+        member = set(comp)
+        polys = [list(p.vertices) for p in mesh.polygons if all(v in member for v in p.vertices)]
+        if not polys:
+            collapse.append(comp)
+            continue
+        tree = BVHTree.FromPolygons(coords, polys, all_triangles=False, epsilon=0.0)
+        room = island_room(mesh, comp, tree)
+        if room < SHADOW_PROXY_MIN_ROOM:
+            collapse.append(comp)
+            continue
+        share = min(SHADOW_PROXY_SHRINK, room) / SHADOW_PROXY_SHRINK
+        for i in comp:
+            weights[i] = share
+    return weights, collapse
 
 
 def install_shadow_proxy(objects) -> list[str]:
@@ -208,10 +350,15 @@ def install_shadow_proxy(objects) -> list[str]:
 
     Switching shadows off is not an option — without them the cast loses contact
     with the ground and looks pasted on. So the visible mesh stops casting and an
-    invisible copy, pushed ``SHADOW_PROXY_SHRINK`` inside its own surface, casts
-    instead. The proxy can never shadow the surface it sits inside, while the
-    silhouette it throws on the ground is the character's own, a couple of
-    centimetres smaller.
+    invisible copy, pushed inside its own surface, casts instead. The proxy can
+    never shadow the surface it sits inside, while the silhouette it throws on the
+    ground is the character's own, a couple of centimetres smaller.
+
+    How far inward each part goes is its own business: a head has 25 mm of room
+    and takes the full shrink, a brow bar has 2.4 mm and takes that, and a flat
+    decal has none and is collapsed out of the caster entirely. The caster carries
+    its own copy of the mesh so the weights that express this never touch the
+    asset the camera renders.
     """
     import bpy
 
@@ -219,16 +366,37 @@ def install_shadow_proxy(objects) -> list[str]:
     for obj in [o for o in objects if o.type == "MESH" and o.name in bpy.data.objects]:
         if obj.name.endswith(SHADOW_PROXY_SUFFIX):
             continue
-        proxy = obj.copy()  # shares mesh data, carries the armature modifier
+        proxy = obj.copy()  # carries the armature modifier and the vertex groups
         proxy.name = f"{obj.name}{SHADOW_PROXY_SUFFIX}"
+        proxy.data = obj.data.copy()
         bpy.context.collection.objects.link(proxy)
         if obj.parent is not None:
             proxy.parent = obj.parent
             proxy.matrix_parent_inverse = obj.matrix_parent_inverse.copy()
         proxy.matrix_world = obj.matrix_world.copy()
+
+        weights, collapse = plan_shadow_shrink(proxy.data)
+        group = proxy.vertex_groups.new(name=SHADOW_PROXY_VERTEX_GROUP)
+        for index, weight in enumerate(weights):
+            if weight > 0.0:
+                group.add([index], weight, "REPLACE")
+        from mathutils import Vector
+
+        for comp in collapse:
+            centre = sum((proxy.data.vertices[i].co for i in comp), Vector()) / len(comp)
+            for i in comp:
+                proxy.data.vertices[i].co = centre
+            # A shape key holds absolute positions, so the collapse has to hold in
+            # every one of them or the part springs back when a key is dialled in.
+            if proxy.data.shape_keys:
+                for block in proxy.data.shape_keys.key_blocks:
+                    for i in comp:
+                        block.data[i].co = centre
+
         shrink = proxy.modifiers.new("DDP_ShadowShrink", "DISPLACE")
         shrink.mid_level = 0.0
         shrink.strength = -SHADOW_PROXY_SHRINK
+        shrink.vertex_group = group.name
         proxy.visible_camera = False
         for attr in ("visible_diffuse", "visible_glossy", "visible_transmission", "visible_volume_scatter"):
             if hasattr(proxy, attr):

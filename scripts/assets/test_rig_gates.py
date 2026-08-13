@@ -300,11 +300,133 @@ class ActionBindingTests(unittest.TestCase):
         )
 
 
+def make_thin_slab(name: str, thickness: float, location=(0.0, 0.0, 0.0)):
+    """A closed box thinner than the shadow shrink wants to travel."""
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=location)
+    obj = bpy.context.object
+    obj.name = name
+    obj.scale = (0.12, 0.12, thickness / 2.0)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    return obj
+
+
+def make_ball(name: str, radius: float, location=(0.0, 0.0, 0.0)):
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=radius, location=location, segments=20, ring_count=14)
+    obj = bpy.context.object
+    obj.name = name
+    return obj
+
+
+def displaced_points(obj):
+    """Every vertex of the caster after its modifier stack runs, in world space."""
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    evaluated = obj.evaluated_get(depsgraph)
+    mesh = evaluated.to_mesh()
+    points = [evaluated.matrix_world @ v.co for v in mesh.vertices]
+    evaluated.to_mesh_clear()
+    return points
+
+
+class ShadowCasterTests(unittest.TestCase):
+    """The shadow caster must stay inside the surface it hides beneath.
+
+    Pip's chest carried a hard vertical band below the beak for exactly this
+    reason: the caster displaced every part 22 mm inward, the beak tip is 15 mm
+    thick, and the inside-out beak threw a shadow of a shape that was not on
+    screen.
+    """
+
+    def setUp(self) -> None:
+        fresh_scene()
+
+    def test_thick_part_still_receives_the_full_shrink(self) -> None:
+        # The acne this proxy exists to kill is on the large surfaces, so they must
+        # not lose any of their shrink to the thin-part rule.
+        ball = make_ball("Thick", 0.16)
+        weights, collapse = A.plan_shadow_shrink(ball.data)
+        self.assertEqual(collapse, [])
+        self.assertAlmostEqual(max(weights), 1.0, places=6)
+
+    def test_part_thinner_than_the_shrink_is_not_turned_inside_out(self) -> None:
+        slab = make_thin_slab("Thin", thickness=0.015)
+        self.assertLess(0.015 / 2.0, A.SHADOW_PROXY_SHRINK, "fixture must be thinner than the shrink")
+        weights, _ = A.plan_shadow_shrink(slab.data)
+        travel = max(weights) * A.SHADOW_PROXY_SHRINK
+        self.assertGreater(travel, 0.0, "a solid part should still cast")
+        self.assertLess(travel, 0.015 / 2.0, "travel past the middle of a part turns it inside out")
+
+    def test_flat_part_is_collapsed_rather_than_displaced(self) -> None:
+        bpy.ops.mesh.primitive_plane_add(size=0.1)
+        plane = bpy.context.object
+        plane.name = "Decal"
+        weights, collapse = A.plan_shadow_shrink(plane.data)
+        self.assertEqual(len(collapse), 1, "a single-sided sheet has no inside to hide a caster in")
+        self.assertEqual(max(weights), 0.0)
+
+    def test_each_island_is_measured_on_its_own(self) -> None:
+        ball = make_ball("Mixed", 0.16)
+        slab = make_thin_slab("MixedThin", thickness=0.015, location=(0.4, 0.0, 0.0))
+        bpy.ops.object.select_all(action="DESELECT")
+        ball.select_set(True)
+        slab.select_set(True)
+        bpy.context.view_layer.objects.active = ball
+        bpy.ops.object.join()
+        joined = bpy.context.object
+        self.assertEqual(len(A.mesh_islands(joined.data)), 2)
+        weights, _ = A.plan_shadow_shrink(joined.data)
+        self.assertEqual(len(set(round(w, 6) for w in weights)), 2, "one shrink per part, not one per mesh")
+
+    def test_caster_of_a_thin_part_stays_inside_the_visible_surface(self) -> None:
+        slab = make_thin_slab("ThinReal", thickness=0.015)
+        created = A.install_shadow_proxy([slab])
+        self.assertEqual(len(created), 1)
+        proxy = bpy.data.objects[created[0]]
+        half = 0.015 / 2.0
+        for point in displaced_points(proxy):
+            self.assertLess(
+                abs(point.z),
+                half,
+                "the caster left the surface it is supposed to sit inside",
+            )
+
+    def test_caster_carries_its_own_mesh_and_leaves_the_asset_alone(self) -> None:
+        ball = make_ball("Asset", 0.16)
+        groups_before = [g.name for g in ball.vertex_groups]
+        created = A.install_shadow_proxy([ball])
+        proxy = bpy.data.objects[created[0]]
+        self.assertIsNot(proxy.data, ball.data, "weighting the caster must not touch the rendered asset")
+        self.assertEqual([g.name for g in ball.vertex_groups], groups_before)
+        self.assertIn(A.SHADOW_PROXY_VERTEX_GROUP, [g.name for g in proxy.vertex_groups])
+        self.assertFalse(ball.visible_shadow, "the visible mesh stops casting")
+        self.assertTrue(proxy.visible_shadow)
+        self.assertFalse(proxy.visible_camera)
+
+    def test_collapsed_part_holds_its_collapse_in_every_shape_key(self) -> None:
+        bpy.ops.mesh.primitive_plane_add(size=0.1)
+        plane = bpy.context.object
+        plane.shape_key_add(name="Basis", from_mix=False)
+        key = plane.shape_key_add(name="expr", from_mix=False)
+        for point in key.data:
+            point.co.z += 0.05
+        created = A.install_shadow_proxy([plane])
+        proxy = bpy.data.objects[created[0]]
+        for block in proxy.data.shape_keys.key_blocks:
+            spread = max((p.co - block.data[0].co).length for p in block.data)
+            self.assertLess(spread, 1e-6, f"{block.name} springs the collapsed part back into the caster")
+
+
 def main() -> int:
     loader = unittest.TestLoader()
     suite = unittest.TestSuite(
         loader.loadTestsFromTestCase(case)
-        for case in (SkinningTests, AnimationTests, LightingTests, HierarchyTests, ActionBindingTests)
+        for case in (
+            SkinningTests,
+            AnimationTests,
+            LightingTests,
+            HierarchyTests,
+            ActionBindingTests,
+            ShadowCasterTests,
+        )
     )
     result = unittest.TextTestRunner(verbosity=2, stream=sys.stdout).run(suite)
     print(
