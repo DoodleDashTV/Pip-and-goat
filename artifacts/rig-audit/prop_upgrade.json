@@ -1,0 +1,65 @@
+{
+  "map": {
+    "blend": "production-library/props/adventure_map.blend",
+    "objects": [
+      "AdventureMap",
+      "MapBorder_N",
+      "MapBorder_S",
+      "MapBorder_W",
+      "MapBorder_E",
+      "MapCoast",
+      "MapWater",
+      "MapTrail_0_0",
+      "MapTrail_0_1",
+      "MapTrail_1_0",
+      "MapTrail_1_1",
+      "MapTrail_2_0",
+      "MapTrail_2_1",
+      "MapTrail_3_0",
+      "MapTrail_3_1",
+      "MapTrail_4_0",
+      "MapTrail_4_1",
+      "MapCompass_N",
+      "MapCompass_E",
+      "MapCrease_V",
+      "MapCrease_H",
+      "MapMark",
+      "MapMark_B"
+    ],
+    "sha256": "2e959d99343a56a5a042626b9c00f272915100073dd0ee364ff1e89b5ae5b120"
+  },
+  "meadow": {
+    "blend": "production-library/environments/meadow_production.blend",
+    "pathBefore": {
+      "name": "Meadow_Path",
+      "parent": null,
+      "min": [
+        -0.7659,
+        -5.5,
+        0.006
+      ],
+      "max": [
+        0.6687,
+        5.5,
+        0.006
+      ]
+    },
+    "pathAfter": {
+      "name": "Meadow_Path",
+      "parent": null,
+      "min": [
+        -0.7659,
+        -5.5,
+        0.006
+      ],
+      "max": [
+        0.6687,
+        5.5,
+        0.006
+      ]
+    },
+    "sha256": "f98a61ec9a6efd90a204bf81c16ba244dd7d313febbf5f150d3dbe928ff0dc3d"
+  },
+  "ok": true,
+  "failures": []
+}
