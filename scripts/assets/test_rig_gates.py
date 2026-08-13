@@ -22,6 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "scripts" / "blender"))
 
 import bpy  # noqa: E402
+from mathutils import Vector  # noqa: E402
 
 import assemble_scene as A  # noqa: E402
 from ddp_rig import (  # noqa: E402
@@ -317,6 +318,89 @@ def make_ball(name: str, radius: float, location=(0.0, 0.0, 0.0)):
     return obj
 
 
+#: A light running eight degrees off the slab's face, so a nub sitting on that face
+#: throws its shadow the length of it. Pip's chest is the same situation: the sun
+#: leaves the body sphere within six degrees of tangent along the line from the beak.
+RAKING_LIGHT = Vector((0.0, 0.9903, -0.1392))
+
+
+#: Half-extents of the fixture slab, and the ball nub that sits on its top face.
+#: A slab 300 mm across and 300 mm thick has room for the whole shrink, so the
+#: planner reads it as a mass; a 30 mm ball does not, so it is a part sitting on
+#: that mass. The ball sinks 5 mm in, the way every part of these characters
+#: meets the mass it is mounted on.
+SLAB_HALF = (0.3, 0.3, 0.15)
+NUB_RADIUS = 0.015
+NUB_SINK = 0.005
+
+
+def make_slab_with_nub(nub_y: float):
+    """A thick slab with a ball nub sitting on it, joined into one mesh.
+
+    Which edge of the top face the nub sits on decides whether the raking light
+    drags its shadow the length of the slab or carries it straight off the end.
+    """
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, 0.0, 0.0))
+    slab = bpy.context.object
+    slab.name = "Mass"
+    slab.scale = tuple(h * 2.0 for h in SLAB_HALF)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+    bpy.ops.mesh.primitive_uv_sphere_add(
+        radius=NUB_RADIUS,
+        location=(0.0, nub_y, SLAB_HALF[2] + NUB_RADIUS - NUB_SINK),
+        segments=20,
+        ring_count=14,
+    )
+    nub = bpy.context.object
+    nub.name = "Nub"
+
+    nub_vertices = len(nub.data.vertices)
+    bpy.ops.object.select_all(action="DESELECT")
+    slab.select_set(True)
+    nub.select_set(True)
+    bpy.context.view_layer.objects.active = slab
+    bpy.ops.object.join()
+    joined = bpy.context.object
+    assert len(A.mesh_islands(joined.data)) == 2
+    return slab, nub_vertices, joined
+
+
+def _nub_index(mesh) -> int:
+    """Which island is the nub, by extent rather than by vertex count."""
+    islands = A.mesh_islands(mesh)
+
+    def extent(comp) -> float:
+        coords = [mesh.vertices[i].co for i in comp]
+        return max(max(c[a] for c in coords) - min(c[a] for c in coords) for a in range(3))
+
+    return min(range(len(islands)), key=lambda n: extent(islands[n]))
+
+
+def nub_island(joined) -> list[int]:
+    """The nub's vertex indices, sorted, so a list comparison can be made."""
+    islands = A.mesh_islands(joined.data)
+    return sorted(islands[_nub_index(joined.data)])
+
+
+def measure_nub(joined, light):
+    """Run the self-shadow measurement on the nub island alone."""
+    from mathutils.bvhtree import BVHTree
+
+    mesh = joined.data
+    islands = A.mesh_islands(mesh)
+    index = _nub_index(mesh)
+    island_of_vertex = {i: n for n, comp in enumerate(islands) for i in comp}
+    faces = [list(p.vertices) for p in mesh.polygons]
+    coords = [v.co.copy() for v in mesh.vertices]
+    tree = BVHTree.FromPolygons(coords, faces, all_triangles=False, epsilon=0.0)
+    island_of_face = [island_of_vertex[f[0]] for f in faces]
+    weights, _collapse = A.plan_shadow_shrink(mesh)
+    return A.island_self_shadow(
+        mesh, islands[index], weights, tree, island_of_face, index, light
+    )
+
+
 def displaced_points(obj):
     """Every vertex of the caster after its modifier stack runs, in world space."""
     depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -400,6 +484,110 @@ class ShadowCasterTests(unittest.TestCase):
         self.assertFalse(ball.visible_shadow, "the visible mesh stops casting")
         self.assertTrue(proxy.visible_shadow)
         self.assertFalse(proxy.visible_camera)
+
+    def test_unlit_planning_is_thickness_only(self) -> None:
+        # Without a light the planner has no opinion about where shadows land, and
+        # must behave exactly as it did before that measurement existed.
+        _slab, _nub, joined = make_slab_with_nub(nub_y=-0.25)
+        weights, collapse = A.plan_shadow_shrink(joined.data)
+        self.assertEqual(collapse, [], "thickness alone collapses neither part here")
+        nub = nub_island(joined)
+        slab = [i for i in range(len(joined.data.vertices)) if i not in set(nub)]
+        self.assertTrue(all(weights[i] >= 1.0 for i in slab), "the slab is a mass")
+        self.assertTrue(all(0.0 < weights[i] < 1.0 for i in nub), "the nub is a part on it")
+
+    def test_part_whose_shadow_lands_far_across_the_character_stops_casting(self) -> None:
+        # The nub sits on the slab at the edge the light comes from, and the light
+        # runs nearly along the slab's face, so the nub's shadow is drawn out across
+        # the whole face: this is Pip's beak and Pip's chest.
+        _slab, _nub, joined = make_slab_with_nub(nub_y=-0.25)
+        light = RAKING_LIGHT
+        weights, collapse = A.plan_shadow_shrink(joined.data, light=light)
+        nub = nub_island(joined)
+        self.assertIn(nub, [sorted(c) for c in collapse])
+        self.assertTrue(all(weights[i] == 0.0 for i in nub), "a dropped part must not displace either")
+
+    def test_that_part_measures_as_a_far_landing_self_shadow(self) -> None:
+        _slab, _nub, joined = make_slab_with_nub(nub_y=-0.25)
+        share, reach = measure_nub(joined, RAKING_LIGHT)
+        self.assertGreaterEqual(share, A.SHADOW_PROXY_SELF_SHARE, "its shadow lands on the character")
+        self.assertGreater(reach, A.SHADOW_PROXY_SELF_REACH, "and further away than the part is wide")
+
+    def test_part_whose_shadow_reaches_the_set_keeps_casting(self) -> None:
+        # Same nub, moved to the far edge, so the light carries its shadow off the
+        # character instead of along it. That shadow is the character's own and has
+        # to survive: Pip's wings and the Goat's horns are this case.
+        _slab, _nub, joined = make_slab_with_nub(nub_y=0.25)
+        weights, collapse = A.plan_shadow_shrink(joined.data, light=RAKING_LIGHT)
+        nub = nub_island(joined)
+        self.assertNotIn(nub, [sorted(c) for c in collapse])
+        self.assertTrue(all(weights[i] > 0.0 for i in nub))
+        share, reach = measure_nub(joined, RAKING_LIGHT)
+        self.assertLess(share, A.SHADOW_PROXY_SELF_SHARE, "most of what it blocks reaches the set")
+        self.assertGreater(reach, A.SHADOW_PROXY_SELF_REACH, "and distance alone did not keep it")
+
+    def test_a_mass_keeps_casting_however_far_its_shadow_reaches(self) -> None:
+        # A body necessarily shadows the parts of itself that face away from the
+        # sun, and over a distance larger than its own width. Dropping it would
+        # take the character's shadow with it, so room for the whole shrink is
+        # enough on its own to keep a part in the caster.
+        _slab, _nub, joined = make_slab_with_nub(nub_y=-0.25)
+        weights, _collapse = A.plan_shadow_shrink(joined.data, light=RAKING_LIGHT)
+        slab = [i for i in range(len(joined.data.vertices)) if i not in set(nub_island(joined))]
+        self.assertTrue(all(weights[i] >= 1.0 for i in slab), "the mass keeps the full shrink")
+
+    def test_key_light_direction_comes_from_the_lighting_state(self) -> None:
+        for state in A.LIGHTING_STATES:
+            direction = A.key_light_direction(state)
+            self.assertAlmostEqual(direction.length, 1.0, places=6)
+            self.assertLess(direction.z, 0.0, f"{state}: a key light shines downward")
+        # The state the acceptance shot is graded on, as the assembled scene reports it.
+        day_key = A.key_light_direction("DAY_KEY")
+        for value, expected in zip(day_key, (-0.322, 0.5277, -0.786)):
+            self.assertAlmostEqual(value, expected, places=3)
+        self.assertEqual(
+            tuple(round(c, 6) for c in A.key_light_direction("NOT_A_STATE")),
+            tuple(round(c, 6) for c in A.key_light_direction(A.DEFAULT_LIGHTING_STATE)),
+        )
+
+    def test_facial_detail_leaves_the_caster_and_the_feet_stay_in_it(self) -> None:
+        # The rule has to hold on the asset it was written for, not only on
+        # fixtures: Pip's beak stops casting, and the feet - which is where the
+        # ground contact comes from - do not.
+        blend = REPO_ROOT / "production-library/characters/pip_production.blend"
+        if not blend.exists():
+            self.skipTest("Pip's production blend is not available")
+        bpy.ops.wm.open_mainfile(filepath=str(blend))
+        mesh = bpy.data.objects["Pip_Character"]
+        materials = [s.material.name if s.material else "" for s in mesh.material_slots]
+        weights, _collapse = A.plan_shadow_shrink(mesh.data, light=A.key_light_direction("DAY_KEY"))
+
+        # Per island, not per material: the beak is two islands and only the large
+        # one throws the band, so a per-material answer would hide the result.
+        parts: list[tuple[str, int, bool]] = []
+        for comp in A.mesh_islands(mesh.data):
+            member = set(comp)
+            used = sorted(
+                {
+                    materials[p.material_index]
+                    for p in mesh.data.polygons
+                    if all(v in member for v in p.vertices)
+                }
+            )
+            parts.append((used[0] if used else "", len(comp), weights[comp[0]] > 0.0))
+
+        def casting(name: str, verts: int) -> bool:
+            matches = [casts for part, count, casts in parts if part == name and count == verts]
+            self.assertTrue(matches, f"no {name} island with {verts} vertices")
+            return any(matches)
+
+        self.assertFalse(casting("PipBeak", 200), "the beak still casts the band down the chest")
+        self.assertTrue(casting("PipBody", 392), "the masses carry the character's shadow")
+        self.assertTrue(casting("PipBody", 262), "the wings shadow the meadow beside Pip")
+        for verts in (48, 86, 52):
+            self.assertTrue(casting("PipFeet", verts), "the feet carry the ground contact")
+        for detail, verts in (("PipEyeWhite", 200), ("PipIris", 200), ("PipComb", 178), ("PipCatchlight", 52)):
+            self.assertFalse(casting(detail, verts), f"{detail} still casts across the character")
 
     def test_collapsed_part_holds_its_collapse_in_every_shape_key(self) -> None:
         bpy.ops.mesh.primitive_plane_add(size=0.1)
