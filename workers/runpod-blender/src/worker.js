@@ -53,12 +53,16 @@ function makeDiagnosticPersister(env) {
   return async function persist(classification, detail = {}) {
     if (!ctx || !jobId) return;
     const key = `jobs/${jobId}/startup-status.json`;
+    // Non-failure boot milestones (PROCESS_STARTED / WORKER_READY) must NOT set
+    // result:'FAILED' — the orchestrator treats that as a terminal kill.
+    const booting = classification === 'BOOTING';
     const body = Buffer.from(
       JSON.stringify(
         {
           jobId,
-          result: 'FAILED',
+          result: booting ? 'RUNNING' : 'FAILED',
           classification,
+          bootStage: detail.bootStage || undefined,
           systemInfo: collectSystemInfo(env),
           detail,
           at: new Date().toISOString(),

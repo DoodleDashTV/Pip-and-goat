@@ -1,0 +1,28 @@
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-13T17:16:54.534Z","event":"config","jobId":"accept1080-2026-08-13T17-16-41-398Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.74,"workerImage":"ghcr.io/<redacted>/ddp-runpod-blender@sha256:32a0e34fde92c90acb3a6b7d6e880216ef162483cd4f6ada8a538b106a388adb","hardCapUsd":0.25}
+{"ts":"2026-08-13T17:16:54.763Z","event":"creating_pod","podName":"ddp-accept1080-1786641414763","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":40,"volumeInGb":0}
+{"ts":"2026-08-13T17:16:55.382Z","event":"pod_created","podId":"1qfrwq50v4c216","at":"2026-08-13T17:16:55.382Z"}
+AUTHORIZATION CONSUMED: pod 1qfrwq50v4c216 created. Watchdog + HARD_KILL active.
+{"ts":"2026-08-13T17:16:56.590Z","event":"stage","elapsedSec":0,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":null,"renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T17:18:00.886Z","event":"wait","elapsedSec":64,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:19:05.113Z","event":"wait","elapsedSec":129,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:20:10.106Z","event":"wait","elapsedSec":194,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:21:14.487Z","event":"wait","elapsedSec":257,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:21:56.972Z","event":"wait","elapsedSec":300,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:22:59.895Z","event":"wait","elapsedSec":363,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:23:42.592Z","event":"startup_failed","classification":"BOOTING"}
+{"ts":"2026-08-13T17:23:42.592Z","event":"terminating_pod","podId":"1qfrwq50v4c216"}
+{"ts":"2026-08-13T17:23:43.045Z","event":"post_terminate_poll","podPresent":false,"totalPods":0,"billableRemaining":false}
+
+===== PHASE B LIFECYCLE SUMMARY =====
+Pod ID: 1qfrwq50v4c216
+Final status: FAILED
+Lifetime: 6.79 min @ $0.74/hr
+ACTUAL COST: $0.0838 (cap $0.25) — within cap: YES
+Pod absent after terminate: YES
+Billable GPU remaining: NO
+Authorization consumed: YES
+
+# Worker reached PROCESS_STARTED after ~6.5min image pull (uptime was null until then).
+# Early persist() wrote result:FAILED classification:BOOTING; orchestrator killed the pod.
+# Fix: BOOTING -> result:RUNNING; launch ignores BOOTING as terminal failure.

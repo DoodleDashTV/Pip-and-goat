@@ -176,7 +176,7 @@ async function main() {
   const stageLog: Array<{ ts: string; stage: string }> = [];
 
   try {
-    log('creating_pod', { podName, cloudType: 'SECURE', gpuTypeId, containerDiskInGb: 40, volumeInGb: 0 });
+    log('creating_pod', { podName, cloudType: 'SECURE', gpuTypeId, containerDiskInGb: 60, volumeInGb: 0 });
     let created: { podId: string } | null = null;
     try {
       created = await withTimeout(
@@ -290,7 +290,9 @@ async function main() {
           log('render_failed', { code: status.code, classification: status.classification, message: redact(status.message || '') });
           break;
         }
-        if (startup?.result === 'FAILED') {
+        // Early boot heartbeats use result:'RUNNING' + classification:'BOOTING'.
+        // Only a real failure classification is terminal.
+        if (startup?.result === 'FAILED' && startup?.classification !== 'BOOTING') {
           finalStatus = 'FAILED';
           log('startup_failed', { classification: startup.classification, code: startup.code });
           break;
