@@ -23,6 +23,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts" / "blender"))
 
 import bpy  # noqa: E402
 from mathutils import Vector  # noqa: E402
+from mathutils.bvhtree import BVHTree  # noqa: E402
 
 import assemble_scene as A  # noqa: E402
 from ddp_rig import (  # noqa: E402
@@ -484,6 +485,96 @@ class ShadowCasterTests(unittest.TestCase):
         self.assertFalse(ball.visible_shadow, "the visible mesh stops casting")
         self.assertTrue(proxy.visible_shadow)
         self.assertFalse(proxy.visible_camera)
+
+    def test_part_sealed_inside_another_part_is_not_a_caster(self) -> None:
+        # Pip's beak has a second sphere authored inside it. The camera never sees
+        # it, so whatever it blocks is a mark with nothing on screen behind it, and
+        # that mark was the faint line left down the chest.
+        outer = make_ball("Outer", 0.16)
+        inner = make_ball("Inner", 0.05)
+        bpy.ops.object.select_all(action="DESELECT")
+        outer.select_set(True)
+        inner.select_set(True)
+        bpy.context.view_layer.objects.active = outer
+        bpy.ops.object.join()
+        joined = bpy.context.object
+        islands = A.mesh_islands(joined.data)
+        self.assertEqual(len(islands), 2)
+        sealed = _nub_index(joined.data)
+        weights, collapse = A.plan_shadow_shrink(joined.data)
+        self.assertEqual([sorted(c) for c in collapse], [sorted(islands[sealed])])
+        self.assertTrue(all(weights[i] == 0.0 for i in islands[sealed]))
+        self.assertTrue(
+            all(weights[i] > 0.0 for i in islands[1 - sealed]), "the shell still casts"
+        )
+
+    def test_the_inner_wall_of_a_hollow_part_keeps_casting(self) -> None:
+        # The Goat's tag letters are extruded rings: the inner wall is its own
+        # island, inside the outer wall's surface, and seen through the letter. It
+        # reaches the same two faces the outer wall does, which is what tells it
+        # apart from a sealed part.
+        bpy.ops.mesh.primitive_cube_add(size=0.2)
+        outer = bpy.context.object
+        bpy.ops.mesh.primitive_cube_add(size=0.2)
+        inner = bpy.context.object
+        inner.scale = (0.3, 1.0, 0.3)  # spans the outer part end to end in y
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        bpy.ops.object.select_all(action="DESELECT")
+        outer.select_set(True)
+        inner.select_set(True)
+        bpy.context.view_layer.objects.active = outer
+        bpy.ops.object.join()
+        joined = bpy.context.object
+        mesh = joined.data
+        islands = A.mesh_islands(mesh)
+        coords = [v.co.copy() for v in mesh.vertices]
+        trees = []
+        for comp in islands:
+            member = set(comp)
+            polys = [list(p.vertices) for p in mesh.polygons if all(v in member for v in p.vertices)]
+            trees.append(
+                BVHTree.FromPolygons(coords, polys, all_triangles=False, epsilon=0.0)
+                if polys
+                else None
+            )
+        self.assertEqual(A.buried_islands(islands, trees, coords), set())
+
+    def test_pips_buried_parts_are_the_beak_tip_and_the_pupils(self) -> None:
+        blend = REPO_ROOT / "production-library/characters/pip_production.blend"
+        if not blend.exists():
+            self.skipTest("Pip's production blend is not available")
+        bpy.ops.wm.open_mainfile(filepath=str(blend))
+        mesh = bpy.data.objects["Pip_Character"].data
+        materials = [m.name if m else "" for m in mesh.materials]
+        islands = A.mesh_islands(mesh)
+        coords = [v.co.copy() for v in mesh.vertices]
+        trees = []
+        for comp in islands:
+            member = set(comp)
+            polys = [list(p.vertices) for p in mesh.polygons if all(v in member for v in p.vertices)]
+            trees.append(
+                BVHTree.FromPolygons(coords, polys, all_triangles=False, epsilon=0.0)
+                if polys
+                else None
+            )
+        buried = A.buried_islands(islands, trees, coords)
+        named = sorted(
+            (
+                materials[
+                    min(
+                        p.material_index
+                        for p in mesh.polygons
+                        if all(v in set(islands[i]) for v in p.vertices)
+                    )
+                ],
+                len(islands[i]),
+            )
+            for i in buried
+        )
+        self.assertEqual(named, [("PipBeak", 86), ("PipPupil", 86), ("PipPupil", 86)])
+        weights, _collapse = A.plan_shadow_shrink(mesh, light=A.key_light_direction("DAY_KEY"))
+        for island in buried:
+            self.assertTrue(all(weights[i] == 0.0 for i in islands[island]))
 
     def test_unlit_planning_is_thickness_only(self) -> None:
         # Without a light the planner has no opinion about where shadows land, and
