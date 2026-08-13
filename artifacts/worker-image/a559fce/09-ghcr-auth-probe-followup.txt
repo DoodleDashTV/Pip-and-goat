@@ -1,0 +1,17 @@
+=== GHCR credential probe (follow-up boot) @ 2026-08-13T16:23:34Z ===
+
+Presence:
+  GHCR_USER  : YES len=13 trailing_ws=True
+  GHCR_TOKEN : YES len=40
+
+Canonical repair commit 1fbbdf2 is ancestor of HEAD: YES
+HEAD: ref: refs/heads/cursor/pip-chest-seam-repair-ba2f
+
+GET api.github.com/user -> HTTP 401 (Bad credentials)
+
+GET ghcr.io token pull,push -> HTTP 403
+
+scripts/cloud/ghcr-login.sh -> docker login denied
+
+Publication NOT attempted beyond auth. No image push. No GPU. Spend $0.
+WORKER_IMAGE remains PENDING_REBUILD.
