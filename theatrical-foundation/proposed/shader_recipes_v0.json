@@ -1,0 +1,171 @@
+{
+  "version": "proposed-shader-v0",
+  "label": "proposed upgrade",
+  "approved": false,
+  "blender": "4.2.3 LTS",
+  "rules": {
+    "neverChangeBaseColor": true,
+    "neverChangeMetallic": true,
+    "neverWriteProductionLibrary": true,
+    "preserveIdentityHues": true
+  },
+  "notes": "Identity-preserving Principled look-dev. Does not add maps, grooms, or mesh edits. Not theatrical-ready.",
+  "materials": {
+    "PipBody": {
+      "role": "feather",
+      "subsurfaceWeight": 0.22,
+      "sheenWeight": 0.5,
+      "sheenRoughness": 0.32,
+      "roughness": 0.5
+    },
+    "PipComb": {
+      "role": "soft-skin",
+      "subsurfaceWeight": 0.16,
+      "sheenWeight": 0.28,
+      "roughness": 0.36
+    },
+    "PipBeak": {
+      "role": "keratin",
+      "subsurfaceWeight": 0.08,
+      "coatWeight": 0.08,
+      "coatRoughness": 0.22,
+      "roughness": 0.32
+    },
+    "PipFeet": {
+      "role": "keratin",
+      "subsurfaceWeight": 0.08,
+      "coatWeight": 0.06,
+      "roughness": 0.38
+    },
+    "PipEyeWhite": {
+      "role": "eye",
+      "coatWeight": 0.28,
+      "coatRoughness": 0.04,
+      "roughness": 0.08,
+      "specularIorLevel": 0.72
+    },
+    "PipIris": {
+      "role": "eye",
+      "coatWeight": 0.18,
+      "coatRoughness": 0.08,
+      "roughness": 0.22
+    },
+    "PipCatchlight": {
+      "role": "eye",
+      "coatWeight": 0.4,
+      "coatRoughness": 0.02,
+      "roughness": 0.06,
+      "emissionStrength": 0.15
+    },
+    "PipBackpack": {
+      "role": "fabric",
+      "sheenWeight": 0.22,
+      "sheenRoughness": 0.45,
+      "roughness": 0.42
+    },
+    "PipStrap": {
+      "role": "fabric",
+      "sheenWeight": 0.18,
+      "roughness": 0.44
+    },
+    "PipStar": {
+      "role": "metal",
+      "coatWeight": 0.12,
+      "coatRoughness": 0.12,
+      "roughness": 0.22
+    },
+    "GoatBody": {
+      "role": "fur",
+      "subsurfaceWeight": 0.26,
+      "sheenWeight": 0.56,
+      "sheenRoughness": 0.3,
+      "roughness": 0.5
+    },
+    "GoatHorn": {
+      "role": "keratin",
+      "coatWeight": 0.1,
+      "coatRoughness": 0.28,
+      "roughness": 0.38
+    },
+    "GoatEarOuter": {
+      "role": "fur",
+      "sheenWeight": 0.4,
+      "subsurfaceWeight": 0.12,
+      "roughness": 0.48
+    },
+    "GoatEarInner": {
+      "role": "soft-skin",
+      "subsurfaceWeight": 0.2,
+      "sheenWeight": 0.18,
+      "roughness": 0.4
+    },
+    "GoatEyeWhite": {
+      "role": "eye",
+      "coatWeight": 0.28,
+      "coatRoughness": 0.04,
+      "roughness": 0.08,
+      "specularIorLevel": 0.72
+    },
+    "GoatIris": {
+      "role": "eye",
+      "coatWeight": 0.18,
+      "coatRoughness": 0.08,
+      "roughness": 0.22
+    },
+    "GoatCatchlight": {
+      "role": "eye",
+      "coatWeight": 0.4,
+      "coatRoughness": 0.02,
+      "roughness": 0.06,
+      "emissionStrength": 0.15
+    },
+    "GoatNose": {
+      "role": "soft-skin",
+      "subsurfaceWeight": 0.14,
+      "coatWeight": 0.08,
+      "roughness": 0.34
+    },
+    "GoatHoof": {
+      "role": "keratin",
+      "coatWeight": 0.06,
+      "roughness": 0.4
+    },
+    "GoatCollar": {
+      "role": "fabric",
+      "sheenWeight": 0.2,
+      "roughness": 0.42
+    },
+    "GoatTag": {
+      "role": "metal",
+      "coatWeight": 0.12,
+      "coatRoughness": 0.12,
+      "roughness": 0.22
+    },
+    "MeadowGrass": {
+      "role": "ground",
+      "sheenWeight": 0.16,
+      "roughness": 0.62
+    },
+    "MeadowPath": {
+      "role": "ground",
+      "roughness": 0.72,
+      "sheenWeight": 0.04
+    },
+    "MapPaper": {
+      "role": "paper",
+      "sheenWeight": 0.08,
+      "roughness": 0.68
+    },
+    "MapInk": {
+      "role": "ink",
+      "roughness": 0.45,
+      "coatWeight": 0.04
+    },
+    "MapWater": {
+      "role": "water",
+      "coatWeight": 0.22,
+      "coatRoughness": 0.06,
+      "roughness": 0.12
+    }
+  }
+}

@@ -1,0 +1,258 @@
+================================================================================
+TIVVLEJOY / TRIVVLEJOY — THEATRICAL CGI ASSET FOUNDATION
+FINAL RESULT FOR JUSTIN  |  2026-08-14  |  SELECT-ALL COPY
+================================================================================
+STATUS: Stopped at the visual-approval gate. NO asset group is approved.
+Tests passing does NOT approve assets. Steps 9–16 have NOT started.
+
+--------------------------------------------------------------------------------
+1. STARTING AND ENDING COMMITS
+--------------------------------------------------------------------------------
+Starting (Milestone 3 ending)     2fdac1d5783a1aaca55953214cc140eb9525085a
+Implementation                    633b1e2d6c7e9413c74662d4110ed1aa92765374
+Validation evidence               e17589f7e3c0243cb4d1ead736050f09c1d6a7e6
+Ending (HEAD)                     31494934099cfa457eecf80558aeb9731e14ac07
+Recovery ancestor (preserved)     19a76c61a1da3d54c20d98a9074c76b33779b1e7
+Empty main (NOT used)             7614139b350dd5ac41b59baddaf0aa4ca325f1ec
+Approved fingerprint (unchanged)  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+
+HEAD descends from 2fdac1d. Recovery and Milestone 3 history were not
+rebased, reset, deleted, or overwritten.
+
+--------------------------------------------------------------------------------
+2. BRANCH AND PULL-REQUEST STATUS
+--------------------------------------------------------------------------------
+Working branch     cursor/theatrical-asset-foundation-1ebc   (clean)
+New draft PR       #14   base: cursor/trivvlejoy-milestone-3-1ebc
+PR #13             UNCHANGED. Draft, MERGEABLE.
+                   base: agent/trivvlejoy-milestone-2-recovery
+PR #13 self-review No blocker. Not merged, closed, retargeted, or rebased.
+Empty main         Not used as a base. Not modified.
+
+--------------------------------------------------------------------------------
+3. COMPLETE ASSET INVENTORY
+--------------------------------------------------------------------------------
+CLASS                         ASSETS
+----------------------------  --------------------------------------------------
+Production-ready (pipeline)   pip_production.blend
+                              goat_production.blend
+                              meadow_production.blend
+                              adventure_map.blend
+Reusable                      The four library blends
+                              Locked LIGHTING_STATES
+                              Milestone 3 additive practicals / VFX
+                              Khronos PBR Neutral
+Needs upgrade                 Pip/Goat mesh, groom, eye-aim, maps
+                              Meadow terrain
+                              Map paper/ink textures
+                              Set lighting
+                              Reusable VFX library
+Missing                       LOC_CREEK_001
+                              Theatrical Pip/Goat bindings
+                              Groom caches
+                              2K/4K PBR texture sets
+                              Eye-aim rigs
+                              Feature animation library
+Prohibited                    Paid / unlicensed marketplace assets
+
+CANONICAL LIBRARY DETAIL
+Asset     Path                                              SHA-256 prefix     Mesh / notes                                         Theatrical?
+--------  ------------------------------------------------  -----------------  ---------------------------------------------------  -----------
+Pip       production-library/characters/pip_production.blend   e15e67364ac1c7b4   3800 verts / 4072 polys, 43 keys, 14-bone Pip_Rig     NO
+Goat      production-library/characters/goat_production.blend  e40b341ca0ed62eb   3848 verts / 4060 polys, 44 keys, 18-bone Goat_Rig    NO
+Meadow    production-library/environments/meadow_production.blend bdfd0656ff719fb3 Ground is 4 verts; path, flowers, trees, sky         NO
+Map       production-library/props/adventure_map.blend         c42f8300580e0fb3   Multi-mesh paper map                                  NO
+
+Bindings remain PROTOTYPE / immutable:
+  PIP_PROTOTYPE_BINDING   pip_default_v1
+  GOAT_PROTOTYPE_BINDING  goat_default_v1
+  LOC_MEADOW_001          meadow_v1
+  PROP_MAP_001            adventure_map_v1
+resolveCharacterBinding(..., THEATRICAL) still fails closed.
+
+--------------------------------------------------------------------------------
+4. ASSETS CREATED OR UPGRADED
+--------------------------------------------------------------------------------
+Item                         Label                         Path
+---------------------------  ----------------------------  ------------------------------------------------
+Shader recipes v0            proposed upgrade              theatrical-foundation/proposed/shader_recipes_v0.json
+Materials datablock dump     proposed upgrade              theatrical-foundation/proposed/materials_v0.blend
+28 local EEVEE stills        existing / proposed / diagnostic  artifacts/theatrical-foundation/previews/
+
+Canonical production-library/ files were NOT replaced.
+Proposed shaders only tweak Principled SSS / sheen / coat / roughness in memory.
+Base Color and Metallic are never written.
+
+--------------------------------------------------------------------------------
+5. FILES CHANGED
+--------------------------------------------------------------------------------
+Added
+  theatrical-foundation/  (inventory, requirements, proposed look-dev, preview index)
+  artifacts/theatrical-foundation/  (audit.json + 28 labeled stills + manifest)
+  scripts/assets/audit_theatrical_foundation.py
+  scripts/assets/theatrical_shaders.py
+  scripts/assets/build_proposed_materials.py
+  scripts/assets/render_theatrical_previews.py
+  apps/web/src/lib/theatrical-foundation.test.ts
+  THEATRICAL_FOUNDATION_REVIEW_2026-08-14.md
+
+Updated
+  scripts/assets/test_rig_gates.py   (+5 proposed-shader guards)
+  TRIVVLEJOY_PROGRESS.md
+
+NOT changed
+  production-library/**
+  scripts/blender/assemble_scene.py
+  packages/direction/src/roadmap.ts  (gate remains closed)
+  packages/direction/src/assets.ts   (no THEATRICAL bindings added)
+  voice IDs
+  worker image pin
+
+--------------------------------------------------------------------------------
+6. EXACT TEST AND GATE RESULTS
+--------------------------------------------------------------------------------
+Gate                                      Result
+----------------------------------------  --------------------------------------
+pnpm test                                 PASS   403 / 403   (was 395; +8 guards)
+pnpm typecheck                            PASS
+pnpm lint                                 PASS   no ESLint warnings or errors
+pnpm test:blender                         PASS   49 / 49     (was 44; +5 guards)
+pnpm test:color                           PASS   19 / 19
+pnpm validate:steps1-8                    PASS   17 passed, 1 skipped
+pnpm validate:steps1-8 -- --render        PASS   18 / 18
+pnpm gates:scene                          PASS   all 8 scene gates
+pnpm gates:local                          PASS   90/90 frames, all 16 visual checks
+approved fingerprint                      PASS   7876ac737de60257… unchanged
+evaluateTheatricalGate().allowed          false  (unchanged)
+resolveCharacterBinding(THEATRICAL)       throws (fail-closed, unchanged)
+
+No threshold was weakened, skipped, mocked, or bypassed.
+
+MILESTONE 3 CHECKPOINT (still valid at 2fdac1d, before this stage)
+  pnpm test                 395 / 395
+  pnpm test:blender         44 / 44
+  pnpm test:color           19 / 19
+  Steps 1–8 --render        18 / 18
+  scene gates               8 / 8
+  gates:local               90/90 frames, 16/16 visual checks
+
+--------------------------------------------------------------------------------
+7. LABELED VISUAL PREVIEWS
+--------------------------------------------------------------------------------
+Teal bar  = existing approved asset
+Amber bar = proposed upgrade
+Gray bar  = temporary diagnostic asset
+
+EXISTING APPROVED ASSET
+  artifacts/theatrical-foundation/previews/existing_approved_pip_front.png
+  artifacts/theatrical-foundation/previews/existing_approved_pip_left.png
+  artifacts/theatrical-foundation/previews/existing_approved_pip_right.png
+  artifacts/theatrical-foundation/previews/existing_approved_pip_rear.png
+  artifacts/theatrical-foundation/previews/existing_approved_pip_closeup.png
+  artifacts/theatrical-foundation/previews/existing_approved_pip_full_body.png
+  artifacts/theatrical-foundation/previews/existing_approved_pip_three_quarter_pip_point.png
+  artifacts/theatrical-foundation/previews/existing_approved_goat_front.png
+  artifacts/theatrical-foundation/previews/existing_approved_goat_left.png
+  artifacts/theatrical-foundation/previews/existing_approved_goat_right.png
+  artifacts/theatrical-foundation/previews/existing_approved_goat_rear.png
+  artifacts/theatrical-foundation/previews/existing_approved_goat_closeup.png
+  artifacts/theatrical-foundation/previews/existing_approved_goat_full_body.png
+  artifacts/theatrical-foundation/previews/existing_approved_goat_three_quarter_goat_head_nod.png
+  artifacts/theatrical-foundation/previews/existing_approved_meadow_set.png
+  artifacts/theatrical-foundation/previews/existing_approved_map_prop.png
+
+PROPOSED UPGRADE
+  artifacts/theatrical-foundation/previews/proposed_upgrade_pip_front.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_pip_closeup.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_pip_full_body.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_pip_closeup_motivated.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_goat_front.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_goat_closeup.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_goat_full_body.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_goat_closeup_motivated.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_meadow_set.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_map_prop.png
+  artifacts/theatrical-foundation/previews/proposed_upgrade_vertical_scene_meadow.png
+
+TEMPORARY DIAGNOSTIC ASSET
+  artifacts/theatrical-foundation/previews/diagnostic_pip_front.png
+
+Index: theatrical-foundation/PREVIEW_INDEX.md
+Manifest: artifacts/theatrical-foundation/previews/manifest.json
+
+--------------------------------------------------------------------------------
+8. EXISTING VERSUS PROPOSED
+--------------------------------------------------------------------------------
+View                 Existing                                      Proposed                                         What to look for
+-------------------  --------------------------------------------  -----------------------------------------------  ------------------------------------------
+Pip front            existing_approved_pip_front.png               proposed_upgrade_pip_front.png                   Softer yellow, wetter eyes. Same kitbash.
+Pip face             existing_approved_pip_closeup.png             proposed_upgrade_pip_closeup.png                 Eye coat / catchlight. Hues must stay.
+Pip full body        existing_approved_pip_full_body.png           proposed_upgrade_pip_full_body.png               Identity unchanged. No feather volume.
+Pip rear             existing_approved_pip_rear.png                (none)                                           Purple backpack + gold star remain.
+Pip acting           existing_approved_pip_three_quarter_pip_point.png  (none)                                       Authored PIP_POINT.
+Goat front           existing_approved_goat_front.png              proposed_upgrade_goat_front.png                  Softer cream / horn coat. Same toy form.
+Goat face            existing_approved_goat_closeup.png            proposed_upgrade_goat_closeup.png                Eye wetness. Framing tighter than ideal.
+Goat full body       existing_approved_goat_full_body.png          proposed_upgrade_goat_full_body.png              No fur volume. Horns still simplified.
+Goat acting          existing_approved_goat_three_quarter_goat_head_nod.png  (none)                                  Authored GOAT_HEAD_NOD.
+Meadow               existing_approved_meadow_set.png              proposed_upgrade_meadow_set.png                   Roughness only. Still 4-vert ground.
+Map                  existing_approved_map_prop.png                proposed_upgrade_map_prop.png                     Paper/ink roughness. No fiber maps.
+Vertical 9:16        (none)                                        proposed_upgrade_vertical_scene_meadow.png       Both characters in meadow. NOT a golden scene.
+Lighting compare     proposed_upgrade_pip_closeup.png (neutral)    proposed_upgrade_pip_closeup_motivated.png       Same shaders, two local light rigs.
+
+HONEST READ
+The proposed pass is look-dev, not a theatrical rebuild. Silhouette, poly
+density, missing groom, missing maps, and missing eye-aim bones are unchanged.
+
+--------------------------------------------------------------------------------
+9. REMAINING DEFECTS OR RISKS
+--------------------------------------------------------------------------------
+- Shader delta is subtle at 270x480 / 8 samples. Do not read that as theatrical quality.
+- Goat close-up framing is tighter than ideal (preview camera, not a mesh change).
+- No groom, PBR maps, eye-aim bones, creek set, or feature animation library exist yet.
+- Visual-approval v1.1 remaining defects still true: kitbash spheres, plastic shading,
+  nub beak, stub wings, simplified horns.
+- RENDER_CODE_MISMATCH remains the intentional paid-launch block.
+- THEATRICAL_GATE_STATE.assetFoundationComplete remains false.
+- Roadmap stage THEATRICAL_ASSET_FOUNDATION remains NOT_STARTED.
+
+--------------------------------------------------------------------------------
+10. PAID / CLOUD / DEPLOY / EXTERNAL CONFIRMATION
+--------------------------------------------------------------------------------
+No RunPod
+No paid GPU
+No cloud render
+No deploy
+No worker image rebuild or re-pin
+No purchase or license
+No paid asset provider
+No merge
+No credential or secret change
+CLOUD_RENDER_ENABLED=false
+ALLOW_PAID_GPU_LAUNCH=false
+Voice IDs not altered. Voice lock is NOT claimed.
+
+--------------------------------------------------------------------------------
+11. RECOMMENDATION PER ASSET GROUP
+--------------------------------------------------------------------------------
+Group                                 Recommendation   Why
+------------------------------------  ---------------  ----------------------------------------------------
+Pip mesh / groom / eye-aim            REVISE           Sphere kitbash; nub beak; stub wings; no feathers; no eye bones
+Goat mesh / groom / eye-aim           REVISE           Toy-primitive; simplified horns; no fur; no eye bones
+Proposed character shaders v0         REVISE           Useful look-dev; not theatrical; do not add THEATRICAL binding
+Meadow / creek                        REVISE           4-vert kitbash meadow; LOC_CREEK_001 missing
+Map prop shaders                      REVISE           No paper-fiber maps; roughness-only change
+Lighting / VFX libraries              REVISE           Do not retune LIGHTING_STATES; no reusable VFX caches
+Canonical production-library replace  REJECT           Fingerprint pin must stay until an approved sculpt/groom pass
+
+WAITING ON JUSTIN
+Do not replace canonical Pip or Goat.
+Do not begin Steps 9–16.
+Do not rebuild the worker image.
+Do not run a paid render.
+Do not deploy.
+Do not merge into a canonical branch.
+until Justin explicitly approves a theatrical visual foundation.
+
+================================================================================
+END OF SELECT-ALL COPY
+================================================================================

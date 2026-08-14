@@ -1,0 +1,192 @@
+{
+  "approved": false,
+  "previews": [
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_pip_front.png",
+      "label": "existing approved asset",
+      "subject": "pip",
+      "view": "front",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_pip_left.png",
+      "label": "existing approved asset",
+      "subject": "pip",
+      "view": "left",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_pip_right.png",
+      "label": "existing approved asset",
+      "subject": "pip",
+      "view": "right",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_pip_rear.png",
+      "label": "existing approved asset",
+      "subject": "pip",
+      "view": "rear",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_pip_closeup.png",
+      "label": "existing approved asset",
+      "subject": "pip",
+      "view": "closeup",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_pip_full_body.png",
+      "label": "existing approved asset",
+      "subject": "pip",
+      "view": "full_body",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_pip_three_quarter_pip_point.png",
+      "label": "existing approved asset",
+      "subject": "pip",
+      "view": "three_quarter",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_goat_front.png",
+      "label": "existing approved asset",
+      "subject": "goat",
+      "view": "front",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_goat_left.png",
+      "label": "existing approved asset",
+      "subject": "goat",
+      "view": "left",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_goat_right.png",
+      "label": "existing approved asset",
+      "subject": "goat",
+      "view": "right",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_goat_rear.png",
+      "label": "existing approved asset",
+      "subject": "goat",
+      "view": "rear",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_goat_closeup.png",
+      "label": "existing approved asset",
+      "subject": "goat",
+      "view": "closeup",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_goat_full_body.png",
+      "label": "existing approved asset",
+      "subject": "goat",
+      "view": "full_body",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_goat_three_quarter_goat_head_nod.png",
+      "label": "existing approved asset",
+      "subject": "goat",
+      "view": "three_quarter",
+      "approved": "existing approved asset \u2014 not a new approval"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_meadow_set.png",
+      "label": "existing approved asset",
+      "subject": "meadow_set"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/existing_approved_map_prop.png",
+      "label": "existing approved asset",
+      "subject": "map_prop"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_pip_front.png",
+      "label": "proposed upgrade",
+      "subject": "pip",
+      "view": "front",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_goat_front.png",
+      "label": "proposed upgrade",
+      "subject": "goat",
+      "view": "front",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_pip_closeup.png",
+      "label": "proposed upgrade",
+      "subject": "pip",
+      "view": "closeup",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_goat_closeup.png",
+      "label": "proposed upgrade",
+      "subject": "goat",
+      "view": "closeup",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_pip_full_body.png",
+      "label": "proposed upgrade",
+      "subject": "pip",
+      "view": "full_body",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_goat_full_body.png",
+      "label": "proposed upgrade",
+      "subject": "goat",
+      "view": "full_body",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_pip_closeup_motivated.png",
+      "label": "proposed upgrade",
+      "subject": "pip",
+      "view": "closeup",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_goat_closeup_motivated.png",
+      "label": "proposed upgrade",
+      "subject": "goat",
+      "view": "closeup",
+      "approved": false
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_meadow_set.png",
+      "label": "proposed upgrade",
+      "subject": "meadow_set"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_map_prop.png",
+      "label": "proposed upgrade",
+      "subject": "map_prop"
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/proposed_upgrade_vertical_scene_meadow.png",
+      "label": "proposed upgrade",
+      "subject": "vertical-scene",
+      "note": "Representative 9:16 still. Proposed shaders on approved meshes. Not a golden scene."
+    },
+    {
+      "file": "artifacts/theatrical-foundation/previews/diagnostic_pip_front.png",
+      "label": "temporary diagnostic asset",
+      "subject": "pip",
+      "view": "front",
+      "approved": false
+    }
+  ]
+}
