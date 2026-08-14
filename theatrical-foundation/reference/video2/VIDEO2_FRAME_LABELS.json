@@ -1,0 +1,44 @@
+{
+  "set": "VIDEO2",
+  "setIndex": "2 of 2",
+  "received": true,
+  "reconstructionStarted": false,
+  "authority": [
+    "full-body proportions",
+    "walking and running movement",
+    "rear views",
+    "backpacks",
+    "character-to-character scale",
+    "forest composition",
+    "blue footprint effects",
+    "cinematic atmosphere"
+  ],
+  "doesNotOverrideVideo1": [
+    "faces",
+    "eyes",
+    "expressions",
+    "materials",
+    "fur",
+    "feather appearance"
+  ],
+  "replacesCanonicalAssets": false,
+  "createsTheatricalBinding": false,
+  "approved": false,
+  "notes": {
+    "composites": "Most images are two-panel composites. Labels follow receipt order.",
+    "scaleInconsistent": true,
+    "watermarks": ["KlingAI 1.0", "KlingAI 3.0"]
+  },
+  "frames": [
+    { "id": "VIDEO2_FRAME_01", "order": 1, "shot": "front_run_and_rear_whispering_woods_entrance" },
+    { "id": "VIDEO2_FRAME_02", "order": 2, "shot": "front_jog_and_rear_stop_at_sign" },
+    { "id": "VIDEO2_FRAME_03", "order": 3, "shot": "front_walk_and_rear_pointing_blue_column" },
+    { "id": "VIDEO2_FRAME_04", "order": 4, "shot": "low_angle_run_and_static_rear_two_shot" },
+    { "id": "VIDEO2_FRAME_05", "order": 5, "shot": "rear_run_cyan_prints_under_feet" },
+    { "id": "VIDEO2_FRAME_06", "order": 6, "shot": "rear_run_motion_blur_foot_splash" },
+    { "id": "VIDEO2_FRAME_07", "order": 7, "shot": "toward_camera_run_four_toed_prints_eyes" },
+    { "id": "VIDEO2_FRAME_08", "order": 8, "shot": "chase_toward_camera_monster_silhouette" },
+    { "id": "VIDEO2_FRAME_09", "order": 9, "shot": "chase_toward_camera_monster_clearer" },
+    { "id": "VIDEO2_FRAME_10", "order": 10, "shot": "lantern_walk_then_fear_run" }
+  ]
+}

@@ -51,3 +51,16 @@ artifacts/steps-1-8-validation/render/
 
 # Blender rewrites these backups on every save; they are pure churn in a diff.
 *.blend1
+
+# Private 22-image video references. Catalogs and hashes may be committed;
+# full-resolution source frames must stay untracked.
+theatrical-foundation/reference/private/video1/
+theatrical-foundation/reference/private/video2/
+theatrical-foundation/reference/video1/*.png
+theatrical-foundation/reference/video1/*.jpg
+theatrical-foundation/reference/video1/*.jpeg
+theatrical-foundation/reference/video1/*.webp
+theatrical-foundation/reference/video2/*.png
+theatrical-foundation/reference/video2/*.jpg
+theatrical-foundation/reference/video2/*.jpeg
+theatrical-foundation/reference/video2/*.webp

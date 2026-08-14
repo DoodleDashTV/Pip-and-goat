@@ -1,0 +1,44 @@
+JUSTIN COPY REPORT — 22-image reconstruction hard stop
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY 22-IMAGE REFERENCE RECONSTRUCTION — ACCESS STOP
+0 of 22 source images are on disk. No assets were modified.
+
+Required:
+  VIDEO1_FRAME_01 through VIDEO1_FRAME_12  — 0 / 12 files
+  VIDEO2_FRAME_01 through VIDEO2_FRAME_10  — 0 / 10 files
+
+Accessible now:
+  Intake catalogs and labels
+  Catalog-inferred classification (not pixel-verified)
+  Feature authority table (planning only)
+  Environment requirement notes (deferred)
+  Theatrical v1.1 at 4bd1c66 (tests pass, not visually approved)
+  Canonical locks and fingerprint
+    7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+
+Not accessible:
+  The 22 full-resolution reference pictures
+  Hashes of those pictures
+  Pixel measurements
+  Matched reference-versus-Blender comparisons
+
+Stopped before:
+  Remodeling Pip or Goat
+  Replacing canonical assets
+  THEATRICAL bindings
+  Hero-Shot Impact Layer
+  Steps 9–16
+  Environment rebuild
+  Paid GPU, RunPod, cloud render, deploy, external AI
+
+Drop the 22 files here (gitignored, not for the PR):
+  theatrical-foundation/reference/private/video1/VIDEO1_FRAME_01.png … _12.png
+  theatrical-foundation/reference/private/video2/VIDEO2_FRAME_01.png … _10.png
+
+Starting commit: 4bd1c66e4909d5d42e46f9ad87338366c0afcc7c
+Branch: cursor/theatrical-22-ref-access-check-1ebc
+PR #16 remains unmerged.
+Reconstruction waits for the 22 private files, then Justin’s go-ahead to remodel.
+============================================================

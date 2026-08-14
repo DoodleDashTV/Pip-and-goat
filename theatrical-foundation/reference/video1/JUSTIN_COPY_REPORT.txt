@@ -1,0 +1,46 @@
+JUSTIN COPY REPORT — VIDEO1 reference set 1 of 2 reconfirm
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY VIDEO1 REFERENCE INTAKE — SET 1 OF 2
+Receipt reconfirmed. Reconstruction has not begun.
+
+Received: 12 frames from the first vertical video.
+Internal labels assigned in the order received:
+  VIDEO1_FRAME_01
+  VIDEO1_FRAME_02
+  VIDEO1_FRAME_03
+  VIDEO1_FRAME_04
+  VIDEO1_FRAME_05
+  VIDEO1_FRAME_06
+  VIDEO1_FRAME_07
+  VIDEO1_FRAME_08
+  VIDEO1_FRAME_09
+  VIDEO1_FRAME_10
+  VIDEO1_FRAME_11
+  VIDEO1_FRAME_12
+
+Some source image metadata said VIDEO2. User receipt order is the label authority. These remain VIDEO1.
+
+Authority recorded: Pip and Goat faces, eyes, expressions, materials, fur and feather appearance.
+These frames are the primary authority for that list.
+VIDEO2 remains secondary for body scale, walk/run, rear views, backpacks, forest, blue prints, and atmosphere.
+VIDEO1 does not override that VIDEO2 list.
+These frames do not replace canonical production-library assets.
+They do not create a THEATRICAL binding.
+They do not approve the theatrical v1 or v1.1 proposals.
+
+Observed and catalogued only, not locked:
+  Pip dense yellow down, three-lobe red comb, orange beak, wet brown eyes, lashes.
+  Goat clumped cream fur, ridged horns, pink nose, wet brown eyes.
+  Pip silver star pendant in close-ups; gold backpack star in the cave interior.
+  Cave-mouth sign reads SOMETHING AMAZING AWAITS.
+
+Catalog:
+  theatrical-foundation/reference/video1/VIDEO1_FRAME_CATALOG.md
+  theatrical-foundation/reference/video1/VIDEO1_FRAME_LABELS.json
+
+Both reference sets are now received and labeled.
+No reconstruction. No Hero-Shot layer. No Steps 9–16. No merge. No paid render.
+Waiting for an explicit reconstruct instruction.
+============================================================
