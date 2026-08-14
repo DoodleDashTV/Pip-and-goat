@@ -1,0 +1,23 @@
+{
+  "label": "proposed theatrical v2 binding references",
+  "approved": false,
+  "sourceBytesPersisted": false,
+  "files": {
+    "REFERENCE_1_pair.png": {
+      "role": "Approved pair image. Identity, appeal, colors, materials, personality, presentation.",
+      "sha256": null,
+      "present": false
+    },
+    "REFERENCE_2_pip_turnaround.png": {
+      "role": "Pip five-view turnaround. Front, three-quarter, profile, rear.",
+      "sha256": null,
+      "present": false
+    },
+    "REFERENCE_3_goat_turnaround.png": {
+      "role": "Goat five-view turnaround. Front, three-quarter, profile, rear.",
+      "sha256": null,
+      "present": false
+    }
+  },
+  "note": "Chat attachments were not written to disk. Hashes will be filled when the three files are dropped here."
+}

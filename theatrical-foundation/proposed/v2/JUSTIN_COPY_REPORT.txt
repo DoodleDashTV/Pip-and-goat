@@ -1,0 +1,47 @@
+JUSTIN COPY REPORT — theatrical v2 first visual gate
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY THEATRICAL V2 — FIRST VISUAL GATE
+Proposed. Unapproved. Stopped for Justin’s sculpt review.
+
+Starting commit: 4bd1c66e4909d5d42e46f9ad87338366c0afcc7c
+Branch: cursor/theatrical-v2-character-foundation-1ebc
+PR #16 remains unmerged.
+
+Binding target: the three attached explorer sheets
+  REFERENCE 1 pair
+  REFERENCE 2 Pip five-view
+  REFERENCE 3 Goat five-view
+Those source files were not on disk, so hashes are still empty.
+The written spec in theatrical-foundation/proposed/v2/CHARACTER_SPEC.md
+is the contract used for this sculpt.
+
+What was built (proposed/v2 only):
+  pip_theatrical_v2.blend
+  goat_theatrical_v2.blend
+  New meshes. No v1.1 import. No rejected GLB. No voxel remesh.
+  No purple backpack. No gold-star pack. No blue collar. No GOAT tag.
+  Pip: teal neckerchief, teal satchel, copper spiral, three coral feathers
+  Goat: two ridged horns, burnt-orange neckerchief, teal compass
+  Scale about 1.4× (Goat taller than Pip)
+
+Honest comparison:
+  These sculpts do not match the polished binding sheets.
+  They still read as smooth procedural volumes, not the approved
+  explorer characters. Eyes now show iris and pupil. Beak, wings,
+  ears, horns, and accessories are present but unfinished.
+
+Recommendations:
+  Pip: REVISE
+  Goat: REVISE
+  Do not approve. Do not retopo, groom, or rig yet.
+
+Clean previews:
+  artifacts/theatrical-v2/previews/clean/
+
+No canonical replace. No THEATRICAL binding. No Hero-Shot.
+No Steps 9–16. No paid GPU, RunPod, cloud render, deploy, or
+external provider. Fingerprint unchanged.
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+============================================================
