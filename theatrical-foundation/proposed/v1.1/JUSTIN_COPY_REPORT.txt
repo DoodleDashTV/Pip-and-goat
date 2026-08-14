@@ -1,0 +1,256 @@
+JUSTIN COPY REPORT — TivvleJoy Theatrical v1.1 visual-quality rescue
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY THEATRICAL V1.1 — VISUAL-QUALITY RESCUE FOR REVIEW
+Studio: TivvleJoy / TivvleJoy Studios
+Product: TivvleJoy. Internal IDs remain Doodle Dash / DDP.
+This is a targeted visual-quality rescue of proposed v1, not another audit and not a voxel-remesh or shader-only pass.
+No asset group is visually approved. Canonical production-library replacement remains REJECTED.
+
+1. STARTING AND ENDING COMMITS
+Starting commit (Justin-specified): 1ad90939ab987355768db436b0044f1d5d73c0fa
+  Message: evidence: theatrical v1 visual-approval package and Justin report
+Implementation commit: 4916943b697c076f6f4f6247b26bc6f30b27a0d3
+  Message: feat(assets): theatrical v1.1 visual-quality rescue (unapproved)
+This visual-package commit is the ending commit of the rescue pass.
+HEAD still contains:
+  1ad90939ab987355768db436b0044f1d5d73c0fa  theatrical v1 proposals
+  123e6b66adf0d0d92054b4ffca2a2eb5c027255b  theatrical audit
+  2fdac1d5783a1aaca55953214cc140eb9525085a  Milestone 3
+  19a76c61a1da3d54c20d98a9074c76b33779b1e7  Milestone 2 recovery
+HEAD does not contain empty main 7614139b350dd5ac41b59baddaf0aa4ca325f1ec as a rewrite base.
+
+2. BRANCH AND DRAFT-PR STATUS
+Working branch: cursor/theatrical-v1-1-rescue-1ebc
+Draft PR: #16
+PR base: cursor/theatrical-v1-proposals-1ebc
+PR title: Theatrical v1.1 visual-quality rescue — revise pass for Justin review
+PR state: OPEN, DRAFT
+This PR is stacked on the v1 proposals branch, which is stacked on the theatrical-audit branch, which is stacked on Milestone 3, which is stacked on recovery.
+Untouched:
+  PR #15  cursor/theatrical-v1-proposals-1ebc
+  PR #14  cursor/theatrical-asset-foundation-1ebc
+  PR #13  cursor/trivvlejoy-milestone-3-1ebc
+  PR #12  recovery
+  PR #11  Steps 1–8 source
+No merge. No close. No retarget. No rebase onto empty main.
+
+3. COMPLETE FILES-CHANGED LIST
+New / changed on this branch versus 1ad9093:
+  apps/web/src/lib/theatrical-v11.test.ts
+  scripts/assets/build_theatrical_v11.py
+  scripts/assets/measure_theatrical_v11_appeal.py
+  scripts/assets/render_theatrical_v11_approval.py
+  scripts/assets/theatrical_v11_common.py
+  scripts/assets/test_rig_gates.py
+  theatrical-foundation/proposed/v1.1/BUILD_MANIFEST.json
+  theatrical-foundation/proposed/v1.1/APPEAL_MEASUREMENTS.json
+  theatrical-foundation/proposed/v1.1/JUSTIN_COPY_REPORT.txt
+  theatrical-foundation/proposed/v1.1/PREVIEW_INDEX.md
+  theatrical-foundation/proposed/v1.1/README.md
+  theatrical-foundation/proposed/v1.1/pip_theatrical_v1_1.blend
+  theatrical-foundation/proposed/v1.1/goat_theatrical_v1_1.blend
+  theatrical-foundation/proposed/v1.1/meadow_theatrical_v1_1.blend
+  theatrical-foundation/proposed/v1.1/creek_theatrical_v1_1.blend
+  theatrical-foundation/proposed/v1.1/map_theatrical_v1_1.blend
+  theatrical-foundation/proposed/v1.1/lighting_vfx_theatrical_v1_1.blend
+  theatrical-foundation/proposed/v1.1/textures/  (12 local 2K maps)
+  artifacts/theatrical-v1.1/previews/  (clean PNGs, labeled sheets, ZIP, manifest)
+NOT changed:
+  production-library/  (all four canonical blends)
+  apps/web/src/lib/assets.ts
+  apps/web/src/lib/roadmap.ts
+  scripts/blender/assemble_scene.py
+  THEATRICAL_GATE_STATE.assetFoundationComplete remains false
+  no THEATRICAL rows in ASSET_BINDINGS
+  approved fingerprint unchanged
+
+4. TECHNICAL ASSET SPECIFICATIONS
+All proposed v1.1 assets live under theatrical-foundation/proposed/v1.1/.
+They are labeled proposed, ddp_approved=False, and are not production-library files.
+Construction rule: no voxel remesh of characters. No rectangular feather/fur cards.
+
+PIP THEATRICAL V1.1
+  File: theatrical-foundation/proposed/v1.1/pip_theatrical_v1_1.blend
+  Object: char_pip_theatrical_v1_1_proposed
+  Construction: separate body/head volumes (no remesh), large eyes, soft beak spheres, relaxed side-hanging wings, 3-lobe crest, 3-toed feet, rigid backpack + gold star
+  Colors preserved: yellow body, red crest, orange beak/feet, purple backpack, gold star
+  Maps: 2K pip_body_basecolor / roughness / normal
+  Materials: Principled BSDF, Khronos PBR Neutral, SSS + sheen surface breakup (no cards)
+  Rig: existing bones plus additive eye_L/eye_R/eyelid_L/eyelid_R
+  Actions: inherited canonical PIP_* plus PIP_POSE_NEUTRAL / POINT_CURIOUS / DISCOVERY / BRAVE / LOOK_GOAT / MAP
+  Eye-aim: fail-closed if bones missing
+  Chest-seam protection: assemble_scene install_shadow_proxy / DDP_ShadowShrink unchanged
+
+GOAT THEATRICAL V1.1
+  File: theatrical-foundation/proposed/v1.1/goat_theatrical_v1_1.blend
+  Object: char_goat_theatrical_v1_1_proposed
+  Construction: separate body/head, LARGE glossy eyes (eyeWhiteRadius 0.078, eyeToHead 0.37), rounded horns, pink nose, blue collar, gold GOAT tag with text
+  Colors preserved: cream, brown horns, pink nose, blue collar, gold tag
+  Maps: 2K goat_body_basecolor / roughness / normal
+  Groom: shader surface only. No fur cards.
+  Rig: existing bones plus additive eye/eyelid
+  Actions: inherited GOAT_* plus GOAT_POSE_NEUTRAL / NOD / PLAYFUL / SURPRISE / LOOK_PIP / MAP
+
+MEADOW / CREEK / MAP / LIGHTING-VFX
+  Meadow ground verts > 100, path toward a hill destination, stylized trees/flowers, staging empties
+  Creek: banks, shallow water, stones, reeds, destination glow, mist, both-character staging
+  Map: thick sheet + generated 2K illustrated graphic + compass ring
+  Lighting/VFX: additive Light_EyeCatch / ForestFill / MeadowAtmosphere + seeded no-shadow dust/pollen/sparkle/mist/trail
+  retunesLightingStates: false
+
+5. RIG AND ACTION-COMPATIBILITY RESULTS
+Canonical rigs and actions were not removed or rewritten.
+Proposed characters append canonical action datablocks, then add pose actions with new names.
+Blender TheatricalV1ProposalTests: PASS
+Blender TheatricalV11ProposalTests: PASS
+  proposed bones include existing set plus eye/eyelid
+  eye-aim fail-closed when bones missing
+  production-library still has exactly 4 blends
+  appeal guards passed (measurement file)
+  lighting retunesLightingStates = false
+No THEATRICAL binding was created.
+No shadow-caster protection was modified.
+Chest-seam guard was not weakened.
+Approved fingerprint unchanged:
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+Live assemble_scene retarget was not performed (that would require a THEATRICAL bind).
+
+6. EXACT TESTS AND GATES
+No threshold was weakened, skipped, mocked, or bypassed.
+
+pnpm test                         412 / 412
+pnpm typecheck                    PASS
+pnpm lint                         PASS
+pnpm test:blender                 55 / 55
+pnpm test:color                   19 / 19
+pnpm validate:steps1-8            17 passed, 1 skipped
+pnpm validate:steps1-8 -- --render  18 / 18
+pnpm gates:scene                  8 / 8 PASS
+pnpm gates:local                  90 frames, 16 / 16 visual checks PASS
+pnpm gates:faults                 6 / 6 PASS
+fingerprint                       UNCHANGED
+appeal guards                     PASS (measurement only; not visual approval)
+
+New tests:
+  apps/web/src/lib/theatrical-v11.test.ts
+  TheatricalV11ProposalTests in scripts/assets/test_rig_gates.py
+
+gates:local rewrote artifacts/local-acceptance and artifacts/steps-1-8-validation/summary.json.
+Those generated files were restored to the Milestone 3 tracked versions so this PR does not rewrite M3 evidence.
+
+7. DOWNLOADABLE / DIRECTLY VIEWABLE VISUAL PREVIEWS
+Repo path: artifacts/theatrical-v1.1/previews/
+Clean frames: artifacts/theatrical-v1.1/previews/clean/
+Labeled sheets: artifacts/theatrical-v1.1/previews/labeled/
+ZIP: artifacts/theatrical-v1.1/previews/theatrical-v1.1-previews.zip
+Index: theatrical-foundation/proposed/v1.1/PREVIEW_INDEX.md
+Manifest: artifacts/theatrical-v1.1/previews/manifest.json
+Hero frames: 1080x1920, EEVEE Next, 48 samples, Khronos PBR Neutral
+Turnarounds: 540x960, 24 samples
+Clean frames have no in-frame bars.
+Labeled comparison sheets use a header strip above the frames so labels do not cover characters.
+
+8. MATCHED EXISTING-VERSUS-PROPOSED COMPARISONS
+Labeled sheets:
+  labeled/compare_pip_full_body.png
+  labeled/compare_pip_face.png
+  labeled/compare_pip_acting.png
+  labeled/compare_goat_full_body.png
+  labeled/compare_goat_face.png
+  labeled/compare_goat_acting.png
+  labeled/compare_meadow_two_shot.png
+  labeled/compare_map_close.png
+Teal header = existing canonical. Amber header = proposed theatrical v1.1.
+
+Honest phone-sized 9:16 read, without zooming:
+
+Pip: large friendly eyes are back. Wings are relaxed, not T-pose. No rectangular feather cards. Rear turnaround shows purple backpack + gold star. The character still reads as two yellow spheres with a nub beak from the front. Face close-up can show leftover center-line language from the 2K fiber map. Not an obvious theatrical jump.
+
+Goat: HIGHEST-PRIORITY FIX LANDED. Eyes are large, glossy, and friendly again. This is no longer the v1 dot-eye regression. Collar and GOAT tag are visible in full-body and most acting views. No rectangular fur cards on the character mesh. The model still reads as cream spheres and cylinders. Tag text can read mirrored in some three-quarter views. Beard can cover part of the tag. Still toy-primitive at phone size.
+
+Meadow: more pieces than canonical (path segments, destination, layered canopies, flowers). Still reads as primitive geometry. Not a stronger children’s-series location at phone size.
+
+Creek: both characters are intended to be fully readable. Water still reads as a flat blue band. VFX spheres can look like floating cards. Goat can still clip the frame in tighter shots.
+
+Map: thicker sheet and a generated graphic exist. In the close-up the graphic does not clearly beat the existing folded card. Interaction shot shows a floating card between the characters, not a convincing held paper prop.
+
+Lighting/VFX: catchlights exist on studio character close-ups. In scene demos the additive particles are visible but read as primitive floating disks/hexes and can look like a fur halo around Goat. Not a finished atmosphere.
+
+Cinematic vertical: not a distinct story beat. It reads as another meadow character shot, not a discovery/mystery composition with one obvious focal point.
+
+9. HONEST DEFECTS AND LIMITATIONS
+Do not recommend approval. Several hard-acceptance automatic-REVISE rules trip.
+
+Automatic REVISE triggers that fired:
+  A center-line can still be read on Pip in face/front cameras (texture fiber, not voxel remesh)
+  Environments still read as primitive geometry
+  The map does not clearly improve on canonical at phone size
+  Lighting/VFX demonstrations are visible but crude
+  The cinematic frame lacks a clear story beat
+  The upgrade is not obvious without inspecting technical details
+  Phone-sized presentation is not clearly stronger than canonical overall
+
+Other defects:
+  Pip beak still reads as a nub from the front
+  Pip backpack hidden in dead-front cameras (visible in rear / some 3/4)
+  Goat tag can read mirrored or partly hidden by the beard
+  Acting poses are readable but still stiff
+  VFX particles can be mistaken for a groom halo
+  2K maps only; no 4K close-up set
+  No live THEATRICAL bind, so action retarget is file-level only
+  Software GL / llvmpipe EEVEE Next is not a farm look
+
+What is better than v1:
+  Goat eyes restored to large glossy friendly appeal (the v1 automatic failure is reversed)
+  No voxel remesh of characters
+  No rectangular feather/fur cards on the character meshes
+  Pip wings are relaxed, not T-pose
+  Measurable appeal guards exist and pass
+  Clean 1080x1920 / 48 spp frames plus labeled header sheets plus a downloadable ZIP
+  Canonical library and fingerprint were not touched
+
+10. SEPARATE APPROVE / REVISE / REJECT RECOMMENDATION
+These are recommendations for Justin. The agent does not approve.
+
+Pip mesh, groom, and eye-aim:          REVISE
+Goat mesh, groom, and eye-aim:         REVISE
+Character shaders / materials:         REVISE
+Meadow environment:                    REVISE
+Creek environment:                     REVISE
+Adventure Map prop:                    REVISE
+Lighting and reusable VFX:             REVISE
+Canonical production-library replace:  REJECT
+THEATRICAL production binding:         DO NOT CREATE
+Hero-Shot Impact Layer:                DO NOT BEGIN
+Steps 9–16:                            DO NOT BEGIN
+
+Reason: v1.1 reversed the Goat eye-appeal regression and removed the worst v1 defects (T-pose, remesh seam, rectangular cards). The on-phone read is still a stylized toy kit, not an obvious theatrical upgrade. Hard-acceptance rules require REVISE.
+
+11. CONFIRMATION THAT NO PAID OR EXTERNAL ACTION OCCURRED
+No RunPod.
+No paid GPU.
+No cloud render.
+No deployment.
+No paid or marketplace assets.
+No external generative provider.
+No worker-image rebuild or repin.
+No credential changes.
+No PR merge.
+CLOUD_RENDER_ENABLED=false
+ALLOW_PAID_GPU_LAUNCH=false
+All Blender work used local Blender 4.2.3 LTS and software GL (llvmpipe).
+
+STOPPING POINT
+Stop here.
+Do not replace canonical assets.
+Do not add THEATRICAL production bindings.
+Do not approve the assets.
+Do not begin the Hero-Shot Impact Layer.
+Do not begin Steps 9–16.
+Do not merge.
+Do not deploy.
+Do not launch a paid render.
+Waiting on Justin’s visual approve / revise / reject per asset group.
+============================================================

@@ -727,6 +727,47 @@ class TheatricalV1ProposalTests(unittest.TestCase):
         self.assertFalse({"eye_L", "eye_R"} <= names)
 
 
+class TheatricalV11ProposalTests(unittest.TestCase):
+    """Proposed v1.1 assets stay additive, unapproved, and appeal-guarded."""
+
+    def test_proposed_v11_manifest_is_unapproved_and_outside_the_library(self) -> None:
+        manifest = REPO_ROOT / "theatrical-foundation/proposed/v1.1/BUILD_MANIFEST.json"
+        self.assertTrue(manifest.exists())
+        data = json.loads(manifest.read_text())
+        self.assertFalse(data["approved"])
+        self.assertFalse(data["productionLibraryMutated"])
+        self.assertFalse(data["voxelRemesh"])
+        self.assertFalse(data["groomCards"])
+        for bone in ("eye_L", "eye_R", "eyelid_L", "root", "head"):
+            self.assertIn(bone, data["pip"]["bones"])
+            self.assertIn(bone, data["goat"]["bones"])
+        self.assertGreater(data["meadow"]["groundVerts"], 100)
+        self.assertFalse(data["lightingVfx"]["retunesLightingStates"])
+        lib = (REPO_ROOT / "production-library").resolve()
+        for blend in (REPO_ROOT / "theatrical-foundation/proposed/v1.1").glob("*.blend"):
+            self.assertFalse(lib in blend.resolve().parents)
+
+    def test_appeal_guards_pass_and_goat_eyes_are_not_shrunk(self) -> None:
+        appeal_path = REPO_ROOT / "theatrical-foundation/proposed/v1.1/APPEAL_MEASUREMENTS.json"
+        self.assertTrue(appeal_path.exists())
+        data = json.loads(appeal_path.read_text())
+        self.assertFalse(data["approved"])
+        self.assertTrue(data["guardsPassed"])
+        self.assertEqual(data["failures"], [])
+        self.assertGreaterEqual(data["goat"]["eyeWhiteRadius"], 0.06)
+        self.assertGreaterEqual(data["goat"]["eyeToHead"], 0.30)
+        self.assertTrue(data["pip"]["backpackPresent"])
+        self.assertTrue(data["goat"]["collarPresent"])
+        self.assertEqual(data["pip"]["forbiddenGroom"], [])
+        self.assertEqual(data["goat"]["forbiddenGroom"], [])
+
+    def test_eye_aim_helper_fails_closed_when_bones_missing(self) -> None:
+        fresh_scene()
+        arm = make_armature("NoEyesV11")
+        names = {b.name for b in arm.data.bones}
+        self.assertFalse({"eye_L", "eye_R"} <= names)
+
+
 class TheatricalShaderTests(unittest.TestCase):
     """Proposed look-dev must stay additive, reversible, and outside the library."""
 
@@ -903,6 +944,7 @@ def main() -> int:
             ActionBindingTests,
             ShadowCasterTests,
             TheatricalV1ProposalTests,
+            TheatricalV11ProposalTests,
             TheatricalShaderTests,
             DirectionConsumerTests,
         )

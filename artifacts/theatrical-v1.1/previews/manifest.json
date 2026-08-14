@@ -1,0 +1,347 @@
+{
+  "approved": false,
+  "label": "proposed theatrical v1.1",
+  "engine": "EEVEE Next",
+  "viewTransform": "Khronos PBR Neutral",
+  "heroRes": "1080x1920",
+  "heroSamples": 48,
+  "archive": "artifacts/theatrical-v1.1/previews/theatrical-v1.1-previews.zip",
+  "previews": [
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_pip_front.png",
+      "name": "existing_pip_front",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_front.png",
+      "name": "proposed_pip_front",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_goat_front.png",
+      "name": "existing_goat_front",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_front.png",
+      "name": "proposed_goat_front",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_pip_left.png",
+      "name": "existing_pip_left",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_left.png",
+      "name": "proposed_pip_left",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_goat_left.png",
+      "name": "existing_goat_left",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_left.png",
+      "name": "proposed_goat_left",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_pip_right.png",
+      "name": "existing_pip_right",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_right.png",
+      "name": "proposed_pip_right",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_goat_right.png",
+      "name": "existing_goat_right",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_right.png",
+      "name": "proposed_goat_right",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_pip_rear.png",
+      "name": "existing_pip_rear",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_rear.png",
+      "name": "proposed_pip_rear",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_goat_rear.png",
+      "name": "existing_goat_rear",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_rear.png",
+      "name": "proposed_goat_rear",
+      "res": "540x960",
+      "samples": 24,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_pip_full_body_1080.png",
+      "name": "existing_pip_full_body_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_full_body_1080.png",
+      "name": "proposed_pip_full_body_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_pip_face_1080.png",
+      "name": "existing_pip_face_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_face_1080.png",
+      "name": "proposed_pip_face_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_pip_acting_1080.png",
+      "name": "existing_pip_acting_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_point_1080.png",
+      "name": "proposed_pip_point_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_discovery_1080.png",
+      "name": "proposed_pip_discovery_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_pip_brave_1080.png",
+      "name": "proposed_pip_brave_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_goat_full_body_1080.png",
+      "name": "existing_goat_full_body_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_full_body_1080.png",
+      "name": "proposed_goat_full_body_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_goat_face_1080.png",
+      "name": "existing_goat_face_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_face_1080.png",
+      "name": "proposed_goat_face_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_goat_acting_1080.png",
+      "name": "existing_goat_acting_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_nod_1080.png",
+      "name": "proposed_goat_nod_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_playful_1080.png",
+      "name": "proposed_goat_playful_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_goat_surprise_1080.png",
+      "name": "proposed_goat_surprise_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_meadow_two_shot_1080.png",
+      "name": "existing_meadow_two_shot_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_meadow_two_shot_1080.png",
+      "name": "proposed_meadow_two_shot_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_creek_two_shot_1080.png",
+      "name": "proposed_creek_two_shot_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/existing_map_close_1080.png",
+      "name": "existing_map_close_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_map_close_1080.png",
+      "name": "proposed_map_close_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_map_interaction_1080.png",
+      "name": "proposed_map_interaction_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_lighting_vfx_1080.png",
+      "name": "proposed_lighting_vfx_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/clean/proposed_cinematic_vertical_1080.png",
+      "name": "proposed_cinematic_vertical_1080",
+      "res": "1080x1920",
+      "samples": 48,
+      "labeled": false
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_pip_full_body.png",
+      "name": "compare_pip_full_body",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_pip_face.png",
+      "name": "compare_pip_face",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_pip_acting.png",
+      "name": "compare_pip_acting",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_goat_full_body.png",
+      "name": "compare_goat_full_body",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_goat_face.png",
+      "name": "compare_goat_face",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_goat_acting.png",
+      "name": "compare_goat_acting",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_meadow_two_shot.png",
+      "name": "compare_meadow_two_shot",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    },
+    {
+      "file": "artifacts/theatrical-v1.1/previews/labeled/compare_map_close.png",
+      "name": "compare_map_close",
+      "labeled": true,
+      "left": "existing canonical",
+      "right": "proposed theatrical v1.1"
+    }
+  ]
+}
