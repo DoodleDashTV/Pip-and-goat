@@ -44,7 +44,7 @@ locally validated**. Theatrical CGI Asset Foundation (roadmap stage 3) has
 | Khronos PBR Neutral python-expr | PASS |
 | `pnpm install --frozen-lockfile` | PASS |
 | `pnpm db:generate` / `pnpm db:migrate` | PASS |
-| `pnpm test` | PASS — **394 / 394** (23 files) |
+| `pnpm test` | PASS — **395 / 395** (23 files) |
 | `pnpm typecheck` | PASS |
 | `pnpm lint` | PASS — no ESLint warnings or errors |
 | `pnpm test:blender` | PASS — **44 / 44** |
