@@ -35,4 +35,4 @@ These notes record what the frames show. They are not an instruction to rebuild 
 
 ## Hard stop
 
-Do not reconstruct characters, environments, shaders, or bindings from this catalog until Justin sends set 2 of 2 and an explicit reconstruct instruction.
+Set 2 of 2 is now received and labeled as VIDEO2_FRAME_01 through VIDEO2_FRAME_10. Do not reconstruct characters, environments, shaders, or bindings from this catalog until Justin sends an explicit reconstruct instruction.

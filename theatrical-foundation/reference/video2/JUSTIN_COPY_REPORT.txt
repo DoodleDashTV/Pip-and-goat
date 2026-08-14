@@ -1,0 +1,53 @@
+JUSTIN COPY REPORT — VIDEO2 reference set 2 of 2 intake
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY VIDEO2 REFERENCE INTAKE — SET 2 OF 2
+Receipt confirmed. Reconstruction has not begun.
+
+Received: 10 images from the second landscape video.
+Internal labels assigned in the order received:
+  VIDEO2_FRAME_01
+  VIDEO2_FRAME_02
+  VIDEO2_FRAME_03
+  VIDEO2_FRAME_04
+  VIDEO2_FRAME_05
+  VIDEO2_FRAME_06
+  VIDEO2_FRAME_07
+  VIDEO2_FRAME_08
+  VIDEO2_FRAME_09
+  VIDEO2_FRAME_10
+
+Most images are two-panel composites. Labels still follow receipt order.
+Several panels carry KlingAI watermarks. Those are source marks, not production assets.
+
+Authority recorded (secondary):
+  full-body proportions
+  walking and running movement
+  rear views
+  backpacks
+  character-to-character scale
+  forest composition
+  blue footprint effects
+  cinematic atmosphere
+
+VIDEO1 remains primary for faces, eyes, expressions, materials, fur, and feather appearance.
+VIDEO2 does not override that list.
+These frames do not replace canonical production-library assets.
+They do not create a THEATRICAL binding.
+They do not approve the theatrical v1 or v1.1 proposals.
+
+Observed and catalogued only, not locked:
+  Pip-to-Goat scale is inconsistent across composites. Do not pick a scale yet.
+  Pip purple backpack. Goat blue backpack. Gold collar tag text varies by panel.
+  Blue prints vary (five-toed, four-toed, or puddle splash).
+  Whispering Woods sign, lantern, watching eyes, and a monster silhouette appear in later frames.
+
+Catalog:
+  theatrical-foundation/reference/video2/VIDEO2_FRAME_CATALOG.md
+  theatrical-foundation/reference/video2/VIDEO2_FRAME_LABELS.json
+
+Both reference sets are now received and labeled.
+No reconstruction. No Hero-Shot layer. No Steps 9–16. No merge. No paid render.
+Waiting for an explicit reconstruct instruction.
+============================================================
