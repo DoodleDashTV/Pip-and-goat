@@ -734,7 +734,9 @@ class TheatricalShaderTests(unittest.TestCase):
         mat, principled = self._principled_material("UnrelatedHero", (0.1, 0.2, 0.3))
         report = self.TS.apply_proposed_shaders([mat])
         self.assertIn("UnrelatedHero", report["skipped"])
-        self.assertEqual(list(principled.inputs["Base Color"].default_value)[:3], [0.1, 0.2, 0.3])
+        leftover = list(principled.inputs["Base Color"].default_value)[:3]
+        for got, expected in zip(leftover, (0.1, 0.2, 0.3)):
+            self.assertAlmostEqual(got, expected, places=5)
 
     def test_recipes_refuse_to_self_approve_or_write_the_library(self) -> None:
         recipes = self.TS.load_recipes()

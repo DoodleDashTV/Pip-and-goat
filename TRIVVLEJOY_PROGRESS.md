@@ -31,20 +31,20 @@ Roadmap stage 3 remains `NOT_STARTED`. `THEATRICAL_GATE_STATE.assetFoundationCom
 - Generated labeled local EEVEE stills (existing / proposed / diagnostic).
 - Added regression tests so the fingerprint, gate, and fail-closed theatrical bindings cannot silently flip.
 
-## Tests / validation
-
-Milestone 3 evidence at `2fdac1d` (unchanged ancestors):
+## Tests / validation (this theatrical-foundation run)
 
 | Gate | Result |
 | --- | --- |
-| `pnpm test` | PASS — **395 / 395** |
-| `pnpm test:blender` | PASS — **44 / 44** |
+| `pnpm test` | PASS — **403 / 403** (24 files; +8 foundation guards) |
+| `pnpm typecheck` | PASS |
+| `pnpm lint` | PASS — no ESLint warnings or errors |
+| `pnpm test:blender` | PASS — **49 / 49** (+5 proposed-shader guards) |
 | `pnpm test:color` | PASS — **19 / 19** |
+| `pnpm validate:steps1-8` | PASS — **17 passed, 0 failed, 1 skipped** |
 | `pnpm validate:steps1-8 -- --render` | PASS — **18 / 18** |
-| `pnpm gates:scene` | PASS — all 8 |
+| `pnpm gates:scene` | PASS — all 8 scene gates |
 | `pnpm gates:local` | PASS — 90/90 frames, all 16 visual checks |
-
-This branch’s new counts are recorded after the validation pass (see the review note).
+| approved fingerprint | PASS — `7876ac737de60257…` unchanged |
 
 ## Known failures / blocker
 
