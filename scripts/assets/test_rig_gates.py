@@ -694,6 +694,112 @@ class ShadowCasterTests(unittest.TestCase):
             self.assertLess(spread, 1e-6, f"{block.name} springs the collapsed part back into the caster")
 
 
+class DirectionConsumerTests(unittest.TestCase):
+    """Milestone 3 consumers are opt-in and must not change a shot without direction."""
+
+    def setUp(self) -> None:
+        fresh_scene()
+
+    def test_every_direction_consumer_noops_without_a_direction_block(self) -> None:
+        scene = bpy.context.scene
+        empty_roles: dict = {}
+        self.assertFalse(A.apply_direction_camera(scene, None)["applied"])
+        self.assertFalse(A.apply_direction_lighting(scene, None)["applied"])
+        self.assertFalse(A.apply_direction_acting(empty_roles, None, 1, 30, 30)["applied"])
+        self.assertFalse(A.apply_direction_emotion(empty_roles, None, 1, 30, 30)["applied"])
+        self.assertFalse(A.apply_direction_face(empty_roles, None, 30)["applied"])
+        self.assertFalse(A.apply_direction_vfx(empty_roles, None, 1, 30, 30)["applied"])
+
+    def test_direction_lighting_does_not_retune_key_fill_rim(self) -> None:
+        scene = bpy.context.scene
+        before = {name: dict(A.LIGHTING_STATES[name]["key"]) for name in A.LIGHTING_STATES}
+        A.apply_direction_lighting(
+            scene,
+            {
+                "lighting": {
+                    "recipe": "MEADOW_DAY_KEY",
+                    "exposure": 0,
+                    "viewTransform": "Khronos PBR Neutral",
+                    "look": "None",
+                    "practicals": [],
+                }
+            },
+        )
+        for name, key in before.items():
+            self.assertEqual(A.LIGHTING_STATES[name]["key"], key)
+
+    def test_direction_vfx_is_seeded_and_casts_no_shadow(self) -> None:
+        first = A.apply_direction_vfx(
+            {},
+            {
+                "vfx": [
+                    {
+                        "instanceId": "spark_a",
+                        "presetId": "vfx_magic_sparkles_v1",
+                        "seed": 42,
+                        "startMs": 0,
+                        "durationMs": 400,
+                        "intensity": 0.4,
+                        "particleCount": 8,
+                        "anchor": {"kind": "WORLD", "ref": "origin"},
+                        "boundsMeters": {"x": 0.4, "y": 0.4, "z": 0.4},
+                        "palette": ["#FFE9A8"],
+                        "layer": "AROUND_SUBJECT",
+                    }
+                ]
+            },
+            1,
+            30,
+            30,
+        )
+        names = [obj.name for obj in bpy.data.objects if obj.name.startswith(A.DDP_VFX_PREFIX)]
+        self.assertTrue(first["applied"])
+        self.assertGreater(len(names), 0)
+        for name in names:
+            obj = bpy.data.objects[name]
+            self.assertFalse(obj.visible_shadow)
+        # Same seed, same instance id: the consumer refuses to duplicate.
+        second = A.apply_direction_vfx(
+            {},
+            {
+                "vfx": [
+                    {
+                        "instanceId": "spark_a",
+                        "presetId": "vfx_magic_sparkles_v1",
+                        "seed": 42,
+                        "startMs": 0,
+                        "durationMs": 400,
+                        "intensity": 0.4,
+                        "particleCount": 8,
+                        "anchor": {"kind": "WORLD", "ref": "origin"},
+                        "boundsMeters": {"x": 0.4, "y": 0.4, "z": 0.4},
+                        "palette": ["#FFE9A8"],
+                        "layer": "AROUND_SUBJECT",
+                    }
+                ]
+            },
+            1,
+            30,
+            30,
+        )
+        self.assertEqual(len(second["instances"]), 0)
+
+    def test_facial_cues_drive_shape_keys_not_geometry(self) -> None:
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.3)
+        mesh = bpy.context.object
+        mesh.name = "Pip_Character"
+        mesh.shape_key_add(name="Basis", from_mix=False)
+        blink = mesh.shape_key_add(name="blink", from_mix=False)
+        blink.data[0].co.z += 0.01
+        applied = A.apply_facial_cues(
+            mesh,
+            [{"channel": "blink", "startMs": 0, "endMs": 120, "weight": 0.8, "source": "BLINK"}],
+            30,
+        )
+        self.assertEqual(applied, 1)
+        self.assertIsNotNone(mesh.data.shape_keys.animation_data)
+
+
 def main() -> int:
     loader = unittest.TestLoader()
     suite = unittest.TestSuite(
@@ -705,6 +811,7 @@ def main() -> int:
             HierarchyTests,
             ActionBindingTests,
             ShadowCasterTests,
+            DirectionConsumerTests,
         )
     )
     result = unittest.TextTestRunner(verbosity=2, stream=sys.stdout).run(suite)

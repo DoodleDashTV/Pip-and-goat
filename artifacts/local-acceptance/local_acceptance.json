@@ -105,7 +105,7 @@
       "p50Luma": 124.19,
       "p95Luma": 203.81,
       "p99Luma": 220.16,
-      "p999Luma": 237.74,
+      "p999Luma": 237.58,
       "contrast": 124.03,
       "tonalRange": 172.7,
       "clippedHighlightFraction": 0.0,
@@ -172,7 +172,7 @@
   "staticCameraMovingPixelFraction": {
     "1->30": 0.043202,
     "30->60": 0.045347,
-    "60->90": 0.050409
+    "60->90": 0.050417
   },
   "minStaticCameraMovingPixelFraction": 0.043202,
   "thresholds": {

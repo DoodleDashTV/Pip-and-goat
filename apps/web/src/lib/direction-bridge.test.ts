@@ -109,6 +109,10 @@ describe('shot_meta projection stays compatible with assemble_scene.py', () => {
       expect(direction.camera).toBeDefined();
       expect(direction.lighting).toBeDefined();
       expect(direction.vfx).toBeDefined();
+      expect(direction.acting).toBeDefined();
+      expect(direction.emotion).toBeDefined();
+      expect(direction.face).toBeDefined();
+      expect(direction.facial).toBeDefined();
       expect(direction.version).toBeTruthy();
     }
   });
@@ -123,7 +127,16 @@ describe('shot_meta projection stays compatible with assemble_scene.py', () => {
 
   it('reads the direction block only when present, so old callers are unaffected', () => {
     const source = readFileSync(path.join(repoRoot, 'scripts/blender/assemble_scene.py'), 'utf8');
-    expect(source).toContain('def apply_direction_camera');
+    for (const fn of [
+      'apply_direction_camera',
+      'apply_direction_acting',
+      'apply_direction_emotion',
+      'apply_direction_face',
+      'apply_direction_lighting',
+      'apply_direction_vfx',
+    ]) {
+      expect(source).toContain(`def ${fn}`);
+    }
     // The early return on a missing block is what makes this safe next to a closed
     // acceptance: no direction block, no behaviour change.
     expect(source).toMatch(/if not direction:\s*\n\s*return \{"applied": False/);

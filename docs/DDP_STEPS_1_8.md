@@ -203,7 +203,9 @@ it in `CHILD_SAFE_POLICY` so it needs explicit story approval.
 **A new overridable field.** Add to `OVERRIDE_BOUNDS` with its bounds. Anything not
 listed is not overridable, and `PROTECTED_OVERRIDE_PATHS` can never be.
 
-**A new Blender-side consumer.** Follow `apply_direction_camera()` in
+**A new Blender-side consumer.** Follow `apply_direction_camera()` and the
+Milestone 3 siblings (`apply_direction_acting`, `apply_direction_emotion`,
+`apply_direction_face`, `apply_direction_lighting`, `apply_direction_vfx`) in
 `assemble_scene.py`: read from the `direction` block, return immediately when it is
 absent. Additive and opt-in means a `shot_meta` without the block renders exactly as it
 did before. Note that any change under `scripts/blender/` or `workers/runpod-blender/src/`
@@ -316,10 +318,11 @@ writes to `production-library/`.
 
 ## 10. Known limitations
 
-- **Blender consumes the camera solve only.** Acting, facial and VFX plans are
-  projected into `shot_meta` and the manifest bags, but `assemble_scene.py` currently
-  reads only the camera block from `direction`. Wiring the remaining consumers is
-  follow-up work and will move the render-code fingerprint again.
+- **Blender now consumes the full direction block when present.** Milestone 3
+  wired opt-in acting, emotion, face, lighting and VFX consumers beside the
+  existing camera hook. A `shot_meta` without `direction` still takes the
+  pre-Milestone-3 path. Adding these hooks moves the render-code fingerprint
+  again; the published worker image is still not re-pinned.
 - **No Blender in this environment.** The optional draft render stage is untested here.
   Blender-dependent gates (`test:blender`, `gates:scene`, `qc:caster`) are unchanged and
   their prior committed results stand.

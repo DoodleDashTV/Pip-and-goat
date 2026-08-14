@@ -738,6 +738,547 @@ def apply_direction_camera(scene, direction: dict | None) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# Milestone 3 direction consumers.
+#
+# Same contract as apply_direction_camera: read only from shot_meta["direction"],
+# return immediately when that block is absent, and never touch the shadow-caster
+# path. A caller that emits no direction block therefore still renders exactly as
+# it did before these hooks existed. LIGHTING_STATES energies are not retuned
+# here; practicals are additive extras, and the approved view transform is only
+# re-asserted, never replaced.
+# ---------------------------------------------------------------------------
+
+DDP_DIRECTION_NLA = "DDP_Direction"
+DDP_PRACTICAL_PREFIX = "DDP_Practical_"
+DDP_VFX_PREFIX = "DDP_VFX_"
+#: Hard cap on instantiated VFX bodies. The planner's particle ceiling is a
+#: budget, not an instruction to spawn thousands of objects in EEVEE.
+DDP_VFX_INSTANCE_CAP = 24
+#: Maximum additive bone rotation (radians) a direction overlay may apply.
+#: Stays well inside the prototype lock's protected-feature deform ceiling.
+DDP_DIRECTION_MAX_BONE_RAD = 0.12
+
+
+def _direction_block(direction: dict | None) -> dict | None:
+    if not direction:
+        return None
+    return direction
+
+
+def _ms_to_frame(ms: float, fps: int, frame_start: int = 1) -> int:
+    return max(frame_start, int(round(float(ms) / 1000.0 * fps)) + (frame_start - 1))
+
+
+def _hex_rgb(value: str) -> tuple[float, float, float]:
+    raw = str(value or "").lstrip("#")
+    if len(raw) != 6:
+        return (1.0, 0.92, 0.7)
+    try:
+        return tuple(int(raw[i : i + 2], 16) / 255.0 for i in (0, 2, 4))
+    except ValueError:
+        return (1.0, 0.92, 0.7)
+
+
+def _find_pose_bone(arm, *names: str):
+    if arm is None or arm.type != "ARMATURE":
+        return None
+    bones = arm.pose.bones
+    wanted = {name.lower() for name in names}
+    for bone in bones:
+        if bone.name.lower() in wanted:
+            return bone
+    for bone in bones:
+        lowered = bone.name.lower()
+        if any(name in lowered for name in wanted):
+            return bone
+    return None
+
+
+def _character_mesh(objs: list):
+    mesh = next((o for o in objs if o.type == "MESH" and "Character" in o.name), None)
+    if mesh is None:
+        mesh = next((o for o in objs if o.type == "MESH"), None)
+    return mesh
+
+
+def _push_action_to_nla(arm, track_name: str) -> None:
+    """Park the active action on an NLA track so an overlay can layer on top."""
+    if arm is None or not arm.animation_data or not arm.animation_data.action:
+        return
+    ad = arm.animation_data
+    action = ad.action
+    track = ad.nla_tracks.new()
+    track.name = track_name
+    start = int(action.frame_range[0]) or 1
+    track.strips.new(action.name, start, action)
+    ad.action = None
+
+
+def _overlay_action(arm, role: str):
+    """Create (or reuse) the additive DDP_Direction action for this armature."""
+    import bpy
+
+    if arm is None:
+        return None
+    if not arm.animation_data:
+        arm.animation_data_create()
+    ad = arm.animation_data
+    if ad.action and not any(track.name == "DDP_BaseAction" for track in ad.nla_tracks):
+        _push_action_to_nla(arm, "DDP_BaseAction")
+    name = f"DDP_Direction_{role}"
+    action = bpy.data.actions.get(name) or bpy.data.actions.new(name=name)
+    ad.action = action
+    return action
+
+
+def _key_bone_euler(bone, frame: int, delta: tuple[float, float, float]) -> bool:
+    """Keyframe a small XYZ euler offset. Skips quaternion bones (fail-closed)."""
+    if bone is None:
+        return False
+    if bone.rotation_mode == "QUATERNION":
+        return False
+    clamped = tuple(
+        max(-DDP_DIRECTION_MAX_BONE_RAD, min(DDP_DIRECTION_MAX_BONE_RAD, float(v))) for v in delta
+    )
+    bone.rotation_mode = bone.rotation_mode or "XYZ"
+    bone.rotation_euler = clamped
+    bone.keyframe_insert(data_path="rotation_euler", frame=frame)
+    return True
+
+
+def apply_facial_cues(mesh_obj, cues: list, fps: int) -> int:
+    """Drive shape keys from direction facial cues. Never edits mesh geometry.
+
+    Prefers the planner's `channel` name (the rig profile's real key) and falls
+    back to the viseme alias table so lip-sync and expression share one path.
+    The shadow-caster proxy is a separate object and is not reachable from here.
+    """
+    if not mesh_obj or not getattr(mesh_obj.data, "shape_keys", None) or not cues:
+        return 0
+    keys = mesh_obj.data.shape_keys.key_blocks
+    applied = 0
+    for cue in cues:
+        channel = str(cue.get("channel") or "")
+        vis = str(cue.get("viseme") or cue.get("code") or "")
+        candidates = [channel] if channel else []
+        if vis:
+            candidates.append(vis if vis.startswith("viseme_") else f"viseme_{vis}")
+        key_name = next((name for name in candidates if name and name in keys), None)
+        if key_name is None:
+            continue
+        start_ms = int(cue.get("startMs") or cue.get("start_ms") or 0)
+        end_ms = int(cue.get("endMs") or cue.get("end_ms") or start_ms + 80)
+        weight = max(0.0, min(1.0, float(cue.get("weight") or 1.0)))
+        f0 = max(1, int(round(start_ms / 1000 * fps)))
+        f1 = max(f0 + 1, int(round(end_ms / 1000 * fps)))
+        kb = keys[key_name]
+        kb.value = 0.0
+        kb.keyframe_insert(data_path="value", frame=max(1, f0 - 1))
+        kb.value = weight
+        kb.keyframe_insert(data_path="value", frame=f0)
+        kb.value = weight
+        kb.keyframe_insert(data_path="value", frame=f1)
+        kb.value = 0.0
+        kb.keyframe_insert(data_path="value", frame=f1 + 1)
+        applied += 1
+    return applied
+
+
+def apply_direction_acting(imported_by_role: dict, direction: dict | None, start_frame: int, end_frame: int, fps: int) -> dict:
+    """Apply pose-to-pose timing, eye/head lead and weight shift when planned.
+
+    Opt-in. Uses only bones the approved rig already has. Does not invent
+    actions, does not edit production-library, and does not touch the caster.
+    """
+    if not direction:
+        return {"applied": False, "reason": "no direction block"}
+    acting = direction.get("acting") or {}
+    if not acting:
+        return {"applied": False, "reason": "direction block carries no acting plan"}
+
+    roles = {}
+    for role, plan in acting.items():
+        objs = imported_by_role.get(role) or []
+        arm = find_armature(objs)
+        if arm is None:
+            roles[role] = {"applied": False, "reason": "no armature"}
+            continue
+        _overlay_action(arm, role)
+        keyed = []
+        keys = list(plan.get("keys") or [])
+        head = _find_pose_bone(arm, "head")
+        eye_lead = int(plan.get("eyeLeadFrames") or 0)
+        head_lead = int(plan.get("headLeadFrames") or 0)
+        # Prototype rigs have no independent eye bones (independentEyeAim=false).
+        # Eye lead is expressed as the head arriving `headLeadFrames` after the
+        # look intent, which is the honest mapping for these assets.
+        if head is not None and keys:
+            look = next((k for k in keys if "LOOK" in str(k.get("pose") or "").upper()), keys[0])
+            look_frame = int(look.get("frame") or start_frame)
+            arrive = min(end_frame, look_frame + max(0, head_lead))
+            if _key_bone_euler(head, max(start_frame, look_frame - max(1, eye_lead)), (0.0, 0.0, 0.0)):
+                keyed.append("head-rest")
+            if _key_bone_euler(head, arrive, (0.06, 0.0, 0.04)):
+                keyed.append("head-lead")
+            _key_bone_euler(head, end_frame, (0.0, 0.0, 0.0))
+        root = _find_pose_bone(arm, "root", "pelvis")
+        shift = float(plan.get("weightShift") or 0.0)
+        if root is not None and abs(shift) > 1e-4:
+            mid = (start_frame + end_frame) // 2
+            root.location = (0.0, 0.0, 0.0)
+            root.keyframe_insert(data_path="location", frame=start_frame)
+            # Fraction of stance width, in metres. Prototype stride is ~0.2-0.3 m.
+            root.location = (max(-0.04, min(0.04, shift * 0.03)), 0.0, 0.0)
+            root.keyframe_insert(data_path="location", frame=mid)
+            root.location = (0.0, 0.0, 0.0)
+            root.keyframe_insert(data_path="location", frame=end_frame)
+            keyed.append("weight-shift")
+        for part in plan.get("overlap") or []:
+            bone = _find_pose_bone(arm, str(part.get("part") or ""), str(part.get("part") or "").replace("_", ""))
+            if bone is None:
+                continue
+            lag = int(part.get("lagFrames") or 2)
+            decay = float(part.get("decay") or 0.5)
+            peak = start_frame + max(1, lag)
+            if _key_bone_euler(bone, start_frame, (0.0, 0.0, 0.0)) and _key_bone_euler(
+                bone, min(end_frame, peak), (0.04 * decay, 0.0, 0.03 * decay)
+            ):
+                keyed.append(f"overlap:{bone.name}")
+            _key_bone_euler(bone, end_frame, (0.0, 0.0, 0.0))
+        roles[role] = {
+            "applied": bool(keyed),
+            "baseAction": plan.get("baseAction"),
+            "gesture": plan.get("gesture"),
+            "eyeLeadFrames": eye_lead,
+            "headLeadFrames": head_lead,
+            "keyed": keyed,
+            "independentEyeAim": False,
+        }
+    return {"applied": any(entry.get("applied") for entry in roles.values()), "roles": roles}
+
+
+def apply_direction_emotion(imported_by_role: dict, direction: dict | None, start_frame: int, end_frame: int, fps: int) -> dict:
+    """Apply beat-level body posture from the emotion plan. Opt-in, bounded."""
+    if not direction:
+        return {"applied": False, "reason": "no direction block"}
+    emotion = direction.get("emotion") or {}
+    if not emotion:
+        return {"applied": False, "reason": "direction block carries no emotion plan"}
+
+    roles = {}
+    for role, plan in emotion.items():
+        objs = imported_by_role.get(role) or []
+        arm = find_armature(objs)
+        if arm is None:
+            roles[role] = {"applied": False, "reason": "no armature"}
+            continue
+        _overlay_action(arm, role)
+        effects = (plan.get("effects") or {}).get("body") or {}
+        posture = float(effects.get("posture") or 0.0)
+        energy = float(effects.get("energy") or 0.0)
+        fidget = float(effects.get("fidget") or 0.0)
+        spine = _find_pose_bone(arm, "spine", "chest")
+        keyed = []
+        transition = max(1, int(round(float(plan.get("transitionInSeconds") or 0.2) * fps)))
+        settle = max(1, int(round(float(plan.get("settleSeconds") or 0.2) * fps)))
+        peak = min(end_frame - settle, start_frame + transition)
+        if spine is not None:
+            pitch = max(-DDP_DIRECTION_MAX_BONE_RAD, min(DDP_DIRECTION_MAX_BONE_RAD, posture * 0.1))
+            if _key_bone_euler(spine, start_frame, (0.0, 0.0, 0.0)) and _key_bone_euler(spine, peak, (pitch, 0.0, 0.0)):
+                keyed.append("spine-posture")
+            _key_bone_euler(spine, end_frame, (0.0, 0.0, 0.0))
+        secondary = _find_pose_bone(arm, "comb", "tail", "ear_L", "backpack")
+        if secondary is not None and fidget > 0:
+            mid = (start_frame + end_frame) // 2
+            amp = max(-DDP_DIRECTION_MAX_BONE_RAD, min(DDP_DIRECTION_MAX_BONE_RAD, fidget * 0.08 * (0.5 + energy)))
+            if _key_bone_euler(secondary, start_frame, (0.0, 0.0, 0.0)) and _key_bone_euler(secondary, mid, (0.0, 0.0, amp)):
+                keyed.append(f"fidget:{secondary.name}")
+            _key_bone_euler(secondary, end_frame, (0.0, 0.0, 0.0))
+        roles[role] = {
+            "applied": bool(keyed),
+            "primary": plan.get("primary"),
+            "intensity": plan.get("intensity"),
+            "keyed": keyed,
+        }
+    return {"applied": any(entry.get("applied") for entry in roles.values()), "roles": roles}
+
+
+def apply_direction_face(imported_by_role: dict, direction: dict | None, fps: int) -> dict:
+    """Apply non-viseme facial cues, blinks and rest recovery. Shape keys only."""
+    if not direction:
+        return {"applied": False, "reason": "no direction block"}
+    face = direction.get("face") or {}
+    facial = direction.get("facial") or {}
+    if not face and not facial:
+        return {"applied": False, "reason": "direction block carries no face plan"}
+
+    roles = {}
+    role_names = sorted(set(list(face.keys()) + list(facial.keys())))
+    for role in role_names:
+        objs = imported_by_role.get(role) or []
+        mesh = _character_mesh(objs)
+        plan = face.get(role) or {}
+        cues = list(plan.get("cues") or facial.get(role) or [])
+        for blink in plan.get("blinks") or []:
+            at = int(blink.get("atMs") or 0)
+            dur = int(blink.get("durationMs") or 120)
+            cues.append({"channel": "blink", "startMs": at, "endMs": at + dur, "weight": 1.0, "source": "BLINK"})
+        rest = plan.get("restRecovery")
+        if rest:
+            cues.append(
+                {
+                    "channel": rest.get("channel") or "viseme_REST",
+                    "startMs": int(rest.get("atMs") or 0),
+                    "endMs": int(rest.get("atMs") or 0) + 80,
+                    "weight": float(rest.get("weight") or 1.0),
+                    "source": "REST",
+                }
+            )
+        applied = apply_facial_cues(mesh, cues, fps)
+        gaze_applied = 0
+        arm = find_armature(objs)
+        if arm is not None and plan.get("gaze"):
+            _overlay_action(arm, role)
+            head = _find_pose_bone(arm, "head")
+            for gaze in plan.get("gaze") or []:
+                start = _ms_to_frame(gaze.get("startMs") or 0, fps)
+                end = _ms_to_frame(gaze.get("endMs") or 0, fps)
+                follow = float(gaze.get("headFollow") or 0.4)
+                lead = int(round(int(gaze.get("eyeLeadMs") or 0) / 1000 * fps))
+                yaw = max(-DDP_DIRECTION_MAX_BONE_RAD, min(DDP_DIRECTION_MAX_BONE_RAD, 0.08 * follow))
+                if _key_bone_euler(head, max(1, start - max(0, lead)), (0.0, 0.0, 0.0)) and _key_bone_euler(
+                    head, start, (0.02 * follow, 0.0, yaw)
+                ):
+                    gaze_applied += 1
+                _key_bone_euler(head, end, (0.0, 0.0, 0.0))
+        roles[role] = {
+            "applied": applied > 0 or gaze_applied > 0,
+            "cuesApplied": applied,
+            "gazeApplied": gaze_applied,
+            "expression": plan.get("expression"),
+            "mesh": mesh.name if mesh else None,
+        }
+    return {"applied": any(entry.get("applied") for entry in roles.values()), "roles": roles}
+
+
+def apply_direction_lighting(scene, direction: dict | None) -> dict:
+    """Re-assert approved colour management and add motivated practicals.
+
+    Does not retune key/fill/rim energies. Those live in LIGHTING_STATES and are
+    the measured DAY_KEY / DAY_SOFT / GOLDEN_HOUR / OVERCAST rigs. A missing
+    direction block is a no-op, so the accepted shot is unchanged.
+    """
+    import bpy
+
+    if not direction:
+        return {"applied": False, "reason": "no direction block"}
+    lighting = direction.get("lighting") or {}
+    if not lighting:
+        return {"applied": False, "reason": "direction block carries no lighting plan"}
+
+    view_transform = lighting.get("viewTransform") or "Khronos PBR Neutral"
+    look = lighting.get("look") or "None"
+    try:
+        scene.view_settings.view_transform = view_transform
+    except (TypeError, ValueError):
+        pass
+    try:
+        scene.view_settings.look = look
+    except (TypeError, ValueError):
+        pass
+    # Planner exposure is a relative stop offset around the measured state.
+    # Only apply a non-zero offset so DAY_KEY (exposure 0) stays exactly the
+    # measured rig the acceptance was graded on.
+    exposure_offset = float(lighting.get("exposure") or 0.0)
+    if abs(exposure_offset) > 1e-6:
+        scene.view_settings.exposure = float(scene.view_settings.exposure) + max(-0.35, min(0.35, exposure_offset))
+
+    created = []
+    for practical in lighting.get("practicals") or []:
+        source = str(practical.get("source") or "practical").replace(" ", "_")[:40]
+        name = f"{DDP_PRACTICAL_PREFIX}{source}"
+        if name in bpy.data.objects:
+            continue
+        energy = max(0.0, min(80.0, float(practical.get("relativeEnergy") or 0.2) * 40.0))
+        light_data = bpy.data.lights.new(name=name, type="AREA")
+        light_data.energy = energy
+        light_data.size = 0.35
+        if hasattr(light_data, "use_shadow"):
+            light_data.use_shadow = False
+        light_obj = bpy.data.objects.new(name, light_data)
+        light_obj.location = (0.0, -2.1, 0.55)
+        bpy.context.collection.objects.link(light_obj)
+        created.append(name)
+
+    return {
+        "applied": True,
+        "recipe": lighting.get("recipe"),
+        "viewTransform": scene.view_settings.view_transform,
+        "look": scene.view_settings.look,
+        "exposure": scene.view_settings.exposure,
+        "practicals": created,
+    }
+
+
+def _vfx_anchor_location(imported_by_role: dict, anchor: dict, layer: str) -> tuple[float, float, float]:
+    kind = (anchor or {}).get("kind")
+    ref = str((anchor or {}).get("ref") or "")
+    loc = (0.0, -1.6, 0.6)
+    if kind == "CHARACTER":
+        role = "pip" if "PIP" in ref.upper() else "goat" if "GOAT" in ref.upper() else ref.lower()
+        objs = imported_by_role.get(role) or []
+        target = next((o for o in objs if o.type == "ARMATURE"), objs[0] if objs else None)
+        if target is not None:
+            loc = tuple(target.location)
+            loc = (loc[0], loc[1], loc[2] + 0.55)
+    elif kind == "PROP":
+        objs = imported_by_role.get("map") or imported_by_role.get(ref.lower()) or []
+        target = objs[0] if objs else None
+        if target is not None:
+            loc = tuple(target.location)
+            loc = (loc[0], loc[1], loc[2] + 0.15)
+    if layer == "BEHIND_SUBJECT":
+        loc = (loc[0], loc[1] + 0.35, loc[2])
+    elif layer == "FRONT_OF_SUBJECT":
+        loc = (loc[0], loc[1] - 0.2, max(0.15, loc[2] * 0.5))
+    return loc
+
+
+def _seeded_unit(seed: int, index: int) -> float:
+    """Deterministic 0..1 value. Same seed+index always yields the same float."""
+    x = (int(seed) + index * 0x9E3779B9) & 0xFFFFFFFF
+    x ^= (x << 13) & 0xFFFFFFFF
+    x ^= x >> 17
+    x ^= (x << 5) & 0xFFFFFFFF
+    return (x & 0xFFFFFFFF) / 0xFFFFFFFF
+
+
+def _new_emissive_ico(name: str, radius: float, location: tuple[float, float, float], mat):
+    """Create an icosphere without bpy.ops so headless assembly stays context-safe."""
+    import bmesh
+    import bpy
+
+    mesh = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    bmesh.ops.create_icosphere(bm, subdivisions=1, radius=radius)
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = bpy.data.objects.new(name, mesh)
+    obj.location = location
+    bpy.context.collection.objects.link(obj)
+    if mat is not None:
+        obj.data.materials.append(mat)
+    if hasattr(obj, "visible_shadow"):
+        obj.visible_shadow = False
+    return obj
+
+
+def _key_hide_render(obj, start_frame: int, visible_from: int, visible_until: int) -> None:
+    obj.hide_render = True
+    obj.keyframe_insert(data_path="hide_render", frame=max(start_frame, visible_from - 1))
+    obj.hide_render = False
+    obj.keyframe_insert(data_path="hide_render", frame=visible_from)
+    obj.hide_render = True
+    obj.keyframe_insert(data_path="hide_render", frame=visible_until)
+
+
+def apply_direction_vfx(imported_by_role: dict, direction: dict | None, start_frame: int, end_frame: int, fps: int) -> dict:
+    """Instantiate planned EEVEE VFX. Opt-in, bounded, no shadows, seeded."""
+    import bpy
+
+    if not direction:
+        return {"applied": False, "reason": "no direction block"}
+    instances = direction.get("vfx") or []
+    if not instances:
+        return {"applied": False, "reason": "direction block carries no vfx instances"}
+
+    created = []
+    for instance in instances:
+        preset = str(instance.get("presetId") or "vfx")
+        instance_id = str(instance.get("instanceId") or preset)
+        seed = int(instance.get("seed") or 0)
+        intensity = max(0.0, min(0.85, float(instance.get("intensity") or 0.4)))
+        count = max(1, min(DDP_VFX_INSTANCE_CAP, int(instance.get("particleCount") or 8)))
+        bounds = instance.get("boundsMeters") or {"x": 0.4, "y": 0.4, "z": 0.4}
+        palette = list(instance.get("palette") or ["#FFE9A8"])
+        layer = str(instance.get("layer") or "AROUND_SUBJECT")
+        loc = _vfx_anchor_location(imported_by_role, instance.get("anchor") or {}, layer)
+        f0 = _ms_to_frame(instance.get("startMs") or 0, fps, start_frame)
+        f1 = min(
+            end_frame,
+            _ms_to_frame((instance.get("startMs") or 0) + (instance.get("durationMs") or 400), fps, start_frame),
+        )
+        color = _hex_rgb(palette[0])
+        root_name = f"{DDP_VFX_PREFIX}{instance_id}"[:60]
+        if root_name in bpy.data.objects:
+            continue
+        mat = bpy.data.materials.new(name=f"{root_name}_mat")
+        mat.use_nodes = True
+        nodes = mat.node_tree.nodes
+        links = mat.node_tree.links
+        nodes.clear()
+        emission = nodes.new("ShaderNodeEmission")
+        emission.inputs[0].default_value = (*color, 1.0)
+        emission.inputs[1].default_value = 1.2 + intensity * 2.0
+        out = nodes.new("ShaderNodeOutputMaterial")
+        links.new(emission.outputs[0], out.inputs[0])
+        if hasattr(mat, "blend_method"):
+            mat.blend_method = "BLEND"
+        root = _new_emissive_ico(root_name, 0.04, loc, mat)
+        _key_hide_render(root, start_frame, f0, f1)
+        spawned = [root.name]
+        particle_like = any(token in preset for token in ("sparkle", "dust", "burst", "particle", "splash"))
+        extra = count - 1 if particle_like else min(4, max(0, count - 1))
+        for i in range(extra):
+            ox = (_seeded_unit(seed, i * 3) - 0.5) * float(bounds.get("x") or 0.4)
+            oy = (_seeded_unit(seed, i * 3 + 1) - 0.5) * float(bounds.get("y") or 0.4)
+            oz = _seeded_unit(seed, i * 3 + 2) * float(bounds.get("z") or 0.4)
+            mote = _new_emissive_ico(
+                f"{root_name}_{i}",
+                0.02 + 0.02 * _seeded_unit(seed, i + 99),
+                (loc[0] + ox, loc[1] + oy, loc[2] + oz),
+                mat,
+            )
+            _key_hide_render(mote, start_frame, f0, min(end_frame, f1 + i))
+            spawned.append(mote.name)
+        created.append(
+            {
+                "instanceId": instance_id,
+                "presetId": preset,
+                "objects": spawned,
+                "seed": seed,
+                "layer": layer,
+            }
+        )
+    return {"applied": len(created) > 0, "instances": created}
+
+
+def commit_direction_overlays(imported_by_role: dict) -> dict:
+    """Park direction overlay actions on additive NLA tracks.
+
+    Leaving a sparse overlay as the active action would REPLACE the authored
+    performance (the motionless-goat failure mode). The overlay must ADD.
+    """
+    committed = []
+    for role, objs in imported_by_role.items():
+        arm = find_armature(objs)
+        if arm is None or not arm.animation_data or not arm.animation_data.action:
+            continue
+        ad = arm.animation_data
+        action = ad.action
+        if not action.name.startswith("DDP_Direction_"):
+            continue
+        track = ad.nla_tracks.new()
+        track.name = DDP_DIRECTION_NLA
+        start = int(action.frame_range[0]) or 1
+        strip = track.strips.new(action.name, start, action)
+        strip.blend_type = "ADD"
+        ad.action = None
+        committed.append(role)
+    return {"committed": committed}
+
+
 # The authoritative lighting layer. One named key/fill/rim rig per state, with an
 # explicit world strength, so exposure is deterministic and never accumulates.
 #
@@ -1252,9 +1793,22 @@ def main() -> None:
     parser.add_argument("--samples", type=int, default=24)
     parser.add_argument("--camera-preset", default="WIDE")
     parser.add_argument("--shot-meta-json", default="{}")
+    parser.add_argument(
+        "--shot-meta",
+        default="",
+        help="Optional path to a shot_meta JSON file. Preferred over --shot-meta-json when set.",
+    )
+    parser.add_argument(
+        "--assets-json-file",
+        default="",
+        help="Optional path to an assets JSON list. Preferred over --assets-json when set.",
+    )
     args = parse_blender_args(parser)
 
-    assets = json.loads(args.assets_json)
+    if args.assets_json_file:
+        assets = json.loads(Path(args.assets_json_file).read_text())
+    else:
+        assets = json.loads(args.assets_json)
     if not isinstance(assets, list):
         emit("INVALID_ARGUMENT", "assets-json must decode to a list.")
         raise SystemExit(2)
@@ -1271,7 +1825,10 @@ def main() -> None:
         emit("MISSING_ASSET", "One or more scene assets are missing.", missing=missing)
         raise SystemExit(2)
 
-    shot_meta = json.loads(args.shot_meta_json) if args.shot_meta_json else {}
+    if args.shot_meta:
+        shot_meta = json.loads(Path(args.shot_meta).read_text())
+    else:
+        shot_meta = json.loads(args.shot_meta_json) if args.shot_meta_json else {}
     width, height = parse_resolution(args.resolution)
     fps = args.fps
     end_frame = args.end_frame if args.end_frame > 0 else int(shot_meta.get("endFrame") or 45)
@@ -1422,8 +1979,16 @@ def build_scene(
     lighting = apply_lighting_state(scene, shot_meta.get("lightingState"))
     materials = apply_material_polish()
     configure_camera(scene, camera_preset, width, height)
-    # Opt-in override, after the preset so it refines rather than competes with it.
-    direction_camera = apply_direction_camera(scene, shot_meta.get("direction"))
+    # Opt-in overrides, after the presets so they refine rather than compete.
+    # Each consumer no-ops when shot_meta has no direction block.
+    direction = shot_meta.get("direction")
+    direction_lighting = apply_direction_lighting(scene, direction)
+    direction_camera = apply_direction_camera(scene, direction)
+    direction_acting = apply_direction_acting(imported_by_role, direction, start_frame, end_frame, fps)
+    direction_emotion = apply_direction_emotion(imported_by_role, direction, start_frame, end_frame, fps)
+    direction_face = apply_direction_face(imported_by_role, direction, fps)
+    direction_vfx = apply_direction_vfx(imported_by_role, direction, start_frame, end_frame, fps)
+    direction_overlays = commit_direction_overlays(imported_by_role)
     if str(engine).upper() == "EEVEE":
         set_eevee(scene, samples)
     else:
@@ -1438,6 +2003,12 @@ def build_scene(
         "placementRoots": roots,
         "appliedActions": applied_actions,
         "directionCamera": direction_camera,
+        "directionLighting": direction_lighting,
+        "directionActing": direction_acting,
+        "directionEmotion": direction_emotion,
+        "directionFace": direction_face,
+        "directionVfx": direction_vfx,
+        "directionOverlays": direction_overlays,
     }
 
 

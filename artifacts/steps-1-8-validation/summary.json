@@ -11,8 +11,8 @@
     "resolution": "360x640",
     "fps": 30
   },
-  "contentHash": "20c1d5fe83414a25a1e235401ceedb18b586688397165d75acfa72474300c192",
-  "cacheKey": "9f3370fbbff766c69b92f2b9c9b6a4a4ebf7c35a1098b3ccbcff618f851e0be2",
+  "contentHash": "66cb90ca34d486d6ce614dd78e35040e5b36c83c069f75e2c24eadaf51816157",
+  "cacheKey": "f3e362016b8f78c315cf9f1c647ad6b0d2aeb49e7011424727bce42dc0518b60",
   "subsystemVersions": {
     "director": "1.1.0",
     "acting": "1.0.0",
@@ -71,7 +71,7 @@
     {
       "name": "deterministic output for identical input",
       "status": "PASS",
-      "detail": "blueprint and projection hashes identical across two runs (24aa3dbf392b4f73…)"
+      "detail": "blueprint and projection hashes identical across two runs (64ca041c75636791…)"
     },
     {
       "name": "seed actually drives the plan",
