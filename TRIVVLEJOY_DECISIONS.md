@@ -29,3 +29,9 @@ Port PR #11's `@doodle-dash/direction` package as a deterministic planning libra
 
 ## D-010 — Render-code changes are delayed until consumer milestone
 Do not port PR #11's Blender hook as part of M2. Software planning stabilizes first; M3 will intentionally connect consumers and account for the render fingerprint once behavior changes.
+
+## D-011 — Do not stack render changes on unexecuted integration code
+The current connector environment can inspect and checkpoint GitHub source but has no mounted repository runtime for pnpm/Prisma/Blender execution. M1/M2 source may be preserved as checkpoints, but they are not declared validated until this branch's tests execute. M3 render-changing implementation is therefore held until executable validation is available. This is safer than using PR #11's historical test result as a substitute for testing the selectively integrated branch.
+
+## D-012 — PR #11 camera hook is evidence, not M3 completion
+Inspection confirms PR #11 adds only an opt-in explicit camera consumer to Blender. The PR itself documents acting, facial and VFX consumers as follow-up. M3 must implement those real consumers deliberately; copying the camera hook alone cannot satisfy genuine professional character-motion integration.
