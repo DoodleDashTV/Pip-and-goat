@@ -1,17 +1,29 @@
 /**
- * GPU / Blender health for Runpod worker (Phase 10).
- * Fails closed if EEVEE cannot render with hardware acceleration.
+ * GPU / Blender health for the Runpod worker.
+ *
+ * Fails closed if EEVEE cannot render with hardware acceleration, BUT the health
+ * benchmark itself must be renderable: the previous benchmark scene contained a
+ * cube and NO CAMERA, so `bpy.ops.render.render()` ALWAYS threw
+ * "Cannot render, no camera" — making benchmarkOk permanently false and
+ * crash-looping every paid pod. The benchmark now builds a complete minimal
+ * scene (camera + sun + mesh) via the shared Blender preflight and applies the
+ * supported headless GL/EGL configuration.
+ *
+ * A GL/EGL/context failure is classified explicitly as EEVEE_CONTEXT_FAILED and
+ * never silently masked. A diagnostic-only CPU fallback is available (records
+ * hardwareAcceleration:false, never fakes GPU acceleration).
  */
 const { spawnSync } = require('node:child_process');
-const { writeFileSync, mkdirSync, rmSync } = require('node:fs');
-const path = require('node:path');
 const os = require('node:os');
+
+const { runBlenderPreflight } = require('./blender-preflight');
+const { resolveHeadlessGlConfig } = require('./headless-gl');
 
 function parseNvidiaSmi() {
   const res = spawnSync(
     'nvidia-smi',
     ['--query-gpu=name,memory.total', '--format=csv,noheader,nounits'],
-    { encoding: 'utf8' },
+    { encoding: 'utf8', timeout: 15_000 },
   );
   if (res.status !== 0) {
     return { gpuModel: null, vramGb: null, error: res.stderr || 'nvidia-smi failed' };
@@ -26,86 +38,104 @@ function parseNvidiaSmi() {
 }
 
 function blenderVersion() {
-  const res = spawnSync('blender', ['--version'], { encoding: 'utf8' });
+  const res = spawnSync('blender', ['--version'], { encoding: 'utf8', timeout: 15_000 });
   const out = `${res.stdout || ''}\n${res.stderr || ''}`;
   const m = out.match(/Blender\s+([0-9.]+)/i);
   return m ? m[1] : null;
 }
 
-function runTinyEeveeBenchmark() {
-  const dir = path.join(os.tmpdir(), `ddp-gpu-bench-${Date.now()}`);
-  mkdirSync(dir, { recursive: true });
-  const script = path.join(dir, 'bench.py');
-  const out = path.join(dir, 'frame.png');
-  writeFileSync(
-    script,
-    `
-import bpy, sys
-bpy.ops.wm.read_factory_settings(use_empty=True)
-scene = bpy.context.scene
-scene.render.engine = 'BLENDER_EEVEE_NEXT' if hasattr(bpy.types, 'Scene') else 'BLENDER_EEVEE'
-try:
-    scene.render.engine = 'BLENDER_EEVEE_NEXT'
-except Exception:
-    scene.render.engine = 'BLENDER_EEVEE'
-scene.render.resolution_x = 64
-scene.render.resolution_y = 64
-scene.render.filepath = r'''${out.replace(/\\/g, '/')}'''
-bpy.ops.mesh.primitive_cube_add()
-bpy.ops.render.render(write_still=True)
-print('DDP_BENCH_OK')
-`,
-  );
+/**
+ * Tiny EEVEE benchmark — renders a COMPLETE minimal scene (camera + light + mesh)
+ * headlessly. Returns { ok, ms, glMode, engineUsed, code, output }.
+ */
+function runTinyEeveeBenchmark(opts = {}) {
   const started = Date.now();
-  const res = spawnSync('blender', ['--background', '--factory-startup', '--python', script], {
-    encoding: 'utf8',
-    timeout: 120_000,
+  const preflightFn = opts.preflight || runBlenderPreflight;
+  const pre = preflightFn({
+    env: opts.env || process.env,
+    forceSoftware: opts.forceSoftware,
+    timeoutMs: opts.timeoutMs ?? 120_000,
+    runCommand: opts.runCommand,
   });
-  const ms = Date.now() - started;
-  const combined = `${res.stdout || ''}\n${res.stderr || ''}`;
-  const ok = combined.includes('DDP_BENCH_OK') && res.status === 0;
-  try {
-    rmSync(dir, { recursive: true, force: true });
-  } catch {
-    /* ignore */
-  }
-  return { ok, ms, output: combined.slice(0, 500) };
+  return {
+    ok: pre.ok,
+    ms: Date.now() - started,
+    glMode: pre.glMode,
+    engineUsed: pre.engineUsed,
+    code: pre.code,
+    output: (pre.reason || '') + (pre.diagnostic && pre.diagnostic.render ? ` [${pre.diagnostic.render.stderrTail || ''}]`.slice(0, 500) : ''),
+  };
 }
 
-function evaluateHealth() {
-  const smi = parseNvidiaSmi();
-  const version = blenderVersion();
-  const bench = runTinyEeveeBenchmark();
+/**
+ * Evaluate worker health.
+ *
+ * @param {object} [opts]
+ * @param {boolean} [opts.allowCpuFallback] diagnostic-only: pass health without a
+ *        GPU as long as Blender + EEVEE init and the benchmark renders. Never
+ *        reports hardware acceleration when there is none.
+ * @param {Record<string,string|undefined>} [opts.env]
+ */
+function evaluateHealth(opts = {}) {
+  const env = opts.env || process.env;
+  const allowCpuFallback =
+    opts.allowCpuFallback ?? String(env.ALLOW_CPU_DIAGNOSTIC_FALLBACK || 'false').toLowerCase() === 'true';
+  const smi = opts.parseNvidiaSmi ? opts.parseNvidiaSmi() : parseNvidiaSmi();
+  const version = opts.blenderVersion ? opts.blenderVersion() : blenderVersion();
+  resolveHeadlessGlConfig({ env, forceSoftware: allowCpuFallback && !smi.gpuModel });
+  const bench = runTinyEeveeBenchmark({
+    env,
+    forceSoftware: allowCpuFallback && !smi.gpuModel,
+    preflight: opts.preflight,
+    runCommand: opts.runCommand,
+  });
   const hardwareAcceleration = Boolean(smi.gpuModel);
+
   const report = {
     gpuModel: smi.gpuModel || 'UNKNOWN',
     vramGb: smi.vramGb,
     blenderVersion: version,
-    eeveeVersion: 'EEVEE',
+    eeveeVersion: bench.engineUsed || 'EEVEE',
     os: `${os.type()} ${os.release()}`,
     renderBackend: hardwareAcceleration ? 'CUDA_OR_OPTIX' : 'CPU',
     hardwareAcceleration,
+    glMode: bench.glMode,
     benchmarkOk: bench.ok,
     benchmarkMs: bench.ms,
+    benchmarkCode: bench.code || null,
+    allowCpuFallback,
   };
-  const ok = Boolean(bench.ok && hardwareAcceleration && version);
-  return {
-    ok,
-    report,
-    reason: ok
-      ? 'GPU worker healthy'
-      : !hardwareAcceleration
-        ? 'No GPU / hardware acceleration — refusing paid broken worker'
-        : !bench.ok
-          ? 'Blender EEVEE benchmark failed'
-          : 'Blender version undetected',
-  };
+
+  // Explicit EEVEE/GL context failure classification (never masked).
+  const eeveeContextFailed = bench.code === 'EEVEE_CONTEXT_FAILED';
+
+  const ok = allowCpuFallback
+    ? Boolean(bench.ok && version)
+    : Boolean(bench.ok && hardwareAcceleration && version);
+
+  let reason;
+  if (ok) {
+    reason = allowCpuFallback && !hardwareAcceleration
+      ? 'Diagnostic CPU fallback healthy (NO hardware acceleration — not for production billing)'
+      : 'GPU worker healthy';
+  } else if (eeveeContextFailed) {
+    reason = 'EEVEE GL/EGL context failed — headless render context unavailable';
+  } else if (!bench.ok) {
+    reason = `Blender EEVEE benchmark failed (${bench.code || 'unknown'})`;
+  } else if (!hardwareAcceleration) {
+    reason = 'No GPU / hardware acceleration — refusing paid broken worker';
+  } else {
+    reason = 'Blender version undetected';
+  }
+
+  return { ok, report, reason, eeveeContextFailed, code: eeveeContextFailed ? 'EEVEE_CONTEXT_FAILED' : bench.code || null };
 }
 
 module.exports = { parseNvidiaSmi, blenderVersion, runTinyEeveeBenchmark, evaluateHealth };
 
 if (require.main === module) {
-  const result = evaluateHealth();
+  const allowCpuFallback = process.argv.includes('--allow-cpu-fallback');
+  const result = evaluateHealth({ allowCpuFallback });
   console.log(JSON.stringify(result));
   process.exit(result.ok ? 0 : 1);
 }

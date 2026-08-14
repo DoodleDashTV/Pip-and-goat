@@ -1,0 +1,26 @@
+LAUNCH_START_UTC=2026-08-13T00:01:08Z
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-13T00:01:09.341Z","event":"config","jobId":"accept1080-2026-08-13T00-00-09-884Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.74,"workerImage":"ghcr.io/<org>/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27","hardCapUsd":0.25}
+{"ts":"2026-08-13T00:01:09.572Z","event":"creating_pod","podName":"ddp-accept1080-1786579269572","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":40,"volumeInGb":0}
+{"ts":"2026-08-13T00:01:10.197Z","event":"pod_created","podId":"8l0zvhp9p44lu0","at":"2026-08-13T00:01:10.197Z"}
+AUTHORIZATION CONSUMED: pod 8l0zvhp9p44lu0 created. Watchdog + HARD_KILL active.
+{"ts":"2026-08-13T00:01:11.018Z","event":"stage","elapsedSec":0,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":null,"renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T00:05:43.637Z","event":"stage","elapsedSec":272,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"MANIFEST_FETCH_START","renderStage":null,"status":null,"uptimeSec":40}
+{"ts":"2026-08-13T00:06:05.223Z","event":"stage","elapsedSec":294,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"ASSET_DOWNLOAD_START","renderStage":"MANIFEST","status":"PREPARING_ASSETS","uptimeSec":40}
+{"ts":"2026-08-13T00:07:08.662Z","event":"stage","elapsedSec":357,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"DOWNLOADING_ASSETS","status":"RENDERING","uptimeSec":130}
+{"ts":"2026-08-13T00:08:17.167Z","event":"stage","elapsedSec":426,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"RENDERING","status":"ENCODING","uptimeSec":190}
+{"ts":"2026-08-13T00:08:22.136Z","event":"stage","elapsedSec":431,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"COMPLETE","status":"COMPLETE","uptimeSec":190}
+{"ts":"2026-08-13T00:08:22.136Z","event":"render_complete","artifactKey":"renders/finals/meadow-map-mystery/accept1080-2026-08-13T00-00-09-884Z/final_1080p.mp4","artifactSha256":"03c45cf28b3bb95b34e99dd787bc7981da2a9ef2cadac317a2cf697f21162145"}
+{"ts":"2026-08-13T00:08:22.136Z","event":"terminating_pod","podId":"8l0zvhp9p44lu0"}
+{"ts":"2026-08-13T00:08:22.620Z","event":"post_terminate_poll","podPresent":false,"totalPods":0,"billableRemaining":false}
+
+===== PHASE B LIFECYCLE SUMMARY =====
+Pod ID: 8l0zvhp9p44lu0
+Final status: COMPLETE
+Lifetime: 7.21 min @ $0.74/hr
+ACTUAL COST: $0.0889 (cap $0.25) — within cap: YES
+Pod absent after terminate: YES
+Billable GPU remaining: NO
+Authorization consumed: YES
+LAUNCHER_EXIT=0
+LAUNCH_END_UTC=2026-08-13T00:08:52Z

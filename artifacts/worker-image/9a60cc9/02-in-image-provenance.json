@@ -1,0 +1,11 @@
+{
+  "sourceCommit": "9a60cc9c379d2038d7d7cd349e2443196f97bb98",
+  "workerBuildTime": "2026-08-13T16:39:23Z",
+  "imageDigest": null,
+  "renderCodeSha256": "f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207",
+  "renderCodeSha256Declared": "f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207",
+  "renderCodeMatch": true,
+  "assembleScriptSha256": "6ba991ba6957782aab98e8d3ba49e590f7b95e0bdf2fe601330a8d10a655c8ab",
+  "renderCodeFileCount": 30,
+  "workerVersion": "0.1.0"
+}

@@ -1,0 +1,7 @@
+{
+  "queriedAt": "2026-08-13T17:35:23.901Z",
+  "podCount": 0,
+  "myselfPodsEmpty": true,
+  "activeBillableGpuCount": 0,
+  "pods": []
+}

@@ -1,0 +1,807 @@
+{
+  "role": "pip",
+  "blend": "production-library/characters/pip_production.blend",
+  "blenderVersion": "4.2.3 LTS",
+  "armatures": [
+    {
+      "armature": "Pip_Rig",
+      "boneCount": 14,
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "useDeform": true
+        },
+        {
+          "name": "pelvis",
+          "parent": "root",
+          "useDeform": true
+        },
+        {
+          "name": "spine",
+          "parent": "pelvis",
+          "useDeform": true
+        },
+        {
+          "name": "chest",
+          "parent": "spine",
+          "useDeform": true
+        },
+        {
+          "name": "neck",
+          "parent": "chest",
+          "useDeform": true
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "useDeform": true
+        },
+        {
+          "name": "comb",
+          "parent": "head",
+          "useDeform": true
+        },
+        {
+          "name": "wing_L",
+          "parent": "chest",
+          "useDeform": true
+        },
+        {
+          "name": "wing_R",
+          "parent": "chest",
+          "useDeform": true
+        },
+        {
+          "name": "backpack",
+          "parent": "chest",
+          "useDeform": true
+        },
+        {
+          "name": "leg_L",
+          "parent": "pelvis",
+          "useDeform": true
+        },
+        {
+          "name": "foot_L",
+          "parent": "leg_L",
+          "useDeform": true
+        },
+        {
+          "name": "leg_R",
+          "parent": "pelvis",
+          "useDeform": true
+        },
+        {
+          "name": "foot_R",
+          "parent": "leg_R",
+          "useDeform": true
+        }
+      ],
+      "poseBoneRotationModes": {
+        "root": "XYZ",
+        "pelvis": "XYZ",
+        "spine": "XYZ",
+        "chest": "XYZ",
+        "neck": "XYZ",
+        "head": "XYZ",
+        "comb": "XYZ",
+        "wing_L": "XYZ",
+        "wing_R": "XYZ",
+        "backpack": "XYZ",
+        "leg_L": "XYZ",
+        "foot_L": "XYZ",
+        "leg_R": "XYZ",
+        "foot_R": "XYZ"
+      },
+      "distinctRotationModes": [
+        "XYZ"
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "mesh": "Pip_Backpack",
+      "vertices": 296,
+      "parent": "Pip_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Pip_Rig"
+        }
+      ],
+      "vertexGroupCount": 1,
+      "vertexGroups": [
+        "backpack"
+      ],
+      "groupsMatchingDeformBones": [
+        "backpack"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 0,
+      "reallyBound": true
+    },
+    {
+      "mesh": "Pip_Backpack_Pouch",
+      "vertices": 128,
+      "parent": "Pip_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Pip_Rig"
+        }
+      ],
+      "vertexGroupCount": 1,
+      "vertexGroups": [
+        "backpack"
+      ],
+      "groupsMatchingDeformBones": [
+        "backpack"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 0,
+      "reallyBound": true
+    },
+    {
+      "mesh": "Pip_Character",
+      "vertices": 3800,
+      "parent": "Pip_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Pip_Rig"
+        }
+      ],
+      "vertexGroupCount": 14,
+      "vertexGroups": [
+        "root",
+        "pelvis",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "comb",
+        "wing_L",
+        "wing_R",
+        "backpack",
+        "leg_L",
+        "foot_L",
+        "leg_R",
+        "foot_R"
+      ],
+      "groupsMatchingDeformBones": [
+        "backpack",
+        "chest",
+        "comb",
+        "foot_L",
+        "foot_R",
+        "head",
+        "leg_L",
+        "leg_R",
+        "neck",
+        "pelvis",
+        "root",
+        "spine",
+        "wing_L",
+        "wing_R"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 43,
+      "reallyBound": true
+    },
+    {
+      "mesh": "Pip_StarCharm",
+      "vertices": 20,
+      "parent": "Pip_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Pip_Rig"
+        }
+      ],
+      "vertexGroupCount": 1,
+      "vertexGroups": [
+        "backpack"
+      ],
+      "groupsMatchingDeformBones": [
+        "backpack"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 0,
+      "reallyBound": true
+    }
+  ],
+  "actions": [
+    {
+      "action": "PIP_CHEER",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_L\"].rotation_euler[2]",
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_EXCITED",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_L\"].rotation_euler[2]",
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_FLAP_EXCITED",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_L\"].rotation_euler[2]",
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_FLAP_SMALL",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_L\"].rotation_euler[2]",
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_GREET",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_HAPPY",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_HAPPY_REACTION",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_IDLE",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"comb\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_IDLE_ALT",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"comb\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_JUMP",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"root\"].location[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_LISTEN",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"comb\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_LISTEN_IDLE",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"comb\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_LOOK",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_LOOK_DOWN",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_LOOK_LEFT",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_LOOK_RIGHT",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_LOOK_UP",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_POINT",
+      "fcurves": 21,
+      "varyingFcurves": 13,
+      "constantFcurves": 8,
+      "keyframes": 1890,
+      "frameRange": [
+        1.0,
+        90.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"chest\"].rotation_euler[0]",
+        "pose.bones[\"chest\"].rotation_euler[2]",
+        "pose.bones[\"comb\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[2]",
+        "pose.bones[\"neck\"].rotation_euler[0]",
+        "pose.bones[\"neck\"].rotation_euler[2]",
+        "pose.bones[\"root\"].location[2]",
+        "pose.bones[\"wing_L\"].rotation_euler[1]",
+        "pose.bones[\"wing_L\"].rotation_euler[2]",
+        "pose.bones[\"wing_R\"].rotation_euler[0]",
+        "pose.bones[\"wing_R\"].rotation_euler[1]",
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_RUN",
+      "fcurves": 84,
+      "varyingFcurves": 6,
+      "constantFcurves": 78,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"leg_L\"].rotation_euler[0]",
+        "pose.bones[\"leg_R\"].rotation_euler[0]",
+        "pose.bones[\"root\"].location[1]",
+        "pose.bones[\"root\"].location[2]",
+        "pose.bones[\"wing_L\"].rotation_euler[2]",
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_SURPRISED",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_SURPRISED_REACTION",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_TALK",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_TALK_IDLE",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_THINK",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_TURN",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_TURN_LEFT",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_TURN_RIGHT",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_WALK",
+      "fcurves": 84,
+      "varyingFcurves": 6,
+      "constantFcurves": 78,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"leg_L\"].rotation_euler[0]",
+        "pose.bones[\"leg_R\"].rotation_euler[0]",
+        "pose.bones[\"root\"].location[1]",
+        "pose.bones[\"root\"].location[2]",
+        "pose.bones[\"wing_L\"].rotation_euler[2]",
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_WAVE",
+      "fcurves": 84,
+      "varyingFcurves": 1,
+      "constantFcurves": 83,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"wing_R\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_WORRIED",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"comb\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "PIP_WORRIED_REACTION",
+      "fcurves": 84,
+      "varyingFcurves": 2,
+      "constantFcurves": 82,
+      "keyframes": 2520,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"comb\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    }
+  ],
+  "deformBones": [
+    "backpack",
+    "chest",
+    "comb",
+    "foot_L",
+    "foot_R",
+    "head",
+    "leg_L",
+    "leg_R",
+    "neck",
+    "pelvis",
+    "root",
+    "spine",
+    "wing_L",
+    "wing_R"
+  ],
+  "evaluatedAction": "PIP_POINT",
+  "evaluatedActionExists": true,
+  "fuzzyCandidates": null,
+  "motion": {
+    "framesSampled": [
+      1,
+      30,
+      60,
+      90
+    ],
+    "maxBoneDelta": 1.048021,
+    "maxVertexDelta": 0.126589,
+    "pairwiseVertexDeltas": {
+      "1->30": 0.126096,
+      "30->60": 0.052141,
+      "60->90": 0.159992
+    },
+    "minConsecutiveVertexDelta": 0.052141,
+    "movingBones": [
+      "backpack",
+      "chest",
+      "comb",
+      "foot_L",
+      "foot_R",
+      "head",
+      "leg_L",
+      "leg_R",
+      "neck",
+      "pelvis",
+      "root",
+      "spine",
+      "wing_L",
+      "wing_R"
+    ],
+    "vertexCount": 4244
+  },
+  "failures": [],
+  "ok": true,
+  "status": "PASS"
+}

@@ -1,0 +1,48 @@
+{
+  "jobId": "accept1080-2026-08-13T18-02-48-636Z",
+  "status": "COMPLETE",
+  "stage": "COMPLETE",
+  "artifactKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-13T18-02-48-636Z/final_1080p.mp4",
+  "artifactSha256": "aefdd0b05881d336c489ba984a891f04eec0a44e889c6b3b3f61002554655458",
+  "metadataKey": "jobs/accept1080-2026-08-13T18-02-48-636Z/metadata.json",
+  "metadata": {
+    "jobId": "accept1080-2026-08-13T18-02-48-636Z",
+    "episodeId": "meadow-map-mystery",
+    "renderMode": "FINAL_1080P",
+    "resolution": "1080x1920",
+    "fps": 30,
+    "frameRange": {
+      "start": 1,
+      "end": 90
+    },
+    "frameCount": 90,
+    "eevee": {
+      "engine": "EEVEE",
+      "samples": 24
+    },
+    "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-13T18-02-48-636Z/final_1080p.mp4",
+    "artifactSha256": "aefdd0b05881d336c489ba984a891f04eec0a44e889c6b3b3f61002554655458",
+    "outputBytes": 1851547,
+    "outputResolution": "1080x1920",
+    "timings": {
+      "assetDownloadMs": 7492,
+      "renderMs": 75560,
+      "encodeMs": 3275,
+      "totalMs": 115722
+    },
+    "gpu": "NVIDIA+GeForce+RTX+4090",
+    "podId": "yw9efy9ylhc5ww",
+    "completedAt": "2026-08-13T18:17:38.568Z",
+    "provenance": {
+      "sourceCommit": "da26bc16806513e7ba58ceb3408728df7712622f",
+      "imageDigest": "sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830",
+      "workerBuildTime": "2026-08-13T17:37:00Z",
+      "renderCodeSha256": "a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a",
+      "renderCodeMatch": true,
+      "assembleScriptSha256": "6ba991ba6957782aab98e8d3ba49e590f7b95e0bdf2fe601330a8d10a655c8ab",
+      "workerVersion": "0.1.0"
+    }
+  },
+  "workerId": "ddp-accept1080-accept1080-2026-08-13T18-02-48-636Z",
+  "at": "2026-08-13T18:17:39.190Z"
+}

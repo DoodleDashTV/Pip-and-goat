@@ -1,0 +1,74 @@
+{
+  "role": "pip",
+  "blend": "production-library/characters/pip_production.blend",
+  "steps": {
+    "rotationMode": "XYZ",
+    "bindings": [
+      {
+        "mesh": "Pip_Character",
+        "armature": "Pip_Rig",
+        "vertexGroups": 14,
+        "unweighted": 0
+      },
+      {
+        "mesh": "Pip_Backpack",
+        "armature": "Pip_Rig",
+        "rigidBone": "backpack"
+      },
+      {
+        "mesh": "Pip_Backpack_Pouch",
+        "armature": "Pip_Rig",
+        "rigidBone": "backpack"
+      },
+      {
+        "mesh": "Pip_StarCharm",
+        "armature": "Pip_Rig",
+        "rigidBone": "backpack"
+      }
+    ],
+    "reauthored": [
+      {
+        "action": "PIP_POINT",
+        "frames": 90,
+        "fcurves": 21,
+        "varyingFcurves": 13
+      }
+    ],
+    "motion": {
+      "framesSampled": [
+        1,
+        30,
+        60,
+        90
+      ],
+      "maxBoneDelta": 1.072084,
+      "maxVertexDelta": 0.124915,
+      "pairwiseVertexDeltas": {
+        "1->30": 0.124915,
+        "30->60": 0.052475,
+        "60->90": 0.160151
+      },
+      "minConsecutiveVertexDelta": 0.052475,
+      "movingBones": [
+        "backpack",
+        "chest",
+        "comb",
+        "foot_L",
+        "foot_R",
+        "head",
+        "leg_L",
+        "leg_R",
+        "neck",
+        "pelvis",
+        "root",
+        "spine",
+        "wing_L",
+        "wing_R"
+      ],
+      "vertexCount": 4244
+    }
+  },
+  "failures": [],
+  "ok": true,
+  "status": "PASS"
+}

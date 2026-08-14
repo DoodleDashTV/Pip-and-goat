@@ -1,0 +1,38 @@
+{
+  "jobId": "accept1080-2026-08-13T00-00-09-884Z",
+  "episodeId": "meadow-map-mystery",
+  "renderMode": "FINAL_1080P",
+  "resolution": "1080x1920",
+  "fps": 30,
+  "frameRange": {
+    "start": 1,
+    "end": 90
+  },
+  "frameCount": 90,
+  "eevee": {
+    "engine": "EEVEE",
+    "samples": 24
+  },
+  "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-13T00-00-09-884Z/final_1080p.mp4",
+  "artifactSha256": "03c45cf28b3bb95b34e99dd787bc7981da2a9ef2cadac317a2cf697f21162145",
+  "outputBytes": 715646,
+  "outputResolution": "1080x1920",
+  "timings": {
+    "assetDownloadMs": 86809,
+    "renderMs": 73906,
+    "encodeMs": 2476,
+    "totalMs": 171662
+  },
+  "gpu": "NVIDIA+GeForce+RTX+4090",
+  "podId": "8l0zvhp9p44lu0",
+  "completedAt": "2026-08-13T00:08:16.919Z",
+  "provenance": {
+    "sourceCommit": "bb5270372ad558e71673fe789260a12fb51a9c6d",
+    "imageDigest": "sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27",
+    "workerBuildTime": "2026-08-12T22:25:23Z",
+    "renderCodeSha256": "c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91",
+    "renderCodeMatch": true,
+    "assembleScriptSha256": "764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709",
+    "workerVersion": "0.1.0"
+  }
+}

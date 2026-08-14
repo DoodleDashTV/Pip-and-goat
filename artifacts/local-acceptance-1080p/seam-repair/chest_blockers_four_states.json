@@ -1,0 +1,217 @@
+{
+ "question": "For every pixel of Pip's chest the camera can see, what stands between that surface and the sun?",
+ "method": "Frame 45 of the DAY_KEY production shot at 1080x1920. From the camera, a ray to the surface the camera actually sees; from there, a ray toward the key light, stepping through geometry that does not cast a shadow, until a shadow caster is hit or the ray escapes. The blocker is named by the connected island of the caster mesh it hit, with that island's material and world size.",
+ "window": {
+  "x0": 200,
+  "x1": 300,
+  "y0": 1240,
+  "y1": 1390,
+  "note": "identical in every state"
+ },
+ "states": [
+  {
+   "state": "shipped",
+   "commit": "a440d88",
+   "label": "flat 22 mm caster shrink (as shipped)",
+   "assembleScene": "/tmp/seam/oldblender/assemble_scene.py",
+   "chestPixelsOnPip": 11078,
+   "lit": 8308,
+   "shadowed": 2770,
+   "shadowedPercent": 25.0,
+   "blockers": [
+    {
+     "pixels": 1287,
+     "part": "PipBeak size=[68.6, 73.1, 73.0]mm verts=200"
+    },
+    {
+     "pixels": 428,
+     "part": "PipBody size=[276.5, 304.3, 260.6]mm verts=392"
+    },
+    {
+     "pixels": 330,
+     "part": "PipCatchlight size=[27.7, 27.7, 28.2]mm verts=52"
+    },
+    {
+     "pixels": 191,
+     "part": "PipCatchlight size=[27.7, 27.7, 28.2]mm verts=52"
+    },
+    {
+     "pixels": 147,
+     "part": "PipEyeWhite size=[89.5, 56.8, 55.2]mm verts=200"
+    },
+    {
+     "pixels": 118,
+     "part": "PipBrow size=[36.4, 26.9, 29.5]mm verts=8"
+    },
+    {
+     "pixels": 73,
+     "part": "PipPupil size=[18.0, 18.4, 18.2]mm verts=86"
+    },
+    {
+     "pixels": 56,
+     "part": "PipEyeWhite size=[76.7, 64.7, 70.0]mm verts=200"
+    },
+    {
+     "pixels": 28,
+     "part": "PipBody size=[250.2, 229.2, 265.3]mm verts=392"
+    },
+    {
+     "pixels": 19,
+     "part": "PipIris size=[15.9, 14.8, 14.7]mm verts=200"
+    },
+    {
+     "pixels": 19,
+     "part": "PipBeak size=[21.8, 18.5, 26.5]mm verts=86"
+    },
+    {
+     "pixels": 19,
+     "part": "PipFeet size=[19.7, 12.5, 30.9]mm verts=52"
+    },
+    {
+     "pixels": 17,
+     "part": "PipFeet size=[19.7, 12.5, 30.9]mm verts=52"
+    },
+    {
+     "pixels": 8,
+     "part": "PipFeet size=[19.7, 12.5, 30.9]mm verts=52"
+    },
+    {
+     "pixels": 8,
+     "part": "PipFeet size=[19.7, 12.5, 30.9]mm verts=52"
+    },
+    {
+     "pixels": 7,
+     "part": "PipFeet size=[19.7, 12.5, 30.9]mm verts=52"
+    },
+    {
+     "pixels": 5,
+     "part": "PipFeet size=[19.7, 12.5, 30.9]mm verts=52"
+    },
+    {
+     "pixels": 5,
+     "part": "PipFeet size=[28.3, 35.2, 23.3]mm verts=86"
+    },
+    {
+     "pixels": 3,
+     "part": "PipPupil size=[18.0, 18.4, 18.2]mm verts=86"
+    },
+    {
+     "pixels": 2,
+     "part": "PipFeet size=[28.3, 35.2, 23.3]mm verts=86"
+    }
+   ]
+  },
+  {
+   "state": "evert",
+   "commit": "c546666",
+   "label": "+ each part shrinks by half its own measured thickness",
+   "assembleScene": "/tmp/seam/evertblender/assemble_scene.py",
+   "chestPixelsOnPip": 11078,
+   "lit": 9214,
+   "shadowed": 1864,
+   "shadowedPercent": 16.83,
+   "blockers": [
+    {
+     "pixels": 999,
+     "part": "PipBeak size=[54.2, 65.9, 59.3]mm verts=200"
+    },
+    {
+     "pixels": 307,
+     "part": "PipBody size=[276.5, 304.3, 260.6]mm verts=392"
+    },
+    {
+     "pixels": 269,
+     "part": "PipEyeWhite size=[94.5, 65.3, 64.0]mm verts=200"
+    },
+    {
+     "pixels": 111,
+     "part": "PipEyeWhite size=[87.2, 73.5, 78.7]mm verts=200"
+    },
+    {
+     "pixels": 57,
+     "part": "PipIris size=[29.9, 28.7, 28.7]mm verts=200"
+    },
+    {
+     "pixels": 42,
+     "part": "PipIris size=[29.9, 28.7, 28.7]mm verts=200"
+    },
+    {
+     "pixels": 28,
+     "part": "PipBody size=[250.2, 229.2, 265.3]mm verts=392"
+    },
+    {
+     "pixels": 21,
+     "part": "PipCatchlight size=[8.0, 7.7, 7.7]mm verts=52"
+    },
+    {
+     "pixels": 21,
+     "part": "PipPupil size=[13.0, 12.4, 12.5]mm verts=86"
+    },
+    {
+     "pixels": 6,
+     "part": "PipCatchlight size=[8.0, 7.7, 7.7]mm verts=52"
+    },
+    {
+     "pixels": 2,
+     "part": "PipBrow size=[53.7, 11.8, 17.5]mm verts=8"
+    },
+    {
+     "pixels": 1,
+     "part": "PipBeak size=[14.7, 18.0, 11.7]mm verts=86"
+    }
+   ]
+  },
+  {
+   "state": "reach",
+   "commit": "c7f5ed3",
+   "label": "+ a part whose shadow only lands stretched across the character stops casting",
+   "assembleScene": "/tmp/seam/reachblender/assemble_scene.py",
+   "chestPixelsOnPip": 11078,
+   "lit": 10508,
+   "shadowed": 570,
+   "shadowedPercent": 5.15,
+   "blockers": [
+    {
+     "pixels": 458,
+     "part": "PipBody size=[276.5, 304.3, 260.6]mm verts=392"
+    },
+    {
+     "pixels": 82,
+     "part": "PipBeak size=[14.7, 18.0, 11.7]mm verts=86"
+    },
+    {
+     "pixels": 28,
+     "part": "PipBody size=[250.2, 229.2, 265.3]mm verts=392"
+    },
+    {
+     "pixels": 2,
+     "part": "PipBrow size=[53.7, 11.8, 17.5]mm verts=8"
+    }
+   ]
+  },
+  {
+   "state": "fixed",
+   "commit": "HEAD",
+   "label": "+ a part sealed inside another part stops casting",
+   "assembleScene": "/workspace/scripts/blender/assemble_scene.py",
+   "chestPixelsOnPip": 11078,
+   "lit": 10590,
+   "shadowed": 488,
+   "shadowedPercent": 4.41,
+   "blockers": [
+    {
+     "pixels": 458,
+     "part": "PipBody size=[276.5, 304.3, 260.6]mm verts=392"
+    },
+    {
+     "pixels": 28,
+     "part": "PipBody size=[250.2, 229.2, 265.3]mm verts=392"
+    },
+    {
+     "pixels": 2,
+     "part": "PipBrow size=[53.7, 11.8, 17.5]mm verts=8"
+    }
+   ]
+  }
+ ]
+}

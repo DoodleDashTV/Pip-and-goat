@@ -1,0 +1,22 @@
+
+> doodle-dash-tv-studio@0.1.0 cloud:preflight-offline /workspace
+> pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-offline.ts
+
+=== FINAL_1080P PREFLIGHT — credential-free checks (no pod, no spend) ===
+[PASS] 0 Local quality gates on the current asset bytes — 9 gates PASS, asset hashes match the gate run
+[PASS] 3.meadow MEADOW approved asset present and is a .blend — sha256=bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015 header=BLENDER
+[PASS] 3.map MAP approved asset present and is a .blend — sha256=c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea header=BLENDER
+[PASS] 4 PIP approved asset present and is a .blend — sha256=e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0 header=BLENDER
+[PASS] 5 GOAT approved asset present and is a .blend — sha256=e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8 header=BLENDER
+[PASS] 6 Scene assembly resolves (assemble_scene.py + helpers) — assemble_scene.py, apply_animation.py, configure_camera.py, configure_lights.py, _common.py
+[PASS] 8 Output exactly 1080x1920 portrait — resolution=1080x1920 fps=30
+[PASS] 9 PRODUCTION render settings, not draft — samples=24 frames=1-90
+[PASS] RATE Live SECURE hourly quote for the RTX 4090 — $0.74/hr secure on-demand — quoted live, anonymously, for NVIDIA GeForce RTX 4090
+[PASS] 14 Estimated total cost <= $0.25 — est=$0.1018 total at $0.74/hr, runtime~8.25min, 90 frames
+[PASS] 15 Hard cost-kill arms from the actual pod rate — at $0.74/hr the kill would arm at 18 min (90% of the cap); recomputed from the pod's real costPerHr at launch
+[PASS] IMG Worker image reference is digest-pinned on ghcr.io — code=OK Worker image pinned by immutable @sha256 digest on ghcr.io.
+[PASS] PROV Worker image provenance matches this checkout — code=OK — image sha256:bd60f26469a2… contains this checkout's render code (f30e6dc010c6…) and its approved assets (7876ac737de6…)
+[PASS] ASSETFP Approved render assets match the pinned fingerprint — 7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7 over 4 files
+
+PREFLIGHT (credential-free subset): PASS — 14 checks run
+Not covered here (needs R2 + Runpod credentials): R2 auth, bucket read/write, asset upload + readback, pod inventory, manifest upload.

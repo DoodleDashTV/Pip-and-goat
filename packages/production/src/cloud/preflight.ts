@@ -4,7 +4,12 @@
  */
 import { secretPresenceReport } from './secret-safety';
 import { runpodAuthSelfTest } from './runpod-client';
-import { resolveCloudCostLimitsFromEnv, DEFAULT_CLOUD_COST_LIMITS } from './config';
+import {
+  resolveCloudCostLimitsFromEnv,
+  DEFAULT_CLOUD_COST_LIMITS,
+  resolveRunpodWorkerImage,
+  validateRunpodWorkerImageRef,
+} from './config';
 import { localBlenderProvider, runpodBlenderProvider } from './render-provider';
 import { buildCloudJobManifest } from './job-manifest';
 import { planAssetSync, FOUNDING_CLOUD_ASSET_IDS } from './asset-sync';
@@ -31,6 +36,14 @@ export type PreDeploymentReport = {
   readyForFirstGpuDeployment: 'YES' | 'NO';
   remainingBlockers: string[];
   secretsPresent: Record<string, 'YES' | 'NO'>;
+  workerImage: {
+    configured: boolean;
+    pinnedByDigest: boolean;
+    registry: string | null;
+    repository: string | null;
+    digest: string | null;
+    code: string;
+  };
   preferredGpus?: Array<{ id: string; displayName: string; uninterruptablePrice: number | null }>;
   notes: string[];
 };
@@ -43,6 +56,8 @@ export async function buildPreDeploymentReport(input?: {
   branch?: string;
   sha?: string;
   workerImageReady?: boolean;
+  /** Configured immutable worker image reference (ghcr.io/...@sha256:...). */
+  workerImage?: string;
   ffmpegOk?: boolean;
   ffprobeOk?: boolean;
   r2LiveTest?: {
@@ -228,6 +243,11 @@ export async function buildPreDeploymentReport(input?: {
     r2Live && r2Live.auth && r2Live.upload && r2Live.download && r2Live.checksum && r2Live.deleted,
   );
 
+  // Immutable worker image pin: the published GHCR image must be configured and
+  // pinned by an @sha256 digest before a paid pod may ever launch.
+  const workerImageRef = input?.workerImage ?? resolveRunpodWorkerImage();
+  const workerImageValidation = validateRunpodWorkerImageRef(workerImageRef);
+
   const gates: Record<string, GateResult> = {
     R2: passFail(r2Pass),
     RUNPOD_AUTH: passFail(runpod.ok),
@@ -236,6 +256,7 @@ export async function buildPreDeploymentReport(input?: {
     CLOUD_JOB_MANIFEST: passFail(Boolean(manifest.jobId) && Boolean(cacheKey)),
     ASSET_SYNC: passFail(syncPlan.uploads === 2),
     WORKER_IMAGE_TEMPLATE: passFail(Boolean(input?.workerImageReady)),
+    WORKER_IMAGE_PIN: passFail(workerImageValidation.ok),
     PERSISTENT_BLENDER: passFail(true), // code present in workers/blender-renderer + cloud worker
     GPU_HEALTH_CHECK_CODE: passFail(gpuHealth.ok),
     CLOUD_CACHE: passFail(Boolean(cacheKey)),
@@ -268,6 +289,9 @@ export async function buildPreDeploymentReport(input?: {
   if (!r2Pass) remainingBlockers.push('R2 live connection test not passed');
   if (!runpod.ok) remainingBlockers.push(`Runpod auth failed: ${runpod.message}`);
   if (!input?.workerImageReady) remainingBlockers.push('Worker image/template not verified built');
+  if (!workerImageValidation.ok) {
+    remainingBlockers.push(`Worker image not pinned: ${workerImageValidation.reason}`);
+  }
   if (!input?.ffmpegOk) remainingBlockers.push('ffmpeg not verified in this environment');
   if (!input?.ffprobeOk) remainingBlockers.push('ffprobe not verified in this environment');
   if (!limits.cloudRenderEnabled) {
@@ -285,6 +309,7 @@ export async function buildPreDeploymentReport(input?: {
     'CLOUD_JOB_MANIFEST',
     'ASSET_SYNC',
     'WORKER_IMAGE_TEMPLATE',
+    'WORKER_IMAGE_PIN',
     'COST_ESTIMATION',
     'MAX_HOURLY_PRICE_GUARD',
     'MAX_JOB_COST_GUARD',
@@ -332,6 +357,14 @@ export async function buildPreDeploymentReport(input?: {
       R2_ACCESS_KEY_ID: secrets.R2_ACCESS_KEY_ID,
       R2_SECRET_ACCESS_KEY: secrets.R2_SECRET_ACCESS_KEY,
       RUNPOD_API_KEY: secrets.RUNPOD_API_KEY,
+    },
+    workerImage: {
+      configured: Boolean(workerImageRef),
+      pinnedByDigest: workerImageValidation.ok,
+      registry: workerImageValidation.registry,
+      repository: workerImageValidation.repository,
+      digest: workerImageValidation.digest,
+      code: workerImageValidation.code,
     },
     preferredGpus: runpod.preferred.map((g) => ({
       id: g.id,

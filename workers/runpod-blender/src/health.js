@@ -3,15 +3,16 @@
  */
 const { spawnSync } = require('node:child_process');
 
-function binOk(bin) {
-  const res = spawnSync(bin, ['-version'], { encoding: 'utf8' });
+function binOk(bin, arg = '-version') {
+  const res = spawnSync(bin, [arg], { encoding: 'utf8', timeout: 20_000 });
   return res.status === 0;
 }
 
 function main() {
   const ffmpeg = binOk('ffmpeg');
   const ffprobe = binOk('ffprobe');
-  const blender = binOk('blender');
+  // Blender uses --version (not -version); the old probe reported blender:false.
+  const blender = binOk(process.env.BLENDER_BIN || 'blender', '--version');
   // On non-GPU hosts (image build/CI), skip nvidia requirement for static check.
   const requireGpu = String(process.env.REQUIRE_GPU_HEALTH || 'false').toLowerCase() === 'true';
   let gpu = { ok: true, skipped: true };

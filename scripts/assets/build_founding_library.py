@@ -600,12 +600,86 @@ def build_goat(path: Path) -> dict:
     }
 
 
+#: Meadow path: worn dirt lying ON the ground. It used to be a unit cube whose
+#: scale never survived the save, so the shot contained a 1 m tan box standing at
+#: the origin and clipping through a tree — the "untextured slab" that dominated
+#: the acceptance render. Built from explicit vertices now, so there is no
+#: unapplied transform left to lose.
+MEADOW_PATH_HALF_WIDTH = 0.55
+MEADOW_PATH_LENGTH = 11.0
+MEADOW_PATH_HEIGHT = 0.006
+
+# Ground albedo. The meadow was authored at 0.70 green, roughly three times what
+# grass reflects, and under a properly exposed key that made the field as bright
+# as the characters standing on it: measured on frame 45, the goat's mean luma was
+# 130.6 against 132.1 for the grass touching its silhouette, so the characters
+# separated by hue alone. Deeper, more saturated ground both restores the tonal
+# gap and gives the meadow a richer green than the pale wash it had.
+MEADOW_GRASS_COLOR = (0.16, 0.40, 0.14)
+#: The sunlit trail is deliberately the brightest large surface in the shot: it
+#: is what carries the top of the tonal range now that the grass no longer does.
+MEADOW_PATH_COLOR = (0.58, 0.46, 0.30)
+
+
+def retint_ground(grass=MEADOW_GRASS_COLOR, dirt=MEADOW_PATH_COLOR) -> dict:
+    """Set the ground albedo on an already-built meadow, by material name."""
+    import bpy
+
+    applied = {}
+    for name, color in (("MeadowGrass", grass), ("MeadowPath", dirt)):
+        material = bpy.data.materials.get(name)
+        if material is None or not material.use_nodes:
+            continue
+        bsdf = material.node_tree.nodes.get("Principled BSDF")
+        if bsdf is None:
+            continue
+        bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+        applied[name] = [round(c, 4) for c in color]
+    return applied
+
+
+def build_meadow_path(material):
+    """Replace/create ``Meadow_Path`` as a flat worn trail on the ground."""
+    import bmesh
+    import bpy
+
+    old = bpy.data.objects.get("Meadow_Path")
+    if old is not None:
+        bpy.data.objects.remove(old, do_unlink=True)
+
+    mesh = bpy.data.meshes.new("Meadow_Path")
+    bm = bmesh.new()
+    half_w, half_l, z = MEADOW_PATH_HALF_WIDTH, MEADOW_PATH_LENGTH / 2.0, MEADOW_PATH_HEIGHT
+    segments = 10
+    rows = []
+    for i in range(segments + 1):
+        t = i / segments
+        y = -half_l + t * MEADOW_PATH_LENGTH
+        # A gentle meander and a slight width variation so it reads as a worn
+        # trail rather than a painted rectangle.
+        offset = 0.22 * math.sin(t * math.pi * 1.6)
+        width = half_w * (0.85 + 0.15 * math.cos(t * math.pi * 2.2))
+        rows.append(
+            (
+                bm.verts.new((offset - width, y, z)),
+                bm.verts.new((offset + width, y, z)),
+            )
+        )
+    for (l0, r0), (l1, r1) in zip(rows, rows[1:]):
+        bm.faces.new((l0, r0, r1, l1))
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = mesh_obj("Meadow_Path", mesh)
+    obj.data.materials.append(material)
+    return obj
+
+
 def build_meadow(path: Path) -> dict:
     import bpy
 
     reset_scene()
-    grass = mat("MeadowGrass", (0.35, 0.7, 0.28), 0.85)
-    path_mat = mat("MeadowPath", (0.62, 0.5, 0.32), 0.7)
+    grass = mat("MeadowGrass", MEADOW_GRASS_COLOR, 0.85)
+    path_mat = mat("MeadowPath", MEADOW_PATH_COLOR, 0.7)
     flower_a = mat("FlowerA", (0.95, 0.45, 0.7), 0.4)
     flower_b = mat("FlowerB", (0.95, 0.85, 0.25), 0.4)
     bark = mat("TreeBark", (0.35, 0.22, 0.12), 0.7)
@@ -617,11 +691,7 @@ def build_meadow(path: Path) -> dict:
     ground.name = "Meadow_Ground"
     ground.data.materials.append(grass)
 
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, 0.02))
-    pth = bpy.context.object
-    pth.name = "Meadow_Path"
-    pth.scale = (1.2, 10, 0.04)
-    pth.data.materials.append(path_mat)
+    build_meadow_path(path_mat)
 
     # Flowers — fewer unique objects (joined) to cut EEVEE per-frame sync cost
     flower_objs = []
@@ -692,25 +762,290 @@ def build_meadow(path: Path) -> dict:
     return {"locationCode": "LOC_MEADOW_001", "blend": str(path)}
 
 
+# --- Adventure map -----------------------------------------------------------
+# The premise of the shot is two characters reading a treasure map, so the prop
+# has to survive being looked at. It used to be a 0.9 m zero-thickness plane with
+# a small cube on it: edge-on from a 12-degree camera it was invisible, and what
+# little showed read as blank paper. This version has real thickness, a curl, a
+# drawn coastline, a dashed trail leading to an X, a compass rose and a border,
+# and it leans on a rock so the drawn face turns toward the lens.
+MAP_WIDTH = 0.96
+MAP_DEPTH = 0.70
+MAP_THICKNESS = 0.014
+MAP_CURL = 0.030
+#: Amplitude of the sheet's ripple. Kept small so a flat drawn shape spanning
+#: half the sheet still sits clear of the paper under it.
+MAP_RIPPLE = 0.0015
+#: Lean angle of the sheet. Combined with the shot camera's 12-degree depression
+#: this puts the drawn face at roughly 44 degrees to the lens: readable, while
+#: still low enough that two characters can plausibly stand over it.
+MAP_TILT = math.radians(32.0)
+MAP_YAW = math.radians(-7.0)
+MAP_LIFT = 0.20
+MAP_STAND_Y = 0.30
+#: Ink sits this far proud of the paper: enough to never z-fight, small enough
+#: to read as printing rather than as blocks lying on top of the map. The first
+#: attempt used 2.2 mm of lift on 4 mm slabs, and at full resolution every border
+#: bar and fold line read as a stick laid on the sheet, each with its own drop
+#: shadow — the coastline's shadow even doubled the landmass into a ghost.
+INK_LIFT = 0.0009
+#: Thickness of a drawn shape. Printing has none; this is just enough to give the
+#: shape a silhouette edge under a raking key.
+INK_THICKNESS = 0.0011
+#: Drawn shapes come in passes, and shapes that cross each other cannot share a
+#: height. The dashed trail is drawn ACROSS the landmass and the fold creases run
+#: across everything; coplanar faces both hide detail and risk z-fighting that
+#: would flicker frame to frame.
+INK_LAYER_STEP = 0.0004
+#: Draw order: base regions, then routes and symbols, then the folds in the sheet.
+#: The top level exists for the second half of a shape that crosses itself — the
+#: two bars of the X, the two fold lines — which would otherwise be coplanar.
+INK_LAYER_REGION = 0
+INK_LAYER_ROUTE = 1
+INK_LAYER_OVER = 2
+INK_LAYER_TOP = 3
+
+
+def _map_surface_z(x: float, y: float = 0.0) -> float:
+    """Height of the paper's top face: the edge curl plus the sheet's ripple.
+
+    The ripple has to be part of this, not added only to the paper's own grid.
+    When it was not, the ink was placed against a smooth idealised surface while
+    the paper undulated +-4 mm through it, and thin printing sank out of sight —
+    the trail, the compass and the X all vanished from the render.
+    """
+    t = (2.0 * x) / MAP_WIDTH
+    ripple = MAP_RIPPLE * math.sin(3.1 * x) * math.cos(2.4 * y)
+    return MAP_THICKNESS + MAP_CURL * t * t + ripple
+
+
+#: Longest edge an ink shape may span before it is subdivided to follow the
+#: paper. The sheet curls 30 mm across its width, so a large shape built as one
+#: flat polygon chords across that curve: the landmass floated 9 mm off the paper
+#: in the middle, high enough to swallow the dashed trail drawn over it.
+INK_SEGMENT = 0.035
+
+
+def _ink_slab(name: str, material, points, thickness: float = INK_THICKNESS, layer: int = 0):
+    """A drawn shape that hugs the paper, subdivided so it follows the curl.
+
+    Ink does not cast: a drawn line has no height to throw a shadow from, and
+    letting these shapes cast turned every one of them into a raised object with
+    its own drop shadow.
+    """
+    import bmesh
+    import bpy
+
+    lift = INK_LIFT + layer * INK_LAYER_STEP
+    cx = sum(p[0] for p in points) / len(points)
+    cy = sum(p[1] for p in points) / len(points)
+
+    # Ring-subdivided fan from the centroid: every shape here is convex, so
+    # interpolating boundary points toward the centre tiles the whole shape.
+    boundary: list[tuple[float, float]] = []
+    for (x0, y0), (x1, y1) in zip(points, points[1:] + points[:1]):
+        steps = max(1, math.ceil(math.dist((x0, y0), (x1, y1)) / INK_SEGMENT))
+        for s in range(steps):
+            f = s / steps
+            boundary.append((x0 + (x1 - x0) * f, y0 + (y1 - y0) * f))
+    rings = max(1, math.ceil(max(math.dist((cx, cy), p) for p in points) / INK_SEGMENT))
+
+    mesh = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+
+    def surface(x, y, offset):
+        return bm.verts.new((x, y, _map_surface_z(x, y) + lift + offset))
+
+    def shell(offset):
+        centre = surface(cx, cy, offset)
+        ring_verts = [[centre]]
+        for r in range(1, rings + 1):
+            f = r / rings
+            ring_verts.append([surface(cx + (x - cx) * f, cy + (y - cy) * f, offset) for x, y in boundary])
+        return ring_verts
+
+    top = shell(thickness)
+    bottom = shell(0.0)
+    count = len(boundary)
+    for shell_verts, flip in ((top, False), (bottom, True)):
+        for i in range(count):
+            j = (i + 1) % count
+            tri = (shell_verts[0][0], shell_verts[1][i], shell_verts[1][j])
+            bm.faces.new(tuple(reversed(tri)) if flip else tri)
+        for r in range(1, rings):
+            for i in range(count):
+                j = (i + 1) % count
+                quad = (shell_verts[r][i], shell_verts[r][j], shell_verts[r + 1][j], shell_verts[r + 1][i])
+                bm.faces.new(tuple(reversed(quad)) if flip else quad)
+    for i in range(count):
+        j = (i + 1) % count
+        bm.faces.new((bottom[rings][i], bottom[rings][j], top[rings][j], top[rings][i]))
+    bm.normal_update()
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = mesh_obj(name, mesh)
+    obj.data.materials.append(material)
+    if hasattr(obj, "visible_shadow"):
+        obj.visible_shadow = False
+    return obj
+
+
+def _ink_bar(name: str, material, cx: float, cy: float, length: float, width: float, angle: float, layer: int = 0):
+    c, s = math.cos(angle), math.sin(angle)
+    hl, hw = length / 2.0, width / 2.0
+    corners = [(-hl, -hw), (hl, -hw), (hl, hw), (-hl, hw)]
+    pts = [(cx + x * c - y * s, cy + x * s + y * c) for x, y in corners]
+    return _ink_slab(name, material, pts, layer=layer)
+
+
 def build_map(path: Path) -> dict:
+    import bmesh
     import bpy
 
     reset_scene()
-    paper = mat("MapPaper", (0.93, 0.86, 0.65), 0.55)
-    ink = mat("MapInk", (0.25, 0.35, 0.55), 0.4)
-    bpy.ops.mesh.primitive_plane_add(size=0.9, location=(0, 0, 0.02))
-    m = bpy.context.object
-    m.name = "AdventureMap"
-    m.rotation_euler = (math.radians(8), 0, math.radians(12))
-    m.data.materials.append(paper)
-    bpy.ops.mesh.primitive_cube_add(size=0.08, location=(0.1, -0.05, 0.05))
-    mark = bpy.context.object
-    mark.name = "MapMark"
-    mark.scale = (1.5, 1.5, 0.2)
-    mark.data.materials.append(ink)
+    paper = mat("MapPaper", (0.82, 0.70, 0.48), 0.62, 0.25)
+    ink = mat("MapInk", (0.16, 0.13, 0.10), 0.55, 0.15)
+    coast = mat("MapCoast", (0.44, 0.56, 0.33), 0.7, 0.1)
+    water = mat("MapWater", (0.32, 0.52, 0.66), 0.45, 0.35)
+    trail = mat("MapTrail", (0.66, 0.24, 0.16), 0.5, 0.2)
+    accent = mat("MapAccent", (0.80, 0.60, 0.18), 0.35, 0.45)
+    stone = mat("MapStone", (0.40, 0.39, 0.36), 0.85, 0.1)
+    # A fold is a shading change in the paper, not a drawn line: inking the
+    # creases black put two hard bars across the middle of the sheet.
+    fold = mat("MapFold", (0.66, 0.55, 0.38), 0.68, 0.2)
+
+    # Paper body: a curled sheet with real thickness.
+    mesh = bpy.data.meshes.new("AdventureMap")
+    bm = bmesh.new()
+    cols, rows = 12, 8
+    grid_top, grid_bottom = [], []
+    for r in range(rows + 1):
+        y = -MAP_DEPTH / 2 + MAP_DEPTH * r / rows
+        top_row, bottom_row = [], []
+        for c in range(cols + 1):
+            x = -MAP_WIDTH / 2 + MAP_WIDTH * c / cols
+            top_row.append(bm.verts.new((x, y, _map_surface_z(x, y))))
+            bottom_row.append(bm.verts.new((x, y, _map_surface_z(x, y) - MAP_THICKNESS)))
+        grid_top.append(top_row)
+        grid_bottom.append(bottom_row)
+    for r in range(rows):
+        for c in range(cols):
+            bm.faces.new((grid_top[r][c], grid_top[r][c + 1], grid_top[r + 1][c + 1], grid_top[r + 1][c]))
+            bm.faces.new(
+                (grid_bottom[r][c], grid_bottom[r + 1][c], grid_bottom[r + 1][c + 1], grid_bottom[r][c + 1])
+            )
+    for c in range(cols):
+        bm.faces.new((grid_top[0][c + 1], grid_top[0][c], grid_bottom[0][c], grid_bottom[0][c + 1]))
+        bm.faces.new((grid_top[rows][c], grid_top[rows][c + 1], grid_bottom[rows][c + 1], grid_bottom[rows][c]))
+    for r in range(rows):
+        bm.faces.new((grid_top[r][0], grid_top[r + 1][0], grid_bottom[r + 1][0], grid_bottom[r][0]))
+        bm.faces.new((grid_top[r + 1][cols], grid_top[r][cols], grid_bottom[r][cols], grid_bottom[r + 1][cols]))
+    bm.normal_update()
+    bm.to_mesh(mesh)
+    bm.free()
+    paper_obj = mesh_obj("AdventureMap", mesh)
+    paper_obj.data.materials.append(paper)
+
+    parts = []
+
+    # Border frame, four bars inset from the edges.
+    bw, bd, inset, bar = MAP_WIDTH, MAP_DEPTH, 0.035, 0.016
+    parts.append(_ink_bar("MapBorder_N", ink, 0.0, bd / 2 - inset, bw - 2 * inset, bar, 0.0))
+    parts.append(_ink_bar("MapBorder_S", ink, 0.0, -bd / 2 + inset, bw - 2 * inset, bar, 0.0))
+    parts.append(_ink_bar("MapBorder_W", ink, -bw / 2 + inset, 0.0, bd - 2 * inset, bar, math.pi / 2))
+    parts.append(_ink_bar("MapBorder_E", ink, bw / 2 - inset, 0.0, bd - 2 * inset, bar, math.pi / 2))
+
+    # Land mass and a bay of water, so the sheet reads as a map at a glance.
+    parts.append(
+        _ink_slab(
+            "MapCoast",
+            coast,
+            [(-0.36, -0.20), (-0.14, -0.25), (0.06, -0.14), (0.16, 0.06), (0.02, 0.20), (-0.20, 0.22), (-0.38, 0.06)],
+        )
+    )
+    parts.append(_ink_slab("MapWater", water, [(0.20, -0.24), (0.40, -0.20), (0.40, 0.02), (0.22, 0.02)]))
+
+    # Dashed trail from the shoreline to the treasure, drawn on the layer above
+    # the landmass it crosses.
+    trail_points = [(-0.30, -0.19), (-0.20, -0.10), (-0.08, -0.04), (0.04, 0.03), (0.14, 0.09), (0.23, 0.15)]
+    for i, ((x0, y0), (x1, y1)) in enumerate(zip(trail_points, trail_points[1:])):
+        for j in range(2):
+            f = (j + 0.5) / 2
+            cx, cy = x0 + (x1 - x0) * f, y0 + (y1 - y0) * f
+            parts.append(
+                _ink_bar(
+                    f"MapTrail_{i}_{j}",
+                    trail,
+                    cx,
+                    cy,
+                    0.052,
+                    0.014,
+                    math.atan2(y1 - y0, x1 - x0),
+                    layer=INK_LAYER_ROUTE,
+                )
+            )
+
+    # Compass rose, in the one corner nothing else occupies. It started out at
+    # the same coordinates as the X and the two drew on top of each other.
+    parts.append(
+        _ink_slab(
+            "MapCompass_N",
+            accent,
+            [(-0.34, 0.30), (-0.305, 0.22), (-0.34, 0.14), (-0.375, 0.22)],
+            layer=INK_LAYER_ROUTE,
+        )
+    )
+    parts.append(
+        _ink_slab(
+            "MapCompass_E",
+            accent,
+            [(-0.42, 0.22), (-0.34, 0.255), (-0.26, 0.22), (-0.34, 0.185)],
+            layer=INK_LAYER_ROUTE,
+        )
+    )
+
+    # Fold creases, in paper's own colour so they read as folds. A fold runs
+    # through whatever is printed on the sheet, so they sit above the drawing.
+    parts.append(
+        _ink_bar("MapCrease_V", fold, 0.0, 0.0, MAP_DEPTH - 2 * inset, 0.006, math.pi / 2, layer=INK_LAYER_TOP)
+    )
+    parts.append(_ink_bar("MapCrease_H", fold, 0.0, 0.0, MAP_WIDTH - 2 * inset, 0.006, 0.0, layer=INK_LAYER_OVER))
+
+    # X marks the spot, over the end of the trail that leads to it. Kept as its
+    # own object named MapMark: the hierarchy gate uses it to prove a placement
+    # moved the whole prop and not just the paper.
+    mark_a = _ink_bar("MapMark", trail, 0.28, 0.19, 0.15, 0.024, math.radians(45), layer=INK_LAYER_OVER)
+    mark_b = _ink_bar("MapMark_B", trail, 0.28, 0.19, 0.15, 0.024, math.radians(-45), layer=INK_LAYER_TOP)
+    parts.extend([mark_a, mark_b])
+
+    for obj in parts:
+        world = obj.matrix_world.copy()
+        obj.parent = paper_obj
+        obj.matrix_world = world
+
+    # Lean the sheet back so its drawn face turns toward the lens. A map lying
+    # flat is edge-on to a shot camera and reads as a blank sliver, which is what
+    # the acceptance render showed. The ink is parented to the paper, so it tilts
+    # with it; the rock does not, because it belongs on the ground.
+    paper_obj.rotation_euler = (MAP_TILT, 0.0, MAP_YAW)
+    paper_obj.location = (0.0, 0.0, MAP_LIFT)
+
+    # A rock for the sheet to rest against, sized so its top meets the paper's
+    # underside instead of leaving the map hovering.
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=1.0, location=(0.0, 0.0, 0.0))
+    rock = bpy.context.object
+    rock.name = "MapStand"
+    rock.scale = (0.26, 0.15, 0.17)
+    rock.location = (0.05, MAP_STAND_Y, 0.17)
+    rock.data.materials.append(stone)
+
     path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(path))
-    return {"propCode": "PROP_MAP_001", "blend": str(path)}
+    return {
+        "propCode": "PROP_MAP_001",
+        "blend": str(path),
+        "objects": ["AdventureMap"] + [o.name for o in parts],
+    }
 
 
 def main() -> int:

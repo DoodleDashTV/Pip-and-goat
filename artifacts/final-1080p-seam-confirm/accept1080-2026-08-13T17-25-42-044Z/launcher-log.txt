@@ -1,0 +1,34 @@
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-13T17:25:47.416Z","event":"config","jobId":"accept1080-2026-08-13T17-25-42-044Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.74,"workerImage":"ghcr.io/<redacted>/ddp-runpod-blender@sha256:9496498c8dfddccd67e9dd87b696135765d50a3a3f44898f6abdc298a94736cd","hardCapUsd":0.25}
+{"ts":"2026-08-13T17:25:47.662Z","event":"creating_pod","podName":"ddp-accept1080-1786641947662","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":60,"volumeInGb":0}
+{"ts":"2026-08-13T17:25:48.280Z","event":"pod_created","podId":"72pluxljut3dtf","at":"2026-08-13T17:25:48.280Z"}
+AUTHORIZATION CONSUMED: pod 72pluxljut3dtf created. Watchdog + HARD_KILL active.
+{"ts":"2026-08-13T17:25:49.386Z","event":"stage","elapsedSec":0,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":null,"renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T17:26:54.192Z","event":"wait","elapsedSec":64,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:27:56.232Z","event":"wait","elapsedSec":127,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:28:58.146Z","event":"wait","elapsedSec":189,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:30:00.838Z","event":"wait","elapsedSec":252,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:31:03.395Z","event":"wait","elapsedSec":314,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:32:08.711Z","event":"wait","elapsedSec":380,"desiredStatus":"RUNNING","uptimeSec":null,"sawStartupStatus":false}
+{"ts":"2026-08-13T17:32:29.806Z","event":"stage","elapsedSec":401,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"PROCESS_STARTED","renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T17:32:50.902Z","event":"wait","elapsedSec":422,"desiredStatus":"RUNNING","uptimeSec":22,"sawStartupStatus":true}
+{"ts":"2026-08-13T17:33:12.285Z","event":"stage","elapsedSec":443,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"ASSET_DOWNLOAD_START","renderStage":"MANIFEST","status":"PREPARING_ASSETS","uptimeSec":22}
+{"ts":"2026-08-13T17:33:33.332Z","event":"stage","elapsedSec":464,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"DOWNLOADING_ASSETS","status":"RENDERING","uptimeSec":51}
+{"ts":"2026-08-13T17:33:52.868Z","event":"wait","elapsedSec":484,"desiredStatus":"RUNNING","uptimeSec":82,"sawStartupStatus":true}
+{"ts":"2026-08-13T17:33:57.700Z","event":"wait","elapsedSec":489,"desiredStatus":"RUNNING","uptimeSec":82,"sawStartupStatus":true}
+{"ts":"2026-08-13T17:34:02.525Z","event":"wait","elapsedSec":493,"desiredStatus":"RUNNING","uptimeSec":82,"sawStartupStatus":true}
+{"ts":"2026-08-13T17:34:07.448Z","event":"wait","elapsedSec":498,"desiredStatus":"RUNNING","uptimeSec":82,"sawStartupStatus":true}
+{"ts":"2026-08-13T17:34:38.053Z","event":"stage","elapsedSec":529,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"RENDERING","status":"ENCODING","uptimeSec":111}
+{"ts":"2026-08-13T17:34:48.391Z","event":"stage","elapsedSec":539,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":"RENDER_STARTED","renderStage":"COMPLETE","status":"COMPLETE","uptimeSec":111}
+{"ts":"2026-08-13T17:34:48.391Z","event":"render_complete","artifactKey":"renders/finals/meadow-map-mystery/accept1080-2026-08-13T17-25-42-044Z/final_1080p.mp4","artifactSha256":"74cb514a0e62417f8aa4915122afcfebfab86619df6dd1ec548ac27080d707d6"}
+{"ts":"2026-08-13T17:34:48.391Z","event":"terminating_pod","podId":"72pluxljut3dtf"}
+{"ts":"2026-08-13T17:34:48.810Z","event":"post_terminate_poll","podPresent":false,"totalPods":0,"billableRemaining":false}
+
+===== PHASE B LIFECYCLE SUMMARY =====
+Pod ID: 72pluxljut3dtf
+Final status: COMPLETE
+Lifetime: 9.01 min @ $0.74/hr
+ACTUAL COST: $0.1111 (cap $0.25) — within cap: YES
+Pod absent after terminate: YES
+Billable GPU remaining: NO
+Authorization consumed: YES

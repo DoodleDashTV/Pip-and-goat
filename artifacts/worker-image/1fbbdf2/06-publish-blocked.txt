@@ -1,0 +1,17 @@
+=== GHCR credential availability @ 2026-08-13T15:44:38Z ===
+
+GHCR_USER  : absent from this VM's environment
+GHCR_TOKEN : absent from this VM's environment
+docker login: none (~/.docker/config.json has no auths)
+
+Fallback attempted: the gh CLI installation token (ghs_).
+
+$ POST https://ghcr.io/v2/doodledashtv/ddp-runpod-blender/blobs/uploads/
+HTTP 403
+{"errors":[{"code":"DENIED","message":"permission_denied: installation not allowed to Write organization package"}]}
+
+$ gh api /orgs/DoodleDashTV/packages?package_type=container
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/packages/packages#list-packages-for-an-organization","status":"404"}gh: Not Found (HTTP 404)
+
+The installation cannot write the package, and cannot even list org packages.
+Anonymous PULL of the same repository works, so this is write scope, not reach.

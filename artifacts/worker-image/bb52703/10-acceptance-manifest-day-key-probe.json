@@ -1,0 +1,35 @@
+{
+    "requestedLightingState": "DAY_KEY",
+    "appliedLightingState": "DAY_KEY",
+    "lights": [
+        "DDP_Fill",
+        "DDP_Key",
+        "DDP_Rim"
+    ],
+    "lightCount": 3,
+    "strippedLights": [
+        "Meadow_Sun",
+        "Area",
+        "Sun",
+        "Area.001",
+        "Area.002",
+        "Sun.001",
+        "Area.003",
+        "Area.004"
+    ],
+    "strippedCameras": [
+        "MeadowCam",
+        "RefCam",
+        "RefCam.001"
+    ],
+    "actions": null,
+    "stats": {
+        "frame": "frame_.png",
+        "height": 480,
+        "width": 270,
+        "meanLuma": 147.4,
+        "minLuma": 9.09,
+        "maxLuma": 189.39,
+        "meanSaturation": 40.79
+    }
+}

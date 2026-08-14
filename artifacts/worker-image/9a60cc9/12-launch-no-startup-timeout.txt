@@ -1,0 +1,21 @@
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-13T16:58:22.925Z","event":"config","jobId":"accept1080-2026-08-13T16-58-17-617Z","gpuTypeId":"NVIDIA GeForce RTX 4090","quotedRate":0.74,"workerImage":"ghcr.io/<redacted>/ddp-runpod-blender@sha256:bd60f26469a2a09ffef48281170263a2121ff10a458f42f94fa487eacae2c2a2","hardCapUsd":0.25}
+{"ts":"2026-08-13T16:58:23.163Z","event":"creating_pod","podName":"ddp-accept1080-1786640303163","cloudType":"SECURE","gpuTypeId":"NVIDIA GeForce RTX 4090","containerDiskInGb":40,"volumeInGb":0}
+{"ts":"2026-08-13T16:58:23.789Z","event":"pod_created","podId":"hfbwg1adbcv38x","at":"2026-08-13T16:58:23.789Z"}
+AUTHORIZATION CONSUMED: pod hfbwg1adbcv38x created. Watchdog + HARD_KILL active.
+{"ts":"2026-08-13T16:58:24.667Z","event":"stage","elapsedSec":0,"costPerHr":0.74,"desiredStatus":"RUNNING","bootStage":null,"renderStage":null,"status":null,"uptimeSec":null}
+{"ts":"2026-08-13T17:13:34.679Z","event":"no_startup_status_kill","elapsedSec":910}
+{"ts":"2026-08-13T17:13:34.679Z","event":"terminating_pod","podId":"hfbwg1adbcv38x"}
+{"ts":"2026-08-13T17:13:35.153Z","event":"post_terminate_poll","podPresent":false,"totalPods":0,"billableRemaining":false}
+
+===== PHASE B LIFECYCLE SUMMARY =====
+Pod ID: hfbwg1adbcv38x
+Final status: NO_STARTUP_STATUS_TIMEOUT
+Lifetime: 15.19 min @ $0.74/hr
+ACTUAL COST: $0.1873 (cap $0.25) — within cap: YES
+Pod absent after terminate: YES
+Billable GPU remaining: NO
+Authorization consumed: YES
+
+# 15min, zero startup-status.json. Image pull or pre-R2 boot failure.
+# Follow-up: early R2 PROCESS_STARTED + HEALTHCHECK GPU override + rebuild.

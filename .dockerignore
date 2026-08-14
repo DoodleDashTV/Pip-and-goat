@@ -1,0 +1,39 @@
+# Build context hygiene for workers/runpod-blender/Dockerfile (built from repo
+# root). Keep the context small and NEVER ship secrets or large local data into
+# the image. The Dockerfile only needs workers/runpod-blender/{package.json,
+# package-lock.json,src} and scripts/blender.
+
+# --- Secrets: never copy into the build context / image ---
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/secrets
+**/*secret*.json
+scripts/ddp_github_push.local.sh
+**/ddp_github_push.local.sh
+
+# --- Dependencies / build output (reinstalled inside the image) ---
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/.vercel
+**/coverage
+**/*.tsbuildinfo
+
+# --- Large local-only data not needed by the worker image ---
+assets/
+artifacts/
+production-library/
+**/.doodle-dash-storage
+**/test-results
+
+# --- VCS / editor / logs ---
+.git
+.gitignore
+**/*.log
+**/.DS_Store

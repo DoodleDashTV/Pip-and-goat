@@ -1,0 +1,43 @@
+=== FAIL-CLOSED FAULT INJECTION @ 2026-08-13T14:53:29Z ===
+commit: e509a01bc74067caf5e96ee39890ee1d4e8f03db
+
+----- FAULT 1: a stale published image, pinned by digest, correctly labelled -----
+image:            ghcr.io/doodledashtv/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27
+expected commit:  bb5270372ad558e71673fe789260a12fb51a9c6d
+expected code:    c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+expected assets:  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+checkout code:    f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207 (30 files)
+checkout assets:  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7 (4 files)
+registry read:    ok=true amd64=true — config blob read; linux/amd64=true
+  ddp.source.commit = bb5270372ad558e71673fe789260a12fb51a9c6d
+  ddp.worker.build.time = 2026-08-12T22:25:23Z
+  ddp.render.code.sha256 = c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91
+  org.opencontainers.image.revision = bb5270372ad558e71673fe789260a12fb51a9c6d
+  org.opencontainers.image.created = 2026-08-12T22:25:23Z
+VERIFY: FAIL code=RENDER_CODE_MISMATCH
+  working tree render code f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207 != image render code c4afa39c8c06b32df7352ff0c02675b64ba6da13a0067215182cb07551ca4c91 — the image is stale and would render different code than this checkout
+  -> expected: FAIL RENDER_CODE_MISMATCH
+
+----- FAULT 2: one byte appended to Pip's approved model -----
+[FAIL] 0 Local quality gates on the current asset bytes — asset pip changed since gates ran (gates: e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0, now: 8ca6c212ebc39750f95b06d1f1a14c4c6a7c7b4516fddf42c5451d0c6b730037)
+[PASS] 4 PIP approved asset present and is a .blend — sha256=8ca6c212ebc39750f95b06d1f1a14c4c6a7c7b4516fddf42c5451d0c6b730037 header=BLENDER
+[FAIL] ASSETFP Approved render assets match the pinned fingerprint — 9bb04ae2e5547aed8d94807729cbd124ede97b7c205d40141f22feefdbf0078c over 4 files
+PREFLIGHT (credential-free subset): FAIL (4) — 13 checks run
+  -> expected: FAIL ASSETFP, and FAIL 0 because the gate run measured other bytes
+  restored: yes
+
+----- FAULT 3: one line added to the scene assembly baked into the image -----
+RENDER_CODE_SHA256 fab2fe2e0dacb9a38f0f748628d3b1b3e3be3cdf9f15d5dac628ac245557045e files=30
+RENDER_ASSET_SHA256 7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7 files=4
+  -> expected: a render-code fingerprint that is not the pinned one
+  restored: yes
+
+----- FAULT 4: the launch-time pin check, after preflight has passed -----
+=== PHASE B — SINGLE AUTHORIZED LAUNCH ===
+{"ts":"2026-08-13T14:53:32.447Z","event":"abort_fingerprint_drift","renderCodeMatches":false,"renderAssetsMatch":true,"localRenderCode":"f30e6dc010c6fdbdb184478da1b24d4a3fe9e236010e17a5536c0c1f4dd1c207","pinnedRenderCode":"PENDING_REBUILD","localRenderAssets":"7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7","pinnedRenderAssets":"7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7"}
+ABORT: working tree no longer matches the pins — not launching. Spend $0.
+  -> expected: ABORT before any Runpod call, exit 2, no pod, $0
+
+=== all faults restored ===
+  pip.blend         e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0
+  assemble_scene.py 6ba991ba6957782aab98e8d3ba49e590f7b95e0bdf2fe601330a8d10a655c8ab

@@ -1,0 +1,271 @@
+{
+  "ok": true,
+  "status": "PASS",
+  "gate": {
+    "LOCAL_VISUAL_ACCEPTANCE": true
+  },
+  "resolution": "270x480",
+  "aspect": "9:16 (same as FINAL_1080P)",
+  "frames": 90,
+  "fps": 30,
+  "samples": 16,
+  "checks": {
+    "frameCount": true,
+    "resolution": true,
+    "staticCameraFramesRendered": true,
+    "characterPixelMotion": true,
+    "noDuplicateLights": true,
+    "exposureInBand": true,
+    "highlightsPresent": true,
+    "noHighlightClipping": true,
+    "shadowsLifted": true,
+    "shadowDepthRetained": true,
+    "saturationHealthy": true,
+    "tonalRangeHealthy": true,
+    "subjectsMeasured": true,
+    "subjectSeparation": true,
+    "groundContact": true,
+    "videoEncoded": true
+  },
+  "keyFrameStats": [
+    {
+      "frame": "frame_0001.png",
+      "height": 480,
+      "width": 270,
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 120.45,
+      "meanLumaPct": 0.4724,
+      "minLuma": 7.7,
+      "maxLuma": 243.72,
+      "p01Luma": 47.61,
+      "p05Luma": 79.77,
+      "p50Luma": 125.05,
+      "p95Luma": 173.49,
+      "p99Luma": 208.73,
+      "p999Luma": 235.58,
+      "contrast": 93.72,
+      "tonalRange": 161.12,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 62.63
+    },
+    {
+      "frame": "frame_0030.png",
+      "height": 480,
+      "width": 270,
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 121.11,
+      "meanLumaPct": 0.475,
+      "minLuma": 8.49,
+      "maxLuma": 244.72,
+      "p01Luma": 47.32,
+      "p05Luma": 79.77,
+      "p50Luma": 125.05,
+      "p95Luma": 179.43,
+      "p99Luma": 208.73,
+      "p999Luma": 235.85,
+      "contrast": 99.66,
+      "tonalRange": 161.41,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 62.31
+    },
+    {
+      "frame": "frame_0060.png",
+      "height": 480,
+      "width": 270,
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 123.06,
+      "meanLumaPct": 0.4826,
+      "minLuma": 6.14,
+      "maxLuma": 240.85,
+      "p01Luma": 47.26,
+      "p05Luma": 79.84,
+      "p50Luma": 124.76,
+      "p95Luma": 201.81,
+      "p99Luma": 211.91,
+      "p999Luma": 236.06,
+      "contrast": 121.96,
+      "tonalRange": 164.65,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 61.24
+    },
+    {
+      "frame": "frame_0090.png",
+      "height": 480,
+      "width": 270,
+      "colorspace": "sRGB (PNG default, no colour chunk)",
+      "meanLuma": 124.32,
+      "meanLumaPct": 0.4875,
+      "minLuma": 2.0,
+      "maxLuma": 246.79,
+      "p01Luma": 47.46,
+      "p05Luma": 79.77,
+      "p50Luma": 124.19,
+      "p95Luma": 203.81,
+      "p99Luma": 220.16,
+      "p999Luma": 237.58,
+      "contrast": 124.03,
+      "tonalRange": 172.7,
+      "clippedHighlightFraction": 0.0,
+      "clippedShadowFraction": 0.0,
+      "meanSaturation": 60.24
+    }
+  ],
+  "subjectSeparation": {
+    "frame_0001": {
+      "pip": {
+        "coveragePct": 0.779,
+        "bodyMeanLuma": 160.07,
+        "litSideMeanLuma": 200.62,
+        "adjacentGrassLuma": 123.14,
+        "groundUnderSubjectLuma": 119.14,
+        "openGrassLuma": 125.76,
+        "litSideVsAdjacentGrass": 77.48,
+        "contactDarkening": 6.62
+      },
+      "goat": {
+        "coveragePct": 2.018,
+        "bodyMeanLuma": 157.39,
+        "litSideMeanLuma": 210.1,
+        "adjacentGrassLuma": 124.58,
+        "groundUnderSubjectLuma": 122.55,
+        "openGrassLuma": 130.23,
+        "litSideVsAdjacentGrass": 85.52,
+        "contactDarkening": 7.68
+      }
+    },
+    "frame_0090": {
+      "pip": {
+        "coveragePct": 1.872,
+        "bodyMeanLuma": 163.51,
+        "litSideMeanLuma": 203.56,
+        "adjacentGrassLuma": 123.31,
+        "groundUnderSubjectLuma": 118.76,
+        "openGrassLuma": 126.47,
+        "litSideVsAdjacentGrass": 80.25,
+        "contactDarkening": 7.71
+      },
+      "goat": {
+        "coveragePct": 4.698,
+        "bodyMeanLuma": 153.59,
+        "litSideMeanLuma": 207.06,
+        "adjacentGrassLuma": 121.08,
+        "groundUnderSubjectLuma": 116.08,
+        "openGrassLuma": 133.29,
+        "litSideVsAdjacentGrass": 85.98,
+        "contactDarkening": 17.21
+      }
+    }
+  },
+  "keyFrames": [
+    "artifacts/local-acceptance/keyframes/production_0001.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0001.png",
+    "artifacts/local-acceptance/keyframes/production_0030.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0030.png",
+    "artifacts/local-acceptance/keyframes/production_0060.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0060.png",
+    "artifacts/local-acceptance/keyframes/production_0090.png",
+    "artifacts/local-acceptance/keyframes/static_camera_0090.png"
+  ],
+  "staticCameraMovingPixelFraction": {
+    "1->30": 0.043202,
+    "30->60": 0.045347,
+    "60->90": 0.050409
+  },
+  "minStaticCameraMovingPixelFraction": 0.043202,
+  "thresholds": {
+    "pixelDelta": 8.0,
+    "minMovingPixelFraction": 0.005,
+    "exposurePctBand": [
+      0.43,
+      0.53
+    ],
+    "highlightP99Min": 200.0,
+    "highlightClipMax": 0.002,
+    "shadowP01Min": 6.0,
+    "shadowClipMax": 0.0005,
+    "shadowDepthMaxRatio": 0.55,
+    "saturationMin": 45.0,
+    "tonalRangeMin": 140.0,
+    "separationMin": 20.0,
+    "contactMin": 2.0
+  },
+  "measurement": {
+    "source": "stored PNG bytes (scripts/assets/png_io.py)",
+    "colorspace": [
+      "sRGB (PNG default, no colour chunk)"
+    ]
+  },
+  "activeLights": [
+    "DDP_Fill",
+    "DDP_Key",
+    "DDP_Rim"
+  ],
+  "lighting": {
+    "skyObjects": [
+      "Meadow_Sky"
+    ],
+    "lightingState": "DAY_KEY",
+    "requested": "DAY_KEY",
+    "created": [
+      "DDP_Key",
+      "DDP_Fill",
+      "DDP_Rim"
+    ],
+    "activeLightCount": 3,
+    "activeLights": [
+      "DDP_Fill",
+      "DDP_Key",
+      "DDP_Rim"
+    ],
+    "worldStrength": 0.18,
+    "look": "None",
+    "lookRequested": "None",
+    "exposure": -3.0999999046325684,
+    "viewTransform": "Khronos PBR Neutral"
+  },
+  "placementRoots": {
+    "meadow": {
+      "object": "meadow_Root",
+      "kind": "created-root"
+    },
+    "map": {
+      "object": "map_Root",
+      "kind": "created-root"
+    },
+    "pip": {
+      "object": "Pip_Rig",
+      "kind": "armature"
+    },
+    "goat": {
+      "object": "Goat_Rig",
+      "kind": "armature"
+    }
+  },
+  "appliedActions": {
+    "pip": "PIP_POINT",
+    "goat": "GOAT_HEAD_NOD"
+  },
+  "strippedFromAssets": {
+    "lights": [
+      "Meadow_Sun",
+      "Area",
+      "Sun",
+      "Area.001",
+      "Area.002",
+      "Sun.001",
+      "Area.003",
+      "Area.004"
+    ],
+    "cameras": [
+      "MeadowCam",
+      "RefCam",
+      "RefCam.001"
+    ]
+  },
+  "video": "artifacts/local-acceptance/local_acceptance_270x480.mp4",
+  "ffmpegOk": true,
+  "blenderVersion": "4.2.3 LTS"
+}

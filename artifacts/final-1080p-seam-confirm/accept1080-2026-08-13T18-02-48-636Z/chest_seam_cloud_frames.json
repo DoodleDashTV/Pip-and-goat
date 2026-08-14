@@ -1,0 +1,101 @@
+{
+ "window": {
+  "x0": 186,
+  "x1": 276,
+  "y0": 1240,
+  "y1": 1382
+ },
+ "shadowThresholdFractionOfLit": 0.75,
+ "framesMeasured": 90,
+ "frame_0045": {
+  "frame": "frame_0045.png",
+  "chestPlumagePixels": 7845,
+  "litLevelP90": 204.61,
+  "shadowedPixels": 3242,
+  "shadowedFractionPct": 41.33,
+  "meanShadowDepthPctBelowLit": 39.56,
+  "maxShadowDepthPctBelowLit": 65.02,
+  "verticalSeamColumnDeltaLuma": 24.73,
+  "skip": false
+ },
+ "shadowedFractionPct": {
+  "min": 19.99,
+  "median": 35.63,
+  "max": 41.62,
+  "mean": 32.35
+ },
+ "verticalSeamColumnDeltaLuma": {
+  "min": 13.77,
+  "median": 32.11,
+  "max": 51.75,
+  "mean": 31.96
+ },
+ "reference": {
+  "before_a440d88_shadowedFractionPct": 40.6,
+  "after_local_repair_shadowedFractionPct": 27.28
+ },
+ "verdict": {
+  "belowPreRepairCeilingAllFrames": false,
+  "frame45AtOrBelowLocalRepairPlusTol": false,
+  "noExtremeVerticalSeamSpike": false,
+  "pass": false
+ },
+ "worstFiveFramesByShadowedFraction": [
+  {
+   "frame": "frame_0043.png",
+   "chestPlumagePixels": 7413,
+   "litLevelP90": 202.92,
+   "shadowedPixels": 3085,
+   "shadowedFractionPct": 41.62,
+   "meanShadowDepthPctBelowLit": 39.0,
+   "maxShadowDepthPctBelowLit": 64.25,
+   "verticalSeamColumnDeltaLuma": 32.23,
+   "skip": false
+  },
+  {
+   "frame": "frame_0001.png",
+   "chestPlumagePixels": 746,
+   "litLevelP90": 168.3,
+   "shadowedPixels": 309,
+   "shadowedFractionPct": 41.42,
+   "meanShadowDepthPctBelowLit": 33.93,
+   "maxShadowDepthPctBelowLit": 56.17,
+   "verticalSeamColumnDeltaLuma": 16.28,
+   "skip": false
+  },
+  {
+   "frame": "frame_0006.png",
+   "chestPlumagePixels": 868,
+   "litLevelP90": 169.2,
+   "shadowedPixels": 359,
+   "shadowedFractionPct": 41.36,
+   "meanShadowDepthPctBelowLit": 34.07,
+   "maxShadowDepthPctBelowLit": 56.78,
+   "verticalSeamColumnDeltaLuma": 14.49,
+   "skip": false
+  },
+  {
+   "frame": "frame_0045.png",
+   "chestPlumagePixels": 7845,
+   "litLevelP90": 204.61,
+   "shadowedPixels": 3242,
+   "shadowedFractionPct": 41.33,
+   "meanShadowDepthPctBelowLit": 39.56,
+   "maxShadowDepthPctBelowLit": 65.02,
+   "verticalSeamColumnDeltaLuma": 24.73,
+   "skip": false
+  },
+  {
+   "frame": "frame_0046.png",
+   "chestPlumagePixels": 8018,
+   "litLevelP90": 205.38,
+   "shadowedPixels": 3314,
+   "shadowedFractionPct": 41.33,
+   "meanShadowDepthPctBelowLit": 39.82,
+   "maxShadowDepthPctBelowLit": 64.88,
+   "verticalSeamColumnDeltaLuma": 23.09,
+   "skip": false
+  }
+ ],
+ "allFramesCount": 90
+}

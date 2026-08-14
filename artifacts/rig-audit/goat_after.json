@@ -1,0 +1,880 @@
+{
+  "role": "goat",
+  "blend": "production-library/characters/goat_production.blend",
+  "blenderVersion": "4.2.3 LTS",
+  "armatures": [
+    {
+      "armature": "Goat_Rig",
+      "boneCount": 18,
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "useDeform": true
+        },
+        {
+          "name": "pelvis",
+          "parent": "root",
+          "useDeform": true
+        },
+        {
+          "name": "spine",
+          "parent": "pelvis",
+          "useDeform": true
+        },
+        {
+          "name": "chest",
+          "parent": "spine",
+          "useDeform": true
+        },
+        {
+          "name": "neck",
+          "parent": "chest",
+          "useDeform": true
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "useDeform": true
+        },
+        {
+          "name": "ear_L",
+          "parent": "head",
+          "useDeform": true
+        },
+        {
+          "name": "ear_R",
+          "parent": "head",
+          "useDeform": true
+        },
+        {
+          "name": "collar",
+          "parent": "neck",
+          "useDeform": true
+        },
+        {
+          "name": "tail",
+          "parent": "spine",
+          "useDeform": true
+        },
+        {
+          "name": "leg_FL",
+          "parent": "root",
+          "useDeform": true
+        },
+        {
+          "name": "hoof_FL",
+          "parent": "leg_FL",
+          "useDeform": true
+        },
+        {
+          "name": "leg_FR",
+          "parent": "root",
+          "useDeform": true
+        },
+        {
+          "name": "hoof_FR",
+          "parent": "leg_FR",
+          "useDeform": true
+        },
+        {
+          "name": "leg_BL",
+          "parent": "root",
+          "useDeform": true
+        },
+        {
+          "name": "hoof_BL",
+          "parent": "leg_BL",
+          "useDeform": true
+        },
+        {
+          "name": "leg_BR",
+          "parent": "root",
+          "useDeform": true
+        },
+        {
+          "name": "hoof_BR",
+          "parent": "leg_BR",
+          "useDeform": true
+        }
+      ],
+      "poseBoneRotationModes": {
+        "root": "XYZ",
+        "pelvis": "XYZ",
+        "spine": "XYZ",
+        "chest": "XYZ",
+        "neck": "XYZ",
+        "head": "XYZ",
+        "ear_L": "XYZ",
+        "ear_R": "XYZ",
+        "collar": "XYZ",
+        "tail": "XYZ",
+        "leg_FL": "XYZ",
+        "hoof_FL": "XYZ",
+        "leg_FR": "XYZ",
+        "hoof_FR": "XYZ",
+        "leg_BL": "XYZ",
+        "hoof_BL": "XYZ",
+        "leg_BR": "XYZ",
+        "hoof_BR": "XYZ"
+      },
+      "distinctRotationModes": [
+        "XYZ"
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "mesh": "Goat_Character",
+      "vertices": 3848,
+      "parent": "Goat_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Goat_Rig"
+        }
+      ],
+      "vertexGroupCount": 18,
+      "vertexGroups": [
+        "root",
+        "pelvis",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "ear_L",
+        "ear_R",
+        "collar",
+        "tail",
+        "leg_FL",
+        "hoof_FL",
+        "leg_FR",
+        "hoof_FR",
+        "leg_BL",
+        "hoof_BL",
+        "leg_BR",
+        "hoof_BR"
+      ],
+      "groupsMatchingDeformBones": [
+        "chest",
+        "collar",
+        "ear_L",
+        "ear_R",
+        "head",
+        "hoof_BL",
+        "hoof_BR",
+        "hoof_FL",
+        "hoof_FR",
+        "leg_BL",
+        "leg_BR",
+        "leg_FL",
+        "leg_FR",
+        "neck",
+        "pelvis",
+        "root",
+        "spine",
+        "tail"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 44,
+      "reallyBound": true
+    },
+    {
+      "mesh": "Goat_Collar",
+      "vertices": 768,
+      "parent": "Goat_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Goat_Rig"
+        }
+      ],
+      "vertexGroupCount": 1,
+      "vertexGroups": [
+        "collar"
+      ],
+      "groupsMatchingDeformBones": [
+        "collar"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 0,
+      "reallyBound": true
+    },
+    {
+      "mesh": "Goat_Tag",
+      "vertices": 64,
+      "parent": "Goat_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Goat_Rig"
+        }
+      ],
+      "vertexGroupCount": 1,
+      "vertexGroups": [
+        "collar"
+      ],
+      "groupsMatchingDeformBones": [
+        "collar"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 0,
+      "reallyBound": true
+    },
+    {
+      "mesh": "Goat_Tag_Text",
+      "vertices": 868,
+      "parent": "Goat_Rig",
+      "parentType": "OBJECT",
+      "armatureModifiers": [
+        {
+          "name": "Armature",
+          "object": "Goat_Rig"
+        }
+      ],
+      "vertexGroupCount": 1,
+      "vertexGroups": [
+        "collar"
+      ],
+      "groupsMatchingDeformBones": [
+        "collar"
+      ],
+      "orphanVertexGroups": [],
+      "unweightedVertices": 0,
+      "shapeKeys": 0,
+      "reallyBound": true
+    }
+  ],
+  "actions": [
+    {
+      "action": "GOAT_CHEER",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_EAR_REACT",
+      "fcurves": 108,
+      "varyingFcurves": 2,
+      "constantFcurves": 106,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[0]",
+        "pose.bones[\"ear_R\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_EXCITED",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_GREET",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_HAPPY",
+      "fcurves": 108,
+      "varyingFcurves": 4,
+      "constantFcurves": 104,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_HAPPY_REACTION",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_HEAD_NOD",
+      "fcurves": 21,
+      "varyingFcurves": 12,
+      "constantFcurves": 9,
+      "keyframes": 1890,
+      "frameRange": [
+        1.0,
+        90.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"chest\"].rotation_euler[0]",
+        "pose.bones[\"chest\"].rotation_euler[2]",
+        "pose.bones[\"ear_L\"].rotation_euler[0]",
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[0]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"head\"].rotation_euler[2]",
+        "pose.bones[\"neck\"].rotation_euler[0]",
+        "pose.bones[\"neck\"].rotation_euler[2]",
+        "pose.bones[\"root\"].location[2]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_HOOF_STEP",
+      "fcurves": 108,
+      "varyingFcurves": 5,
+      "constantFcurves": 103,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"leg_BL\"].rotation_euler[0]",
+        "pose.bones[\"leg_BR\"].rotation_euler[0]",
+        "pose.bones[\"leg_FL\"].rotation_euler[0]",
+        "pose.bones[\"leg_FR\"].rotation_euler[0]",
+        "pose.bones[\"root\"].location[1]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_IDLE",
+      "fcurves": 108,
+      "varyingFcurves": 4,
+      "constantFcurves": 104,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_IDLE_ALT",
+      "fcurves": 108,
+      "varyingFcurves": 4,
+      "constantFcurves": 104,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_JUMP",
+      "fcurves": 108,
+      "varyingFcurves": 5,
+      "constantFcurves": 103,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"leg_BL\"].rotation_euler[0]",
+        "pose.bones[\"leg_BR\"].rotation_euler[0]",
+        "pose.bones[\"leg_FL\"].rotation_euler[0]",
+        "pose.bones[\"leg_FR\"].rotation_euler[0]",
+        "pose.bones[\"root\"].location[1]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_LISTEN",
+      "fcurves": 108,
+      "varyingFcurves": 4,
+      "constantFcurves": 104,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_LISTEN_IDLE",
+      "fcurves": 108,
+      "varyingFcurves": 4,
+      "constantFcurves": 104,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_LOOK",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_LOOK_DOWN",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_LOOK_LEFT",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_LOOK_RIGHT",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_LOOK_UP",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_POINT",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_RUN",
+      "fcurves": 108,
+      "varyingFcurves": 5,
+      "constantFcurves": 103,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"leg_BL\"].rotation_euler[0]",
+        "pose.bones[\"leg_BR\"].rotation_euler[0]",
+        "pose.bones[\"leg_FL\"].rotation_euler[0]",
+        "pose.bones[\"leg_FR\"].rotation_euler[0]",
+        "pose.bones[\"root\"].location[1]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_SURPRISED",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_SURPRISED_REACTION",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_TALK",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_TALK_IDLE",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_THINK",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[0]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_TURN",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_TURN_LEFT",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_TURN_RIGHT",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_WALK",
+      "fcurves": 108,
+      "varyingFcurves": 5,
+      "constantFcurves": 103,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"leg_BL\"].rotation_euler[0]",
+        "pose.bones[\"leg_BR\"].rotation_euler[0]",
+        "pose.bones[\"leg_FL\"].rotation_euler[0]",
+        "pose.bones[\"leg_FR\"].rotation_euler[0]",
+        "pose.bones[\"root\"].location[1]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_WAVE",
+      "fcurves": 108,
+      "varyingFcurves": 1,
+      "constantFcurves": 107,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"head\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_WORRIED",
+      "fcurves": 108,
+      "varyingFcurves": 4,
+      "constantFcurves": 104,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    },
+    {
+      "action": "GOAT_WORRIED_REACTION",
+      "fcurves": 108,
+      "varyingFcurves": 4,
+      "constantFcurves": 104,
+      "keyframes": 3240,
+      "frameRange": [
+        1.0,
+        30.0
+      ],
+      "varyingChannels": [
+        "pose.bones[\"ear_L\"].rotation_euler[1]",
+        "pose.bones[\"ear_R\"].rotation_euler[1]",
+        "pose.bones[\"head\"].rotation_euler[0]",
+        "pose.bones[\"tail\"].rotation_euler[2]"
+      ],
+      "rotationModeConflicts": [],
+      "deadAction": false
+    }
+  ],
+  "deformBones": [
+    "chest",
+    "collar",
+    "ear_L",
+    "ear_R",
+    "head",
+    "hoof_BL",
+    "hoof_BR",
+    "hoof_FL",
+    "hoof_FR",
+    "leg_BL",
+    "leg_BR",
+    "leg_FL",
+    "leg_FR",
+    "neck",
+    "pelvis",
+    "root",
+    "spine",
+    "tail"
+  ],
+  "evaluatedAction": "GOAT_HEAD_NOD",
+  "evaluatedActionExists": true,
+  "fuzzyCandidates": null,
+  "motion": {
+    "framesSampled": [
+      1,
+      30,
+      60,
+      90
+    ],
+    "maxBoneDelta": 0.719718,
+    "maxVertexDelta": 0.219654,
+    "pairwiseVertexDeltas": {
+      "1->30": 0.129035,
+      "30->60": 0.32175,
+      "60->90": 0.168604
+    },
+    "minConsecutiveVertexDelta": 0.129035,
+    "movingBones": [
+      "chest",
+      "collar",
+      "ear_L",
+      "ear_R",
+      "head",
+      "hoof_BL",
+      "hoof_BR",
+      "hoof_FL",
+      "hoof_FR",
+      "leg_BL",
+      "leg_BR",
+      "leg_FL",
+      "leg_FR",
+      "neck",
+      "pelvis",
+      "root",
+      "spine",
+      "tail"
+    ],
+    "vertexCount": 5548
+  },
+  "failures": [],
+  "ok": true,
+  "status": "PASS"
+}

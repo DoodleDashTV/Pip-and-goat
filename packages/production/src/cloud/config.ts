@@ -83,3 +83,126 @@ export const PREFERRED_RUNPOD_GPU_TYPES = [
 
 export const DEFAULT_BLENDER_VERSION = '4.2';
 export const CLOUD_JOB_MANIFEST_SCHEMA = 'ddp-cloud-job-manifest-v1' as const;
+
+/**
+ * Trusted registry for the published Runpod GPU worker image. The image is
+ * built + pushed by CI (workers/runpod-blender/Dockerfile) and MUST be pinned
+ * by an immutable @sha256 digest so a paid pod always boots the exact bytes we
+ * smoke-tested. Mutable tags (e.g. :latest) are rejected on purpose.
+ */
+export const RUNPOD_WORKER_IMAGE_REGISTRY = 'ghcr.io' as const;
+
+/** Read the configured Runpod worker image reference (never a secret). */
+export function resolveRunpodWorkerImage(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  return String(env.RUNPOD_WORKER_IMAGE ?? '').trim();
+}
+
+export type WorkerImageValidation = {
+  ok: boolean;
+  ref: string;
+  code:
+    | 'OK'
+    | 'WORKER_IMAGE_MISSING'
+    | 'WORKER_IMAGE_UNTRUSTED_REGISTRY'
+    | 'WORKER_IMAGE_MUTABLE_TAG'
+    | 'WORKER_IMAGE_NOT_PINNED'
+    | 'WORKER_IMAGE_BAD_DIGEST'
+    | 'WORKER_IMAGE_MALFORMED';
+  reason: string;
+  registry: string | null;
+  repository: string | null;
+  digest: string | null;
+};
+
+/**
+ * Fail-closed validation of a worker image reference. Accepts ONLY an
+ * immutable ghcr.io reference pinned by @sha256 digest, e.g.
+ *   ghcr.io/OWNER/ddp-runpod-blender@sha256:<64-hex>
+ * Rejects empty, non-ghcr.io, mutable (:latest / tag-only) and malformed refs.
+ */
+export function validateRunpodWorkerImageRef(ref: string | undefined): WorkerImageValidation {
+  const value = String(ref ?? '').trim();
+  const base: Pick<WorkerImageValidation, 'ref' | 'registry' | 'repository' | 'digest'> = {
+    ref: value,
+    registry: null,
+    repository: null,
+    digest: null,
+  };
+
+  if (!value) {
+    return {
+      ...base,
+      ok: false,
+      code: 'WORKER_IMAGE_MISSING',
+      reason: 'RUNPOD_WORKER_IMAGE is not configured. Set the immutable @sha256 worker image digest.',
+    };
+  }
+
+  const atIndex = value.indexOf('@');
+  if (atIndex === -1) {
+    // No digest at all — a tag-only reference is mutable and rejected.
+    if (/:latest$/i.test(value)) {
+      return { ...base, ok: false, code: 'WORKER_IMAGE_MUTABLE_TAG', reason: 'Mutable :latest tag is not allowed; pin the @sha256 digest.' };
+    }
+    return {
+      ...base,
+      ok: false,
+      code: 'WORKER_IMAGE_NOT_PINNED',
+      reason: 'Worker image must be pinned by an immutable @sha256 digest (repo@sha256:...).',
+    };
+  }
+
+  const repoPart = value.slice(0, atIndex);
+  const digest = value.slice(atIndex + 1);
+
+  // Reject a mutable tag even when a digest is present (e.g. repo:latest@sha256:...).
+  if (/:latest$/i.test(repoPart)) {
+    return { ...base, ref: value, registry: null, repository: null, digest, ok: false, code: 'WORKER_IMAGE_MUTABLE_TAG', reason: 'Mutable :latest tag is not allowed; use the bare repo@sha256 digest.' };
+  }
+
+  if (!/^sha256:[0-9a-f]{64}$/.test(digest)) {
+    return { ...base, digest, ok: false, code: 'WORKER_IMAGE_BAD_DIGEST', reason: 'Worker image digest must be sha256:<64 lowercase hex>.' };
+  }
+
+  // Strip an optional (non-latest) tag from the repo portion for parsing.
+  const repoNoTag = repoPart.replace(/:[^/:@]+$/, '');
+  const slash = repoNoTag.indexOf('/');
+  const registry = slash === -1 ? '' : repoNoTag.slice(0, slash);
+  const repository = slash === -1 ? repoNoTag : repoNoTag.slice(slash + 1);
+
+  if (registry.toLowerCase() !== RUNPOD_WORKER_IMAGE_REGISTRY) {
+    return {
+      ...base,
+      digest,
+      registry: registry || null,
+      repository: repository || null,
+      ok: false,
+      code: 'WORKER_IMAGE_UNTRUSTED_REGISTRY',
+      reason: `Worker image must be hosted on ${RUNPOD_WORKER_IMAGE_REGISTRY} (got '${registry || 'none'}').`,
+    };
+  }
+
+  if (!/^[a-z0-9]+(?:[._-][a-z0-9]+)*(?:\/[a-z0-9]+(?:[._-][a-z0-9]+)*)+$/.test(repository)) {
+    return {
+      ...base,
+      digest,
+      registry,
+      repository: repository || null,
+      ok: false,
+      code: 'WORKER_IMAGE_MALFORMED',
+      reason: `Worker image repository path is malformed: '${repository}'.`,
+    };
+  }
+
+  return {
+    ok: true,
+    ref: value,
+    code: 'OK',
+    reason: 'Worker image pinned by immutable @sha256 digest on ghcr.io.',
+    registry,
+    repository,
+    digest,
+  };
+}

@@ -1,0 +1,77 @@
+{
+ "pip/Pip_Backpack": {
+  "planner": [],
+  "sixRay": [],
+  "agree": true,
+  "parts": []
+ },
+ "pip/Pip_Backpack_Pouch": {
+  "planner": [],
+  "sixRay": [],
+  "agree": true,
+  "parts": []
+ },
+ "pip/Pip_Character": {
+  "planner": [
+   8,
+   13,
+   16
+  ],
+  "sixRay": [
+   8,
+   13,
+   16
+  ],
+  "agree": true,
+  "parts": [
+   "#8 PipPupil (86 verts)",
+   "#13 PipPupil (86 verts)",
+   "#16 PipBeak (86 verts)"
+  ]
+ },
+ "pip/Pip_StarCharm": {
+  "planner": [],
+  "sixRay": [],
+  "agree": true,
+  "parts": []
+ },
+ "goat/Goat_Character": {
+  "planner": [
+   12,
+   17
+  ],
+  "sixRay": [
+   12,
+   17
+  ],
+  "agree": true,
+  "parts": [
+   "#12 GoatPupil (86 verts)",
+   "#17 GoatPupil (86 verts)"
+  ]
+ },
+ "goat/Goat_Collar": {
+  "planner": [],
+  "sixRay": [],
+  "agree": true,
+  "parts": []
+ },
+ "goat/Goat_Tag": {
+  "planner": [],
+  "sixRay": [],
+  "agree": true,
+  "parts": []
+ },
+ "goat/Goat_Tag_Text": {
+  "planner": [],
+  "sixRay": [
+   10,
+   12
+  ],
+  "agree": false,
+  "parts": [
+   "#10 GoatTagInk (96 verts)",
+   "#12 GoatTagInk (6 verts)"
+  ]
+ }
+}

@@ -1,0 +1,26 @@
+=== GHCR credential probe @ 2026-08-13T16:21:03Z ===
+
+Secret presence (values not printed):
+  GHCR_USER     : present len=13 trailing_ws=True
+  GHCR_USERNAME : present len=7 trailing_ws=True
+  GHCR_TOKEN    : present len=40 prefix=ghp_
+
+Package org segment length: 12 (equals stripped GHCR_USER: False)
+
+GET api.github.com/user -> HTTP 401
+{
+  "message": "Bad credentials",
+  "documentation_url": "https://docs.github.com/rest",
+  "status": "401"
+}
+
+GET ghcr.io token (pull,push) -> HTTP 403: {"errors":[{"code":"DENIED","message":"denied"}]}
+
+
+docker login ghcr.io:
+  Error response from daemon: Get "https://ghcr.io/v2/": denied: denied
+
+Conclusion: secrets are injected at boot (unlike the prior run where they were absent),
+but the token is rejected as Bad credentials and both username secrets carry trailing
+whitespace. Publication remains blocked; WORKER_IMAGE stays PENDING_REBUILD.
+No image was pushed. No GPU pod was created. Spend $0.

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "ddp-cloud-job-manifest-v1",
+  "jobId": "accept1080-2026-08-13T17-25-42-044Z",
+  "episodeId": "meadow-map-mystery",
+  "sceneId": "meadow_map_mystery",
+  "renderMode": "FINAL_1080P",
+  "resolution": "1080x1920",
+  "fps": 30,
+  "frameRange": {
+    "start": 1,
+    "end": 90
+  },
+  "blenderVersion": "4.2.3",
+  "eevee": {
+    "engine": "EEVEE",
+    "samples": 24
+  },
+  "cameraState": {
+    "preset": "PUSH_IN"
+  },
+  "lightingState": {},
+  "vfxState": {},
+  "shotMeta": {
+    "title": "Meadow Map Mystery — FINAL_1080P acceptance",
+    "cameraPreset": "PUSH_IN",
+    "lightingState": "DAY_KEY",
+    "placements": {
+      "pip": {
+        "location": [
+          -0.72,
+          -1.5,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0.34
+        ],
+        "action": "PIP_POINT"
+      },
+      "goat": {
+        "location": [
+          0.72,
+          -1.2,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          -0.42
+        ],
+        "action": "GOAT_HEAD_NOD"
+      }
+    }
+  },
+  "expectedAssets": [
+    {
+      "role": "meadow",
+      "kind": "blend",
+      "r2Key": "environments/env_meadow_v1/env_meadow_v1_bdfd0656ff71/meadow_production.blend",
+      "sha256": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015"
+    },
+    {
+      "role": "map",
+      "kind": "blend",
+      "r2Key": "props/prop_map_001/prop_map_001_c42f8300580e/adventure_map.blend",
+      "sha256": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea"
+    },
+    {
+      "role": "pip",
+      "kind": "blend",
+      "r2Key": "characters/pip/char_pip_v1_e15e6736f911/pip_production.blend",
+      "sha256": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0"
+    },
+    {
+      "role": "goat",
+      "kind": "blend",
+      "r2Key": "characters/goat/char_goat_v1_e40b341ca0ed/goat_production.blend",
+      "sha256": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8"
+    }
+  ],
+  "outputKey": "renders/finals/meadow-map-mystery/accept1080-2026-08-13T17-25-42-044Z/final_1080p.mp4",
+  "limits": {
+    "maxRuntimeMinutes": 15,
+    "maxCostUsd": 0.25,
+    "maxFrames": 300
+  },
+  "createdAt": "2026-08-13T17:25:45.104Z",
+  "credentialsPolicy": {
+    "secretsInManifest": false,
+    "r2Scoped": true,
+    "runpodServerSideOnly": true
+  }
+}{"key":"jobs/accept1080-2026-08-13T17-25-42-044Z/manifest.json","bytes":2350,"sha256":"4cce35f84c021ecf28a9a400e2627b4b30ce37f0f53e9f4f2a47c61c5e98b879"}

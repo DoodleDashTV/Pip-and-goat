@@ -1,0 +1,77 @@
+{
+  "map": {
+    "blend": "production-library/props/adventure_map.blend",
+    "objects": [
+      "AdventureMap",
+      "MapBorder_N",
+      "MapBorder_S",
+      "MapBorder_W",
+      "MapBorder_E",
+      "MapCoast",
+      "MapWater",
+      "MapTrail_0_0",
+      "MapTrail_0_1",
+      "MapTrail_1_0",
+      "MapTrail_1_1",
+      "MapTrail_2_0",
+      "MapTrail_2_1",
+      "MapTrail_3_0",
+      "MapTrail_3_1",
+      "MapTrail_4_0",
+      "MapTrail_4_1",
+      "MapCompass_N",
+      "MapCompass_E",
+      "MapCrease_V",
+      "MapCrease_H",
+      "MapMark",
+      "MapMark_B"
+    ],
+    "sha256": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea"
+  },
+  "meadow": {
+    "blend": "production-library/environments/meadow_production.blend",
+    "pathBefore": {
+      "name": "Meadow_Path",
+      "parent": null,
+      "min": [
+        -0.7659,
+        -5.5,
+        0.006
+      ],
+      "max": [
+        0.6687,
+        5.5,
+        0.006
+      ]
+    },
+    "pathAfter": {
+      "name": "Meadow_Path",
+      "parent": null,
+      "min": [
+        -0.7659,
+        -5.5,
+        0.006
+      ],
+      "max": [
+        0.6687,
+        5.5,
+        0.006
+      ]
+    },
+    "groundAlbedo": {
+      "MeadowGrass": [
+        0.16,
+        0.4,
+        0.14
+      ],
+      "MeadowPath": [
+        0.58,
+        0.46,
+        0.3
+      ]
+    },
+    "sha256": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015"
+  },
+  "ok": true,
+  "failures": []
+}

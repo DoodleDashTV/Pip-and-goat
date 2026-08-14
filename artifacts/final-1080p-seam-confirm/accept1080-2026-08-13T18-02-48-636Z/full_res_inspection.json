@@ -1,0 +1,62 @@
+{
+ "frames": 90,
+ "resolution": "1080x1920",
+ "allFrames": {
+  "meanLumaPct": {
+   "min": 0.4669,
+   "max": 0.479
+  },
+  "p01": {
+   "min": 49.1824,
+   "max": 51.1032
+  },
+  "p99": {
+   "min": 205.1634,
+   "max": 219.4444
+  },
+  "tonalRange": {
+   "min": 154.691,
+   "max": 168.8166
+  },
+  "clippedHighlightFraction": {
+   "min": 0.0,
+   "max": 0.0001
+  },
+  "clippedShadowFraction": {
+   "min": 0.0,
+   "max": 0.0
+  },
+  "saturation": {
+   "min": 62.2412,
+   "max": 63.5631
+  }
+ },
+ "allFramesPassAcceptanceThresholds": {
+  "exposureInBand": true,
+  "highlightsPresent": true,
+  "noHighlightClipping": true,
+  "shadowsLifted": true,
+  "shadowDepthRetained": true,
+  "saturationHealthy": true,
+  "tonalRangeHealthy": true
+ },
+ "temporalStability": {
+  "meanLumaRangeAcrossShot": 3.071,
+  "frameToFrameMeanLumaStep": {
+   "mean": 0.0381,
+   "max": 0.0992,
+   "signChanges": 28
+  },
+  "perPixelAbsDelta": {
+   "avg": 2.81,
+   "max": 3.709
+  },
+  "perPixelP999Delta": {
+   "avg": 108.9,
+   "max": 138.0
+  },
+  "outlierFrames": []
+ },
+ "maskSolidAlpha": 229.0,
+ "perMaskFrame": {}
+}

@@ -1,0 +1,71 @@
+{
+ "frame45_windows": {
+  "original": {
+   "chestPixels": 4164,
+   "shadowedFractionPct": 13.02,
+   "meanDepth": 28.52,
+   "colMedianMinusMin": 20.31,
+   "highPassMaxAbs": 8.06,
+   "litP90": 211.09
+  },
+  "upper_chest_under_beak": {
+   "chestPixels": 2880,
+   "shadowedFractionPct": 7.08,
+   "meanDepth": 28.31,
+   "colMedianMinusMin": 17.7,
+   "highPassMaxAbs": 2.89,
+   "litP90": 206.54
+  },
+  "narrow_band": {
+   "chestPixels": 1323,
+   "shadowedFractionPct": 9.45,
+   "meanDepth": 29.17,
+   "colMedianMinusMin": 15.22,
+   "highPassMaxAbs": 3.44,
+   "litP90": 211.09
+  }
+ },
+ "upperChestHighPassAcrossShot": {
+  "frames": 90,
+  "min": 1.2,
+  "median": 8.29,
+  "max": 18.5,
+  "mean": 8.95,
+  "worstFive": [
+   [
+    "frame_0010.png",
+    18.502852380952362,
+    385
+   ],
+   [
+    "frame_0012.png",
+    18.315046666666646,
+    454
+   ],
+   [
+    "frame_0022.png",
+    17.95195000000001,
+    1276
+   ],
+   [
+    "frame_0018.png",
+    17.569190384615396,
+    912
+   ],
+   [
+    "frame_0017.png",
+    17.11972619047617,
+    789
+   ]
+  ]
+ },
+ "visualReview": {
+  "frame45_full": "No vertical chest seam visible; smooth yellow chest under beak",
+  "chest_crop_f45": "Continuous chest shading; belly form shadow only; no hard vertical band"
+ },
+ "verdict": {
+  "noHardVerticalSeamBand": true,
+  "frame45_upperChest_highPass": 2.89,
+  "pass": true
+ }
+}

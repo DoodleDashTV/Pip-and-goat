@@ -4,7 +4,11 @@
  * Never logs API keys.
  */
 import { AppError } from '@doodle-dash/shared';
-import { PREFERRED_RUNPOD_GPU_TYPES, resolveCloudCostLimitsFromEnv } from './config';
+import {
+  PREFERRED_RUNPOD_GPU_TYPES,
+  resolveCloudCostLimitsFromEnv,
+  validateRunpodWorkerImageRef,
+} from './config';
 import { redactSecrets, stripTrailingSecretNoise } from './secret-safety';
 
 export type RunpodGpuType = {
@@ -34,6 +38,7 @@ export class RunpodClient {
   private readonly apiKey: string;
   private readonly endpoint: string;
   private readonly userAgent: string;
+  private readonly env: Record<string, string | undefined>;
 
   constructor(options?: {
     apiKey?: string;
@@ -42,6 +47,7 @@ export class RunpodClient {
     env?: Record<string, string | undefined>;
   }) {
     const env = options?.env ?? process.env;
+    this.env = env;
     this.apiKey = stripTrailingSecretNoise(options?.apiKey ?? env.RUNPOD_API_KEY);
     this.endpoint = options?.endpoint ?? env.RUNPOD_API_ENDPOINT ?? 'https://api.runpod.io/graphql';
     this.userAgent = options?.userAgent ?? 'DoodleDashProduction/1.0';
@@ -150,6 +156,53 @@ export class RunpodClient {
   }
 
   /**
+   * Read-only secure-cloud on-demand price for one GPU. Creates nothing.
+   *
+   * `verifyAuthAndListGpus` asks for `lowestPrice(gpuCount: 1)` without a cloud
+   * filter, so it returns the cheapest offer across community AND secure — for
+   * the RTX 4090 that quoted $0.34/hr while a SECURE pod actually billed
+   * $0.74/hr, understating a pre-launch estimate by ~2x. Launches are SECURE, so
+   * estimates must use the secure price. The pod's returned `costPerHr` remains
+   * authoritative for the hard-kill deadline after creation.
+   */
+  async getSecureOnDemandPrice(gpuTypeId: string): Promise<{
+    gpuTypeId: string;
+    uninterruptablePrice: number | null;
+    minimumBidPrice: number | null;
+    stockStatus: string | null;
+  }> {
+    const data = await this.graphql<{
+      gpuTypes?: Array<{
+        id?: string;
+        lowestPrice?: {
+          minimumBidPrice?: number;
+          uninterruptablePrice?: number;
+          stockStatus?: string | null;
+        } | null;
+      }>;
+    }>(
+      `query SecurePrice($id: String) {
+        gpuTypes(input: { id: $id }) {
+          id
+          lowestPrice(input: { gpuCount: 1, secureCloud: true }) {
+            minimumBidPrice
+            uninterruptablePrice
+            stockStatus
+          }
+        }
+      }`,
+      { id: gpuTypeId },
+    );
+    const g = (data.gpuTypes ?? []).find((x) => x.id === gpuTypeId) ?? (data.gpuTypes ?? [])[0];
+    return {
+      gpuTypeId,
+      uninterruptablePrice: g?.lowestPrice?.uninterruptablePrice ?? null,
+      minimumBidPrice: g?.lowestPrice?.minimumBidPrice ?? null,
+      stockStatus: g?.lowestPrice?.stockStatus ?? null,
+    };
+  }
+
+  /**
    * HARD SAFETY GATE — refuses unless ALLOW_PAID_GPU_LAUNCH=true and caller opts in.
    * Do not call from automatic flows after coding.
    */
@@ -159,11 +212,26 @@ export class RunpodClient {
     gpuTypeId: string;
     confirmPaidLaunch: true;
     cloudType?: 'SECURE' | 'COMMUNITY';
+    /**
+     * Number of GPUs for the on-demand finder. RunPod's
+     * `podFindAndDeployOnDemand` matches nothing (and returns the generic
+     * "no longer any instances available with the requested specifications"
+     * error, even when aggregate stockStatus is High) unless a positive
+     * gpuCount is supplied. Defaults to 1.
+     */
+    gpuCount?: number;
     containerDiskInGb?: number;
     volumeInGb?: number;
     env?: Record<string, string>;
+    /**
+     * Optional container command override (Runpod `dockerArgs`). Used by the
+     * single-pod benchmark to run the worker's single-shot mode twice in
+     * sequence (DRAFT_HD then one FINAL_1080P shot) on ONE pod. Must never
+     * contain secret values — secrets are passed via `env` only.
+     */
+    dockerArgs?: string;
   }): Promise<{ podId: string }> {
-    const limits = resolveCloudCostLimitsFromEnv();
+    const limits = resolveCloudCostLimitsFromEnv(this.env);
     if (!limits.allowPaidGpuLaunch) {
       throw new AppError(
         'Paid GPU launch blocked: ALLOW_PAID_GPU_LAUNCH is false. Waiting for explicit user approval.',
@@ -178,6 +246,19 @@ export class RunpodClient {
       throw new AppError('confirmPaidLaunch must be true.', 'PAID_GPU_NOT_CONFIRMED', 403);
     }
 
+    // Fail-closed image gate: refuse to boot a paid pod unless the worker image
+    // is a trusted, immutable ghcr.io reference pinned by @sha256 digest. This
+    // check runs BEFORE any create-pod network request so a missing / malformed
+    // / mutable (:latest) image can never launch billable hardware.
+    const imageCheck = validateRunpodWorkerImageRef(input.imageName);
+    if (!imageCheck.ok) {
+      throw new AppError(
+        `Worker image rejected before pod creation: ${imageCheck.reason}`,
+        imageCheck.code,
+        403,
+      );
+    }
+
     // Intentionally not auto-invoked. Mutation included for Phase 22 only after approval.
     const data = await this.graphql<{
       podFindAndDeployOnDemand?: { id?: string } | null;
@@ -190,10 +271,12 @@ export class RunpodClient {
           name: input.name,
           imageName: input.imageName,
           gpuTypeId: input.gpuTypeId,
+          gpuCount: input.gpuCount && input.gpuCount > 0 ? Math.floor(input.gpuCount) : 1,
           cloudType: input.cloudType ?? 'SECURE',
           containerDiskInGb: input.containerDiskInGb ?? 40,
           volumeInGb: input.volumeInGb ?? 20,
           env: Object.entries(input.env ?? {}).map(([key, value]) => ({ key, value })),
+          ...(input.dockerArgs ? { dockerArgs: input.dockerArgs } : {}),
         },
       },
     );
@@ -222,7 +305,76 @@ export class RunpodClient {
       { podId },
     );
   }
+
+  /**
+   * Read-only listing of the authenticated account's pods (never creates or
+   * mutates anything). Used to (a) read back the ACTUAL live $/hr of a pod after
+   * creation so the hard-kill budget is sized from the real rate, and (b) confirm
+   * a terminated pod is gone and NO billable GPU remains. Non-billable query.
+   */
+  async listMyPods(): Promise<RunpodPodStatus[]> {
+    const data = await this.graphql<{
+      myself?: {
+        pods?: Array<{
+          id?: string;
+          name?: string;
+          desiredStatus?: string;
+          costPerHr?: number | null;
+          gpuCount?: number | null;
+          machineId?: string | null;
+          lastStatusChange?: string | null;
+          runtime?: { uptimeInSeconds?: number | null } | null;
+          machine?: { gpuDisplayName?: string | null } | null;
+        }> | null;
+      } | null;
+    }>(
+      `query {
+        myself {
+          pods {
+            id
+            name
+            desiredStatus
+            costPerHr
+            gpuCount
+            machineId
+            lastStatusChange
+            runtime { uptimeInSeconds }
+            machine { gpuDisplayName }
+          }
+        }
+      }`,
+    );
+    return (data.myself?.pods ?? []).map((p) => ({
+      id: p.id ?? '',
+      name: p.name ?? null,
+      desiredStatus: p.desiredStatus ?? null,
+      costPerHr: typeof p.costPerHr === 'number' ? p.costPerHr : null,
+      gpuCount: typeof p.gpuCount === 'number' ? p.gpuCount : null,
+      machineId: p.machineId ?? null,
+      lastStatusChange: p.lastStatusChange ?? null,
+      uptimeInSeconds: p.runtime?.uptimeInSeconds ?? null,
+      gpuDisplayName: p.machine?.gpuDisplayName ?? null,
+    }));
+  }
+
+  /** Read-only fetch of a single pod by id via the account pod list. */
+  async getPod(podId: string): Promise<RunpodPodStatus | null> {
+    const pods = await this.listMyPods();
+    return pods.find((p) => p.id === podId) ?? null;
+  }
 }
+
+export type RunpodPodStatus = {
+  id: string;
+  name: string | null;
+  desiredStatus: string | null;
+  costPerHr: number | null;
+  gpuCount: number | null;
+  machineId: string | null;
+  lastStatusChange: string | null;
+  uptimeInSeconds: number | null;
+  gpuDisplayName: string | null;
+};
 
 export async function runpodAuthSelfTest(
   env: Record<string, string | undefined> = process.env,

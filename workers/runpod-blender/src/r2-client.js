@@ -27,13 +27,40 @@ function createR2Client(env = process.env) {
   if (!bucket || !endpoint || !accessKeyId || !secretAccessKey) {
     throw new Error('R2 configuration incomplete');
   }
+  // Bounded network timeouts so no R2 op can hang a paid pod indefinitely.
+  const connectionTimeout = Number(env.R2_CONNECT_TIMEOUT_MS || 10_000);
+  const requestTimeout = Number(env.R2_REQUEST_TIMEOUT_MS || 60_000);
+  const maxAttempts = Number(env.R2_MAX_ATTEMPTS || 3);
   const client = new S3Client({
     region: strip(env.R2_REGION || env.OBJECT_STORAGE_REGION || 'auto') || 'auto',
     endpoint,
     forcePathStyle: true,
     credentials: { accessKeyId, secretAccessKey },
+    maxAttempts: Number.isFinite(maxAttempts) && maxAttempts > 0 ? maxAttempts : 3,
+    requestHandler: {
+      connectionTimeout: Number.isFinite(connectionTimeout) ? connectionTimeout : 10_000,
+      requestTimeout: Number.isFinite(requestTimeout) ? requestTimeout : 60_000,
+    },
   });
-  return { client, bucket };
+  return { client, bucket, timeouts: { connectionTimeout, requestTimeout, maxAttempts } };
+}
+
+/**
+ * Wrap any promise with a bounded timeout that rejects with a tagged error.
+ * Used to fence external ops (registry/Runpod/pod-status) that lack native
+ * timeouts so nothing hangs indefinitely.
+ */
+function withTimeout(promise, ms, label = 'operation') {
+  let timer;
+  const timeout = new Promise((_resolve, reject) => {
+    timer = setTimeout(() => {
+      const err = new Error(`${label} timed out after ${ms}ms`);
+      err.code = 'NETWORK_TIMEOUT';
+      reject(err);
+    }, ms);
+    if (timer && typeof timer.unref === 'function') timer.unref();
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 function sha256(buf) {
@@ -86,4 +113,5 @@ module.exports = {
   deleteKey,
   sha256,
   strip,
+  withTimeout,
 };

@@ -1,0 +1,115 @@
+=== BAKED FILE ===
+764dfcc4e17a55134ea042a9ad1fe997971aab9eec59004952884427f8922709  /opt/ddp-worker/blender/assemble_scene.py
+621 /opt/ddp-worker/blender/assemble_scene.py
+
+=== HIT COUNTS: repaired three-light path ===
+DDP_LIGHT_PREFIX                       3
+DDP_Sky                                1
+DDP_World                              1
+apply_lighting_state                   2
+strip_imported_lights_and_cameras      2
+apply_sky_emission                     2
+LIGHTING_STATES                        3
+resolve_lighting_state                 2
+view_transform                         1
+view_settings.look                     3
+view_settings.exposure                 2
+placement_root                         2
+use_raytracing                         1
+visible_shadow                         2
+
+=== DDP_Key / DDP_Fill / DDP_Rim: generated at runtime from DDP_LIGHT_PREFIX + role ===
+302:DDP_LIGHT_PREFIX = "DDP_"
+372:    for obj in [o for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(DDP_LIGHT_PREFIX)]:
+378:        name = f"{DDP_LIGHT_PREFIX}{role.capitalize()}"
+378:        name = f"{DDP_LIGHT_PREFIX}{role.capitalize()}"
+376:    for role in ("key", "fill", "rim"):
+
+=== literal-name grep (expected 0 -- names are f-string composed) ===
+DDP_Key      0
+DDP_Fill     0
+DDP_Rim      0
+
+=== OLD 8-LIGHT PATH ===
+ensure_lights                          0
+def ensure_lights                      0
+any function whose name contains light:
+74:def strip_imported_lights_and_cameras(objects) -> dict:
+305:def resolve_lighting_state(requested: str | None) -> str:
+352:def apply_lighting_state(scene, requested: str | None) -> dict:
+all top-level defs in the baked file:
+17:def eevee_engine_id(scene) -> str:
+34:def set_eevee(scene, samples: int = 32) -> None:
+47:def append_object(blend_path: str, names: list[str] | None = None):
+67:def find_armature(objects):
+74:def strip_imported_lights_and_cameras(objects) -> dict:
+100:def placement_root(role: str, objects):
+134:def apply_action(arm, action_name: str | None, frame_start: int, frame_end: int) -> bool:
+165:def apply_viseme_cues(mesh_obj, cues: list[dict], fps: int) -> None:
+205:def configure_camera(scene, preset: str, width: int, height: int) -> None:
+305:def resolve_lighting_state(requested: str | None) -> str:
+310:def apply_sky_emission(spec: dict) -> list[str]:
+352:def apply_lighting_state(scene, requested: str | None) -> dict:
+419:def parse_resolution(value: str) -> tuple[int, int]:
+424:def main() -> None:
+525:def build_scene(
+
+=== quoted: the deterministic 3-light rig ===
+    # Idempotent: clear any rig this layer previously created.
+    for obj in [o for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(DDP_LIGHT_PREFIX)]:
+        bpy.data.objects.remove(obj, do_unlink=True)
+
+    created = []
+    for role in ("key", "fill", "rim"):
+        cfg = spec[role]
+        name = f"{DDP_LIGHT_PREFIX}{role.capitalize()}"
+        light_data = bpy.data.lights.new(name=name, type=cfg["type"])
+        light_data.energy = cfg["energy"]
+        if cfg["type"] == "AREA" and "size" in cfg:
+            light_data.size = cfg["size"]
+        light_obj = bpy.data.objects.new(name, light_data)
+        light_obj.location = cfg["location"]
+        if "rotation" in cfg:
+            light_obj.rotation_euler = cfg["rotation"]
+        bpy.context.collection.objects.link(light_obj)
+        created.append(name)
+
+
+=== quoted: tone mapping (look / exposure) ===
+    # Filmic tone mapping. Without a look, AgX renders this palette flat and
+    # desaturated, which is a large part of why the first render looked milky.
+    scene.view_settings.exposure = float(spec.get("exposure", 0.0))
+    look = spec.get("look") or "None"
+    look_applied = None
+    try:
+        scene.view_settings.look = look
+        look_applied = scene.view_settings.look
+    except (TypeError, ValueError):  # look unavailable in this build's OCIO config
+        look_applied = scene.view_settings.look
+
+
+=== quoted: the 8-light strip that replaced the old early-return path ===
+def strip_imported_lights_and_cameras(objects) -> dict:
+    """Remove lights/cameras that ride along inside asset blends.
+
+    Every founding blend ships its own reference lighting rig and reference
+    camera. Appending four of them stacked 8 lights and 3 stray cameras into the
+    shot, which is what washed out the first 1080p acceptance render. The shot
+    owns its lighting and camera; assets only contribute geometry.
+    """
+    import bpy
+
+    # Snapshot names first: removing an object invalidates every Python handle to
+    # it, so the survivor list has to be rebuilt by name afterwards.
+    inventory = [(obj.name, obj.type) for obj in objects]
+    removed = {"lights": [], "cameras": []}
+    for name, kind in inventory:
+        if kind not in ("LIGHT", "CAMERA"):
+            continue
+        obj = bpy.data.objects.get(name)
+        if obj is None:
+            continue
+        removed["lights" if kind == "LIGHT" else "cameras"].append(name)
+        bpy.data.objects.remove(obj, do_unlink=True)
+    removed["survivors"] = [name for name, kind in inventory if kind not in ("LIGHT", "CAMERA")]
+    return removed
