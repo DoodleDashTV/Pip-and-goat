@@ -1,0 +1,3045 @@
+{
+  "audit": "theatrical-cgi-asset-foundation",
+  "label": "existing approved asset inventory \u2014 not a visual approval",
+  "productionLibraryMutated": false,
+  "assets": [
+    {
+      "id": "pip",
+      "kind": "character",
+      "role": "pip",
+      "path": "production-library/characters/pip_production.blend",
+      "exists": true,
+      "bytes": 9581974,
+      "sha256": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0",
+      "blenderVersion": "4.2.3 LTS",
+      "meshes": [
+        {
+          "name": "Pip_Backpack",
+          "vertices": 296,
+          "polygons": 268,
+          "parent": "Pip_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "backpack"
+          ],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "PipBackpack",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.47999998927116394,
+                  0.2800000011920929,
+                  0.7799999713897705,
+                  1.0
+                ],
+                "roughness": 0.3799999952316284,
+                "metallic": 0.0,
+                "specular": 0.2800000011920929,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipStrap",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.3799999952316284,
+                  0.20000000298023224,
+                  0.6499999761581421,
+                  1.0
+                ],
+                "roughness": 0.4000000059604645,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        },
+        {
+          "name": "Pip_Backpack_Pouch",
+          "vertices": 128,
+          "polygons": 140,
+          "parent": "Pip_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "backpack"
+          ],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "PipBackpack",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.47999998927116394,
+                  0.2800000011920929,
+                  0.7799999713897705,
+                  1.0
+                ],
+                "roughness": 0.3799999952316284,
+                "metallic": 0.0,
+                "specular": 0.2800000011920929,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        },
+        {
+          "name": "Pip_Character",
+          "vertices": 3800,
+          "polygons": 4072,
+          "parent": "Pip_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "root",
+            "pelvis",
+            "spine",
+            "chest",
+            "neck",
+            "head",
+            "comb",
+            "wing_L",
+            "wing_R",
+            "backpack",
+            "leg_L",
+            "foot_L",
+            "leg_R",
+            "foot_R"
+          ],
+          "shapeKeys": [
+            "Basis",
+            "jaw_open",
+            "mouth_smile",
+            "mouth_frown",
+            "mouth_pucker",
+            "mouth_wide",
+            "blink_left",
+            "blink_right",
+            "brow_up",
+            "brow_down",
+            "cheek_puff",
+            "eye_look_left",
+            "eye_look_right",
+            "eye_look_up",
+            "eye_look_down",
+            "viseme_REST",
+            "viseme_A",
+            "viseme_E",
+            "viseme_I",
+            "viseme_O",
+            "viseme_U",
+            "viseme_MBP",
+            "viseme_FV",
+            "viseme_L",
+            "viseme_R",
+            "viseme_S_Z",
+            "viseme_TH",
+            "viseme_WQ",
+            "expr_neutral",
+            "expr_happy",
+            "expr_excited",
+            "expr_surprised",
+            "expr_worried",
+            "expr_sad",
+            "expr_thinking",
+            "expr_shy",
+            "expr_determined",
+            "expr_confused",
+            "expr_talking",
+            "expr_listening",
+            "expr_laughing",
+            "expr_scared",
+            "expr_proud"
+          ],
+          "shapeKeyCount": 43,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "PipBeak",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  1.0,
+                  0.550000011920929,
+                  0.07999999821186066,
+                  1.0
+                ],
+                "roughness": 0.3499999940395355,
+                "metallic": 0.0,
+                "specular": 0.30000001192092896,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.05000000074505806,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipBody",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  1.0,
+                  0.8999999761581421,
+                  0.11999999731779099,
+                  1.0
+                ],
+                "roughness": 0.47999998927116394,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.18000000715255737,
+                "sheenWeight": 0.3959999978542328,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipComb",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.949999988079071,
+                  0.07999999821186066,
+                  0.11999999731779099,
+                  1.0
+                ],
+                "roughness": 0.3499999940395355,
+                "metallic": 0.0,
+                "specular": 0.25,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.10000000149011612,
+                "sheenWeight": 0.2199999988079071,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipEyeWhite",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.9900000095367432,
+                  0.9900000095367432,
+                  0.9900000095367432,
+                  1.0
+                ],
+                "roughness": 0.11999999731779099,
+                "metallic": 0.0,
+                "specular": 0.6499999761581421,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipIris",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.3799999952316284,
+                  0.18000000715255737,
+                  0.05999999865889549,
+                  1.0
+                ],
+                "roughness": 0.2800000011920929,
+                "metallic": 0.0,
+                "specular": 0.3499999940395355,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipPupil",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.03999999910593033,
+                  0.029999999329447746,
+                  0.029999999329447746,
+                  1.0
+                ],
+                "roughness": 0.18000000715255737,
+                "metallic": 0.0,
+                "specular": 0.05000000074505806,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipCatchlight",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "roughness": 0.11999999731779099,
+                "metallic": 0.0,
+                "specular": 0.6499999761581421,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipBrow",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.10000000149011612,
+                  0.05000000074505806,
+                  0.029999999329447746,
+                  1.0
+                ],
+                "roughness": 0.550000011920929,
+                "metallic": 0.0,
+                "specular": 0.05000000074505806,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "PipFeet",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  1.0,
+                  0.44999998807907104,
+                  0.07999999821186066,
+                  1.0
+                ],
+                "roughness": 0.4000000059604645,
+                "metallic": 0.0,
+                "specular": 0.25,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.05000000074505806,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        },
+        {
+          "name": "Pip_StarCharm",
+          "vertices": 20,
+          "polygons": 12,
+          "parent": "Pip_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "backpack"
+          ],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "PipStar",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.9700000286102295,
+                  0.800000011920929,
+                  0.2199999988079071,
+                  1.0
+                ],
+                "roughness": 0.2800000011920929,
+                "metallic": 0.3499999940395355,
+                "specular": 0.699999988079071,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        }
+      ],
+      "armatures": [
+        {
+          "name": "Pip_Rig",
+          "boneCount": 14,
+          "bones": [
+            {
+              "name": "root",
+              "parent": null,
+              "useDeform": true
+            },
+            {
+              "name": "pelvis",
+              "parent": "root",
+              "useDeform": true
+            },
+            {
+              "name": "spine",
+              "parent": "pelvis",
+              "useDeform": true
+            },
+            {
+              "name": "chest",
+              "parent": "spine",
+              "useDeform": true
+            },
+            {
+              "name": "neck",
+              "parent": "chest",
+              "useDeform": true
+            },
+            {
+              "name": "head",
+              "parent": "neck",
+              "useDeform": true
+            },
+            {
+              "name": "comb",
+              "parent": "head",
+              "useDeform": true
+            },
+            {
+              "name": "wing_L",
+              "parent": "chest",
+              "useDeform": true
+            },
+            {
+              "name": "wing_R",
+              "parent": "chest",
+              "useDeform": true
+            },
+            {
+              "name": "backpack",
+              "parent": "chest",
+              "useDeform": true
+            },
+            {
+              "name": "leg_L",
+              "parent": "pelvis",
+              "useDeform": true
+            },
+            {
+              "name": "foot_L",
+              "parent": "leg_L",
+              "useDeform": true
+            },
+            {
+              "name": "leg_R",
+              "parent": "pelvis",
+              "useDeform": true
+            },
+            {
+              "name": "foot_R",
+              "parent": "leg_R",
+              "useDeform": true
+            }
+          ],
+          "poseBoneRotationModes": {
+            "root": "XYZ",
+            "pelvis": "XYZ",
+            "spine": "XYZ",
+            "chest": "XYZ",
+            "neck": "XYZ",
+            "head": "XYZ",
+            "comb": "XYZ",
+            "wing_L": "XYZ",
+            "wing_R": "XYZ",
+            "backpack": "XYZ",
+            "leg_L": "XYZ",
+            "foot_L": "XYZ",
+            "leg_R": "XYZ",
+            "foot_R": "XYZ"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "PIP_CHEER",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_EXCITED",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_FLAP_EXCITED",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_FLAP_SMALL",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_GREET",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_HAPPY",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_HAPPY_REACTION",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_IDLE",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_IDLE_ALT",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_JUMP",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_LISTEN",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_LISTEN_IDLE",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_LOOK",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_LOOK_DOWN",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_LOOK_LEFT",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_LOOK_RIGHT",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_LOOK_UP",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_POINT",
+          "fcurves": 21,
+          "varyingFcurves": 13,
+          "constantFcurves": 8,
+          "frameRange": [
+            1.0,
+            90.0
+          ]
+        },
+        {
+          "name": "PIP_RUN",
+          "fcurves": 84,
+          "varyingFcurves": 6,
+          "constantFcurves": 78,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_SURPRISED",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_SURPRISED_REACTION",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_TALK",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_TALK_IDLE",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_THINK",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_TURN",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_TURN_LEFT",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_TURN_RIGHT",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_WALK",
+          "fcurves": 84,
+          "varyingFcurves": 6,
+          "constantFcurves": 78,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_WAVE",
+          "fcurves": 84,
+          "varyingFcurves": 1,
+          "constantFcurves": 83,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_WORRIED",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "PIP_WORRIED_REACTION",
+          "fcurves": 84,
+          "varyingFcurves": 2,
+          "constantFcurves": 82,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        }
+      ],
+      "lights": [
+        {
+          "name": "Area",
+          "lightType": "AREA",
+          "energy": 50.0
+        },
+        {
+          "name": "Area.001",
+          "lightType": "AREA",
+          "energy": 25.0
+        },
+        {
+          "name": "Sun",
+          "lightType": "SUN",
+          "energy": 3.799999952316284
+        }
+      ],
+      "cameras": [
+        {
+          "name": "RefCam"
+        }
+      ],
+      "materialCount": 12,
+      "imageCount": 0,
+      "packedImages": [],
+      "classification": {
+        "productionReadyForPipeline": true,
+        "reusable": true,
+        "needsUpgrade": true,
+        "theatricalReady": false,
+        "issues": [
+          "low mesh density (4244 verts across meshes) \u2014 prototype kitbash, not theatrical sculpt",
+          "no image textures \u2014 no PBR texture set",
+          "no normal maps",
+          "no eye-aim bones (independentEyeAim false)"
+        ],
+        "label": "existing approved asset"
+      }
+    },
+    {
+      "id": "goat",
+      "kind": "character",
+      "role": "goat",
+      "path": "production-library/characters/goat_production.blend",
+      "exists": true,
+      "bytes": 11847394,
+      "sha256": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8",
+      "blenderVersion": "4.2.3 LTS",
+      "meshes": [
+        {
+          "name": "Goat_Character",
+          "vertices": 3848,
+          "polygons": 4060,
+          "parent": "Goat_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "root",
+            "pelvis",
+            "spine",
+            "chest",
+            "neck",
+            "head",
+            "ear_L",
+            "ear_R",
+            "collar",
+            "tail",
+            "leg_FL",
+            "hoof_FL",
+            "leg_FR",
+            "hoof_FR",
+            "leg_BL",
+            "hoof_BL",
+            "leg_BR",
+            "hoof_BR"
+          ],
+          "shapeKeys": [
+            "Basis",
+            "jaw_open",
+            "mouth_smile",
+            "mouth_frown",
+            "mouth_pucker",
+            "mouth_wide",
+            "blink_left",
+            "blink_right",
+            "brow_up",
+            "brow_down",
+            "cheek_puff",
+            "nose_wrinkle",
+            "eye_look_left",
+            "eye_look_right",
+            "eye_look_up",
+            "eye_look_down",
+            "viseme_REST",
+            "viseme_A",
+            "viseme_E",
+            "viseme_I",
+            "viseme_O",
+            "viseme_U",
+            "viseme_MBP",
+            "viseme_FV",
+            "viseme_L",
+            "viseme_R",
+            "viseme_S_Z",
+            "viseme_TH",
+            "viseme_WQ",
+            "expr_neutral",
+            "expr_happy",
+            "expr_excited",
+            "expr_surprised",
+            "expr_worried",
+            "expr_sad",
+            "expr_thinking",
+            "expr_shy",
+            "expr_determined",
+            "expr_confused",
+            "expr_talking",
+            "expr_listening",
+            "expr_laughing",
+            "expr_scared",
+            "expr_proud"
+          ],
+          "shapeKeyCount": 44,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "GoatBody",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.9700000286102295,
+                  0.949999988079071,
+                  0.8999999761581421,
+                  1.0
+                ],
+                "roughness": 0.47999998927116394,
+                "metallic": 0.0,
+                "specular": 0.1599999964237213,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.2199999988079071,
+                "sheenWeight": 0.48399999737739563,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatHorn",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.5,
+                  0.30000001192092896,
+                  0.14000000059604645,
+                  1.0
+                ],
+                "roughness": 0.4000000059604645,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatEarOuter",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.949999988079071,
+                  0.9200000166893005,
+                  0.8600000143051147,
+                  1.0
+                ],
+                "roughness": 0.47999998927116394,
+                "metallic": 0.0,
+                "specular": 0.14000000059604645,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.11999999731779099,
+                "sheenWeight": 0.2639999985694885,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatEarInner",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.9800000190734863,
+                  0.5799999833106995,
+                  0.44999998807907104,
+                  1.0
+                ],
+                "roughness": 0.44999998807907104,
+                "metallic": 0.0,
+                "specular": 0.14000000059604645,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.10000000149011612,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatEyeWhite",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.9900000095367432,
+                  0.9900000095367432,
+                  0.9900000095367432,
+                  1.0
+                ],
+                "roughness": 0.11999999731779099,
+                "metallic": 0.0,
+                "specular": 0.6499999761581421,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatIris",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.36000001430511475,
+                  0.18000000715255737,
+                  0.07000000029802322,
+                  1.0
+                ],
+                "roughness": 0.2800000011920929,
+                "metallic": 0.0,
+                "specular": 0.3499999940395355,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatPupil",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.03999999910593033,
+                  0.029999999329447746,
+                  0.029999999329447746,
+                  1.0
+                ],
+                "roughness": 0.18000000715255737,
+                "metallic": 0.0,
+                "specular": 0.05000000074505806,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatCatchlight",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "roughness": 0.11999999731779099,
+                "metallic": 0.0,
+                "specular": 0.6499999761581421,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatBrow",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.11999999731779099,
+                  0.07000000029802322,
+                  0.03999999910593033,
+                  1.0
+                ],
+                "roughness": 0.550000011920929,
+                "metallic": 0.0,
+                "specular": 0.05000000074505806,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatNose",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.9800000190734863,
+                  0.550000011920929,
+                  0.4000000059604645,
+                  1.0
+                ],
+                "roughness": 0.4000000059604645,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": 0.07999999821186066,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "GoatHoof",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.20000000298023224,
+                  0.10000000149011612,
+                  0.05999999865889549,
+                  1.0
+                ],
+                "roughness": 0.3799999952316284,
+                "metallic": 0.0,
+                "specular": 0.11999999731779099,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        },
+        {
+          "name": "Goat_Collar",
+          "vertices": 768,
+          "polygons": 768,
+          "parent": "Goat_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "collar"
+          ],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "GoatCollar",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.15000000596046448,
+                  0.44999998807907104,
+                  0.8999999761581421,
+                  1.0
+                ],
+                "roughness": 0.30000001192092896,
+                "metallic": 0.0,
+                "specular": 0.3199999928474426,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        },
+        {
+          "name": "Goat_Tag",
+          "vertices": 64,
+          "polygons": 34,
+          "parent": "Goat_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "collar"
+          ],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "GoatTag",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.9800000190734863,
+                  0.8199999928474426,
+                  0.20000000298023224,
+                  1.0
+                ],
+                "roughness": 0.25999999046325684,
+                "metallic": 0.44999998807907104,
+                "specular": 0.75,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        },
+        {
+          "name": "Goat_Tag_Text",
+          "vertices": 868,
+          "polygons": 643,
+          "parent": "Goat_Rig",
+          "parentType": "OBJECT",
+          "vertexGroups": [
+            "collar"
+          ],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "GoatTagInk",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.05000000074505806,
+                  0.05000000074505806,
+                  0.07000000029802322,
+                  1.0
+                ],
+                "roughness": 0.550000011920929,
+                "metallic": 0.0,
+                "specular": 0.05000000074505806,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": [
+            "ARMATURE",
+            "NODES"
+          ]
+        }
+      ],
+      "armatures": [
+        {
+          "name": "Goat_Rig",
+          "boneCount": 18,
+          "bones": [
+            {
+              "name": "root",
+              "parent": null,
+              "useDeform": true
+            },
+            {
+              "name": "pelvis",
+              "parent": "root",
+              "useDeform": true
+            },
+            {
+              "name": "spine",
+              "parent": "pelvis",
+              "useDeform": true
+            },
+            {
+              "name": "chest",
+              "parent": "spine",
+              "useDeform": true
+            },
+            {
+              "name": "neck",
+              "parent": "chest",
+              "useDeform": true
+            },
+            {
+              "name": "head",
+              "parent": "neck",
+              "useDeform": true
+            },
+            {
+              "name": "ear_L",
+              "parent": "head",
+              "useDeform": true
+            },
+            {
+              "name": "ear_R",
+              "parent": "head",
+              "useDeform": true
+            },
+            {
+              "name": "collar",
+              "parent": "neck",
+              "useDeform": true
+            },
+            {
+              "name": "tail",
+              "parent": "spine",
+              "useDeform": true
+            },
+            {
+              "name": "leg_FL",
+              "parent": "root",
+              "useDeform": true
+            },
+            {
+              "name": "hoof_FL",
+              "parent": "leg_FL",
+              "useDeform": true
+            },
+            {
+              "name": "leg_FR",
+              "parent": "root",
+              "useDeform": true
+            },
+            {
+              "name": "hoof_FR",
+              "parent": "leg_FR",
+              "useDeform": true
+            },
+            {
+              "name": "leg_BL",
+              "parent": "root",
+              "useDeform": true
+            },
+            {
+              "name": "hoof_BL",
+              "parent": "leg_BL",
+              "useDeform": true
+            },
+            {
+              "name": "leg_BR",
+              "parent": "root",
+              "useDeform": true
+            },
+            {
+              "name": "hoof_BR",
+              "parent": "leg_BR",
+              "useDeform": true
+            }
+          ],
+          "poseBoneRotationModes": {
+            "root": "XYZ",
+            "pelvis": "XYZ",
+            "spine": "XYZ",
+            "chest": "XYZ",
+            "neck": "XYZ",
+            "head": "XYZ",
+            "ear_L": "XYZ",
+            "ear_R": "XYZ",
+            "collar": "XYZ",
+            "tail": "XYZ",
+            "leg_FL": "XYZ",
+            "hoof_FL": "XYZ",
+            "leg_FR": "XYZ",
+            "hoof_FR": "XYZ",
+            "leg_BL": "XYZ",
+            "hoof_BL": "XYZ",
+            "leg_BR": "XYZ",
+            "hoof_BR": "XYZ"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "GOAT_CHEER",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_EAR_REACT",
+          "fcurves": 108,
+          "varyingFcurves": 2,
+          "constantFcurves": 106,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_EXCITED",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_GREET",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_HAPPY",
+          "fcurves": 108,
+          "varyingFcurves": 4,
+          "constantFcurves": 104,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_HAPPY_REACTION",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_HEAD_NOD",
+          "fcurves": 21,
+          "varyingFcurves": 12,
+          "constantFcurves": 9,
+          "frameRange": [
+            1.0,
+            90.0
+          ]
+        },
+        {
+          "name": "GOAT_HOOF_STEP",
+          "fcurves": 108,
+          "varyingFcurves": 5,
+          "constantFcurves": 103,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_IDLE",
+          "fcurves": 108,
+          "varyingFcurves": 4,
+          "constantFcurves": 104,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_IDLE_ALT",
+          "fcurves": 108,
+          "varyingFcurves": 4,
+          "constantFcurves": 104,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_JUMP",
+          "fcurves": 108,
+          "varyingFcurves": 5,
+          "constantFcurves": 103,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_LISTEN",
+          "fcurves": 108,
+          "varyingFcurves": 4,
+          "constantFcurves": 104,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_LISTEN_IDLE",
+          "fcurves": 108,
+          "varyingFcurves": 4,
+          "constantFcurves": 104,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_LOOK",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_LOOK_DOWN",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_LOOK_LEFT",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_LOOK_RIGHT",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_LOOK_UP",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_POINT",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_RUN",
+          "fcurves": 108,
+          "varyingFcurves": 5,
+          "constantFcurves": 103,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_SURPRISED",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_SURPRISED_REACTION",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_TALK",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_TALK_IDLE",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_THINK",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_TURN",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_TURN_LEFT",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_TURN_RIGHT",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_WALK",
+          "fcurves": 108,
+          "varyingFcurves": 5,
+          "constantFcurves": 103,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_WAVE",
+          "fcurves": 108,
+          "varyingFcurves": 1,
+          "constantFcurves": 107,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_WORRIED",
+          "fcurves": 108,
+          "varyingFcurves": 4,
+          "constantFcurves": 104,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        },
+        {
+          "name": "GOAT_WORRIED_REACTION",
+          "fcurves": 108,
+          "varyingFcurves": 4,
+          "constantFcurves": 104,
+          "frameRange": [
+            1.0,
+            30.0
+          ]
+        }
+      ],
+      "lights": [
+        {
+          "name": "Area",
+          "lightType": "AREA",
+          "energy": 70.0
+        },
+        {
+          "name": "Area.001",
+          "lightType": "AREA",
+          "energy": 30.0
+        },
+        {
+          "name": "Sun",
+          "lightType": "SUN",
+          "energy": 4.0
+        }
+      ],
+      "cameras": [
+        {
+          "name": "RefCam"
+        }
+      ],
+      "materialCount": 14,
+      "imageCount": 0,
+      "packedImages": [],
+      "classification": {
+        "productionReadyForPipeline": true,
+        "reusable": true,
+        "needsUpgrade": true,
+        "theatricalReady": false,
+        "issues": [
+          "low mesh density (5548 verts across meshes) \u2014 prototype kitbash, not theatrical sculpt",
+          "no image textures \u2014 no PBR texture set",
+          "no normal maps",
+          "no eye-aim bones (independentEyeAim false)"
+        ],
+        "label": "existing approved asset"
+      }
+    },
+    {
+      "id": "meadow",
+      "kind": "environment",
+      "role": "meadow",
+      "path": "production-library/environments/meadow_production.blend",
+      "exists": true,
+      "bytes": 735868,
+      "sha256": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015",
+      "blenderVersion": "4.2.3 LTS",
+      "meshes": [
+        {
+          "name": "Meadow_Flowers",
+          "vertices": 408,
+          "polygons": 480,
+          "parent": null,
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "FlowerA",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.949999988079071,
+                  0.44999998807907104,
+                  0.699999988079071,
+                  1.0
+                ],
+                "roughness": 0.4000000059604645,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "FlowerB",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.949999988079071,
+                  0.8500000238418579,
+                  0.25,
+                  1.0
+                ],
+                "roughness": 0.4000000059604645,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "Meadow_Ground",
+          "vertices": 4,
+          "polygons": 1,
+          "parent": null,
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "MeadowGrass",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.1599999964237213,
+                  0.4000000059604645,
+                  0.14000000059604645,
+                  1.0
+                ],
+                "roughness": 0.8500000238418579,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "Meadow_Path",
+          "vertices": 22,
+          "polygons": 10,
+          "parent": null,
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MeadowPath",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.5799999833106995,
+                  0.46000000834465027,
+                  0.30000001192092896,
+                  1.0
+                ],
+                "roughness": 0.699999988079071,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "Meadow_Sky",
+          "vertices": 266,
+          "polygons": 288,
+          "parent": null,
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "Sky",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.550000011920929,
+                  0.7799999713897705,
+                  0.949999988079071,
+                  1.0
+                ],
+                "roughness": 1.0,
+                "metallic": 0.0,
+                "specular": null,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "Meadow_Trees",
+          "vertices": 756,
+          "polygons": 636,
+          "parent": null,
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "TreeBark",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.3499999940395355,
+                  0.2199999988079071,
+                  0.11999999731779099,
+                  1.0
+                ],
+                "roughness": 0.699999988079071,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            },
+            {
+              "name": "TreeLeaf",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.25,
+                  0.550000011920929,
+                  0.2199999988079071,
+                  1.0
+                ],
+                "roughness": 0.6499999761581421,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.4500000476837158,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        }
+      ],
+      "armatures": [],
+      "actions": [],
+      "lights": [
+        {
+          "name": "Area",
+          "lightType": "AREA",
+          "energy": 60.0
+        },
+        {
+          "name": "Meadow_Sun",
+          "lightType": "SUN",
+          "energy": 3.5
+        }
+      ],
+      "cameras": [
+        {
+          "name": "MeadowCam"
+        }
+      ],
+      "materialCount": 7,
+      "imageCount": 0,
+      "packedImages": [],
+      "classification": {
+        "productionReadyForPipeline": true,
+        "reusable": true,
+        "needsUpgrade": true,
+        "theatricalReady": false,
+        "issues": [],
+        "label": "existing approved asset"
+      }
+    },
+    {
+      "id": "map",
+      "kind": "prop",
+      "role": "map",
+      "path": "production-library/props/adventure_map.blend",
+      "exists": true,
+      "bytes": 1236300,
+      "sha256": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea",
+      "blenderVersion": "4.2.3 LTS",
+      "meshes": [
+        {
+          "name": "AdventureMap",
+          "vertices": 234,
+          "polygons": 232,
+          "parent": null,
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapPaper",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.8199999928474426,
+                  0.699999988079071,
+                  0.47999998927116394,
+                  1.0
+                ],
+                "roughness": 0.6200000047683716,
+                "metallic": 0.0,
+                "specular": 0.25,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapBorder_E",
+          "vertices": 762,
+          "polygons": 798,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapInk",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.1599999964237213,
+                  0.12999999523162842,
+                  0.10000000149011612,
+                  1.0
+                ],
+                "roughness": 0.550000011920929,
+                "metallic": 0.0,
+                "specular": 0.15000000596046448,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapBorder_N",
+          "vertices": 1406,
+          "polygons": 1458,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapInk",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.1599999964237213,
+                  0.12999999523162842,
+                  0.10000000149011612,
+                  1.0
+                ],
+                "roughness": 0.550000011920929,
+                "metallic": 0.0,
+                "specular": 0.15000000596046448,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapBorder_S",
+          "vertices": 1406,
+          "polygons": 1458,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapInk",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.1599999964237213,
+                  0.12999999523162842,
+                  0.10000000149011612,
+                  1.0
+                ],
+                "roughness": 0.550000011920929,
+                "metallic": 0.0,
+                "specular": 0.15000000596046448,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapBorder_W",
+          "vertices": 762,
+          "polygons": 798,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapInk",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.1599999964237213,
+                  0.12999999523162842,
+                  0.10000000149011612,
+                  1.0
+                ],
+                "roughness": 0.550000011920929,
+                "metallic": 0.0,
+                "specular": 0.15000000596046448,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapCoast",
+          "vertices": 884,
+          "polygons": 931,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapCoast",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.4399999976158142,
+                  0.5600000023841858,
+                  0.33000001311302185,
+                  1.0
+                ],
+                "roughness": 0.699999988079071,
+                "metallic": 0.0,
+                "specular": 0.10000000149011612,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapCompass_E",
+          "vertices": 74,
+          "polygons": 84,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapAccent",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.800000011920929,
+                  0.6000000238418579,
+                  0.18000000715255737,
+                  1.0
+                ],
+                "roughness": 0.3499999940395355,
+                "metallic": 0.0,
+                "specular": 0.44999998807907104,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapCompass_N",
+          "vertices": 74,
+          "polygons": 84,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapAccent",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.800000011920929,
+                  0.6000000238418579,
+                  0.18000000715255737,
+                  1.0
+                ],
+                "roughness": 0.3499999940395355,
+                "metallic": 0.0,
+                "specular": 0.44999998807907104,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapCrease_H",
+          "vertices": 1406,
+          "polygons": 1458,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapFold",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.550000011920929,
+                  0.3799999952316284,
+                  1.0
+                ],
+                "roughness": 0.6800000071525574,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapCrease_V",
+          "vertices": 762,
+          "polygons": 798,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapFold",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.550000011920929,
+                  0.3799999952316284,
+                  1.0
+                ],
+                "roughness": 0.6800000071525574,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapMark",
+          "vertices": 74,
+          "polygons": 84,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapMark_B",
+          "vertices": 74,
+          "polygons": 84,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapStand",
+          "vertices": 42,
+          "polygons": 80,
+          "parent": null,
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [
+            "UVMap"
+          ],
+          "materials": [
+            {
+              "name": "MapStone",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.4000000059604645,
+                  0.38999998569488525,
+                  0.36000001430511475,
+                  1.0
+                ],
+                "roughness": 0.8500000238418579,
+                "metallic": 0.0,
+                "specular": 0.10000000149011612,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_0_0",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_0_1",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_1_0",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_1_1",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_2_0",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_2_1",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_3_0",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_3_1",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_4_0",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapTrail_4_1",
+          "vertices": 14,
+          "polygons": 18,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapTrail",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.6600000262260437,
+                  0.23999999463558197,
+                  0.1599999964237213,
+                  1.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "specular": 0.20000000298023224,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        },
+        {
+          "name": "MapWater",
+          "vertices": 272,
+          "polygons": 297,
+          "parent": "AdventureMap",
+          "parentType": "OBJECT",
+          "vertexGroups": [],
+          "shapeKeys": [],
+          "shapeKeyCount": 0,
+          "uvLayers": [],
+          "materials": [
+            {
+              "name": "MapWater",
+              "useNodes": true,
+              "blendMethod": "HASHED",
+              "principled": {
+                "baseColor": [
+                  0.3199999928474426,
+                  0.5199999809265137,
+                  0.6600000262260437,
+                  1.0
+                ],
+                "roughness": 0.44999998807907104,
+                "metallic": 0.0,
+                "specular": 0.3499999940395355,
+                "ior": 1.5,
+                "subsurfaceWeight": null,
+                "sheenWeight": null,
+                "emissionStrength": 0.0
+              },
+              "hasImageTexture": false,
+              "hasNormalMap": false
+            }
+          ],
+          "modifiers": []
+        }
+      ],
+      "armatures": [],
+      "actions": [],
+      "lights": [],
+      "cameras": [],
+      "materialCount": 8,
+      "imageCount": 0,
+      "packedImages": [],
+      "classification": {
+        "productionReadyForPipeline": true,
+        "reusable": true,
+        "needsUpgrade": true,
+        "theatricalReady": false,
+        "issues": [],
+        "label": "existing approved asset"
+      }
+    }
+  ],
+  "missing": [
+    {
+      "id": "LOC_CREEK_001",
+      "kind": "environment",
+      "reason": "validation scene beat B4 names a creek; no creek blend exists"
+    },
+    {
+      "id": "pip_theatrical",
+      "kind": "character",
+      "reason": "no THEATRICAL binding; resolveCharacterBinding(THEATRICAL) fails closed"
+    },
+    {
+      "id": "goat_theatrical",
+      "kind": "character",
+      "reason": "no THEATRICAL binding; resolveCharacterBinding(THEATRICAL) fails closed"
+    },
+    {
+      "id": "groom_caches",
+      "kind": "simulation",
+      "reason": "prototype bindings have no groomVersion"
+    },
+    {
+      "id": "pbr_texture_sets",
+      "kind": "material",
+      "reason": "no 2K/4K texture sets on founding assets"
+    },
+    {
+      "id": "eye_aim_rigs",
+      "kind": "rig",
+      "reason": "prototype rigs have independentEyeAim=false"
+    },
+    {
+      "id": "feature_animation_library",
+      "kind": "animation",
+      "reason": "authored actions are prototype clips, not a theatrical library"
+    }
+  ],
+  "prohibitedOrUnlicensed": [
+    {
+      "id": "third_party_marketplace_assets",
+      "reason": "paid/unlicensed placeholders are forbidden; studio provenance is in-house only"
+    }
+  ],
+  "approvedFingerprintPin": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7"
+}

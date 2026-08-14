@@ -694,6 +694,62 @@ class ShadowCasterTests(unittest.TestCase):
             self.assertLess(spread, 1e-6, f"{block.name} springs the collapsed part back into the caster")
 
 
+class TheatricalShaderTests(unittest.TestCase):
+    """Proposed look-dev must stay additive, reversible, and outside the library."""
+
+    def setUp(self) -> None:
+        sys.path.insert(0, str(REPO_ROOT / "scripts" / "assets"))
+        import theatrical_shaders as TS  # noqa: WPS433
+
+        self.TS = TS
+        fresh_scene()
+
+    def _principled_material(self, name: str, color, metallic: float = 0.0):
+        mat = bpy.data.materials.new(name)
+        mat.use_nodes = True
+        principled = next(n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        principled.inputs["Base Color"].default_value = (*color, 1.0)
+        principled.inputs["Metallic"].default_value = metallic
+        return mat, principled
+
+    def test_apply_does_not_change_base_color_or_metallic(self) -> None:
+        mat, principled = self._principled_material("PipBody", (1.0, 0.9, 0.12), 0.0)
+        color = list(principled.inputs["Base Color"].default_value)
+        report = self.TS.apply_proposed_shaders([mat])
+        self.assertEqual(list(principled.inputs["Base Color"].default_value), color)
+        self.assertEqual(principled.inputs["Metallic"].default_value, 0.0)
+        self.assertTrue(any(row["name"] == "PipBody" for row in report["applied"]))
+
+    def test_apply_sets_body_sheen_and_subsurface(self) -> None:
+        mat, principled = self._principled_material("GoatBody", (0.97, 0.95, 0.9))
+        self.TS.apply_proposed_shaders([mat])
+        sss = principled.inputs.get("Subsurface Weight") or principled.inputs.get("Subsurface")
+        sheen = principled.inputs.get("Sheen Weight") or principled.inputs.get("Sheen")
+        self.assertIsNotNone(sss)
+        self.assertIsNotNone(sheen)
+        self.assertGreaterEqual(float(sss.default_value), 0.2)
+        self.assertGreaterEqual(float(sheen.default_value), 0.45)
+
+    def test_unknown_materials_are_left_alone(self) -> None:
+        mat, principled = self._principled_material("UnrelatedHero", (0.1, 0.2, 0.3))
+        report = self.TS.apply_proposed_shaders([mat])
+        self.assertIn("UnrelatedHero", report["skipped"])
+        self.assertEqual(list(principled.inputs["Base Color"].default_value)[:3], [0.1, 0.2, 0.3])
+
+    def test_recipes_refuse_to_self_approve_or_write_the_library(self) -> None:
+        recipes = self.TS.load_recipes()
+        self.assertFalse(recipes["approved"])
+        self.assertTrue(recipes["rules"]["neverWriteProductionLibrary"])
+        with self.assertRaises(PermissionError):
+            self.TS.assert_not_production_library(REPO_ROOT / "production-library" / "characters" / "pip_production.blend")
+
+    def test_proposed_material_datablocks_use_theatrical_prefix(self) -> None:
+        created = self.TS.build_proposed_material_datablocks(bpy)
+        self.assertTrue(created)
+        self.assertTrue(all(name.startswith("THEATRICAL_") for name in created))
+        self.assertNotIn("PipBody", created)
+
+
 class DirectionConsumerTests(unittest.TestCase):
     """Milestone 3 consumers are opt-in and must not change a shot without direction."""
 
@@ -811,6 +867,7 @@ def main() -> int:
             HierarchyTests,
             ActionBindingTests,
             ShadowCasterTests,
+            TheatricalShaderTests,
             DirectionConsumerTests,
         )
     )
