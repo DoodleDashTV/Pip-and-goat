@@ -1,8 +1,8 @@
 {
   "episodeId": "VALIDATION_STEPS_1_8",
-  "schemaVersion": "ddp-production-blueprint-v1",
-  "contentHash": "5dda53147d67a4e4a03eca9c9196fd7560b56ae4396c1ef3cf60d8cc6568ce0a",
-  "cacheKey": "e6a53172daaf1ca19ce1b3431db89dc8006e0118c30f9ae66a57603a23482365",
+  "schemaVersion": "ddp-production-blueprint-v2",
+  "contentHash": "20c1d5fe83414a25a1e235401ceedb18b586688397165d75acfa72474300c192",
+  "cacheKey": "9f3370fbbff766c69b92f2b9c9b6a4a4ebf7c35a1098b3ccbcff618f851e0be2",
   "shots": [
     {
       "shotId": "VALIDATION_STEPS_1_8_s001",
@@ -179,7 +179,7 @@
           ]
         },
         "direction": {
-          "version": "1.0.0",
+          "version": "1.1.0",
           "camera": {
             "composition": "MEDIUM",
             "move": "PUSH_IN",
@@ -500,7 +500,7 @@
         },
         "expressionStates": {
           "goat": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "curious",
             "weights": {
               "brow_inner_up": 0.103,
@@ -536,6 +536,11 @@
               "channel": "viseme_REST",
               "atMs": 2203,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -583,7 +588,7 @@
             ]
           },
           "pip": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "curious",
             "weights": {
               "beak_open": 0.097,
@@ -619,6 +624,11 @@
               "channel": "viseme_REST",
               "atMs": 2198,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -670,6 +680,7 @@
           "goat": [
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 2203,
               "endMs": 2500,
               "weight": 1
@@ -678,126 +689,310 @@
           "pip": [
             {
               "viseme": "O",
+              "channel": "viseme_O",
               "startMs": 240,
               "endMs": 374,
               "weight": 0.654
             },
             {
               "viseme": "A",
+              "channel": "viseme_A",
               "startMs": 339,
               "endMs": 474,
               "weight": 0.654
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 439,
               "endMs": 573,
               "weight": 0.654
             },
             {
               "viseme": "L",
+              "channel": "viseme_L",
               "startMs": 538,
               "endMs": 672,
               "weight": 0.654
             },
             {
               "viseme": "O",
+              "channel": "viseme_O",
               "startMs": 637,
               "endMs": 772,
               "weight": 0.654
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 737,
               "endMs": 871,
               "weight": 0.654
             },
             {
               "viseme": "A",
+              "channel": "viseme_A",
               "startMs": 836,
               "endMs": 971,
               "weight": 0.654
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 936,
               "endMs": 1070,
               "weight": 0.654
             },
             {
               "viseme": "TH",
+              "channel": "viseme_TH",
               "startMs": 1035,
               "endMs": 1169,
               "weight": 0.654
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 1134,
               "endMs": 1269,
               "weight": 0.654
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1234,
               "endMs": 1368,
               "weight": 0.654
             },
             {
               "viseme": "L",
+              "channel": "viseme_L",
               "startMs": 1333,
               "endMs": 1467,
               "weight": 0.654
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 1432,
               "endMs": 1567,
               "weight": 0.654
             },
             {
               "viseme": "L",
+              "channel": "viseme_L",
               "startMs": 1532,
               "endMs": 1666,
               "weight": 0.654
             },
             {
               "viseme": "E",
+              "channel": "viseme_E",
               "startMs": 1631,
               "endMs": 1766,
               "weight": 0.654
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1731,
               "endMs": 1865,
               "weight": 0.654
             },
             {
               "viseme": "M_B_P",
+              "channel": "viseme_M_B_P",
               "startMs": 1830,
               "endMs": 1964,
               "weight": 0.654
             },
             {
               "viseme": "A",
+              "channel": "viseme_A",
               "startMs": 1929,
               "endMs": 2064,
               "weight": 0.654
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 2029,
               "endMs": 2163,
               "weight": 0.654
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 2198,
               "endMs": 2500,
               "weight": 1
             }
           ]
+        },
+        "renderSettings": {
+          "directionVersion": "1.0.0",
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 24,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.02,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "288be60fb4c5889696f1c86d3cdbf34a45d970d6db37063c0eca374610bc719f"
+        },
+        "simulationState": {
+          "directionVersion": "1.0.0",
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 3,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.336
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.336
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.336
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 3,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.411
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0
         }
+      },
+      "assetRefs": {
+        "characters": {
+          "goat": {
+            "assetId": "goat",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          },
+          "pip": {
+            "assetId": "pip",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          }
+        },
+        "environments": [],
+        "props": []
       },
       "audio": {
         "shotId": "VALIDATION_STEPS_1_8_s001",
@@ -991,7 +1186,7 @@
         "vfx_environment_particles_v1",
         "vfx_map_glow_v1"
       ],
-      "cacheKey": "d382856a648d29441aa1a8f6cfc66855bd16c822f6fb1d08daf1390cf0c24056",
+      "cacheKey": "78ae33bd97bc7ff7c177df11a1ba2161934317a2e27832b7f83ad12ade2b4a70",
       "cost": {
         "frameCount": 75,
         "estimatedLocalMinutes": 4.5,
@@ -1001,6 +1196,143 @@
         "cacheHit": false
       },
       "qcStatus": "PASS",
+      "acceptance": {
+        "technical": "PASS",
+        "technicalChecks": [
+          {
+            "item": "SCHEMA_VALIDATION",
+            "status": "PASS"
+          },
+          {
+            "item": "MOTION_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "21 measurement(s)"
+          },
+          {
+            "item": "FACIAL_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "16 measurement(s)"
+          },
+          {
+            "item": "SOUND_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "8 measurement(s)"
+          },
+          {
+            "item": "CHARACTER_LOCK",
+            "status": "PASS",
+            "detail": "0 lock violation(s)"
+          },
+          {
+            "item": "RIG_INTEGRITY",
+            "status": "PASS",
+            "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+          },
+          {
+            "item": "ASSET_FINGERPRINTS",
+            "status": "PASS",
+            "detail": "2 binding(s) pinned"
+          },
+          {
+            "item": "LIGHTING_THRESHOLDS",
+            "status": "NOT_RUN",
+            "detail": "measured on rendered frames by scripts/assets gates"
+          },
+          {
+            "item": "VFX_BUDGET",
+            "status": "PASS"
+          },
+          {
+            "item": "AUTOMATED_TESTS",
+            "status": "NOT_RUN",
+            "detail": "reported by the test suite, not by planning"
+          }
+        ],
+        "artistic": "NOT_RENDERED",
+        "artisticReviews": [
+          {
+            "item": "CHARACTER_IDENTITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "DEFORMATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GROOM_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "MATERIAL_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "FACIAL_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "EYE_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "BODY_MECHANICS",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTACT_AND_COLLISION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CAMERA",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIGHTING_AND_EXPOSURE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "VFX_INTEGRATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "SIMULATION_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "TEMPORAL_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIP_SYNC",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "AUDIO_AND_MIX",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTINUITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CHILD_CONTENT_SAFETY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GOLDEN_REFERENCE_COMPARISON",
+            "status": "NOT_RENDERED"
+          }
+        ],
+        "overall": "TECHNICAL_PASS_NOT_RENDERED",
+        "blockedBy": [
+          "No render has been produced, so nothing has been visually reviewed.",
+          "No golden reference exists yet; comparison against the theatrical standard is not possible."
+        ]
+      },
+      "renderTier": "DRAFT",
+      "renderEngine": "EEVEE",
+      "cloudRenderProfile": "DRAFT_FAST",
+      "isMasterCandidate": false,
       "roles": [
         "goat",
         "pip"
@@ -1121,7 +1453,7 @@
           ]
         },
         "direction": {
-          "version": "1.0.0",
+          "version": "1.1.0",
           "camera": {
             "composition": "MEDIUM",
             "move": "PUSH_IN",
@@ -1437,7 +1769,7 @@
         },
         "expressionStates": {
           "goat": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "happy",
             "weights": {
               "brow_up": 0.375,
@@ -1472,6 +1804,11 @@
               "channel": "viseme_REST",
               "atMs": 2569,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -1512,7 +1849,7 @@
             ]
           },
           "pip": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "surprised",
             "weights": {
               "beak_open": 0.395,
@@ -1548,6 +1885,11 @@
               "channel": "viseme_REST",
               "atMs": 2612,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -1599,60 +1941,70 @@
           "goat": [
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 180,
               "endMs": 342,
               "weight": 0.716
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 307,
               "endMs": 468,
               "weight": 0.716
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 433,
               "endMs": 595,
               "weight": 0.716
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 560,
               "endMs": 722,
               "weight": 0.716
             },
             {
               "viseme": "L",
+              "channel": "viseme_L",
               "startMs": 687,
               "endMs": 848,
               "weight": 0.716
             },
             {
               "viseme": "O",
+              "channel": "viseme_O",
               "startMs": 813,
               "endMs": 975,
               "weight": 0.716
             },
             {
               "viseme": "U",
+              "channel": "viseme_U",
               "startMs": 940,
               "endMs": 1102,
               "weight": 0.716
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 1067,
               "endMs": 1228,
               "weight": 0.716
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1193,
               "endMs": 1355,
               "weight": 0.716
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 2569,
               "endMs": 3000,
               "weight": 1
@@ -1661,12 +2013,177 @@
           "pip": [
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 2612,
               "endMs": 3000,
               "weight": 1
             }
           ]
+        },
+        "renderSettings": {
+          "directionVersion": "1.0.0",
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 24,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.026,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "84f4b5393b507a4c878488a9d13077920d85a2da1a2e91577b180c775b206b1c"
+        },
+        "simulationState": {
+          "directionVersion": "1.0.0",
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.43
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.43
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.43
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.449
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.449
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.449
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0
         }
+      },
+      "assetRefs": {
+        "characters": {
+          "goat": {
+            "assetId": "goat",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          },
+          "pip": {
+            "assetId": "pip",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          }
+        },
+        "environments": [],
+        "props": []
       },
       "audio": {
         "shotId": "VALIDATION_STEPS_1_8_s002",
@@ -1879,7 +2396,7 @@
         "vfx_discovery_burst_v1",
         "vfx_map_glow_v1"
       ],
-      "cacheKey": "65a86fae7c89414f0e8716beaa76e943f48c10467cc9df08cb6df174fbd767f7",
+      "cacheKey": "5f52030d076b23e1f7ce150b97c3651201d43d26e1e9c0a6f02b2ea99b46449e",
       "cost": {
         "frameCount": 90,
         "estimatedLocalMinutes": 5.4,
@@ -1889,6 +2406,143 @@
         "cacheHit": false
       },
       "qcStatus": "PASS",
+      "acceptance": {
+        "technical": "PASS",
+        "technicalChecks": [
+          {
+            "item": "SCHEMA_VALIDATION",
+            "status": "PASS"
+          },
+          {
+            "item": "MOTION_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "21 measurement(s)"
+          },
+          {
+            "item": "FACIAL_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "16 measurement(s)"
+          },
+          {
+            "item": "SOUND_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "8 measurement(s)"
+          },
+          {
+            "item": "CHARACTER_LOCK",
+            "status": "PASS",
+            "detail": "0 lock violation(s)"
+          },
+          {
+            "item": "RIG_INTEGRITY",
+            "status": "PASS",
+            "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+          },
+          {
+            "item": "ASSET_FINGERPRINTS",
+            "status": "PASS",
+            "detail": "2 binding(s) pinned"
+          },
+          {
+            "item": "LIGHTING_THRESHOLDS",
+            "status": "NOT_RUN",
+            "detail": "measured on rendered frames by scripts/assets gates"
+          },
+          {
+            "item": "VFX_BUDGET",
+            "status": "PASS"
+          },
+          {
+            "item": "AUTOMATED_TESTS",
+            "status": "NOT_RUN",
+            "detail": "reported by the test suite, not by planning"
+          }
+        ],
+        "artistic": "NOT_RENDERED",
+        "artisticReviews": [
+          {
+            "item": "CHARACTER_IDENTITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "DEFORMATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GROOM_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "MATERIAL_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "FACIAL_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "EYE_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "BODY_MECHANICS",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTACT_AND_COLLISION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CAMERA",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIGHTING_AND_EXPOSURE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "VFX_INTEGRATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "SIMULATION_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "TEMPORAL_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIP_SYNC",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "AUDIO_AND_MIX",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTINUITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CHILD_CONTENT_SAFETY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GOLDEN_REFERENCE_COMPARISON",
+            "status": "NOT_RENDERED"
+          }
+        ],
+        "overall": "TECHNICAL_PASS_NOT_RENDERED",
+        "blockedBy": [
+          "No render has been produced, so nothing has been visually reviewed.",
+          "No golden reference exists yet; comparison against the theatrical standard is not possible."
+        ]
+      },
+      "renderTier": "DRAFT",
+      "renderEngine": "EEVEE",
+      "cloudRenderProfile": "DRAFT_FAST",
+      "isMasterCandidate": false,
       "roles": [
         "goat",
         "pip"
@@ -2057,7 +2711,7 @@
           ]
         },
         "direction": {
-          "version": "1.0.0",
+          "version": "1.1.0",
           "camera": {
             "composition": "MEDIUM",
             "move": "FOLLOW",
@@ -2351,7 +3005,7 @@
         },
         "expressionStates": {
           "goat": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "happy",
             "weights": {
               "brow_up": 0.145,
@@ -2379,6 +3033,11 @@
               "channel": "viseme_REST",
               "atMs": 3168,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -2419,7 +3078,7 @@
             ]
           },
           "pip": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "determined",
             "weights": {
               "beak_open": 0.05,
@@ -2448,6 +3107,11 @@
               "channel": "viseme_REST",
               "atMs": 3163,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -2499,6 +3163,7 @@
           "goat": [
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 3168,
               "endMs": 3500,
               "weight": 1
@@ -2507,114 +3172,296 @@
           "pip": [
             {
               "viseme": "O",
+              "channel": "viseme_O",
               "startMs": 180,
               "endMs": 325,
               "weight": 0.638
             },
             {
               "viseme": "M_B_P",
+              "channel": "viseme_M_B_P",
               "startMs": 290,
               "endMs": 434,
               "weight": 0.638
             },
             {
               "viseme": "E",
+              "channel": "viseme_E",
               "startMs": 399,
               "endMs": 544,
               "weight": 0.638
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 509,
               "endMs": 653,
               "weight": 0.638
             },
             {
               "viseme": "O",
+              "channel": "viseme_O",
               "startMs": 618,
               "endMs": 763,
               "weight": 0.638
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 728,
               "endMs": 873,
               "weight": 0.638
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 838,
               "endMs": 982,
               "weight": 0.638
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 947,
               "endMs": 1092,
               "weight": 0.638
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 1057,
               "endMs": 1201,
               "weight": 0.638
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1166,
               "endMs": 1311,
               "weight": 0.638
             },
             {
               "viseme": "TH",
+              "channel": "viseme_TH",
               "startMs": 1276,
               "endMs": 1420,
               "weight": 0.638
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 1385,
               "endMs": 1530,
               "weight": 0.638
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1495,
               "endMs": 1640,
               "weight": 0.638
             },
             {
               "viseme": "U",
+              "channel": "viseme_U",
               "startMs": 1605,
               "endMs": 1749,
               "weight": 0.638
             },
             {
               "viseme": "A",
+              "channel": "viseme_A",
               "startMs": 1714,
               "endMs": 1859,
               "weight": 0.638
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 1824,
               "endMs": 1968,
               "weight": 0.638
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1933,
               "endMs": 2078,
               "weight": 0.638
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 3163,
               "endMs": 3500,
               "weight": 1
             }
           ]
+        },
+        "renderSettings": {
+          "directionVersion": "1.0.0",
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 24,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.022,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "3cdac431de2b3f37a03b40b995b115469b507383edc336068c8721d494c6136c"
+        },
+        "simulationState": {
+          "directionVersion": "1.0.0",
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.358
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.358
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.358
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.471
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.471
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.471
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0
         }
+      },
+      "assetRefs": {
+        "characters": {
+          "goat": {
+            "assetId": "goat",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          },
+          "pip": {
+            "assetId": "pip",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          }
+        },
+        "environments": [],
+        "props": []
       },
       "audio": {
         "shotId": "VALIDATION_STEPS_1_8_s003",
@@ -3226,7 +4073,7 @@
         "vfx_dust_puff_v1",
         "vfx_magic_sparkles_v1"
       ],
-      "cacheKey": "5864b3a212badfac88b9e6e89d4b058dff16ced6de1ee1bbcf1645331490e24c",
+      "cacheKey": "2ef9d7a955e318cdbc48565554fbeea2caff2f10c18867255adc7f95a83c6bdd",
       "cost": {
         "frameCount": 105,
         "estimatedLocalMinutes": 6.3,
@@ -3236,6 +4083,143 @@
         "cacheHit": false
       },
       "qcStatus": "PASS",
+      "acceptance": {
+        "technical": "PASS",
+        "technicalChecks": [
+          {
+            "item": "SCHEMA_VALIDATION",
+            "status": "PASS"
+          },
+          {
+            "item": "MOTION_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "19 measurement(s)"
+          },
+          {
+            "item": "FACIAL_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "16 measurement(s)"
+          },
+          {
+            "item": "SOUND_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "8 measurement(s)"
+          },
+          {
+            "item": "CHARACTER_LOCK",
+            "status": "PASS",
+            "detail": "0 lock violation(s)"
+          },
+          {
+            "item": "RIG_INTEGRITY",
+            "status": "PASS",
+            "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+          },
+          {
+            "item": "ASSET_FINGERPRINTS",
+            "status": "PASS",
+            "detail": "2 binding(s) pinned"
+          },
+          {
+            "item": "LIGHTING_THRESHOLDS",
+            "status": "NOT_RUN",
+            "detail": "measured on rendered frames by scripts/assets gates"
+          },
+          {
+            "item": "VFX_BUDGET",
+            "status": "PASS"
+          },
+          {
+            "item": "AUTOMATED_TESTS",
+            "status": "NOT_RUN",
+            "detail": "reported by the test suite, not by planning"
+          }
+        ],
+        "artistic": "NOT_RENDERED",
+        "artisticReviews": [
+          {
+            "item": "CHARACTER_IDENTITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "DEFORMATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GROOM_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "MATERIAL_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "FACIAL_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "EYE_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "BODY_MECHANICS",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTACT_AND_COLLISION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CAMERA",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIGHTING_AND_EXPOSURE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "VFX_INTEGRATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "SIMULATION_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "TEMPORAL_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIP_SYNC",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "AUDIO_AND_MIX",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTINUITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CHILD_CONTENT_SAFETY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GOLDEN_REFERENCE_COMPARISON",
+            "status": "NOT_RENDERED"
+          }
+        ],
+        "overall": "TECHNICAL_PASS_NOT_RENDERED",
+        "blockedBy": [
+          "No render has been produced, so nothing has been visually reviewed.",
+          "No golden reference exists yet; comparison against the theatrical standard is not possible."
+        ]
+      },
+      "renderTier": "DRAFT",
+      "renderEngine": "EEVEE",
+      "cloudRenderProfile": "DRAFT_FAST",
+      "isMasterCandidate": false,
       "roles": [
         "goat",
         "pip"
@@ -3386,7 +4370,7 @@
           ]
         },
         "direction": {
-          "version": "1.0.0",
+          "version": "1.1.0",
           "camera": {
             "composition": "TWO_SHOT",
             "move": "STATIC",
@@ -3685,7 +4669,7 @@
         },
         "expressionStates": {
           "goat": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "laughing",
             "weights": {
               "brow_up": 0.272,
@@ -3714,6 +4698,11 @@
               "channel": "viseme_REST",
               "atMs": 2553,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -3761,7 +4750,7 @@
             ]
           },
           "pip": {
-            "directionVersion": "1.0.0",
+            "directionVersion": "1.1.0",
             "expression": "happy",
             "weights": {
               "beak_open": 0.05,
@@ -3790,6 +4779,11 @@
               "channel": "viseme_REST",
               "atMs": 2641,
               "weight": 1
+            },
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
             },
             "cues": [
               {
@@ -3841,90 +4835,105 @@
           "goat": [
             {
               "viseme": "U",
+              "channel": "viseme_U",
               "startMs": 180,
               "endMs": 340,
               "weight": 0.773
             },
             {
               "viseme": "E",
+              "channel": "viseme_E",
               "startMs": 305,
               "endMs": 466,
               "weight": 0.773
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 431,
               "endMs": 591,
               "weight": 0.773
             },
             {
               "viseme": "F_V",
+              "channel": "viseme_F_V",
               "startMs": 556,
               "endMs": 716,
               "weight": 0.773
             },
             {
               "viseme": "O",
+              "channel": "viseme_O",
               "startMs": 681,
               "endMs": 842,
               "weight": 0.773
             },
             {
               "viseme": "U",
+              "channel": "viseme_U",
               "startMs": 807,
               "endMs": 967,
               "weight": 0.773
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 932,
               "endMs": 1093,
               "weight": 0.773
             },
             {
               "viseme": "I",
+              "channel": "viseme_I",
               "startMs": 1058,
               "endMs": 1218,
               "weight": 0.773
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1183,
               "endMs": 1343,
               "weight": 0.773
             },
             {
               "viseme": "O",
+              "channel": "viseme_O",
               "startMs": 1308,
               "endMs": 1469,
               "weight": 0.773
             },
             {
               "viseme": "E",
+              "channel": "viseme_E",
               "startMs": 1434,
               "endMs": 1594,
               "weight": 0.773
             },
             {
               "viseme": "TH",
+              "channel": "viseme_TH",
               "startMs": 1559,
               "endMs": 1719,
               "weight": 0.773
             },
             {
               "viseme": "E",
+              "channel": "viseme_E",
               "startMs": 1684,
               "endMs": 1845,
               "weight": 0.773
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 1810,
               "endMs": 1970,
               "weight": 0.773
             },
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 2553,
               "endMs": 3000,
               "weight": 1
@@ -3933,12 +4942,177 @@
           "pip": [
             {
               "viseme": "REST",
+              "channel": "viseme_REST",
               "startMs": 2641,
               "endMs": 3000,
               "weight": 1
             }
           ]
+        },
+        "renderSettings": {
+          "directionVersion": "1.0.0",
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 28,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": -0.026,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "c3e5708f67f9f3e7a86e9d44fb2e37ad1d977717c408cf37bc58fa47855c3a8f"
+        },
+        "simulationState": {
+          "directionVersion": "1.0.0",
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.423
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.423
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.423
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 3,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.411
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0
         }
+      },
+      "assetRefs": {
+        "characters": {
+          "goat": {
+            "assetId": "goat",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          },
+          "pip": {
+            "assetId": "pip",
+            "version": "prototype-1.1",
+            "checksum": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "role": "character",
+            "required": true,
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "quality": "PROTOTYPE"
+          }
+        },
+        "environments": [],
+        "props": []
       },
       "audio": {
         "shotId": "VALIDATION_STEPS_1_8_s004",
@@ -4092,7 +5266,7 @@
         "vfx_environment_particles_v1",
         "vfx_magic_sparkles_v1"
       ],
-      "cacheKey": "18a6daee092ed25775ddcffe8f4e4745edf3c254a31018a53afd27c848e9edd9",
+      "cacheKey": "07030cc5dc642ad242fe905bde1a5788a73f7a44e5946c846c8745509f3be834",
       "cost": {
         "frameCount": 90,
         "estimatedLocalMinutes": 5.4,
@@ -4102,10 +5276,251 @@
         "cacheHit": false
       },
       "qcStatus": "PASS",
+      "acceptance": {
+        "technical": "PASS",
+        "technicalChecks": [
+          {
+            "item": "SCHEMA_VALIDATION",
+            "status": "PASS"
+          },
+          {
+            "item": "MOTION_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "19 measurement(s)"
+          },
+          {
+            "item": "FACIAL_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "16 measurement(s)"
+          },
+          {
+            "item": "SOUND_MEASUREMENTS",
+            "status": "PASS",
+            "detail": "8 measurement(s)"
+          },
+          {
+            "item": "CHARACTER_LOCK",
+            "status": "PASS",
+            "detail": "0 lock violation(s)"
+          },
+          {
+            "item": "RIG_INTEGRITY",
+            "status": "PASS",
+            "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+          },
+          {
+            "item": "ASSET_FINGERPRINTS",
+            "status": "PASS",
+            "detail": "2 binding(s) pinned"
+          },
+          {
+            "item": "LIGHTING_THRESHOLDS",
+            "status": "NOT_RUN",
+            "detail": "measured on rendered frames by scripts/assets gates"
+          },
+          {
+            "item": "VFX_BUDGET",
+            "status": "PASS"
+          },
+          {
+            "item": "AUTOMATED_TESTS",
+            "status": "NOT_RUN",
+            "detail": "reported by the test suite, not by planning"
+          }
+        ],
+        "artistic": "NOT_RENDERED",
+        "artisticReviews": [
+          {
+            "item": "CHARACTER_IDENTITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "DEFORMATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GROOM_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "MATERIAL_INTEGRITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "FACIAL_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "EYE_PERFORMANCE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "BODY_MECHANICS",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTACT_AND_COLLISION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CAMERA",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIGHTING_AND_EXPOSURE",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "VFX_INTEGRATION",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "SIMULATION_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "TEMPORAL_STABILITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "LIP_SYNC",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "AUDIO_AND_MIX",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CONTINUITY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "CHILD_CONTENT_SAFETY",
+            "status": "NOT_RENDERED"
+          },
+          {
+            "item": "GOLDEN_REFERENCE_COMPARISON",
+            "status": "NOT_RENDERED"
+          }
+        ],
+        "overall": "TECHNICAL_PASS_NOT_RENDERED",
+        "blockedBy": [
+          "No render has been produced, so nothing has been visually reviewed.",
+          "No golden reference exists yet; comparison against the theatrical standard is not possible."
+        ]
+      },
+      "renderTier": "DRAFT",
+      "renderEngine": "EEVEE",
+      "cloudRenderProfile": "DRAFT_FAST",
+      "isMasterCandidate": false,
       "roles": [
         "goat",
         "pip"
       ]
     }
-  ]
+  ],
+  "qualityContext": {
+    "assetQuality": "PROTOTYPE",
+    "renderTier": "DRAFT",
+    "isMasterCandidate": false
+  },
+  "acceptance": {
+    "technical": "PASS",
+    "technicalChecks": [
+      {
+        "item": "SCHEMA_VALIDATION",
+        "status": "PASS"
+      },
+      {
+        "item": "AUTOMATED_TESTS",
+        "status": "NOT_RUN",
+        "detail": "reported by the test suite, not by planning"
+      },
+      {
+        "item": "ASSET_FINGERPRINTS",
+        "status": "PASS",
+        "detail": "4/4 shot(s) version-pinned"
+      }
+    ],
+    "artistic": "NOT_RENDERED",
+    "artisticReviews": [
+      {
+        "item": "CHARACTER_IDENTITY",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "DEFORMATION",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "GROOM_INTEGRITY",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "MATERIAL_INTEGRITY",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "FACIAL_PERFORMANCE",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "EYE_PERFORMANCE",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "BODY_MECHANICS",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "CONTACT_AND_COLLISION",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "CAMERA",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "LIGHTING_AND_EXPOSURE",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "VFX_INTEGRATION",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "SIMULATION_STABILITY",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "TEMPORAL_STABILITY",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "LIP_SYNC",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "AUDIO_AND_MIX",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "CONTINUITY",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "CHILD_CONTENT_SAFETY",
+        "status": "NOT_RENDERED"
+      },
+      {
+        "item": "GOLDEN_REFERENCE_COMPARISON",
+        "status": "NOT_RENDERED"
+      }
+    ],
+    "overall": "TECHNICAL_PASS_NOT_RENDERED",
+    "blockedBy": [
+      "No render has been produced, so nothing has been visually reviewed.",
+      "No golden reference exists yet; comparison against the theatrical standard is not possible."
+    ]
+  }
 }

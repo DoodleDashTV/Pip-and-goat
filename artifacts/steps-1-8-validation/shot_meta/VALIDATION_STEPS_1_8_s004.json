@@ -134,7 +134,7 @@
     ]
   },
   "direction": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "camera": {
       "composition": "TWO_SHOT",
       "move": "STATIC",

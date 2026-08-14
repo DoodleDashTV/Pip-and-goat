@@ -1,6 +1,6 @@
 {
   "content": {
-    "schemaVersion": "ddp-production-blueprint-v1",
+    "schemaVersion": "ddp-production-blueprint-v2",
     "episodeId": "VALIDATION_STEPS_1_8",
     "episodeTitle": "Steps 1-8 Validation — Meadow Map Glimmer",
     "seed": "tivvlejoy-steps-1-8-validation-seed-v1",
@@ -8,18 +8,24 @@
       "aspect": "9:16",
       "resolution": "360x640",
       "fps": 30,
-      "targetDurationSeconds": 12
+      "targetDurationSeconds": 12,
+      "renderTier": "DRAFT",
+      "assetQuality": "PROTOTYPE"
     },
     "systemVersions": {
-      "director": "1.0.0",
+      "director": "1.1.0",
       "acting": "1.0.0",
       "emotion": "1.0.0",
-      "face": "1.0.0",
+      "face": "1.1.0",
       "camera": "1.0.0",
       "lighting": "1.0.0",
       "vfx": "1.0.0",
       "sound": "1.0.0",
-      "locks": "1.0.0"
+      "locks": "1.0.0",
+      "assets": "1.0.0",
+      "rig": "1.0.0",
+      "render": "1.0.0",
+      "simulation": "1.0.0"
     },
     "shots": [
       {
@@ -432,9 +438,14 @@
               "weight": 1
             },
             "dialogueFree": true,
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 3471807417
             }
           },
@@ -812,9 +823,14 @@
               "weight": 1
             },
             "dialogueFree": false,
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 2617062558
             }
           }
@@ -1189,6 +1205,133 @@
             "seed": 3581561110
           }
         },
+        "simulation": {
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 3,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.336
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.336
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.336
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 3,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.411
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0,
+          "provenance": {
+            "system": "simulation",
+            "version": "1.0.0",
+            "seed": 1731387894
+          }
+        },
+        "render": {
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 24,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.02,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "288be60fb4c5889696f1c86d3cdbf34a45d970d6db37063c0eca374610bc719f"
+        },
         "continuity": {
           "references": [],
           "screenDirection": "NEUTRAL"
@@ -1200,6 +1343,44 @@
           "pip",
           "vfx_environment_particles_v1",
           "vfx_map_glow_v1"
+        ],
+        "assetBindings": [
+          {
+            "logicalId": "goat",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_GOAT_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "37de74aa5386b05ca1be111aae558fe0d47f50c3552fec2f8551a4a8d5dc2ba4"
+          },
+          {
+            "logicalId": "pip",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_PIP_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "dc62d7a10b45bde53a8d7b26b977ce268c46f1a725d03066174b61201bb78ca5"
+          }
         ],
         "cost": {
           "frameCount": 75,
@@ -1607,7 +1788,140 @@
           ],
           "status": "PASS"
         },
-        "cacheKey": "d382856a648d29441aa1a8f6cfc66855bd16c822f6fb1d08daf1390cf0c24056",
+        "acceptance": {
+          "technical": "PASS",
+          "technicalChecks": [
+            {
+              "item": "SCHEMA_VALIDATION",
+              "status": "PASS"
+            },
+            {
+              "item": "MOTION_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "21 measurement(s)"
+            },
+            {
+              "item": "FACIAL_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "16 measurement(s)"
+            },
+            {
+              "item": "SOUND_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "8 measurement(s)"
+            },
+            {
+              "item": "CHARACTER_LOCK",
+              "status": "PASS",
+              "detail": "0 lock violation(s)"
+            },
+            {
+              "item": "RIG_INTEGRITY",
+              "status": "PASS",
+              "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+            },
+            {
+              "item": "ASSET_FINGERPRINTS",
+              "status": "PASS",
+              "detail": "2 binding(s) pinned"
+            },
+            {
+              "item": "LIGHTING_THRESHOLDS",
+              "status": "NOT_RUN",
+              "detail": "measured on rendered frames by scripts/assets gates"
+            },
+            {
+              "item": "VFX_BUDGET",
+              "status": "PASS"
+            },
+            {
+              "item": "AUTOMATED_TESTS",
+              "status": "NOT_RUN",
+              "detail": "reported by the test suite, not by planning"
+            }
+          ],
+          "artistic": "NOT_RENDERED",
+          "artisticReviews": [
+            {
+              "item": "CHARACTER_IDENTITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "DEFORMATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GROOM_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "MATERIAL_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "FACIAL_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "EYE_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "BODY_MECHANICS",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTACT_AND_COLLISION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CAMERA",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIGHTING_AND_EXPOSURE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "VFX_INTEGRATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "SIMULATION_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "TEMPORAL_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIP_SYNC",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "AUDIO_AND_MIX",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTINUITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CHILD_CONTENT_SAFETY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GOLDEN_REFERENCE_COMPARISON",
+              "status": "NOT_RENDERED"
+            }
+          ],
+          "overall": "TECHNICAL_PASS_NOT_RENDERED",
+          "blockedBy": [
+            "No render has been produced, so nothing has been visually reviewed.",
+            "No golden reference exists yet; comparison against the theatrical standard is not possible."
+          ]
+        },
+        "cacheKey": "78ae33bd97bc7ff7c177df11a1ba2161934317a2e27832b7f83ad12ade2b4a70",
         "shotMeta": {
           "title": "Pip spots a faint glimmer at the edge of the map and leans in to study it",
           "cameraPreset": "PUSH_IN",
@@ -1774,7 +2088,7 @@
             ]
           },
           "direction": {
-            "version": "1.0.0",
+            "version": "1.1.0",
             "camera": {
               "composition": "MEDIUM",
               "move": "PUSH_IN",
@@ -2492,9 +2806,14 @@
               "weight": 1
             },
             "dialogueFree": false,
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 3548662419
             }
           },
@@ -2600,9 +2919,14 @@
               "weight": 1
             },
             "dialogueFree": true,
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 2860290561
             }
           }
@@ -2998,6 +3322,133 @@
             "seed": 2926010995
           }
         },
+        "simulation": {
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.43
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.43
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.43
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.449
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.449
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.449
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0,
+          "provenance": {
+            "system": "simulation",
+            "version": "1.0.0",
+            "seed": 962605098
+          }
+        },
+        "render": {
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 24,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.026,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "84f4b5393b507a4c878488a9d13077920d85a2da1a2e91577b180c775b206b1c"
+        },
         "continuity": {
           "references": [
             "B1_HOOK"
@@ -3012,6 +3463,44 @@
           "pip",
           "vfx_discovery_burst_v1",
           "vfx_map_glow_v1"
+        ],
+        "assetBindings": [
+          {
+            "logicalId": "goat",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_GOAT_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "37de74aa5386b05ca1be111aae558fe0d47f50c3552fec2f8551a4a8d5dc2ba4"
+          },
+          {
+            "logicalId": "pip",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_PIP_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "dc62d7a10b45bde53a8d7b26b977ce268c46f1a725d03066174b61201bb78ca5"
+          }
         ],
         "cost": {
           "frameCount": 90,
@@ -3419,7 +3908,140 @@
           ],
           "status": "PASS"
         },
-        "cacheKey": "65a86fae7c89414f0e8716beaa76e943f48c10467cc9df08cb6df174fbd767f7",
+        "acceptance": {
+          "technical": "PASS",
+          "technicalChecks": [
+            {
+              "item": "SCHEMA_VALIDATION",
+              "status": "PASS"
+            },
+            {
+              "item": "MOTION_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "21 measurement(s)"
+            },
+            {
+              "item": "FACIAL_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "16 measurement(s)"
+            },
+            {
+              "item": "SOUND_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "8 measurement(s)"
+            },
+            {
+              "item": "CHARACTER_LOCK",
+              "status": "PASS",
+              "detail": "0 lock violation(s)"
+            },
+            {
+              "item": "RIG_INTEGRITY",
+              "status": "PASS",
+              "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+            },
+            {
+              "item": "ASSET_FINGERPRINTS",
+              "status": "PASS",
+              "detail": "2 binding(s) pinned"
+            },
+            {
+              "item": "LIGHTING_THRESHOLDS",
+              "status": "NOT_RUN",
+              "detail": "measured on rendered frames by scripts/assets gates"
+            },
+            {
+              "item": "VFX_BUDGET",
+              "status": "PASS"
+            },
+            {
+              "item": "AUTOMATED_TESTS",
+              "status": "NOT_RUN",
+              "detail": "reported by the test suite, not by planning"
+            }
+          ],
+          "artistic": "NOT_RENDERED",
+          "artisticReviews": [
+            {
+              "item": "CHARACTER_IDENTITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "DEFORMATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GROOM_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "MATERIAL_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "FACIAL_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "EYE_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "BODY_MECHANICS",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTACT_AND_COLLISION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CAMERA",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIGHTING_AND_EXPOSURE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "VFX_INTEGRATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "SIMULATION_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "TEMPORAL_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIP_SYNC",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "AUDIO_AND_MIX",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTINUITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CHILD_CONTENT_SAFETY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GOLDEN_REFERENCE_COMPARISON",
+              "status": "NOT_RENDERED"
+            }
+          ],
+          "overall": "TECHNICAL_PASS_NOT_RENDERED",
+          "blockedBy": [
+            "No render has been produced, so nothing has been visually reviewed.",
+            "No golden reference exists yet; comparison against the theatrical standard is not possible."
+          ]
+        },
+        "cacheKey": "5f52030d076b23e1f7ce150b97c3651201d43d26e1e9c0a6f02b2ea99b46449e",
         "shotMeta": {
           "title": "The mark glows and both of them react with delight",
           "cameraPreset": "PUSH_IN",
@@ -3526,7 +4148,7 @@
             ]
           },
           "direction": {
-            "version": "1.0.0",
+            "version": "1.1.0",
             "camera": {
               "composition": "MEDIUM",
               "move": "PUSH_IN",
@@ -4099,9 +4721,14 @@
               "weight": 1
             },
             "dialogueFree": true,
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 2537454438
             }
           },
@@ -4439,9 +5066,14 @@
               "weight": 1
             },
             "dialogueFree": false,
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 4245995783
             }
           }
@@ -5226,6 +5858,133 @@
             "seed": 839758994
           }
         },
+        "simulation": {
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.358
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.358
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.358
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.471
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.471
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.471
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0,
+          "provenance": {
+            "system": "simulation",
+            "version": "1.0.0",
+            "seed": 1725207760
+          }
+        },
+        "render": {
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 24,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": 0.022,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "3cdac431de2b3f37a03b40b995b115469b507383edc336068c8721d494c6136c"
+        },
         "continuity": {
           "references": [
             "B2_DISCOVERY"
@@ -5239,6 +5998,44 @@
           "pip",
           "vfx_dust_puff_v1",
           "vfx_magic_sparkles_v1"
+        ],
+        "assetBindings": [
+          {
+            "logicalId": "goat",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_GOAT_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "37de74aa5386b05ca1be111aae558fe0d47f50c3552fec2f8551a4a8d5dc2ba4"
+          },
+          {
+            "logicalId": "pip",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_PIP_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "dc62d7a10b45bde53a8d7b26b977ce268c46f1a725d03066174b61201bb78ca5"
+          }
         ],
         "cost": {
           "frameCount": 105,
@@ -5628,7 +6425,140 @@
           ],
           "status": "PASS"
         },
-        "cacheKey": "5864b3a212badfac88b9e6e89d4b058dff16ced6de1ee1bbcf1645331490e24c",
+        "acceptance": {
+          "technical": "PASS",
+          "technicalChecks": [
+            {
+              "item": "SCHEMA_VALIDATION",
+              "status": "PASS"
+            },
+            {
+              "item": "MOTION_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "19 measurement(s)"
+            },
+            {
+              "item": "FACIAL_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "16 measurement(s)"
+            },
+            {
+              "item": "SOUND_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "8 measurement(s)"
+            },
+            {
+              "item": "CHARACTER_LOCK",
+              "status": "PASS",
+              "detail": "0 lock violation(s)"
+            },
+            {
+              "item": "RIG_INTEGRITY",
+              "status": "PASS",
+              "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+            },
+            {
+              "item": "ASSET_FINGERPRINTS",
+              "status": "PASS",
+              "detail": "2 binding(s) pinned"
+            },
+            {
+              "item": "LIGHTING_THRESHOLDS",
+              "status": "NOT_RUN",
+              "detail": "measured on rendered frames by scripts/assets gates"
+            },
+            {
+              "item": "VFX_BUDGET",
+              "status": "PASS"
+            },
+            {
+              "item": "AUTOMATED_TESTS",
+              "status": "NOT_RUN",
+              "detail": "reported by the test suite, not by planning"
+            }
+          ],
+          "artistic": "NOT_RENDERED",
+          "artisticReviews": [
+            {
+              "item": "CHARACTER_IDENTITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "DEFORMATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GROOM_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "MATERIAL_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "FACIAL_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "EYE_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "BODY_MECHANICS",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTACT_AND_COLLISION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CAMERA",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIGHTING_AND_EXPOSURE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "VFX_INTEGRATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "SIMULATION_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "TEMPORAL_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIP_SYNC",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "AUDIO_AND_MIX",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTINUITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CHILD_CONTENT_SAFETY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GOLDEN_REFERENCE_COMPARISON",
+              "status": "NOT_RENDERED"
+            }
+          ],
+          "overall": "TECHNICAL_PASS_NOT_RENDERED",
+          "blockedBy": [
+            "No render has been produced, so nothing has been visually reviewed.",
+            "No golden reference exists yet; comparison against the theatrical standard is not possible."
+          ]
+        },
+        "cacheKey": "2ef9d7a955e318cdbc48565554fbeea2caff2f10c18867255adc7f95a83c6bdd",
         "shotMeta": {
           "title": "They walk together toward the creek the glowing mark points to",
           "cameraPreset": "FOLLOW",
@@ -5783,7 +6713,7 @@
             ]
           },
           "direction": {
-            "version": "1.0.0",
+            "version": "1.1.0",
             "camera": {
               "composition": "MEDIUM",
               "move": "FOLLOW",
@@ -6550,9 +7480,14 @@
               "weight": 1
             },
             "dialogueFree": false,
+            "rig": {
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 3937109171
             }
           },
@@ -6651,9 +7586,14 @@
               "weight": 1
             },
             "dialogueFree": true,
+            "rig": {
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "controlScheme": "SHAPE_KEYS"
+            },
             "provenance": {
               "system": "face",
-              "version": "1.0.0",
+              "version": "1.1.0",
               "seed": 3408858515
             }
           }
@@ -6979,6 +7919,133 @@
             "seed": 1820172697
           }
         },
+        "simulation": {
+          "groom": [
+            {
+              "characterCode": "CHAR_GOAT_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            },
+            {
+              "characterCode": "CHAR_PIP_001",
+              "mode": "NONE",
+              "motionResponse": 0,
+              "windResponse": 0,
+              "regions": [],
+              "validationRequired": false
+            }
+          ],
+          "secondaryMotion": [
+            {
+              "part": "collar_tag",
+              "mode": "PROCEDURAL",
+              "lagFrames": 4,
+              "decay": 0.65,
+              "maxAmplitudeUnit": 0.423
+            },
+            {
+              "part": "ears",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.5,
+              "maxAmplitudeUnit": 0.423
+            },
+            {
+              "part": "tail",
+              "mode": "PROCEDURAL",
+              "lagFrames": 6,
+              "decay": 0.45,
+              "maxAmplitudeUnit": 0.423
+            },
+            {
+              "part": "backpack",
+              "mode": "PROCEDURAL",
+              "lagFrames": 5,
+              "decay": 0.4,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "crest",
+              "mode": "PROCEDURAL",
+              "lagFrames": 3,
+              "decay": 0.55,
+              "maxAmplitudeUnit": 0.411
+            },
+            {
+              "part": "wing_tips",
+              "mode": "PROCEDURAL",
+              "lagFrames": 2,
+              "decay": 0.6,
+              "maxAmplitudeUnit": 0.411
+            }
+          ],
+          "environment": [
+            {
+              "element": "grass",
+              "mode": "PROCEDURAL",
+              "intensity": 0.15
+            }
+          ],
+          "requiredCaches": [],
+          "costWeight": 0,
+          "provenance": {
+            "system": "simulation",
+            "version": "1.0.0",
+            "seed": 3346905108
+          }
+        },
+        "render": {
+          "tier": "DRAFT",
+          "engine": "EEVEE",
+          "resolution": "360x640",
+          "samples": 28,
+          "adaptiveSampling": {
+            "enabled": false,
+            "noiseThreshold": 0,
+            "minSamples": 0
+          },
+          "denoise": {
+            "enabled": false,
+            "denoiser": "NONE"
+          },
+          "motionBlur": {
+            "enabled": false,
+            "shutter": 0.5
+          },
+          "depthOfField": {
+            "enabled": false,
+            "motivation": "",
+            "fStop": 2.8
+          },
+          "passes": [
+            "COMBINED"
+          ],
+          "compositing": {
+            "enabled": false,
+            "recipeId": "",
+            "recipeVersion": "",
+            "operations": [],
+            "usesCryptomatte": false
+          },
+          "colorGrade": {
+            "enabled": false,
+            "gradeId": "",
+            "gradeVersion": "",
+            "viewTransform": "Khronos PBR Neutral",
+            "look": "None",
+            "exposure": -0.026,
+            "contrast": 0,
+            "saturation": 1
+          },
+          "groomValidation": false,
+          "atmosphere": false,
+          "isMasterCandidate": false,
+          "cloudRenderProfile": "DRAFT_FAST",
+          "cacheKey": "c3e5708f67f9f3e7a86e9d44fb2e37ad1d977717c408cf37bc58fa47855c3a8f"
+        },
         "continuity": {
           "references": [
             "B3_TURN"
@@ -6992,6 +8059,44 @@
           "pip",
           "vfx_environment_particles_v1",
           "vfx_magic_sparkles_v1"
+        ],
+        "assetBindings": [
+          {
+            "logicalId": "goat",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_GOAT_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "goat_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "goat_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "37de74aa5386b05ca1be111aae558fe0d47f50c3552fec2f8551a4a8d5dc2ba4"
+          },
+          {
+            "logicalId": "pip",
+            "kind": "CHARACTER",
+            "characterCode": "CHAR_PIP_001",
+            "assetVersion": "prototype-1.1",
+            "quality": "PROTOTYPE",
+            "components": {
+              "meshVersion": "1.1",
+              "rigId": "pip_prototype",
+              "rigVersion": "1.0.0",
+              "shaderVersion": "1.0.0",
+              "textureSetId": "pip_prototype_vertex_color",
+              "textureResolution": "1K"
+            },
+            "lod": "HERO",
+            "sourceFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+            "cacheKey": "dc62d7a10b45bde53a8d7b26b977ce268c46f1a725d03066174b61201bb78ca5"
+          }
         ],
         "cost": {
           "frameCount": 90,
@@ -7381,7 +8486,140 @@
           ],
           "status": "PASS"
         },
-        "cacheKey": "18a6daee092ed25775ddcffe8f4e4745edf3c254a31018a53afd27c848e9edd9",
+        "acceptance": {
+          "technical": "PASS",
+          "technicalChecks": [
+            {
+              "item": "SCHEMA_VALIDATION",
+              "status": "PASS"
+            },
+            {
+              "item": "MOTION_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "19 measurement(s)"
+            },
+            {
+              "item": "FACIAL_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "16 measurement(s)"
+            },
+            {
+              "item": "SOUND_MEASUREMENTS",
+              "status": "PASS",
+              "detail": "8 measurement(s)"
+            },
+            {
+              "item": "CHARACTER_LOCK",
+              "status": "PASS",
+              "detail": "0 lock violation(s)"
+            },
+            {
+              "item": "RIG_INTEGRITY",
+              "status": "PASS",
+              "detail": "planned against goat_prototype@1.0.0, pip_prototype@1.0.0"
+            },
+            {
+              "item": "ASSET_FINGERPRINTS",
+              "status": "PASS",
+              "detail": "2 binding(s) pinned"
+            },
+            {
+              "item": "LIGHTING_THRESHOLDS",
+              "status": "NOT_RUN",
+              "detail": "measured on rendered frames by scripts/assets gates"
+            },
+            {
+              "item": "VFX_BUDGET",
+              "status": "PASS"
+            },
+            {
+              "item": "AUTOMATED_TESTS",
+              "status": "NOT_RUN",
+              "detail": "reported by the test suite, not by planning"
+            }
+          ],
+          "artistic": "NOT_RENDERED",
+          "artisticReviews": [
+            {
+              "item": "CHARACTER_IDENTITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "DEFORMATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GROOM_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "MATERIAL_INTEGRITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "FACIAL_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "EYE_PERFORMANCE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "BODY_MECHANICS",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTACT_AND_COLLISION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CAMERA",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIGHTING_AND_EXPOSURE",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "VFX_INTEGRATION",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "SIMULATION_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "TEMPORAL_STABILITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "LIP_SYNC",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "AUDIO_AND_MIX",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CONTINUITY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "CHILD_CONTENT_SAFETY",
+              "status": "NOT_RENDERED"
+            },
+            {
+              "item": "GOLDEN_REFERENCE_COMPARISON",
+              "status": "NOT_RENDERED"
+            }
+          ],
+          "overall": "TECHNICAL_PASS_NOT_RENDERED",
+          "blockedBy": [
+            "No render has been produced, so nothing has been visually reviewed.",
+            "No golden reference exists yet; comparison against the theatrical standard is not possible."
+          ]
+        },
+        "cacheKey": "07030cc5dc642ad242fe905bde1a5788a73f7a44e5946c846c8745509f3be834",
         "shotMeta": {
           "title": "They arrive and share a quiet, pleased look at what they found",
           "cameraPreset": "TWO_SHOT",
@@ -7518,7 +8756,7 @@
             ]
           },
           "direction": {
-            "version": "1.0.0",
+            "version": "1.1.0",
             "camera": {
               "composition": "TWO_SHOT",
               "move": "STATIC",
@@ -8466,7 +9704,7 @@
         "characterCode": "CHAR_GOAT_001",
         "decision": "mouth-group-normalisation",
         "chose": "scaled mouth_open+smile by 0.861",
-        "because": "combined mouth travel was 1.161 against a 1 limit; proportional scaling keeps the expression's shape without pushing the mouth through the face",
+        "because": "combined mouth travel was 1.161 against a 1 limit on rig goat_prototype@1.0.0; proportional scaling keeps the expression's shape without pushing the mouth through the face",
         "alternatives": [
           {
             "option": "clamp the open channel alone",
@@ -8529,17 +9767,164 @@
         "seed": 1945567998
       }
     ],
-    "issues": [],
+    "issues": [
+      {
+        "code": "ASSET_BINDING_MISSING",
+        "severity": "INFO",
+        "system": "director",
+        "message": "\"LOC_MEADOW_001\" has no versioned asset binding, so it cannot be version-pinned or rolled back. It renders from its logical id as before.",
+        "shotId": "VALIDATION_STEPS_1_8_s001"
+      },
+      {
+        "code": "ASSET_BINDING_MISSING",
+        "severity": "INFO",
+        "system": "director",
+        "message": "\"PROP_MAP_001\" has no versioned asset binding, so it cannot be version-pinned or rolled back. It renders from its logical id as before.",
+        "shotId": "VALIDATION_STEPS_1_8_s001"
+      },
+      {
+        "code": "ASSET_BINDING_MISSING",
+        "severity": "INFO",
+        "system": "director",
+        "message": "\"LOC_MEADOW_001\" has no versioned asset binding, so it cannot be version-pinned or rolled back. It renders from its logical id as before.",
+        "shotId": "VALIDATION_STEPS_1_8_s002"
+      },
+      {
+        "code": "ASSET_BINDING_MISSING",
+        "severity": "INFO",
+        "system": "director",
+        "message": "\"PROP_MAP_001\" has no versioned asset binding, so it cannot be version-pinned or rolled back. It renders from its logical id as before.",
+        "shotId": "VALIDATION_STEPS_1_8_s002"
+      },
+      {
+        "code": "ASSET_BINDING_MISSING",
+        "severity": "INFO",
+        "system": "director",
+        "message": "\"LOC_MEADOW_001\" has no versioned asset binding, so it cannot be version-pinned or rolled back. It renders from its logical id as before.",
+        "shotId": "VALIDATION_STEPS_1_8_s003"
+      },
+      {
+        "code": "ASSET_BINDING_MISSING",
+        "severity": "INFO",
+        "system": "director",
+        "message": "\"LOC_CREEK_001\" has no versioned asset binding, so it cannot be version-pinned or rolled back. It renders from its logical id as before.",
+        "shotId": "VALIDATION_STEPS_1_8_s004"
+      }
+    ],
     "overrides": [],
     "validation": {
       "status": "PASS",
       "errorCount": 0,
       "warningCount": 0
     },
-    "contentHash": "5dda53147d67a4e4a03eca9c9196fd7560b56ae4396c1ef3cf60d8cc6568ce0a",
-    "cacheKey": "e6a53172daaf1ca19ce1b3431db89dc8006e0118c30f9ae66a57603a23482365"
+    "acceptance": {
+      "technical": "PASS",
+      "technicalChecks": [
+        {
+          "item": "SCHEMA_VALIDATION",
+          "status": "PASS"
+        },
+        {
+          "item": "AUTOMATED_TESTS",
+          "status": "NOT_RUN",
+          "detail": "reported by the test suite, not by planning"
+        },
+        {
+          "item": "ASSET_FINGERPRINTS",
+          "status": "PASS",
+          "detail": "4/4 shot(s) version-pinned"
+        }
+      ],
+      "artistic": "NOT_RENDERED",
+      "artisticReviews": [
+        {
+          "item": "CHARACTER_IDENTITY",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "DEFORMATION",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "GROOM_INTEGRITY",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "MATERIAL_INTEGRITY",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "FACIAL_PERFORMANCE",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "EYE_PERFORMANCE",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "BODY_MECHANICS",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "CONTACT_AND_COLLISION",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "CAMERA",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "LIGHTING_AND_EXPOSURE",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "VFX_INTEGRATION",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "SIMULATION_STABILITY",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "TEMPORAL_STABILITY",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "LIP_SYNC",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "AUDIO_AND_MIX",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "CONTINUITY",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "CHILD_CONTENT_SAFETY",
+          "status": "NOT_RENDERED"
+        },
+        {
+          "item": "GOLDEN_REFERENCE_COMPARISON",
+          "status": "NOT_RENDERED"
+        }
+      ],
+      "overall": "TECHNICAL_PASS_NOT_RENDERED",
+      "blockedBy": [
+        "No render has been produced, so nothing has been visually reviewed.",
+        "No golden reference exists yet; comparison against the theatrical standard is not possible."
+      ]
+    },
+    "qualityContext": {
+      "assetQuality": "PROTOTYPE",
+      "renderTier": "DRAFT",
+      "isMasterCandidate": false
+    },
+    "contentHash": "20c1d5fe83414a25a1e235401ceedb18b586688397165d75acfa72474300c192",
+    "cacheKey": "9f3370fbbff766c69b92f2b9c9b6a4a4ebf7c35a1098b3ccbcff618f851e0be2"
   },
   "meta": {
-    "storedSchemaVersion": "ddp-production-blueprint-v1"
+    "storedSchemaVersion": "ddp-production-blueprint-v2"
   }
 }

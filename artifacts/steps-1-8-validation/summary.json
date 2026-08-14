@@ -11,25 +11,29 @@
     "resolution": "360x640",
     "fps": 30
   },
-  "contentHash": "5dda53147d67a4e4a03eca9c9196fd7560b56ae4396c1ef3cf60d8cc6568ce0a",
-  "cacheKey": "e6a53172daaf1ca19ce1b3431db89dc8006e0118c30f9ae66a57603a23482365",
+  "contentHash": "20c1d5fe83414a25a1e235401ceedb18b586688397165d75acfa72474300c192",
+  "cacheKey": "9f3370fbbff766c69b92f2b9c9b6a4a4ebf7c35a1098b3ccbcff618f851e0be2",
   "subsystemVersions": {
-    "director": "1.0.0",
+    "director": "1.1.0",
     "acting": "1.0.0",
     "emotion": "1.0.0",
-    "face": "1.0.0",
+    "face": "1.1.0",
     "camera": "1.0.0",
     "lighting": "1.0.0",
     "vfx": "1.0.0",
     "sound": "1.0.0",
-    "locks": "1.0.0"
+    "locks": "1.0.0",
+    "assets": "1.0.0",
+    "rig": "1.0.0",
+    "render": "1.0.0",
+    "simulation": "1.0.0"
   },
   "estimatedCloudCostUsdIfEverAuthorized": 0.02245,
   "paidProviderUsed": false,
   "gpuLaunched": false,
   "environment": {
     "ffmpeg": true,
-    "blender": false,
+    "blender": true,
     "cloudRenderEnabled": false,
     "paidGpuLaunchAllowed": false
   },
@@ -67,7 +71,7 @@
     {
       "name": "deterministic output for identical input",
       "status": "PASS",
-      "detail": "blueprint and projection hashes identical across two runs (2b96a01f383b5291…)"
+      "detail": "blueprint and projection hashes identical across two runs (24aa3dbf392b4f73…)"
     },
     {
       "name": "seed actually drives the plan",

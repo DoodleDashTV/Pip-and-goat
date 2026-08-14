@@ -129,7 +129,7 @@
   },
   "expressionStates": {
     "goat": {
-      "directionVersion": "1.0.0",
+      "directionVersion": "1.1.0",
       "expression": "happy",
       "weights": {
         "brow_up": 0.145,
@@ -157,6 +157,11 @@
         "channel": "viseme_REST",
         "atMs": 3168,
         "weight": 1
+      },
+      "rig": {
+        "rigId": "goat_prototype",
+        "rigVersion": "1.0.0",
+        "controlScheme": "SHAPE_KEYS"
       },
       "cues": [
         {
@@ -197,7 +202,7 @@
       ]
     },
     "pip": {
-      "directionVersion": "1.0.0",
+      "directionVersion": "1.1.0",
       "expression": "determined",
       "weights": {
         "beak_open": 0.05,
@@ -226,6 +231,11 @@
         "channel": "viseme_REST",
         "atMs": 3163,
         "weight": 1
+      },
+      "rig": {
+        "rigId": "pip_prototype",
+        "rigVersion": "1.0.0",
+        "controlScheme": "SHAPE_KEYS"
       },
       "cues": [
         {
@@ -277,6 +287,7 @@
     "goat": [
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 3168,
         "endMs": 3500,
         "weight": 1
@@ -285,112 +296,254 @@
     "pip": [
       {
         "viseme": "O",
+        "channel": "viseme_O",
         "startMs": 180,
         "endMs": 325,
         "weight": 0.638
       },
       {
         "viseme": "M_B_P",
+        "channel": "viseme_M_B_P",
         "startMs": 290,
         "endMs": 434,
         "weight": 0.638
       },
       {
         "viseme": "E",
+        "channel": "viseme_E",
         "startMs": 399,
         "endMs": 544,
         "weight": 0.638
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 509,
         "endMs": 653,
         "weight": 0.638
       },
       {
         "viseme": "O",
+        "channel": "viseme_O",
         "startMs": 618,
         "endMs": 763,
         "weight": 0.638
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 728,
         "endMs": 873,
         "weight": 0.638
       },
       {
         "viseme": "I",
+        "channel": "viseme_I",
         "startMs": 838,
         "endMs": 982,
         "weight": 0.638
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 947,
         "endMs": 1092,
         "weight": 0.638
       },
       {
         "viseme": "I",
+        "channel": "viseme_I",
         "startMs": 1057,
         "endMs": 1201,
         "weight": 0.638
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 1166,
         "endMs": 1311,
         "weight": 0.638
       },
       {
         "viseme": "TH",
+        "channel": "viseme_TH",
         "startMs": 1276,
         "endMs": 1420,
         "weight": 0.638
       },
       {
         "viseme": "I",
+        "channel": "viseme_I",
         "startMs": 1385,
         "endMs": 1530,
         "weight": 0.638
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 1495,
         "endMs": 1640,
         "weight": 0.638
       },
       {
         "viseme": "U",
+        "channel": "viseme_U",
         "startMs": 1605,
         "endMs": 1749,
         "weight": 0.638
       },
       {
         "viseme": "A",
+        "channel": "viseme_A",
         "startMs": 1714,
         "endMs": 1859,
         "weight": 0.638
       },
       {
         "viseme": "I",
+        "channel": "viseme_I",
         "startMs": 1824,
         "endMs": 1968,
         "weight": 0.638
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 1933,
         "endMs": 2078,
         "weight": 0.638
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 3163,
         "endMs": 3500,
         "weight": 1
       }
     ]
+  },
+  "renderSettings": {
+    "directionVersion": "1.0.0",
+    "tier": "DRAFT",
+    "engine": "EEVEE",
+    "resolution": "360x640",
+    "samples": 24,
+    "adaptiveSampling": {
+      "enabled": false,
+      "noiseThreshold": 0,
+      "minSamples": 0
+    },
+    "denoise": {
+      "enabled": false,
+      "denoiser": "NONE"
+    },
+    "motionBlur": {
+      "enabled": false,
+      "shutter": 0.5
+    },
+    "depthOfField": {
+      "enabled": false,
+      "motivation": "",
+      "fStop": 2.8
+    },
+    "passes": [
+      "COMBINED"
+    ],
+    "compositing": {
+      "enabled": false,
+      "recipeId": "",
+      "recipeVersion": "",
+      "operations": [],
+      "usesCryptomatte": false
+    },
+    "colorGrade": {
+      "enabled": false,
+      "gradeId": "",
+      "gradeVersion": "",
+      "viewTransform": "Khronos PBR Neutral",
+      "look": "None",
+      "exposure": 0.022,
+      "contrast": 0,
+      "saturation": 1
+    },
+    "groomValidation": false,
+    "atmosphere": false,
+    "isMasterCandidate": false,
+    "cloudRenderProfile": "DRAFT_FAST",
+    "cacheKey": "3cdac431de2b3f37a03b40b995b115469b507383edc336068c8721d494c6136c"
+  },
+  "simulationState": {
+    "directionVersion": "1.0.0",
+    "groom": [
+      {
+        "characterCode": "CHAR_GOAT_001",
+        "mode": "NONE",
+        "motionResponse": 0,
+        "windResponse": 0,
+        "regions": [],
+        "validationRequired": false
+      },
+      {
+        "characterCode": "CHAR_PIP_001",
+        "mode": "NONE",
+        "motionResponse": 0,
+        "windResponse": 0,
+        "regions": [],
+        "validationRequired": false
+      }
+    ],
+    "secondaryMotion": [
+      {
+        "part": "collar_tag",
+        "mode": "PROCEDURAL",
+        "lagFrames": 4,
+        "decay": 0.65,
+        "maxAmplitudeUnit": 0.358
+      },
+      {
+        "part": "ears",
+        "mode": "PROCEDURAL",
+        "lagFrames": 5,
+        "decay": 0.5,
+        "maxAmplitudeUnit": 0.358
+      },
+      {
+        "part": "tail",
+        "mode": "PROCEDURAL",
+        "lagFrames": 6,
+        "decay": 0.45,
+        "maxAmplitudeUnit": 0.358
+      },
+      {
+        "part": "backpack",
+        "mode": "PROCEDURAL",
+        "lagFrames": 5,
+        "decay": 0.4,
+        "maxAmplitudeUnit": 0.471
+      },
+      {
+        "part": "crest",
+        "mode": "PROCEDURAL",
+        "lagFrames": 4,
+        "decay": 0.55,
+        "maxAmplitudeUnit": 0.471
+      },
+      {
+        "part": "wing_tips",
+        "mode": "PROCEDURAL",
+        "lagFrames": 2,
+        "decay": 0.6,
+        "maxAmplitudeUnit": 0.471
+      }
+    ],
+    "environment": [
+      {
+        "element": "grass",
+        "mode": "PROCEDURAL",
+        "intensity": 0.15
+      }
+    ],
+    "requiredCaches": [],
+    "costWeight": 0
   }
 }
