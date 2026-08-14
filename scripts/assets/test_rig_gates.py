@@ -13,6 +13,7 @@ placement.
 
 from __future__ import annotations
 
+import json
 import math
 import sys
 import unittest
@@ -694,6 +695,38 @@ class ShadowCasterTests(unittest.TestCase):
             self.assertLess(spread, 1e-6, f"{block.name} springs the collapsed part back into the caster")
 
 
+class TheatricalV1ProposalTests(unittest.TestCase):
+    """Proposed v1 assets must stay additive and fail-closed."""
+
+    def test_proposed_v1_manifest_exists_and_is_unapproved(self) -> None:
+        manifest = REPO_ROOT / "theatrical-foundation/proposed/v1/BUILD_MANIFEST.json"
+        self.assertTrue(manifest.exists())
+        data = json.loads(manifest.read_text())
+        self.assertFalse(data["approved"])
+        self.assertFalse(data["productionLibraryMutated"])
+        for bone in ("eye_L", "eye_R", "eyelid_L", "root", "head"):
+            self.assertIn(bone, data["pip"]["bones"])
+            self.assertIn(bone, data["goat"]["bones"])
+        self.assertGreater(data["meadow"]["groundVerts"], 100)
+        self.assertFalse(data["lightingVfx"]["retunesLightingStates"])
+
+    def test_proposed_v1_blends_are_outside_the_library(self) -> None:
+        root = REPO_ROOT / "theatrical-foundation/proposed/v1"
+        blends = list(root.glob("*.blend"))
+        self.assertGreaterEqual(len(blends), 6)
+        lib = (REPO_ROOT / "production-library").resolve()
+        for blend in blends:
+            self.assertFalse(lib in blend.resolve().parents)
+
+    def test_eye_aim_helper_fails_closed_when_bones_missing(self) -> None:
+        fresh_scene()
+        arm = make_armature("NoEyes")
+        names = {b.name for b in arm.data.bones}
+        self.assertNotIn("eye_L", names)
+        # Fail closed: missing eye bones are reported, not invented.
+        self.assertFalse({"eye_L", "eye_R"} <= names)
+
+
 class TheatricalShaderTests(unittest.TestCase):
     """Proposed look-dev must stay additive, reversible, and outside the library."""
 
@@ -869,6 +902,7 @@ def main() -> int:
             HierarchyTests,
             ActionBindingTests,
             ShadowCasterTests,
+            TheatricalV1ProposalTests,
             TheatricalShaderTests,
             DirectionConsumerTests,
         )
