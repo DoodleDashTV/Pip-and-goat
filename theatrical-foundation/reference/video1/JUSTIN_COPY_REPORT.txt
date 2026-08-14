@@ -1,0 +1,36 @@
+JUSTIN COPY REPORT — VIDEO1 reference set 1 of 2 intake
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY VIDEO1 REFERENCE INTAKE — SET 1 OF 2
+Receipt confirmed. Reconstruction has not begun.
+
+Received: 12 frames from the first vertical video.
+Internal labels assigned in the order received:
+  VIDEO1_FRAME_01
+  VIDEO1_FRAME_02
+  VIDEO1_FRAME_03
+  VIDEO1_FRAME_04
+  VIDEO1_FRAME_05
+  VIDEO1_FRAME_06
+  VIDEO1_FRAME_07
+  VIDEO1_FRAME_08
+  VIDEO1_FRAME_09
+  VIDEO1_FRAME_10
+  VIDEO1_FRAME_11
+  VIDEO1_FRAME_12
+
+Authority recorded: Pip and Goat faces, eyes, expressions, materials, fur and feather appearance.
+These frames are the primary authority for that list.
+They do not replace canonical production-library assets.
+They do not create a THEATRICAL binding.
+They do not approve the theatrical v1 or v1.1 proposals.
+
+Catalog:
+  theatrical-foundation/reference/video1/VIDEO1_FRAME_CATALOG.md
+  theatrical-foundation/reference/video1/VIDEO1_FRAME_LABELS.json
+
+Branch: cursor/theatrical-video1-reference-intake-1ebc
+No reconstruction. No Hero-Shot layer. No Steps 9–16. No merge. No paid render.
+Waiting for reference set 2 of 2, then an explicit reconstruct instruction.
+============================================================

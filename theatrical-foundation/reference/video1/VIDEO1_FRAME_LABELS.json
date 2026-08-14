@@ -1,0 +1,31 @@
+{
+  "set": "VIDEO1",
+  "setIndex": "1 of 2",
+  "received": true,
+  "reconstructionStarted": false,
+  "authority": [
+    "faces",
+    "eyes",
+    "expressions",
+    "materials",
+    "fur",
+    "feather appearance"
+  ],
+  "replacesCanonicalAssets": false,
+  "createsTheatricalBinding": false,
+  "approved": false,
+  "frames": [
+    { "id": "VIDEO1_FRAME_01", "order": 1, "shot": "goat_profile_path_prints_cave" },
+    { "id": "VIDEO1_FRAME_02", "order": 2, "shot": "pip_closeup_goat_partial" },
+    { "id": "VIDEO1_FRAME_03", "order": 3, "shot": "pip_goat_heads_supportive" },
+    { "id": "VIDEO1_FRAME_04", "order": 4, "shot": "pip_goat_medium_close_arm_around" },
+    { "id": "VIDEO1_FRAME_05", "order": 5, "shot": "pip_goat_closeup_hoof_on_shoulder" },
+    { "id": "VIDEO1_FRAME_06", "order": 6, "shot": "two_shot_looking_at_prints" },
+    { "id": "VIDEO1_FRAME_07", "order": 7, "shot": "rear_two_shot_holding_hands" },
+    { "id": "VIDEO1_FRAME_08", "order": 8, "shot": "pip_reaction_goat_enters_left" },
+    { "id": "VIDEO1_FRAME_09", "order": 9, "shot": "rear_walk_toward_portal" },
+    { "id": "VIDEO1_FRAME_10", "order": 10, "shot": "rear_walk_crystal_portal" },
+    { "id": "VIDEO1_FRAME_11", "order": 11, "shot": "cave_pip_excited_goat_invite" },
+    { "id": "VIDEO1_FRAME_12", "order": 12, "shot": "rear_cave_mouth_sign" }
+  ]
+}
