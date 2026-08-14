@@ -29,6 +29,9 @@ importers:
       '@doodle-dash/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@doodle-dash/direction':
+        specifier: workspace:*
+        version: link:../../packages/direction
       '@doodle-dash/domain':
         specifier: workspace:*
         version: link:../../packages/domain
@@ -157,6 +160,22 @@ importers:
         specifier: ^5.8.2
         version: 5.9.3
 
+  packages/direction:
+    dependencies:
+      '@doodle-dash/domain':
+        specifier: workspace:*
+        version: link:../domain
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+
   packages/domain:
     dependencies:
       zod:
@@ -175,6 +194,9 @@ importers:
       '@doodle-dash/database':
         specifier: workspace:*
         version: link:../database
+      '@doodle-dash/direction':
+        specifier: workspace:*
+        version: link:../direction
       '@doodle-dash/domain':
         specifier: workspace:*
         version: link:../domain
