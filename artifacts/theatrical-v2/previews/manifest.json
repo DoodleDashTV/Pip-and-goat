@@ -1,0 +1,190 @@
+{
+  "label": "proposed theatrical v2 first visual gate",
+  "approved": false,
+  "engine": "EEVEE Next",
+  "viewTransform": "Khronos PBR Neutral",
+  "resolution": "1080x1920",
+  "samples": 24,
+  "previews": [
+    {
+      "name": "pip_color_front",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_color_front.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_color_front.png",
+      "caption": "pip color front"
+    },
+    {
+      "name": "pip_color_left",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_color_left.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_color_left.png",
+      "caption": "pip color left"
+    },
+    {
+      "name": "pip_color_right",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_color_right.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_color_right.png",
+      "caption": "pip color right"
+    },
+    {
+      "name": "pip_color_rear",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_color_rear.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_color_rear.png",
+      "caption": "pip color rear"
+    },
+    {
+      "name": "pip_color_three_quarter",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_color_three_quarter.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_color_three_quarter.png",
+      "caption": "pip color three_quarter"
+    },
+    {
+      "name": "pip_color_closeup",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_color_closeup.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_color_closeup.png",
+      "caption": "pip color closeup"
+    },
+    {
+      "name": "pip_color_full_body",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_color_full_body.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_color_full_body.png",
+      "caption": "pip color full_body"
+    },
+    {
+      "name": "pip_clay_front",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_clay_front.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_clay_front.png",
+      "caption": "pip clay front"
+    },
+    {
+      "name": "pip_clay_left",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_clay_left.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_clay_left.png",
+      "caption": "pip clay left"
+    },
+    {
+      "name": "pip_clay_right",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_clay_right.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_clay_right.png",
+      "caption": "pip clay right"
+    },
+    {
+      "name": "pip_clay_rear",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_clay_rear.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_clay_rear.png",
+      "caption": "pip clay rear"
+    },
+    {
+      "name": "pip_clay_three_quarter",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_clay_three_quarter.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_clay_three_quarter.png",
+      "caption": "pip clay three_quarter"
+    },
+    {
+      "name": "pip_clay_closeup",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_clay_closeup.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_clay_closeup.png",
+      "caption": "pip clay closeup"
+    },
+    {
+      "name": "pip_clay_full_body",
+      "clean": "artifacts/theatrical-v2/previews/clean/pip_clay_full_body.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pip_clay_full_body.png",
+      "caption": "pip clay full_body"
+    },
+    {
+      "name": "goat_color_front",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_color_front.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_color_front.png",
+      "caption": "goat color front"
+    },
+    {
+      "name": "goat_color_left",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_color_left.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_color_left.png",
+      "caption": "goat color left"
+    },
+    {
+      "name": "goat_color_right",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_color_right.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_color_right.png",
+      "caption": "goat color right"
+    },
+    {
+      "name": "goat_color_rear",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_color_rear.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_color_rear.png",
+      "caption": "goat color rear"
+    },
+    {
+      "name": "goat_color_three_quarter",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_color_three_quarter.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_color_three_quarter.png",
+      "caption": "goat color three_quarter"
+    },
+    {
+      "name": "goat_color_closeup",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_color_closeup.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_color_closeup.png",
+      "caption": "goat color closeup"
+    },
+    {
+      "name": "goat_color_full_body",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_color_full_body.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_color_full_body.png",
+      "caption": "goat color full_body"
+    },
+    {
+      "name": "goat_clay_front",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_clay_front.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_clay_front.png",
+      "caption": "goat clay front"
+    },
+    {
+      "name": "goat_clay_left",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_clay_left.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_clay_left.png",
+      "caption": "goat clay left"
+    },
+    {
+      "name": "goat_clay_right",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_clay_right.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_clay_right.png",
+      "caption": "goat clay right"
+    },
+    {
+      "name": "goat_clay_rear",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_clay_rear.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_clay_rear.png",
+      "caption": "goat clay rear"
+    },
+    {
+      "name": "goat_clay_three_quarter",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_clay_three_quarter.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_clay_three_quarter.png",
+      "caption": "goat clay three_quarter"
+    },
+    {
+      "name": "goat_clay_closeup",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_clay_closeup.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_clay_closeup.png",
+      "caption": "goat clay closeup"
+    },
+    {
+      "name": "goat_clay_full_body",
+      "clean": "artifacts/theatrical-v2/previews/clean/goat_clay_full_body.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/goat_clay_full_body.png",
+      "caption": "goat clay full_body"
+    },
+    {
+      "name": "pair_color_full_body",
+      "clean": "artifacts/theatrical-v2/previews/clean/pair_color_full_body.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pair_color_full_body.png",
+      "caption": "pair color full-body scale"
+    },
+    {
+      "name": "pair_clay_full_body",
+      "clean": "artifacts/theatrical-v2/previews/clean/pair_clay_full_body.png",
+      "labeled": "artifacts/theatrical-v2/previews/labeled/pair_clay_full_body.png",
+      "caption": "pair clay full-body scale"
+    }
+  ]
+}
