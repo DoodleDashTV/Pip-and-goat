@@ -9,6 +9,7 @@ Non-destructive look-dev and inventory for roadmap stage 3.
 | `THEATRICAL_CGI_REQUIREMENTS.md` | Measurable fidelity bars |
 | `proposed/` | Proposed shader look-dev (outside `production-library/`) |
 | `PREVIEW_INDEX.md` | Labeled stills for Justin |
+| `JUSTIN_COPY_REPORT.txt` | One select-all copy of the final result and charts |
 
 Canonical Pip, Goat, meadow, and map blends are unchanged.
 The approved fingerprint remains `7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7`.

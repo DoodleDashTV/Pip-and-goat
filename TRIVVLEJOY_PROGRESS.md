@@ -71,6 +71,13 @@ The worker image was not rebuilt or re-pinned.
 - Voice IDs were not altered. Voice lock is not claimed.
 - 1080×1920 / 30 fps and 15/30/45/60-second options are unchanged.
 
+## Reporting
+
+Justin reports use **one select-all copy block**: a single plain-text fence
+with every chart and the numbered result. Also write the same text to
+`theatrical-foundation/JUSTIN_COPY_REPORT.txt`. Do not split the final
+result across mixed prose and tables outside that block.
+
 ## Safest next action
 
 Justin reviews `theatrical-foundation/PREVIEW_INDEX.md` and `SIDE_BY_SIDE.md`.
