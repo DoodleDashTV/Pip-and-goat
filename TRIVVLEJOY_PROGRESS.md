@@ -7,6 +7,7 @@ Updated: 2026-08-14
 - Repository: `Pip-and-goat` (canonical GitHub remote for this studio)
 - Working branch: `cursor/theatrical-asset-foundation-1ebc`
 - Starting commit for this stage: `2fdac1d5783a1aaca55953214cc140eb9525085a` (Milestone 3 ending)
+- Validation evidence commit: `e17589f7e3c0243cb4d1ead736050f09c1d6a7e6`
 - Authoritative Milestone 3 branch: `cursor/trivvlejoy-milestone-3-1ebc` @ `2fdac1d` (draft PR #13, base `agent/trivvlejoy-milestone-2-recovery`)
 - Authoritative Milestone 2 recovery: `agent/trivvlejoy-milestone-2-recovery` @ `19a76c61a1da3d54c20d98a9074c76b33779b1e7`
 - Authoritative preserved source: `cursor/ddp-steps-1-8-production-excellence-6b40` @ `4543943b7c19fc14e6d45c0dd5eec26492319efb`

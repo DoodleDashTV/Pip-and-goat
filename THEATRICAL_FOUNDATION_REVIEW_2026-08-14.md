@@ -2,7 +2,8 @@
 
 **Status:** Stopped at the visual-approval gate. **No asset group is approved.**
 **Starting commit:** `2fdac1d5783a1aaca55953214cc140eb9525085a`
-**Implementation commit:** `633b1e2c` (full hash on the branch)
+**Implementation commit:** `633b1e2d6c7e9413c74662d4110ed1aa92765374`
+**Validation evidence commit:** `e17589f7e3c0243cb4d1ead736050f09c1d6a7e6`
 **Branch:** `cursor/theatrical-asset-foundation-1ebc`
 **New PR:** #14 (draft, base `cursor/trivvlejoy-milestone-3-1ebc`)
 **PR #13:** left untouched (Milestone 3 over `agent/trivvlejoy-milestone-2-recovery`, MERGEABLE)
