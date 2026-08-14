@@ -1,0 +1,59 @@
+{
+  "approved": false,
+  "label": "proposed theatrical v1.1 appeal guards",
+  "pip": {
+    "eyeWhiteRadius": 0.06720000505447388,
+    "headRadius": 0.158099964261055,
+    "eyeToHead": 0.42504756638346286,
+    "eyeSpacing": 0.11599999666213989,
+    "beakPresent": true,
+    "beakLength": 0.0989999771118164,
+    "crestCount": 3,
+    "crestHeight": 0.1109999418258667,
+    "backpackPresent": true,
+    "starPresent": true,
+    "threeToedFeet": true,
+    "forbiddenGroom": [],
+    "groundContact": true
+  },
+  "goat": {
+    "eyeWhiteRadius": 0.07840001583099365,
+    "headRadius": 0.21199989318847656,
+    "eyeToHead": 0.36981158175062306,
+    "eyeSpacing": 0.15000000968575478,
+    "collarPresent": true,
+    "tagPresent": true,
+    "tagText": "GOAT",
+    "hornCount": 2,
+    "hornLength": 0.16295576095581055,
+    "nosePresent": true,
+    "forbiddenGroom": [],
+    "groundContact": true
+  },
+  "reference": {
+    "pip": {
+      "headRadius": 0.155,
+      "bodyRadius": 0.135,
+      "headToBody": 1.15,
+      "eyeWhiteRadius": 0.06,
+      "eyeToHead": 0.387,
+      "eyeSpacing": 0.116,
+      "beakLength": 0.05,
+      "crestHeight": 0.16,
+      "limbLength": 0.11
+    },
+    "goat": {
+      "headRadius": 0.2,
+      "bodyRadius": 0.21,
+      "headToBody": 0.95,
+      "eyeWhiteRadius": 0.07,
+      "eyeToHead": 0.35,
+      "eyeSpacing": 0.15,
+      "muzzleRadius": 0.078,
+      "hornLength": 0.11,
+      "limbLength": 0.3
+    }
+  },
+  "failures": [],
+  "guardsPassed": true
+}
