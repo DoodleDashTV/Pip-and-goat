@@ -225,6 +225,394 @@
         }
       ]
     },
+    "face": {
+      "goat": {
+        "cues": [
+          {
+            "channel": "brow_up",
+            "startMs": 0,
+            "endMs": 2569,
+            "weight": 0.375,
+            "source": "BROW"
+          },
+          {
+            "channel": "ear_perk",
+            "startMs": 0,
+            "endMs": 2569,
+            "weight": 0.288,
+            "source": "EXPRESSION"
+          },
+          {
+            "channel": "mouth_open",
+            "startMs": 0,
+            "endMs": 2569,
+            "weight": 0.275,
+            "source": "EXPRESSION"
+          },
+          {
+            "channel": "smile",
+            "startMs": 0,
+            "endMs": 2569,
+            "weight": 0.625,
+            "source": "EXPRESSION"
+          },
+          {
+            "channel": "blink",
+            "startMs": 1553,
+            "endMs": 1676,
+            "weight": 1,
+            "source": "BLINK"
+          }
+        ],
+        "expression": "happy",
+        "expressionWeights": {
+          "brow_up": 0.375,
+          "ear_perk": 0.288,
+          "mouth_open": 0.275,
+          "smile": 0.625
+        },
+        "gaze": [
+          {
+            "startMs": 0,
+            "endMs": 1860,
+            "target": "PROP_MAP_001",
+            "eyeLeadMs": 100,
+            "headFollow": 0.655
+          },
+          {
+            "startMs": 1860,
+            "endMs": 3000,
+            "target": "CHAR_PIP_001",
+            "eyeLeadMs": 100,
+            "headFollow": 0.56
+          }
+        ],
+        "blinks": [
+          {
+            "atMs": 1553,
+            "durationMs": 123
+          }
+        ],
+        "restRecovery": {
+          "channel": "viseme_REST",
+          "atMs": 2569,
+          "weight": 1
+        },
+        "rig": {
+          "rigId": "goat_prototype",
+          "rigVersion": "1.0.0",
+          "controlScheme": "SHAPE_KEYS"
+        }
+      },
+      "pip": {
+        "cues": [
+          {
+            "channel": "beak_open",
+            "startMs": 0,
+            "endMs": 2612,
+            "weight": 0.395,
+            "source": "EXPRESSION"
+          },
+          {
+            "channel": "brow_inner_up",
+            "startMs": 0,
+            "endMs": 2612,
+            "weight": 0.302,
+            "source": "BROW"
+          },
+          {
+            "channel": "brow_up",
+            "startMs": 0,
+            "endMs": 2612,
+            "weight": 0.69,
+            "source": "BROW"
+          },
+          {
+            "channel": "cheek_puff",
+            "startMs": 0,
+            "endMs": 2612,
+            "weight": 0.247,
+            "source": "EXPRESSION"
+          },
+          {
+            "channel": "smile",
+            "startMs": 0,
+            "endMs": 2612,
+            "weight": 0.143,
+            "source": "EXPRESSION"
+          },
+          {
+            "channel": "blink",
+            "startMs": 1473,
+            "endMs": 1596,
+            "weight": 1,
+            "source": "BLINK"
+          }
+        ],
+        "expression": "surprised",
+        "expressionWeights": {
+          "beak_open": 0.395,
+          "brow_inner_up": 0.302,
+          "brow_up": 0.69,
+          "cheek_puff": 0.247,
+          "smile": 0.143
+        },
+        "gaze": [
+          {
+            "startMs": 0,
+            "endMs": 1860,
+            "target": "PROP_MAP_001",
+            "eyeLeadMs": 133,
+            "headFollow": 0.329
+          },
+          {
+            "startMs": 1860,
+            "endMs": 3000,
+            "target": "CHAR_GOAT_001",
+            "eyeLeadMs": 133,
+            "headFollow": 0.36
+          }
+        ],
+        "blinks": [
+          {
+            "atMs": 1473,
+            "durationMs": 123
+          }
+        ],
+        "restRecovery": {
+          "channel": "viseme_REST",
+          "atMs": 2612,
+          "weight": 1
+        },
+        "rig": {
+          "rigId": "pip_prototype",
+          "rigVersion": "1.0.0",
+          "controlScheme": "SHAPE_KEYS"
+        }
+      }
+    },
+    "acting": {
+      "goat": {
+        "baseAction": "GOAT_IDLE",
+        "gesture": "CELEBRATE",
+        "keys": [
+          {
+            "phase": "ANTICIPATION",
+            "frame": 1,
+            "pose": "CELEBRATE_ANTICIPATE",
+            "holdFrames": 4,
+            "interpolation": "EASE_OUT",
+            "silhouetteScore": 0.836
+          },
+          {
+            "phase": "ACTION",
+            "frame": 18,
+            "pose": "CELEBRATE_ACTION",
+            "holdFrames": 11,
+            "interpolation": "EASE_IN_OUT",
+            "silhouetteScore": 0.959
+          },
+          {
+            "phase": "REACTION",
+            "frame": 58,
+            "pose": "CELEBRATE_REACTION",
+            "holdFrames": 5,
+            "interpolation": "EASE_IN_OUT",
+            "silhouetteScore": 0.809
+          },
+          {
+            "phase": "SETTLE",
+            "frame": 74,
+            "pose": "REST",
+            "holdFrames": 10,
+            "interpolation": "EASE_IN",
+            "silhouetteScore": 0.78
+          }
+        ],
+        "eyeLeadFrames": 3,
+        "headLeadFrames": 5,
+        "overlap": [
+          {
+            "part": "ears",
+            "lagFrames": 5,
+            "decay": 0.5
+          },
+          {
+            "part": "tail",
+            "lagFrames": 6,
+            "decay": 0.45
+          },
+          {
+            "part": "collar_tag",
+            "lagFrames": 4,
+            "decay": 0.65
+          }
+        ],
+        "secondaryMotion": 0.43,
+        "weightShift": 0.139,
+        "locomotion": {
+          "mode": "NONE",
+          "distanceMeters": 0,
+          "steps": 0,
+          "cruiseSpeedMps": 0,
+          "rampSeconds": 0.567,
+          "facingDegrees": 0
+        },
+        "staging": {
+          "screenSide": "LEFT",
+          "facing": "RIGHT",
+          "position": {
+            "x": -0.689,
+            "y": -1.405
+          },
+          "rotationZ": 0.5
+        }
+      },
+      "pip": {
+        "baseAction": "PIP_IDLE",
+        "gesture": "CELEBRATE",
+        "keys": [
+          {
+            "phase": "ANTICIPATION",
+            "frame": 1,
+            "pose": "CELEBRATE_ANTICIPATE",
+            "holdFrames": 3,
+            "interpolation": "EASE_OUT",
+            "silhouetteScore": 0.798
+          },
+          {
+            "phase": "ACTION",
+            "frame": 12,
+            "pose": "CELEBRATE_ACTION",
+            "holdFrames": 16,
+            "interpolation": "EASE_IN_OUT",
+            "silhouetteScore": 0.936
+          },
+          {
+            "phase": "REACTION",
+            "frame": 65,
+            "pose": "CELEBRATE_REACTION",
+            "holdFrames": 6,
+            "interpolation": "EASE_IN_OUT",
+            "silhouetteScore": 0.775
+          },
+          {
+            "phase": "SETTLE",
+            "frame": 81,
+            "pose": "REST",
+            "holdFrames": 6,
+            "interpolation": "EASE_IN",
+            "silhouetteScore": 0.748
+          }
+        ],
+        "eyeLeadFrames": 4,
+        "headLeadFrames": 3,
+        "overlap": [
+          {
+            "part": "crest",
+            "lagFrames": 4,
+            "decay": 0.55
+          },
+          {
+            "part": "backpack",
+            "lagFrames": 5,
+            "decay": 0.4
+          },
+          {
+            "part": "wing_tips",
+            "lagFrames": 2,
+            "decay": 0.6
+          }
+        ],
+        "secondaryMotion": 0.449,
+        "weightShift": 0.023,
+        "locomotion": {
+          "mode": "NONE",
+          "distanceMeters": 0,
+          "steps": 0,
+          "cruiseSpeedMps": 0,
+          "rampSeconds": 0.367,
+          "facingDegrees": 0
+        },
+        "staging": {
+          "screenSide": "RIGHT",
+          "facing": "LEFT",
+          "position": {
+            "x": 0.778,
+            "y": -1.621
+          },
+          "rotationZ": -0.56
+        }
+      }
+    },
+    "emotion": {
+      "goat": {
+        "primary": "excited",
+        "intensity": 0.75,
+        "valence": "POSITIVE",
+        "transitionInSeconds": 0.535,
+        "settleSeconds": 0.431,
+        "effects": {
+          "body": {
+            "posture": 0.3375,
+            "expansiveness": 0.6672,
+            "energy": 0.663,
+            "approach": 0.3375,
+            "fidget": 0.375
+          },
+          "face": {
+            "browRaise": 0.375,
+            "browInnerUp": 0,
+            "smile": 0.625,
+            "eyeWiden": 0.3375,
+            "squint": 0,
+            "mouthOpen": 0.275,
+            "blinkRatePerMinute": 19,
+            "gazeDartsPerSecond": 0.4
+          },
+          "voice": {
+            "pitchSemitones": 0.975,
+            "rate": 1.09,
+            "gainDb": 0.9,
+            "brightness": 0.7625,
+            "preDelayMs": 0
+          }
+        }
+      },
+      "pip": {
+        "primary": "surprised",
+        "intensity": 0.862,
+        "valence": "NEUTRAL",
+        "transitionInSeconds": 0.386,
+        "settleSeconds": 0.388,
+        "effects": {
+          "body": {
+            "posture": 0.2586,
+            "expansiveness": 0.5396,
+            "energy": 0.4983,
+            "approach": -0.1724,
+            "fidget": 0.1931
+          },
+          "face": {
+            "browRaise": 0.6896,
+            "browInnerUp": 0.3017,
+            "smile": 0.1431,
+            "eyeWiden": 0.6034,
+            "squint": 0,
+            "mouthOpen": 0.3948,
+            "blinkRatePerMinute": 9.1,
+            "gazeDartsPerSecond": 0.228
+          },
+          "voice": {
+            "pitchSemitones": 1.853,
+            "rate": 1.052,
+            "gainDb": 0,
+            "brightness": 0.7155,
+            "preDelayMs": 103
+          }
+        }
+      }
+    },
     "vfx": [
       {
         "instanceId": "VALIDATION_STEPS_1_8_s002_vfx_discovery_burst_v1",

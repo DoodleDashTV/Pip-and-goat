@@ -453,9 +453,25 @@ function main(): void {
     record('draft Blender render', 'SKIPPED', 'Blender is not installed in this environment');
   } else {
     const shot = projection.shots[0];
-    const metaPath = path.join(OUT_DIR, 'render/shot_meta.json');
-    mkdirSync(path.dirname(metaPath), { recursive: true });
+    const renderDir = path.join(OUT_DIR, 'render');
+    const metaPath = path.join(renderDir, 'shot_meta.json');
+    const assetsPath = path.join(renderDir, 'assets.json');
+    mkdirSync(renderDir, { recursive: true });
     writeFileSync(metaPath, `${JSON.stringify(shot.shotMeta, null, 2)}\n`);
+    const library = path.join(REPO_ROOT, 'production-library');
+    writeFileSync(
+      assetsPath,
+      `${JSON.stringify(
+        [
+          { id: 'meadow', role: 'meadow', localPath: path.join(library, 'environments/meadow_production.blend') },
+          { id: 'map', role: 'map', localPath: path.join(library, 'props/adventure_map.blend') },
+          { id: 'pip', role: 'pip', localPath: path.join(library, 'characters/pip_production.blend') },
+          { id: 'goat', role: 'goat', localPath: path.join(library, 'characters/goat_production.blend') },
+        ],
+        null,
+        2,
+      )}\n`,
+    );
     const result = spawnSync(
       'blender',
       [
@@ -464,14 +480,26 @@ function main(): void {
         '--python',
         path.join(REPO_ROOT, 'scripts/blender/assemble_scene.py'),
         '--',
+        '--scene-id',
+        shot.shotId,
         '--shot-meta',
         metaPath,
+        '--assets-json-file',
+        assetsPath,
         '--resolution',
         VALIDATION_SCENE_PLAN.delivery.resolution,
+        '--fps',
+        String(VALIDATION_SCENE_PLAN.delivery.fps),
         '--samples',
         '8',
-        '--out',
-        path.join(OUT_DIR, 'render'),
+        '--start-frame',
+        '1',
+        '--end-frame',
+        '1',
+        '--camera-preset',
+        String((shot.shotMeta as { cameraPreset?: string }).cameraPreset ?? 'WIDE'),
+        '--output-dir',
+        renderDir,
       ],
       { encoding: 'utf8', env: { ...process.env, LIBGL_ALWAYS_SOFTWARE: '1', GALLIUM_DRIVER: 'llvmpipe' } },
     );

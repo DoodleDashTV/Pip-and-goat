@@ -225,15 +225,23 @@ describe('the chest seam repair is still in the render path', () => {
     }
   });
 
-  // The new camera hook is the only thing this tranche added to the render path,
-  // and it has to be strictly additive: a shot_meta without a `direction` block
-  // must take exactly the path it took before.
-  it('applies the direction camera only when a direction block is present', () => {
-    expect(assembleScene).toContain('def apply_direction_camera');
-    const fn = assembleScene.slice(assembleScene.indexOf('def apply_direction_camera'));
-    const body = fn.slice(0, fn.indexOf('\ndef ', 4));
-    expect(body).toMatch(/direction[^\n]*\)\s*(or|if)|if not direction/);
-    expect(body).toContain('return');
+  // Direction consumers are strictly additive: a shot_meta without a `direction`
+  // block must take exactly the path it took before Milestone 3.
+  it('applies each direction consumer only when a direction block is present', () => {
+    for (const name of [
+      'apply_direction_camera',
+      'apply_direction_acting',
+      'apply_direction_emotion',
+      'apply_direction_face',
+      'apply_direction_lighting',
+      'apply_direction_vfx',
+    ]) {
+      expect(assembleScene).toContain(`def ${name}`);
+      const fn = assembleScene.slice(assembleScene.indexOf(`def ${name}`));
+      const body = fn.slice(0, fn.indexOf('\ndef ', 4));
+      expect(body, name).toMatch(/if not direction/);
+      expect(body, name).toContain('return');
+    }
   });
 });
 

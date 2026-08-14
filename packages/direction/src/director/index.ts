@@ -434,6 +434,7 @@ export function direct(planInput: unknown, config: DirectorConfig = {}): DirectR
       camera: cameraPlan,
       lighting: lightingPlan,
       acting: actingPlans,
+      emotion: emotions,
       face: facePlans.map((entry) => entry.plan),
       vfx: vfxResult.plan,
       frameRange,
@@ -959,7 +960,17 @@ export function projectShotMeta(input: {
   camera: CameraPlan;
   lighting: LightingPlan;
   acting: readonly ActingPlan[];
-  face: ReadonlyArray<{ characterCode: string; cues: ReadonlyArray<{ channel: string; startMs: number; endMs: number; weight: number }> }>;
+  emotion?: readonly EmotionPlan[];
+  face: ReadonlyArray<{
+    characterCode: string;
+    cues: ReadonlyArray<{ channel: string; startMs: number; endMs: number; weight: number; source?: string }>;
+    expression?: string;
+    expressionWeights?: Record<string, number>;
+    gaze?: ReadonlyArray<{ startMs: number; endMs: number; target: string; eyeLeadMs: number; headFollow: number }>;
+    blinks?: ReadonlyArray<{ atMs: number; durationMs: number }>;
+    restRecovery?: { channel: string; atMs: number; weight: number };
+    rig?: { rigId: string; rigVersion: string; controlScheme: string };
+  }>;
   vfx: { instances: ReadonlyArray<{ instanceId: string; presetId: string; presetVersion: string; seed: number; startMs: number; durationMs: number; intensity: number; particleCount: number; anchor: { kind: string; ref: string }; boundsMeters: { x: number; y: number; z: number }; palette: readonly string[]; layer: string }> };
   frameRange: { start: number; end: number };
 }): Record<string, unknown> {
@@ -1021,6 +1032,58 @@ export function projectShotMeta(input: {
         .map((facePlan) => [
           characterAssetId(facePlan.characterCode as CharacterCode),
           facePlan.cues.filter((cue) => !cue.channel.startsWith('viseme_')),
+        ]),
+    ),
+    // Richer face/acting/emotion payloads for Milestone 3 Blender consumers.
+    // Kept beside the original `facial` cue map so older readers stay valid.
+    face: Object.fromEntries(
+      [...input.face]
+        .sort((a, b) => a.characterCode.localeCompare(b.characterCode))
+        .map((facePlan) => [
+          characterAssetId(facePlan.characterCode as CharacterCode),
+          {
+            cues: facePlan.cues.filter((cue) => !cue.channel.startsWith('viseme_')),
+            expression: facePlan.expression ?? null,
+            expressionWeights: facePlan.expressionWeights ?? {},
+            gaze: facePlan.gaze ?? [],
+            blinks: facePlan.blinks ?? [],
+            restRecovery: facePlan.restRecovery ?? null,
+            rig: facePlan.rig ?? null,
+          },
+        ]),
+    ),
+    acting: Object.fromEntries(
+      [...input.acting]
+        .sort((a, b) => a.characterCode.localeCompare(b.characterCode))
+        .map((actingPlan) => [
+          characterAssetId(actingPlan.characterCode as CharacterCode),
+          {
+            baseAction: actingPlan.baseAction,
+            gesture: actingPlan.gesture,
+            keys: actingPlan.keys,
+            eyeLeadFrames: actingPlan.eyeLeadFrames,
+            headLeadFrames: actingPlan.headLeadFrames,
+            overlap: actingPlan.overlap,
+            secondaryMotion: actingPlan.secondaryMotion,
+            weightShift: actingPlan.weightShift,
+            locomotion: actingPlan.locomotion,
+            staging: actingPlan.staging,
+          },
+        ]),
+    ),
+    emotion: Object.fromEntries(
+      [...(input.emotion ?? [])]
+        .sort((a, b) => a.characterCode.localeCompare(b.characterCode))
+        .map((emotionPlan) => [
+          characterAssetId(emotionPlan.characterCode as CharacterCode),
+          {
+            primary: emotionPlan.primary,
+            intensity: emotionPlan.intensity,
+            valence: emotionPlan.valence,
+            transitionInSeconds: emotionPlan.transitionInSeconds,
+            settleSeconds: emotionPlan.settleSeconds,
+            effects: emotionPlan.effects,
+          },
         ]),
     ),
     vfx: input.vfx.instances.map((instance) => ({
