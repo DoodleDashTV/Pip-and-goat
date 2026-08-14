@@ -6,35 +6,35 @@ Updated: 2026-08-14
 - Repository: `DoodleDashTV/Pip-and-goat`
 - Controlled branch: `codex/trivvlejoy-recovery-integration`
 - Baseline: `1ff46d595023ede5a33aa9e7f12cbbebe5ec9ed1`
-- Branch starting HEAD: baseline commit; first contract checkpoint is being created from its tree.
-- Baseline verification: GitHub reports `1ff46d5` as `Merge PR #10: Repair Pip's chest seam (shadow caster fix + cloud evidence)` with a valid verified signature.
+- Contract checkpoint: `0ca2525b893ba4fac04efe4f3641075eb744d7f8`, direct child of baseline.
 
 ## Current milestone
-Milestone 0 — Recovery Foundation.
+Milestone 1 — TrivvleJoy Presentation Integration.
 
 ## Completed
-- Read-only recovery audit completed before activation.
-- Verified exact baseline commit exists and is PR #10 merge.
-- Verified requested controlled branch did not already exist through branch search.
-- Created `codex/trivvlejoy-recovery-integration` directly from exact baseline SHA.
-- Prepared the four durable contract/plan/progress/decision files as the first isolated tree change.
-- Inventoried baseline setup and validation commands from the recovery audit/repository package configuration.
+- M0: exact PR #10 merge baseline verified; controlled branch created directly from it; four durable contract files created and checkpointed.
+- M0 validation inventory recorded. No local checkout was pre-mounted, so executable pnpm/Blender baseline suites remain environmental validation gaps rather than claimed passes.
+- M1: inspected PR #11 diff against baseline; confirmed it is nine commits ahead with the exact accepted merge-base and contains both branding and unrelated Steps 1–8/render changes.
+- M1: selected only the presentation-layer brand resolver and UI naming changes; preserved `PRODUCT_DISPLAY_NAME`, DDP abbreviation, Doodle Dash TV channel, Doodle Dash Universe, package/storage/worker identifiers and persisted compatibility.
+- M1: kept the PR #11 Direction navigation out of the StudioShell because that belongs to M2, not branding.
+- M1: added focused legacy-brand compatibility tests independent of the Steps 1–8 package.
 
 ## Tests / validation
-- GitHub commit identity check: PASS — exact SHA and PR #10 merge message confirmed.
-- Branch existence/ancestry setup: PASS — branch newly created from exact SHA.
-- Runtime baseline test suite: NOT YET RUN in this session. No local checkout was pre-mounted; connector-based branch setup is being used. This is an execution-environment limitation, not a test pass.
+- Baseline commit identity: PASS via GitHub metadata.
+- Controlled branch ancestry: PASS; first checkpoint parent is exact baseline.
+- PR #11 merge-base inspection: PASS; compare reports merge-base `1ff46d5`, ahead by 9, behind by 0.
+- M1 runtime tests/typecheck/lint: BLOCKED in this session by absence of a local repository checkout/runtime mount. Tests were added but are not claimed executed.
+- Blender/render validation: NOT REQUIRED for the presentation-only diff and not claimed. No Blender/render code or accepted asset is changed by M1.
 
 ## Known failures / limitations
-- No local repository checkout was present in the execution container at contract activation, so pnpm/Blender commands cannot yet be executed locally in this checkpoint.
-- No Blender validation is claimed.
-- No credential-dependent cloud validation is claimed.
+- Runtime validation requires a checkout/CI execution path not currently mounted in the execution container.
+- No unavailable validation is represented as PASS.
 
 ## Paid activity
-None attempted. No GPU, RunPod pod or billable render launched. Protected paid-render settings were not changed.
+None attempted. No GPU, RunPod pod or billable render launched. Paid-render protections were not changed.
 
 ## Next action
-Finish the isolated contract checkpoint, then inspect PR #11 branding diff against baseline and begin Milestone 1 with the smallest presentation-only port and focused compatibility tests.
+Checkpoint M1, then begin M2 by inspecting the PR #11 Steps 1–8 package in subsystem groups. Port software-only schemas/determinism/locks first, then Director/acting/emotion/face, then camera/lighting/VFX/sound and production bridge, with focused commits and explicit render-fingerprint accounting.
 
 ## Resume
-Read all four contract files first. Verify `codex/trivvlejoy-recovery-integration` still descends from `1ff46d5`, inspect its latest HEAD/tree, and continue from the Next action. Do not restart M0 or touch stale `main`.
+Read all four root contract files. Verify branch ancestry from `1ff46d5`, inspect latest HEAD, and continue from Next action. Do not integrate PR #9 and do not use stale `main`.

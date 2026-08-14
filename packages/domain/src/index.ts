@@ -5,8 +5,16 @@ export const FOUNDING_CODES = {
   GOAT: 'CHAR_GOAT_001',
 } as const;
 
+export * from './brand';
+
 export const DEFAULT_UNIVERSE_NAME = 'Doodle Dash Universe';
 export const DEFAULT_BRAND_NAME = 'Doodle Dash Production';
+/**
+ * The persisted brand identifier. Kept at its original value on purpose: it is
+ * reconciled into `universe.brandName` and compared against existing rows. For
+ * anything a human reads, use `STUDIO_DISPLAY_NAME` or `resolveStudioDisplayName()`
+ * from `./brand` instead.
+ */
 export const PRODUCT_DISPLAY_NAME = 'Doodle Dash Production';
 
 /** Permanent production philosophy: Blender-first, EEVEE-first, 1080×1920 finals. */

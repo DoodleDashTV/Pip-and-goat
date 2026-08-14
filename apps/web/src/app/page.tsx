@@ -5,7 +5,7 @@ import {
   costOptimizedWorkflowService,
   productionSetupService,
 } from '@doodle-dash/production';
-import { PRODUCT_DISPLAY_NAME } from '@doodle-dash/domain';
+import { STUDIO_DISPLAY_NAME, resolveStudioDisplayName } from '@doodle-dash/domain';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,10 +31,10 @@ export default async function HomePage() {
     <div className="space-y-8 overflow-x-hidden">
       <header className="overflow-hidden rounded-[2rem] border border-[var(--line)] bg-[var(--panel)] p-6 shadow-studio backdrop-blur-md sm:p-8 md:p-10">
         <p className="text-xs font-bold uppercase tracking-[0.28em] text-sun-400">
-          {PRODUCT_DISPLAY_NAME}
+          {STUDIO_DISPLAY_NAME}
         </p>
         <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-mist-100 md:text-5xl">
-          {universe?.brandName ?? PRODUCT_DISPLAY_NAME}
+          {resolveStudioDisplayName(universe?.brandName)}
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--muted)]">
           Extremely high-quality children’s animation. Blender-first. EEVEE-first. 1080×1920 @ 30
