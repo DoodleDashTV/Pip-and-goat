@@ -53,6 +53,9 @@ on a new branch. Did not use empty `main`. Did not modify PR #11’s branch.
 | `pnpm test:blender` (`scripts/assets/test_rig_gates.py`) | PASS — **44 / 44** |
 | `pnpm validate:steps1-8` | PASS — **17 passed, 0 failed, 1 skipped** |
 | `pnpm validate:steps1-8 -- --render` | PASS — **18 passed, 0 failed, 0 skipped** (local CPU EEVEE still) |
+| `pnpm test:color` | PASS — **19 / 19** |
+| `pnpm gates:scene` | PASS — all 8 scene gates, including `NO_DUPLICATE_LIGHTS` |
+| `pnpm gates:local` | PASS — 90/90 frames, all 16 visual checks |
 
 ## Protections confirmed
 

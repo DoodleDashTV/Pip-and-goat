@@ -50,6 +50,9 @@ locally validated**. Theatrical CGI Asset Foundation (roadmap stage 3) has
 | `pnpm test:blender` | PASS — **44 / 44** |
 | `pnpm validate:steps1-8` | PASS — **17 passed, 0 failed, 1 skipped** |
 | `pnpm validate:steps1-8 -- --render` | PASS — **18 passed, 0 failed, 0 skipped** |
+| `pnpm test:color` | PASS — **19 / 19** |
+| `pnpm gates:scene` | PASS — all 8 scene gates |
+| `pnpm gates:local` | PASS — 90/90 frames, all 16 visual checks |
 
 See `MILESTONE_3_GATE_2026-08-14.md` for the full evidence table.
 
@@ -57,9 +60,8 @@ See `MILESTONE_3_GATE_2026-08-14.md` for the full evidence table.
 
 None remaining for Milestone 3 consumer wiring.
 
-`pnpm gates:local` (90-frame / 16-check acceptance, no direction block) is the
-next confirmation that the no-direction path is unchanged. It was last run to
-PASS on the Milestone 2 recovery commit.
+`pnpm gates:local` was re-run on this branch and PASSed (90/90 frames, all 16
+visual checks). The no-direction acceptance path is unchanged.
 
 Roadmap stage 3 (Theatrical CGI Asset Foundation) is the next *defined* studio
 stage and is blocked on new production assets plus human visual approval. It
@@ -86,11 +88,10 @@ the intentional paid-launch block.
 
 ## Safest next action
 
-1. Run `pnpm gates:local` on this branch to reconfirm the no-direction
-   90-frame / 16-check acceptance still PASSes.
-2. Stop before Theatrical CGI Asset Foundation. That stage needs new assets
-   and Justin’s visual approval; it is not a conservative engineering step.
-3. Do not rebuild or re-pin the worker image. Do not launch paid cloud renders.
+Stop. Milestone 3 consumer wiring is complete and locally gated. Do **not**
+begin Theatrical CGI Asset Foundation (roadmap stage 3): it needs new
+production assets and Justin’s visual approval. Do not rebuild or re-pin the
+worker image. Do not launch paid cloud renders.
 
 ## Resume
 
