@@ -128,7 +128,7 @@
   },
   "expressionStates": {
     "goat": {
-      "directionVersion": "1.0.0",
+      "directionVersion": "1.1.0",
       "expression": "laughing",
       "weights": {
         "brow_up": 0.272,
@@ -157,6 +157,11 @@
         "channel": "viseme_REST",
         "atMs": 2553,
         "weight": 1
+      },
+      "rig": {
+        "rigId": "goat_prototype",
+        "rigVersion": "1.0.0",
+        "controlScheme": "SHAPE_KEYS"
       },
       "cues": [
         {
@@ -204,7 +209,7 @@
       ]
     },
     "pip": {
-      "directionVersion": "1.0.0",
+      "directionVersion": "1.1.0",
       "expression": "happy",
       "weights": {
         "beak_open": 0.05,
@@ -233,6 +238,11 @@
         "channel": "viseme_REST",
         "atMs": 2641,
         "weight": 1
+      },
+      "rig": {
+        "rigId": "pip_prototype",
+        "rigVersion": "1.0.0",
+        "controlScheme": "SHAPE_KEYS"
       },
       "cues": [
         {
@@ -284,90 +294,105 @@
     "goat": [
       {
         "viseme": "U",
+        "channel": "viseme_U",
         "startMs": 180,
         "endMs": 340,
         "weight": 0.773
       },
       {
         "viseme": "E",
+        "channel": "viseme_E",
         "startMs": 305,
         "endMs": 466,
         "weight": 0.773
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 431,
         "endMs": 591,
         "weight": 0.773
       },
       {
         "viseme": "F_V",
+        "channel": "viseme_F_V",
         "startMs": 556,
         "endMs": 716,
         "weight": 0.773
       },
       {
         "viseme": "O",
+        "channel": "viseme_O",
         "startMs": 681,
         "endMs": 842,
         "weight": 0.773
       },
       {
         "viseme": "U",
+        "channel": "viseme_U",
         "startMs": 807,
         "endMs": 967,
         "weight": 0.773
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 932,
         "endMs": 1093,
         "weight": 0.773
       },
       {
         "viseme": "I",
+        "channel": "viseme_I",
         "startMs": 1058,
         "endMs": 1218,
         "weight": 0.773
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 1183,
         "endMs": 1343,
         "weight": 0.773
       },
       {
         "viseme": "O",
+        "channel": "viseme_O",
         "startMs": 1308,
         "endMs": 1469,
         "weight": 0.773
       },
       {
         "viseme": "E",
+        "channel": "viseme_E",
         "startMs": 1434,
         "endMs": 1594,
         "weight": 0.773
       },
       {
         "viseme": "TH",
+        "channel": "viseme_TH",
         "startMs": 1559,
         "endMs": 1719,
         "weight": 0.773
       },
       {
         "viseme": "E",
+        "channel": "viseme_E",
         "startMs": 1684,
         "endMs": 1845,
         "weight": 0.773
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 1810,
         "endMs": 1970,
         "weight": 0.773
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 2553,
         "endMs": 3000,
         "weight": 1
@@ -376,10 +401,135 @@
     "pip": [
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 2641,
         "endMs": 3000,
         "weight": 1
       }
     ]
+  },
+  "renderSettings": {
+    "directionVersion": "1.0.0",
+    "tier": "DRAFT",
+    "engine": "EEVEE",
+    "resolution": "360x640",
+    "samples": 28,
+    "adaptiveSampling": {
+      "enabled": false,
+      "noiseThreshold": 0,
+      "minSamples": 0
+    },
+    "denoise": {
+      "enabled": false,
+      "denoiser": "NONE"
+    },
+    "motionBlur": {
+      "enabled": false,
+      "shutter": 0.5
+    },
+    "depthOfField": {
+      "enabled": false,
+      "motivation": "",
+      "fStop": 2.8
+    },
+    "passes": [
+      "COMBINED"
+    ],
+    "compositing": {
+      "enabled": false,
+      "recipeId": "",
+      "recipeVersion": "",
+      "operations": [],
+      "usesCryptomatte": false
+    },
+    "colorGrade": {
+      "enabled": false,
+      "gradeId": "",
+      "gradeVersion": "",
+      "viewTransform": "Khronos PBR Neutral",
+      "look": "None",
+      "exposure": -0.026,
+      "contrast": 0,
+      "saturation": 1
+    },
+    "groomValidation": false,
+    "atmosphere": false,
+    "isMasterCandidate": false,
+    "cloudRenderProfile": "DRAFT_FAST",
+    "cacheKey": "c3e5708f67f9f3e7a86e9d44fb2e37ad1d977717c408cf37bc58fa47855c3a8f"
+  },
+  "simulationState": {
+    "directionVersion": "1.0.0",
+    "groom": [
+      {
+        "characterCode": "CHAR_GOAT_001",
+        "mode": "NONE",
+        "motionResponse": 0,
+        "windResponse": 0,
+        "regions": [],
+        "validationRequired": false
+      },
+      {
+        "characterCode": "CHAR_PIP_001",
+        "mode": "NONE",
+        "motionResponse": 0,
+        "windResponse": 0,
+        "regions": [],
+        "validationRequired": false
+      }
+    ],
+    "secondaryMotion": [
+      {
+        "part": "collar_tag",
+        "mode": "PROCEDURAL",
+        "lagFrames": 4,
+        "decay": 0.65,
+        "maxAmplitudeUnit": 0.423
+      },
+      {
+        "part": "ears",
+        "mode": "PROCEDURAL",
+        "lagFrames": 5,
+        "decay": 0.5,
+        "maxAmplitudeUnit": 0.423
+      },
+      {
+        "part": "tail",
+        "mode": "PROCEDURAL",
+        "lagFrames": 6,
+        "decay": 0.45,
+        "maxAmplitudeUnit": 0.423
+      },
+      {
+        "part": "backpack",
+        "mode": "PROCEDURAL",
+        "lagFrames": 5,
+        "decay": 0.4,
+        "maxAmplitudeUnit": 0.411
+      },
+      {
+        "part": "crest",
+        "mode": "PROCEDURAL",
+        "lagFrames": 3,
+        "decay": 0.55,
+        "maxAmplitudeUnit": 0.411
+      },
+      {
+        "part": "wing_tips",
+        "mode": "PROCEDURAL",
+        "lagFrames": 2,
+        "decay": 0.6,
+        "maxAmplitudeUnit": 0.411
+      }
+    ],
+    "environment": [
+      {
+        "element": "grass",
+        "mode": "PROCEDURAL",
+        "intensity": 0.15
+      }
+    ],
+    "requiredCaches": [],
+    "costWeight": 0
   }
 }

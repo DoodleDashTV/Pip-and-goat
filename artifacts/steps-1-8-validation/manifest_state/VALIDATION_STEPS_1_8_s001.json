@@ -139,7 +139,7 @@
   },
   "expressionStates": {
     "goat": {
-      "directionVersion": "1.0.0",
+      "directionVersion": "1.1.0",
       "expression": "curious",
       "weights": {
         "brow_inner_up": 0.103,
@@ -175,6 +175,11 @@
         "channel": "viseme_REST",
         "atMs": 2203,
         "weight": 1
+      },
+      "rig": {
+        "rigId": "goat_prototype",
+        "rigVersion": "1.0.0",
+        "controlScheme": "SHAPE_KEYS"
       },
       "cues": [
         {
@@ -222,7 +227,7 @@
       ]
     },
     "pip": {
-      "directionVersion": "1.0.0",
+      "directionVersion": "1.1.0",
       "expression": "curious",
       "weights": {
         "beak_open": 0.097,
@@ -258,6 +263,11 @@
         "channel": "viseme_REST",
         "atMs": 2198,
         "weight": 1
+      },
+      "rig": {
+        "rigId": "pip_prototype",
+        "rigVersion": "1.0.0",
+        "controlScheme": "SHAPE_KEYS"
       },
       "cues": [
         {
@@ -309,6 +319,7 @@
     "goat": [
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 2203,
         "endMs": 2500,
         "weight": 1
@@ -317,124 +328,268 @@
     "pip": [
       {
         "viseme": "O",
+        "channel": "viseme_O",
         "startMs": 240,
         "endMs": 374,
         "weight": 0.654
       },
       {
         "viseme": "A",
+        "channel": "viseme_A",
         "startMs": 339,
         "endMs": 474,
         "weight": 0.654
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 439,
         "endMs": 573,
         "weight": 0.654
       },
       {
         "viseme": "L",
+        "channel": "viseme_L",
         "startMs": 538,
         "endMs": 672,
         "weight": 0.654
       },
       {
         "viseme": "O",
+        "channel": "viseme_O",
         "startMs": 637,
         "endMs": 772,
         "weight": 0.654
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 737,
         "endMs": 871,
         "weight": 0.654
       },
       {
         "viseme": "A",
+        "channel": "viseme_A",
         "startMs": 836,
         "endMs": 971,
         "weight": 0.654
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 936,
         "endMs": 1070,
         "weight": 0.654
       },
       {
         "viseme": "TH",
+        "channel": "viseme_TH",
         "startMs": 1035,
         "endMs": 1169,
         "weight": 0.654
       },
       {
         "viseme": "I",
+        "channel": "viseme_I",
         "startMs": 1134,
         "endMs": 1269,
         "weight": 0.654
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 1234,
         "endMs": 1368,
         "weight": 0.654
       },
       {
         "viseme": "L",
+        "channel": "viseme_L",
         "startMs": 1333,
         "endMs": 1467,
         "weight": 0.654
       },
       {
         "viseme": "I",
+        "channel": "viseme_I",
         "startMs": 1432,
         "endMs": 1567,
         "weight": 0.654
       },
       {
         "viseme": "L",
+        "channel": "viseme_L",
         "startMs": 1532,
         "endMs": 1666,
         "weight": 0.654
       },
       {
         "viseme": "E",
+        "channel": "viseme_E",
         "startMs": 1631,
         "endMs": 1766,
         "weight": 0.654
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 1731,
         "endMs": 1865,
         "weight": 0.654
       },
       {
         "viseme": "M_B_P",
+        "channel": "viseme_M_B_P",
         "startMs": 1830,
         "endMs": 1964,
         "weight": 0.654
       },
       {
         "viseme": "A",
+        "channel": "viseme_A",
         "startMs": 1929,
         "endMs": 2064,
         "weight": 0.654
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 2029,
         "endMs": 2163,
         "weight": 0.654
       },
       {
         "viseme": "REST",
+        "channel": "viseme_REST",
         "startMs": 2198,
         "endMs": 2500,
         "weight": 1
       }
     ]
+  },
+  "renderSettings": {
+    "directionVersion": "1.0.0",
+    "tier": "DRAFT",
+    "engine": "EEVEE",
+    "resolution": "360x640",
+    "samples": 24,
+    "adaptiveSampling": {
+      "enabled": false,
+      "noiseThreshold": 0,
+      "minSamples": 0
+    },
+    "denoise": {
+      "enabled": false,
+      "denoiser": "NONE"
+    },
+    "motionBlur": {
+      "enabled": false,
+      "shutter": 0.5
+    },
+    "depthOfField": {
+      "enabled": false,
+      "motivation": "",
+      "fStop": 2.8
+    },
+    "passes": [
+      "COMBINED"
+    ],
+    "compositing": {
+      "enabled": false,
+      "recipeId": "",
+      "recipeVersion": "",
+      "operations": [],
+      "usesCryptomatte": false
+    },
+    "colorGrade": {
+      "enabled": false,
+      "gradeId": "",
+      "gradeVersion": "",
+      "viewTransform": "Khronos PBR Neutral",
+      "look": "None",
+      "exposure": 0.02,
+      "contrast": 0,
+      "saturation": 1
+    },
+    "groomValidation": false,
+    "atmosphere": false,
+    "isMasterCandidate": false,
+    "cloudRenderProfile": "DRAFT_FAST",
+    "cacheKey": "288be60fb4c5889696f1c86d3cdbf34a45d970d6db37063c0eca374610bc719f"
+  },
+  "simulationState": {
+    "directionVersion": "1.0.0",
+    "groom": [
+      {
+        "characterCode": "CHAR_GOAT_001",
+        "mode": "NONE",
+        "motionResponse": 0,
+        "windResponse": 0,
+        "regions": [],
+        "validationRequired": false
+      },
+      {
+        "characterCode": "CHAR_PIP_001",
+        "mode": "NONE",
+        "motionResponse": 0,
+        "windResponse": 0,
+        "regions": [],
+        "validationRequired": false
+      }
+    ],
+    "secondaryMotion": [
+      {
+        "part": "collar_tag",
+        "mode": "PROCEDURAL",
+        "lagFrames": 3,
+        "decay": 0.65,
+        "maxAmplitudeUnit": 0.336
+      },
+      {
+        "part": "ears",
+        "mode": "PROCEDURAL",
+        "lagFrames": 5,
+        "decay": 0.5,
+        "maxAmplitudeUnit": 0.336
+      },
+      {
+        "part": "tail",
+        "mode": "PROCEDURAL",
+        "lagFrames": 6,
+        "decay": 0.45,
+        "maxAmplitudeUnit": 0.336
+      },
+      {
+        "part": "backpack",
+        "mode": "PROCEDURAL",
+        "lagFrames": 5,
+        "decay": 0.4,
+        "maxAmplitudeUnit": 0.411
+      },
+      {
+        "part": "crest",
+        "mode": "PROCEDURAL",
+        "lagFrames": 3,
+        "decay": 0.55,
+        "maxAmplitudeUnit": 0.411
+      },
+      {
+        "part": "wing_tips",
+        "mode": "PROCEDURAL",
+        "lagFrames": 2,
+        "decay": 0.6,
+        "maxAmplitudeUnit": 0.411
+      }
+    ],
+    "environment": [
+      {
+        "element": "grass",
+        "mode": "PROCEDURAL",
+        "intensity": 0.15
+      }
+    ],
+    "requiredCaches": [],
+    "costWeight": 0
   }
 }
