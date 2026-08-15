@@ -14,7 +14,7 @@ primaries, revised fused sculpts, and `production-library/` are untouched.
 | --- | --- |
 | `pip_theatrical_production_rebuild.blend` | New separate-object Pip sculpt |
 | `goat_theatrical_production_rebuild.blend` | New separate-object Goat sculpt |
-| `textures/` | Lookdev albedo / roughness / normal maps |
+| `DISCREPANCY.md` | Honest Stage 3 visual report |
 
 Binding authority is the ten five-view JPEGs. Generated `.blend` / GLB models
 are comparison/rollback only and must not override the sheets.
