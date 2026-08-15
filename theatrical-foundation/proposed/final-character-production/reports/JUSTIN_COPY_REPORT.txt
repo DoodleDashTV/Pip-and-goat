@@ -1,78 +1,72 @@
-TIVVLEJOY — TARGETED CHARACTER CORRECTION PASS
+TIVVLEJOY — PIP LONG-WING COMPARISON CANDIDATE
 SELECT-ALL COPY BLOCK
 
-Starting commit: 7bf2b717e217b3422b58b75ba1829d9f3aa43e35
 Working branch: cursor/theatrical-final-character-production-1ebc
 Draft PR: #24
 Blender: 4.2.3 LTS
 Paid resources: not used
+Current Pip overwritten: no
+production-library touched: no
 Canon / merge / theatrical binding: unchanged / not performed / not declared
 
-This was a tightly limited correction pass. Neither character was rebuilt.
-Prism foundations were not replaced. No retopo, rig, merge, or paid resources.
+A new GLB was uploaded, then moved to
+theatrical-foundation/proposed/final-character-production/source-candidates/pip-long-wing/pip_long_wing_candidate_github.glb
+SHA-256 48c7de9a11c1121e0dd36aade66121b943000d652b8f89dc9d9560a0374054ff
+19.4 MB. Comparison candidate only.
 
-FIX 1 — GOAT WHITE FOREHEAD SPOTS
-Exact cause: Goat_Catch_0 and Goat_Catch_1 were detached emissive white
-highlight spheres (~0.018 diameter) placed above the brows, not in the
-eyes. Goat_Cornea_0 / Goat_Cornea_1 were oversized glassy spheres
-(originally 0.136 diameter) whose upper hemispheres poked through the
-brow as white circles.
-How removed: catch spheres deleted; cornea objects kept in the file but
-hidden from render (not deleted); no paint-over. Painted in-eye
-catchlights remain.
-Proof: front close-up brow/forehead pixel analysis white_count = 0.
+OPENED CORRECTLY
+Blender 4.2.3 LTS imported it in 0.50s.
+One fused Tripo mesh: tripo_mesh_136daef8-168c-4eaa-956b-023aa96a0a3f
+210,060 verts / 430,615 faces / 39,040 non-manifold
+Different mesh from current Pip Prism (997,238 verts).
+No armature. No shape keys. Scaled to 2.05 for comparison renders only.
 
-FIX 2 — GOAT BROWN BACK RECTANGLE
-Exact cause: Stage 2 Color stamp used a hard-z-cut teardrop (widest at a
-flat top) plus a separate vertical tail-base bar at z 0.92–1.16, width
-0.065. That rasterized as a brown rectangle down the back and above the
-tail.
-How reshaped: restored the original working Color map, then painted a
-rounded-crown organic teardrop only. No tail bar. No hard z-cut.
-Result: the tail rectangle is gone. The upper-back cinnamon is present
-and centered under the scarf, but it still reads as a somewhat geometric
-stamp, not the sheet’s fluffy teardrop. Further albedo stamps were
-stopped to avoid more UV rectangles.
+WHAT IS BETTER THAN CURRENT PIP
+- Wings are clearly longer. They leave the shoulders, rest against the
+  sides, and reach about lower-belly / upper-thigh. Current Pip still
+  stops around mid-torso.
+- Rear satchel strap is continuous: character-right shoulder, across the
+  back, into the left-hip bag, with buckle hardware. Current Prism rear
+  still loses the strap into the back feathers.
+- Laterality matches the sheets: strap character-right, bag character-left.
 
-FIX 3 — PIP WING LENGTH
-Stop condition hit. Lower-feather translation on the fused Prism mesh
-shredded into vertical shards (same failure as the earlier sculpt
-revision). Stretch reverted. No second attempt.
-tip_z before: left 0.550 / right 0.558
-tip_z after failed stretch: left 0.391 / right 0.399
-after revert: original Prism length (~0.55 / ~0.56)
-Wings are still short of the pair-image lower-belly / upper-thigh
-guidance. Isolated wing geometry would be required.
+WHAT IS WORSE
+- A cracked / veined overlay covers body, eyes, crest, scarf, and bag.
+- A vertical center seam splits the face and beak.
+- Lower mesh density than current Prism.
+- Eyes still unequal. Extra crest nub remains.
+- Rounder / more spherical than the binding pear.
+- Still one fused non-manifold object. Cannot retopo or rig from this.
 
-FIX 4 — PIP UNEQUAL EYES
-Stop condition hit. No independent eyeball / iris / pupil objects.
-Iris-vert isolation returned left 0 / right 0. No eye mesh was edited.
-The straight-on close-up still shows a slightly more open viewer-left
-eye. That is fused eyelid-opening / generated-face asymmetry, not a
-mismatched pair of globes and not camera perspective alone.
-Head was not mirrored.
+RECOMMENDATION
+C — reject as a replacement or production donor.
+
+Not A. The complete model is not better.
+Not B as geometry. Wings and satchel cannot be safely cut out of this
+fused mesh. That path already shredded current Pip.
+
+Keep the file as comparison evidence. If an isolated wing / strap rebuild
+is later authorized, use this GLB as visual reference only.
+
+Current Pip high-res was not replaced.
 
 VALIDATION RENDERS
-1. artifacts/theatrical-v2/final-character-production/corrections/01_goat_corrected_front_closeup.png
-2. artifacts/theatrical-v2/final-character-production/corrections/02_goat_corrected_rear.png
-3. artifacts/theatrical-v2/final-character-production/corrections/03_goat_corrected_rear_three_quarter.png
-4. artifacts/theatrical-v2/final-character-production/corrections/04_pip_corrected_front_neutral_closeup.png
-5. artifacts/theatrical-v2/final-character-production/corrections/05_pip_corrected_three_quarter_closeup.png
-6. artifacts/theatrical-v2/final-character-production/corrections/06_pip_corrected_front_full.png
-7. artifacts/theatrical-v2/final-character-production/corrections/07_pip_corrected_three_quarter_full.png
-8. artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png
-
-EDITED FILES
-goat_highres_candidate.blend, pip_highres_candidate.blend (wings reverted),
-textures/goat_highres_basecolor.png, correction scripts and reports.
-Working blends not overwritten. production-library not touched.
+artifacts/theatrical-v2/final-character-production/long-wing-candidate/
+  pip_long_wing_front.png
+  pip_long_wing_rear.png
+  pip_long_wing_side.png
+  pip_long_wing_front_three_quarter.png
+  pip_long_wing_rear_three_quarter.png
+  pip_long_wing_face_closeup.png
+  pip_long_wing_strap_rear_closeup.png
+Comparisons in long-wing-candidate/comparison/
 
 STATUS
-PIP VISUAL CANDIDATE: BLOCKED — Prism + finish polish; wings still short; eyes still slightly unequal; extra crest stubbles remain
-GOAT VISUAL CANDIDATE: BLOCKED — forehead catch spheres removed and corneas hidden from render; tail rectangle removed; upper-back mark still a somewhat geometric stamp; slimmer than sheets
-PIP PRODUCTION ASSET: BLOCKED — 1.9M-tri non-manifold Tripo mesh; no retopo, groom, or rig
-GOAT PRODUCTION ASSET: BLOCKED — same
+PIP VISUAL CANDIDATE: BLOCKED — current Prism unchanged; long-wing GLB rejected as replacement
+GOAT VISUAL CANDIDATE: UNCHANGED FROM PRIOR PASS
+PIP PRODUCTION ASSET: BLOCKED
+GOAT PRODUCTION ASSET: BLOCKED
 CANON: UNCHANGED
 MERGE: NOT PERFORMED
-THEATRICAL BINDING: AWAITING JUSTIN’S FINAL VISUAL APPROVAL
+THEATRICAL BINDING: AWAITING JUSTIN’S VISUAL APPROVAL
 PAID RESOURCES: NOT USED

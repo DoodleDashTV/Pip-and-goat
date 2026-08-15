@@ -33,5 +33,9 @@ Targeted correction stills live under
 `artifacts/theatrical-v2/final-character-production/corrections/`.
 See `reports/TARGETED_CORRECTION_PASS.md`.
 
+A Pip long-wing GLB is stored as a comparison candidate only under
+`source-candidates/pip-long-wing/`. It does not replace current Pip.
+See `reports/PIP_LONG_WING_CANDIDATE.md`.
+
 Production retopo, groom, and rigs are **not** in this folder. See
 `reports/PRODUCTION_BLOCKERS.md`.

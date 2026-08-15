@@ -56,3 +56,13 @@
   `artifacts/theatrical-v2/final-character-production/corrections/`.
 
 No canon replace. No merge.
+
+## Pip long-wing comparison candidate — this commit
+
+- Uploaded GLB moved to `source-candidates/pip-long-wing/`.
+- Opened in Blender 4.2.3 LTS. Different fused Tripo mesh from current Pip.
+- Rendered front, rear, side, front 3/4, rear 3/4, face, and rear strap close-up.
+- Compared against current Pip and the binding five-view sheets.
+- Recommendation: **C — reject as replacement**. Longer wings and a
+  continuous back strap are real, but the cracked overlay, center seam,
+  and fused topology make it unusable as a donor. Current Pip unchanged.
