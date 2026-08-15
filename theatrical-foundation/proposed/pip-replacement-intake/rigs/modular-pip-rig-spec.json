@@ -1,0 +1,41 @@
+{
+  "schema": "tivvlejoy.modular_rig_spec.v1",
+  "rigId": "pip_theatrical_modular_spec",
+  "rigVersion": "0.1.0-unbound",
+  "characterCode": "CHAR_PIP_001",
+  "boundToCurrentCandidate": false,
+  "boundToReplacementCandidate": false,
+  "quality": "SPEC_ONLY",
+  "inRigRegistry": false,
+  "defaultForPip": false,
+  "modules": [
+    { "id": "root", "bones": ["root", "center_of_gravity"] },
+    { "id": "spine", "bones": ["pelvis", "spine_01", "spine_02", "chest"] },
+    { "id": "head", "bones": ["neck", "head"] },
+    { "id": "face", "bones": ["eye_L", "eye_R", "lid_L", "lid_R", "brow_L", "brow_R", "jaw", "beak"] },
+    { "id": "wings", "bones": ["wing_L", "wing_R", "wing_feather_L", "wing_feather_R"] },
+    { "id": "legs", "bones": ["thigh_L", "thigh_R", "shin_L", "shin_R", "foot_L", "foot_R", "hallux_L", "hallux_R"] },
+    { "id": "accessories", "bones": ["strap", "satchel", "scarf", "copper_spiral"] }
+  ],
+  "requiredCapabilities": [
+    "ikfk",
+    "footLock",
+    "independentEyeAim",
+    "eyelidControls",
+    "browControls",
+    "accessoryDynamics",
+    "groomDeformation"
+  ],
+  "deformationTests": [
+    { "id": "WING_FOLD", "module": "wings", "proxyOnly": true },
+    { "id": "HEAD_TURN", "module": "head", "proxyOnly": true },
+    { "id": "FOOT_PLANT", "module": "legs", "proxyOnly": true },
+    { "id": "SATCHEL_SWAY", "module": "accessories", "proxyOnly": true, "blockedOnFusedMesh": true }
+  ],
+  "rules": [
+    "Do not bind this spec to the current fused Pip candidate.",
+    "Do not add this spec to DEFAULT_RIG_BY_CHARACTER.",
+    "Do not publish a THEATRICAL asset binding.",
+    "Run deformation tests on PROXY_PIPELINE_BIRD only."
+  ]
+}

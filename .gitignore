@@ -51,3 +51,9 @@ artifacts/steps-1-8-validation/render/
 
 # Blender rewrites these backups on every save; they are pure churn in a diff.
 *.blend1
+# Next Pip uploads stay local. Manifests and reports in the package may be
+# copied out for review; the original binaries are not committed.
+theatrical-foundation/proposed/pip-replacement-intake/inbox/**
+!theatrical-foundation/proposed/pip-replacement-intake/inbox/README.md
+!theatrical-foundation/proposed/pip-replacement-intake/inbox/.gitkeep
+artifacts/theatrical-v2/pip-replacement-intake/

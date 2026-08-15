@@ -46,3 +46,10 @@ topology.
 
 PIP PRODUCTION ASSET: BLOCKED — fused 1.9M-tri non-manifold Tripo mesh; no retopo, groom, or rig  
 GOAT PRODUCTION ASSET: BLOCKED — same
+
+## Pip replacement pending
+
+Stop further destructive work on the fused left-front riser. The next uploaded
+Pip model is a replacement candidate only. Ingest it with
+`scripts/tivvlejoy/ingest-next-pip.sh`. Do not overwrite current Pip, the
+long-wing original parts, Goat, or `production-library/`.

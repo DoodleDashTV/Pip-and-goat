@@ -1,0 +1,37 @@
+{
+  "schema": "tivvlejoy.recovery_ledger.v1",
+  "paidResources": false,
+  "rollbackPoints": [
+    {
+      "id": "MILESTONE_2_RECOVERY",
+      "ref": "agent/trivvlejoy-milestone-2-recovery",
+      "note": "Authoritative Milestone 2 recovery. Do not overwrite."
+    },
+    {
+      "id": "MILESTONE_3",
+      "ref": "cursor/trivvlejoy-milestone-3-1ebc",
+      "note": "Authoritative Milestone 3. Do not overwrite."
+    },
+    {
+      "id": "APPROVED_LIBRARY_FINGERPRINT",
+      "sha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+      "note": "production-library/ pin. Any change invalidates accepted plans."
+    },
+    {
+      "id": "PIP_LONG_WING_ORIGINAL",
+      "sha256": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+      "note": "Conditionally approved long-wing appearance. Reassemble only to /tmp."
+    },
+    {
+      "id": "STRAP_REPAIR_STOP",
+      "ref": "7c76cb16b91c299d67e8da4b0141643438c1af51",
+      "note": "Last destructive strap attempt. Evidence only. Do not continue mesh edits."
+    }
+  ],
+  "rules": [
+    "Preserve rollback points.",
+    "Do not reset, rebase, or delete recovery history.",
+    "Do not use empty main as an implementation base.",
+    "Intake copies originals; it never mutates them."
+  ]
+}

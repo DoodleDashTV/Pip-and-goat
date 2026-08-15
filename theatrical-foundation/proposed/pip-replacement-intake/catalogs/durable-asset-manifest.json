@@ -1,0 +1,96 @@
+{
+  "schema": "tivvlejoy.durable_asset_manifest.v1",
+  "studio": "TivvleJoy",
+  "approved": false,
+  "canonicalMutated": false,
+  "theatricalBound": false,
+  "productionLibraryFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+  "classes": {
+    "production_library_locked": "Hashed, bound prototype assets. Do not replace.",
+    "preserved_comparison": "Conditionally approved or evidential files. Do not overwrite.",
+    "proposed_unapproved": "Working theatrical proposals. Not canon.",
+    "proxy_pipeline_only": "Labeled stand-ins for pipeline tests. Not Pip. Not Goat.",
+    "intake_candidate": "Next uploaded Pip package. Replacement candidate only."
+  },
+  "assets": [
+    {
+      "id": "LIB_PIP_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/characters/pip_production.blend",
+      "characterCode": "CHAR_PIP_001",
+      "quality": "PROTOTYPE",
+      "immutable": true,
+      "notes": "Steps 1–8 prototype. Not theatrical."
+    },
+    {
+      "id": "LIB_GOAT_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/characters/goat_production.blend",
+      "characterCode": "CHAR_GOAT_001",
+      "quality": "PROTOTYPE",
+      "immutable": true,
+      "notes": "Steps 1–8 prototype. Not theatrical."
+    },
+    {
+      "id": "LIB_MEADOW_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/environments/meadow_production.blend",
+      "quality": "PROTOTYPE",
+      "immutable": true
+    },
+    {
+      "id": "LIB_MAP_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/props/adventure_map.blend",
+      "quality": "PROTOTYPE",
+      "immutable": true
+    },
+    {
+      "id": "PIP_LONG_WING_ORIGINAL_PARTS",
+      "class": "preserved_comparison",
+      "path": "theatrical-foundation/proposed/final-character-production/pip_long_wing_original.part0{1,2,3}.bin",
+      "characterCode": "CHAR_PIP_001",
+      "sha256WhenReassembled": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+      "immutable": true,
+      "notes": "Conditionally approved long-wing appearance. Reassemble only to /tmp. Do not overwrite."
+    },
+    {
+      "id": "PIP_CURRENT_WORKING",
+      "class": "preserved_comparison",
+      "path": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+      "characterCode": "CHAR_PIP_001",
+      "immutable": true,
+      "notes": "Current Prism working Pip. Do not overwrite, merge, canonize, or rig as final."
+    },
+    {
+      "id": "PIP_STRAP_REPAIR_EVIDENCE",
+      "class": "preserved_comparison",
+      "path": "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/",
+      "immutable": true,
+      "notes": "Failed strap-repair evidence. Comparison only. Do not continue destructive mesh work."
+    },
+    {
+      "id": "GOAT_CURRENT_WORKING",
+      "class": "preserved_comparison",
+      "path": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+      "characterCode": "CHAR_GOAT_001",
+      "immutable": true,
+      "notes": "Goat unchanged unless Justin separately authorizes Goat work."
+    },
+    {
+      "id": "BINDING_FIVE_VIEWS",
+      "class": "preserved_comparison",
+      "path": "artifacts/theatrical-v2/source-package-validation/refs/",
+      "immutable": true,
+      "notes": "Ten binding JPEGs win every identity conflict."
+    },
+    {
+      "id": "PROXY_PIPELINE_BIRD",
+      "class": "proxy_pipeline_only",
+      "path": "theatrical-foundation/proposed/pipeline-proxy/PROXY_PIPELINE_BIRD.blend",
+      "characterCode": null,
+      "immutable": false,
+      "notes": "Labeled PROXY only. Not Pip. Not canon. Used for deformation and intake tests."
+    }
+  ]
+}

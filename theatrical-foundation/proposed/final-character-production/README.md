@@ -43,3 +43,8 @@ Reassembled only under `/tmp` after SHA-256 match. See
 
 Production retopo, groom, and rigs are **not** in this folder. See
 `reports/PRODUCTION_BLOCKERS.md`.
+
+Destructive strap work on the fused Tripo Pip is **stopped**. Preserve the
+conditionally approved long-wing original and strap-repair evidence. The next
+Pip upload uses `scripts/tivvlejoy/ingest-next-pip.sh` and does not overwrite
+files in this folder.

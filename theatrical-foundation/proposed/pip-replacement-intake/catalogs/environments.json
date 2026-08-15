@@ -1,0 +1,29 @@
+{
+  "schema": "tivvlejoy.environment_catalog.v1",
+  "approved": false,
+  "paidAssets": false,
+  "environments": [
+    {
+      "id": "LOC_MEADOW_001",
+      "name": "Sunny Meadow",
+      "status": "PROTOTYPE_REUSABLE",
+      "path": "production-library/environments/meadow_production.blend",
+      "theatricalReady": false,
+      "notes": "Locked prototype meadow. Reusable for pipeline tests. Needs sculpted terrain for theatrical use."
+    },
+    {
+      "id": "LOC_CREEK_001",
+      "name": "Creek",
+      "status": "MISSING",
+      "theatricalReady": false,
+      "notes": "Required for Steps 9+ creek sequence. Not started. Do not purchase marketplace sets."
+    },
+    {
+      "id": "LOC_PLAYROOM_LOOKDEV",
+      "name": "Lookdev cyclorama",
+      "status": "PROPOSED_PRESET",
+      "theatricalReady": false,
+      "notes": "Neutral cyclorama from lookdev presets. Not a story location."
+    }
+  ]
+}

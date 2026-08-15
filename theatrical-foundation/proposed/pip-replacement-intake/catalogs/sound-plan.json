@@ -1,0 +1,25 @@
+{
+  "schema": "tivvlejoy.sound_plan_catalog.v1",
+  "approved": false,
+  "paidProviders": false,
+  "voiceLocks": {
+    "CHAR_PIP_001": "pip_default_v1",
+    "CHAR_GOAT_001": "goat_default_v1"
+  },
+  "tracks": [
+    { "kind": "DIALOGUE", "provider": "local-espeak", "status": "PLAN_ONLY" },
+    { "kind": "NARRATION", "provider": "local-espeak", "status": "PLAN_ONLY" },
+    { "kind": "AMBIENCE", "provider": "mock", "status": "PLAN_ONLY", "bed": "meadow_day_safe" },
+    { "kind": "MUSIC", "provider": "mock", "status": "PLAN_ONLY", "bed": "preschool_playful_safe" },
+    { "kind": "FOLEY", "provider": "mock", "status": "PLAN_ONLY" },
+    { "kind": "FOOTSTEPS", "provider": "mock", "status": "PLAN_ONLY" },
+    { "kind": "PROP", "provider": "mock", "status": "PLAN_ONLY" },
+    { "kind": "VFX", "provider": "mock", "status": "PLAN_ONLY" },
+    { "kind": "TRANSITION", "provider": "mock", "status": "PLAN_ONLY" }
+  ],
+  "rules": [
+    "Planning never issues a paid voice or music request.",
+    "Voice identities stay locked.",
+    "Cache keys are the only generation contract."
+  ]
+}

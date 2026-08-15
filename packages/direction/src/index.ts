@@ -53,3 +53,4 @@ export * from './ffmpeg';
 export * from './overrides';
 export * from './cache';
 export * from './fixtures';
+export * from './modular-rig-spec';
