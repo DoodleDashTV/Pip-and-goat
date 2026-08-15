@@ -1,0 +1,50 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "retopo": false,
+  "groom": false,
+  "rig": false,
+  "glb_used": false,
+  "target": "binding Pip_front / Pip_three_quarter yellow-chartreuse and wing length",
+  "grade": {
+    "pixels": 67108864,
+    "plumage": 24370305,
+    "cream": 319486
+  },
+  "shader": "Material",
+  "wings": {
+    "left": 11709,
+    "right": 11487,
+    "left_moved": 11709,
+    "left_max_delta": 0.22000002381148281,
+    "left_shoulder": [
+      0.29766327142715454,
+      0.15610741078853607,
+      1.1406292915344238
+    ],
+    "right_moved": 11487,
+    "right_max_delta": 0.220000022703553,
+    "right_shoulder": [
+      0.23972688615322113,
+      -0.15734326839447021,
+      1.1334422826766968
+    ]
+  },
+  "pair": {
+    "renders": [
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
+    ],
+    "pip_height": 2.045262575149536,
+    "goat_height": 3.0597290992736816,
+    "ratio": 1.4960079632073522
+  },
+  "renders": [
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_back.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_side.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
+  ]
+}

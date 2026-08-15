@@ -1,0 +1,48 @@
+JUSTIN COPY REPORT — Pip brightness pullback
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY — PIP BRIGHTNESS PULLBACK
+Proposed. Unapproved. Stopped for Justin’s visual review.
+
+Justin: “She’s too bright.”
+The last chartreuse lift was blown-out and flat.
+This pass is color only. Wings were not moved.
+
+Starting for this pass:
+  cursor/theatrical-v2-sculpt-revision-1ebc
+  96f4f69d0ac92a31ff73c5794d5c9c1117c0602a
+
+What changed:
+  Shader value 1.16 → 1.02
+  Albedo highlights compressed; midtone shading restored
+  Hue kept in yellow-chartreuse, not mustard/olive
+  Cream cheeks / lower face kept distinct
+  Larger wings, crest, hallux, satchel laterality unchanged
+  Goat unchanged. Pair scale still 1.500
+
+Measured front brightness (mean V):
+  too-bright body 0.731 / wing 0.925
+  pullback   body 0.667 / wing 0.887
+  overnight  body 0.697 / wing 0.884
+
+Honest remaining gaps:
+  May still read bright vs Image 1, or a hair dark vs overnight
+  Profile crest can still collapse toward two blades
+  Back wings still less leaf-layered than the binding sheet
+  Fused generated sculpt
+
+Recommendations:
+  Pip: REVISE remaining
+  Goat: unchanged this pass; still REVISE remaining
+  Do not approve as a lock.
+
+Clean previews:
+  artifacts/theatrical-v2/sculpt-revision/clean/
+Too-bright vs pullback:
+  artifacts/theatrical-v2/sculpt-revision/comparison/pip_*_pullback.png
+
+No THEATRICAL binding. No Hero-Shot. No Steps 9–16.
+No paid GPU. Fingerprint unchanged.
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+============================================================

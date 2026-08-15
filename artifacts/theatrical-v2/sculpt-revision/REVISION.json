@@ -1,0 +1,26 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "retopo": false,
+  "groom": false,
+  "rig": false,
+  "glb_used": false,
+  "paid_gpu": false,
+  "blender": "4.2.3 LTS",
+  "starting_commit": "a1a7d195c329f97622ed9264c4825a10a34f7797",
+  "recommendation": {
+    "pip": "REVISE remaining",
+    "goat": "REVISE remaining"
+  },
+  "pair": {
+    "pip_height": 2.0512187504848605,
+    "goat_height": 3.0768280029296875,
+    "ratio": 1.4999999418836778
+  },
+  "reopen": {
+    "pip": true,
+    "goat": true,
+    "packed_textures": true,
+    "libraries": []
+  }
+}

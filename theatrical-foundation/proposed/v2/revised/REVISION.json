@@ -1,0 +1,32 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "retopo": false,
+  "groom": false,
+  "rig": false,
+  "glb_used": false,
+  "paid_gpu": false,
+  "blender": "4.2.3 LTS",
+  "starting_commit": "a1a7d195c329f97622ed9264c4825a10a34f7797",
+  "justin_pip_pass_from": "dd608ef5561ef06f9d99a02971762759032beabb",
+  "branch": "cursor/theatrical-v2-sculpt-revision-1ebc",
+  "recommendation": {
+    "pip": "REVISE remaining",
+    "goat": "REVISE remaining"
+  },
+  "pair": {
+    "pip_height": 2.0512187504848605,
+    "goat_height": 3.0768280029296875,
+    "ratio": 1.4999999418836778
+  },
+  "reopen": {
+    "pip": true,
+    "goat": true,
+    "packed_textures": true,
+    "libraries": []
+  },
+  "inspect": {
+    "pip": {"verts": 78687, "tris": 157379, "nonmanifold_edges": 48, "boundary_edges": 45},
+    "goat": {"verts": 79743, "tris": 159481, "nonmanifold_edges": 32, "boundary_edges": 31}
+  }
+}

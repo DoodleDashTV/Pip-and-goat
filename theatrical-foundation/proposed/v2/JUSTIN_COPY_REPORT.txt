@@ -1,53 +1,48 @@
-JUSTIN COPY REPORT — Pip / Goat v2 source-package validation
+JUSTIN COPY REPORT — Pip brightness pullback
 Copy everything between the ===== lines.
 
 ============================================================
-TIVVLEJOY — PIP / GOAT V2 SOURCE PACKAGE VALIDATION
-Inspected only. Not approved. Nothing merged. Canon untouched.
+TIVVLEJOY — PIP BRIGHTNESS PULLBACK
+Proposed. Unapproved. Stopped for Justin’s visual review.
 
-Source branch: assets/pip-goat-v2-source
-Source commit: bf00a8c8818519094003b992bce71b1aca7eefd3
-Package: TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE (~395 MB)
-Hashes: 22 / 22 OK
-LITE gaps: FBX/OBJ interchange rows absent (expected)
+Justin: “She’s too bright.”
+The last chartreuse lift was blown-out and flat.
+This pass is color only. Wings were not moved.
 
-Authority: the ten five-view JPEGs win.
-Primary .blend files are editable source, not canon.
-GLBs are comparison only.
+Starting for this pass:
+  cursor/theatrical-v2-sculpt-revision-1ebc
+  96f4f69d0ac92a31ff73c5794d5c9c1117c0602a
 
-Technical (Blender 4.2.3 LTS; blends authored in 4.0.4):
-  Pip primary: 78,687 verts, 157k tris, 8K, height 2.00, no rig
-  Goat primary: 79,743 verts, 159k tris, 8K, height 2.00, no rig
-  Both are one fused mesh. Accessories not separated.
-  Pair scale is wrong. Goat should be about 1.5× Pip.
-  Prism GLBs ~2M tris, generator, tens of thousands of non-manifold edges.
-  Hunyuan GLBs ~500k tris, 4K maps dated texture_20250901.
+What changed:
+  Shader value 1.16 → 1.02
+  Albedo highlights compressed; midtone shading restored
+  Hue kept in yellow-chartreuse, not mustard/olive
+  Cream cheeks / lower face kept distinct
+  Larger wings, crest, hallux, satchel laterality unchanged
+  Goat unchanged. Pair scale still 1.500
 
-Visual vs the sheets:
-  These generated sculpts are much closer than the agent kitbash v2.
-  Pip: yellow-chartreuse, 3 coral feathers, teal satchel + spiral, green eyes.
-  Goat: oatmeal, left-eye cinnamon patch, 2 ridged horns, orange scarf, teal compass.
-  Still generated. Not production topology. Not a lock.
-  Review: Pip crest count in some profiles; rear toe; satchel shoulder/hip
-  (Hunyuan puts the bag on the opposite side — do not average).
-  Review: Goat upper-back cinnamon patch is strong on the sheet, weak on the primary back.
-  Review: Goat Prism filename vs pose may be inverted (one is hand-on-hip).
+Measured front brightness (mean V):
+  too-bright body 0.731 / wing 0.925
+  pullback   body 0.667 / wing 0.887
+  overnight  body 0.697 / wing 0.884
+
+Honest remaining gaps:
+  May still read bright vs Image 1, or a hair dark vs overnight
+  Profile crest can still collapse toward two blades
+  Back wings still less leaf-layered than the binding sheet
+  Fused generated sculpt
 
 Recommendations:
-  Five-view JPEGs: ACCEPT as binding authority
-  Pip primary .blend: REVISE
-  Goat primary .blend: REVISE
-  All GLBs: REJECT as canon (comparison only)
-  Do not retopo, groom, rig, or replace canonical assets yet.
+  Pip: REVISE remaining
+  Goat: unchanged this pass; still REVISE remaining
+  Do not approve as a lock.
 
-Corrected previews:
-  artifacts/theatrical-v2/source-package-validation/clean/
-  artifacts/theatrical-v2/source-package-validation/refs/
-Full writeup:
-  theatrical-foundation/proposed/v2/source-package-validation/VALIDATION.md
+Clean previews:
+  artifacts/theatrical-v2/sculpt-revision/clean/
+Too-bright vs pullback:
+  artifacts/theatrical-v2/sculpt-revision/comparison/pip_*_pullback.png
 
-No canonical replace. No THEATRICAL binding. No Hero-Shot.
-No Steps 9–16. No paid GPU, RunPod, cloud render, deploy, or
-external provider. Fingerprint unchanged.
+No THEATRICAL binding. No Hero-Shot. No Steps 9–16.
+No paid GPU. Fingerprint unchanged.
   7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
 ============================================================

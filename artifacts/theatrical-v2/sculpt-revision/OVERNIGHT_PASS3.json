@@ -1,0 +1,105 @@
+{
+  "approved": false,
+  "pass": 3,
+  "canonical_mutated": false,
+  "retopo": false,
+  "groom": false,
+  "rig": false,
+  "glb_used": false,
+  "blender": "4.2.3 LTS",
+  "pip": {
+    "wings": {
+      "left": {
+        "count": 12064,
+        "moved": 6659,
+        "max_delta": 0.09000000440101646
+      },
+      "right": {
+        "count": 11959,
+        "moved": 6998,
+        "max_delta": 0.09000000440101646
+      },
+      "smooth": {
+        "verts": 13657,
+        "factors": [
+          0.18,
+          0.1
+        ]
+      }
+    },
+    "inspect": {
+      "verts": 78687,
+      "tris": 157379,
+      "nonmanifold_edges": 48,
+      "boundary_edges": 45,
+      "materials": [
+        "Material"
+      ],
+      "images": [
+        {
+          "name": "texture_0.png",
+          "size": [
+            8192,
+            8192
+          ],
+          "packed": true
+        }
+      ],
+      "libraries": []
+    },
+    "height": 2.0512187504848605
+  },
+  "goat": {
+    "patch": {
+      "top": 2.2,
+      "bot": 1.78,
+      "filled_px": 444535,
+      "tris": 2068
+    },
+    "inspect": {
+      "verts": 79743,
+      "tris": 159481,
+      "nonmanifold_edges": 32,
+      "boundary_edges": 31,
+      "materials": [
+        "Material"
+      ],
+      "images": [
+        {
+          "name": "texture_0.png",
+          "size": [
+            8192,
+            8192
+          ],
+          "packed": true
+        }
+      ],
+      "libraries": []
+    }
+  },
+  "pair": {
+    "renders": [
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png",
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_side.png"
+    ],
+    "pip_height": 2.0512187480926514,
+    "goat_height": 3.0768280029296875,
+    "ratio": 1.4999999418836778
+  },
+  "renders": [
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_back.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_side.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_side_left.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_side_right.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_back.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_side.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_side.png"
+  ]
+}

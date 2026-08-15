@@ -1,0 +1,60 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "retopo": false,
+  "groom": false,
+  "rig": false,
+  "glb_used": false,
+  "paid_gpu": false,
+  "wings_edited": false,
+  "target": "pull back blown-out brightness; keep Image 1 chartreuse family and larger wings",
+  "grade": {
+    "plumage": 26551309,
+    "cream": 478703
+  },
+  "shader": {
+    "value": 1.02,
+    "sat": 1.0,
+    "material": "Material",
+    "value_from": 1.159999966621399,
+    "sat_from": 1.0199999809265137
+  },
+  "inspect": {
+    "verts": 78687,
+    "tris": 157379,
+    "nonmanifold_edges": 48,
+    "boundary_edges": 45,
+    "materials": [
+      "Material"
+    ],
+    "images": [
+      {
+        "name": "texture_0.png",
+        "size": [
+          8192,
+          8192
+        ],
+        "packed": true
+      }
+    ],
+    "libraries": []
+  },
+  "pip_height": 2.0512187480926514,
+  "pair": {
+    "renders": [
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
+    ],
+    "pip_height": 2.0512187480926514,
+    "goat_height": 3.0768280029296875,
+    "ratio": 1.4999999418836778
+  },
+  "renders": [
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_back.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_side.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
+  ]
+}
