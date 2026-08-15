@@ -1,16 +1,10 @@
 #!/usr/bin/env python3
-"""Correct the approved original Pip to one continuous cross-body strap.
+"""Remove the false left-front satchel riser on the approved original Pip.
 
-Non-destructive: does not move fused body verts. The first flatten pass
-shredded the mesh and is not reused.
-
-Hides the false backpack straps with a vertex-color shader mix, then adds
-a separate surface-following ribbon that starts at the character-right
-shoulder, crosses the front, wraps the same shoulder, crosses the back,
-and meets the satchel on the character-left hip.
-
-Does not overwrite current Prism Pip. Does not write production-library/.
-Does not save a >=100MB blend. Does not retopo, rig, merge, or declare canon.
+Keeps the original rear diagonal. Adds one front diagonal over the
+character-right shoulder. Rebuilds the exposed left chest as surrounding
+yellow feathers. Does not flatten the whole torso. Does not overwrite
+current Prism Pip. Does not write production-library/.
 
   LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \\
     /usr/local/bin/blender -b -noaudio -P scripts/assets/fix_pip_original_strap.py
@@ -21,10 +15,12 @@ import hashlib
 import json
 import os
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import bpy
 from mathutils import Vector
+from mathutils.kdtree import KDTree
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "scripts" / "assets"))
@@ -57,15 +53,14 @@ CURRENT_PRISM = (
     REPO / "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend"
 )
 
-TEAL = (0.07, 0.28, 0.26)
-TEAL_STITCH = (0.04, 0.18, 0.16)
+TEAL = (0.07, 0.26, 0.24)
+TEAL_STITCH = (0.04, 0.16, 0.15)
 COPPER = (0.62, 0.38, 0.16)
-CHARTREUSE = (0.80, 0.73, 0.22)
-CREAM = (0.90, 0.84, 0.48)
-OFFSET = 0.012
-STRAP_WIDTH = 0.048
+OFFSET = 0.013
+STRAP_WIDTH = 0.040
 STRAP_THICK = 0.007
-SHOULDER_Z_MAX = 1.165
+SHOULDER_Z_MAX = 1.105
+MAX_DISPLACE = 0.038
 
 
 def sha256(path: Path) -> str:
@@ -84,44 +79,60 @@ def shoot(name, loc, focus, ortho, dest, samples=24):
 
 
 def in_scarf(world: Vector) -> bool:
-    """Neckerchief only — not the backpack risers that emerge under it."""
-    if world.z > 1.12 and (world.x * world.x + world.y * world.y) < 0.10:
+    if world.z > 1.04 and (world.x * world.x + world.y * world.y) < 0.068:
         return True
-    if world.z > 1.10 and abs(world.y) < 0.10 and 0.08 < world.x < 0.28:
+    if world.z > 1.04 and abs(world.y) < 0.09 and 0.08 < world.x < 0.30:
         return True
-    if world.z > 1.10 and abs(world.y) < 0.12 and -0.22 < world.x < 0.06:
+    if world.z > 1.04 and abs(world.y) < 0.10 and -0.24 < world.x < 0.05:
         return True
     return False
 
 
-def in_bag(world: Vector) -> bool:
-    """Satchel body and flap on the character-left hip. Do not hide."""
-    return world.z < 0.64 and world.x > 0.10 and -0.06 < world.y < 0.28
+def in_bag_body(world: Vector) -> bool:
+    return world.z < 0.56 and world.x > 0.18 and -0.04 < world.y < 0.26
 
 
 def in_left_riser(world: Vector) -> bool:
-    return 0.10 < world.x < 0.50 and 0.03 < world.y < 0.20 and 0.58 < world.z < 1.04
-
-
-def in_right_riser(world: Vector) -> bool:
-    return 0.10 < world.x < 0.50 and -0.20 < world.y < -0.02 and 0.58 < world.z < 1.04
-
-
-def in_false_strap(world: Vector) -> bool:
-    """Front backpack risers only. The original rear diagonal is already correct."""
-    if in_scarf(world) or in_bag(world):
+    """Character-left front backpack riser, shoulder down to the satchel."""
+    if in_scarf(world) or in_bag_body(world):
         return False
-    return in_left_riser(world) or in_right_riser(world)
+    if world.x < 0.08 or world.y < 0.022 or world.y > 0.22:
+        return False
+    if world.z < 0.545 or world.z > 1.14:
+        return False
+    if world.z < 0.62 and world.x > 0.40:
+        return False
+    if world.z > 1.08 and world.y < 0.055:
+        return False
+    return True
+
+
+def in_old_right_vertical(world: Vector) -> bool:
+    """Old right-front backpack riser. Paint only; the new diagonal replaces it."""
+    if in_scarf(world) or in_bag_body(world):
+        return False
+    if world.x < 0.10 or world.y > -0.05 or world.y < -0.22:
+        return False
+    if not (0.56 < world.z < 1.02):
+        return False
+    return True
 
 
 def strap_like(col) -> bool:
-    """Teal leather plus the gold-dot mix that fails a strict teal() test."""
     r, g, b = col
     if yellow(col):
         return False
     if teal(col):
         return True
     return g > 0.18 and b > 0.10 and r < 0.62 and (b > r - 0.02 or g > r + 0.02)
+
+
+def chest_feather(col) -> bool:
+    """Warm yellow/cream body only. Rejects gold-on-teal strap dots."""
+    r, g, b = col
+    if teal(col) or strap_like(col):
+        return False
+    return r > 0.48 and g > 0.38 and b < 0.30 and (r + g) > 0.95 and g > b + 0.16
 
 
 def color_image():
@@ -135,52 +146,248 @@ def color_image():
     )
 
 
-def paint_false_straps(obj, colors) -> dict:
-    """Paint old strap tris yellow on the Color map. Does not move verts."""
-    import numpy as np
+def normal_image():
+    return next(
+        (img for img in bpy.data.images if img.size[0] > 64 and "normal" in img.name.lower()),
+        None,
+    )
 
+
+def flood_region(obj, colors, predicate, seeds_need_strap=True) -> set[int]:
     mw = obj.matrix_world
     verts = obj.data.vertices
     adj = adjacency(obj)
     seeds = []
     for vid, col in colors.items():
         world = mw @ verts[vid].co
-        if in_false_strap(world) and strap_like(col):
-            seeds.append(vid)
-    paint_ids = set(seeds)
-    for vid in seeds:
-        for nb in adj[vid]:
-            world = mw @ verts[nb].co
-            if in_scarf(world) or in_bag(world):
+        if not predicate(world):
+            continue
+        if seeds_need_strap and not strap_like(col):
+            continue
+        seeds.append(vid)
+    seen = set()
+    stack = list(seeds)
+    region = set()
+    while stack:
+        vid = stack.pop()
+        if vid in seen:
+            continue
+        seen.add(vid)
+        world = mw @ verts[vid].co
+        if not predicate(world):
+            continue
+        region.add(vid)
+        stack.extend(adj[vid])
+    return region
+
+
+def feather_samples(obj, colors):
+    """Yellow chest/body verts with world position and a UV for clone-stamp."""
+    mw = obj.matrix_world
+    verts = obj.data.vertices
+    uv = obj.data.uv_layers.active.data if obj.data.uv_layers else None
+    samples = []
+    uv_of = {}
+    if uv is not None:
+        for poly in obj.data.polygons:
+            for li in poly.loop_indices:
+                vid = obj.data.loops[li].vertex_index
+                if vid not in uv_of:
+                    uv_of[vid] = uv[li].uv.copy()
+    for vid, col in colors.items():
+        if not chest_feather(col):
+            continue
+        world = mw @ verts[vid].co
+        if in_left_riser(world) or in_old_right_vertical(world) or in_scarf(world) or in_bag_body(world):
+            continue
+        if world.x < 0.06 or abs(world.y) > 0.20:
+            continue
+        if not (0.50 < world.z < 1.12):
+            continue
+        # Prefer the open chest between the two old risers, plus side feathers.
+        samples.append((vid, world, uv_of.get(vid), col))
+    return samples
+
+
+def build_kdtree(samples):
+    tree = KDTree(len(samples))
+    for i, (_vid, world, _uv, _col) in enumerate(samples):
+        tree.insert(world, i)
+    tree.balance()
+    return tree
+
+
+def nearest_feather(tree, samples, world, n=7):
+    hits = tree.find_n(world, n)
+    if not hits:
+        return None
+    return [samples[idx] for _co, idx, _dist in hits if idx < len(samples)]
+
+
+def settle_left_riser(obj, colors, left_ids, samples, tree) -> dict:
+    """Push the raised left column inward in X onto the chest profile."""
+    mw = obj.matrix_world
+    imw = mw.inverted()
+    verts = obj.data.vertices
+    profile = defaultdict(list)
+    for _vid, pos, _uv, _col in samples:
+        if abs(pos.y) < 0.07 and 0.10 < pos.x < 0.36:
+            profile[int(pos.z * 25)].append(pos.x)
+    chest_x = {k: sorted(xs)[len(xs) // 2] for k, xs in profile.items() if xs}
+    moved = 0
+    total = 0.0
+    for vid in left_ids:
+        world = mw @ verts[vid].co
+        key = int(world.z * 25)
+        target_x = None
+        for delta_k in (0, -1, 1, -2, 2):
+            if key + delta_k in chest_x:
+                target_x = chest_x[key + delta_k] + 0.006
+                break
+        if target_x is None:
+            near = nearest_feather(tree, samples, world, 6)
+            if not near:
                 continue
-            if in_false_strap(world):
-                paint_ids.add(nb)
-    img = color_image()
-    painted = 0
+            target_x = min(s[1].x for s in near) + 0.006
+        if world.x <= target_x + 0.002:
+            continue
+        new_x = max(target_x, world.x - MAX_DISPLACE)
+        verts[vid].co = imw @ Vector((new_x, world.y, world.z))
+        moved += 1
+        total += world.x - new_x
+    obj.data.update()
+    return {
+        "moved_verts": moved,
+        "mean_move": (total / moved) if moved else 0.0,
+        "max_allowed": MAX_DISPLACE,
+        "profile_bins": len(chest_x),
+    }
+
+
+def clone_stamp(obj, paint_ids, samples, tree, img, nrm_img, kill_ids=None) -> dict:
+    """Paint Color (and Normal) from nearby yellow feather texels. No flat fill."""
+    import numpy as np
+
     if img is None or not obj.data.uv_layers:
-        return {"seeds": len(seeds), "paint_ids": len(paint_ids), "painted": 0}
+        return {"painted": 0}
+    mw = obj.matrix_world
+    verts = obj.data.vertices
     w, h = int(img.size[0]), int(img.size[1])
     px = np.empty(w * h * 4, dtype=np.float32)
     img.pixels.foreach_get(px)
     px = px.reshape((h, w, 4))
+    nrm = None
+    nw = nh = 0
+    if nrm_img is not None:
+        nw, nh = int(nrm_img.size[0]), int(nrm_img.size[1])
+        nrm = np.empty(nw * nh * 4, dtype=np.float32)
+        nrm_img.pixels.foreach_get(nrm)
+        nrm = nrm.reshape((nh, nw, 4))
     uv = obj.data.uv_layers.active.data
-    cream = np.array([*CREAM, 1.0], dtype=np.float32)
-    body = np.array([*CHARTREUSE, 1.0], dtype=np.float32)
+    painted = 0
+    nrm_painted = 0
+    cache = {}
+
+    def feather_color(world):
+        key = (round(world.x, 3), round(world.y, 3), round(world.z, 3))
+        if key in cache:
+            return cache[key]
+        near = nearest_feather(tree, samples, world, 6)
+        if not near:
+            cache[key] = None
+            return None
+        acc = np.zeros(4, dtype=np.float32)
+        nacc = np.zeros(4, dtype=np.float32)
+        n = 0
+        nn = 0
+        for _vid, _pos, suv, col in near:
+            if suv is not None:
+                sx = min(max(int(suv.x * (w - 1)) % w, 0), w - 1)
+                sy = min(max(int(suv.y * (h - 1)) % h, 0), h - 1)
+                acc += px[sy, sx]
+                n += 1
+                if nrm is not None:
+                    nx = min(max(int(suv.x * (nw - 1)) % nw, 0), nw - 1)
+                    ny = min(max(int(suv.y * (nh - 1)) % nh, 0), nh - 1)
+                    nacc += nrm[ny, nx]
+                    nn += 1
+            else:
+                acc += np.array([col[0], col[1], col[2], 1.0], dtype=np.float32)
+                n += 1
+        if not n:
+            cache[key] = None
+            return None
+        color = acc / n
+        ncolor = (nacc / nn) if nn else None
+        cache[key] = (color, ncolor)
+        return cache[key]
+
     for poly in obj.data.polygons:
         loops = list(poly.loop_indices)
         vids = [obj.data.loops[li].vertex_index for li in loops]
         marked = [vid in paint_ids for vid in vids]
-        if sum(marked) < 2:
+        if sum(marked) < 1:
             continue
         world = mw @ verts[vids[0]].co
-        color = cream if world.x > 0.10 else body
+        sampled = feather_color(world)
+        if sampled is None:
+            continue
+        color, ncolor = sampled
         pts = [(float(uv[li].uv.x) * (w - 1), float(uv[li].uv.y) * (h - 1)) for li in loops]
-        alphas = [0.92 if flag else 0.15 for flag in marked]
+        alphas = [0.96 if flag else 0.20 for flag in marked]
         for i in range(1, len(pts) - 1):
-            painted += raster_tri(px, [pts[0], pts[i], pts[i + 1]], [alphas[0], alphas[i], alphas[i + 1]], color, 0.90)
+            painted += raster_tri(px, [pts[0], pts[i], pts[i + 1]], [alphas[0], alphas[i], alphas[i + 1]], color, 0.94)
+        if nrm is not None and ncolor is not None:
+            npts = [(float(uv[li].uv.x) * (nw - 1), float(uv[li].uv.y) * (nh - 1)) for li in loops]
+            for i in range(1, len(npts) - 1):
+                nrm_painted += raster_tri(
+                    nrm, [npts[0], npts[i], npts[i + 1]], [alphas[0], alphas[i], alphas[i + 1]], ncolor, 0.88
+                )
+    killed = 0
+    uv_layer = obj.data.uv_layers.active.data
+    kill = set(kill_ids) if kill_ids is not None else paint_ids
+
+    def is_strap_texel(pix):
+        r, g, b = float(pix[0]), float(pix[1]), float(pix[2])
+        if r > 0.55 and g > 0.45 and b < 0.32:
+            return False
+        return (b > r + 0.03 and g > r + 0.01 and r < 0.58) or (
+            g > 0.20 and b > 0.12 and r < 0.50 and g > r - 0.02
+        )
+
+    for poly in obj.data.polygons:
+        loops = list(poly.loop_indices)
+        vids = [obj.data.loops[li].vertex_index for li in loops]
+        if not any(vid in kill for vid in vids):
+            continue
+        world = mw @ verts[vids[0]].co
+        sampled = feather_color(world)
+        if sampled is None:
+            continue
+        color, _ncolor = sampled
+        for li, vid in zip(loops, vids):
+            if vid not in kill:
+                continue
+            u, v = uv_layer[li].uv
+            cx = min(max(int(u * (w - 1)) % w, 0), w - 1)
+            cy = min(max(int(v * (h - 1)) % h, 0), h - 1)
+            radius = 8
+            y0, y1 = max(cy - radius, 0), min(cy + radius, h - 1)
+            x0, x1 = max(cx - radius, 0), min(cx + radius, w - 1)
+            patch = px[y0 : y1 + 1, x0 : x1 + 1]
+            rr, gg, bb = patch[:, :, 0], patch[:, :, 1], patch[:, :, 2]
+            mask = ((bb > rr + 0.03) & (gg > rr + 0.01) & (rr < 0.58)) | (
+                (gg > 0.20) & (bb > 0.12) & (rr < 0.50) & (gg > rr - 0.02) & ~((rr > 0.55) & (gg > 0.45) & (bb < 0.32))
+            )
+            if mask.any():
+                patch[mask] = color
+                killed += int(mask.sum())
     img.pixels.foreach_set(px.reshape(-1))
     img.update()
-    return {"seeds": len(seeds), "paint_ids": len(paint_ids), "painted": painted}
+    if nrm is not None:
+        nrm_img.pixels.foreach_set(nrm.reshape(-1))
+        nrm_img.update()
+    return {"painted": painted, "normal_painted": nrm_painted, "stamp_cache": len(cache), "teal_killed": killed}
 
 
 def ray_hit(obj, src: Vector, dst: Vector, offset: float = OFFSET):
@@ -202,6 +409,10 @@ def ray_hit(obj, src: Vector, dst: Vector, offset: float = OFFSET):
     placed = world + normal * offset
     if placed.z > SHOULDER_Z_MAX:
         placed = Vector((placed.x, placed.y, SHOULDER_Z_MAX))
+    # Keep the ribbon off the scarf tails (center-front / center-back neck).
+    if placed.z > 1.02 and abs(placed.y) < 0.14:
+        extra = (0.16 - abs(placed.y))
+        placed = Vector((placed.x, placed.y - extra if placed.y < 0 else placed.y + extra, min(placed.z, 1.08)))
     return placed, normal
 
 
@@ -221,25 +432,18 @@ def ray_hit_multi(obj, src: Vector, dst: Vector):
 
 
 def stations() -> list[tuple[Vector, Vector]]:
-    """Aim rays that reconstruct one continuous cross-body path.
-
-    Bag on character-left hip (+Y). Strap over character-right shoulder (−Y).
-    Front diagonal, then the same shoulder, then back diagonal, then bag.
-    Shoulder rays stay beside the neck, never from above the head.
-    Left-hip wrap rays stay inside the wing, aimed at the bag, not +Y.
-    """
+    """Front diagonal only, then the character-right shoulder, meeting the rear."""
     return [
-        (Vector((0.70, 0.18, 0.52)), Vector((0.20, 0.16, 0.50))),
-        (Vector((0.70, 0.12, 0.62)), Vector((0.12, 0.10, 0.60))),
-        (Vector((0.68, 0.06, 0.72)), Vector((0.08, 0.04, 0.70))),
-        (Vector((0.66, 0.00, 0.82)), Vector((0.06, 0.00, 0.80))),
-        (Vector((0.64, -0.06, 0.92)), Vector((0.04, -0.06, 0.90))),
-        (Vector((0.58, -0.12, 1.02)), Vector((0.04, -0.10, 1.00))),
-        (Vector((0.48, -0.20, 1.06)), Vector((0.02, -0.16, 1.04))),
-        (Vector((0.32, -0.30, 1.10)), Vector((0.02, -0.18, 1.06))),
-        (Vector((0.14, -0.40, 1.12)), Vector((0.00, -0.18, 1.06))),
-        (Vector((-0.02, -0.42, 1.12)), Vector((0.00, -0.18, 1.06))),
-        (Vector((-0.16, -0.38, 1.10)), Vector((0.00, -0.16, 1.04))),
+        (Vector((0.70, 0.16, 0.52)), Vector((0.20, 0.15, 0.50))),
+        (Vector((0.70, 0.10, 0.62)), Vector((0.12, 0.08, 0.60))),
+        (Vector((0.68, 0.04, 0.72)), Vector((0.08, 0.02, 0.70))),
+        (Vector((0.66, -0.02, 0.82)), Vector((0.06, -0.04, 0.80))),
+        (Vector((0.64, -0.08, 0.92)), Vector((0.04, -0.10, 0.90))),
+        (Vector((0.56, -0.16, 1.00)), Vector((0.04, -0.16, 0.98))),
+        (Vector((0.40, -0.26, 1.04)), Vector((0.02, -0.20, 1.00))),
+        (Vector((0.20, -0.38, 1.06)), Vector((0.00, -0.22, 1.00))),
+        (Vector((0.02, -0.42, 1.06)), Vector((0.00, -0.22, 1.00))),
+        (Vector((-0.14, -0.40, 1.04)), Vector((0.00, -0.20, 0.98))),
     ]
 
 
@@ -265,7 +469,7 @@ def trace_path(obj) -> list[tuple[Vector, Vector]]:
             print(f"miss {src} -> {dst}")
             continue
         hits.append(hit)
-    if len(hits) < 8:
+    if len(hits) < 7:
         raise RuntimeError(f"strap path too short: {len(hits)} hits, missed={missed}")
     hits = smooth_hits(hits)
     print(f"strap ray hits={len(hits)} missed={missed}")
@@ -291,6 +495,77 @@ def _frame(hits, i, prev_side=None):
     return loc, tangent, nrm, side
 
 
+def make_chest_patch(obj) -> bpy.types.Object | None:
+    """Cover the leftover left riser with a yellow-feather surface patch."""
+    aims = [
+        (Vector((0.62, 0.14, 1.06)), Vector((0.08, 0.12, 1.04))),
+        (Vector((0.64, 0.13, 0.96)), Vector((0.08, 0.11, 0.94))),
+        (Vector((0.66, 0.12, 0.86)), Vector((0.08, 0.10, 0.84))),
+        (Vector((0.66, 0.11, 0.76)), Vector((0.08, 0.10, 0.74))),
+        (Vector((0.66, 0.11, 0.66)), Vector((0.10, 0.10, 0.64))),
+        (Vector((0.64, 0.12, 0.58)), Vector((0.12, 0.11, 0.56))),
+    ]
+    hits = []
+    for src, dst in aims:
+        hit = ray_hit_multi(obj, src, dst)
+        if hit is not None:
+            hits.append(hit)
+    if len(hits) < 4:
+        return None
+    hits = smooth_hits(hits)
+    verts = []
+    faces = []
+    n = len(hits)
+    half_w = 0.034
+    prev_side = None
+    for i in range(n):
+        loc, _tangent, nrm, side = _frame(hits, i, prev_side)
+        prev_side = side
+        # Sit just above the repaired chest.
+        loc = loc + nrm * 0.004
+        verts.extend(
+            [
+                loc + side * half_w + nrm * 0.003,
+                loc - side * half_w + nrm * 0.003,
+                loc - side * half_w,
+                loc + side * half_w,
+            ]
+        )
+    for i in range(n - 1):
+        a = i * 4
+        b = (i + 1) * 4
+        faces.extend(
+            [
+                (a, a + 1, b + 1, b),
+                (a + 1, a + 2, b + 2, b + 1),
+                (a + 2, a + 3, b + 3, b + 2),
+                (a + 3, a, b, b + 3),
+            ]
+        )
+    mesh = bpy.data.meshes.new("Pip_LeftChestPatchMesh")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    patch = bpy.data.objects.new("Pip_LeftChestPatch", mesh)
+    bpy.context.collection.objects.link(patch)
+    mat = principled_mat("Pip_LeftChestPatchMat", (0.86, 0.78, 0.32), roughness=0.62, specular=0.12, sheen=0.20)
+    nt = mat.node_tree
+    bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    noise = nt.nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 38.0
+    noise.inputs["Detail"].default_value = 6.0
+    mix = nt.nodes.new("ShaderNodeMixRGB")
+    mix.blend_type = "MIX"
+    mix.inputs["Fac"].default_value = 0.28
+    mix.inputs["Color1"].default_value = (0.88, 0.80, 0.36, 1.0)
+    mix.inputs["Color2"].default_value = (0.76, 0.68, 0.20, 1.0)
+    nt.links.new(noise.outputs["Fac"], mix.inputs["Fac"])
+    nt.links.new(mix.outputs["Color"], bsdf.inputs["Base Color"])
+    patch.data.materials.append(mat)
+    for poly in patch.data.polygons:
+        poly.use_smooth = True
+    return patch
+
+
 def make_ribbon(hits) -> bpy.types.Object:
     verts = []
     faces = []
@@ -302,11 +577,14 @@ def make_ribbon(hits) -> bpy.types.Object:
         loc, _tangent, nrm, side = _frame(hits, i, prev_side)
         prev_side = side
         v = i / max(n - 1, 1)
-        outer = loc + side * half_w + nrm * STRAP_THICK
-        inner = loc - side * half_w + nrm * STRAP_THICK
-        inner_b = loc - side * half_w + nrm * 0.0015
-        outer_b = loc + side * half_w + nrm * 0.0015
-        verts.extend([outer, inner, inner_b, outer_b])
+        verts.extend(
+            [
+                loc + side * half_w + nrm * STRAP_THICK,
+                loc - side * half_w + nrm * STRAP_THICK,
+                loc - side * half_w + nrm * 0.0015,
+                loc + side * half_w + nrm * 0.0015,
+            ]
+        )
         uvs.extend([(0.0, v), (1.0, v), (1.0, v), (0.0, v)])
     for i in range(n - 1):
         a = i * 4
@@ -326,39 +604,24 @@ def make_ribbon(hits) -> bpy.types.Object:
     mesh.from_pydata(verts, [], faces)
     mesh.update()
     uv = mesh.uv_layers.new(name="UVMap")
-    # from_pydata creates 4 loops per quad in the given order.
     for poly in mesh.polygons:
         for li in poly.loop_indices:
-            vid = mesh.loops[li].vertex_index
-            uv.data[li].uv = uvs[vid]
+            uv.data[li].uv = uvs[mesh.loops[li].vertex_index]
     obj = bpy.data.objects.new("Pip_CrossbodyStrap", mesh)
     bpy.context.collection.objects.link(obj)
-    mat = strap_material()
-    obj.data.materials.append(mat)
+    obj.data.materials.append(strap_material())
     for poly in obj.data.polygons:
         poly.use_smooth = True
     return obj
 
 
-def sit_on_body(strap, body):
-    mod = strap.modifiers.new("sit", "SHRINKWRAP")
-    mod.target = body
-    mod.wrap_method = "NEAREST_SURFACEPOINT"
-    mod.wrap_mode = "ABOVE_SURFACE"
-    mod.offset = OFFSET
-    bpy.context.view_layer.objects.active = strap
-    strap.select_set(True)
-    bpy.ops.object.modifier_apply(modifier=mod.name)
-
-
 def strap_material():
-    mat = principled_mat("Pip_CrossbodyStrapMat", TEAL, roughness=0.50, specular=0.20, sheen=0.16)
+    mat = principled_mat("Pip_CrossbodyStrapMat", TEAL, roughness=0.52, specular=0.18, sheen=0.14)
     nt = mat.node_tree
     bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
     tex = nt.nodes.new("ShaderNodeTexCoord")
     sep = nt.nodes.new("ShaderNodeSeparateXYZ")
     nt.links.new(tex.outputs["UV"], sep.inputs["Vector"])
-    # Two stitch rows near the strap edges.
     edge = nt.nodes.new("ShaderNodeMath")
     edge.operation = "PINGPONG"
     edge.inputs[1].default_value = 0.5
@@ -366,7 +629,7 @@ def strap_material():
     stitch = nt.nodes.new("ShaderNodeMath")
     stitch.operation = "COMPARE"
     stitch.inputs[1].default_value = 0.11
-    stitch.inputs[2].default_value = 0.025
+    stitch.inputs[2].default_value = 0.022
     nt.links.new(edge.outputs["Value"], stitch.inputs[0])
     dash = nt.nodes.new("ShaderNodeMath")
     dash.operation = "PINGPONG"
@@ -398,22 +661,18 @@ def add_hardware(hits) -> list[str]:
     copper = principled_mat("Pip_StrapHardware", COPPER, roughness=0.28, metallic=0.58, specular=0.46)
     names = []
     n = len(hits)
-    right_front = min(range(n), key=lambda i: hits[i][0].y - hits[i][0].x * 0.2 if hits[i][0].z > 1.00 and hits[i][0].x > 0 else 99)
-    right_back = min(range(n), key=lambda i: hits[i][0].y + hits[i][0].x * 0.2 if hits[i][0].z > 1.00 and hits[i][0].x < 0 else 99)
-    back_mid = min(range(n), key=lambda i: hits[i][0].x if 0.70 < hits[i][0].z < 0.95 else 99)
-    picks = [
-        (0, "bag_front"),
-        (right_front, "right_shoulder_front"),
-        (right_back, "right_shoulder_back"),
-    ]
+    right_front = min(
+        range(n),
+        key=lambda i: hits[i][0].y - hits[i][0].x * 0.2 if hits[i][0].z > 0.96 and hits[i][0].x > 0 else 99,
+    )
+    picks = [(0, "bag_front"), (right_front, "right_shoulder_front")]
     for idx, label in picks:
-        loc, tangent, nrm, side = _frame(hits, idx)
+        loc, tangent, nrm, _side = _frame(hits, idx)
         bpy.ops.mesh.primitive_cube_add(size=1.0, location=loc + nrm * (STRAP_THICK * 0.7))
         buckle = bpy.context.active_object
         buckle.name = f"Pip_StrapBuckle_{label}"
-        buckle.scale = (STRAP_WIDTH * 0.42, 0.016, 0.006)
-        rot = tangent.to_track_quat("Y", "Z").to_matrix().to_4x4()
-        buckle.rotation_euler = rot.to_euler()
+        buckle.scale = (STRAP_WIDTH * 0.38, 0.014, 0.005)
+        buckle.rotation_euler = tangent.to_track_quat("Y", "Z").to_matrix().to_4x4().to_euler()
         buckle.data.materials.append(copper)
         names.append(buckle.name)
     return names
@@ -432,6 +691,19 @@ def save_strap_only(strap, hardware_names) -> dict:
         STRAP_BLEND.unlink()
         raise RuntimeError(f"refusing to keep strap blend at {size} bytes")
     return {"blend": str(STRAP_BLEND.relative_to(REPO)), "bytes": size}
+
+
+def leftover_left_teal(obj, colors) -> dict:
+    mw = obj.matrix_world
+    verts = obj.data.vertices
+    n = 0
+    for vid, col in colors.items():
+        if not strap_like(col):
+            continue
+        world = mw @ verts[vid].co
+        if in_left_riser(world):
+            n += 1
+    return {"left_riser_straplike_after_paint_sample": n}
 
 
 def render_proofs() -> list[str]:
@@ -462,14 +734,14 @@ def render_proofs() -> list[str]:
         ),
         "07_right_shoulder_closeup.png": (
             "r_shoulder",
-            Vector((0.42, -0.24, 1.16)),
-            Vector((0.06, -0.16, 1.14)),
+            Vector((0.42, -0.26, 1.12)),
+            Vector((0.04, -0.18, 1.08)),
             height * 0.38,
         ),
         "08_left_shoulder_closeup.png": (
             "l_shoulder",
-            Vector((0.42, 0.22, 1.16)),
-            Vector((0.08, 0.10, 1.10)),
+            Vector((0.42, 0.22, 1.12)),
+            Vector((0.08, 0.10, 1.06)),
             height * 0.38,
         ),
         "09_satchel_front_attach.png": (
@@ -509,16 +781,31 @@ def main() -> int:
     body = meshes()[0]
     body.name = "Pip_LongWingOriginal"
     colors, _ = sample_colors(body)
-    hide = paint_false_straps(body, colors)
+    left_ids = flood_region(body, colors, in_left_riser)
+    adj = adjacency(body)
+    extra = set()
+    mw = body.matrix_world
+    for vid in left_ids:
+        for nb in adj[vid]:
+            if in_left_riser(mw @ body.data.vertices[nb].co):
+                extra.add(nb)
+    left_ids = set(left_ids) | extra
+    right_ids = flood_region(body, colors, in_old_right_vertical)
+    samples = feather_samples(body, colors)
+    tree = build_kdtree(samples)
+    settle = settle_left_riser(body, colors, left_ids, samples, tree)
+    paint_ids = set(left_ids) | set(right_ids)
+    paint = clone_stamp(body, paint_ids, samples, tree, color_image(), normal_image(), kill_ids=left_ids)
     hits = trace_path(body)
     strap = make_ribbon(hits)
     hardware = add_hardware(hits)
+    leftover = leftover_left_teal(body, colors)
     renders = render_proofs()
     strap_save = None
     if os.environ.get("PIP_STRAP_SAVE", "1") != "0":
         strap_save = save_strap_only(strap, hardware)
     report = {
-        "method": "paint-only hide of front backpack risers + front-to-shoulder ribbon meeting the original rear diagonal; no fused-vert flatten",
+        "method": "gentle left-riser surface-match + feather clone-stamp; front diagonal ribbon; original rear kept",
         "first_flatten_pass_reused": False,
         "current_prism_overwritten": False,
         "production_library_touched": False,
@@ -528,8 +815,12 @@ def main() -> int:
         "paid_resources": False,
         "reconstructed_glb_committed": False,
         "sha256": digest,
-        "hide": hide,
-        "shader": None,
+        "left_riser_verts": len(left_ids),
+        "old_right_vertical_verts": len(right_ids),
+        "feather_samples": len(samples),
+        "settle": settle,
+        "paint": paint,
+        "leftover": leftover,
         "strap": strap.name,
         "hardware": hardware,
         "hits": [[list(p), list(n)] for p, n in hits],

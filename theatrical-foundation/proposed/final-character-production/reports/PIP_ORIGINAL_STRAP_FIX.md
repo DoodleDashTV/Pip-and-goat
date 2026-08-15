@@ -1,66 +1,59 @@
-# Pip original — strap correction (stop for visual approval)
+# Pip original — left-riser removal (not one-path yet)
 
 Does not overwrite current Prism Pip.
 Does not write `production-library/`.
 Does not declare canon, theatrical binding, or production-ready.
 Does not merge.
 
-## What was wrong
+## Review addendum
 
-The untouched original long-wing Pip (hash
-`9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2`)
-was conditionally approved except for the satchel strap.
-
-- Front reads as two vertical backpack straps.
-- Rear already shows one diagonal from the character-right shoulder
-  to the character-left hip.
-- Those paths do not physically connect.
+The previous front/rear previews were not approved. The front still
+showed two shoulder paths. This pass targeted the character-left
+vertical riser only.
 
 ## What this pass did
 
-Rebuilt from the hash-verified `/tmp` original. Did **not** flatten
-fused strap verts. The first flatten pass shredded the mesh and is
-not reused.
+Rebuilt from the hash-verified `/tmp` original. Did not reuse the
+shredding flatten.
 
-1. Paint-only hide of the **front** backpack risers on the Color map.
-2. Additive ribbon `Pip_CrossbodyStrap` from the satchel, diagonally
-   across the front, over the character-right shoulder, intended to
-   meet the original rear diagonal.
-3. Original rear diagonal, scarf, satchel, copper spiral, face, eyes,
-   crest, wings, and feet were left on the body mesh.
-
-The full scene is not saved as a blend (that file exceeds GitHub’s
-100MB limit). Rebuild with:
-
-`scripts/assets/fix_pip_original_strap.py`
-
-A 7MB strap-only blend is stored next to the long-wing candidate.
+- Identified the left-front riser (~33k verts)
+- Pushed that column inward in X onto a chest profile (max 0.038)
+- Clone-stamped Color and Normal from nearby yellow chest feathers
+- Killed leftover teal texels only (no square UV stamps onto the face)
+- Kept the original rear diagonal
+- Added one front diagonal ribbon over the character-right shoulder
+- Did not add a chest-cover primitive (it read as another strap)
 
 ## Honest visual result
 
-**Not a clean one-path strap yet.**
+**The front still does not read as exactly one diagonal.**
 
-- Rear: original diagonal is still the correct laterality and is
-  intact.
-- Front: a new diagonal ribbon is present, but the fused backpack
-  risers still ghost. Paint reduces their teal; it does not erase
-  raised fused geometry.
-- Flattening those risers shreds the mesh. Broader paint hits the
-  scarf / bag UV atlas.
-- Isolated strap-geometry replacement was not authorized this pass.
+- Mid left-chest teal is lower than the untouched original
+  (about 0.17 → 0.07 in the mid-riser crop)
+- A fused left riser still ghosts as a second shoulder path
+  (raised column + leftover olive/teal near the bag)
+- A yellow primitive patch over that column looked like a second
+  strap/scarf tail and was not kept
+- Heavier flatten of the fused column shreds the mesh
+- Broader paint hits scarf / bag / face UVs
 
-Face pixel check vs the untouched original front: mean albedo stays
-in the same yellow/cream range. No face hole.
+The original rear diagonal is preserved.
 
-## Proof renders
+Face, eyes, long wings, three coral feathers, satchel design, copper
+spiral, and feet remain on the original mesh.
+
+## What is required next
+
+Isolated replacement of the left-front riser geometry — not another
+paint or flatten pass on the fused Tripo mesh.
+
+## Proofs
 
 `artifacts/theatrical-v2/final-character-production/long-wing-original-strap/`
 
-01 front · 02 rear · 03 left · 04 right · 05 front 3/4 · 06 rear 3/4
-07 right shoulder · 08 left shoulder · 09 satchel front · 10 satchel rear
+Rebuild: `scripts/assets/fix_pip_original_strap.py`
 
 ## Status
 
-Stop for Justin’s visual approval of this strap pass.
-Not production-ready. Not canon. Not theatrical-bound. Not merged.
-Paid resources: not used.
+Not a clean one-path strap. Not production-ready. Not canon.
+Not theatrical-bound. Not merged. Paid resources: not used.
