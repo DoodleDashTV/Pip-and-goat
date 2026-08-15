@@ -66,3 +66,10 @@ No canon replace. No merge.
 - Recommendation: **C — reject as replacement**. Longer wings and a
   continuous back strap are real, but the cracked overlay, center seam,
   and fused topology make it unusable as a donor. Current Pip unchanged.
+
+## Pip long-wing original reassembly — STOP
+
+- Pulled `9380aae` and `06486a3`.
+- `part02.bin` and `part03.bin` are on the branch.
+- `part01.bin` is missing. No concatenation. No hash verify. No import.
+- See `PIP_LONG_WING_ORIGINAL_STOP.md`.
