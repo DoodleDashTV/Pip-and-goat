@@ -25,6 +25,19 @@ not a continuation of the neon-bright Pip grade.
 
 The ten five-view JPEGs win every conflict.
 
+## Measured
+
+- Pip height: 2.050
+- Goat height: 3.075
+- Ratio: **1.500**
+- Pip satchel bag on character-left: yes
+- Goat left-eye cinnamon patch on character-left: yes
+
+## Honest recommendation
+
+**REVISE both.** The rebuild is a readable identity blockout, not a
+binding-sheet match. Do not approve. Do not begin Stage 4.
+
 ## Stop
 
 Do not continue past this gate until Justin explicitly approves both Stage 3
