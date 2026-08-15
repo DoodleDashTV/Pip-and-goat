@@ -8,6 +8,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 ROOT = Path("/workspace")
 CLEAN = ROOT / "artifacts/theatrical-v2/final-character-production/clean"
+CLOSE = ROOT / "artifacts/theatrical-v2/final-character-production/closeups"
+FEATURE = ROOT / "artifacts/theatrical-v2/final-character-production/feature"
 REFS = ROOT / "artifacts/theatrical-v2/source-package-validation/refs"
 OUT = ROOT / "artifacts/theatrical-v2/final-character-production/comparison"
 PHONE = ROOT / "artifacts/theatrical-v2/final-character-production/phone"
@@ -165,6 +167,24 @@ def main() -> int:
         OUT / "pair_scale.png",
         "Pair scale — Goat must remain approximately 1.50× Pip height",
     )
+    close_cells = []
+    for name, path in (
+        ("Pip strap", CLOSE / "pip_strap.png"),
+        ("Pip wing", CLOSE / "pip_wing.png"),
+        ("Pip crest", CLOSE / "pip_crest.png"),
+        ("Pip eye", CLOSE / "pip_eye.png"),
+        ("Goat eye patch", CLOSE / "goat_eye_patch.png"),
+        ("Goat back mark", CLOSE / "goat_back_mark.png"),
+        ("Goat horn", CLOSE / "goat_horn.png"),
+        ("Goat compass", CLOSE / "goat_compass.png"),
+        ("Goat fur", CLOSE / "goat_fur.png"),
+    ):
+        if path.exists():
+            close_cells.append((name, load(path)))
+    if close_cells:
+        sheet(close_cells[:3], OUT / "pip_required_closeups.png", "Pip required close-ups — strap, wing, crest")
+        if len(close_cells) >= 6:
+            sheet(close_cells[4:8], OUT / "goat_required_closeups.png", "Goat required close-ups — patch, back, horn, compass")
     compose_phone()
     print(f"wrote comparison sheets to {OUT}")
     return 0
@@ -182,7 +202,13 @@ def compose_phone() -> None:
         ("Goat side", CLEAN / "goat_final_side.png"),
         ("Goat back", CLEAN / "goat_final_back.png"),
         ("Pair front", CLEAN / "pair_front.png"),
+        ("Pip strap", CLOSE / "pip_strap.png"),
+        ("Pip wing", CLOSE / "pip_wing.png"),
+        ("Goat patch", CLOSE / "goat_eye_patch.png"),
+        ("Goat back mark", CLOSE / "goat_back_mark.png"),
+        ("Goat compass", CLOSE / "goat_compass.png"),
     ]
+    cells = [(name, path) for name, path in cells if path.exists()]
     width = 1080
     thumb_h = 520
     gap = 10

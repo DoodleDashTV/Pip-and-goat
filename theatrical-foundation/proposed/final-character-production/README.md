@@ -24,5 +24,10 @@ Do not overwrite original GLB, FBX, JPEG, texture, or source `.blend` files.
 Pip high-res is the restored Prism foundation (crest shrink reverted).
 Goat high-res is the same foundation plus the painted upper-back teardrop.
 
+Finish-polish views live under
+`artifacts/theatrical-v2/final-character-production/{clean,feature,closeups}/`.
+The attached pair CGI image is the polish target only. See
+`reports/SUPPLEMENTAL_TARGET.md`.
+
 Production retopo, groom, and rigs are **not** in this folder. See
 `reports/PRODUCTION_BLOCKERS.md`.

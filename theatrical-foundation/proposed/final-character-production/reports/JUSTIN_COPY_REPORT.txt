@@ -24,18 +24,24 @@ The other Prism file is a hands-on-hips pose donor only.
 WHAT THIS PASS DID
 1. Imported the two selected Prism files into new proposed working blends.
 2. Locked Pip height 2.05 and Goat height 3.075 (ratio 1.50).
-3. Rendered five views each, pair views, and four lighting fronts.
-4. Tried to suppress Pip’s extra crest stubbles by shrinking coral verts.
-   That pass tore the scalp. It was reverted. Pip candidate = restored Prism.
-5. Painted Goat’s missing upper-back cinnamon teardrop on a Color-map
+3. Painted Goat’s missing upper-back cinnamon teardrop on a Color-map
    duplicate. Readable on the proposed back render.
+4. Applied a finish-polish pass toward the attached pair CGI image:
+   sheen, subsurface, coat, gentle warm HSV, Goat cornea spheres,
+   warm feature lighting. Did not copy the prediction hands-on-hips pose.
+5. Rendered required Blender views: front, 3/4, side, back, face,
+   pair scale, Pip strap/wing/crest/eye close-ups, Goat patch/back/horn/
+   compass/fur close-ups.
 6. Built proposed-vs-binding comparison sheets and a phone contact sheet.
 
 WHAT WAS NOT DONE — DO NOT TREAT AS FINISHED PRODUCTION
-No retopo. No production UVs. No groom. No facial rig. No body rig.
+No retopo. No production UVs. No production groom. No facial rig. No body rig.
 No walk / run / jump / blink / lip-sync / strap deformation tests.
 Both meshes are still ~1.9 million triangles, tens of thousands of
 non-manifold edges, one fused object, no armature.
+Lighting and shader polish do not equal a finished production asset.
+Pip cornea spheres were not placed (detector found no eye centroids).
+The compass close-up framed the face more tightly than the compass housing.
 
 HONEST LIKENESS
 Closer to the binding sheets than the rejected primitive rebuild.

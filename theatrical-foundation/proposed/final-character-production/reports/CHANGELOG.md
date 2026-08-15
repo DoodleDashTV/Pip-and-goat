@@ -28,4 +28,15 @@
 - Comparison sheets, lighting variants, and phone contact sheet added.
 - Stages 4–8 not claimed. See `PRODUCTION_BLOCKERS.md`.
 
+## Supplemental finish polish — this commit
+
+- Attached pair CGI image treated as polish/finish target only.
+- Multi-view sheets remain identity authority. Hands-on-hips pose not copied.
+- Sheen, subsurface, and coat added to the existing Tripo Principled.
+- Gentle Pip HSV toward warm chartreuse. Not a neon lift.
+- Goat cornea/catchlight spheres added at detected eye centers. Pip eye
+  detector found no centroids; painted eyes plus feature lights remain.
+- Required Blender views and close-ups rendered under warm feature lighting.
+- Production topology/groom/rig still blocked.
+
 No canon replace. No merge.
