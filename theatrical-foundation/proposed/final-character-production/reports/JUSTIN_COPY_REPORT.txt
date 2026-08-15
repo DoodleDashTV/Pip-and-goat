@@ -1,4 +1,4 @@
-TIVVLEJOY — UNTOUCHED ORIGINAL PIP LONG-WING
+TIVVLEJOY — PIP STRAP CORRECTION
 SELECT-ALL COPY BLOCK
 
 Working branch: cursor/theatrical-final-character-production-1ebc
@@ -10,56 +10,51 @@ production-library touched: no
 Reconstructed 61MB GLB committed: no
 Canon / merge / theatrical binding: unchanged / not performed / not declared
 
-REASSEMBLY
-part01 + part02 + part03 concatenated in order to
-/tmp/pip_long_wing_candidate_original.glb
-63,616,868 bytes. Header glTF.
-SHA-256 9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2
-MATCH. Imported in 2.22s.
+WHY THE STRAP LOOKED LIKE A BACKPACK
+The original front sculpts two vertical teal risers. The original
+rear already has one diagonal from the character-right shoulder to
+the left-hip bag. Those paths do not connect.
 
-WHAT OPENED
-Same Tripo mesh as the reduced 19.4MB file
-(tripo_mesh_136daef8-168c-4eaa-956b-023aa96a0a3f) at full density.
-1,022,626 verts / 1,969,582 faces / 74,902 non-manifold.
-Reduced copy was 210,060 verts. Current Pip Prism is a different mesh.
+WHAT THIS PASS DID
+Started from the hash-verified original
+(9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2).
+Did not flatten fused verts. The first flatten pass shredded the
+mesh and was thrown away.
 
-DID THE REDUCED COPY CAUSE THE DEFECTS?
-Cracked / veined overlay: YES — absent on the original
-Vertical face / beak seam: YES — not visible on the original face close-up
-Dirty texture: YES — original is clean yellow down
-Eye asymmetry: WORSENED — mild in the original, worse on the reduced file
-Crest extra volume: mostly in the source; reduction made it worse
-Rounder-than-sheet body: in the original mesh, not invented by reduction
+Painted the front backpack risers toward yellow on the Color map.
+Added one ribbon from the bag, diagonally across the front, over
+the character-right shoulder, to meet the original rear diagonal.
+Did not add a second rear strap. Did not overwrite current Prism Pip.
 
-RECHECK
-Wings: longer than current Pip; layered; shoulder roots; reach lower-belly
-  / upper-thigh. Closer to the binding sheets.
-Strap: continuous rear path, character-right shoulder to left-hip bag.
-  Current Prism rear still loses the strap.
-Identity: recognizably Pip. Cleaner than the reduced copy.
-Still fused. No rig. Still rounder than the binding pear.
+HONEST RESULT — NOT A CLEAN ONE-PATH STRAP YET
+Rear: original diagonal is still correct and intact.
+Front: the new diagonal is there, but the fused backpack risers
+still ghost. Paint lowers their teal. It cannot delete raised
+fused geometry. Flattening them shreds the mesh. Heavier paint
+hits the scarf and bag UVs.
 
-RECOMMENDATION
-A — use the complete untouched original as the proposed high-res Pip
-likeness candidate.
+Face, eyes, expression, yellow finish, long wings, three coral
+feathers, satchel design, copper spiral, and feet are preserved.
+Face albedo vs the untouched original is unchanged in range.
 
-Not the reduced 19.4MB file.
-Not C.
-Not B as geometry — fused wings/satchel cannot be transplanted.
+PROOF
+artifacts/theatrical-v2/final-character-production/long-wing-original-strap/
+01 front, 02 rear, 03 left, 04 right, 05 front 3/4, 06 rear 3/4,
+07 right shoulder, 08 left shoulder, 09 satchel front, 10 satchel rear
 
-This pass did not overwrite current Pip. Justin’s visual approval is
-required before any switch. Not canon. Not theatrical-bound. Not merged.
+STOP
+Justin’s visual approval is required. Options: accept leftover
+fused ridges with the new front diagonal, authorize isolated strap
+geometry replacement, or keep iterating paint only.
 
-VALIDATION
-artifacts/theatrical-v2/final-character-production/long-wing-original/
-Comparisons in long-wing-original/comparison/
+Not production-ready. Not canon. Not theatrical-bound. Not merged.
 
 STATUS
-PIP VISUAL CANDIDATE: BLOCKED — awaiting Justin’s approval to adopt the untouched original; current Prism not overwritten
+PIP VISUAL CANDIDATE: BLOCKED — original appearance conditionally approved; strap correction required and not yet a clean one-path strap
 GOAT VISUAL CANDIDATE: UNCHANGED FROM PRIOR PASS
 PIP PRODUCTION ASSET: BLOCKED
 GOAT PRODUCTION ASSET: BLOCKED
 CANON: UNCHANGED
 MERGE: NOT PERFORMED
-THEATRICAL BINDING: AWAITING JUSTIN’S VISUAL APPROVAL
+THEATRICAL BINDING: AWAITING JUSTIN’S VISUAL APPROVAL OF THE STRAP FIX
 PAID RESOURCES: NOT USED
