@@ -1,0 +1,91 @@
+{
+  "pip_restored_from_working": true,
+  "crest_vertex_shrink_reverted": true,
+  "goat_teardrop_kept": true,
+  "pip": {
+    "blend": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "textures": [
+      {
+        "name": "Color_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/pip_highres_basecolor.png",
+        "size": [
+          8192,
+          8192
+        ]
+      },
+      {
+        "name": "NormalGL_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/pip_highres_basecolor.png",
+        "size": [
+          4096,
+          4096
+        ]
+      },
+      {
+        "name": "ORM_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/pip_highres_basecolor.png",
+        "size": [
+          4096,
+          4096
+        ]
+      }
+    ],
+    "bytes": 90219222
+  },
+  "goat": {
+    "blend": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+    "textures": [
+      {
+        "name": "Color_3eec9046-421b-4d5d-838e-2439a6e261d8",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/goat_highres_basecolor.png",
+        "size": [
+          8192,
+          8192
+        ]
+      },
+      {
+        "name": "NormalGL_3eec9046-421b-4d5d-838e-2439a6e261d8",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/goat_highres_basecolor.png",
+        "size": [
+          4096,
+          4096
+        ]
+      },
+      {
+        "name": "ORM_3eec9046-421b-4d5d-838e-2439a6e261d8",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/goat_highres_basecolor.png",
+        "size": [
+          4096,
+          4096
+        ]
+      }
+    ],
+    "bytes": 87463969
+  },
+  "pair": {
+    "renders": [
+      "artifacts/theatrical-v2/final-character-production/clean/pair_front.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pair_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pair_side.png"
+    ],
+    "pip_height": 2.0500001907348633,
+    "goat_height": 3.0749998092651367,
+    "ratio": 1.4999997673965297
+  },
+  "pip_renders": [
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_front.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_back.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_side.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_face.png"
+  ],
+  "goat_renders": [
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_front.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_back.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_side.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_face.png"
+  ],
+  "paid_resources": false,
+  "canonical_mutated": false
+}

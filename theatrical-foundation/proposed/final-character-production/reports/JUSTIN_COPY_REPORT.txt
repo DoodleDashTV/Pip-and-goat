@@ -1,0 +1,72 @@
+TIVVLEJOY — PIP AND GOAT FINAL THEATRICAL CHARACTER PRODUCTION
+SELECT-ALL COPY BLOCK
+
+Starting branch: cursor/theatrical-production-rebuild-1ebc
+Starting commit: 31970a41500bc77b88d1bae26982009769d7e6d1
+Working branch: cursor/theatrical-final-character-production-1ebc
+Draft PR: #24
+Blender: 4.2.3 LTS
+Paid resources: not used
+
+PIP FOUNDATION
+Packaged Pip_Prism_source.glb
+SHA-256 722f8bd9bf6eb02e31f5ee297898232de2633462eee467290c01b511c9c4fecd
+Justin’s exact Prism filename was not in the LITE tree. This is the only
+Pip Prism available. Rejected primitive rebuild was not used.
+
+GOAT FOUNDATION
+Goat_Prism_expressive_source.glb (neutral stance)
+SHA-256 0b4eebc5f89fd24fa7d2d4508d3551e4d11de57778089cc714c6080015424658
+Selected because it is the closest high-detail NEUTRAL match: face, left-eye
+cinnamon, two ridged horns, floppy ears, orange scarf, teal compass, hooves.
+The other Prism file is a hands-on-hips pose donor only.
+
+WHAT THIS PASS DID
+1. Imported the two selected Prism files into new proposed working blends.
+2. Locked Pip height 2.05 and Goat height 3.075 (ratio 1.50).
+3. Rendered five views each, pair views, and four lighting fronts.
+4. Tried to suppress Pip’s extra crest stubbles by shrinking coral verts.
+   That pass tore the scalp. It was reverted. Pip candidate = restored Prism.
+5. Painted Goat’s missing upper-back cinnamon teardrop on a Color-map
+   duplicate. Readable on the proposed back render.
+6. Built proposed-vs-binding comparison sheets and a phone contact sheet.
+
+WHAT WAS NOT DONE — DO NOT TREAT AS FINISHED PRODUCTION
+No retopo. No production UVs. No groom. No facial rig. No body rig.
+No walk / run / jump / blink / lip-sync / strap deformation tests.
+Both meshes are still ~1.9 million triangles, tens of thousands of
+non-manifold edges, one fused object, no armature.
+
+HONEST LIKENESS
+Closer to the binding sheets than the rejected primitive rebuild.
+Not an exact match.
+
+Pip still: slimmer/taller than the sheet pear; wings hang closer to the
+body than the binding flare; crest usually reads as three feathers but
+extra stubbles remain in close-up; color is chartreuse-family, can still
+read a little olive-lime.
+
+Goat still: slimmer than the sheet bean; teardrop is now present but more
+stamped than fluffy; extra small cinnamon stamp above the tail; scarf back
+is a wrap, not the sheet bow; fur is generated, not a groom.
+
+Satchel laterality (front/3q/pair): strap character-right, bag
+character-left. Held. Do not flip.
+Goat left-eye cinnamon: character-left. Held.
+
+JUSTIN DECISION NEEDED
+1. Accept these Prism high-res candidates as the likeness target and
+   commission a real retopo/rig, or
+2. Supply a different already-separated high-detail source, or
+3. Authorize a scoped isolated rebuild of only Pip wings and crest as
+   separate geometry (not another primitive character).
+
+STATUS
+PIP VISUAL CANDIDATE: BLOCKED — Prism foundation imported and scaled; crest count, wing rest pose, and slimmer silhouette still fail the binding-quality gate
+GOAT VISUAL CANDIDATE: BLOCKED — Neutral Prism expressive imported and scaled 1.50x; back teardrop now present; slimmer silhouette, scarf-back bow, and generated fur still fail the binding-quality gate
+PIP PRODUCTION ASSET: BLOCKED — 1.9M-tri non-manifold Tripo mesh; no retopo, UVs, groom, or rig
+GOAT PRODUCTION ASSET: BLOCKED — same
+CANON: UNCHANGED
+MERGE: NOT PERFORMED
+THEATRICAL BINDING: AWAITING JUSTIN’S FINAL VISUAL APPROVAL
+PAID RESOURCES: NOT USED

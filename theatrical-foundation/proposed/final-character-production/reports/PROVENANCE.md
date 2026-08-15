@@ -45,6 +45,14 @@ is **not present as that string** in the LITE tree. The packaged file is the sam
 | `Goat_Hunyuan_source.glb` | Comparison only. Weaker laterality trust. |
 | Revised fused `goat_v2_revised.blend` | Rollback evidence. 1.50 scale lock on that branch. Not canon. |
 
+## Feature donors actually used in this pass
+
+- Pip: none. Crest shrink was attempted and reverted.
+- Goat: none from alternate meshes. The upper-back teardrop was painted
+  onto the selected expressive Prism Color map so it would match the
+  binding rear sheet. Shoulder and left-eye cinnamon already on that mesh
+  were used only as color references.
+
 ## What is never overwritten
 
 - The isolated source package under `/tmp/pip-goat-v2-source/.../TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/`
