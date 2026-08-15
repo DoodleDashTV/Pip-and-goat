@@ -271,6 +271,37 @@ def snap_root_to_ground(root, prefix: str):
     bpy.context.view_layer.update()
 
 
+def mesh_centroid(obj):
+    from mathutils import Vector
+
+    acc = Vector()
+    verts = obj.data.vertices
+    if not verts:
+        return obj.matrix_world.translation.copy()
+    for vert in verts:
+        acc += obj.matrix_world @ vert.co
+    return acc / len(verts)
+
+
+def shade_smooth_object(obj):
+    import bpy
+
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.shade_smooth()
+
+
+def scale_root_to_height(root, prefix: str, target: float):
+    import bpy
+
+    mn, mx = world_bounds_objects(mesh_objects(prefix))
+    height = max(mx.z - mn.z, 1e-4)
+    root.scale *= target / height
+    bpy.context.view_layer.update()
+    snap_root_to_ground(root, prefix)
+
+
 def apply_and_parent(prefix: str, root, uv_names=()):
     import bpy
 
@@ -279,6 +310,7 @@ def apply_and_parent(prefix: str, root, uv_names=()):
             continue
         apply_all(obj)
         finalize_mesh(obj)
+        shade_smooth_object(obj)
         if obj.name in uv_names:
             ensure_uv(obj)
         parent_keep(obj, root)
