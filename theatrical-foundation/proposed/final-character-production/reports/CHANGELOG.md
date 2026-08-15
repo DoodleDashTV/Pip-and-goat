@@ -73,3 +73,13 @@ No canon replace. No merge.
 - `part02.bin` and `part03.bin` are on the branch.
 - `part01.bin` is missing. No concatenation. No hash verify. No import.
 - See `PIP_LONG_WING_ORIGINAL_STOP.md`.
+
+## Untouched original Pip — this commit
+
+- `part01` landed in `35c74ce`. All three pieces present.
+- Concatenated to `/tmp` only. SHA-256 matched
+  `9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2`.
+- Same Tripo mesh as the reduced 19.4MB file, at 1,022,626 verts.
+- Reduced copy caused the cracked overlay, face seam, and dirty look.
+- Recommendation **A**: proposed high-res likeness, pending Justin.
+  Current Pip not overwritten. 61MB GLB not committed.

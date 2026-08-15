@@ -1,43 +1,61 @@
-TIVVLEJOY — PIP LONG-WING ORIGINAL REASSEMBLY
+TIVVLEJOY — UNTOUCHED ORIGINAL PIP LONG-WING
 SELECT-ALL COPY BLOCK
 
 Working branch: cursor/theatrical-final-character-production-1ebc
 Draft PR: #24
-Blender: 4.2.3 LTS not started for this file
+Blender: 4.2.3 LTS
 Paid resources: not used
 Current Pip overwritten: no
 production-library touched: no
+Reconstructed 61MB GLB committed: no
 Canon / merge / theatrical binding: unchanged / not performed / not declared
 
-STOP
-The untouched original could not be reconstructed.
+REASSEMBLY
+part01 + part02 + part03 concatenated in order to
+/tmp/pip_long_wing_candidate_original.glb
+63,616,868 bytes. Header glTF.
+SHA-256 9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2
+MATCH. Imported in 2.22s.
 
-Expected SHA-256:
-9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2
+WHAT OPENED
+Same Tripo mesh as the reduced 19.4MB file
+(tripo_mesh_136daef8-168c-4eaa-956b-023aa96a0a3f) at full density.
+1,022,626 verts / 1,969,582 faces / 74,902 non-manifold.
+Reduced copy was 210,060 verts. Current Pip Prism is a different mesh.
 
-Pieces on the branch:
-- part01.bin MISSING — no commit contains this file
-- part02.bin present 22,000,000 bytes
-  SHA-256 cd0442eb751d7d5f4d2f534b4b12dc91799641e2f208cc35c17d06adcda065f7
-- part03.bin present 19,616,868 bytes
-  SHA-256 88c5cfe59016a84496f499801a99b3840f35d92ecbd5c01c6eb82d81aad2078d
+DID THE REDUCED COPY CAUSE THE DEFECTS?
+Cracked / veined overlay: YES — absent on the original
+Vertical face / beak seam: YES — not visible on the original face close-up
+Dirty texture: YES — original is clean yellow down
+Eye asymmetry: WORSENED — mild in the original, worse on the reduced file
+Crest extra volume: mostly in the source; reduction made it worse
+Rounder-than-sheet body: in the original mesh, not invented by reduction
 
-Pulled commits 9380aae and 06486a3 only added part02 and part03.
-Part02 is a middle chunk (no glTF header). Concatenating 02+03 alone
-would not be the original file. Hash was not computed on a partial join.
+RECHECK
+Wings: longer than current Pip; layered; shoulder roots; reach lower-belly
+  / upper-thigh. Closer to the binding sheets.
+Strap: continuous rear path, character-right shoulder to left-hip bag.
+  Current Prism rear still loses the strap.
+Identity: recognizably Pip. Cleaner than the reduced copy.
+Still fused. No rig. Still rounder than the binding pear.
 
-WHAT WAS NOT DONE
-No /tmp reconstruction. No Blender import. No A/B/C recommendation.
-Current Pip unchanged. The two uploaded pieces were left in place.
+RECOMMENDATION
+A — use the complete untouched original as the proposed high-res Pip
+likeness candidate.
 
-NEEDED TO CONTINUE
-Re-upload pip_long_wing_original.part01.bin to
-theatrical-foundation/proposed/final-character-production/
-on this branch. Then concatenate 01+02+03 in order and verify the
-exact SHA-256 before any inspection.
+Not the reduced 19.4MB file.
+Not C.
+Not B as geometry — fused wings/satchel cannot be transplanted.
+
+This pass did not overwrite current Pip. Justin’s visual approval is
+required before any switch. Not canon. Not theatrical-bound. Not merged.
+
+VALIDATION
+artifacts/theatrical-v2/final-character-production/long-wing-original/
+Comparisons in long-wing-original/comparison/
 
 STATUS
-PIP VISUAL CANDIDATE: BLOCKED — original reassembly stopped; part01 missing
+PIP VISUAL CANDIDATE: BLOCKED — awaiting Justin’s approval to adopt the untouched original; current Prism not overwritten
 GOAT VISUAL CANDIDATE: UNCHANGED FROM PRIOR PASS
 PIP PRODUCTION ASSET: BLOCKED
 GOAT PRODUCTION ASSET: BLOCKED

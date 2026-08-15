@@ -37,9 +37,9 @@ A Pip long-wing GLB is stored as a comparison candidate only under
 `source-candidates/pip-long-wing/`. It does not replace current Pip.
 See `reports/PIP_LONG_WING_CANDIDATE.md`.
 
-Lossless original split pieces: `part02` and `part03` are on this folder.
-`part01` has not landed. Reassembly is stopped. See
-`reports/PIP_LONG_WING_ORIGINAL_STOP.md`.
+Lossless original split pieces `part01`–`part03` are on this folder.
+Reassembled only under `/tmp` after SHA-256 match. See
+`reports/PIP_LONG_WING_ORIGINAL.md`. The 61MB GLB is not committed.
 
 Production retopo, groom, and rigs are **not** in this folder. See
 `reports/PRODUCTION_BLOCKERS.md`.
