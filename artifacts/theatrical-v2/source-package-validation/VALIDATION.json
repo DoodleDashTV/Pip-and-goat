@@ -1,0 +1,480 @@
+{
+  "package": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE",
+  "branch": "assets/pip-goat-v2-source",
+  "integrity": {
+    "listed": 22,
+    "ok": 22,
+    "missing": [],
+    "mismatch": [],
+    "all_ok": true
+  },
+  "manifest_present": 17,
+  "manifest_missing": [
+    {
+      "package_path": "Pip/models/interchange/Pip_source.fbx",
+      "role": "interchange_backup",
+      "notes": "Complete archive only; same source family as primary"
+    },
+    {
+      "package_path": "Pip/models/interchange/obj/model.obj",
+      "role": "interchange_backup",
+      "notes": "Complete archive only; keep with MTL and textures"
+    },
+    {
+      "package_path": "Goat/models/interchange/Goat_source.fbx",
+      "role": "interchange_backup",
+      "notes": "Complete archive only; same source family as primary"
+    },
+    {
+      "package_path": "Goat/models/interchange/obj/model.obj",
+      "role": "interchange_backup",
+      "notes": "Complete archive only; keep with MTL and textures"
+    }
+  ],
+  "audits": [
+    {
+      "label": "pip_primary",
+      "path": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/Pip/models/primary/Pip_primary_source.blend",
+      "bytes": 76953275,
+      "blender_version": "4.2.3 LTS",
+      "objects": [
+        "output"
+      ],
+      "mesh_count": 1,
+      "meshes": [
+        {
+          "name": "output",
+          "verts": 78687,
+          "faces": 79592,
+          "materials": [
+            "Material"
+          ]
+        }
+      ],
+      "vertex_count": 78687,
+      "triangle_count": 157379,
+      "ngon_count": 1072,
+      "nonmanifold_edge_count": 48,
+      "materials": [
+        "Material"
+      ],
+      "images": [
+        {
+          "name": "texture_0.png",
+          "width": 8192,
+          "height": 8192
+        }
+      ],
+      "armatures": [],
+      "bone_count": 0,
+      "shape_keys": [],
+      "actions": [],
+      "world_min": [
+        -0.6888599991798401,
+        -0.5111140012741089,
+        -3.8613855224411964e-08
+      ],
+      "world_max": [
+        0.6891170144081116,
+        0.5114561915397644,
+        1.9998470544815063
+      ],
+      "height": 1.9998470930953616,
+      "has_rig": false,
+      "has_weights": false,
+      "single_fused_mesh": true,
+      "facing_xy": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "label": "goat_primary",
+      "path": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/Goat/models/primary/Goat_primary_source.blend",
+      "bytes": 78389021,
+      "blender_version": "4.2.3 LTS",
+      "objects": [
+        "output"
+      ],
+      "mesh_count": 1,
+      "meshes": [
+        {
+          "name": "output",
+          "verts": 79743,
+          "faces": 80327,
+          "materials": [
+            "Material"
+          ]
+        }
+      ],
+      "vertex_count": 79743,
+      "triangle_count": 159481,
+      "ngon_count": 769,
+      "nonmanifold_edge_count": 32,
+      "materials": [
+        "Material"
+      ],
+      "images": [
+        {
+          "name": "texture_0.png",
+          "width": 8192,
+          "height": 8192
+        }
+      ],
+      "armatures": [],
+      "bone_count": 0,
+      "shape_keys": [],
+      "actions": [],
+      "world_min": [
+        -0.3936249911785126,
+        -0.49551400542259216,
+        -3.742604803846916e-08
+      ],
+      "world_max": [
+        0.39345601201057434,
+        0.495723158121109,
+        2.0001049041748047
+      ],
+      "height": 2.0001049416008527,
+      "has_rig": false,
+      "has_weights": false,
+      "single_fused_mesh": true,
+      "facing_xy": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "label": "pip_prism",
+      "path": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/Pip/models/alternates/Pip_Prism_source.glb",
+      "bytes": 62208016,
+      "blender_version": "4.2.3 LTS",
+      "objects": [
+        "tripo_node_b700c619-1b99-4d0c-ae5d-d51496e556d8"
+      ],
+      "mesh_count": 1,
+      "meshes": [
+        {
+          "name": "tripo_node_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+          "verts": 997238,
+          "faces": 1925501,
+          "materials": [
+            "tripo_material_b700c619-1b99-4d0c-ae5d-d51496e556d8"
+          ]
+        }
+      ],
+      "vertex_count": 997238,
+      "triangle_count": 1925501,
+      "ngon_count": 0,
+      "nonmanifold_edge_count": 68319,
+      "materials": [
+        "tripo_material_b700c619-1b99-4d0c-ae5d-d51496e556d8"
+      ],
+      "images": [
+        {
+          "name": "Color_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+          "width": 8192,
+          "height": 8192
+        },
+        {
+          "name": "NormalGL_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+          "width": 4096,
+          "height": 4096
+        },
+        {
+          "name": "ORM_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+          "width": 4096,
+          "height": 4096
+        }
+      ],
+      "armatures": [],
+      "bone_count": 0,
+      "shape_keys": [],
+      "actions": [],
+      "world_min": [
+        -0.33773672580718994,
+        -0.25078555941581726,
+        -0.48982691764831543
+      ],
+      "world_max": [
+        0.3375653624534607,
+        0.2504914104938507,
+        0.4901336133480072
+      ],
+      "height": 0.9799605309963226,
+      "has_rig": false,
+      "has_weights": false,
+      "single_fused_mesh": true,
+      "facing_xy": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "label": "pip_hunyuan",
+      "path": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/Pip/models/alternates/Pip_Hunyuan_source.glb",
+      "bytes": 36471100,
+      "blender_version": "4.2.3 LTS",
+      "objects": [
+        "node_0"
+      ],
+      "mesh_count": 1,
+      "meshes": [
+        {
+          "name": "node_0",
+          "verts": 312617,
+          "faces": 500000,
+          "materials": [
+            "Material.001"
+          ]
+        }
+      ],
+      "vertex_count": 312617,
+      "triangle_count": 500000,
+      "ngon_count": 0,
+      "nonmanifold_edge_count": 119784,
+      "materials": [
+        "Material.001"
+      ],
+      "images": [
+        {
+          "name": "texture_20250901",
+          "width": 4096,
+          "height": 4096
+        }
+      ],
+      "armatures": [],
+      "bone_count": 0,
+      "shape_keys": [],
+      "actions": [],
+      "world_min": [
+        -0.3651230037212372,
+        -0.2523461878299713,
+        -3.3904921536986876e-08
+      ],
+      "world_max": [
+        0.352277010679245,
+        0.29472804069519043,
+        1.121494174003601
+      ],
+      "height": 1.1214942079085226,
+      "has_rig": false,
+      "has_weights": false,
+      "single_fused_mesh": true,
+      "facing_xy": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "label": "goat_prism",
+      "path": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/Goat/models/alternates/Goat_Prism_source.glb",
+      "bytes": 61923512,
+      "blender_version": "4.2.3 LTS",
+      "objects": [
+        "tripo_node_ac26e6c2-f662-48bc-871b-85c19fb23a88"
+      ],
+      "mesh_count": 1,
+      "meshes": [
+        {
+          "name": "tripo_node_ac26e6c2-f662-48bc-871b-85c19fb23a88",
+          "verts": 977106,
+          "faces": 1901509,
+          "materials": [
+            "tripo_material_ac26e6c2-f662-48bc-871b-85c19fb23a88"
+          ]
+        }
+      ],
+      "vertex_count": 977106,
+      "triangle_count": 1901509,
+      "ngon_count": 0,
+      "nonmanifold_edge_count": 52357,
+      "materials": [
+        "tripo_material_ac26e6c2-f662-48bc-871b-85c19fb23a88"
+      ],
+      "images": [
+        {
+          "name": "Color_ac26e6c2-f662-48bc-871b-85c19fb23a88",
+          "width": 8192,
+          "height": 8192
+        },
+        {
+          "name": "NormalGL_ac26e6c2-f662-48bc-871b-85c19fb23a88",
+          "width": 4096,
+          "height": 4096
+        },
+        {
+          "name": "ORM_ac26e6c2-f662-48bc-871b-85c19fb23a88",
+          "width": 4096,
+          "height": 4096
+        }
+      ],
+      "armatures": [],
+      "bone_count": 0,
+      "shape_keys": [],
+      "actions": [],
+      "world_min": [
+        -0.19501714408397675,
+        -0.24125142395496368,
+        -0.4895779490470886
+      ],
+      "world_max": [
+        0.1949387490749359,
+        0.24140521883964539,
+        0.4895726442337036
+      ],
+      "height": 0.9791505932807922,
+      "has_rig": false,
+      "has_weights": false,
+      "single_fused_mesh": true,
+      "facing_xy": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "label": "goat_prism_expressive",
+      "path": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/Goat/models/alternates/Goat_Prism_expressive_source.glb",
+      "bytes": 61719464,
+      "blender_version": "4.2.3 LTS",
+      "objects": [
+        "tripo_node_3eec9046-421b-4d5d-838e-2439a6e261d8"
+      ],
+      "mesh_count": 1,
+      "meshes": [
+        {
+          "name": "tripo_node_3eec9046-421b-4d5d-838e-2439a6e261d8",
+          "verts": 975519,
+          "faces": 1903808,
+          "materials": [
+            "tripo_material_3eec9046-421b-4d5d-838e-2439a6e261d8"
+          ]
+        }
+      ],
+      "vertex_count": 975519,
+      "triangle_count": 1903808,
+      "ngon_count": 0,
+      "nonmanifold_edge_count": 46938,
+      "materials": [
+        "tripo_material_3eec9046-421b-4d5d-838e-2439a6e261d8"
+      ],
+      "images": [
+        {
+          "name": "Color_3eec9046-421b-4d5d-838e-2439a6e261d8",
+          "width": 8192,
+          "height": 8192
+        },
+        {
+          "name": "NormalGL_3eec9046-421b-4d5d-838e-2439a6e261d8",
+          "width": 4096,
+          "height": 4096
+        },
+        {
+          "name": "ORM_3eec9046-421b-4d5d-838e-2439a6e261d8",
+          "width": 4096,
+          "height": 4096
+        }
+      ],
+      "armatures": [],
+      "bone_count": 0,
+      "shape_keys": [],
+      "actions": [],
+      "world_min": [
+        -0.19277150928974152,
+        -0.24274003505706787,
+        -0.48914834856987
+      ],
+      "world_max": [
+        0.19244861602783203,
+        0.24232999980449677,
+        0.4895029067993164
+      ],
+      "height": 0.9786512553691864,
+      "has_rig": false,
+      "has_weights": false,
+      "single_fused_mesh": true,
+      "facing_xy": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "label": "goat_hunyuan",
+      "path": "/tmp/pip-goat-v2-source/theatrical-foundation/proposed/v2/scource-package/TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE/Goat/models/alternates/Goat_Hunyuan_source.glb",
+      "bytes": 33958724,
+      "blender_version": "4.2.3 LTS",
+      "objects": [
+        "node_0"
+      ],
+      "mesh_count": 1,
+      "meshes": [
+        {
+          "name": "node_0",
+          "verts": 293524,
+          "faces": 499994,
+          "materials": [
+            "Material.001"
+          ]
+        }
+      ],
+      "vertex_count": 293524,
+      "triangle_count": 499994,
+      "ngon_count": 0,
+      "nonmanifold_edge_count": 84216,
+      "materials": [
+        "Material.001"
+      ],
+      "images": [
+        {
+          "name": "texture_20250901",
+          "width": 4096,
+          "height": 4096
+        }
+      ],
+      "armatures": [],
+      "bone_count": 0,
+      "shape_keys": [],
+      "actions": [],
+      "world_min": [
+        -0.29243800044059753,
+        -0.23358118534088135,
+        -3.138367787869356e-08
+      ],
+      "world_max": [
+        0.28703901171684265,
+        0.1643030196428299,
+        1.128391146659851
+      ],
+      "height": 1.128391178043529,
+      "has_rig": false,
+      "has_weights": false,
+      "single_fused_mesh": true,
+      "facing_xy": [
+        0.0,
+        -1.0
+      ]
+    }
+  ],
+  "renders": [
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_primary_front.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_primary_back.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_primary_left.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_primary_right.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_primary_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_primary_closeup.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_primary_front.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_primary_back.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_primary_left.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_primary_right.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_primary_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_primary_closeup.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_prism_front.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/pip_hunyuan_front.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_prism_front.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_prism_expressive_front.png",
+    "/workspace/artifacts/theatrical-v2/source-package-validation/clean/goat_hunyuan_front.png"
+  ],
+  "canonical_mutated": false,
+  "merged": false,
+  "approved": false
+}

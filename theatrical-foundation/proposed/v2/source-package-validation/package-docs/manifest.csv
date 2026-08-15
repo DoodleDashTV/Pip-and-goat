@@ -1,0 +1,22 @@
+character,package_path,role,format,notes
+Pip,Pip/references/Pip_front.jpeg,binding_reference,JPEG,Neutral front view
+Pip,Pip/references/Pip_back.jpeg,binding_reference,JPEG,Neutral back view
+Pip,Pip/references/Pip_profile_facing_left.jpeg,binding_reference,JPEG,Principal profile
+Pip,Pip/references/Pip_profile_facing_right.jpeg,binding_reference,JPEG,Opposite profile
+Pip,Pip/references/Pip_three_quarter.jpeg,binding_reference,JPEG,Three-quarter appearance reference
+Pip,Pip/models/primary/Pip_primary_source.blend,primary_editable_source,BLEND,Generated editable high-detail source; not approved canon
+Pip,Pip/models/alternates/Pip_Prism_source.glb,comparison_source,GLB,Static textured mesh; no skin or animation
+Pip,Pip/models/alternates/Pip_Hunyuan_source.glb,comparison_source,GLB,Static textured mesh; no skin or animation
+Pip,Pip/models/interchange/Pip_source.fbx,interchange_backup,FBX,Complete archive only; same source family as primary
+Pip,Pip/models/interchange/obj/model.obj,interchange_backup,OBJ,Complete archive only; keep with MTL and textures
+Goat,Goat/references/Goat_front.jpeg,binding_reference,JPEG,Neutral front view
+Goat,Goat/references/Goat_back.jpeg,binding_reference,JPEG,Neutral back view
+Goat,Goat/references/Goat_profile_facing_left.jpeg,binding_reference,JPEG,Principal profile
+Goat,Goat/references/Goat_profile_facing_right.jpeg,binding_reference,JPEG,Opposite profile
+Goat,Goat/references/Goat_three_quarter.jpeg,binding_reference,JPEG,Three-quarter appearance reference
+Goat,Goat/models/primary/Goat_primary_source.blend,primary_editable_source,BLEND,Generated editable high-detail source; not approved canon
+Goat,Goat/models/alternates/Goat_Prism_source.glb,comparison_source,GLB,Static textured mesh; no skin or animation
+Goat,Goat/models/alternates/Goat_Hunyuan_source.glb,comparison_source,GLB,Static textured mesh; no skin or animation
+Goat,Goat/models/alternates/Goat_Prism_expressive_source.glb,comparison_source,GLB,Additional unique static textured source
+Goat,Goat/models/interchange/Goat_source.fbx,interchange_backup,FBX,Complete archive only; same source family as primary
+Goat,Goat/models/interchange/obj/model.obj,interchange_backup,OBJ,Complete archive only; keep with MTL and textures
