@@ -28,7 +28,7 @@ ARTIFACTS = REPO_ROOT / "artifacts/theatrical-v2/production-rebuild"
 REFS = REPO_ROOT / "artifacts/theatrical-v2/source-package-validation/refs"
 
 # Binding-family colors. Not v1 kitbash DNA. Not neon lemon. Not mustard.
-PIP_CHARTREUSE = (0.78, 0.74, 0.20)
+PIP_CHARTREUSE = (0.82, 0.76, 0.18)
 PIP_CREAM = (0.90, 0.86, 0.60)
 PIP_OLIVE = (0.58, 0.54, 0.16)
 PIP_CREST = (0.84, 0.34, 0.24)

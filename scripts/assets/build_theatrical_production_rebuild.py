@@ -313,7 +313,7 @@ def build_pip():
     # Satchel: strap over character-right shoulder (-Y), bag on character-left hip (+Y).
     make_cube("Pip_SatchelBag", (0.16, 0.24, 0.58), (0.14, 0.08, 0.16), material=m["satchel"], rot=(0.0, math.radians(-8), math.radians(12)))
     make_cube("Pip_SatchelFlap", (0.18, 0.25, 0.66), (0.145, 0.085, 0.06), material=m["satchel"], rot=(0.0, math.radians(-4), math.radians(12)))
-    make_spiral("Pip_SatchelSpiral", (0.26, 0.25, 0.62), 0.042, m["copper"], rot=(0.0, math.radians(90), math.radians(12)))
+    make_spiral("Pip_SatchelSpiral", (0.26, 0.25, 0.62), 0.048, m["copper"])
     make_bar("Pip_StrapFront", (0.12, -0.22, 1.24), (0.18, 0.24, 0.70), 0.022, m["satchel"])
     make_bar("Pip_StrapBack", (-0.10, -0.20, 1.22), (-0.02, 0.22, 0.68), 0.020, m["satchel"])
     make_torus("Pip_StrapBuckle_0", 0.018, 0.004, (0.02, -0.12, 1.08), material=m["copper"], major_seg=16, minor_seg=8)
@@ -488,16 +488,16 @@ def build_goat(pip_height: float):
     make_sphere("Goat_ScarfTail_A", 0.044, (-0.28, 0.05, 1.54), segs=12, rings=8, material=m["scarf"], scale=(0.45, 0.70, 1.25))
     make_sphere("Goat_ScarfTail_B", 0.040, (-0.26, -0.05, 1.52), segs=12, rings=8, material=m["scarf"], scale=(0.42, 0.65, 1.10))
 
-    make_torus("Goat_CompassRing", 0.038, 0.008, (0.34, 0.00, 1.60), material=m["copper"], rot=(math.radians(90), 0.0, 0.0), major_seg=20, minor_seg=8)
-    make_torus("Goat_CompassRim", 0.078, 0.014, (0.38, 0.00, 1.46), material=m["teal"], rot=(math.radians(90), 0.0, 0.0), major_seg=28, minor_seg=10)
-    make_cylinder("Goat_CompassFace", 0.068, 0.016, (0.38, 0.00, 1.46), verts=28, material=m["face"], rot=(math.radians(90), 0.0, 0.0))
-    make_cone("Goat_NeedleN", 0.014, 0.052, (0.390, 0.00, 1.485), verts=8, material=m["needle_n"])
-    make_cone("Goat_NeedleS", 0.014, 0.044, (0.390, 0.00, 1.435), verts=8, material=m["needle_s"], rot=(math.radians(180), 0.0, 0.0))
+    make_torus("Goat_CompassRing", 0.038, 0.008, (0.34, 0.00, 1.60), material=m["copper"], rot=(0.0, math.radians(90), 0.0), major_seg=20, minor_seg=8)
+    make_torus("Goat_CompassRim", 0.078, 0.014, (0.38, 0.00, 1.46), material=m["teal"], rot=(0.0, math.radians(90), 0.0), major_seg=28, minor_seg=10)
+    make_cylinder("Goat_CompassFace", 0.068, 0.016, (0.38, 0.00, 1.46), verts=28, material=m["face"], rot=(0.0, math.radians(90), 0.0))
+    make_cone("Goat_NeedleN", 0.014, 0.052, (0.42, 0.00, 1.485), verts=8, material=m["needle_n"])
+    make_cone("Goat_NeedleS", 0.014, 0.044, (0.42, 0.00, 1.435), verts=8, material=m["needle_s"], rot=(math.radians(180), 0.0, 0.0))
 
-    for side, y in (("L", 0.50), ("R", -0.50)):
-        make_sphere(f"Goat_UpperArm_{side}", 0.11, (0.10, y, 1.42), segs=18, rings=12, material=m["body"], scale=(0.72, 0.72, 1.10))
-        make_cylinder(f"Goat_Arm_{side}", 0.060, 0.42, (0.14, y, 1.08), verts=14, material=m["body"])
-        _cloven(f"Goat_Hand_{side}", (0.18, y, 0.82), m["hoof"], 0.060)
+    for side, y in (("L", 0.44), ("R", -0.44)):
+        make_sphere(f"Goat_UpperArm_{side}", 0.12, (0.08, y, 1.42), segs=18, rings=12, material=m["body"], scale=(0.80, 0.85, 1.05))
+        make_cylinder(f"Goat_Arm_{side}", 0.062, 0.40, (0.12, y, 1.10), verts=14, material=m["body"])
+        _cloven(f"Goat_Hand_{side}", (0.16, y, 0.86), m["hoof"], 0.060)
 
     for side, y in (("L", 0.16), ("R", -0.16)):
         make_sphere(f"Goat_Hip_{side}", 0.13, (0.02, y, 0.78), segs=16, rings=12, material=m["body"])
