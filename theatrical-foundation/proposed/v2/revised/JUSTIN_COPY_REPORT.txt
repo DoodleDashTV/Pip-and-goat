@@ -1,40 +1,59 @@
-JUSTIN COPY REPORT — Pip / Goat v2 sculpt-revision gate
+JUSTIN COPY REPORT — Pip / Goat v2 overnight sculpt refinement
 Copy everything between the ===== lines.
 
 ============================================================
-TIVVLEJOY — PIP / GOAT V2 SCULPT REVISION GATE
+TIVVLEJOY — PIP / GOAT V2 OVERNIGHT SCULPT REFINEMENT
 Proposed. Unapproved. Stopped for Justin’s visual review.
 
-Binding authority: the ten five-view JPEGs.
-Only the two primary .blend files were edited.
-No GLB used as canon. No retopo, groom, or rig.
-No canonical replace. Nothing merged.
+Starting branch/commit:
+  cursor/theatrical-v2-sculpt-revision-1ebc
+  a1a7d195c329f97622ed9264c4825a10a34f7797
 
-What changed:
-  Pip crest: three-group fan, center tallest, sweep back
-  Pip rear toe: hallux pulled back and planted on both feet
-  Pip satchel: kept sheet laterality (right-shoulder strap,
-    left-hip bag). Hard move tore the fused strap, so only
-    a small bag-body falloff was kept.
-  Goat upper-back cinnamon: teardrop stamp below the scarf
-  Goat scale: 1.5× Pip (measured 2.033 / 3.050)
+Ending branch: same. Do not merge.
+
+Binding authority:
+  1) the ten five-view JPEG sheets
+  2) the bright Pip target for color, warmth, and wing size
+Dark mustard/olive Pip stills are comparison only.
+
+What this overnight pass did:
+  Restored the last usable Pip sculpt after a shredded
+  wing-stretch failed. Regraded Pip to bright
+  yellow-chartreuse with cream cheeks. Enlarged wings
+  by isolating the real wing mass, then lengthening
+  and unfurling them without retopo. Kept the three
+  coral crest, rear hallux, and satchel laterality.
+  Restarted Goat from the primary source, scaled to
+  1.5× Pip, and painted a cinnamon teardrop on the
+  upper back below the scarf.
+
+Measured pair scale:
+  Pip 2.051 / Goat 3.077 / ratio 1.500
+  Both blends reopen. Packed 8K textures resolve.
+  No GLB linked. No canon replaced.
 
 Honest remaining gaps:
-  Pip profile can still read as two crest feathers
-  Goat back patch is present but still lighter/smaller
-    than the binding teardrop
-  Still generated fused sculpts, not production topology
+  Pip back wings are larger than the last usable
+    sculpt but still less full/graceful than the
+    binding back sheet
+  Pip profile crest can still collapse toward two
+    blades plus a nub
+  Goat teardrop is present and below the scarf, but
+    still narrower and more triangular than the
+    binding sheet
+  Goat’s source head-back dark trapezoid remains
+  These are still fused generated sculpts
 
 Recommendations:
-  Pip revised: REVISE remaining
-  Goat revised: REVISE remaining
+  Pip: REVISE remaining
+  Goat: REVISE remaining
   Do not approve as a lock.
-  Do not retopo, groom, rig, or replace canon yet.
+  Do not begin retopo, groom, rig, or canon replace.
 
 Clean previews:
   artifacts/theatrical-v2/sculpt-revision/clean/
-  pip/goat: front, three_quarter, side, back
-  pair: front, three_quarter
+Comparisons:
+  artifacts/theatrical-v2/sculpt-revision/comparison/
 
 No THEATRICAL binding. No Hero-Shot. No Steps 9–16.
 No paid GPU, RunPod, cloud render, deploy, or

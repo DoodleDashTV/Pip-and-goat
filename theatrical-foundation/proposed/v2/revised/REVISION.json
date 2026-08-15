@@ -5,68 +5,27 @@
   "groom": false,
   "rig": false,
   "glb_used": false,
-  "pip": {
-    "crest_counts": {
-      "right": 1259,
-      "center": 1258,
-      "left": 1259
-    },
-    "crest": "spread three coral feathers, center tallest, sweep back",
-    "satchel": {
-      "from": [
-        0.5525872111320496,
-        0.15410955250263214,
-        0.531919538974762
-      ],
-      "max_shift": [
-        0.017999999225139618,
-        0.03999999910593033,
-        -0.019999999552965164
-      ],
-      "count": 2815,
-      "moved": 200
-    },
-    "hallux": {
-      "left": 439,
-      "right": 446
-    }
+  "paid_gpu": false,
+  "blender": "4.2.3 LTS",
+  "starting_commit": "a1a7d195c329f97622ed9264c4825a10a34f7797",
+  "branch": "cursor/theatrical-v2-sculpt-revision-1ebc",
+  "recommendation": {
+    "pip": "REVISE remaining",
+    "goat": "REVISE remaining"
   },
-  "goat": {
-    "back_patch": {
-      "stamps": 1351,
-      "image": "texture_0.png",
-      "size": [
-        8192,
-        8192
-      ]
-    },
-    "scale": {
-      "from_height": 2.0001049416008527,
-      "to_height": 3.049828290939331,
-      "factor": 1.5248341362020215,
-      "target": 3.049828290939331
-    }
-  },
-  "pip_height": 2.0332188606262207,
   "pair": {
-    "renders": [
-      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
-      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
-    ],
-    "pip_height": 2.0332188606262207,
-    "goat_height": 3.049828290939331,
-    "ratio": 1.5
+    "pip_height": 2.0512187504848605,
+    "goat_height": 3.0768280029296875,
+    "ratio": 1.4999999418836778
   },
-  "renders": [
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_front.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_back.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_side.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_three_quarter.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_front.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_back.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_side.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/goat_revised_three_quarter.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
-    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
-  ]
+  "reopen": {
+    "pip": true,
+    "goat": true,
+    "packed_textures": true,
+    "libraries": []
+  },
+  "inspect": {
+    "pip": {"verts": 78687, "tris": 157379, "nonmanifold_edges": 48, "boundary_edges": 45},
+    "goat": {"verts": 79743, "tris": 159481, "nonmanifold_edges": 32, "boundary_edges": 31}
+  }
 }

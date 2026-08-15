@@ -1,4 +1,4 @@
-# Proposed theatrical v2 — sculpt revision gate
+# Proposed theatrical v2 — overnight sculpt refinement
 
 **Label:** proposed unapproved v2 sculpt revision  
 **Approved:** no  
@@ -6,12 +6,12 @@
 **THEATRICAL binding:** not created  
 **GLBs used:** no  
 
-Binding authority is the ten five-view JPEGs from the uploaded CURSOR_LITE package. Only the two primary editable `.blend` files are revised.
+Binding authority is the ten five-view JPEGs plus the bright Pip color/wing target. Only the two primary editable `.blend` files are revised.
 
 | File | Role |
 | --- | --- |
 | `pip_v2_revised.blend` | Revised Pip primary sculpt |
-| `goat_v2_revised.blend` | Revised Goat primary sculpt, ~1.5× Pip height |
+| `goat_v2_revised.blend` | Revised Goat primary sculpt, 1.5× Pip height |
 
 This pass does **not** retopologize, groom, rig, replace `production-library/`, or begin Hero-Shot / Steps 9–16.
 
