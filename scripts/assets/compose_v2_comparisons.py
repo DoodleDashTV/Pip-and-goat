@@ -10,6 +10,7 @@ ROOT = Path("/workspace")
 CLEAN = ROOT / "artifacts/theatrical-v2/sculpt-revision/clean"
 BEFORE = ROOT / "artifacts/theatrical-v2/sculpt-revision/before"
 THIS = ROOT / "artifacts/theatrical-v2/sculpt-revision/before_this_pass"
+PULLBACK = ROOT / "artifacts/theatrical-v2/sculpt-revision/before_pullback"
 FAILED = ROOT / "artifacts/theatrical-v2/sculpt-revision/failed-stretch"
 REFS = ROOT / "artifacts/theatrical-v2/source-package-validation/refs"
 OUT = ROOT / "artifacts/theatrical-v2/sculpt-revision/comparison"
@@ -100,6 +101,23 @@ def main() -> int:
                 ],
                 OUT / f"pip_{view}_justin_pass.png",
                 f"Pip {view.replace('_', ' ')} — previous overnight | Justin pass | binding JPEG",
+            )
+    if (PULLBACK / "pip_revised_front.png").exists():
+        pull_map = {
+            "front": ("pip_revised_front.png", "pip_revised_front.png", "Pip_front.jpeg"),
+            "three_quarter": ("pip_revised_three_quarter.png", "pip_revised_three_quarter.png", "Pip_three_quarter.jpeg"),
+            "side": ("pip_revised_side.png", "pip_revised_side.png", "Pip_profile_facing_left.jpeg"),
+            "back": ("pip_revised_back.png", "pip_revised_back.png", "Pip_back.jpeg"),
+        }
+        for view, (before_name, after_name, ref_name) in pull_map.items():
+            sheet(
+                [
+                    ("TOO BRIGHT last pass", load(PULLBACK / before_name)),
+                    ("AFTER pullback", load(CLEAN / after_name)),
+                    ("BINDING sheet", load(REFS / ref_name)),
+                ],
+                OUT / f"pip_{view}_pullback.png",
+                f"Pip {view.replace('_', ' ')} — too-bright pass | brightness pullback | binding JPEG",
             )
     if (FAILED / "pip_revised_front.png").exists():
         sheet(

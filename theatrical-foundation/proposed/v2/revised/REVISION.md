@@ -21,6 +21,8 @@ Measured pair scale: Pip **2.051**, Goat **3.077**, ratio **1.500**.
 
 A later Justin pass lifted Pip further toward the attached Image 1 yellow-chartreuse (less golden mustard, brighter body/wings) and broadened isolated wings (`|y|` 0.66 → 0.74). Crest, hallux, and satchel laterality were left alone. Goat was not edited in that pass.
 
+Justin then marked that lift **too bright**. A color-only pullback dropped the shader value 1.16 → 1.02 and compressed blown highlights. Wings were not moved again.
+
 Both blends reopen in Blender 4.2.3 LTS. Packed 8K `texture_0.png` resolves. No libraries / GLBs linked.
 
 ## What changed
