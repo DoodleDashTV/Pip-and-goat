@@ -8,6 +8,7 @@
   "paid_gpu": false,
   "blender": "4.2.3 LTS",
   "starting_commit": "a1a7d195c329f97622ed9264c4825a10a34f7797",
+  "justin_pip_pass_from": "dd608ef5561ef06f9d99a02971762759032beabb",
   "branch": "cursor/theatrical-v2-sculpt-revision-1ebc",
   "recommendation": {
     "pip": "REVISE remaining",

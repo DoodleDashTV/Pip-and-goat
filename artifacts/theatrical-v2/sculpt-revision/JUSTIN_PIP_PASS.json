@@ -1,0 +1,79 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "retopo": false,
+  "groom": false,
+  "rig": false,
+  "glb_used": false,
+  "paid_gpu": false,
+  "target": "attached Image 1 bright yellow-chartreuse and larger wings",
+  "grade": {
+    "plumage": 26531503,
+    "cream": 450095
+  },
+  "cream": {
+    "stamps": 4670
+  },
+  "shader": "Material",
+  "wings": {
+    "left": {
+      "count": 11720,
+      "moved": 11720,
+      "max_delta": 0.11000001237185739,
+      "tip_z_before": 0.40008246898651123,
+      "max_abs_y_before": 0.6636623740196228
+    },
+    "right": {
+      "count": 11669,
+      "moved": 11669,
+      "max_delta": 0.1100000109961176,
+      "tip_z_before": 0.40003013610839844,
+      "max_abs_y_before": 0.6653900146484375
+    },
+    "smooth": {
+      "verts": 23389,
+      "factors": [
+        0.2,
+        0.12
+      ]
+    }
+  },
+  "inspect": {
+    "verts": 78687,
+    "tris": 157379,
+    "nonmanifold_edges": 48,
+    "boundary_edges": 45,
+    "materials": [
+      "Material"
+    ],
+    "images": [
+      {
+        "name": "texture_0.png",
+        "size": [
+          8192,
+          8192
+        ],
+        "packed": true
+      }
+    ],
+    "libraries": []
+  },
+  "pip_height": 2.0512187480926514,
+  "pair": {
+    "renders": [
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+      "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
+    ],
+    "pip_height": 2.0512187480926514,
+    "goat_height": 3.0768280029296875,
+    "ratio": 1.4999999418836778
+  },
+  "renders": [
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_back.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_side.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pip_revised_three_quarter.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_front.png",
+    "/workspace/artifacts/theatrical-v2/sculpt-revision/clean/pair_three_quarter.png"
+  ]
+}

@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path("/workspace")
 CLEAN = ROOT / "artifacts/theatrical-v2/sculpt-revision/clean"
 BEFORE = ROOT / "artifacts/theatrical-v2/sculpt-revision/before"
+THIS = ROOT / "artifacts/theatrical-v2/sculpt-revision/before_this_pass"
 FAILED = ROOT / "artifacts/theatrical-v2/sculpt-revision/failed-stretch"
 REFS = ROOT / "artifacts/theatrical-v2/source-package-validation/refs"
 OUT = ROOT / "artifacts/theatrical-v2/sculpt-revision/comparison"
@@ -81,8 +82,25 @@ def main() -> int:
                 ("BINDING sheet", load(REFS / ref_name)),
             ],
             OUT / f"pip_{view}_before_after.png",
-            f"Pip {view.replace('_', ' ')} — last usable | overnight | binding JPEG",
+            f"Pip {view.replace('_', ' ')} — last usable | current | binding JPEG",
         )
+    if (THIS / "pip_revised_front.png").exists():
+        this_map = {
+            "front": ("pip_revised_front.png", "pip_revised_front.png", "Pip_front.jpeg"),
+            "three_quarter": ("pip_revised_three_quarter.png", "pip_revised_three_quarter.png", "Pip_three_quarter.jpeg"),
+            "side": ("pip_revised_side.png", "pip_revised_side.png", "Pip_profile_facing_left.jpeg"),
+            "back": ("pip_revised_back.png", "pip_revised_back.png", "Pip_back.jpeg"),
+        }
+        for view, (before_name, after_name, ref_name) in this_map.items():
+            sheet(
+                [
+                    ("BEFORE this Justin pass", load(THIS / before_name)),
+                    ("AFTER this Justin pass", load(CLEAN / after_name)),
+                    ("BINDING sheet", load(REFS / ref_name)),
+                ],
+                OUT / f"pip_{view}_justin_pass.png",
+                f"Pip {view.replace('_', ' ')} — previous overnight | Justin pass | binding JPEG",
+            )
     if (FAILED / "pip_revised_front.png").exists():
         sheet(
             [
