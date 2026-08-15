@@ -1,0 +1,22 @@
+{
+  "label": "PROXY_PIPELINE_BIRD",
+  "approved": false,
+  "isPip": false,
+  "isGoat": false,
+  "canonicalMutated": false,
+  "theatricalBound": false,
+  "productionLibraryTouched": false,
+  "path": "theatrical-foundation/proposed/pipeline-proxy/PROXY_PIPELINE_BIRD.blend",
+  "objects": [
+    "PROXY_PIPELINE_BIRD_BODY",
+    "PROXY_PIPELINE_BIRD_CREST_1",
+    "PROXY_PIPELINE_BIRD_CREST_2",
+    "PROXY_PIPELINE_BIRD_CREST_3",
+    "PROXY_PIPELINE_BIRD_HEAD",
+    "PROXY_PIPELINE_BIRD_SCARF",
+    "PROXY_PIPELINE_BIRD_WING_L",
+    "PROXY_PIPELINE_BIRD_WING_R",
+    "PROXY_PIPELINE_RIG"
+  ],
+  "purpose": "Pipeline and deformation tests only."
+}

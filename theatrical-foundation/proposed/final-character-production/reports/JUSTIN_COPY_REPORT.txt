@@ -1,4 +1,4 @@
-TIVVLEJOY — PIP LEFT RISER
+TIVVLEJOY — PRODUCTION CONTINUED WHILE PIP REPLACEMENT IS PENDING
 SELECT-ALL COPY BLOCK
 
 Working branch: cursor/theatrical-final-character-production-1ebc
@@ -6,53 +6,114 @@ Draft PR: #24
 Blender: 4.2.3 LTS
 Paid resources: not used
 Current Pip overwritten: no
+Long-wing original overwritten: no
+Goat touched: no
 production-library touched: no
-Reconstructed 61MB GLB committed: no
 Canon / merge / theatrical binding: unchanged / not performed / not declared
 
-REVIEW ADDENDUM
-Previous front/rear previews were not approved. The front still
-showed two shoulder paths. This pass targeted the character-left
-vertical riser only.
-
 WHAT THIS PASS DID
-Started from the hash-verified original
-(9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2).
-Did not flatten the torso. Did not reuse the shredding pass.
+Stopped all destructive work on the fused Tripo Pip. Preserved the
+conditionally approved long-wing candidate and strap-repair evidence
+for comparison only. Did not paint, flatten, remesh, or cover the
+fused left-front riser.
 
-Pushed the left-front column inward in X onto a chest profile.
-Clone-stamped nearby yellow feather color and normals onto that
-riser. Killed leftover teal texels only. Kept the original rear
-diagonal. Added one front diagonal over the character-right
-shoulder. A yellow cover patch was tried and dropped — it read as
-another strap.
+Built character-independent production systems and one documented
+command to ingest the next Pip model as a replacement candidate.
 
-HONEST RESULT — FRONT IS STILL NOT ONE PATH
-Mid left-chest teal is lower than the original, but a fused left
-riser still ghosts from the shoulder toward the bag. Paint cannot
-delete raised fused geometry. Heavier flatten shreds the mesh.
-Broader paint hits scarf, bag, and face UVs.
+COMPLETED PRODUCTION SYSTEMS
+1. Durable asset manifest and repository classification
+   (locked library, preserved comparison, proposed, proxy, intake).
+2. Canon/reference database structure. Binding five-views remain
+   authority. Locked canon is not mutated. Theatrical gate stays closed.
+3. Character-candidate ingestion and comparison tools.
+4. Automated Pip replacement intake for BLEND, GLB, GLTF, FBX, OBJ,
+   textures, and ZIP.
+5. SHA-256 hashing, provenance, license/source fields, Blender 4.2.3
+   import validation, scale, orientation, and texture checks.
+6. Automatic five-view, shoulder/satchel close-ups, and 8-frame
+   turntable preview rendering (proved on a local fixture).
+7. Geometry reports: verts/tris, disconnected components, non-manifold,
+   holes, intersections, normals, UVs, materials/textures, armature,
+   shape keys, object separation, dimensions.
+8. Reference-comparison checklist for face/eyes, yellow finish, three
+   coral feathers, long wings, teal scarf, one continuous cross-body
+   strap, right-shoulder origin, diagonal front/rear path, left-hip
+   satchel, copper spiral, feet/toes/hallux, fused vs separated
+   accessories. Every visual item stays REQUIRES_JUSTIN.
+9. Non-destructive material, lighting, camera, and render presets
+   (Khronos PBR Neutral, 1080×1920, EEVEE). They do not rewrite
+   uploaded meshes or claim final character framing.
+10. Director AI, Story Brain, continuity, storyboard, animatic,
+    shot-planning QC, cost-control, recovery, and provenance continued.
+    Final Pip framing is an error until a replacement is approved.
+11. Episode/season catalogs, reusable meadow/map indexes, creek marked
+    missing, sound plan stays local/mock, no paid providers.
+12. Modular Pip rig specification written and unbound. Not registered
+    as the live Pip rig. Not bound to the current candidate.
+13. PROXY_PIPELINE_BIRD built and labeled. Pipeline tests only.
+    Not Pip. Not canon.
+14. Automated tests added. Existing thresholds not weakened.
+15. One command to ingest the next Pip and build its comparison package.
 
-Rear diagonal: preserved, still the correct direction.
-Face, eyes, wings, crest, satchel, copper spiral, feet: preserved.
+HONEST LIMIT
+These systems are ready to receive and compare the next Pip upload.
+They are not a production-ready Pip, not a theatrical bind, and not
+a finished episode pipeline.
 
-WHAT IS REQUIRED
-Authorize isolated replacement of the left-front riser geometry.
-Another paint or flatten pass on this fused Tripo mesh will not
-make the front read as exactly one diagonal.
+TESTS AND VALIDATION
+- python3 scripts/assets/test_pip_replacement_intake.py — 11/11 PASS
+- pnpm test:color — 19/19 PASS
+- blender test_rig_gates.py — 57/57 PASS (includes 2 new proxy tests)
+- vitest pip-replacement-intake.test.ts — 11/11 PASS
+- vitest theatrical-foundation + theatrical-v1 + direction-steps-1-8
+  — 121/121 PASS
+- direction / production / story typecheck — PASS
+- Fixture OBJ ingest + Blender 4.2.3 validation — PASS
+- Fixture five-view + turntable (16 stills) — PASS
+- Approved library fingerprint unchanged:
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
 
-PROOF
-artifacts/theatrical-v2/final-character-production/long-wing-original-strap/
-01–10 as before.
+COMMITS
+- 9337f66 Add Pip replacement intake gate and character-independent production systems.
+- (this report + labeled proxy blend follow on the same branch)
 
-Not production-ready. Not canon. Not theatrical-bound. Not merged.
+REMAINING CHARACTER-DEPENDENT BLOCKERS
+- Current Pip still has a fused left-front satchel riser.
+- No approved replacement mesh.
+- No final Pip retopo, UVs, texture lock, rig, facial rig, groom,
+  animation, collision, or Pip–Goat scale bind.
+- Goat remains unchanged and unapproved.
+- No hero shots or final episode renders.
+- Season 1 public canon is not approved.
+
+HOW TO UPLOAD AND PROCESS THE NEXT PIP MODEL
+1. Put the file on this machine (BLEND, GLB, GLTF, FBX, OBJ, or ZIP).
+2. Run:
+
+   scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
+
+   Optional:
+   PIP_LICENSE="in-house sculpt" PIP_ORIGIN="Justin upload" \
+     scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
+
+3. Review inbox/<package-id>/reports/COMPARISON_PACKAGE.md
+   and inbox/<package-id>/previews/.
+4. Approve or reject visually against the ten binding five-views
+   and the conditionally approved long-wing look.
+5. Do not retopo, rig, replace canon, bind theatrically, or merge
+   until that visual approval.
+
+The command copies the file unchanged, records filename + SHA-256,
+opens it in Blender 4.2.3 LTS, and stops. It will not replace
+current Pip.
 
 STATUS
-PIP VISUAL CANDIDATE: BLOCKED — original appearance conditionally approved; left-front riser still visible; isolated geometry replacement required
-GOAT VISUAL CANDIDATE: UNCHANGED FROM PRIOR PASS
+PIP VISUAL CANDIDATE: BLOCKED — original appearance conditionally approved; left-front riser still fused; waiting for a new upload
+GOAT VISUAL CANDIDATE: UNCHANGED — do not work unless separately authorized
 PIP PRODUCTION ASSET: BLOCKED
 GOAT PRODUCTION ASSET: BLOCKED
 CANON: UNCHANGED
 MERGE: NOT PERFORMED
 THEATRICAL BINDING: NOT DECLARED
+PRODUCTION-LIBRARY: UNTOUCHED
 PAID RESOURCES: NOT USED
