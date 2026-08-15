@@ -1,53 +1,43 @@
-JUSTIN COPY REPORT — Pip / Goat v2 source-package validation
+JUSTIN COPY REPORT — Pip / Goat v2 sculpt-revision gate
 Copy everything between the ===== lines.
 
 ============================================================
-TIVVLEJOY — PIP / GOAT V2 SOURCE PACKAGE VALIDATION
-Inspected only. Not approved. Nothing merged. Canon untouched.
+TIVVLEJOY — PIP / GOAT V2 SCULPT REVISION GATE
+Proposed. Unapproved. Stopped for Justin’s visual review.
 
-Source branch: assets/pip-goat-v2-source
-Source commit: bf00a8c8818519094003b992bce71b1aca7eefd3
-Package: TivvleJoy_Pip_Goat_3D_Source_v1_CURSOR_LITE (~395 MB)
-Hashes: 22 / 22 OK
-LITE gaps: FBX/OBJ interchange rows absent (expected)
+Binding authority: the ten five-view JPEGs.
+Only the two primary .blend files were edited.
+No GLB used as canon. No retopo, groom, or rig.
+No canonical replace. Nothing merged.
 
-Authority: the ten five-view JPEGs win.
-Primary .blend files are editable source, not canon.
-GLBs are comparison only.
+What changed:
+  Pip crest: three-group fan, center tallest, sweep back
+  Pip rear toe: hallux pulled back and planted on both feet
+  Pip satchel: kept sheet laterality (right-shoulder strap,
+    left-hip bag). Hard move tore the fused strap, so only
+    a small bag-body falloff was kept.
+  Goat upper-back cinnamon: teardrop stamp below the scarf
+  Goat scale: 1.5× Pip (measured 2.033 / 3.050)
 
-Technical (Blender 4.2.3 LTS; blends authored in 4.0.4):
-  Pip primary: 78,687 verts, 157k tris, 8K, height 2.00, no rig
-  Goat primary: 79,743 verts, 159k tris, 8K, height 2.00, no rig
-  Both are one fused mesh. Accessories not separated.
-  Pair scale is wrong. Goat should be about 1.5× Pip.
-  Prism GLBs ~2M tris, generator, tens of thousands of non-manifold edges.
-  Hunyuan GLBs ~500k tris, 4K maps dated texture_20250901.
-
-Visual vs the sheets:
-  These generated sculpts are much closer than the agent kitbash v2.
-  Pip: yellow-chartreuse, 3 coral feathers, teal satchel + spiral, green eyes.
-  Goat: oatmeal, left-eye cinnamon patch, 2 ridged horns, orange scarf, teal compass.
-  Still generated. Not production topology. Not a lock.
-  Review: Pip crest count in some profiles; rear toe; satchel shoulder/hip
-  (Hunyuan puts the bag on the opposite side — do not average).
-  Review: Goat upper-back cinnamon patch is strong on the sheet, weak on the primary back.
-  Review: Goat Prism filename vs pose may be inverted (one is hand-on-hip).
+Honest remaining gaps:
+  Pip profile can still read as two crest feathers
+  Goat back patch is present but still lighter/smaller
+    than the binding teardrop
+  Still generated fused sculpts, not production topology
 
 Recommendations:
-  Five-view JPEGs: ACCEPT as binding authority
-  Pip primary .blend: REVISE
-  Goat primary .blend: REVISE
-  All GLBs: REJECT as canon (comparison only)
-  Do not retopo, groom, rig, or replace canonical assets yet.
+  Pip revised: REVISE remaining
+  Goat revised: REVISE remaining
+  Do not approve as a lock.
+  Do not retopo, groom, rig, or replace canon yet.
 
-Corrected previews:
-  artifacts/theatrical-v2/source-package-validation/clean/
-  artifacts/theatrical-v2/source-package-validation/refs/
-Full writeup:
-  theatrical-foundation/proposed/v2/source-package-validation/VALIDATION.md
+Clean previews:
+  artifacts/theatrical-v2/sculpt-revision/clean/
+  pip/goat: front, three_quarter, side, back
+  pair: front, three_quarter
 
-No canonical replace. No THEATRICAL binding. No Hero-Shot.
-No Steps 9–16. No paid GPU, RunPod, cloud render, deploy, or
+No THEATRICAL binding. No Hero-Shot. No Steps 9–16.
+No paid GPU, RunPod, cloud render, deploy, or
 external provider. Fingerprint unchanged.
   7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
 ============================================================

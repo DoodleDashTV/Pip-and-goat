@@ -1,0 +1,43 @@
+JUSTIN COPY REPORT — Pip / Goat v2 sculpt-revision gate
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY — PIP / GOAT V2 SCULPT REVISION GATE
+Proposed. Unapproved. Stopped for Justin’s visual review.
+
+Binding authority: the ten five-view JPEGs.
+Only the two primary .blend files were edited.
+No GLB used as canon. No retopo, groom, or rig.
+No canonical replace. Nothing merged.
+
+What changed:
+  Pip crest: three-group fan, center tallest, sweep back
+  Pip rear toe: hallux pulled back and planted on both feet
+  Pip satchel: kept sheet laterality (right-shoulder strap,
+    left-hip bag). Hard move tore the fused strap, so only
+    a small bag-body falloff was kept.
+  Goat upper-back cinnamon: teardrop stamp below the scarf
+  Goat scale: 1.5× Pip (measured 2.033 / 3.050)
+
+Honest remaining gaps:
+  Pip profile can still read as two crest feathers
+  Goat back patch is present but still lighter/smaller
+    than the binding teardrop
+  Still generated fused sculpts, not production topology
+
+Recommendations:
+  Pip revised: REVISE remaining
+  Goat revised: REVISE remaining
+  Do not approve as a lock.
+  Do not retopo, groom, rig, or replace canon yet.
+
+Clean previews:
+  artifacts/theatrical-v2/sculpt-revision/clean/
+  pip/goat: front, three_quarter, side, back
+  pair: front, three_quarter
+
+No THEATRICAL binding. No Hero-Shot. No Steps 9–16.
+No paid GPU, RunPod, cloud render, deploy, or
+external provider. Fingerprint unchanged.
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+============================================================

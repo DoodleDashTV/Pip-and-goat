@@ -126,22 +126,27 @@ def revise_pip(obj, colors) -> dict:
     bag_ids = []
     for vid, col in colors.items():
         world = mw @ verts[vid].co
-        if teal(col) and world.z < 0.95 and world.x > 0.12:
+        # Bag body only. Do not pull the strap or neckerchief — that tears the fused mesh.
+        if teal(col) and 0.38 < world.z < 0.82 and world.x > 0.28 and world.y > 0.00:
             bag_ids.append(vid)
     if bag_ids:
         centroid = sum((mw @ verts[vid].co for vid in bag_ids), Vector()) / len(bag_ids)
-        # Binding: bag on character-left hip (+Y), lower front torso, clasp facing +X.
-        shift = Vector((0.018, 0.18 - centroid.y, 0.50 - centroid.z))
-        shift.z = max(-0.08, min(0.02, shift.z))
-        shift.y = max(0.04, min(0.12, shift.y))
+        target = Vector((0.018, 0.04, -0.02))
+        moved = 0
         for vid in bag_ids:
             world = mw @ verts[vid].co
-            verts[vid].co = imw @ (world + shift)
+            dist = (world - centroid).length
+            weight = max(0.0, 1.0 - dist / 0.13) ** 2
+            if weight < 0.05:
+                continue
+            verts[vid].co = imw @ (world + target * weight)
+            moved += 1
         obj.data.update()
         notes["satchel"] = {
             "from": list(centroid),
-            "shift": list(shift),
+            "max_shift": list(target),
             "count": len(bag_ids),
+            "moved": moved,
         }
 
     foot_ids = []
@@ -164,7 +169,7 @@ def revise_pip(obj, colors) -> dict:
             if back < 0.35 or world.z > 0.09:
                 continue
             # Plant a readable hallux behind the foot, on the ground.
-            delta = Vector((-0.055 * back, 0.0, -world.z * 0.35 + 0.004))
+            delta = Vector((-0.072 * back, 0.0, -world.z * 0.42 + 0.003))
             verts[vid].co = imw @ (world + delta)
             pulled += 1
         hallux[name] = pulled
@@ -185,32 +190,37 @@ def paint_goat_back_patch(obj, img) -> dict:
     mw = obj.matrix_world
     cinnamon_rgb = (0.62, 0.32, 0.16)
     stamps = 0
+    seen = set()
     for poly in obj.data.polygons:
         for li in poly.loop_indices:
             vid = obj.data.loops[li].vertex_index
             world = mw @ obj.data.vertices[vid].co
-            # Center upper-back teardrop, point up, plus a small tail-top stamp.
-            on_back = world.x < -0.02
+            # Upper-back teardrop only — keep off the skull (z > ~1.45).
+            on_back = world.x < -0.05
             teardrop = False
-            if on_back and 1.18 <= world.z <= 1.56:
-                t = (world.z - 1.18) / 0.38
-                width = 0.105 * (1.0 - 0.62 * t)
+            if on_back and 1.17 <= world.z <= 1.38:
+                t = (world.z - 1.17) / 0.21
+                width = 0.125 * (1.0 - 0.50 * t)
                 teardrop = abs(world.y) <= width
-            tail = on_back and 0.72 <= world.z <= 0.95 and abs(world.y) <= 0.07 and world.x < -0.08
+            tail = on_back and 0.74 <= world.z <= 0.90 and abs(world.y) <= 0.055 and world.x < -0.10
             if not (teardrop or tail):
                 continue
             u, v = uv[li].uv
             cx = int(round(u * (w - 1))) % w
             cy = int(round(v * (h - 1))) % h
-            rad = 14 if teardrop else 9
+            key = (cx // 5, cy // 5)
+            if key in seen:
+                continue
+            seen.add(key)
+            rad = 52 if teardrop else 20
             y0, y1 = max(0, cy - rad), min(h, cy + rad + 1)
             x0, x1 = max(0, cx - rad), min(w, cx + rad + 1)
             yy, xx = np.ogrid[y0:y1, x0:x1]
             dist = ((yy - cy) / rad) ** 2 + ((xx - cx) / rad) ** 2
             mask = dist <= 1.0
-            fall = np.clip(1.0 - dist, 0.0, 1.0)
+            fall = np.clip(1.0 - np.sqrt(np.clip(dist, 0, 1)), 0.0, 1.0)
             region = px[y0:y1, x0:x1]
-            alpha = (fall * (0.72 if teardrop else 0.55))[..., None]
+            alpha = (fall * (0.78 if teardrop else 0.45))[..., None]
             color = np.array([*cinnamon_rgb, 1.0], dtype=np.float32)
             region[mask] = region[mask] * (1.0 - alpha[mask]) + color * alpha[mask]
             stamps += 1
