@@ -76,6 +76,7 @@ TESTS AND VALIDATION
 COMMITS
 - 9337f66 Add Pip replacement intake gate and character-independent production systems.
 - efb17d9 Add labeled pipeline proxy and Justin intake report.
+- b10c2de Record intake checkpoint SHAs in the Justin copy report.
 
 REMAINING CHARACTER-DEPENDENT BLOCKERS
 - Current Pip still has a fused left-front satchel riser.
