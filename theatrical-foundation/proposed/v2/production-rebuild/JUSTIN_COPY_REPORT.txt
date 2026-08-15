@@ -1,0 +1,46 @@
+JUSTIN COPY REPORT — Pip / Goat theatrical production rebuild
+Copy everything between the ===== lines.
+
+============================================================
+TIVVLEJOY — PIP / GOAT THEATRICAL PRODUCTION REBUILD
+Stages 1–3 only. Proposed. Unapproved. Stopped for Justin’s visual review.
+
+Starting branch: cursor/theatrical-v2-sculpt-revision-1ebc
+Starting commit: d90b1d53f6c1094d3f536f9607ccc7341005a280
+Working branch: cursor/theatrical-production-rebuild-1ebc
+Draft PR: #23
+
+What this is:
+  A new separate-object rebuild. Not another grade of the fused sculpt.
+  Binding five-view JPEGs are the authority.
+  Existing primaries, revised blends, and canon were not overwritten.
+
+What held:
+  Goat is 1.500 × Pip (3.075 / 2.050)
+  Pip satchel: strap over character-right, bag on character-left
+  Goat cinnamon patch stays on the character-left eye
+  Pip: 3 coral crest feathers, teal scarf + satchel, green eyes
+  Goat: 2 ridged horns, floppy ears, orange neckwear, teal compass
+  88 Pip objects / 80 Goat objects. No fused mesh.
+
+Honest gaps:
+  This is a clean toy-kitbash lookdev, not the sheet’s feathered/furred
+  production characters. Faces are spherical. Scarves are rings.
+  Pip wings are hanging leaves, not graceful layered arms.
+  Goat back patch is an oval, not the sheet’s spine teardrop.
+  Not ready for retopo, groom, or rig.
+
+Recommendation:
+  Pip: REVISE — awaiting Justin’s visual direction
+  Goat: REVISE — awaiting Justin’s visual direction
+  Do not approve. Do not continue to Stages 4–8.
+
+Previews:
+  artifacts/theatrical-v2/production-rebuild/clean/
+  artifacts/theatrical-v2/production-rebuild/comparison/
+
+Canon unchanged. No THEATRICAL binding. No merge.
+No Hero-Shot. No paid GPU, RunPod, cloud render, or external provider.
+Fingerprint unchanged:
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+============================================================
