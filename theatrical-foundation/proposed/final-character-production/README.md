@@ -29,5 +29,9 @@ Finish-polish views live under
 The attached pair CGI image is the polish target only. See
 `reports/SUPPLEMENTAL_TARGET.md`.
 
+Targeted correction stills live under
+`artifacts/theatrical-v2/final-character-production/corrections/`.
+See `reports/TARGETED_CORRECTION_PASS.md`.
+
 Production retopo, groom, and rigs are **not** in this folder. See
 `reports/PRODUCTION_BLOCKERS.md`.

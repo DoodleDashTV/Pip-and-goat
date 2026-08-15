@@ -1,0 +1,49 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "theatrical_bound": false,
+  "merge": false,
+  "paid_resources": false,
+  "primitive_rebuild_used": false,
+  "prediction_pose_copied": false,
+  "blender": "4.2.3 LTS",
+  "starting_commit": "7bf2b717e217b3422b58b75ba1829d9f3aa43e35",
+  "goat_forehead_spots": {
+    "cause": "Goat_Catch_0 and Goat_Catch_1 were detached emissive highlight spheres (~0.018 diameter, emission 0.35) placed above brow-detected centroids. Goat_Cornea_0 and Goat_Cornea_1 were glassy spheres (originally 0.136 diameter) whose upper hemispheres poked through the brow.",
+    "how_removed": "Catch spheres deleted. Cornea objects kept in the file with hide_render=true and hide_viewport=true. Not painted over. Painted in-eye catchlights preserved.",
+    "corneas_deleted": false,
+    "front_closeup_white_count_brow_forehead": 0
+  },
+  "goat_back_marking": {
+    "cause": "Stage-2 Color stamp used a hard-z-cut teardrop widest at a flat top plus a separate vertical tail-base bar at z 0.92-1.16, width 0.065.",
+    "how_reshaped": "Restored original working Color map, then painted a rounded-crown organic teardrop with cosine sides, sine irregularity, soft scarf fade, and no tail bar.",
+    "tail_rectangle_removed": true,
+    "upper_mark_still_geometric_stamp": true,
+    "further_stamps_stopped": true
+  },
+  "pip_wings": {
+    "stop": true,
+    "reason": "Fused Prism wing verts shredded into vertical shards when lower feathers were translated. Stretch reverted.",
+    "tip_z_before": {"left": 0.54996657371521, "right": 0.5580368041992188},
+    "tip_z_after_failed_stretch": {"left": 0.39056241512298584, "right": 0.3985961675643921},
+    "after_revert": "original Prism length"
+  },
+  "pip_eyes": {
+    "stop": true,
+    "imbalance": "fused eyelid opening / generated-face asymmetry, not independent globe scale and not camera perspective alone",
+    "separate_globes": false,
+    "isolated_iris_verts": {"left": 0, "right": 0},
+    "geometry_edited": false,
+    "head_mirrored": false
+  },
+  "renders": [
+    "artifacts/theatrical-v2/final-character-production/corrections/01_goat_corrected_front_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/02_goat_corrected_rear.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/03_goat_corrected_rear_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/04_pip_corrected_front_neutral_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/05_pip_corrected_three_quarter_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/06_pip_corrected_front_full.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/07_pip_corrected_three_quarter_full.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png"
+  ]
+}

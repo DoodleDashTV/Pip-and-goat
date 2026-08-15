@@ -1,0 +1,58 @@
+{
+  "objects": [
+    {
+      "name": "Goat_Cornea_0",
+      "hide_render": true,
+      "hide_viewport": true,
+      "location": [
+        0.34465622901916504,
+        0.2237841784954071,
+        2.18477725982666
+      ],
+      "dims": [
+        0.0652800053358078,
+        0.0652800053358078,
+        0.0652800053358078
+      ],
+      "materials": [
+        "Goat_Cornea"
+      ]
+    },
+    {
+      "name": "Goat_Cornea_1",
+      "hide_render": true,
+      "hide_viewport": true,
+      "location": [
+        0.34357374906539917,
+        -0.2331567406654358,
+        2.186133861541748
+      ],
+      "dims": [
+        0.0652800053358078,
+        0.0652800053358078,
+        0.0652800053358078
+      ],
+      "materials": [
+        "Goat_Cornea"
+      ]
+    },
+    {
+      "name": "Goat_HighDetail",
+      "hide_render": false,
+      "hide_viewport": false,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dims": [
+        1.21039217710495,
+        1.524128496646881,
+        3.0749998092651367
+      ],
+      "materials": [
+        "tripo_material_3eec9046-421b-4d5d-838e-2439a6e261d8"
+      ]
+    }
+  ]
+}

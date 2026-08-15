@@ -1,76 +1,76 @@
-TIVVLEJOY — PIP AND GOAT FINAL THEATRICAL CHARACTER PRODUCTION
+TIVVLEJOY — TARGETED CHARACTER CORRECTION PASS
 SELECT-ALL COPY BLOCK
 
-Starting branch: cursor/theatrical-production-rebuild-1ebc
-Starting commit: 31970a41500bc77b88d1bae26982009769d7e6d1
+Starting commit: 7bf2b717e217b3422b58b75ba1829d9f3aa43e35
 Working branch: cursor/theatrical-final-character-production-1ebc
 Draft PR: #24
 Blender: 4.2.3 LTS
 Paid resources: not used
+Canon / merge / theatrical binding: unchanged / not performed / not declared
 
-PIP FOUNDATION
-Packaged Pip_Prism_source.glb
-SHA-256 722f8bd9bf6eb02e31f5ee297898232de2633462eee467290c01b511c9c4fecd
-Justin’s exact Prism filename was not in the LITE tree. This is the only
-Pip Prism available. Rejected primitive rebuild was not used.
+This was a tightly limited correction pass. Neither character was rebuilt.
+Prism foundations were not replaced. No retopo, rig, merge, or paid resources.
 
-GOAT FOUNDATION
-Goat_Prism_expressive_source.glb (neutral stance)
-SHA-256 0b4eebc5f89fd24fa7d2d4508d3551e4d11de57778089cc714c6080015424658
-Selected because it is the closest high-detail NEUTRAL match: face, left-eye
-cinnamon, two ridged horns, floppy ears, orange scarf, teal compass, hooves.
-The other Prism file is a hands-on-hips pose donor only.
+FIX 1 — GOAT WHITE FOREHEAD SPOTS
+Exact cause: Goat_Catch_0 and Goat_Catch_1 were detached emissive white
+highlight spheres (~0.018 diameter) placed above the brows, not in the
+eyes. Goat_Cornea_0 / Goat_Cornea_1 were oversized glassy spheres
+(originally 0.136 diameter) whose upper hemispheres poked through the
+brow as white circles.
+How removed: catch spheres deleted; cornea objects kept in the file but
+hidden from render (not deleted); no paint-over. Painted in-eye
+catchlights remain.
+Proof: front close-up brow/forehead pixel analysis white_count = 0.
 
-WHAT THIS PASS DID
-1. Imported the two selected Prism files into new proposed working blends.
-2. Locked Pip height 2.05 and Goat height 3.075 (ratio 1.50).
-3. Painted Goat’s missing upper-back cinnamon teardrop on a Color-map
-   duplicate. Readable on the proposed back render.
-4. Applied a finish-polish pass toward the attached pair CGI image:
-   sheen, subsurface, coat, gentle warm HSV, Goat cornea spheres,
-   warm feature lighting. Did not copy the prediction hands-on-hips pose.
-5. Rendered required Blender views: front, 3/4, side, back, face,
-   pair scale, Pip strap/wing/crest/eye close-ups, Goat patch/back/horn/
-   compass/fur close-ups.
-6. Built proposed-vs-binding comparison sheets and a phone contact sheet.
+FIX 2 — GOAT BROWN BACK RECTANGLE
+Exact cause: Stage 2 Color stamp used a hard-z-cut teardrop (widest at a
+flat top) plus a separate vertical tail-base bar at z 0.92–1.16, width
+0.065. That rasterized as a brown rectangle down the back and above the
+tail.
+How reshaped: restored the original working Color map, then painted a
+rounded-crown organic teardrop only. No tail bar. No hard z-cut.
+Result: the tail rectangle is gone. The upper-back cinnamon is present
+and centered under the scarf, but it still reads as a somewhat geometric
+stamp, not the sheet’s fluffy teardrop. Further albedo stamps were
+stopped to avoid more UV rectangles.
 
-WHAT WAS NOT DONE — DO NOT TREAT AS FINISHED PRODUCTION
-No retopo. No production UVs. No production groom. No facial rig. No body rig.
-No walk / run / jump / blink / lip-sync / strap deformation tests.
-Both meshes are still ~1.9 million triangles, tens of thousands of
-non-manifold edges, one fused object, no armature.
-Lighting and shader polish do not equal a finished production asset.
-Pip cornea spheres were not placed (detector found no eye centroids).
-The compass close-up framed the face more tightly than the compass housing.
+FIX 3 — PIP WING LENGTH
+Stop condition hit. Lower-feather translation on the fused Prism mesh
+shredded into vertical shards (same failure as the earlier sculpt
+revision). Stretch reverted. No second attempt.
+tip_z before: left 0.550 / right 0.558
+tip_z after failed stretch: left 0.391 / right 0.399
+after revert: original Prism length (~0.55 / ~0.56)
+Wings are still short of the pair-image lower-belly / upper-thigh
+guidance. Isolated wing geometry would be required.
 
-HONEST LIKENESS
-Closer to the binding sheets than the rejected primitive rebuild.
-Not an exact match.
+FIX 4 — PIP UNEQUAL EYES
+Stop condition hit. No independent eyeball / iris / pupil objects.
+Iris-vert isolation returned left 0 / right 0. No eye mesh was edited.
+The straight-on close-up still shows a slightly more open viewer-left
+eye. That is fused eyelid-opening / generated-face asymmetry, not a
+mismatched pair of globes and not camera perspective alone.
+Head was not mirrored.
 
-Pip still: slimmer/taller than the sheet pear; wings hang closer to the
-body than the binding flare; crest usually reads as three feathers but
-extra stubbles remain in close-up; color is chartreuse-family, can still
-read a little olive-lime.
+VALIDATION RENDERS
+1. artifacts/theatrical-v2/final-character-production/corrections/01_goat_corrected_front_closeup.png
+2. artifacts/theatrical-v2/final-character-production/corrections/02_goat_corrected_rear.png
+3. artifacts/theatrical-v2/final-character-production/corrections/03_goat_corrected_rear_three_quarter.png
+4. artifacts/theatrical-v2/final-character-production/corrections/04_pip_corrected_front_neutral_closeup.png
+5. artifacts/theatrical-v2/final-character-production/corrections/05_pip_corrected_three_quarter_closeup.png
+6. artifacts/theatrical-v2/final-character-production/corrections/06_pip_corrected_front_full.png
+7. artifacts/theatrical-v2/final-character-production/corrections/07_pip_corrected_three_quarter_full.png
+8. artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png
 
-Goat still: slimmer than the sheet bean; teardrop is now present but more
-stamped than fluffy; extra small cinnamon stamp above the tail; scarf back
-is a wrap, not the sheet bow; fur is generated, not a groom.
-
-Satchel laterality (front/3q/pair): strap character-right, bag
-character-left. Held. Do not flip.
-Goat left-eye cinnamon: character-left. Held.
-
-JUSTIN DECISION NEEDED
-1. Accept these Prism high-res candidates as the likeness target and
-   commission a real retopo/rig, or
-2. Supply a different already-separated high-detail source, or
-3. Authorize a scoped isolated rebuild of only Pip wings and crest as
-   separate geometry (not another primitive character).
+EDITED FILES
+goat_highres_candidate.blend, pip_highres_candidate.blend (wings reverted),
+textures/goat_highres_basecolor.png, correction scripts and reports.
+Working blends not overwritten. production-library not touched.
 
 STATUS
-PIP VISUAL CANDIDATE: BLOCKED — Prism foundation imported and scaled; crest count, wing rest pose, and slimmer silhouette still fail the binding-quality gate
-GOAT VISUAL CANDIDATE: BLOCKED — Neutral Prism expressive imported and scaled 1.50x; back teardrop now present; slimmer silhouette, scarf-back bow, and generated fur still fail the binding-quality gate
-PIP PRODUCTION ASSET: BLOCKED — 1.9M-tri non-manifold Tripo mesh; no retopo, UVs, groom, or rig
+PIP VISUAL CANDIDATE: BLOCKED — Prism + finish polish; wings still short; eyes still slightly unequal; extra crest stubbles remain
+GOAT VISUAL CANDIDATE: BLOCKED — forehead catch spheres removed and corneas hidden from render; tail rectangle removed; upper-back mark still a somewhat geometric stamp; slimmer than sheets
+PIP PRODUCTION ASSET: BLOCKED — 1.9M-tri non-manifold Tripo mesh; no retopo, groom, or rig
 GOAT PRODUCTION ASSET: BLOCKED — same
 CANON: UNCHANGED
 MERGE: NOT PERFORMED

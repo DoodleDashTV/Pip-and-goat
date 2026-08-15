@@ -28,7 +28,7 @@
 - Comparison sheets, lighting variants, and phone contact sheet added.
 - Stages 4–8 not claimed. See `PRODUCTION_BLOCKERS.md`.
 
-## Supplemental finish polish — this commit
+## Supplemental finish polish — `7bf2b71`
 
 - Attached pair CGI image treated as polish/finish target only.
 - Multi-view sheets remain identity authority. Hands-on-hips pose not copied.
@@ -38,5 +38,21 @@
   detector found no centroids; painted eyes plus feature lights remain.
 - Required Blender views and close-ups rendered under warm feature lighting.
 - Production topology/groom/rig still blocked.
+
+## Targeted correction pass — this commit
+
+- Goat forehead spots: identified as detached `Goat_Catch_*` spheres plus
+  oversized `Goat_Cornea_*` spheres poking through the brow. Catch spheres
+  deleted. Corneas kept in the file and hidden from render. Not painted over.
+- Goat back rectangle: caused by a hard-z-cut Color stamp plus a tail-base
+  bar. Restored original working Color, then painted a rounded-crown
+  teardrop with no tail bar. Tail rectangle is gone. Upper mark still a
+  somewhat geometric stamp; further stamps stopped.
+- Pip wings: lower-feather translation shredded the fused mesh. Reverted.
+  Wings remain short.
+- Pip eyes: no isolatable globes. No eye mesh edit. Lid opening still
+  slightly unequal in the straight-on close-up.
+- Eight labeled correction renders written under
+  `artifacts/theatrical-v2/final-character-production/corrections/`.
 
 No canon replace. No merge.

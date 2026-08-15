@@ -31,9 +31,9 @@ high-detail sources in the LITE package. Binding five-view JPEGs still win.
 | Identity / explorer costume | Held: oatmeal fur, orange scarf, teal compass, two ridged horns |
 | Left-eye cinnamon | Held, character-left |
 | Scale | 1.50× Pip held |
-| Upper-back teardrop | Now painted on the Color map; readable on the proposed back render.
-  Shape is closer to a rounded-to-point stamp than the sheet’s fluffier
-  organic patch. A small extra cinnamon stamp sits above the tail |
+| Upper-back teardrop | Tail-base rectangle removed. Upper-back cinnamon is
+  present under the scarf as a rounded-crown stamp. Still more geometric
+  than the sheet’s fluffy organic patch. Further albedo stamps stopped |
 | Body volume | Proposed reads slimmer than the binding bean |
 | Scarf back | Binding shows a bow; Prism reads as a simple wrap |
 | Fur | Generated groom-look, not a production fur system |
