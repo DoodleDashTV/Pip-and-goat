@@ -114,10 +114,10 @@ def revise_pip(obj, colors) -> dict:
             nearest = min(dists, key=dists.get)
             ordered = sorted(dists.values())
             t = max(0.0, min(1.0, (world.z - 1.60) / 0.42))
-            valley = t > 0.22 and ordered[1] / max(ordered[0], 1e-4) < 1.38
+            valley = t > 0.38 and ordered[1] / max(ordered[0], 1e-4) < 1.20
             if valley:
-                skull = Vector((attach.x * 0.75 + world.x * 0.25, world.y * 0.25, attach.z - 0.01))
-                verts[vid].co = imw @ (world + cap((skull - world) * (0.28 * t), 0.075))
+                skull = Vector((attach.x * 0.8 + world.x * 0.2, world.y * 0.35, attach.z))
+                verts[vid].co = imw @ (world + cap((skull - world) * (0.16 * t), 0.045))
                 counts["valley"] += 1
                 continue
             tip = tips[nearest]
@@ -126,14 +126,14 @@ def revise_pip(obj, colors) -> dict:
                 continue
             axis.normalize()
             closest = attach + axis * (world - attach).dot(axis)
-            thin = (closest - world) * (0.48 * t)
+            thin = (closest - world) * (0.32 * t)
             if nearest == "center":
-                extra = Vector((-0.055 * t, 0.0, 0.042 * t))
+                extra = Vector((-0.062 * t, 0.0, 0.048 * t))
             elif nearest == "left":
-                extra = Vector((-0.018 * t, 0.052 * t, 0.010 * t))
+                extra = Vector((-0.008 * t, 0.062 * t, 0.032 * t))
             else:
-                extra = Vector((0.012 * t, -0.052 * t, 0.010 * t))
-            verts[vid].co = imw @ (world + cap(thin + extra, 0.095))
+                extra = Vector((0.022 * t, -0.062 * t, 0.032 * t))
+            verts[vid].co = imw @ (world + cap(thin + extra, 0.10))
             counts[nearest] += 1
         obj.data.update()
         notes["crest_counts"] = counts
@@ -226,11 +226,12 @@ def paint_goat_back_patch(obj, img) -> dict:
             u, v = uv[li].uv
             cx = int(round(u * (w - 1))) % w
             cy = int(round(v * (h - 1))) % h
-            key = (cx // 3, cy // 3)
+            key = (cx, cy)
             if key in seen:
                 continue
             seen.add(key)
-            rad = 64 if teardrop else 22
+            # Small stamps so the mesh-space teardrop is not bled into a UV rectangle.
+            rad = 11 if teardrop else 8
             y0, y1 = max(0, cy - rad), min(h, cy + rad + 1)
             x0, x1 = max(0, cx - rad), min(w, cx + rad + 1)
             yy, xx = np.ogrid[y0:y1, x0:x1]
@@ -238,7 +239,7 @@ def paint_goat_back_patch(obj, img) -> dict:
             mask = dist <= 1.0
             fall = np.clip(1.0 - np.sqrt(np.clip(dist, 0, 1)), 0.0, 1.0)
             region = px[y0:y1, x0:x1]
-            alpha = (fall * (0.92 if teardrop else 0.50))[..., None]
+            alpha = (fall * (0.96 if teardrop else 0.55))[..., None]
             color = np.array([*cinnamon_rgb, 1.0], dtype=np.float32)
             region[mask] = region[mask] * (1.0 - alpha[mask]) + color * alpha[mask]
             stamps += 1
