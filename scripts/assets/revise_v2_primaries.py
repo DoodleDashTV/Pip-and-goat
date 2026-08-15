@@ -85,43 +85,60 @@ def revise_pip(obj, colors) -> dict:
     verts = obj.data.vertices
     notes = {}
 
-    crest_ids = []
+    crest = []
     for vid, col in colors.items():
         world = mw @ verts[vid].co
-        if coral(col) and world.z >= 1.68:
-            crest_ids.append(vid)
-    if crest_ids:
-        ys = sorted((mw @ verts[vid].co).y for vid in crest_ids)
-        q1 = ys[len(ys) // 3]
-        q2 = ys[(2 * len(ys)) // 3]
-        groups = {"right": [], "center": [], "left": []}
-        for vid in crest_ids:
-            y = (mw @ verts[vid].co).y
-            if y <= q1:
-                groups["right"].append(vid)
-            elif y >= q2:
-                groups["left"].append(vid)
-            else:
-                groups["center"].append(vid)
-        notes["crest_counts"] = {name: len(ids) for name, ids in groups.items()}
-        for name, ids in groups.items():
-            if not ids:
+        if coral(col) and world.z >= 1.60:
+            crest.append((vid, world))
+    if crest:
+        attach_pts = [p for _, p in crest if p.z <= 1.74]
+        attach = sum(attach_pts, Vector()) / len(attach_pts) if attach_pts else Vector((0.22, 0.0, 1.68))
+        high = [(vid, p) for vid, p in crest if p.z >= 1.80] or crest
+        center_tip = max(high, key=lambda item: item[1].z - 0.20 * abs(item[1].y))[1]
+        left_tip = max(high, key=lambda item: item[1].y + 0.25 * item[1].z)[1]
+        right_tip = max(high, key=lambda item: -item[1].y + 0.25 * item[1].z)[1]
+        # Force three distinct Y targets if the mesh collapsed to one lobe.
+        if abs(left_tip.y - right_tip.y) < 0.06:
+            left_tip = Vector((center_tip.x, 0.075, center_tip.z - 0.04))
+            right_tip = Vector((center_tip.x, -0.075, center_tip.z - 0.04))
+        tips = {"center": center_tip, "left": left_tip, "right": right_tip}
+        counts = {"center": 0, "left": 0, "right": 0, "valley": 0}
+
+        def cap(delta: Vector, limit: float) -> Vector:
+            if delta.length > limit:
+                return delta * (limit / delta.length)
+            return delta
+
+        for vid, world in crest:
+            dists = {name: (world - tip).length for name, tip in tips.items()}
+            nearest = min(dists, key=dists.get)
+            ordered = sorted(dists.values())
+            t = max(0.0, min(1.0, (world.z - 1.60) / 0.42))
+            valley = t > 0.22 and ordered[1] / max(ordered[0], 1e-4) < 1.38
+            if valley:
+                skull = Vector((attach.x * 0.75 + world.x * 0.25, world.y * 0.25, attach.z - 0.01))
+                verts[vid].co = imw @ (world + cap((skull - world) * (0.28 * t), 0.075))
+                counts["valley"] += 1
                 continue
-            worlds = [mw @ verts[vid].co for vid in ids]
-            tip_z = max(p.z for p in worlds)
-            for vid, world in zip(ids, worlds):
-                # Hierarchy: center tallest, sides shorter, all sweep back (-X) and fan in Y.
-                t = max(0.0, (world.z - 1.68) / max(tip_z - 1.68, 1e-4))
-                delta = Vector((-0.034 * t, 0.0, 0.018 * t))
-                if name == "left":
-                    delta += Vector((-0.008 * t, 0.028 * t, -0.004 * t))
-                elif name == "right":
-                    delta += Vector((-0.008 * t, -0.028 * t, -0.004 * t))
-                else:
-                    delta += Vector((-0.006 * t, 0.0, 0.016 * t))
-                verts[vid].co = imw @ (world + delta)
+            tip = tips[nearest]
+            axis = tip - attach
+            if axis.length < 1e-4:
+                continue
+            axis.normalize()
+            closest = attach + axis * (world - attach).dot(axis)
+            thin = (closest - world) * (0.48 * t)
+            if nearest == "center":
+                extra = Vector((-0.055 * t, 0.0, 0.042 * t))
+            elif nearest == "left":
+                extra = Vector((-0.018 * t, 0.052 * t, 0.010 * t))
+            else:
+                extra = Vector((0.012 * t, -0.052 * t, 0.010 * t))
+            verts[vid].co = imw @ (world + cap(thin + extra, 0.095))
+            counts[nearest] += 1
         obj.data.update()
-        notes["crest"] = "spread three coral feathers, center tallest, sweep back"
+        notes["crest_counts"] = counts
+        notes["crest_tips"] = {name: list(tip) for name, tip in tips.items()}
+        notes["crest"] = "carve valleys and thin three separate blades; center tallest and swept back"
 
     bag_ids = []
     for vid, col in colors.items():
@@ -188,19 +205,20 @@ def paint_goat_back_patch(obj, img) -> dict:
     px = px.reshape((h, w, 4))
     uv = obj.data.uv_layers.active.data
     mw = obj.matrix_world
-    cinnamon_rgb = (0.62, 0.32, 0.16)
+    # Binding sheet: saturated reddish-brown teardrop, rounded just below
+    # the scarf, point tapering down the spine. Keep off the skull.
+    cinnamon_rgb = (0.58, 0.26, 0.11)
     stamps = 0
     seen = set()
     for poly in obj.data.polygons:
         for li in poly.loop_indices:
             vid = obj.data.loops[li].vertex_index
             world = mw @ obj.data.vertices[vid].co
-            # Upper-back teardrop only — keep off the skull (z > ~1.45).
-            on_back = world.x < -0.05
+            on_back = world.x < -0.04
             teardrop = False
-            if on_back and 1.17 <= world.z <= 1.38:
-                t = (world.z - 1.17) / 0.21
-                width = 0.125 * (1.0 - 0.50 * t)
+            if on_back and 1.12 <= world.z <= 1.405:
+                t = (1.405 - world.z) / 0.285
+                width = 0.145 * (1.0 - 0.78 * max(0.0, min(1.0, t)))
                 teardrop = abs(world.y) <= width
             tail = on_back and 0.74 <= world.z <= 0.90 and abs(world.y) <= 0.055 and world.x < -0.10
             if not (teardrop or tail):
@@ -208,11 +226,11 @@ def paint_goat_back_patch(obj, img) -> dict:
             u, v = uv[li].uv
             cx = int(round(u * (w - 1))) % w
             cy = int(round(v * (h - 1))) % h
-            key = (cx // 5, cy // 5)
+            key = (cx // 3, cy // 3)
             if key in seen:
                 continue
             seen.add(key)
-            rad = 52 if teardrop else 20
+            rad = 64 if teardrop else 22
             y0, y1 = max(0, cy - rad), min(h, cy + rad + 1)
             x0, x1 = max(0, cx - rad), min(w, cx + rad + 1)
             yy, xx = np.ogrid[y0:y1, x0:x1]
@@ -220,7 +238,7 @@ def paint_goat_back_patch(obj, img) -> dict:
             mask = dist <= 1.0
             fall = np.clip(1.0 - np.sqrt(np.clip(dist, 0, 1)), 0.0, 1.0)
             region = px[y0:y1, x0:x1]
-            alpha = (fall * (0.78 if teardrop else 0.45))[..., None]
+            alpha = (fall * (0.92 if teardrop else 0.50))[..., None]
             color = np.array([*cinnamon_rgb, 1.0], dtype=np.float32)
             region[mask] = region[mask] * (1.0 - alpha[mask]) + color * alpha[mask]
             stamps += 1
