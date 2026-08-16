@@ -13,6 +13,7 @@ import { trackShotDependencies, invalidateShots } from '../dependencies';
 import { recordArtifactVersion } from '../versioning';
 import { compileDraftMux } from '../assembly';
 import { specifyReusableLibrary } from '../library';
+import { compileClosedStepsAcceptance } from '../steps-closed';
 import type { StoryBrief } from '../story';
 
 export const EPISODE_1_DRAFT_LABEL = 'DRAFT_NONCANONICAL' as const;
@@ -176,6 +177,8 @@ export function buildEpisode1DraftPackage(): {
   versions: ReturnType<typeof recordArtifactVersion>[];
   manifests: ReturnType<typeof buildEpisode1Manifests>;
   mux: ReturnType<typeof compileDraftMux>;
+  closedSteps: ReturnType<typeof compileClosedStepsAcceptance>;
+  pipelineClass: 'PIPELINE_TEST_ONLY';
   version: typeof PREPRODUCTION_SUBSYSTEM_VERSIONS.episode1;
 } {
   const workflow = advanceWorkflow(EPISODE_1_DRAFT_BRIEF);
@@ -196,11 +199,13 @@ export function buildEpisode1DraftPackage(): {
     recordArtifactVersion({ kind: 'ANIMATIC', cacheKey: workflow.bundle.animatic.cacheKey }),
     recordArtifactVersion({ kind: 'SHOT_PLAN', cacheKey: workflow.bundle.shotPlan.cacheKey }),
   ];
-  const mux = compileDraftMux({
-    animatic: workflow.bundle.animatic,
-    audio: workflow.bundle.audio,
-    outputPath: 'artifacts/studio-hardening-17-24/episode-1-draft.mp4',
+  const closedSteps = compileClosedStepsAcceptance({
+    brief: EPISODE_1_DRAFT_BRIEF,
+    workflow,
+    sourceCommit: 'DRAFT_NONCANONICAL',
+    outputPath: 'artifacts/studio-steps-9-16-closed/episode-1-draft.mp4',
   });
+  const mux = closedSteps.animatic.mux;
   return {
     label: EPISODE_1_DRAFT_LABEL,
     productionEligible: false,
@@ -218,6 +223,8 @@ export function buildEpisode1DraftPackage(): {
     versions,
     manifests: buildEpisode1Manifests(workflow),
     mux,
+    closedSteps,
+    pipelineClass: 'PIPELINE_TEST_ONLY',
     version: PREPRODUCTION_SUBSYSTEM_VERSIONS.episode1,
   };
 }

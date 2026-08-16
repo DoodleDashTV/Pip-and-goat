@@ -49,3 +49,4 @@ export * from './dependencies';
 export * from './profile';
 export * from './provenance';
 export * from './analytics';
+export * from './steps-closed';
