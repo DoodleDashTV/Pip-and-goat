@@ -23,6 +23,8 @@
     "validate:milestone4": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-milestone4.ts",
     "validate:milestone5": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-milestone5.ts",
     "validate:hardening": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-milestone5.ts",
+    "validate:persist": "pnpm --filter @doodle-dash/database exec tsx --env-file=../../.env ../../scripts/preproduction/validate-persist.ts",
+    "validate:studio-hardening": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-studio-hardening.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
