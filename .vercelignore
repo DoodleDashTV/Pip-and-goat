@@ -7,7 +7,6 @@ production-library
 **/*.blend
 **/*.blend1
 artifacts
-workers/runpod-blender
 .doodle-dash-storage
 **/.doodle-dash-storage
 .doodle-dash-cache
