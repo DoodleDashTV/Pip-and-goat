@@ -100,12 +100,7 @@ export function StudioShell({
         />
       ) : null}
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col overflow-x-hidden px-4 pb-10 pt-5 md:px-6 lg:flex-row lg:gap-8 lg:px-8">
-        <header
-          className={[
-            'mb-4 flex items-center justify-between gap-3 lg:hidden',
-            navOpen ? 'relative z-[60]' : '',
-          ].join(' ')}
-        >
+        <header className="mb-4 flex items-center justify-between gap-3 lg:hidden">
           <div className="min-w-0">
             <p className="font-display text-xl font-bold text-[var(--color-navigation)]">
               {STUDIO_SHORT_NAME}
@@ -127,7 +122,7 @@ export function StudioShell({
         <aside
           id="studio-navigation"
           className={[
-            'z-50 w-full shrink-0 lg:relative lg:mb-0 lg:block lg:w-64',
+            'z-[60] w-full shrink-0 lg:relative lg:mb-0 lg:block lg:w-64',
             navOpen ? 'fixed inset-y-0 left-0 block max-w-[20rem] p-4' : 'hidden lg:block',
           ].join(' ')}
         >
