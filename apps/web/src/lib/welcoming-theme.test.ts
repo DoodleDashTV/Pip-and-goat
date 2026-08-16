@@ -14,6 +14,7 @@ import {
   planStudioCompletion25To32Infrastructure,
 } from '@doodle-dash/preproduction';
 import { readStudioDashboardStatus } from './studio-status';
+import { isPublicWebsitePreview } from './public-preview';
 
 const repoRoot = path.resolve(__dirname, '../../../..');
 
@@ -186,6 +187,21 @@ describe('protected production state is unchanged', () => {
   it('refuses paid-resource execution', () => {
     const paid = evaluatePaidResourcePolicy({ allowPaidGpu: true, estimateUsd: 1 });
     expect(paid.allowed).toBe(false);
+  });
+
+  it('keeps public preview from bundling secrets or protected assets', () => {
+    const ignore = readRepo('.vercelignore');
+    expect(ignore).toContain('production-library');
+    expect(ignore).toContain('**/*.blend');
+    expect(ignore).toContain('.env');
+    expect(ignore).toContain('artifacts');
+    expect(ignore).toContain('workers/runpod-blender');
+    expect(isPublicWebsitePreview({ DATABASE_URL: 'postgresql://local' })).toBe(false);
+    expect(isPublicWebsitePreview({})).toBe(true);
+    const home = readRepo('apps/web/src/app/page.tsx');
+    expect(home).toContain('isPublicWebsitePreview');
+    expect(home).toContain('Not available yet');
+    expect(home).toContain('StudioStatusPanel');
   });
 
   it('keeps required lineage strings in the progress file', () => {

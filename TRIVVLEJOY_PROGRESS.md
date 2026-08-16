@@ -27,6 +27,8 @@ stay closed. This increment is UI-only.
 - Truthful dashboard status consumed from existing gate interfaces
 - Collapsible mobile navigation and visible keyboard focus
 - Temporary local preview for iPhone visual review
+- Public-preview safety: no database, no secrets, no production-library upload
+- Draft PR #32 stays draft and unmerged
 
 ## Tests / validation
 
@@ -45,7 +47,7 @@ stay closed. This increment is UI-only.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, or #31.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, or #32.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

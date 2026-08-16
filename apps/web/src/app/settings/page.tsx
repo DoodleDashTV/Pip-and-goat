@@ -1,10 +1,14 @@
 import { studioSettingsService } from '@doodle-dash/characters';
 import { SettingsForm } from '@/components/SettingsForm';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
-  const strictCharacterLock = await studioSettingsService.isStrictCharacterLockEnabled();
+  const publicPreview = isPublicWebsitePreview();
+  const strictCharacterLock = publicPreview
+    ? true
+    : await studioSettingsService.isStrictCharacterLockEnabled();
 
   return (
     <div className="space-y-6">
@@ -17,7 +21,20 @@ export default async function SettingsPage() {
         </p>
       </header>
 
-      <SettingsForm initialStrictCharacterLock={strictCharacterLock} />
+      {publicPreview ? (
+        <section className="studio-card p-6">
+          <h2 className="font-display text-2xl font-semibold">Character Lock</h2>
+          <p className="status-warning mt-3 inline-flex min-h-touch items-center gap-2 rounded-full px-3 py-2 text-sm font-bold">
+            <span aria-hidden="true">!</span>
+            <span>Not available yet</span>
+          </p>
+          <p className="mt-3 text-sm text-[var(--color-text-muted)]">
+            The public preview does not connect to the studio database or change production locks.
+          </p>
+        </section>
+      ) : (
+        <SettingsForm initialStrictCharacterLock={strictCharacterLock} />
+      )}
 
       <section aria-labelledby="theme-tokens-heading" className="studio-card space-y-4 p-6">
         <h2 id="theme-tokens-heading" className="font-display text-2xl font-semibold">
