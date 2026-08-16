@@ -1,6 +1,6 @@
 {
-  "episodeId": "M4_PROXY_PIPELINE_TEST",
-  "title": "Proxy Meadow Notice",
+  "episodeId": "E1_DRAFT_NONCANONICAL",
+  "title": "Draft Episode 1 — Meadow Notice (noncanonical)",
   "characterMode": "PROXY",
   "occupants": [
     "PROXY_NONCANONICAL_BIRD_A",
@@ -83,7 +83,7 @@
       "errorCount": 0
     }
   ],
-  "cacheKey": "fb55dc34c9c04e23d50bbc72cf0456c800dbb342f0ed1eeb78881fe7d9fd6faa",
+  "cacheKey": "16950b9c11fd193dfab20e86b49a96b2f211d4a873277541b580363dede18bed",
   "paidGpu": false,
   "writesProductionLibrary": false
 }

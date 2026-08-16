@@ -136,7 +136,7 @@ export function evaluateEpisodeLaunchSafety(raw: LaunchSafetyInput): LaunchSafet
     intent !== 'THEATRICAL' &&
     !theatrical.allowed
   ) {
-    code = 'FINAL_RENDER_REFUSED';
+    if (code === 'ALLOWED') code = 'FINAL_RENDER_REFUSED';
     blockers.push(
       'generate-final / FINAL_RENDER is refused while evaluateTheatricalGate().allowed is false and currentStage is DDP_STEPS_1_8.',
     );
@@ -148,7 +148,7 @@ export function evaluateEpisodeLaunchSafety(raw: LaunchSafetyInput): LaunchSafet
   }
 
   if (intent === 'THEATRICAL' || intent === 'PUBLISH') {
-    code = 'THEATRICAL_LAUNCH_REFUSED';
+    if (code === 'ALLOWED') code = 'THEATRICAL_LAUNCH_REFUSED';
     blockers.push('Theatrical / publishing launch is refused. Steps 9–16 stay closed.');
   }
 
