@@ -1,0 +1,34 @@
+{
+  "schema": "tivvlejoy.prop_catalog.v1",
+  "approved": false,
+  "paidAssets": false,
+  "props": [
+    {
+      "id": "PROP_MAP_001",
+      "name": "Adventure map",
+      "status": "PROTOTYPE_REUSABLE",
+      "path": "production-library/props/adventure_map.blend",
+      "theatricalReady": false
+    },
+    {
+      "id": "PROP_PIP_SATCHEL",
+      "name": "Pip satchel",
+      "status": "FUSED_IN_CANDIDATE",
+      "theatricalReady": false,
+      "notes": "Must be a separate object on an approved replacement. Current candidate is fused."
+    },
+    {
+      "id": "PROP_PIP_SCARF",
+      "name": "Pip teal scarf",
+      "status": "FUSED_IN_CANDIDATE",
+      "theatricalReady": false
+    },
+    {
+      "id": "PROP_GOAT_COMPASS",
+      "name": "Goat teal compass",
+      "status": "UNCHANGED",
+      "theatricalReady": false,
+      "notes": "Goat work is frozen unless separately authorized."
+    }
+  ]
+}

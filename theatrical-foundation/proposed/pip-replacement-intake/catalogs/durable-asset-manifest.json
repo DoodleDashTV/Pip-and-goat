@@ -1,0 +1,133 @@
+{
+  "schema": "tivvlejoy.durable_asset_manifest.v1",
+  "studio": "TivvleJoy",
+  "approved": false,
+  "canonicalMutated": false,
+  "theatricalBound": false,
+  "productionLibraryFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+  "classes": {
+    "production_library_locked": "Hashed, bound prototype assets. Do not replace.",
+    "preserved_comparison": "Conditionally approved or evidential files. Do not overwrite.",
+    "proposed_unapproved": "Working theatrical proposals. Not canon.",
+    "proxy_pipeline_only": "Labeled stand-ins for pipeline tests. Not Pip. Not Goat.",
+    "intake_candidate": "Next uploaded Pip package. Replacement candidate only.",
+    "approved_visual_foundation": "Justin-selected official Pip visual identity. Not production-ready. Not production-library. Not theatrical-bound.",
+    "superseded_archive": "Earlier Pip models kept for rollback. Do not delete.",
+    "production_conversion_in_progress": "Protected conversion copy of the official backpack Pip. Not production-ready. Not production-library. Not theatrical-bound."
+  },
+  "assets": [
+    {
+      "id": "LIB_PIP_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/characters/pip_production.blend",
+      "characterCode": "CHAR_PIP_001",
+      "quality": "PROTOTYPE",
+      "immutable": true,
+      "notes": "Steps 1\u20138 prototype. Not theatrical."
+    },
+    {
+      "id": "LIB_GOAT_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/characters/goat_production.blend",
+      "characterCode": "CHAR_GOAT_001",
+      "quality": "PROTOTYPE",
+      "immutable": true,
+      "notes": "Steps 1\u20138 prototype. Not theatrical."
+    },
+    {
+      "id": "LIB_MEADOW_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/environments/meadow_production.blend",
+      "quality": "PROTOTYPE",
+      "immutable": true
+    },
+    {
+      "id": "LIB_MAP_PROTOTYPE",
+      "class": "production_library_locked",
+      "path": "production-library/props/adventure_map.blend",
+      "quality": "PROTOTYPE",
+      "immutable": true
+    },
+    {
+      "id": "PIP_LONG_WING_ORIGINAL_PARTS",
+      "class": "preserved_comparison",
+      "path": "theatrical-foundation/proposed/final-character-production/pip_long_wing_original.part0{1,2,3}.bin",
+      "characterCode": "CHAR_PIP_001",
+      "sha256WhenReassembled": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+      "immutable": true,
+      "notes": "Conditionally approved long-wing appearance. Reassemble only to /tmp. Do not overwrite."
+    },
+    {
+      "id": "PIP_CURRENT_WORKING",
+      "class": "preserved_comparison",
+      "path": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+      "characterCode": "CHAR_PIP_001",
+      "immutable": true,
+      "notes": "Superseded Prism working Pip. Keep for rollback. Do not overwrite or delete."
+    },
+    {
+      "id": "PIP_OFFICIAL_VISUAL_SOURCE",
+      "class": "approved_visual_foundation",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_backpack_replacement.glb.part{1,2,3}.bin",
+      "characterCode": "CHAR_PIP_001",
+      "sha256WhenReassembled": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "immutable": true,
+      "notes": "Justin official permanent Pip design source. Fused mesh. Not production-ready."
+    },
+    {
+      "id": "PIP_OFFICIAL_WORKING_COPY",
+      "class": "approved_visual_foundation",
+      "path": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+      "characterCode": "CHAR_PIP_001",
+      "immutable": true,
+      "notes": "Protected production-prep working copy. Object-level normalize only. Do not overwrite the approved source."
+    },
+    {
+      "id": "PIP_SATCHEL_SUPERSEDED",
+      "class": "superseded_archive",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_replacement.glb.part{1,2,3}.bin",
+      "characterCode": "CHAR_PIP_001",
+      "sha256WhenReassembled": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+      "immutable": true,
+      "notes": "Satchel / cross-body candidate. Superseded. Keep for rollback."
+    },
+    {
+      "id": "PIP_STRAP_REPAIR_EVIDENCE",
+      "class": "preserved_comparison",
+      "path": "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/",
+      "immutable": true,
+      "notes": "Failed strap-repair evidence. Comparison only. Do not continue destructive mesh work."
+    },
+    {
+      "id": "GOAT_CURRENT_WORKING",
+      "class": "preserved_comparison",
+      "path": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+      "characterCode": "CHAR_GOAT_001",
+      "immutable": true,
+      "notes": "Goat unchanged unless Justin separately authorizes Goat work."
+    },
+    {
+      "id": "BINDING_FIVE_VIEWS",
+      "class": "preserved_comparison",
+      "path": "artifacts/theatrical-v2/source-package-validation/refs/",
+      "immutable": true,
+      "notes": "Ten binding JPEGs win every identity conflict."
+    },
+    {
+      "id": "PROXY_PIPELINE_BIRD",
+      "class": "proxy_pipeline_only",
+      "path": "theatrical-foundation/proposed/pipeline-proxy/PROXY_PIPELINE_BIRD.blend",
+      "characterCode": null,
+      "immutable": false,
+      "notes": "Labeled PROXY only. Not Pip. Not canon. Used for deformation and intake tests."
+    },
+    {
+      "id": "PIP_PRODUCTION_CONVERSION_COPY",
+      "class": "production_conversion_in_progress",
+      "path": "theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend",
+      "characterCode": "CHAR_PIP_001",
+      "immutable": false,
+      "notes": "Protected conversion copy. Do not overwrite the official working blend or approved source."
+    }
+  ]
+}

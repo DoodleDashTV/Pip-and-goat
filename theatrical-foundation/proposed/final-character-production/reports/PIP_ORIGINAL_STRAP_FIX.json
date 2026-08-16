@@ -1,0 +1,180 @@
+{
+  "method": "gentle left-riser surface-match + feather clone-stamp; front diagonal ribbon; original rear kept",
+  "first_flatten_pass_reused": false,
+  "current_prism_overwritten": false,
+  "production_library_touched": false,
+  "canonical_mutated": false,
+  "theatrical_bound": false,
+  "merge": false,
+  "paid_resources": false,
+  "reconstructed_glb_committed": false,
+  "sha256": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+  "left_riser_verts": 32916,
+  "old_right_vertical_verts": 33534,
+  "feather_samples": 6153,
+  "settle": {
+    "moved_verts": 7134,
+    "mean_move": 0.02420045560479755,
+    "max_allowed": 0.038,
+    "profile_bins": 8
+  },
+  "paint": {
+    "painted": 2707518,
+    "normal_painted": 676437,
+    "stamp_cache": 61377,
+    "teal_killed": 135214
+  },
+  "leftover": {
+    "left_riser_straplike_after_paint_sample": 11854
+  },
+  "strap": "Pip_CrossbodyStrap",
+  "hardware": [
+    "Pip_StrapBuckle_bag_front",
+    "Pip_StrapBuckle_right_shoulder_front"
+  ],
+  "hits": [
+    [
+      [
+        0.49480143189430237,
+        0.1646803617477417,
+        0.5122672319412231
+      ],
+      [
+        0.7207235097885132,
+        0.6901325583457947,
+        0.06538165360689163
+      ]
+    ],
+    [
+      [
+        0.4601820707321167,
+        0.09705619513988495,
+        0.6167187094688416
+      ],
+      [
+        0.8490113615989685,
+        0.178939551115036,
+        0.4971522390842438
+      ]
+    ],
+    [
+      [
+        0.4102189242839813,
+        0.03158881887793541,
+        0.71759033203125
+      ],
+      [
+        0.5520365834236145,
+        0.1581602245569229,
+        0.8186825513839722
+      ]
+    ],
+    [
+      [
+        0.35686591267585754,
+        -0.03285853564739227,
+        0.8145726323127747
+      ],
+      [
+        0.9364194273948669,
+        -0.2791794538497925,
+        0.21254988014698029
+      ]
+    ],
+    [
+      [
+        0.2967148423194885,
+        -0.09821172803640366,
+        0.9043290019035339
+      ],
+      [
+        0.8193947672843933,
+        -0.25628867745399475,
+        0.5127460360527039
+      ]
+    ],
+    [
+      [
+        0.22082825005054474,
+        -0.16203056275844574,
+        0.9711551666259766
+      ],
+      [
+        0.6751207113265991,
+        -0.5920020341873169,
+        0.44016557931900024
+      ]
+    ],
+    [
+      [
+        0.12897951900959015,
+        -0.2102329432964325,
+        1.0039774179458618
+      ],
+      [
+        0.21805284917354584,
+        -0.9595751762390137,
+        0.1779567450284958
+      ]
+    ],
+    [
+      [
+        0.046795524656772614,
+        -0.2315688282251358,
+        1.0119065046310425
+      ],
+      [
+        -0.3135668635368347,
+        -0.535454273223877,
+        0.7841967940330505
+      ]
+    ],
+    [
+      [
+        0.003526640823110938,
+        -0.23571181297302246,
+        1.007321834564209
+      ],
+      [
+        -0.2688218057155609,
+        -0.5142651200294495,
+        0.8144116997718811
+      ]
+    ],
+    [
+      [
+        -0.012626910582184792,
+        -0.23672796785831451,
+        0.9956021308898926
+      ],
+      [
+        0.5742843151092529,
+        -0.6172497868537903,
+        0.5377734303474426
+      ]
+    ]
+  ],
+  "renders": [
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/01_front.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/02_rear.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/03_left_side.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/04_right_side.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/05_front_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/06_rear_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/07_right_shoulder_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/08_left_shoulder_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/09_satchel_front_attach.png",
+    "artifacts/theatrical-v2/final-character-production/long-wing-original-strap/10_satchel_rear_attach.png"
+  ],
+  "strap_save": {
+    "blend": "theatrical-foundation/proposed/final-character-production/source-candidates/pip-long-wing/pip_crossbody_strap_only.blend",
+    "bytes": 7256100
+  },
+  "blend_full_scene": null,
+  "visual_result": "front_still_shows_left_riser",
+  "front_one_path": false,
+  "left_riser_fully_removed": false,
+  "rear_original_diagonal_preserved": true,
+  "flatten_reused": false,
+  "isolated_geometry_replacement_needed": true
+}

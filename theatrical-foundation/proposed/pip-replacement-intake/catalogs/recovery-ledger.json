@@ -1,0 +1,57 @@
+{
+  "schema": "tivvlejoy.recovery_ledger.v1",
+  "paidResources": false,
+  "rollbackPoints": [
+    {
+      "id": "MILESTONE_2_RECOVERY",
+      "ref": "agent/trivvlejoy-milestone-2-recovery",
+      "note": "Authoritative Milestone 2 recovery. Do not overwrite."
+    },
+    {
+      "id": "MILESTONE_3",
+      "ref": "cursor/trivvlejoy-milestone-3-1ebc",
+      "note": "Authoritative Milestone 3. Do not overwrite."
+    },
+    {
+      "id": "APPROVED_LIBRARY_FINGERPRINT",
+      "sha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+      "note": "production-library/ pin. Any change invalidates accepted plans."
+    },
+    {
+      "id": "PIP_LONG_WING_ORIGINAL",
+      "sha256": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+      "note": "Conditionally approved long-wing appearance. Reassemble only to /tmp."
+    },
+    {
+      "id": "STRAP_REPAIR_STOP",
+      "ref": "7c76cb16b91c299d67e8da4b0141643438c1af51",
+      "note": "Last destructive strap attempt. Evidence only. Do not continue mesh edits."
+    },
+    {
+      "id": "PIP_OFFICIAL_BACKPACK_VISUAL",
+      "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "note": "Justin official Pip visual identity. Preserve source. Do not replace production-library from this point."
+    },
+    {
+      "id": "PIP_PRODUCTION_CONVERSION_START",
+      "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "note": "Production conversion starts from the official backpack working copy. Do not overwrite that working copy or the approved source."
+    },
+    {
+      "id": "PIP_CONVERSION_CHECKPOINT_NOT_ANIMATION_READY",
+      "sha256": "581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe",
+      "note": "Justin accepted the audit and official working copy as a checkpoint only. Envelope conversion is not animation-ready. Do not repeat that approach."
+    },
+    {
+      "id": "PIP_CONVERSION_PAUSED",
+      "sha256": "581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe",
+      "note": "Justin paused Pip conversion. Official backpack working copy is the immutable high-res reference. No voxel, Quadriflow, primitive, envelope-on-fused, or destructive edits. Justin will assign professional retopo separately."
+    }
+  ],
+  "rules": [
+    "Preserve rollback points.",
+    "Do not reset, rebase, or delete recovery history.",
+    "Do not use empty main as an implementation base.",
+    "Intake copies originals; it never mutates them."
+  ]
+}

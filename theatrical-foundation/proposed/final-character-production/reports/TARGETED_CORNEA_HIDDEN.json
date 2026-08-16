@@ -1,0 +1,52 @@
+{
+  "cornea": {
+    "hidden_from_render_not_deleted": [
+      {
+        "name": "Goat_Cornea_0",
+        "location": [
+          0.34465622901916504,
+          0.2237841784954071,
+          2.18477725982666
+        ],
+        "hide_render": true,
+        "deleted": false
+      },
+      {
+        "name": "Goat_Cornea_1",
+        "location": [
+          0.34357374906539917,
+          -0.2331567406654358,
+          2.186133861541748
+        ],
+        "hide_render": true,
+        "deleted": false
+      }
+    ],
+    "leftover_catch_removed": []
+  },
+  "color_restore": {
+    "restored": true,
+    "from": "goat_highdetail_working.blend",
+    "size": [
+      8192,
+      8192
+    ]
+  },
+  "back": {
+    "cause": "Stage-2 Color stamp used a hard z-cut teardrop (widest at the flat top) plus a separate vertical tail-base bar at z 0.92-1.16, width 0.065. UV rasterization read as a brown rectangle.",
+    "fix": "Restored original working Color map, then painted a rounded-crown organic teardrop with cosine sides, sine irregularity, soft scarf fade, and no tail bar.",
+    "top": 1.86,
+    "bot": 1.34,
+    "filled": 503236,
+    "no_tail_bar": true,
+    "no_hard_z_cut": true
+  },
+  "renders": [
+    "artifacts/theatrical-v2/final-character-production/corrections/01_goat_corrected_front_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/02_goat_corrected_rear.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/03_goat_corrected_rear_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png"
+  ],
+  "paid_resources": false,
+  "pip_mesh_edited": false
+}

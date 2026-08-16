@@ -1,0 +1,357 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.comparison.v1",
+  "blender": "4.2.3 LTS",
+  "source": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T025617Z_pip_backpack_replacement.glb_dca239475c78/original/pip_backpack_replacement.glb",
+  "sourceRecord": {
+    "filename": "pip_backpack_replacement.glb",
+    "relative": "pip_backpack_replacement.glb",
+    "extension": ".glb",
+    "kind": "model",
+    "bytes": 62876180,
+    "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+    "magic": "glb",
+    "supported": true
+  },
+  "geometry": {
+    "objectCount": 1,
+    "objectNames": [
+      "tripo_node_72aab415-8aae-46cc-aa12-6d00f03117fe"
+    ],
+    "objectSeparation": "single_or_fused",
+    "armatures": [],
+    "rigPresent": false,
+    "shapeKeys": [],
+    "materials": [
+      "tripo_material_72aab415-8aae-46cc-aa12-6d00f03117fe"
+    ],
+    "textures": [
+      {
+        "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+        "size": [
+          8192,
+          8192
+        ]
+      },
+      {
+        "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+        "size": [
+          4096,
+          4096
+        ]
+      },
+      {
+        "name": "ORM_72aab415-8aae-46cc-aa12-6d00f03117fe",
+        "size": [
+          4096,
+          4096
+        ]
+      }
+    ],
+    "uvMaps": [
+      "UVMap"
+    ],
+    "objects": [
+      {
+        "name": "tripo_node_72aab415-8aae-46cc-aa12-6d00f03117fe",
+        "vertices": 1006107,
+        "faces": 1930054,
+        "triangles": 1930054,
+        "disconnectedComponents": 463,
+        "nonManifoldEdges": 81234,
+        "boundaryEdges": 81234,
+        "holesEstimate": 27078,
+        "invertedNormalFaces": 278123,
+        "intersections": {
+          "checked": false,
+          "overlappingPairs": 0,
+          "reason": "deferred_high_density"
+        },
+        "uvMaps": [
+          "UVMap"
+        ],
+        "materials": [
+          "tripo_material_72aab415-8aae-46cc-aa12-6d00f03117fe"
+        ],
+        "shapeKeys": []
+      }
+    ],
+    "totals": {
+      "vertices": 1006107,
+      "triangles": 1930054,
+      "faces": 1930054,
+      "disconnectedComponents": 463,
+      "nonManifoldEdges": 81234,
+      "boundaryEdges": 81234,
+      "holesEstimate": 27078,
+      "invertedNormalFaces": 278123
+    },
+    "textureCheck": {
+      "hasImageTextures": true,
+      "colorLike": [
+        {
+          "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+          "size": [
+            8192,
+            8192
+          ]
+        }
+      ],
+      "normalLike": [
+        {
+          "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+          "size": [
+            4096,
+            4096
+          ]
+        }
+      ]
+    },
+    "dimensions": {
+      "min": [
+        -0.2055005431175232,
+        -0.2326963245868683,
+        -0.4896332025527954
+      ],
+      "max": [
+        0.20517095923423767,
+        0.2327689528465271,
+        0.4895886182785034
+      ],
+      "size": [
+        0.41067150235176086,
+        0.4654652774333954,
+        0.9792218208312988
+      ],
+      "nativeHeight": 0.9792218208312988
+    },
+    "scaleCheck": {
+      "nativeHeight": 0.9792218208312988,
+      "targetHeight": 2.05,
+      "suggestedFactor": 2.0934990993763565,
+      "withinTenPercent": false,
+      "appliedToOriginal": false
+    },
+    "orientationCheck": {
+      "charactersFace": "+X",
+      "characterLeft": "+Y",
+      "characterRight": "-Y",
+      "strapShoulder": "character-right (\u2212Y)",
+      "satchelHip": "character-left (+Y)",
+      "whenFacingCamera": {
+        "cameraLooksToward": "\u2212X",
+        "strapViewerSide": "viewer-left",
+        "bagViewerSide": "viewer-right"
+      },
+      "autoCorrectOriginal": false,
+      "heuristic": "Reviewers must confirm +X facing against the binding front sheet. Intake does not auto-rotate the original.",
+      "appliedToOriginal": false
+    },
+    "highDensity": true
+  },
+  "renders": [
+    "previews/front.png",
+    "previews/rear.png",
+    "previews/left.png",
+    "previews/right.png",
+    "previews/front_three_quarter.png",
+    "previews/rear_three_quarter.png",
+    "previews/shoulder_left.png",
+    "previews/shoulder_right.png",
+    "previews/backpack_attachment.png",
+    "previews/backpack_wing_clearance.png",
+    "previews/turntable_00.png",
+    "previews/turntable_01.png",
+    "previews/turntable_02.png",
+    "previews/turntable_03.png",
+    "previews/turntable_04.png",
+    "previews/turntable_05.png",
+    "previews/turntable_06.png",
+    "previews/turntable_07.png"
+  ],
+  "previewBlend": "preview/candidate_preview.blend",
+  "checklist": [
+    {
+      "id": "face_and_green_eyes",
+      "label": "Face and green/teal glossy eyes",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "bright_yellow_cgi_finish",
+      "label": "Bright yellow CGI feather finish",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "three_coral_crest_feathers",
+      "label": "Exactly three coral crown/crest feathers",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect exactly three coral crest feathers"
+    },
+    {
+      "id": "long_layered_wings_visible",
+      "label": "Long layered wings remain visible",
+      "authority": "conditionally approved long-wing appearance + backpack accessory refs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 long layered wings must remain visible"
+    },
+    {
+      "id": "teal_scarf",
+      "label": "Teal neckerchief/scarf, not intersected by backpack",
+      "authority": "binding five-view JPEGs + backpack accessory refs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "true_backpack_centered_on_back",
+      "label": "True backpack centered on Pip\u2019s back",
+      "authority": "four newest Pip backpack pictures + written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm a true backpack centered on the back"
+    },
+    {
+      "id": "two_symmetrical_shoulder_straps",
+      "label": "Two symmetrical shoulder straps",
+      "authority": "four newest Pip backpack pictures + written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm two symmetrical shoulder straps"
+    },
+    {
+      "id": "no_satchel",
+      "label": "No satchel",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm no satchel"
+    },
+    {
+      "id": "no_cross_body_strap",
+      "label": "No cross-body strap",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm no cross-body strap"
+    },
+    {
+      "id": "no_hip_bag",
+      "label": "No hip bag",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm no hip bag"
+    },
+    {
+      "id": "backpack_no_intersection",
+      "label": "Backpack must not intersect wings, scarf, neck, tail, or body",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 backpack must not intersect wings, scarf, neck, tail, or body"
+    },
+    {
+      "id": "feet_toes_rear_hallux",
+      "label": "Feet, toes, and rear hallux",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "accessories_separated_or_fused",
+      "label": "Accessories are separate objects vs fused into the body",
+      "authority": "production suitability",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "single_or_fused"
+    },
+    {
+      "id": "proportions_and_cgi_appearance",
+      "label": "Preserve approved face, eyes, yellow finish, crest, wings, feet, proportions, CGI appearance",
+      "authority": "conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    }
+  ],
+  "gate": {
+    "role": "replacement_candidate_only",
+    "autoReplaceCurrentPip": false,
+    "approved": false,
+    "canonicalMutated": false,
+    "theatricalBound": false,
+    "merge": false,
+    "productionLibraryTouched": false,
+    "paidResources": false,
+    "currentPipOverwritten": false,
+    "goatTouched": false,
+    "stopForJustin": true,
+    "forbidden": {
+      "autoReplaceCurrentPip": false,
+      "canonReplace": false,
+      "theatricalBind": false,
+      "merge": false,
+      "productionLibraryWrite": false,
+      "finalRigBindToCurrentPip": false,
+      "paidResources": false
+    },
+    "blockers": [
+      "Current fused Tripo Pip is preserved for comparison only.",
+      "Next upload is a replacement candidate, not automatic canon.",
+      "Justin visual approval is required before retopo, rigging, canon replacement, theatrical binding, or merging.",
+      "Justin has not visually approved this candidate.",
+      "Reference-comparison checklist is not fully approved."
+    ],
+    "nextAllowed": [
+      "Preserve the uploaded file unchanged.",
+      "Record filename and SHA-256.",
+      "Open in Blender 4.2.3 LTS.",
+      "Generate geometry report, five-views, close-ups, and turntable.",
+      "Fill the reference-comparison checklist as REQUIRES_JUSTIN.",
+      "Stop for Justin visual approval."
+    ],
+    "nextForbidden": [
+      "final Pip retopology",
+      "final Pip UV replacement",
+      "final Pip texture lock",
+      "final Pip rig binding",
+      "final Pip facial rig",
+      "final Pip groom/feather lock",
+      "final Pip animation",
+      "final Pip collision fitting",
+      "final character-dependent camera framing",
+      "final Pip-and-Goat scale binding",
+      "hero shots or final episode renders",
+      "canonical replacement",
+      "theatrical binding",
+      "merging an unapproved character",
+      "deployment or paid rendering"
+    ]
+  },
+  "strengths": [],
+  "defects": [
+    "Visual strengths and defects require Justin review against the ten binding five-views."
+  ],
+  "repairability": "Not assessed automatically. Fused accessories are usually not paint-repairable.",
+  "productionSuitability": "NOT_PRODUCTION_READY",
+  "approved": false,
+  "autoReplaceCurrentPip": false
+}

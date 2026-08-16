@@ -1,0 +1,74 @@
+{
+  "pip": {
+    "blend": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "blend_bytes": 90219299,
+    "textures": [
+      {
+        "name": "Color_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+        "kind": "basecolor",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/pip_highres_basecolor.png",
+        "size": [
+          4096,
+          4096
+        ],
+        "bytes": 12518437
+      },
+      {
+        "name": "NormalGL_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+        "kind": "normal",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/pip_highres_normal.png",
+        "size": [
+          4096,
+          4096
+        ],
+        "bytes": 12518437
+      },
+      {
+        "name": "ORM_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+        "kind": "orm",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/pip_highres_orm.png",
+        "size": [
+          4096,
+          4096
+        ],
+        "bytes": 12518437
+      }
+    ]
+  },
+  "goat": {
+    "blend": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+    "blend_bytes": 87463844,
+    "textures": [
+      {
+        "name": "Color_3eec9046-421b-4d5d-838e-2439a6e261d8",
+        "kind": "basecolor",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/goat_highres_basecolor.png",
+        "size": [
+          4096,
+          4096
+        ],
+        "bytes": 10128944
+      },
+      {
+        "name": "NormalGL_3eec9046-421b-4d5d-838e-2439a6e261d8",
+        "kind": "normal",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/goat_highres_normal.png",
+        "size": [
+          4096,
+          4096
+        ],
+        "bytes": 10128944
+      },
+      {
+        "name": "ORM_3eec9046-421b-4d5d-838e-2439a6e261d8",
+        "kind": "orm",
+        "path": "theatrical-foundation/proposed/final-character-production/textures/goat_highres_orm.png",
+        "size": [
+          4096,
+          4096
+        ],
+        "bytes": 10128944
+      }
+    ]
+  }
+}

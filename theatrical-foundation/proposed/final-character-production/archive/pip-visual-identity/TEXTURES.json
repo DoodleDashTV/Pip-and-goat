@@ -1,0 +1,25 @@
+{
+  "schema": "tivvlejoy.pip_approved_source.textures.v1",
+  "sourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+  "binariesCommitted": false,
+  "textures": [
+    {
+      "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [8192, 8192],
+      "bytes": 74428330,
+      "sha256": "c6dcdd394f4bc594892723444c3f74db036f0e4aab47b4ec8b028458cd3cb61f"
+    },
+    {
+      "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [4096, 4096],
+      "bytes": 6061850,
+      "sha256": "41e2f91006bef8cb82eeae2a8383057189ffe775906611b10646caff11c53815"
+    },
+    {
+      "name": "ORM_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [4096, 4096],
+      "bytes": 10718424,
+      "sha256": "585ba31bd09f330b37a0478ab6d8fb42d4f50d55c2aa72c641db4fed5e583bec"
+    }
+  ]
+}

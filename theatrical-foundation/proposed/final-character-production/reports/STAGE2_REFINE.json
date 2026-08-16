@@ -1,0 +1,102 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "theatrical_bound": false,
+  "merge": false,
+  "paid_resources": false,
+  "blender": "4.2.3 LTS",
+  "working_preserved": [
+    "theatrical-foundation/proposed/final-character-production/working/pip_highdetail_working.blend",
+    "theatrical-foundation/proposed/final-character-production/working/goat_highdetail_working.blend"
+  ],
+  "pip": {
+    "crest_n": 57526,
+    "stub_n": 40384,
+    "kept": {
+      "center": 3343,
+      "left": 3340,
+      "right": 5115
+    },
+    "tips": {
+      "center": [
+        0.13864879310131073,
+        0.027901791036128998,
+        2.04958438873291
+      ],
+      "left": [
+        0.1645292192697525,
+        0.18180707097053528,
+        1.911047101020813
+      ],
+      "right": [
+        0.05409039556980133,
+        -0.1598862260580063,
+        1.9868801832199097
+      ]
+    },
+    "stamps": 40369,
+    "image": "Color_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+    "size": [
+      8192,
+      8192
+    ]
+  },
+  "goat": {
+    "top": 1.9364430618286133,
+    "bot": 1.1564430618286132,
+    "filled_px": 2081134,
+    "tris": 95190,
+    "cinnamon_rgb": [
+      0.4529869192649478,
+      0.2959576963385198,
+      0.1740649601499358
+    ],
+    "image": "Color_3eec9046-421b-4d5d-838e-2439a6e261d8",
+    "size": [
+      8192,
+      8192
+    ]
+  },
+  "pair": {
+    "renders": [
+      "artifacts/theatrical-v2/final-character-production/clean/pair_front.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pair_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pair_side.png"
+    ],
+    "pip_height": 2.0500001907348633,
+    "goat_height": 3.0749998092651367,
+    "ratio": 1.4999997673965297
+  },
+  "textures": {
+    "pip": "theatrical-foundation/proposed/final-character-production/textures/pip_highres_basecolor.png",
+    "goat": "theatrical-foundation/proposed/final-character-production/textures/goat_highres_basecolor.png"
+  },
+  "renders": [
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_front.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_back.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_side.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pip_final_face.png",
+    "artifacts/theatrical-v2/final-character-production/lighting/pip_final_front_daylight.png",
+    "artifacts/theatrical-v2/final-character-production/lighting/pip_final_front_warm_interior.png",
+    "artifacts/theatrical-v2/final-character-production/lighting/pip_final_front_cinematic.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_front.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_back.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_side.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/clean/goat_final_face.png",
+    "artifacts/theatrical-v2/final-character-production/lighting/goat_final_front_daylight.png",
+    "artifacts/theatrical-v2/final-character-production/lighting/goat_final_front_warm_interior.png",
+    "artifacts/theatrical-v2/final-character-production/lighting/goat_final_front_cinematic.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pair_front.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pair_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/clean/pair_side.png"
+  ],
+  "outputs": {
+    "pip_blend": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "goat_blend": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend"
+  },
+  "primitive_rebuild_used": false,
+  "whole_mesh_stretch": false,
+  "satchel_hard_translate": false
+}

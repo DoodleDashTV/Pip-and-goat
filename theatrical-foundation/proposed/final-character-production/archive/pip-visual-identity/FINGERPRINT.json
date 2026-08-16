@@ -1,0 +1,39 @@
+{
+  "schema": "tivvlejoy.pip_approved_source.fingerprint.v1",
+  "packageId": "20260816T025617Z_pip_backpack_replacement.glb_dca239475c78",
+  "characterCode": "CHAR_PIP_001",
+  "createdAt": "2026-08-16T03:20:30Z",
+  "complete": {
+    "path": "/tmp/pip_backpack_replacement.glb",
+    "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+    "bytes": 62876180,
+    "verified": true
+  },
+  "inboxParts": [
+    {
+      "filename": "pip_backpack_replacement.glb.part1.bin",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_backpack_replacement.glb.part1.bin",
+      "bytes": 20958727,
+      "sha256": "e7108bfc299ec523af7d9e2916433fd7a892f5565b898c9c4e5733d8f35d5ee1",
+      "immutable": true
+    },
+    {
+      "filename": "pip_backpack_replacement.glb.part2.bin",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_backpack_replacement.glb.part2.bin",
+      "bytes": 20958727,
+      "sha256": "2501552679c62a388d0e13f385078494a8719fc145cb80ede03ef8cbc4a8f4bd",
+      "immutable": true
+    },
+    {
+      "filename": "pip_backpack_replacement.glb.part3.bin",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_backpack_replacement.glb.part3.bin",
+      "bytes": 20958726,
+      "sha256": "f3a70077039ac75245364988e1fb70543586214131a4e3561eee56bf54e8de37",
+      "immutable": true
+    }
+  ],
+  "immutable": true,
+  "paidResource": false,
+  "doNotDelete": true,
+  "doNotOverwrite": true
+}

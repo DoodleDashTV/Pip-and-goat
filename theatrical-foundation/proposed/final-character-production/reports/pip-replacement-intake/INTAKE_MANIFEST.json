@@ -1,0 +1,69 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.manifest.v1",
+  "packageId": "20260816T022327Z_pip_replacement.glb_2e06f4285448",
+  "createdAt": "2026-08-16T02:23:27Z",
+  "original": {
+    "filename": "pip_replacement.glb",
+    "relative": "pip_replacement.glb",
+    "extension": ".glb",
+    "kind": "model",
+    "bytes": 64634144,
+    "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+    "magic": "glb",
+    "supported": true
+  },
+  "classification": {
+    "files": [
+      {
+        "filename": "pip_replacement.glb",
+        "relative": "pip_replacement.glb",
+        "extension": ".glb",
+        "kind": "model",
+        "bytes": 64634144,
+        "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+        "magic": "glb",
+        "supported": true
+      }
+    ],
+    "modelCount": 1,
+    "textureCount": 0,
+    "otherCount": 0,
+    "primaryModel": {
+      "filename": "pip_replacement.glb",
+      "relative": "pip_replacement.glb",
+      "extension": ".glb",
+      "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+      "bytes": 64634144
+    },
+    "supported": true
+  },
+  "paths": {
+    "root": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T022327Z_pip_replacement.glb_2e06f4285448",
+    "original": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T022327Z_pip_replacement.glb_2e06f4285448/original",
+    "unpacked": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T022327Z_pip_replacement.glb_2e06f4285448/unpacked",
+    "reports": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T022327Z_pip_replacement.glb_2e06f4285448/reports",
+    "previews": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T022327Z_pip_replacement.glb_2e06f4285448/previews",
+    "preview_blend": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T022327Z_pip_replacement.glb_2e06f4285448/preview"
+  },
+  "blenderValidation": "complete",
+  "renders": [
+    "previews/front.png",
+    "previews/rear.png",
+    "previews/left.png",
+    "previews/right.png",
+    "previews/three_quarter.png",
+    "previews/face.png",
+    "previews/shoulder_right.png",
+    "previews/satchel_left.png",
+    "previews/turntable_00.png",
+    "previews/turntable_01.png",
+    "previews/turntable_02.png",
+    "previews/turntable_03.png",
+    "previews/turntable_04.png",
+    "previews/turntable_05.png",
+    "previews/turntable_06.png",
+    "previews/turntable_07.png"
+  ],
+  "approved": false,
+  "autoReplaceCurrentPip": false
+}

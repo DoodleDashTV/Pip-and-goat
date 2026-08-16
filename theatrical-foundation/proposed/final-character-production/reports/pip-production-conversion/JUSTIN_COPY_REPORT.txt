@@ -1,0 +1,64 @@
+TIVVLEJOY — PIP CONVERSION PAUSED
+SELECT-ALL COPY BLOCK
+
+Working branch: cursor/theatrical-final-character-production-1ebc
+Draft PR: #24 — still draft, not merged
+Blender: 4.2.3 LTS
+Paid resources: not used
+production-library replaced: no
+Theatrical binding: not declared
+Goat touched: no
+
+JUSTIN DECISION RECORDED
+Option 3: pause production conversion at the protected checkpoint.
+Option 4 confirmed:
+- no voxel remesh
+- no Quadriflow replacement
+- no primitive reconstruction
+- no envelope rig on the fused source
+- no destructive edits to the approved Pip
+
+OFFICIAL IDENTITY
+The backpack Pip remains TivvleJoy’s official visual identity and the
+immutable high-resolution reference.
+Package: 20260816T025617Z_pip_backpack_replacement.glb_dca239475c78
+Source SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
+Working copy: theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend
+Working copy SHA-256: 581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe
+
+PRESERVED CHECKPOINT
+Conversion evidence kept, not continued:
+theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend
+Audit, comparison stills, and the feasibility plan stay on disk.
+No new remesh. No new rig. No destructive edit.
+
+NOT CLAIMED
+Pip is not animation-ready.
+The fused 1.9M-tri source is not a production mesh.
+
+NEXT RETOPO
+Justin will separately decide who creates the professional animation
+retopo. Do not resume conversion in this environment until that
+assignment exists.
+
+STILL CLOSED
+- production-library replace
+- theatrical bind
+- Draft PR #24 merge
+- paid services
+- Goat
+- voxel / Quadriflow / primitive / envelope-on-fused / destructive edits
+
+STATUS
+PIP VISUAL IDENTITY: APPROVED — backpack design is official
+PIP PRODUCTION CONVERSION: PAUSED — protected checkpoint
+PIP PRODUCTION ASSET: NOT READY
+PIP SATCHEL / PRISM / LONG-WING: ARCHIVED FOR ROLLBACK
+GOAT: UNCHANGED
+CANON / PRODUCTION-LIBRARY: UNTOUCHED
+THEATRICAL BINDING: NOT DECLARED
+MERGE: NOT PERFORMED
+PAID RESOURCES: NOT USED
+
+STOP
+Checkpoint recorded. Waiting for Justin to assign the professional retopo.

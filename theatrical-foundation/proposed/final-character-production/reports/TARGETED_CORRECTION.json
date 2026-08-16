@@ -1,0 +1,189 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "theatrical_bound": false,
+  "merge": false,
+  "paid_resources": false,
+  "primitive_rebuild_used": false,
+  "prediction_pose_copied": false,
+  "blender": "4.2.3 LTS",
+  "goat_forehead_spots": {
+    "cause": "Goat_Catch_0 and Goat_Catch_1 were detached emissive highlight spheres placed above brow-detected centroids, not in-eye catchlights.",
+    "removed": [
+      {
+        "name": "Goat_Catch_0",
+        "location": [
+          0.29689639806747437,
+          0.27785569429397583,
+          2.3552451133728027
+        ]
+      },
+      {
+        "name": "Goat_Catch_1",
+        "location": [
+          0.27469614148139954,
+          -0.2516781687736511,
+          2.4147186279296875
+        ]
+      }
+    ],
+    "corneas_repositioned": [
+      {
+        "name": "Goat_Cornea_0",
+        "from": [
+          0.27173638343811035,
+          0.26561570167541504,
+          2.344365119934082
+        ],
+        "to": [
+          0.35152244567871094,
+          0.22205041348934174,
+          2.2451529502868652
+        ]
+      },
+      {
+        "name": "Goat_Cornea_1",
+        "from": [
+          0.24953612685203552,
+          -0.2639181613922119,
+          2.403838634490967
+        ],
+        "to": [
+          0.35914820432662964,
+          -0.24093471467494965,
+          2.2713985443115234
+        ]
+      }
+    ],
+    "true_eye_centers": [
+      [
+        0.33952245116233826,
+        0.22205041348934174,
+        2.2451529502868652
+      ],
+      [
+        0.34714820981025696,
+        -0.24093471467494965,
+        2.2713985443115234
+      ]
+    ],
+    "before_extras": [
+      {
+        "name": "Goat_Catch_0",
+        "location": [
+          0.29689639806747437,
+          0.27785569429397583,
+          2.3552451133728027
+        ],
+        "dims": [
+          0.017680000513792038,
+          0.017680000513792038,
+          0.017680000513792038
+        ]
+      },
+      {
+        "name": "Goat_Catch_1",
+        "location": [
+          0.27469614148139954,
+          -0.2516781687736511,
+          2.4147186279296875
+        ],
+        "dims": [
+          0.017680000513792038,
+          0.017680000513792038,
+          0.017680000513792038
+        ]
+      },
+      {
+        "name": "Goat_Cornea_0",
+        "location": [
+          0.27173638343811035,
+          0.26561570167541504,
+          2.344365119934082
+        ],
+        "dims": [
+          0.13600000739097595,
+          0.13600000739097595,
+          0.13600000739097595
+        ]
+      },
+      {
+        "name": "Goat_Cornea_1",
+        "location": [
+          0.24953612685203552,
+          -0.2639181613922119,
+          2.403838634490967
+        ],
+        "dims": [
+          0.13600000739097595,
+          0.13600000739097595,
+          0.13600000739097595
+        ]
+      }
+    ]
+  },
+  "goat_color_restore": {
+    "restored": true,
+    "from": "goat_highdetail_working.blend",
+    "size": [
+      8192,
+      8192
+    ]
+  },
+  "goat_back_marking": {
+    "cause": "Previous Color-map stamp used a hard-width teardrop plus a separate vertical tail-base bar (z 0.92-1.16), which rasterized as a rectangle.",
+    "fix": "Restored original working Color map, then painted a cosine-edged organic teardrop only. No tail bar.",
+    "top": 1.878911576271057,
+    "bot": 1.298911576271057,
+    "filled": 581462,
+    "no_tail_bar": true
+  },
+  "pip_wings": {
+    "left": {
+      "count": 89776,
+      "moved": 48674,
+      "max_delta": 0.1600000127583184,
+      "tip_z_before": 0.54996657371521,
+      "tip_z_after": 0.39056241512298584,
+      "shoulder_z": 1.171496033668518,
+      "target_tip": 0.3
+    },
+    "right": {
+      "count": 88355,
+      "moved": 65868,
+      "max_delta": 0.16000001047321313,
+      "tip_z_before": 0.5580368041992188,
+      "tip_z_after": 0.3985961675643921,
+      "shoulder_z": 1.1462892293930054,
+      "target_tip": 0.3
+    }
+  },
+  "pip_eyes": {
+    "before": {
+      "left": {},
+      "right": {}
+    },
+    "skipped": true,
+    "reason": "could not isolate both eyes"
+  },
+  "pip_eye_isolation_n": {
+    "left": 0,
+    "right": 0
+  },
+  "renders": [
+    "artifacts/theatrical-v2/final-character-production/corrections/01_goat_corrected_front_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/02_goat_corrected_rear.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/03_goat_corrected_rear_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/04_pip_corrected_front_neutral_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/05_pip_corrected_three_quarter_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/06_pip_corrected_front_full.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/07_pip_corrected_three_quarter_full.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png"
+  ],
+  "pair": {
+    "render": "artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png",
+    "pip_height": 2.0500001907348633,
+    "goat_height": 3.0749998092651367,
+    "ratio": 1.4999997673965297
+  }
+}

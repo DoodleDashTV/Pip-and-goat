@@ -1,0 +1,102 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "theatrical_bound": false,
+  "merge": false,
+  "paid_resources": false,
+  "primitive_rebuild_used": false,
+  "prediction_pose_copied": false,
+  "completion_claimed_from_lighting_only": false,
+  "blender": "4.2.3 LTS",
+  "pip": {
+    "blend": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "material": {
+      "material": "tripo_material_b700c619-1b99-4d0c-ae5d-d51496e556d8",
+      "sheen": 0.4,
+      "sss": 0.14,
+      "hsv": [
+        0.492000013589859,
+        1.059999942779541,
+        1.034999966621399
+      ]
+    },
+    "eye_centers": [],
+    "cornea_objects": 0,
+    "renders": [
+      "artifacts/theatrical-v2/final-character-production/clean/pip_final_front.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pip_final_back.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pip_final_side.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pip_final_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pip_final_face.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pip_feature_front.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pip_feature_back.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pip_feature_side.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pip_feature_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pip_feature_face.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/pip_strap.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/pip_wing.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/pip_crest.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/pip_eye.png"
+    ],
+    "bytes": 97290289
+  },
+  "goat": {
+    "blend": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+    "material": {
+      "material": "tripo_material_3eec9046-421b-4d5d-838e-2439a6e261d8",
+      "sheen": 0.46,
+      "sss": 0.18,
+      "hsv": [
+        0.49799999594688416,
+        1.0299999713897705,
+        1.0199999809265137
+      ]
+    },
+    "eye_centers": [
+      [
+        0.25949639081954956,
+        0.26561570167541504,
+        2.344365119934082
+      ],
+      [
+        0.23729613423347473,
+        -0.2639181613922119,
+        2.403838634490967
+      ]
+    ],
+    "cornea_objects": 4,
+    "renders": [
+      "artifacts/theatrical-v2/final-character-production/clean/goat_final_front.png",
+      "artifacts/theatrical-v2/final-character-production/clean/goat_final_back.png",
+      "artifacts/theatrical-v2/final-character-production/clean/goat_final_side.png",
+      "artifacts/theatrical-v2/final-character-production/clean/goat_final_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/clean/goat_final_face.png",
+      "artifacts/theatrical-v2/final-character-production/feature/goat_feature_front.png",
+      "artifacts/theatrical-v2/final-character-production/feature/goat_feature_back.png",
+      "artifacts/theatrical-v2/final-character-production/feature/goat_feature_side.png",
+      "artifacts/theatrical-v2/final-character-production/feature/goat_feature_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/feature/goat_feature_face.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/goat_eye_patch.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/goat_back_mark.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/goat_horn.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/goat_compass.png",
+      "artifacts/theatrical-v2/final-character-production/closeups/goat_fur.png"
+    ],
+    "bytes": 88632121
+  },
+  "pair": {
+    "renders": [
+      "artifacts/theatrical-v2/final-character-production/clean/pair_front.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pair_front.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pair_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pair_three_quarter.png",
+      "artifacts/theatrical-v2/final-character-production/clean/pair_side.png",
+      "artifacts/theatrical-v2/final-character-production/feature/pair_side.png"
+    ],
+    "pip_height": 2.0500001907348633,
+    "goat_height": 3.0749998092651367,
+    "ratio": 1.4999997673965297,
+    "goat_pose": "neutral \u2014 prediction-image hands-on-hips not copied"
+  },
+  "supplemental_target": "attached pair CGI image controls polish/finish only; multi-view sheets remain identity authority"
+}

@@ -1,0 +1,94 @@
+TIVVLEJOY — OFFICIAL PIP VISUAL IDENTITY RECORDED
+SELECT-ALL COPY BLOCK
+
+Working branch: cursor/theatrical-final-character-production-1ebc
+Draft PR: #24 — still draft, not merged
+Blender: 4.2.3 LTS
+Paid resources: not used
+production-library replaced: no
+Theatrical binding: not declared
+Goat touched: no
+
+JUSTIN SELECTION
+Official permanent Pip design:
+20260816T025617Z_pip_backpack_replacement.glb_dca239475c78
+SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
+Size: 62876180 bytes
+
+This is no longer a comparison candidate. It is Pip’s official visual
+identity for future TivvleJoy work. It is not a production-ready mesh.
+
+WHAT THIS PASS DID
+1. Re-verified the approved source hash and size.
+2. Archived and fingerprinted the source. Inbox split parts stay
+   immutable evidence.
+3. Indexed superseded satchel, Prism high-res, long-wing original, and
+   earlier working blends for rollback. Nothing was deleted.
+4. Wrote the visual-identity catalog, character spec, asset manifest,
+   recovery ledger, and working-copy pointer so future Pip work uses
+   the backpack design.
+5. Built a protected working copy with object-level scale 2.0935 and
+   feet on the ground. The approved source hash stays the immutable
+   original. No remesh.
+6. Probed backpack/body intersections. 17 close pairs. Minimum gap
+   about 0.0011. No destructive cleanup.
+7. Recorded 8K/4K texture hashes. Binaries stay local.
+8. Rendered front, back, left, right, and three-quarter verification
+   views after promotion.
+
+WORKING COPY
+theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend
+Pointer: working/CURRENT_PIP.json
+Superseded Prism file was not overwritten.
+
+BOUND DESIGN
+- approved face, eyes, cheerful expression
+- bright-yellow polished CGI appearance
+- three coral crest feathers
+- long layered yellow wings
+- teal scarf
+- orange beak and feet
+- centered backpack
+- two symmetrical shoulder straps
+- no satchel, cross-body strap, or hip bag
+
+VERIFICATION VIEWS
+artifacts/theatrical-v2/final-character-production/pip-visual-identity/phone/
+1. front
+2. back
+3. left
+4. right
+5. three-quarter
+
+NOT PRODUCTION-READY
+Still required later, and not started:
+- retopology
+- deformation-safe backpack and strap treatment
+- UV/material preservation on that retopo
+- rigging
+- facial controls
+- animation validation
+
+STOPPED BEFORE
+- merging Draft PR #24
+- replacing production-library
+- final theatrical binding
+- destructive mesh cleanup
+- paid rendering or external services
+
+TESTS
+- python3 scripts/assets/test_pip_visual_foundation.py — 5/5 PASS
+- python3 scripts/assets/test_pip_replacement_intake.py — 13/13 PASS
+- vitest pip-replacement-intake + theatrical-foundation — 20/20 PASS
+- Approved library fingerprint unchanged:
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+
+STATUS
+PIP VISUAL IDENTITY: APPROVED — backpack design is official
+PIP PRODUCTION ASSET: NOT READY — fused source; stop for Justin
+PIP SATCHEL / PRISM / LONG-WING: ARCHIVED FOR ROLLBACK — not deleted
+GOAT: UNCHANGED
+CANON / PRODUCTION-LIBRARY: UNTOUCHED
+THEATRICAL BINDING: NOT DECLARED
+MERGE: NOT PERFORMED
+PAID RESOURCES: NOT USED

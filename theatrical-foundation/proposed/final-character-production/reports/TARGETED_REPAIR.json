@@ -1,0 +1,67 @@
+{
+  "approved": false,
+  "canonical_mutated": false,
+  "theatrical_bound": false,
+  "merge": false,
+  "paid_resources": false,
+  "goat": {
+    "catch_removed": [
+      "Goat_Catch_in_eye_0",
+      "Goat_Catch_in_eye_1"
+    ],
+    "corneas": [
+      {
+        "name": "Goat_Cornea_0",
+        "location": [
+          0.34465622901916504,
+          0.2237841784954071,
+          2.18477725982666
+        ],
+        "applied_scale": 0.3
+      },
+      {
+        "name": "Goat_Cornea_1",
+        "location": [
+          0.34357374906539917,
+          -0.2331567406654358,
+          2.186133861541748
+        ],
+        "applied_scale": 0.3
+      }
+    ],
+    "eye_centers": [
+      [
+        0.3266562223434448,
+        0.2237841784954071,
+        2.18477725982666
+      ],
+      [
+        0.32557374238967896,
+        -0.2331567406654358,
+        2.186133861541748
+      ]
+    ],
+    "renders": [
+      "artifacts/theatrical-v2/final-character-production/corrections/01_goat_corrected_front_closeup.png",
+      "artifacts/theatrical-v2/final-character-production/corrections/02_goat_corrected_rear.png",
+      "artifacts/theatrical-v2/final-character-production/corrections/03_goat_corrected_rear_three_quarter.png"
+    ],
+    "bytes": 88627977
+  },
+  "pip": {
+    "wings_reverted": true,
+    "reason": "Fused Prism wing verts shredded into vertical shards when lower feathers were translated. Stop condition hit.",
+    "renders": [
+      "artifacts/theatrical-v2/final-character-production/corrections/04_pip_corrected_front_neutral_closeup.png",
+      "artifacts/theatrical-v2/final-character-production/corrections/05_pip_corrected_three_quarter_closeup.png",
+      "artifacts/theatrical-v2/final-character-production/corrections/06_pip_corrected_front_full.png",
+      "artifacts/theatrical-v2/final-character-production/corrections/07_pip_corrected_three_quarter_full.png"
+    ],
+    "bytes": 97290555
+  },
+  "pair": {
+    "render": "artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png"
+  },
+  "wing_stop": true,
+  "eye_stop": "Pip eye verts could not be isolated from the fused textured mesh without risking a face tear. No eye geometry edit was applied."
+}

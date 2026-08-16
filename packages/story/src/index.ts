@@ -910,3 +910,13 @@ export const shotService = new ShotService();
 export const cameraDirectorService = new CameraDirectorService();
 export const lightingDirectorService = new LightingDirectorService();
 export const nextEpisodeOrchestrator = new NextEpisodeOrchestrator();
+
+export {
+  AnimaticBeatSchema,
+  AnimaticPlanSchema,
+  SEASON_ORGANIZATION,
+  continuityBlockersForUnapprovedPip,
+  evaluateShotPlanningQc,
+  planAnimatic,
+} from './production-planning';
+export type { AnimaticBeat, AnimaticPlan, ShotPlanningIssue } from './production-planning';

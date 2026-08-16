@@ -1,0 +1,54 @@
+{
+  "role": "replacement_candidate_only",
+  "autoReplaceCurrentPip": false,
+  "approved": false,
+  "canonicalMutated": false,
+  "theatricalBound": false,
+  "merge": false,
+  "productionLibraryTouched": false,
+  "paidResources": false,
+  "currentPipOverwritten": false,
+  "goatTouched": false,
+  "stopForJustin": true,
+  "forbidden": {
+    "autoReplaceCurrentPip": false,
+    "canonReplace": false,
+    "theatricalBind": false,
+    "merge": false,
+    "productionLibraryWrite": false,
+    "finalRigBindToCurrentPip": false,
+    "paidResources": false
+  },
+  "blockers": [
+    "Current fused Tripo Pip is preserved for comparison only.",
+    "Next upload is a replacement candidate, not automatic canon.",
+    "Justin visual approval is required before retopo, rigging, canon replacement, theatrical binding, or merging.",
+    "Justin has not visually approved this candidate.",
+    "Reference-comparison checklist is not fully approved."
+  ],
+  "nextAllowed": [
+    "Preserve the uploaded file unchanged.",
+    "Record filename and SHA-256.",
+    "Open in Blender 4.2.3 LTS.",
+    "Generate geometry report, five-views, close-ups, and turntable.",
+    "Fill the reference-comparison checklist as REQUIRES_JUSTIN.",
+    "Stop for Justin visual approval."
+  ],
+  "nextForbidden": [
+    "final Pip retopology",
+    "final Pip UV replacement",
+    "final Pip texture lock",
+    "final Pip rig binding",
+    "final Pip facial rig",
+    "final Pip groom/feather lock",
+    "final Pip animation",
+    "final Pip collision fitting",
+    "final character-dependent camera framing",
+    "final Pip-and-Goat scale binding",
+    "hero shots or final episode renders",
+    "canonical replacement",
+    "theatrical binding",
+    "merging an unapproved character",
+    "deployment or paid rendering"
+  ]
+}

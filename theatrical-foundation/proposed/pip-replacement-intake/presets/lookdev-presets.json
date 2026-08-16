@@ -1,0 +1,56 @@
+{
+  "schema": "tivvlejoy.lookdev_presets.v1",
+  "destructive": false,
+  "appliesToOriginalMeshes": false,
+  "characterDependentFinalFraming": false,
+  "colorManagement": {
+    "viewTransform": "Khronos PBR Neutral",
+    "look": "None",
+    "exposure": 0.0,
+    "gamma": 1.0,
+    "displayDevice": "sRGB"
+  },
+  "render": {
+    "engine": "BLENDER_EEVEE_NEXT",
+    "resolutionX": 1080,
+    "resolutionY": 1920,
+    "fps": 30,
+    "samplesDraft": 16,
+    "samplesReview": 24,
+    "samplesTurntable": 12,
+    "paidCyclesHero": false
+  },
+  "materials": {
+    "neutral_clay": {
+      "label": "Neutral clay (diagnostic only)",
+      "baseColor": [0.82, 0.82, 0.8],
+      "roughness": 0.55,
+      "metallic": 0.0,
+      "replacesUploadedTextures": false
+    },
+    "keep_imported": {
+      "label": "Keep imported materials",
+      "replacesUploadedTextures": false
+    }
+  },
+  "lighting": {
+    "neutral_lookdev": {
+      "worldColor": [0.83, 0.86, 0.89],
+      "worldStrength": 0.88,
+      "keyEnergy": 2.35,
+      "keyRotation": [0.7, 0.1, 0.32],
+      "fillEnergy": 0.62,
+      "fillRotation": [0.95, -0.42, 3.25]
+    }
+  },
+  "cameras": {
+    "front": { "facing": "+X", "shot": "full" },
+    "rear": { "facing": "-X", "shot": "full" },
+    "left": { "facing": "+Y", "shot": "full" },
+    "right": { "facing": "-Y", "shot": "full" },
+    "three_quarter": { "facing": "+X+Y", "shot": "full" },
+    "face": { "shot": "closeup", "finalHero": false },
+    "shoulder_right": { "shot": "closeup", "purpose": "strap origin" },
+    "satchel_left": { "shot": "closeup", "purpose": "bag attachment" }
+  }
+}

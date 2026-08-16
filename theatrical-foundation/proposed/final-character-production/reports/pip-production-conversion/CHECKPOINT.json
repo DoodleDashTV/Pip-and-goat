@@ -1,0 +1,33 @@
+{
+  "schema": "tivvlejoy.pip_conversion_checkpoint.v1",
+  "studio": "TivvleJoy",
+  "characterCode": "CHAR_PIP_001",
+  "paused": true,
+  "choice": "pause_keep_checkpoint",
+  "alsoConfirmed": [
+    "refuse_automated_remesh"
+  ],
+  "visualIdentityApproved": true,
+  "justinConversionApproved": false,
+  "animationReady": false,
+  "productionReady": false,
+  "officialWorkingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+  "officialWorkingBlendSha256": "581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe",
+  "approvedSourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+  "conversionEvidence": "theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend",
+  "immutableHighResolutionReference": true,
+  "retopoOwner": "justin_will_assign_separately",
+  "refused": [
+    "voxel_remesh",
+    "quadriflow_replacement",
+    "primitive_reconstruction",
+    "envelope_rig_on_fused_source",
+    "destructive_edits_to_approved_pip"
+  ],
+  "productionLibraryReplaced": false,
+  "theatricalBound": false,
+  "mergeAuthorized": false,
+  "paidResources": false,
+  "goatTouched": false,
+  "stop": true
+}

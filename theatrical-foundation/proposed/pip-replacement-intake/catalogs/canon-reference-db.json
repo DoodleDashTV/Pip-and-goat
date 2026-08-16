@@ -1,0 +1,97 @@
+{
+  "schema": "tivvlejoy.canon_reference_db.v1",
+  "studio": "TivvleJoy",
+  "mutatesLockedCanon": false,
+  "theatricalGate": {
+    "assetFoundationComplete": false,
+    "goldenSceneRendered": false,
+    "justinApproved": false,
+    "referenceQualityLockEngaged": false
+  },
+  "bindingAuthority": {
+    "rule": "The ten five-view JPEGs win every identity, anatomy, laterality, and marking conflict.",
+    "directory": "artifacts/theatrical-v2/source-package-validation/refs/",
+    "pip": [
+      "Pip_front.jpeg",
+      "Pip_three_quarter.jpeg",
+      "Pip_back.jpeg",
+      "Pip_profile_facing_left.jpeg",
+      "Pip_profile_facing_right.jpeg"
+    ],
+    "goat": [
+      "Goat_front.jpeg",
+      "Goat_three_quarter.jpeg",
+      "Goat_back.jpeg",
+      "Goat_profile_facing_left.jpeg",
+      "Goat_profile_facing_right.jpeg"
+    ]
+  },
+  "orientation": {
+    "charactersFace": "+X",
+    "characterLeft": "+Y",
+    "characterRight": "-Y"
+  },
+  "characters": {
+    "CHAR_PIP_001": {
+      "displayName": "Pip",
+      "role": "young girl bird explorer",
+      "canonicalIdLocked": true,
+      "productionModelApproved": false,
+      "theatricalBound": false,
+      "currentCandidateStatus": "VISUAL_IDENTITY_APPROVED_PRODUCTION_PREP",
+      "officialVisualSource": {
+        "packageId": "20260816T025617Z_pip_backpack_replacement.glb_dca239475c78",
+        "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+        "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+        "productionReady": false,
+        "productionLibraryReplaced": false
+      },
+      "identity": {
+        "finish": "bright yellow polished CGI feathers",
+        "face": "approved cheerful face, cream-yellow face/cheeks/chest",
+        "eyes": "large glossy green/teal",
+        "crest": "exactly three coral crown feathers",
+        "wings": "long layered yellow wings",
+        "scarf": "teal neckerchief, not intersected by backpack",
+        "backpack": "centered true backpack on the back",
+        "straps": "two symmetrical shoulder straps",
+        "forbiddenAccessories": ["satchel", "cross-body strap", "hip bag"],
+        "feet": "orange beak and feet; toes and rear hallux visible"
+      },
+      "laterality": {
+        "backpack": "centered on the back",
+        "straps": "symmetrical over both shoulders",
+        "facingCamera": "two straps visible; no satchel"
+      },
+      "forbiddenOnCurrentCandidate": [
+        "overwrite",
+        "merge",
+        "canonize",
+        "final rig bind",
+        "move into production-library",
+        "destructive flatten/paint/remesh of fused left-front riser"
+      ]
+    },
+    "CHAR_GOAT_001": {
+      "displayName": "Goat",
+      "role": "young boy goat explorer",
+      "canonicalIdLocked": true,
+      "productionModelApproved": false,
+      "theatricalBound": false,
+      "currentCandidateStatus": "UNCHANGED_UNAPPROVED",
+      "scaleVsPip": 1.5,
+      "notes": "Do not work unless Justin separately authorizes additional Goat work."
+    }
+  },
+  "referenceSlots": [
+    "PRIMARY",
+    "FRONT",
+    "THREE_QUARTER",
+    "SIDE",
+    "BACK",
+    "EXPRESSION_SHEET",
+    "POSE_SHEET",
+    "COLOR_REFERENCE"
+  ],
+  "rule": "Approving a JPEG or ingesting a model never marks PRODUCTION_READY, THEATRICAL, or canon replacement."
+}

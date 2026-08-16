@@ -1,0 +1,19 @@
+{
+  "cornea": {
+    "cleared": true,
+    "alpha": 0.18,
+    "transmission": 0.92,
+    "catch_removed": []
+  },
+  "back": {
+    "softened": true,
+    "filled": 7729309
+  },
+  "renders": [
+    "artifacts/theatrical-v2/final-character-production/corrections/01_goat_corrected_front_closeup.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/02_goat_corrected_rear.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/03_goat_corrected_rear_three_quarter.png",
+    "artifacts/theatrical-v2/final-character-production/corrections/08_corrected_pair.png"
+  ],
+  "paid_resources": false
+}

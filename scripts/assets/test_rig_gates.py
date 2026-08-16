@@ -932,6 +932,43 @@ class DirectionConsumerTests(unittest.TestCase):
         self.assertIsNotNone(mesh.data.shape_keys.animation_data)
 
 
+class ProxyPipelineTests(unittest.TestCase):
+    """Deformation tests on a labeled PROXY, never on current Pip."""
+
+    def setUp(self) -> None:
+        fresh_scene()
+
+    def test_proxy_label_is_required_and_is_not_pip(self) -> None:
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.3, location=(0, 0, 0.6))
+        body = bpy.context.object
+        body.name = "PROXY_PIPELINE_BIRD_BODY"
+        body["ddp_proxy"] = True
+        body["ddp_not_pip"] = True
+        body["ddp_approved"] = False
+        self.assertTrue(body.get("ddp_proxy"))
+        self.assertTrue(body.get("ddp_not_pip"))
+        self.assertFalse(body.get("ddp_approved"))
+        self.assertNotIn("Pip", body.name)
+        self.assertNotEqual(body.name, "CHAR_PIP_001")
+
+    def test_proxy_skin_deforms_without_touching_production_library(self) -> None:
+        arm = make_armature("PROXY_PIPELINE_RIG")
+        body = make_body("PROXY_PIPELINE_BIRD_BODY")
+        body["ddp_proxy"] = True
+        bind_skin(body, arm)
+        author_action(arm, "PROXY_WAVE", 30, wave)
+        arm.animation_data.action = bpy.data.actions["PROXY_WAVE"]
+        motion = sample_local_motion(arm, [body], [1, 15, 30])
+        self.assertGreater(motion["maxVertexDelta"], 0.01)
+        from pathlib import Path
+
+        repo = Path(__file__).resolve().parents[2]
+        lib = repo / "production-library"
+        self.assertTrue(lib.is_dir())
+        # The test scene is in-memory only; production-library stays untouched.
+        self.assertFalse(any(obj.name.startswith("Pip_") for obj in bpy.data.objects))
+
+
 def main() -> int:
     loader = unittest.TestLoader()
     suite = unittest.TestSuite(
@@ -947,6 +984,7 @@ def main() -> int:
             TheatricalV11ProposalTests,
             TheatricalShaderTests,
             DirectionConsumerTests,
+            ProxyPipelineTests,
         )
     )
     result = unittest.TextTestRunner(verbosity=2, stream=sys.stdout).run(suite)

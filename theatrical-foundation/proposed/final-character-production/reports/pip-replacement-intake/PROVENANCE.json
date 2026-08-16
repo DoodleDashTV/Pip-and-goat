@@ -1,0 +1,106 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.provenance.v1",
+  "packageId": "20260816T022327Z_pip_replacement.glb_2e06f4285448",
+  "characterCode": "CHAR_PIP_001",
+  "role": "replacement_candidate_only",
+  "createdAt": "2026-08-16T02:23:27Z",
+  "blender": "4.2.3 LTS",
+  "original": {
+    "filename": "pip_replacement.glb",
+    "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+    "bytes": 64634144,
+    "preservedUnchanged": true
+  },
+  "license": {
+    "name": "in-house sculpt",
+    "source": "Justin upload 2026-08-16",
+    "paidResource": false,
+    "thirdPartyMarketplace": false
+  },
+  "notes": "Reassembled from inbox part1+part2+part3; SHA-256 2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+  "unpacked": {
+    "files": [
+      {
+        "filename": "pip_replacement.glb",
+        "relative": "pip_replacement.glb",
+        "extension": ".glb",
+        "kind": "model",
+        "bytes": 64634144,
+        "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+        "magic": "glb",
+        "supported": true
+      }
+    ],
+    "modelCount": 1,
+    "textureCount": 0,
+    "otherCount": 0,
+    "primaryModel": {
+      "filename": "pip_replacement.glb",
+      "relative": "pip_replacement.glb",
+      "extension": ".glb",
+      "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+      "bytes": 64634144
+    },
+    "supported": true
+  },
+  "protected": {
+    "currentPip": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "currentGoat": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+    "longWingOriginalSha256": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+    "productionLibraryFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7"
+  },
+  "gate": {
+    "role": "replacement_candidate_only",
+    "autoReplaceCurrentPip": false,
+    "approved": false,
+    "canonicalMutated": false,
+    "theatricalBound": false,
+    "merge": false,
+    "productionLibraryTouched": false,
+    "paidResources": false,
+    "currentPipOverwritten": false,
+    "goatTouched": false,
+    "stopForJustin": true,
+    "forbidden": {
+      "autoReplaceCurrentPip": false,
+      "canonReplace": false,
+      "theatricalBind": false,
+      "merge": false,
+      "productionLibraryWrite": false,
+      "finalRigBindToCurrentPip": false,
+      "paidResources": false
+    },
+    "blockers": [
+      "Current fused Tripo Pip is preserved for comparison only.",
+      "Next upload is a replacement candidate, not automatic canon.",
+      "Justin visual approval is required before retopo, rigging, canon replacement, theatrical binding, or merging.",
+      "Justin has not visually approved this candidate.",
+      "Reference-comparison checklist is not fully approved."
+    ],
+    "nextAllowed": [
+      "Preserve the uploaded file unchanged.",
+      "Record filename and SHA-256.",
+      "Open in Blender 4.2.3 LTS.",
+      "Generate geometry report, five-views, close-ups, and turntable.",
+      "Fill the reference-comparison checklist as REQUIRES_JUSTIN.",
+      "Stop for Justin visual approval."
+    ],
+    "nextForbidden": [
+      "final Pip retopology",
+      "final Pip UV replacement",
+      "final Pip texture lock",
+      "final Pip rig binding",
+      "final Pip facial rig",
+      "final Pip groom/feather lock",
+      "final Pip animation",
+      "final Pip collision fitting",
+      "final character-dependent camera framing",
+      "final Pip-and-Goat scale binding",
+      "hero shots or final episode renders",
+      "canonical replacement",
+      "theatrical binding",
+      "merging an unapproved character",
+      "deployment or paid rendering"
+    ]
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.provenance.v1",
+  "packageId": "20260816T025617Z_pip_backpack_replacement.glb_dca239475c78",
+  "characterCode": "CHAR_PIP_001",
+  "role": "replacement_candidate_only",
+  "createdAt": "2026-08-16T02:56:18Z",
+  "blender": "4.2.3 LTS",
+  "original": {
+    "filename": "pip_backpack_replacement.glb",
+    "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+    "bytes": 62876180,
+    "preservedUnchanged": true
+  },
+  "license": {
+    "name": "in-house sculpt",
+    "source": "Justin upload 2026-08-16",
+    "paidResource": false,
+    "thirdPartyMarketplace": false
+  },
+  "notes": "Backpack replacement candidate. Supersedes satchel candidate for visual review only. Do not overwrite current Pip.",
+  "unpacked": {
+    "files": [
+      {
+        "filename": "pip_backpack_replacement.glb",
+        "relative": "pip_backpack_replacement.glb",
+        "extension": ".glb",
+        "kind": "model",
+        "bytes": 62876180,
+        "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+        "magic": "glb",
+        "supported": true
+      }
+    ],
+    "modelCount": 1,
+    "textureCount": 0,
+    "otherCount": 0,
+    "primaryModel": {
+      "filename": "pip_backpack_replacement.glb",
+      "relative": "pip_backpack_replacement.glb",
+      "extension": ".glb",
+      "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "bytes": 62876180
+    },
+    "supported": true
+  },
+  "protected": {
+    "currentPip": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "currentGoat": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+    "longWingOriginalSha256": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+    "productionLibraryFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7"
+  },
+  "gate": {
+    "role": "replacement_candidate_only",
+    "autoReplaceCurrentPip": false,
+    "approved": false,
+    "canonicalMutated": false,
+    "theatricalBound": false,
+    "merge": false,
+    "productionLibraryTouched": false,
+    "paidResources": false,
+    "currentPipOverwritten": false,
+    "goatTouched": false,
+    "stopForJustin": true,
+    "forbidden": {
+      "autoReplaceCurrentPip": false,
+      "canonReplace": false,
+      "theatricalBind": false,
+      "merge": false,
+      "productionLibraryWrite": false,
+      "finalRigBindToCurrentPip": false,
+      "paidResources": false
+    },
+    "blockers": [
+      "Current fused Tripo Pip is preserved for comparison only.",
+      "Next upload is a replacement candidate, not automatic canon.",
+      "Justin visual approval is required before retopo, rigging, canon replacement, theatrical binding, or merging.",
+      "Justin has not visually approved this candidate.",
+      "Reference-comparison checklist is not fully approved."
+    ],
+    "nextAllowed": [
+      "Preserve the uploaded file unchanged.",
+      "Record filename and SHA-256.",
+      "Open in Blender 4.2.3 LTS.",
+      "Generate geometry report, five-views, close-ups, and turntable.",
+      "Fill the reference-comparison checklist as REQUIRES_JUSTIN.",
+      "Stop for Justin visual approval."
+    ],
+    "nextForbidden": [
+      "final Pip retopology",
+      "final Pip UV replacement",
+      "final Pip texture lock",
+      "final Pip rig binding",
+      "final Pip facial rig",
+      "final Pip groom/feather lock",
+      "final Pip animation",
+      "final Pip collision fitting",
+      "final character-dependent camera framing",
+      "final Pip-and-Goat scale binding",
+      "hero shots or final episode renders",
+      "canonical replacement",
+      "theatrical binding",
+      "merging an unapproved character",
+      "deployment or paid rendering"
+    ]
+  },
+  "accessoryProfile": "backpack"
+}

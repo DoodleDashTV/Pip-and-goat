@@ -1,0 +1,33 @@
+{
+  "schema": "tivvlejoy.season_organization.v1",
+  "approved": false,
+  "publicCanonSeasonStarted": false,
+  "seasons": [
+    {
+      "id": "SEASON_INTERNAL_TEST",
+      "seasonNumber": 99,
+      "title": "INTERNAL: Production Test Season",
+      "publicCanon": false,
+      "approvedForProduction": true,
+      "purpose": "Exercise story, continuity, storyboard, shot planning, QC, and cost gates without claiming Season 1.",
+      "episodes": [
+        {
+          "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "title": "[PRODUCTION TEST] Meadow Map Mystery",
+          "status": "BLOCKED_AT_ASSET_CHECK",
+          "reason": "No approved theatrical Pip/Goat production assets."
+        }
+      ]
+    },
+    {
+      "id": "SEASON_01_PROPOSAL",
+      "seasonNumber": 1,
+      "title": "Pip and Goat Season 1",
+      "publicCanon": true,
+      "approvedForProduction": false,
+      "purpose": "Public season remains a proposal until Justin approves characters and a season bible.",
+      "targetEpisodeCount": 10,
+      "episodes": []
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.checklist.v1",
+  "items": [
+    {
+      "id": "face_and_green_eyes",
+      "label": "Face and green/teal glossy eyes",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "bright_yellow_cgi_finish",
+      "label": "Bright yellow CGI feather finish (warm chartreuse / golden-lime, cream face/chest)",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "three_coral_crest_feathers",
+      "label": "Exactly three coral crown/crest feathers",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect exactly three coral crest feathers"
+    },
+    {
+      "id": "long_layered_wings",
+      "label": "Long layered wings",
+      "authority": "conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "teal_scarf",
+      "label": "Teal neckerchief/scarf, separate from strap tails",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "one_continuous_cross_body_strap",
+      "label": "Exactly one continuous cross-body strap (not two backpack risers)",
+      "authority": "Justin strap addendum + binding sheets",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 automated strap classification is a hint only"
+    },
+    {
+      "id": "character_right_shoulder_origin",
+      "label": "Strap originates over character-right shoulder (\u2212Y)",
+      "authority": "binding laterality",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect character-right shoulder (\u2212Y) and character-left hip (+Y)"
+    },
+    {
+      "id": "diagonal_front_and_rear_path",
+      "label": "Diagonal strap path on both front and rear",
+      "authority": "Justin strap addendum",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "character_left_hip_satchel",
+      "label": "Satchel/bag on character-left hip (+Y)",
+      "authority": "binding laterality",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect satchel on +Y"
+    },
+    {
+      "id": "copper_spiral",
+      "label": "Copper spiral clasp",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "feet_toes_rear_hallux",
+      "label": "Feet, toes, and rear hallux",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "accessories_separated_or_fused",
+      "label": "Accessories are separate objects vs fused into the body",
+      "authority": "production suitability",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "single_or_fused"
+    },
+    {
+      "id": "front_exactly_one_diagonal_strap",
+      "label": "Front has exactly one diagonal cross-body strap",
+      "authority": "Justin strap addendum",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm exactly one front diagonal"
+    }
+  ],
+  "approved": false,
+  "autoReplace": false
+}
