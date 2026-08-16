@@ -125,8 +125,8 @@ describe('primary components use semantic tokens', () => {
     expect(shell).toContain('z-[60]');
     expect(shell).toContain('PRIMARY_NAV');
     expect(shell).toContain('Advanced / debug');
-    expect(shell).toContain('Foundation Stage');
-    expect(shell).toContain('PREVIEW — Work is stored only in this browser. It is not a production render.');
+    expect(shell).toContain('FOUNDATION_STAGE_LABEL');
+    expect(shell).toContain('PREVIEW_PUBLIC_BANNER');
     expect(shell).toContain('Technical tools, not the normal Preview workflow');
     expect(shell).toContain('{navOpen ? \'Close menu\' : \'Menu\'}');
     expect(shell).toContain('Technical stage: DDP_STEPS_1_8');
@@ -182,7 +182,7 @@ describe('closed stages remain truthfully displayed', () => {
     expect(panel).toContain('Not canonical or production-ready');
     expect(panel).toContain('Not authorized');
     expect(panel).toContain('Not completed');
-    expect(panel).toContain('Foundation Stage');
+    expect(panel).toContain('FOUNDATION_STAGE_LABEL');
     expect(panel).toContain('Advanced / debug — technical values');
     expect(panel).not.toContain('Launch paid');
   });

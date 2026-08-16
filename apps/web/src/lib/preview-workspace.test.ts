@@ -237,8 +237,9 @@ describe('Preview navigation and primary workflow wiring', () => {
     expect(shell).toContain('Advanced / debug');
     expect(shell).toContain('aria-current');
     expect(shell).toContain('Close menu');
-    expect(shell).toContain(FOUNDATION_STAGE_LABEL);
-    expect(shell).toContain(PREVIEW_PUBLIC_BANNER);
+    expect(shell).toContain('FOUNDATION_STAGE_LABEL');
+    expect(FOUNDATION_STAGE_LABEL).toBe('Foundation Stage');
+    expect(shell).toContain('PREVIEW_PUBLIC_BANNER');
     expect(shell).toContain('Technical tools, not the normal Preview workflow');
     for (const file of [
       'apps/web/src/app/production-setup/page.tsx',
@@ -293,7 +294,7 @@ describe('Preview navigation and primary workflow wiring', () => {
       expect(readRepo(file)).toContain('PreviewEmptyState');
     }
     expect(readRepo('apps/web/src/components/preview/PreviewWorkflow.tsx')).toContain(
-      FOUNDATION_STAGE_LABEL,
+      'FOUNDATION_STAGE_LABEL',
     );
     expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).toContain('Available');
     expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).toContain(
