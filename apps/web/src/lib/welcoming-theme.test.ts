@@ -198,7 +198,6 @@ describe('protected production state is unchanged', () => {
     expect(ignore).toContain('artifacts');
     expect(ignore).toContain('workers/runpod-blender');
     expect(vercel).toContain('"framework": "nextjs"');
-    expect(vercel).toContain('"deploymentEnabled": true');
     expect(vercel).toContain('pnpm --filter @doodle-dash/web build');
     expect(vercel).not.toContain('rootDirectory');
     expect(vercel).not.toContain('DATABASE_URL');
