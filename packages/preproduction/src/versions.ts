@@ -1,0 +1,27 @@
+/**
+ * Pre-production subsystem versions.
+ *
+ * Hashed into every cache key this package emits. Bump the version in the same
+ * commit as a behaviour change, or a later planner will reuse work it would not
+ * have produced.
+ *
+ * This package is a parallel studio track. It is not DDP Steps 9–16 and does not
+ * flip the theatrical gate.
+ */
+export const PREPRODUCTION_SCHEMA_VERSION = 'ddp-preproduction-bundle-v1' as const;
+
+export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
+  story: '1.0.0',
+  continuity: '1.0.0',
+  storyboard: '1.0.0',
+  animatic: '1.0.0',
+  shotplan: '1.0.0',
+  library: '1.0.0',
+  audio: '1.0.0',
+  orchestration: '1.0.0',
+  qc: '1.0.0',
+  gates: '1.0.0',
+  proxy: '1.0.0',
+} as const;
+
+export type PreproductionSubsystemName = keyof typeof PREPRODUCTION_SUBSYSTEM_VERSIONS;

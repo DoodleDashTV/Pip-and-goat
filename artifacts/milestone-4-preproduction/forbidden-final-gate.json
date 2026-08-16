@@ -1,0 +1,25 @@
+{
+  "allowed": false,
+  "blockers": [
+    "Proxy occupants PROXY_NONCANONICAL_BIRD_A, PROXY_NONCANONICAL_QUADRUPED_A cannot enter FINAL production output.",
+    "Proxy occupants cannot bind THEATRICAL asset quality.",
+    "Pre-production must not write production-library/.",
+    "Pre-production output cannot be labeled master, final, or production ready.",
+    "Paid GPU launch is refused from this package. Justin’s explicit approval is required elsewhere.",
+    "A proxy bundle cannot emit a story-approved ScenePlan or be marked storyApproved.",
+    "Proxy PROXY_NONCANONICAL_BIRD_A cannot bind locked voice pip_default_v1.",
+    "Proxy PROXY_NONCANONICAL_BIRD_A may only use proxy_voice_placeholder_v1."
+  ],
+  "codes": [
+    "THEATRICAL_GATE_STILL_CLOSED",
+    "STEPS_9_16_STILL_BLOCKED",
+    "PROXY_IN_FINAL_RENDER",
+    "PROXY_IN_THEATRICAL_BINDING",
+    "PROXY_IN_PRODUCTION_LIBRARY",
+    "PROXY_IN_MASTER_LABEL",
+    "PROXY_IN_PAID_LAUNCH",
+    "PROXY_IN_STORY_APPROVED_SCENE_PLAN",
+    "PROXY_VOICE_AS_LOCKED_IDENTITY"
+  ],
+  "version": "1.0.0"
+}

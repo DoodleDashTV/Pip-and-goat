@@ -1,0 +1,27 @@
+[
+  {
+    "name": "proxy-pipeline",
+    "status": "PASS",
+    "detail": "PASS · PIPELINE_TEST · scenePlan=false"
+  },
+  {
+    "name": "canonical-scene-plan",
+    "status": "PASS",
+    "detail": "PASS · scenePlan=true"
+  },
+  {
+    "name": "proxy-final-refused",
+    "status": "PASS",
+    "detail": "THEATRICAL_GATE_STILL_CLOSED, STEPS_9_16_STILL_BLOCKED, PROXY_IN_FINAL_RENDER, PROXY_IN_THEATRICAL_BINDING, PROXY_IN_PRODUCTION_LIBRARY, PROXY_IN_MASTER_LABEL, PROXY_IN_PAID_LAUNCH, PROXY_IN_STORY_APPROVED_SCENE_PLAN, PROXY_VOICE_AS_LOCKED_IDENTITY"
+  },
+  {
+    "name": "theatrical-still-closed",
+    "status": "PASS",
+    "detail": "stage=DDP_STEPS_1_8"
+  },
+  {
+    "name": "determinism",
+    "status": "PASS",
+    "detail": "proxy fixture cache key is stable"
+  }
+]

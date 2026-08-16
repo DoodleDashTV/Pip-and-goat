@@ -17,6 +17,7 @@
     "@doodle-dash/database": "workspace:*",
     "@doodle-dash/direction": "workspace:*",
     "@doodle-dash/domain": "workspace:*",
+    "@doodle-dash/preproduction": "workspace:*",
     "@doodle-dash/production": "workspace:*",
     "@doodle-dash/providers": "workspace:*",
     "@doodle-dash/rendering": "workspace:*",

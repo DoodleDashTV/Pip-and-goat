@@ -1,0 +1,57 @@
+{
+  "episodeId": "M4_CANONICAL_STORY_DRAFT",
+  "outputClass": "STORY_APPROVED_PLAN",
+  "occupants": [
+    "CHAR_PIP_001",
+    "CHAR_GOAT_001"
+  ],
+  "status": "PASS",
+  "cacheKey": "466b1e27babf6cb34b4c1fe1cf83dda84545b2379d2a4c76b9669b763a02d7b4",
+  "scenePlanEmitted": true,
+  "delivery": {
+    "aspect": "9:16",
+    "resolution": "1080x1920",
+    "fps": 30,
+    "targetDurationSeconds": 30,
+    "renderTier": "DRAFT",
+    "assetQuality": "PROTOTYPE"
+  },
+  "issues": [
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_003 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_003"
+      }
+    },
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_004 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_004"
+      }
+    },
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_005 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_005"
+      }
+    },
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_006 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_006"
+      }
+    }
+  ]
+}

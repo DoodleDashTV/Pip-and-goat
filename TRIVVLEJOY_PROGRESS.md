@@ -1,104 +1,76 @@
 # TrivvleJoy Studio Progress
 
-Updated: 2026-08-14
+Updated: 2026-08-16
 
 ## Repository state
 
 - Repository: `Pip-and-goat` (canonical GitHub remote for this studio)
-- Working branch: `cursor/trivvlejoy-milestone-3-1ebc`
+- Working branch: `cursor/studio-character-independent-73f1`
+- Accepted studio baseline: `cursor/trivvlejoy-milestone-3-1ebc` @ `2fdac1d5783a1aaca55953214cc140eb9525085a`
 - Authoritative Milestone 2 recovery: `agent/trivvlejoy-milestone-2-recovery` @ `19a76c61a1da3d54c20d98a9074c76b33779b1e7`
 - Authoritative preserved source: `cursor/ddp-steps-1-8-production-excellence-6b40` @ `4543943b7c19fc14e6d45c0dd5eec26492319efb`
 - Immutable accepted baseline (PR #10 merge): `1ff46d595023ede5a33aa9e7f12cbbebe5ec9ed1`
-- Empty `main` (`7614139`) is not an implementation base.
+- Empty `main` is not an implementation base.
+- Draft PR #24 (`cursor/theatrical-final-character-production-1ebc`) is isolated and not merged.
 
 ## Current milestone
 
-Milestone 3 — Blender production consumers for Steps 1–8 **implemented and
-locally validated**. Theatrical CGI Asset Foundation (roadmap stage 3) has
-**not** begun.
+Studio Milestone 4 — **character-independent pre-production** implemented on a
+branch taken from the Milestone 3 ending commit. Theatrical CGI Asset Foundation
+and Steps 9–16 remain closed. Pip conversion stays paused on PR #24.
 
-## Completed
+## Completed this increment
 
-- Confirmed this agent booted on empty `main` @ `7614139` and branched from the
-  republished Milestone 2 checkpoint `19a76c6` instead.
-- Installed official Blender **4.2.3 LTS** at `/usr/local/bin/blender` and
-  confirmed `Khronos PBR Neutral`.
-- Installed local PostgreSQL 16 and applied the existing additive migrations.
-- Projected acting, emotion, and richer face plans into the opt-in `direction`
-  block without changing top-level `shot_meta` keys.
-- Wired real Blender consumers: acting (eye/head lead, weight shift, overlap),
-  emotion (bounded posture/fidget), face (shape-key cues, blinks, gaze),
-  lighting (approved colour management + additive no-shadow practicals), and
-  VFX (seeded, capped, no-shadow EEVEE instances).
-- Direction overlays commit to additive NLA so they cannot replace authored
-  actions (the motionless-goat failure mode).
-- Fixed the draft `--render` harness to call `assemble_scene.py` with its real
-  CLI and confirmed one local 360×640 EEVEE still.
-- Wrote `MILESTONE_3_GATE_2026-08-14.md`.
+- Audited remotes, open PRs #1–#25, and prior agent branches. Chose Milestone 3
+  as the safest accepted studio baseline (not `main`, not PR #24).
+- Added `@doodle-dash/preproduction`: story, continuity, storyboard, animatic,
+  9:16 shot planning, reusable env/prop/lighting/VFX planning, audio
+  infrastructure without voice cloning, local cache/retry/recovery/spend
+  refuse, proxy QC, and fail-closed proxy output gates.
+- Labeled noncanonical proxies `PROXY_NONCANONICAL_BIRD_A` and
+  `PROXY_NONCANONICAL_QUADRUPED_A`. They are not Pip or Goat.
+- Wired `/preproduction` and `/api/preproduction`, plus
+  `assertManifestSafeForFinal()` in `@doodle-dash/production`.
+- Local harness: `pnpm validate:milestone4`.
 
-## Tests / validation (this Milestone 3 run)
+## Tests / validation (this Milestone 4 run)
 
-| Gate | Result |
-| --- | --- |
-| `blender --version` | PASS — 4.2.3 LTS |
-| Khronos PBR Neutral python-expr | PASS |
-| `pnpm install --frozen-lockfile` | PASS |
-| `pnpm db:generate` / `pnpm db:migrate` | PASS |
-| `pnpm test` | PASS — **395 / 395** (23 files) |
-| `pnpm typecheck` | PASS |
-| `pnpm lint` | PASS — no ESLint warnings or errors |
-| `pnpm test:blender` | PASS — **44 / 44** |
-| `pnpm validate:steps1-8` | PASS — **17 passed, 0 failed, 1 skipped** |
-| `pnpm validate:steps1-8 -- --render` | PASS — **18 passed, 0 failed, 0 skipped** |
-| `pnpm test:color` | PASS — **19 / 19** |
-| `pnpm gates:scene` | PASS — all 8 scene gates |
-| `pnpm gates:local` | PASS — 90/90 frames, all 16 visual checks |
-
-See `MILESTONE_3_GATE_2026-08-14.md` for the full evidence table.
+Recorded in `MILESTONE_4_GATE_2026-08-16.md` after local gates run.
 
 ## Known failures / blocker
 
-None remaining for Milestone 3 consumer wiring.
-
-`pnpm gates:local` was re-run on this branch and PASSed (90/90 frames, all 16
-visual checks). The no-direction acceptance path is unchanged.
-
-Roadmap stage 3 (Theatrical CGI Asset Foundation) is the next *defined* studio
-stage and is blocked on new production assets plus human visual approval. It
-must not be started from this increment.
+Pip and Goat animation retopology is still being completed separately. No
+final facial controls, weights, character animation, lip-sync binding, or
+hero renders until those models are delivered and validated.
 
 ## Paid activity
 
-None. No GPU, RunPod pod, billable render, deployment, merge to main/canonical,
-secret change, deletion, rebase, amend, squash, or force-push occurred.
-`CLOUD_RENDER_ENABLED=false` and `ALLOW_PAID_GPU_LAUNCH=false` remained set.
-The worker image was not rebuilt or re-pinned. `RENDER_CODE_MISMATCH` remains
-the intentional paid-launch block.
+None. No GPU, RunPod, billable render, deployment, or merge.
+`CLOUD_RENDER_ENABLED` and `ALLOW_PAID_GPU_LAUNCH` remain unset/false.
 
 ## Protections
 
-- Pip/Goat character locks, approved asset fingerprint `7876ac737de60257…`,
-  chest-seam protection, accepted visual thresholds, and deterministic direction
-  behavior were not weakened.
-- `production-library/` is unchanged versus `19a76c6` / `4543943`.
-- PR #11’s branch `cursor/ddp-steps-1-8-production-excellence-6b40` was not
-  modified or overwritten.
-- 1080×1920 / 30 fps and 15/30/45/60-second production options are unchanged.
-  `targetDurationSeconds` still allows future 2/3/5-minute plans (max 600s).
+- Do not continue the paused Pip conversion.
+- Do not modify Pip or Goat source files.
+- Do not replace production-library character assets.
+- Do not merge Draft PR #24.
+- Do not declare final theatrical character binding.
+- Do not use paid resources without Justin’s explicit approval.
+- Existing render, cost, security and quality gates are unchanged.
+- `currentStage()` remains `DDP_STEPS_1_8`.
+- `evaluateTheatricalGate().allowed` remains `false`.
+- Approved asset fingerprint `7876ac737de60257…` is unchanged.
 
 ## Safest next action
 
-Stop. Milestone 3 consumer wiring is complete and locally gated. Do **not**
-begin Theatrical CGI Asset Foundation (roadmap stage 3): it needs new
-production assets and Justin’s visual approval. Do not rebuild or re-pin the
-worker image. Do not launch paid cloud renders.
+Stop after this character-independent milestone. Wait for approved
+retopologized Pip and Goat models before any theatrical character binding.
+Do not merge automatically.
 
 ## Resume
 
-- Do not use empty `main` as an implementation base.
-- Do not modify PR #11’s branch.
-- Do not restart Steps 1–8 source-port work; it already lives at `4543943`.
-- Read `MILESTONE_2_GATE_2026-08-14.md` and `MILESTONE_3_GATE_2026-08-14.md`
-  before any further milestone work.
-- Do not begin roadmap stage 3 (theatrical assets) or Steps 9–16. The
-  theatrical gate is closed (`evaluateTheatricalGate().allowed === false`).
+- Branch from `cursor/studio-character-independent-73f1` or from Milestone 3
+  (`2fdac1d`) if this PR is not accepted.
+- Do not use empty `main`.
+- Do not retarget onto PR #24.
+- Read `MILESTONE_3_GATE_2026-08-14.md` and `MILESTONE_4_GATE_2026-08-16.md`.
