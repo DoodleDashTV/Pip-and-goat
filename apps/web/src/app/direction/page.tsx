@@ -42,10 +42,10 @@ export default async function DirectionPage() {
   return (
     <div className="space-y-6 overflow-x-hidden">
       <header>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-sun-400">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-primary)]">
           {STUDIO_DISPLAY_NAME} · Direction
         </p>
-        <h1 className="mt-2 font-display text-3xl font-bold text-mist-100 sm:text-4xl">
+        <h1 className="mt-2 font-display text-3xl font-bold text-[var(--color-text)] sm:text-4xl">
           Production Blueprint
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-[var(--muted)]">
