@@ -89,9 +89,7 @@ REMAINING CHARACTER-DEPENDENT BLOCKERS
 
 HOW TO UPLOAD AND PROCESS THE NEXT PIP MODEL
 1. Put the file on this machine (BLEND, GLB, GLTF, FBX, OBJ, or ZIP).
-2. Run:
-
-   scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
+2. Run: scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
 
    Optional:
    PIP_LICENSE="in-house sculpt" PIP_ORIGIN="Justin upload" \
