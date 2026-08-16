@@ -15,6 +15,7 @@ import {
   CANONICAL_AUDITION_SCRIPT,
   VERTICAL_SLICE_EPISODE_ID,
   loadLatestPreproductionRun,
+  readLaunchEnvFlags,
 } from '@doodle-dash/production';
 import { AppError } from '@doodle-dash/shared';
 import { prisma } from '@doodle-dash/database';
@@ -154,6 +155,7 @@ export async function POST(request: Request) {
     if (body.action === 'generate-final') {
       const episodeId = body.episodeId || VERTICAL_SLICE_EPISODE_ID;
       const persisted = await loadLatestPreproductionRun(episodeId);
+      const flags = readLaunchEnvFlags();
       const safety = evaluateEpisodeLaunchSafety({
         command: 'generate-final',
         intent:
@@ -169,8 +171,11 @@ export async function POST(request: Request) {
           ? raw.occupants.map(String)
           : persisted?.occupants,
         characterCodes: Array.isArray(raw.characterCodes) ? raw.characterCodes.map(String) : undefined,
-        allowPaidGpu: raw.allowPaidGpu === true,
+        allowPaidGpu: raw.allowPaidGpu === true || flags.allowPaidGpu,
+        cloudRenderEnabled: flags.cloudRenderEnabled,
         writeProductionLibrary: raw.writeProductionLibrary === true,
+        synthesizeLockedVoice: raw.synthesizeLockedVoice === true,
+        publish: raw.publish === true || raw.intent === 'PUBLISH',
       });
       if (!safety.allowed) {
         return NextResponse.json(

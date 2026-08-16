@@ -17,7 +17,7 @@ import type { AnimaticPlan } from '../animatic';
 import type { AudioPlan } from '../audio';
 
 export const AssemblyCommandSchema = z.object({
-  kind: z.enum(['ANIMATIC', 'AUDIO_MIX']),
+  kind: z.enum(['ANIMATIC', 'AUDIO_MIX', 'DRAFT_MUX']),
   args: z.array(z.string()).min(1),
   filterGraph: z.string(),
   outputPath: z.string(),
@@ -175,7 +175,8 @@ export function compileAudioMix(input: {
 
   for (const track of tracks) {
     const hz = SYNTHETIC_TONE_HZ[track.kind] ?? 0;
-    if (track.kind === 'PLACEHOLDER' || hz === 0) {
+    // Dialogue / narration / placeholder stay silent so locked voices are never synthesised.
+    if (track.kind === 'PLACEHOLDER' || track.kind === 'DIALOGUE' || track.kind === 'NARRATION' || hz === 0) {
       args.push(
         '-f',
         'lavfi',
@@ -231,6 +232,139 @@ export function compileAudioMix(input: {
     paid: false,
     writesProductionLibrary: false,
     watermark: tracks.some((track) => track.kind === 'PLACEHOLDER') ? PROXY_WATERMARK : undefined,
+    version: PREPRODUCTION_SUBSYSTEM_VERSIONS.assembly,
+  });
+}
+
+/**
+ * One local draft MP4: 9:16 color holds + synthetic non-voice audio + mux.
+ * Dialogue tracks are silence. Music / ambience / foley are tones. No locked
+ * voice is synthesised.
+ */
+export function compileDraftMux(input: {
+  animatic: AnimaticPlan;
+  audio: AudioPlan;
+  outputPath: string;
+  overwrite?: boolean;
+  fontFile?: string;
+  sampleRate?: number;
+}): AssemblyCommand {
+  assertSafeOutputPath(input.outputPath);
+  if (input.animatic.renderTier !== 'DRAFT') {
+    throw new Error('Refuse: draft mux only accepts DRAFT animatics.');
+  }
+  if (input.audio.tracks.some((track) => track.requiresPaidProvider)) {
+    throw new Error('Refuse: draft mux cannot use a paid audio provider.');
+  }
+  if (!input.audio.lockedVoicesUntouched) {
+    throw new Error('Refuse: draft mux requires lockedVoicesUntouched.');
+  }
+
+  const { width, height } = parseResolution(input.animatic.resolution);
+  const fps = input.animatic.fps;
+  const durationSeconds = input.animatic.totalFrames / fps;
+  const sampleRate = input.sampleRate ?? 48_000;
+  const watermark = input.animatic.clips.find((clip) => clip.watermark)?.watermark;
+  const tracks = [...input.audio.tracks].sort((a, b) => a.trackId.localeCompare(b.trackId));
+
+  const args: string[] = [];
+  if (input.overwrite ?? true) args.push('-y');
+  args.push('-hide_banner', '-nostdin');
+
+  for (const clip of input.animatic.clips) {
+    const seconds = Math.max(clip.holdFrames, 1) / fps;
+    args.push(
+      '-f',
+      'lavfi',
+      '-t',
+      seconds.toFixed(3),
+      '-i',
+      `color=c=0x1a1a2e:s=${width}x${height}:d=${seconds.toFixed(3)}:r=${fps}`,
+    );
+  }
+
+  for (const track of tracks) {
+    const hz = SYNTHETIC_TONE_HZ[track.kind] ?? 0;
+    const silent =
+      track.kind === 'PLACEHOLDER' || track.kind === 'DIALOGUE' || track.kind === 'NARRATION' || hz === 0;
+    args.push(
+      '-f',
+      'lavfi',
+      '-t',
+      durationSeconds.toFixed(3),
+      '-i',
+      silent
+        ? `anullsrc=r=${sampleRate}:cl=stereo`
+        : `sine=frequency=${hz}:sample_rate=${sampleRate}:duration=${durationSeconds.toFixed(3)}`,
+    );
+  }
+
+  const chains: string[] = [];
+  input.animatic.clips.forEach((clip, index) => {
+    const filters = [
+      `scale=${width}:${height}`,
+      'drawbox=x=0:y=0:w=iw:h=48:color=red@0.55:t=fill',
+    ];
+    if (clip.watermark) {
+      const font = input.fontFile ? `:fontfile=${input.fontFile}` : '';
+      filters.push(
+        `drawtext=text='${escapeDrawtext(clip.watermark)}':fontsize=16:fontcolor=white:x=16:y=14${font}`,
+      );
+    }
+    chains.push(`[${index}:v]${filters.join(',')}[v${index}]`);
+  });
+  const concatIn = input.animatic.clips.map((_, index) => `[v${index}]`).join('');
+  chains.push(`${concatIn}concat=n=${input.animatic.clips.length}:v=1:a=0[vout]`);
+
+  const audioOffset = input.animatic.clips.length;
+  tracks.forEach((track, index) => {
+    chains.push(
+      `[${audioOffset + index}:a]volume=${track.gainDb.toFixed(2)}dB,apad=whole_dur=${durationSeconds.toFixed(3)}[t${index}]`,
+    );
+  });
+  const labels = tracks.map((_, index) => `[t${index}]`).join('');
+  chains.push(
+    `${labels}amix=inputs=${tracks.length}:duration=longest:dropout_transition=0:normalize=0[aout]`,
+  );
+
+  const filterGraph = chains.join(';');
+  args.push(
+    '-filter_complex',
+    filterGraph,
+    '-map',
+    '[vout]',
+    '-map',
+    '[aout]',
+    '-c:v',
+    'mpeg4',
+    '-q:v',
+    '8',
+    '-pix_fmt',
+    'yuv420p',
+    '-r',
+    String(fps),
+    '-c:a',
+    'aac',
+    '-ar',
+    String(sampleRate),
+    '-ac',
+    '2',
+    '-shortest',
+    input.outputPath,
+  );
+
+  return AssemblyCommandSchema.parse({
+    kind: 'DRAFT_MUX',
+    args,
+    filterGraph,
+    outputPath: input.outputPath,
+    durationSeconds,
+    width,
+    height,
+    fps,
+    watermark,
+    paid: false,
+    writesProductionLibrary: false,
     version: PREPRODUCTION_SUBSYSTEM_VERSIONS.assembly,
   });
 }

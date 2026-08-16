@@ -30,6 +30,11 @@
     "detail": "PROXY_GENERATE_FINAL_REFUSED"
   },
   {
+    "name": "unmarked-generate-final-refused",
+    "status": "PASS",
+    "detail": "FINAL_RENDER_REFUSED"
+  },
+  {
     "name": "theatrical-still-closed",
     "status": "PASS",
     "detail": "stage=DDP_STEPS_1_8"
@@ -40,8 +45,48 @@
     "detail": "animatic 65 args · mix 46 args"
   },
   {
-    "name": "ffmpeg-animatic",
+    "name": "ffmpeg-visual-holds",
     "status": "PASS",
-    "detail": "local draft animatic assembled"
+    "detail": "executed"
+  },
+  {
+    "name": "ffmpeg-synthetic-audio",
+    "status": "PASS",
+    "detail": "executed"
+  },
+  {
+    "name": "ffmpeg-draft-mux",
+    "status": "PASS",
+    "detail": "executed"
+  },
+  {
+    "name": "draft-mp4-duration",
+    "status": "PASS",
+    "detail": "planned=29.500s measured=29.500s"
+  },
+  {
+    "name": "draft-mp4-resolution",
+    "status": "PASS",
+    "detail": "360x640"
+  },
+  {
+    "name": "draft-mp4-audio-stream",
+    "status": "PASS",
+    "detail": "audio stream present"
+  },
+  {
+    "name": "draft-mp4-nonzero",
+    "status": "PASS",
+    "detail": "1035625 bytes"
+  },
+  {
+    "name": "episode-1-draft-noncanonical",
+    "status": "PASS",
+    "detail": "DRAFT_NONCANONICAL"
+  },
+  {
+    "name": "steps-9-16-still-closed",
+    "status": "PASS",
+    "detail": "opened=false stage=DDP_STEPS_1_8"
   }
 ]

@@ -1,0 +1,39 @@
+{
+  "stageId": "DDP_STEPS_9_16",
+  "currentStage": "DDP_STEPS_1_8",
+  "gateAllowed": false,
+  "blockers": [
+    "Theatrical CGI Asset Foundation is not complete: premium characters, feature rigs, environments and the three-tier render system must ship first.",
+    "No golden scene has been rendered: a 5–10 second Cycles render with compositing and grade is required.",
+    "Justin has not given explicit visual approval of the golden scene. No automated result substitutes for it.",
+    "The Reference Quality Lock is not engaged: the approved golden scene must be locked as the standard first."
+  ],
+  "workstreams": [
+    {
+      "id": "PREMIUM_CHARACTERS",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "FEATURE_RIGS",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "THEATRICAL_ENVIRONMENTS",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "THREE_TIER_RENDER",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "GOLDEN_SCENE",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "REFERENCE_QUALITY_LOCK",
+      "status": "BLOCKED"
+    }
+  ],
+  "opened": false,
+  "version": "1.0.0"
+}

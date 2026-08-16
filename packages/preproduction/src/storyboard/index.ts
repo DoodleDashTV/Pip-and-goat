@@ -21,6 +21,8 @@ export const StoryboardPanelSchema = z.object({
   captionSafe: z.literal(true),
   watermark: z.string().optional(),
   proxyLabeled: z.boolean(),
+  cameraIntent: z.string().optional(),
+  holdHintSeconds: z.number().positive().optional(),
 });
 export type StoryboardPanel = z.infer<typeof StoryboardPanelSchema>;
 
@@ -71,6 +73,8 @@ export function planStoryboard(draft: StoryDraft): {
       captionSafe: true,
       watermark: usesProxy ? PROXY_WATERMARK : undefined,
       proxyLabeled: usesProxy,
+      cameraIntent: `${framing} 9:16 caption-safe`,
+      holdHintSeconds: beat.durationSeconds,
     });
   });
 

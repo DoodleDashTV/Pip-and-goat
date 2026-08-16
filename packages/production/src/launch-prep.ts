@@ -2268,6 +2268,15 @@ export class DraftFinalOrchestrator {
     episodeId: string,
     opts?: { debugOverride?: boolean; profileCode?: 'FINAL_1080P' | 'PREMIUM' },
   ) {
+    const { assertProductionLaunchSafe } = await import('./launch-safety-hook');
+    await assertProductionLaunchSafe({
+      episodeId,
+      command: 'generate-final',
+      intent: 'FINAL',
+      writeProductionLibrary: false,
+      synthesizeLockedVoice: false,
+      publish: false,
+    });
     const draft = await prisma.draftReview.findFirst({
       where: { episodeId, status: 'APPROVED' },
       orderBy: { createdAt: 'desc' },

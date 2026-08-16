@@ -12,6 +12,8 @@ import {
   PROXY_PIPELINE_BRIEF,
   PROXY_WATERMARK,
   advanceWorkflow,
+  buildEpisode1DraftPackage,
+  planSteps9To16Infrastructure,
   summarizeWorkflow,
 } from '@doodle-dash/preproduction';
 import { currentStage as directionCurrentStage, evaluateTheatricalGate as directionTheatricalGate } from '@doodle-dash/direction';
@@ -23,6 +25,8 @@ export default async function WorkflowPage() {
   const run = advanceWorkflow(PROXY_PIPELINE_BRIEF);
   const summary = summarizeWorkflow(run);
   const theatrical = directionTheatricalGate();
+  const episode1 = buildEpisode1DraftPackage();
+  const closed = planSteps9To16Infrastructure();
 
   return (
     <div className="space-y-6 overflow-x-hidden">
@@ -88,6 +92,23 @@ export default async function WorkflowPage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-mist-100">Draft Episode 1</h2>
+        <p className="mt-2 text-[var(--muted)]">
+          {episode1.label} · productionEligible={String(episode1.productionEligible)} ·
+          canonical={String(episode1.canonical)}. Persistence for the proxy fixture is
+          EPHEMERAL_TEST_ONLY unless a durable write is explicitly required.
+        </p>
+      </section>
+
+      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-mist-100">Steps 9–16</h2>
+        <p className="mt-2 text-[var(--muted)]">
+          Infrastructure is described only. Gate {closed.gateAllowed ? 'OPEN' : 'CLOSED'}. Stage{' '}
+          {closed.currentStage}. Workstreams stay BLOCKED.
+        </p>
       </section>
 
       <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">

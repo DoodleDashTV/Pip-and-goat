@@ -23,6 +23,9 @@ export const LAUNCH_SAFETY_CODES = [
   'PRODUCTION_LIBRARY_WRITE_REFUSED',
   'THEATRICAL_LAUNCH_REFUSED',
   'STEPS_9_16_STILL_BLOCKED',
+  'FINAL_RENDER_REFUSED',
+  'PUBLISHING_REFUSED',
+  'LOCKED_VOICE_SYNTHESIS_REFUSED',
 ] as const;
 export type LaunchSafetyCode = (typeof LAUNCH_SAFETY_CODES)[number];
 
@@ -34,7 +37,10 @@ export const LaunchSafetyInputSchema = z.object({
   occupants: z.array(z.string()).optional(),
   characterCodes: z.array(z.string()).optional(),
   allowPaidGpu: z.boolean().default(false),
+  cloudRenderEnabled: z.boolean().default(false),
   writeProductionLibrary: z.boolean().default(false),
+  synthesizeLockedVoice: z.boolean().default(false),
+  publish: z.boolean().default(false),
   estimateUsd: z.number().default(0),
 });
 export type LaunchSafetyInput = z.input<typeof LaunchSafetyInputSchema>;
@@ -64,13 +70,14 @@ function modeOf(input: z.infer<typeof LaunchSafetyInputSchema>): 'PROXY' | 'CANO
 
 export function evaluatePaidResourcePolicy(input: {
   allowPaidGpu?: boolean;
+  cloudRenderEnabled?: boolean;
   estimateUsd?: number;
 }): { allowed: boolean; code: LaunchSafetyCode; reason: string } {
-  if (input.allowPaidGpu) {
+  if (input.allowPaidGpu || input.cloudRenderEnabled) {
     return {
       allowed: false,
       code: 'PAID_RESOURCE_REFUSED',
-      reason: 'Paid GPU launch is refused from the character-independent track.',
+      reason: 'Paid GPU / cloud render is refused from the character-independent track.',
     };
   }
   if ((input.estimateUsd ?? 0) > 0) {
@@ -100,6 +107,7 @@ export function evaluateEpisodeLaunchSafety(raw: LaunchSafetyInput): LaunchSafet
 
   const paid = evaluatePaidResourcePolicy({
     allowPaidGpu: input.allowPaidGpu,
+    cloudRenderEnabled: input.cloudRenderEnabled,
     estimateUsd: input.estimateUsd,
   });
   if (!paid.allowed) {
@@ -112,13 +120,35 @@ export function evaluateEpisodeLaunchSafety(raw: LaunchSafetyInput): LaunchSafet
     blockers.push('Pre-production and proxy paths must not write production-library/.');
   }
 
+  if (input.synthesizeLockedVoice) {
+    code = 'LOCKED_VOICE_SYNTHESIS_REFUSED';
+    blockers.push('Locked voices cannot be synthesised, cloned, or replaced.');
+  }
+
+  if (input.publish || intent === 'PUBLISH') {
+    code = 'PUBLISHING_REFUSED';
+    blockers.push('Publishing is refused while the character-independent track is open and Steps 9–16 stay closed.');
+  }
+
+  if (
+    (command === 'generate-final' || intent === 'FINAL') &&
+    intent !== 'PUBLISH' &&
+    intent !== 'THEATRICAL' &&
+    !theatrical.allowed
+  ) {
+    if (code === 'ALLOWED') code = 'FINAL_RENDER_REFUSED';
+    blockers.push(
+      'generate-final / FINAL_RENDER is refused while evaluateTheatricalGate().allowed is false and currentStage is DDP_STEPS_1_8.',
+    );
+  }
+
   if (command === 'create-episode' && (intent === 'FINAL' || intent === 'THEATRICAL' || intent === 'PUBLISH')) {
     code = intent === 'FINAL' ? 'PROXY_GENERATE_FINAL_REFUSED' : 'THEATRICAL_LAUNCH_REFUSED';
     blockers.push('create-episode only accepts DRAFT intent. Final / theatrical / publishing are refused.');
   }
 
   if (intent === 'THEATRICAL' || intent === 'PUBLISH') {
-    code = 'THEATRICAL_LAUNCH_REFUSED';
+    if (code === 'ALLOWED') code = 'THEATRICAL_LAUNCH_REFUSED';
     blockers.push('Theatrical / publishing launch is refused. Steps 9–16 stay closed.');
   }
 

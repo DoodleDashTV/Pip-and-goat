@@ -253,6 +253,15 @@ export class EpisodeShotRenderService {
             : resProfile.samples;
     if (params.profileCode === 'FINAL_1080P') {
       assertFinalQualityNotDegraded(samples);
+      const { assertProductionLaunchSafe } = await import('./launch-safety-hook');
+      await assertProductionLaunchSafe({
+        episodeId: params.episodeId,
+        command: 'generate-final',
+        intent: 'FINAL',
+        writeProductionLibrary: false,
+        synthesizeLockedVoice: false,
+        publish: false,
+      });
     }
 
     const dirty = perf.enableShotCache
