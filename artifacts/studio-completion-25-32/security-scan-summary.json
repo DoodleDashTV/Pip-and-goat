@@ -1,0 +1,34 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "canonical": false,
+  "productionEligible": false,
+  "final": false,
+  "publishable": false,
+  "available": true,
+  "refused": false,
+  "reason": "no committed secrets",
+  "findings": [],
+  "rotation": [
+    {
+      "name": "RUNPOD_API_KEY",
+      "owner": "studio-security",
+      "provider": "runpod",
+      "lastRotation": "2026-01-01T00:00:00.000Z",
+      "deadline": "2026-12-31T00:00:00.000Z",
+      "status": "DUE"
+    },
+    {
+      "name": "R2_SECRET_ACCESS_KEY",
+      "owner": "studio-security",
+      "provider": "r2",
+      "lastRotation": "2026-01-01T00:00:00.000Z",
+      "deadline": "2026-12-31T00:00:00.000Z",
+      "status": "DUE"
+    }
+  ],
+  "cacheKey": "cdb81603b2a01676a96bf2bd5a3c9c2ed6608784fac5b7979b4f51404f4b09d3",
+  "version": "1.0.0"
+}

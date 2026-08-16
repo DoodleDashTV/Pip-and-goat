@@ -1,0 +1,51 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "canonical": false,
+  "productionEligible": false,
+  "final": false,
+  "publishable": false,
+  "denyByDefault": true,
+  "osPermissionsChanged": false,
+  "cloudPermissionsChanged": false,
+  "samples": [
+    {
+      "allowed": false,
+      "denied": true,
+      "reason": "Refuse: TEST cannot write protected PRODUCTION_LIBRARY.",
+      "audited": true
+    },
+    {
+      "allowed": false,
+      "denied": true,
+      "reason": "Refuse: automated or draft roles cannot approve or promote canonical output.",
+      "audited": true
+    },
+    {
+      "allowed": true,
+      "denied": false,
+      "reason": "Draft propose/read only.",
+      "audited": true
+    },
+    {
+      "allowed": false,
+      "denied": true,
+      "reason": "Refuse: TEST cannot administer protected BILLING.",
+      "audited": true
+    },
+    {
+      "allowed": false,
+      "denied": true,
+      "reason": "Refuse: ADMIN_BLOCKED cannot deploy protected DEPLOYMENT.",
+      "audited": true
+    }
+  ],
+  "separation": {
+    "generatorApprove": false,
+    "approverGenerate": false
+  },
+  "cacheKey": "6bdb2ff3bea4dcea8650d18eeefeaeb7c988e06c187758d6fe9829cdf17c232d",
+  "version": "1.0.0"
+}

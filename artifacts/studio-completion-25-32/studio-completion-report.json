@@ -1,0 +1,186 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "title": "TIVVLEJOY STUDIO COMPLETION 25-32",
+  "branch": "cursor/studio-completion-25-32-73f1",
+  "commit": "e3d69e22521a62693345c565289ddd03e37a5e08",
+  "opened": false,
+  "checks": [
+    {
+      "name": "gates-current-stage",
+      "status": "PASS",
+      "detail": "DDP_STEPS_1_8"
+    },
+    {
+      "name": "gates-theatrical-closed",
+      "status": "PASS",
+      "detail": "false"
+    },
+    {
+      "name": "gates-9-16-closed",
+      "status": "PASS",
+      "detail": "opened=false"
+    },
+    {
+      "name": "gates-25-32-closed",
+      "status": "PASS",
+      "detail": "opened=false"
+    },
+    {
+      "name": "security-redaction",
+      "status": "PASS",
+      "detail": "values redacted"
+    },
+    {
+      "name": "security-placeholder",
+      "status": "PASS",
+      "detail": "placeholder refused"
+    },
+    {
+      "name": "security-no-committed-env",
+      "status": "PASS",
+      "detail": "no tracked .env"
+    },
+    {
+      "name": "security-key-block-refused",
+      "status": "PASS",
+      "detail": "PRIVATE_KEY"
+    },
+    {
+      "name": "security-service-available",
+      "status": "PASS",
+      "detail": "no committed secrets"
+    },
+    {
+      "name": "security-fail-closed-unavailable",
+      "status": "PASS",
+      "detail": "required security service unavailable"
+    },
+    {
+      "name": "access-deny-default",
+      "status": "PASS",
+      "detail": "Refuse: TEST cannot write protected PRODUCTION_LIBRARY."
+    },
+    {
+      "name": "access-test-no-production",
+      "status": "PASS",
+      "detail": "TEST write library"
+    },
+    {
+      "name": "access-separation",
+      "status": "PASS",
+      "detail": "generator cannot approve"
+    },
+    {
+      "name": "audit-intact",
+      "status": "PASS",
+      "detail": "2 events"
+    },
+    {
+      "name": "audit-tamper-detected",
+      "status": "PASS",
+      "detail": "edit breaks chain"
+    },
+    {
+      "name": "release-seal-ok",
+      "status": "PASS",
+      "detail": "seal intact"
+    },
+    {
+      "name": "release-immutable",
+      "status": "PASS",
+      "detail": "reseal refused"
+    },
+    {
+      "name": "release-new-version",
+      "status": "PASS",
+      "detail": "v2"
+    },
+    {
+      "name": "release-tamper-fails",
+      "status": "PASS",
+      "detail": "tamper detected"
+    },
+    {
+      "name": "ci-required-pass",
+      "status": "PASS",
+      "detail": "all required gates reported PASS"
+    },
+    {
+      "name": "ci-missing-refused",
+      "status": "PASS",
+      "detail": "12 missing"
+    },
+    {
+      "name": "backup-complete",
+      "status": "PASS",
+      "detail": "restored into fresh disposable target"
+    },
+    {
+      "name": "backup-corrupt-refused",
+      "status": "PASS",
+      "detail": "corrupt refused"
+    },
+    {
+      "name": "backup-interrupted-refused",
+      "status": "PASS",
+      "detail": "missing dependencies.json"
+    },
+    {
+      "name": "vuln-unavailable-not-pass",
+      "status": "PASS",
+      "detail": "UNKNOWN/UNAVAILABLE"
+    },
+    {
+      "name": "vuln-critical-refused",
+      "status": "PASS",
+      "detail": "dangerous script"
+    },
+    {
+      "name": "spend-default-deny",
+      "status": "PASS",
+      "detail": "Refuse: missing spend authorization."
+    },
+    {
+      "name": "spend-expired",
+      "status": "PASS",
+      "detail": "Refuse: expired spend authorization."
+    },
+    {
+      "name": "spend-reuse",
+      "status": "PASS",
+      "detail": "Refuse: authorization reuse is forbidden."
+    },
+    {
+      "name": "spend-ceiling",
+      "status": "PASS",
+      "detail": "Refuse: stop new work; ceiling would be exceeded."
+    },
+    {
+      "name": "golden-deterministic",
+      "status": "PASS",
+      "detail": "b822e619148a"
+    },
+    {
+      "name": "golden-draft-only",
+      "status": "PASS",
+      "detail": "DRAFT_NONCANONICAL"
+    },
+    {
+      "name": "protected-assets-unchanged",
+      "status": "PASS",
+      "detail": "5 hashed"
+    },
+    {
+      "name": "no-paid-provider",
+      "status": "PASS",
+      "detail": "fake only"
+    },
+    {
+      "name": "no-deployment",
+      "status": "PASS",
+      "detail": "local gates only"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "canonical": false,
+  "productionEligible": false,
+  "final": false,
+  "publishable": false,
+  "checks": [
+    {
+      "name": "tests",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "persist",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "studio-hardening-17-24",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "steps-9-16-closed",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "security-access-policy",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "audit-chain-integrity",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "release-verification",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "backup-restore",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "vulnerability-policy",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "spend-controls",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    },
+    {
+      "name": "golden-scene-regression",
+      "status": "PASS",
+      "detail": "local infrastructure check"
+    }
+  ],
+  "missing": [],
+  "skipped": [],
+  "falsePass": [],
+  "refused": false,
+  "reason": "all required gates reported PASS",
+  "deployed": false,
+  "merged": false,
+  "paidJobs": false,
+  "machineReadable": true,
+  "humanReadable": "all required gates reported PASS",
+  "cacheKey": "59e6e967bdb9f573991ff5d8acb767fca60b348d3d8ab5c58374491bc6214ce2",
+  "version": "1.0.0"
+}

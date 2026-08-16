@@ -45,6 +45,16 @@ export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
   motionAudioQc: '1.0.0',
   autoRepair: '1.0.0',
   stepsClosed: '1.0.0',
+  studioCompletion: '1.0.0',
+  security: '1.0.0',
+  access: '1.0.0',
+  audit: '1.0.0',
+  release: '1.0.0',
+  ciGates: '1.0.0',
+  backup: '1.0.0',
+  vulnerability: '1.0.0',
+  spend: '1.0.0',
+  golden: '1.0.0',
 } as const;
 
 export type PreproductionSubsystemName = keyof typeof PREPRODUCTION_SUBSYSTEM_VERSIONS;

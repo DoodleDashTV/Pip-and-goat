@@ -1,0 +1,72 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "audit": {
+    "classification": "INFRASTRUCTURE_TEST",
+    "label": "DRAFT_NONCANONICAL",
+    "watermark": "NOT FOR FINAL PRODUCTION",
+    "outputClass": "PIPELINE_TEST_ONLY",
+    "canonical": false,
+    "productionEligible": false,
+    "final": false,
+    "publishable": false,
+    "eventCount": 2,
+    "intact": true,
+    "issues": [],
+    "storesSecrets": false,
+    "cacheKey": "040f3266459bd794beb50511ae64fc633b9986a297e0dc60119d1db1dc99f4d7",
+    "version": "1.0.0"
+  },
+  "tampered": {
+    "edited": true,
+    "deleted": true,
+    "inserted": false,
+    "reordered": false,
+    "broken": true
+  },
+  "chain": [
+    {
+      "actor": "validator",
+      "action": "propose",
+      "target": "story",
+      "timestamp": "2026-08-16T00:00:00.000Z",
+      "correlationId": "corr-1",
+      "outcome": "DENIED",
+      "denialReason": "canonical refuse",
+      "stage": "DDP_STEPS_1_8",
+      "branch": "cursor/studio-completion-25-32-73f1",
+      "commit": "e3d69e22521a62693345c565289ddd03e37a5e08",
+      "inputHash": "in",
+      "outputHash": "out",
+      "provenanceRef": "prov",
+      "costClass": "PAID_REFUSED",
+      "policyDecision": "deny",
+      "index": 0,
+      "authorized": false,
+      "prevHash": "GENESIS",
+      "eventHash": "58633844e0337da5205710167b7a9983ccbbdaf7094d8809aa32fd93f3f99d3a"
+    },
+    {
+      "actor": "validator",
+      "action": "read",
+      "target": "continuity",
+      "timestamp": "2026-08-16T00:00:01.000Z",
+      "correlationId": "corr-2",
+      "outcome": "ALLOWED",
+      "denialReason": null,
+      "stage": "DDP_STEPS_1_8",
+      "branch": "cursor/studio-completion-25-32-73f1",
+      "commit": "e3d69e22521a62693345c565289ddd03e37a5e08",
+      "inputHash": "in2",
+      "outputHash": "out2",
+      "provenanceRef": "prov",
+      "costClass": "ZERO",
+      "policyDecision": "allow-read",
+      "index": 1,
+      "authorized": false,
+      "prevHash": "58633844e0337da5205710167b7a9983ccbbdaf7094d8809aa32fd93f3f99d3a",
+      "eventHash": "b361073ab596b0fa2cdc7f63954dae4582efed3c466e66fd7b9a657d901fa83a"
+    }
+  ]
+}
