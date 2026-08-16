@@ -1,0 +1,11 @@
+{
+  "status": 200,
+  "overflow": {
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "title": "TivvleJoy Studios",
+    "h1": "Character-independent production walk",
+    "statusText": "CURRENT STUDIO CONDITION\n\nTruthful production status\n\nThese values come from the existing stage and gate interfaces. Closed work is labeled closed. No control here starts a paid job or opens a locked stage.\n\nStage\n\n×\nDDP_STEPS_1_8\n\nTheatrical gate\n\n×\nClosed\n\nSteps 9–16\n\n×\nClosed\n\nSteps 25–32\n\n×\nClosed\n\nEpisode 1\n\n!\nNot canonical or production-ready\n\nPaid resources\n\n×\nNot authorized\n\nPip/Goat theatrical binding\n\n×\nNot completed"
+  },
+  "href": "http://127.0.0.1:3010/workflow"
+}
