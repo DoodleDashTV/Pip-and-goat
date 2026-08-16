@@ -31,6 +31,11 @@
       "id": "PIP_OFFICIAL_BACKPACK_VISUAL",
       "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
       "note": "Justin official Pip visual identity. Preserve source. Do not replace production-library from this point."
+    },
+    {
+      "id": "PIP_PRODUCTION_CONVERSION_START",
+      "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "note": "Production conversion starts from the official backpack working copy. Do not overwrite that working copy or the approved source."
     }
   ],
   "rules": [

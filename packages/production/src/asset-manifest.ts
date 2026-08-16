@@ -15,6 +15,7 @@ export const ASSET_MANIFEST_CLASSES = [
   'intake_candidate',
   'approved_visual_foundation',
   'superseded_archive',
+  'production_conversion_in_progress',
 ] as const;
 
 export const DurableAssetClassSchema = z.enum(ASSET_MANIFEST_CLASSES);

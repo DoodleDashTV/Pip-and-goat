@@ -1,0 +1,34 @@
+{
+  "schema": "tivvlejoy.pip_production_conversion.gate.v1",
+  "visualIdentityApproved": true,
+  "conversionStarted": true,
+  "conversionComplete": false,
+  "productionReady": false,
+  "productionLibraryReplaced": false,
+  "theatricalBound": false,
+  "mergeAuthorized": false,
+  "rigRegistryBound": false,
+  "modularSpecBoundToFusedMesh": false,
+  "workingBlendOverwritten": false,
+  "approvedSourceOverwritten": false,
+  "currentPipHighresOverwritten": false,
+  "goatTouched": false,
+  "paidResources": false,
+  "voxelRemesh": false,
+  "primitiveRebuild": false,
+  "stopForJustin": true,
+  "conversionArtifactsPresent": false,
+  "blockers": [
+    "Official backpack Pip is the visual identity, not a production-ready mesh.",
+    "Safe conversion may separate disconnected islands and add a validation armature only.",
+    "Voxel remesh, Quadriflow of this density, and primitive rebuild remain refused.",
+    "A later animation retopo is still required for eyelid, mouth, and wing-fold loops."
+  ],
+  "protected": {
+    "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+    "approvedSourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+    "currentPip": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "currentGoat": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+    "productionLibraryFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7"
+  }
+}

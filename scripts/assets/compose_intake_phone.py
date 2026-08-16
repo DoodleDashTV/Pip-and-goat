@@ -77,18 +77,40 @@ def main() -> int:
         "backpack_wing_clearance",
         "satchel_left",
         "face",
+        "rest_front",
+        "rest_rear",
+        "rest_left",
+        "rest_right",
+        "rest_three_quarter",
+        "wing_fold_front",
+        "wing_fold_three_quarter",
+        "head_turn_front",
+        "head_turn_three_quarter",
+        "foot_lift_front",
+        "foot_lift_three_quarter",
+        "backpack_sway_front",
+        "backpack_sway_three_quarter",
+        "strap_shift_front",
+        "strap_shift_three_quarter",
+        "scarf_sway_front",
+        "scarf_sway_three_quarter",
     ]
     written = []
+    seen = set()
     for name in order:
         src = previews / f"{name}.png"
         if src.exists():
             dest = phone / f"{name}.jpg"
             to_phone(src, dest)
             written.append(dest)
-    for src in sorted(previews.glob("turntable_*.png")):
+            seen.add(src.name)
+    for src in sorted(previews.glob("*.png")):
+        if src.name in seen:
+            continue
         dest = phone / f"{src.stem}.jpg"
         to_phone(src, dest)
         written.append(dest)
+        seen.add(src.name)
     contact_sheet(written, phone / "contact_sheet.jpg", args.title)
     print(f"wrote {len(written)} phone jpegs to {phone}")
     return 0

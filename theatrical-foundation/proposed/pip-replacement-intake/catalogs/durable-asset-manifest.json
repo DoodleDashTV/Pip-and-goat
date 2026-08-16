@@ -12,7 +12,8 @@
     "proxy_pipeline_only": "Labeled stand-ins for pipeline tests. Not Pip. Not Goat.",
     "intake_candidate": "Next uploaded Pip package. Replacement candidate only.",
     "approved_visual_foundation": "Justin-selected official Pip visual identity. Not production-ready. Not production-library. Not theatrical-bound.",
-    "superseded_archive": "Earlier Pip models kept for rollback. Do not delete."
+    "superseded_archive": "Earlier Pip models kept for rollback. Do not delete.",
+    "production_conversion_in_progress": "Protected conversion copy of the official backpack Pip. Not production-ready. Not production-library. Not theatrical-bound."
   },
   "assets": [
     {
@@ -22,7 +23,7 @@
       "characterCode": "CHAR_PIP_001",
       "quality": "PROTOTYPE",
       "immutable": true,
-      "notes": "Steps 1–8 prototype. Not theatrical."
+      "notes": "Steps 1\u20138 prototype. Not theatrical."
     },
     {
       "id": "LIB_GOAT_PROTOTYPE",
@@ -31,7 +32,7 @@
       "characterCode": "CHAR_GOAT_001",
       "quality": "PROTOTYPE",
       "immutable": true,
-      "notes": "Steps 1–8 prototype. Not theatrical."
+      "notes": "Steps 1\u20138 prototype. Not theatrical."
     },
     {
       "id": "LIB_MEADOW_PROTOTYPE",
@@ -119,6 +120,14 @@
       "characterCode": null,
       "immutable": false,
       "notes": "Labeled PROXY only. Not Pip. Not canon. Used for deformation and intake tests."
+    },
+    {
+      "id": "PIP_PRODUCTION_CONVERSION_COPY",
+      "class": "production_conversion_in_progress",
+      "path": "theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend",
+      "characterCode": "CHAR_PIP_001",
+      "immutable": false,
+      "notes": "Protected conversion copy. Do not overwrite the official working blend or approved source."
     }
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "schema": "tivvlejoy.current_pip_conversion.v1",
+  "characterCode": "CHAR_PIP_001",
+  "sourceWorkingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+  "conversionBlend": "theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend",
+  "sourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+  "productionReady": false,
+  "overwritesWorkingBlend": false,
+  "overwritesApprovedSource": false,
+  "overwritesHighresCandidate": false,
+  "overwritesProductionLibrary": false,
+  "goatTouched": false
+}
