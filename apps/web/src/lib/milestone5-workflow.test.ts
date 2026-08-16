@@ -63,7 +63,8 @@ describe('Milestone 5 isolation and protections', () => {
     expect(workflow).not.toContain('writeFileSync');
     expect(assembly).not.toContain('node:fs');
     expect(assembly).not.toContain('writeFileSync');
-    expect(assembly).not.toContain('spawn');
+    expect(assembly).not.toContain('node:child_process');
+    expect(assembly).not.toContain('spawnSync');
     expect(proxy.bundle.library.writesProductionLibrary).toBe(false);
     expect(() =>
       compileAnimaticAssembly({

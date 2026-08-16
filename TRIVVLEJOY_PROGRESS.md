@@ -43,7 +43,13 @@ stays paused on PR #24.
 
 ## Tests / validation (this Milestone 5 run)
 
-Recorded in `MILESTONE_5_GATE_2026-08-16.md` after local gates run.
+| Command | Result |
+| --- | --- |
+| `pnpm test` | PASS — **428 / 428** (25 files; +13 Milestone 5) |
+| `pnpm typecheck` | PASS |
+| `pnpm lint` | PASS |
+| `pnpm validate:milestone5` | PASS — 9 / 9 |
+| `pnpm validate:milestone4` | PASS — 5 / 5 |
 
 ## Known failures / blocker
 

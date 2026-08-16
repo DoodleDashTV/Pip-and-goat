@@ -8,10 +8,18 @@ Draft PR #26 remains unmerged.
 
 ## Required local gates
 
-Recorded after the local run in this file.
-
 Paid GPU was not launched. Pip, Goat, production-library, locked voices, and
 the theatrical stack were not modified.
+
+| Command | Result |
+| --- | --- |
+| `pnpm test` | PASS — **428 / 428** (25 files; +13 Milestone 5) |
+| `pnpm typecheck` | PASS |
+| `pnpm lint` | PASS — no ESLint warnings or errors |
+| `pnpm validate:milestone5` | PASS — 9 / 9 (local FFmpeg animatic assembled) |
+| `pnpm validate:milestone4` | PASS — 5 / 5 |
+| `pnpm test:blender` | NOT RUN — out of scope; Pip/Goat untouched |
+| `pnpm gates:local` | NOT RUN — would rewrite Milestone 3 visual evidence |
 
 ## Protections verified
 
