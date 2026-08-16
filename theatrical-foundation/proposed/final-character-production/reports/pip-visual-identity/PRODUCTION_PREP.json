@@ -4,7 +4,7 @@
   "sourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
   "normalize": {
     "workingObject": "pip_backpack_working",
-    "nativeObject": "pip_approved_native",
+    "nativeObject": "approved inbox split parts + SHA-256 dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
     "nativeMeshDatablockPreserved": true,
     "appliedToMeshDatablock": false,
     "objectScale": 2.0934990993763565,

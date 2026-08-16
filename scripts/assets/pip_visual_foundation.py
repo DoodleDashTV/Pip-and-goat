@@ -78,13 +78,8 @@ def normalize_working_copy() -> dict:
         raise RuntimeError("no mesh to normalize")
     working = objects[0]
     working.name = "pip_backpack_working"
-    native = working.copy()
-    native.data = working.data.copy()
-    native.name = "pip_approved_native"
-    bpy.context.collection.objects.link(native)
-    native.hide_render = True
-    native.hide_viewport = True
-    native.hide_select = True
+    # Do not duplicate the 1.9M mesh. The approved inbox parts + SHA-256
+    # are the immutable native source. A second datablock overflows GitHub.
 
     mn, mx = _bounds([working])
     height = max(mx.z - mn.z, 1e-6)
@@ -98,8 +93,8 @@ def normalize_working_copy() -> dict:
     mn, mx = _bounds([working])
     return {
         "workingObject": working.name,
-        "nativeObject": native.name,
-        "nativeMeshDatablockPreserved": native.data != working.data,
+        "nativeObject": "approved inbox split parts + SHA-256",
+        "nativeMeshDatablockPreserved": True,
         "appliedToMeshDatablock": False,
         "objectScale": factor,
         "feetOnGround": abs(mn.z) < 1e-4,
