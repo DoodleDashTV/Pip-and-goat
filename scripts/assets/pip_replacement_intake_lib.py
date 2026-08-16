@@ -155,6 +155,86 @@ PIP_COMPARISON_ITEMS: tuple[dict[str, str], ...] = (
     },
 )
 
+BACKPACK_COMPARISON_ITEMS: tuple[dict[str, str], ...] = (
+    {
+        "id": "face_and_green_eyes",
+        "label": "Face and green/teal glossy eyes",
+        "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+    },
+    {
+        "id": "bright_yellow_cgi_finish",
+        "label": "Bright yellow CGI feather finish",
+        "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+    },
+    {
+        "id": "three_coral_crest_feathers",
+        "label": "Exactly three coral crown/crest feathers",
+        "authority": "binding five-view JPEGs",
+    },
+    {
+        "id": "long_layered_wings_visible",
+        "label": "Long layered wings remain visible",
+        "authority": "conditionally approved long-wing appearance + backpack accessory refs",
+    },
+    {
+        "id": "teal_scarf",
+        "label": "Teal neckerchief/scarf, not intersected by backpack",
+        "authority": "binding five-view JPEGs + backpack accessory refs",
+    },
+    {
+        "id": "true_backpack_centered_on_back",
+        "label": "True backpack centered on Pip’s back",
+        "authority": "four newest Pip backpack pictures + written accessory spec",
+    },
+    {
+        "id": "two_symmetrical_shoulder_straps",
+        "label": "Two symmetrical shoulder straps",
+        "authority": "four newest Pip backpack pictures + written accessory spec",
+    },
+    {
+        "id": "no_satchel",
+        "label": "No satchel",
+        "authority": "written accessory spec",
+    },
+    {
+        "id": "no_cross_body_strap",
+        "label": "No cross-body strap",
+        "authority": "written accessory spec",
+    },
+    {
+        "id": "no_hip_bag",
+        "label": "No hip bag",
+        "authority": "written accessory spec",
+    },
+    {
+        "id": "backpack_no_intersection",
+        "label": "Backpack must not intersect wings, scarf, neck, tail, or body",
+        "authority": "written accessory spec",
+    },
+    {
+        "id": "feet_toes_rear_hallux",
+        "label": "Feet, toes, and rear hallux",
+        "authority": "binding five-view JPEGs",
+    },
+    {
+        "id": "accessories_separated_or_fused",
+        "label": "Accessories are separate objects vs fused into the body",
+        "authority": "production suitability",
+    },
+    {
+        "id": "proportions_and_cgi_appearance",
+        "label": "Preserve approved face, eyes, yellow finish, crest, wings, feet, proportions, CGI appearance",
+        "authority": "conditionally approved long-wing appearance",
+    },
+)
+
+
+def detect_accessory_profile(name: str) -> str:
+    lowered = name.lower()
+    if "backpack" in lowered:
+        return "backpack"
+    return "satchel"
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -346,7 +426,8 @@ def package_paths(package_id: str, root: Path | None = None) -> dict[str, Path]:
     }
 
 
-def empty_checklist() -> list[dict[str, Any]]:
+def empty_checklist(profile: str = "satchel") -> list[dict[str, Any]]:
+    items = BACKPACK_COMPARISON_ITEMS if profile == "backpack" else PIP_COMPARISON_ITEMS
     return [
         {
             **item,
@@ -354,7 +435,7 @@ def empty_checklist() -> list[dict[str, Any]]:
             "automated": False,
             "notes": "Visual comparison only. Intake never auto-approves this item.",
         }
-        for item in PIP_COMPARISON_ITEMS
+        for item in items
     ]
 
 
@@ -369,6 +450,13 @@ def apply_measured_hints(checklist: list[dict[str, Any]], measured: dict[str, An
         "front_exactly_one_diagonal_strap": measured.get("frontStrapHint"),
         "character_right_shoulder_origin": measured.get("lateralityHint"),
         "character_left_hip_satchel": measured.get("bagHint"),
+        "true_backpack_centered_on_back": measured.get("backpackHint"),
+        "two_symmetrical_shoulder_straps": measured.get("strapPairHint"),
+        "no_satchel": measured.get("noSatchelHint"),
+        "no_cross_body_strap": measured.get("noCrossBodyHint"),
+        "no_hip_bag": measured.get("noHipBagHint"),
+        "backpack_no_intersection": measured.get("intersectionHint"),
+        "long_layered_wings_visible": measured.get("wingHint"),
     }
     out = []
     for item in checklist:
@@ -574,6 +662,7 @@ def prepare_package(
     else:
         classification = classify_package([original], paths["original"])
 
+    profile = detect_accessory_profile(source.name)
     provenance = build_provenance(
         package_id=package_id,
         source_name=source.name,
@@ -584,14 +673,21 @@ def prepare_package(
         notes=notes,
         unpacked=classification,
     )
-    checklist = empty_checklist()
+    provenance["accessoryProfile"] = profile
+    checklist = empty_checklist(profile)
     write_json(paths["reports"] / "PROVENANCE.json", provenance)
     write_json(
         paths["reports"] / "COMPARISON_CHECKLIST.json",
         {
             "schema": "tivvlejoy.pip_replacement_intake.checklist.v1",
             "packageId": package_id,
+            "accessoryProfile": profile,
             "bindingRefs": [f"artifacts/theatrical-v2/source-package-validation/refs/{name}" for name in PIP_BINDING_VIEWS],
+            "accessoryBinding": (
+                "written backpack spec + four newest Pip backpack pictures when present"
+                if profile == "backpack"
+                else "satchel / cross-body laterality from binding five-views"
+            ),
             "items": checklist,
             "approved": False,
             "autoReplace": False,
@@ -608,6 +704,7 @@ def prepare_package(
             "classification": classification,
             "paths": {key: str(value) for key, value in paths.items()},
             "blenderValidation": "pending",
+            "accessoryProfile": profile,
             "renders": [],
             "approved": False,
             "autoReplaceCurrentPip": False,

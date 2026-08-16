@@ -18,10 +18,12 @@ sys.path.insert(0, str(REPO_ROOT / "scripts" / "assets"))
 
 from pip_replacement_intake_lib import (  # noqa: E402
     APPROVED_LIBRARY_FINGERPRINT,
+    BACKPACK_COMPARISON_ITEMS,
     CURRENT_PIP,
     LONG_WING_ORIGINAL_SHA256,
     PIP_COMPARISON_ITEMS,
     PRODUCTION_LIBRARY,
+    detect_accessory_profile,
     apply_measured_hints,
     assert_not_protected_write,
     build_provenance,
@@ -111,6 +113,19 @@ class ProtectionAndGateTests(unittest.TestCase):
         self.assertFalse(gate["paidResources"])
         self.assertTrue(gate["stopForJustin"])
         self.assertTrue(any("Canon replacement" in item for item in gate["blockers"]))
+
+    def test_backpack_profile_uses_backpack_checklist(self) -> None:
+        self.assertEqual(detect_accessory_profile("pip_backpack_replacement.glb"), "backpack")
+        self.assertEqual(detect_accessory_profile("pip_replacement.glb"), "satchel")
+        items = empty_checklist("backpack")
+        ids = {item["id"] for item in items}
+        self.assertIn("true_backpack_centered_on_back", ids)
+        self.assertIn("two_symmetrical_shoulder_straps", ids)
+        self.assertIn("no_satchel", ids)
+        self.assertIn("no_cross_body_strap", ids)
+        self.assertNotIn("character_left_hip_satchel", ids)
+        self.assertTrue(all(item["status"] == "REQUIRES_JUSTIN" for item in items))
+        self.assertEqual(len(BACKPACK_COMPARISON_ITEMS), len(items))
 
     def test_checklist_covers_required_identity_items(self) -> None:
         items = empty_checklist()

@@ -37,6 +37,7 @@ from pip_replacement_intake_lib import (  # noqa: E402
     assert_not_protected_write,
     blender_command,
     classify_file,
+    detect_accessory_profile,
     empty_checklist,
     evaluate_replacement_gate,
     orientation_expectations,
@@ -274,7 +275,7 @@ def render_still(path: Path, samples: int = 16):
     bpy.ops.render.render(write_still=True)
 
 
-def render_comparison_views(dest: Path) -> list[str]:
+def render_comparison_views(dest: Path, profile: str = "satchel") -> list[str]:
     from mathutils import Vector
 
     apply_lookdev()
@@ -286,28 +287,58 @@ def render_comparison_views(dest: Path) -> list[str]:
     left = Vector(CHAR_LEFT)
     right = Vector(CHAR_RIGHT)
     focus = center + Vector((0, 0, height * 0.02))
-    views = {
-        "front": (center + facing * radius, height * 1.28, focus),
-        "rear": (center - facing * radius, height * 1.28, focus),
-        "left": (center + left * radius, height * 1.28, focus),
-        "right": (center + right * radius, height * 1.28, focus),
-        "three_quarter": (center + (facing * 0.72 + left * 0.72) * radius, height * 1.32, focus),
-        "face": (
-            center + facing * (height * 0.85) + Vector((0, 0, height * 0.28)),
-            height * 0.52,
-            center + Vector((0, 0, height * 0.78)),
-        ),
-        "shoulder_right": (
-            Vector((height * 0.55, -height * 0.35, height * 0.78)),
-            height * 0.62,
-            Vector((0.05, -0.12, height * 0.78)),
-        ),
-        "satchel_left": (
-            Vector((height * 0.45, height * 0.42, height * 0.42)),
-            height * 0.58,
-            Vector((0.0, 0.18, height * 0.38)),
-        ),
-    }
+    if profile == "backpack":
+        views = {
+            "front": (center + facing * radius, height * 1.28, focus),
+            "rear": (center - facing * radius, height * 1.28, focus),
+            "left": (center + left * radius, height * 1.28, focus),
+            "right": (center + right * radius, height * 1.28, focus),
+            "front_three_quarter": (center + (facing * 0.72 + left * 0.72) * radius, height * 1.32, focus),
+            "rear_three_quarter": (center + (-facing * 0.72 + left * 0.72) * radius, height * 1.32, focus),
+            "shoulder_left": (
+                Vector((height * 0.55, height * 0.35, height * 0.78)),
+                height * 0.62,
+                Vector((0.05, 0.12, height * 0.78)),
+            ),
+            "shoulder_right": (
+                Vector((height * 0.55, -height * 0.35, height * 0.78)),
+                height * 0.62,
+                Vector((0.05, -0.12, height * 0.78)),
+            ),
+            "backpack_attachment": (
+                Vector((-height * 0.85, 0.0, height * 0.72)),
+                height * 0.68,
+                Vector((0.0, 0.0, height * 0.68)),
+            ),
+            "backpack_wing_clearance": (
+                Vector((-height * 0.72, height * 0.55, height * 0.78)),
+                height * 0.72,
+                Vector((-0.05, 0.08, height * 0.70)),
+            ),
+        }
+    else:
+        views = {
+            "front": (center + facing * radius, height * 1.28, focus),
+            "rear": (center - facing * radius, height * 1.28, focus),
+            "left": (center + left * radius, height * 1.28, focus),
+            "right": (center + right * radius, height * 1.28, focus),
+            "three_quarter": (center + (facing * 0.72 + left * 0.72) * radius, height * 1.32, focus),
+            "face": (
+                center + facing * (height * 0.85) + Vector((0, 0, height * 0.28)),
+                height * 0.52,
+                center + Vector((0, 0, height * 0.78)),
+            ),
+            "shoulder_right": (
+                Vector((height * 0.55, -height * 0.35, height * 0.78)),
+                height * 0.62,
+                Vector((0.05, -0.12, height * 0.78)),
+            ),
+            "satchel_left": (
+                Vector((height * 0.45, height * 0.42, height * 0.42)),
+                height * 0.58,
+                Vector((0.0, 0.18, height * 0.38)),
+            ),
+        }
     written = []
     for name, (loc, ortho, look) in views.items():
         cam = add_camera(f"intake_{name}", loc, look, ortho)
@@ -359,17 +390,31 @@ def validate_package_in_blender(package_dir: Path) -> dict:
         raise RuntimeError(f"expected Blender {REQUIRED_BLENDER} LTS, got {version}")
     geo = geometry_report()
     skip_renders = "--skip-renders" in sys.argv
-    renders = [] if skip_renders else render_comparison_views(previews)
+    profile = manifest.get("accessoryProfile") or detect_accessory_profile(source.name)
+    renders = [] if skip_renders else render_comparison_views(previews, profile)
     save_preview_blend(preview_blend)
-    measured = {
-        "objectSeparation": geo["objectSeparation"],
-        "strapHint": "REQUIRES_JUSTIN — automated strap classification is a hint only",
-        "frontStrapHint": "REQUIRES_JUSTIN — confirm exactly one front diagonal",
-        "lateralityHint": "Expect character-right shoulder (−Y) and character-left hip (+Y)",
-        "bagHint": "Expect satchel on +Y",
-        "crestHint": "Expect exactly three coral crest feathers",
-    }
-    checklist = apply_measured_hints(empty_checklist(), measured)
+    if profile == "backpack":
+        measured = {
+            "objectSeparation": geo["objectSeparation"],
+            "backpackHint": "REQUIRES_JUSTIN — confirm a true backpack centered on the back",
+            "strapPairHint": "REQUIRES_JUSTIN — confirm two symmetrical shoulder straps",
+            "noSatchelHint": "REQUIRES_JUSTIN — confirm no satchel",
+            "noCrossBodyHint": "REQUIRES_JUSTIN — confirm no cross-body strap",
+            "noHipBagHint": "REQUIRES_JUSTIN — confirm no hip bag",
+            "intersectionHint": "REQUIRES_JUSTIN — backpack must not intersect wings, scarf, neck, tail, or body",
+            "wingHint": "REQUIRES_JUSTIN — long layered wings must remain visible",
+            "crestHint": "Expect exactly three coral crest feathers",
+        }
+    else:
+        measured = {
+            "objectSeparation": geo["objectSeparation"],
+            "strapHint": "REQUIRES_JUSTIN — automated strap classification is a hint only",
+            "frontStrapHint": "REQUIRES_JUSTIN — confirm exactly one front diagonal",
+            "lateralityHint": "Expect character-right shoulder (−Y) and character-left hip (+Y)",
+            "bagHint": "Expect satchel on +Y",
+            "crestHint": "Expect exactly three coral crest feathers",
+        }
+    checklist = apply_measured_hints(empty_checklist(profile), measured)
     gate = evaluate_replacement_gate()
     comparison = {
         "schema": "tivvlejoy.pip_replacement_intake.comparison.v1",
