@@ -1,0 +1,10 @@
+{
+  "schema": "tivvlejoy.current_pip_working.v1",
+  "characterCode": "CHAR_PIP_001",
+  "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+  "supersedes": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+  "sourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+  "productionReady": false,
+  "overwritesHighresCandidate": false,
+  "overwritesProductionLibrary": false
+}

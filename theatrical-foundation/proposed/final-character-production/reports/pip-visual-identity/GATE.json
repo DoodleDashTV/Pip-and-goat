@@ -1,0 +1,21 @@
+{
+  "schema": "tivvlejoy.pip_visual_identity.gate.v1",
+  "visualIdentityApproved": true,
+  "productionReady": false,
+  "productionLibraryReplaced": false,
+  "theatricalBound": false,
+  "mergeAuthorized": false,
+  "currentPipHighresOverwritten": false,
+  "goatTouched": false,
+  "paidResources": false,
+  "stopForJustin": true,
+  "blockers": [
+    "Approved visual identity is not a production-ready mesh.",
+    "Retopo, deformation-safe backpack treatment, UV/material preservation, rigging, facial controls, and animation validation remain open."
+  ],
+  "protected": {
+    "currentPip": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+    "currentGoat": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
+    "productionLibraryFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7"
+  }
+}

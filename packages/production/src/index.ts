@@ -968,6 +968,7 @@ export * from './audit-fast';
 export * from './cloud';
 export * from './direction-service';
 export * from './pip-replacement-intake';
+export * from './pip-visual-identity';
 export * from './asset-manifest';
 export * from './canon-reference';
 export * from './lookdev-presets';

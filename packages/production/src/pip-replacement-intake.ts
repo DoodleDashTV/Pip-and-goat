@@ -136,8 +136,9 @@ export function evaluatePipReplacementGate(raw: IntakeGateRequest = {}) {
 
   return {
     schema: PIP_REPLACEMENT_INTAKE_SCHEMA,
-    role: 'replacement_candidate_only' as const,
+    role: request.justinApproved ? ('approved_visual_foundation' as const) : ('replacement_candidate_only' as const),
     autoReplaceCurrentPip: false,
+    visualIdentityApproved: request.justinApproved,
     approved: false,
     canonicalMutated: false,
     theatricalBound: false,

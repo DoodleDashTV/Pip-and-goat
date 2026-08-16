@@ -554,8 +554,9 @@ def evaluate_replacement_gate(
     if requestRigBindToCurrentPip:
         blockers.append("Final Pip rig bind to current candidate requested and refused.")
     return {
-        "role": "replacement_candidate_only",
+        "role": "approved_visual_foundation" if justinApproved else "replacement_candidate_only",
         "autoReplaceCurrentPip": False,
+        "visualIdentityApproved": bool(justinApproved),
         "approved": False,
         "canonicalMutated": False,
         "theatricalBound": False,

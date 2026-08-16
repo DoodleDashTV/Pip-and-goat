@@ -15,7 +15,7 @@
     { "id": "face", "bones": ["eye_L", "eye_R", "lid_L", "lid_R", "brow_L", "brow_R", "jaw", "beak"] },
     { "id": "wings", "bones": ["wing_L", "wing_R", "wing_feather_L", "wing_feather_R"] },
     { "id": "legs", "bones": ["thigh_L", "thigh_R", "shin_L", "shin_R", "foot_L", "foot_R", "hallux_L", "hallux_R"] },
-    { "id": "accessories", "bones": ["strap", "satchel", "scarf", "copper_spiral"] }
+    { "id": "accessories", "bones": ["backpack", "strap_L", "strap_R", "scarf"] }
   ],
   "requiredCapabilities": [
     "ikfk",
@@ -30,7 +30,7 @@
     { "id": "WING_FOLD", "module": "wings", "proxyOnly": true },
     { "id": "HEAD_TURN", "module": "head", "proxyOnly": true },
     { "id": "FOOT_PLANT", "module": "legs", "proxyOnly": true },
-    { "id": "SATCHEL_SWAY", "module": "accessories", "proxyOnly": true, "blockedOnFusedMesh": true }
+    { "id": "BACKPACK_SWAY", "module": "accessories", "proxyOnly": true, "blockedOnFusedMesh": true }
   ],
   "rules": [
     "Do not bind this spec to the current fused Pip candidate.",

@@ -64,3 +64,5 @@ theatrical-foundation/proposed/pip-replacement-intake/inbox/**
 !theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_backpack_replacement.glb.part2.bin
 !theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_backpack_replacement.glb.part3.bin
 artifacts/theatrical-v2/pip-replacement-intake/
+# Extracted 8K/4K source textures are hashed in reports; the binaries stay local.
+theatrical-foundation/proposed/final-character-production/archive/pip-visual-identity/textures/

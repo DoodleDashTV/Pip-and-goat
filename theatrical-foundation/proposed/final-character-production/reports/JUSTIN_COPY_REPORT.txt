@@ -1,116 +1,94 @@
-TIVVLEJOY — PIP BACKPACK CANDIDATE READY FOR VISUAL APPROVAL
+TIVVLEJOY — OFFICIAL PIP VISUAL IDENTITY RECORDED
 SELECT-ALL COPY BLOCK
 
 Working branch: cursor/theatrical-final-character-production-1ebc
-Draft PR: #24
+Draft PR: #24 — still draft, not merged
 Blender: 4.2.3 LTS
 Paid resources: not used
-Current Pip overwritten: no
-Long-wing original overwritten: no
+production-library replaced: no
+Theatrical binding: not declared
 Goat touched: no
-production-library touched: no
-Canon / merge / theatrical binding: unchanged / not performed / not declared
 
-WHAT THIS PASS DID
-Located the three backpack split uploads, copied exact bytes into
-theatrical-foundation/proposed/pip-replacement-intake/inbox/, and
-reassembled only those inbox parts to /tmp/pip_backpack_replacement.glb.
-Size 62876180 and SHA-256
-dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
-matched. Ran scripts/tivvlejoy/ingest-next-pip.sh on that file.
-Wrote the backpack comparison package and phone-viewable stills.
-Did not overwrite current Pip. Did not delete the earlier satchel
-candidate.
-
-This backpack version supersedes the satchel replacement candidate
-for visual review. Satchel inbox parts, reports, and phone stills
-remain for comparison only.
-
-BINDING USED
-Identity still binds to the ten five-view JPEGs (Pip front, 3/4, back,
-both profiles, plus Goat equivalents). Accessory binding is Justin’s
-written backpack spec: true backpack centered on the back, two
-symmetrical shoulder straps, no satchel, no cross-body strap, no hip
-bag, long wings remain visible, no intersection with wings/scarf/neck/
-tail/body, preserve approved face, eyes, bright-yellow finish, three
-coral crest feathers, wings, feet, proportions, and CGI appearance.
-
-The four newest dedicated Pip backpack photographs were not found on
-this branch, in the inbox, or in the source package. They were not used.
-
-INTAKE CANDIDATE (WAITING FOR JUSTIN)
-Package: 20260816T025617Z_pip_backpack_replacement.glb_dca239475c78
+JUSTIN SELECTION
+Official permanent Pip design:
+20260816T025617Z_pip_backpack_replacement.glb_dca239475c78
 SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
 Size: 62876180 bytes
-Mesh: 1 fused Tripo object, 1,006,107 verts, 1,930,054 tris
-Native height 0.979; suggested scale 2.093; not applied
-Approved: no
-Auto-replace current Pip: no
 
-PHONE-VIEWABLE COMPARISON
+This is no longer a comparison candidate. It is Pip’s official visual
+identity for future TivvleJoy work. It is not a production-ready mesh.
+
+WHAT THIS PASS DID
+1. Re-verified the approved source hash and size.
+2. Archived and fingerprinted the source. Inbox split parts stay
+   immutable evidence.
+3. Indexed superseded satchel, Prism high-res, long-wing original, and
+   earlier working blends for rollback. Nothing was deleted.
+4. Wrote the visual-identity catalog, character spec, asset manifest,
+   recovery ledger, and working-copy pointer so future Pip work uses
+   the backpack design.
+5. Built a protected working copy with object-level scale 2.0935 and
+   feet on the ground. The approved source hash stays the immutable
+   original. No remesh.
+6. Probed backpack/body intersections. 17 close pairs. Minimum gap
+   about 0.0011. No destructive cleanup.
+7. Recorded 8K/4K texture hashes. Binaries stay local.
+8. Rendered front, back, left, right, and three-quarter verification
+   views after promotion.
+
+WORKING COPY
+theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend
+Pointer: working/CURRENT_PIP.json
+Superseded Prism file was not overwritten.
+
+BOUND DESIGN
+- approved face, eyes, cheerful expression
+- bright-yellow polished CGI appearance
+- three coral crest feathers
+- long layered yellow wings
+- teal scarf
+- orange beak and feet
+- centered backpack
+- two symmetrical shoulder straps
+- no satchel, cross-body strap, or hip bag
+
+VERIFICATION VIEWS
+artifacts/theatrical-v2/final-character-production/pip-visual-identity/phone/
 1. front
 2. back
-3. left side
-4. right side
-5. front three-quarter
-6. rear three-quarter
-7. left shoulder close-up
-8. right shoulder close-up
-9. backpack attachment close-up
-10. backpack/wing-clearance close-up
-11. turntable (8 frames)
+3. left
+4. right
+5. three-quarter
 
-Folder:
-artifacts/theatrical-v2/final-character-production/pip-backpack-replacement-intake/phone/
+NOT PRODUCTION-READY
+Still required later, and not started:
+- retopology
+- deformation-safe backpack and strap treatment
+- UV/material preservation on that retopo
+- rigging
+- facial controls
+- animation validation
 
-Contact sheet:
-artifacts/theatrical-v2/final-character-production/pip-backpack-replacement-intake/phone/contact_sheet_phone.jpg
-
-HONEST VISUAL NOTES (NOT AN APPROVAL)
-Front and turntable show two green shoulder straps and no satchel,
-cross-body strap, or hip bag. Rear views show a centered green
-backpack with a circular gold clasp. Long yellow wings stay visible.
-Face, green/teal eyes, bright-yellow finish, three coral crest
-feathers, teal scarf, and orange feet are present. Shoulder close-ups
-show each strap passing under the scarf. Attachment and wing-clearance
-close-ups show the pack on the upper back with space beside the wing
-roots in these camera angles. Accessories are fused into one object.
-Justin must still decide intersection and identity match.
-
-Close-up cameras were first aimed too high because the mesh is
-centered on the origin. Those four stills were re-rendered from the
-saved preview blend using bounds-relative cameras. Wide views and the
-turntable were not replaced.
-
-PRESERVED FOR COMPARISON ONLY
-- Current pip_highres_candidate.blend (unchanged)
-- Long-wing original parts (SHA-256 9158dea0e23e5ebb…c4f2)
-- Satchel candidate inbox parts and
-  artifacts/theatrical-v2/final-character-production/pip-replacement-intake/
-- Strap-repair evidence
-
-NOT DONE
-- No retopo, UV, texture lock, rig, facial rig, groom, or animation
-- Goat untouched
-- Canon untouched
-- production-library untouched
-- No theatrical bind
-- No merge
-- Draft PR #24 stays draft
-- No paid resources
+STOPPED BEFORE
+- merging Draft PR #24
+- replacing production-library
+- final theatrical binding
+- destructive mesh cleanup
+- paid rendering or external services
 
 TESTS
+- python3 scripts/assets/test_pip_visual_foundation.py — 5/5 PASS
 - python3 scripts/assets/test_pip_replacement_intake.py — 13/13 PASS
+- vitest pip-replacement-intake + theatrical-foundation — 20/20 PASS
 - Approved library fingerprint unchanged:
   7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
 
 STATUS
-PIP BACKPACK CANDIDATE: INTAKE COMPLETE — waiting for Justin visual approval
-PIP SATCHEL CANDIDATE: PRESERVED FOR COMPARISON ONLY — superseded for review
-PIP CURRENT WORKING: UNCHANGED — do not overwrite
+PIP VISUAL IDENTITY: APPROVED — backpack design is official
+PIP PRODUCTION ASSET: NOT READY — fused source; stop for Justin
+PIP SATCHEL / PRISM / LONG-WING: ARCHIVED FOR ROLLBACK — not deleted
 GOAT: UNCHANGED
-CANON: UNCHANGED
-MERGE: NOT PERFORMED
+CANON / PRODUCTION-LIBRARY: UNTOUCHED
 THEATRICAL BINDING: NOT DECLARED
-PRODUCTION-LIBRARY: UNTOUCHED
+MERGE: NOT PERFORMED
 PAID RESOURCES: NOT USED

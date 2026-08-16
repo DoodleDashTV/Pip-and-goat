@@ -38,23 +38,30 @@
       "canonicalIdLocked": true,
       "productionModelApproved": false,
       "theatricalBound": false,
-      "currentCandidateStatus": "BLOCKED_PENDING_REPLACEMENT_UPLOAD",
+      "currentCandidateStatus": "VISUAL_IDENTITY_APPROVED_PRODUCTION_PREP",
+      "officialVisualSource": {
+        "packageId": "20260816T025617Z_pip_backpack_replacement.glb_dca239475c78",
+        "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+        "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+        "productionReady": false,
+        "productionLibraryReplaced": false
+      },
       "identity": {
-        "finish": "warm yellow-chartreuse / golden-lime CGI feathers",
-        "face": "cream-yellow face, cheeks, and chest",
+        "finish": "bright yellow polished CGI feathers",
+        "face": "approved cheerful face, cream-yellow face/cheeks/chest",
         "eyes": "large glossy green/teal",
         "crest": "exactly three coral crown feathers",
-        "wings": "long layered wings (conditionally approved appearance)",
-        "scarf": "teal neckerchief, separate from strap",
-        "strap": "one continuous cross-body strap over character-right shoulder",
-        "satchel": "character-left hip",
-        "clasp": "copper spiral",
-        "feet": "toes and rear hallux visible"
+        "wings": "long layered yellow wings",
+        "scarf": "teal neckerchief, not intersected by backpack",
+        "backpack": "centered true backpack on the back",
+        "straps": "two symmetrical shoulder straps",
+        "forbiddenAccessories": ["satchel", "cross-body strap", "hip bag"],
+        "feet": "orange beak and feet; toes and rear hallux visible"
       },
       "laterality": {
-        "strapShoulder": "character-right (−Y)",
-        "bagHip": "character-left (+Y)",
-        "facingCamera": "strap viewer-left, bag viewer-right"
+        "backpack": "centered on the back",
+        "straps": "symmetrical over both shoulders",
+        "facingCamera": "two straps visible; no satchel"
       },
       "forbiddenOnCurrentCandidate": [
         "overwrite",

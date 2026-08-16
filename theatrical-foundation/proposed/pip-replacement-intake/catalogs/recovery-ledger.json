@@ -26,6 +26,11 @@
       "id": "STRAP_REPAIR_STOP",
       "ref": "7c76cb16b91c299d67e8da4b0141643438c1af51",
       "note": "Last destructive strap attempt. Evidence only. Do not continue mesh edits."
+    },
+    {
+      "id": "PIP_OFFICIAL_BACKPACK_VISUAL",
+      "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "note": "Justin official Pip visual identity. Preserve source. Do not replace production-library from this point."
     }
   ],
   "rules": [

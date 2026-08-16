@@ -1,0 +1,40 @@
+{
+  "schema": "tivvlejoy.pip_visual_identity.v1",
+  "characterCode": "CHAR_PIP_001",
+  "displayName": "Pip",
+  "role": "official_permanent_visual_identity",
+  "packageId": "20260816T025617Z_pip_backpack_replacement.glb_dca239475c78",
+  "sourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+  "sourceBytes": 62876180,
+  "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+  "archiveDir": "theatrical-foundation/proposed/final-character-production/archive/pip-visual-identity",
+  "productionReady": false,
+  "productionLibraryReplaced": false,
+  "theatricalBound": false,
+  "mergeAuthorized": false,
+  "destructiveCleanupAuthorized": false,
+  "paidResources": false,
+  "goatTouched": false,
+  "boundDesignElements": [
+    "approved_face_eyes_cheerful_expression",
+    "bright_yellow_polished_cgi_appearance",
+    "three_coral_crest_feathers",
+    "long_layered_yellow_wings",
+    "teal_scarf",
+    "orange_beak_and_feet",
+    "centered_backpack",
+    "two_symmetrical_shoulder_straps",
+    "no_satchel",
+    "no_cross_body_strap",
+    "no_hip_bag"
+  ],
+  "remainingBeforeProductionReady": [
+    "retopology",
+    "deformation_safe_backpack_and_strap_treatment",
+    "uv_and_material_preservation_on_retopo",
+    "body_and_accessory_rigging",
+    "facial_controls",
+    "animation_validation"
+  ],
+  "createdAt": "2026-08-16T03:20:30Z"
+}

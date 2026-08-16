@@ -1,0 +1,28 @@
+{
+  "schema": "tivvlejoy.pip_superseded_archive.v1",
+  "rule": "Preserve superseded models for rollback. Do not delete source files or prior evidence.",
+  "items": [
+    {
+      "id": "PIP_SATCHEL_REPLACEMENT",
+      "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_replacement.glb.part{1,2,3}.bin",
+      "reason": "Satchel / cross-body replacement candidate. Superseded by backpack Pip."
+    },
+    {
+      "id": "PIP_CURRENT_PRISM_WORKING",
+      "path": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
+      "reason": "Earlier Prism working Pip. Superseded as visual foundation. Keep for rollback."
+    },
+    {
+      "id": "PIP_HIGHDETAIL_WORKING",
+      "path": "theatrical-foundation/proposed/final-character-production/working/pip_highdetail_working.blend",
+      "reason": "Earlier high-detail working blend. Keep for rollback. Do not delete."
+    },
+    {
+      "id": "PIP_LONG_WING_ORIGINAL",
+      "sha256": "9158dea0e23e5ebb086a574badb0b5a62982d0b90e1d8b118f54cfac0549c4f2",
+      "path": "theatrical-foundation/proposed/final-character-production/pip_long_wing_original.part0{1,2,3}.bin",
+      "reason": "Earlier long-wing original. Archive for rollback. Do not delete."
+    }
+  ]
+}

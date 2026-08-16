@@ -44,12 +44,18 @@ topology.
 
 ## Status
 
+PIP VISUAL IDENTITY: APPROVED — backpack source `dca239475c78…8696`  
 PIP PRODUCTION ASSET: BLOCKED — fused 1.9M-tri non-manifold Tripo mesh; no retopo, groom, or rig  
-GOAT PRODUCTION ASSET: BLOCKED — same
+GOAT PRODUCTION ASSET: BLOCKED — unchanged
 
-## Pip replacement pending
+## Official Pip source
 
-Stop further destructive work on the fused left-front riser. The next uploaded
-Pip model is a replacement candidate only. Ingest it with
-`scripts/tivvlejoy/ingest-next-pip.sh`. Do not overwrite current Pip, the
-long-wing original parts, Goat, or `production-library/`.
+Justin selected
+`20260816T025617Z_pip_backpack_replacement.glb_dca239475c78`
+as the official permanent Pip design. The working copy is
+`working/pip_backpack_canonical_working.blend`. The superseded Prism and
+satchel files stay on disk for rollback.
+
+Do not replace `production-library/`, declare theatrical binding, merge
+Draft PR #24, remesh, or use paid resources until Justin authorizes those
+later steps.

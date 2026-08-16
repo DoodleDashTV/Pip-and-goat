@@ -1,9 +1,10 @@
 # Final theatrical character production — proposed
 
-**Label:** proposed unapproved final-character-production  
-**Approved:** no  
-**Replaces canonical assets:** no  
-**THEATRICAL binding:** awaiting Justin’s final visual approval  
+**Label:** proposed final-character-production  
+**Official Pip visual identity:** backpack candidate `dca239475c78…8696`  
+**Production-ready:** no  
+**Replaces production-library:** no  
+**THEATRICAL binding:** not declared  
 **Merge:** not performed  
 **Paid resources:** not used  
 
@@ -15,8 +16,11 @@ Do not overwrite original GLB, FBX, JPEG, texture, or source `.blend` files.
 
 ## Current proposed files
 
+- Official Pip working copy: `working/pip_backpack_canonical_working.blend`
+- Pointer: `working/CURRENT_PIP.json`
+- Superseded Prism Pip (rollback): `high-resolution/pip_highres_candidate.blend`
 - Rollback working: `working/pip_highdetail_working.blend`, `working/goat_highdetail_working.blend`
-- High-res candidates: `high-resolution/pip_highres_candidate.blend`, `high-resolution/goat_highres_candidate.blend`
+- Goat high-res: `high-resolution/goat_highres_candidate.blend` (unchanged)
 - Goat painted Color: `textures/goat_highres_basecolor.png`
 - Reports: `reports/`
 - Previews: `artifacts/theatrical-v2/final-character-production/`

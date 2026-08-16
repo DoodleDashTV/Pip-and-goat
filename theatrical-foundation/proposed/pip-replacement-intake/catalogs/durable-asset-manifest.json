@@ -10,7 +10,9 @@
     "preserved_comparison": "Conditionally approved or evidential files. Do not overwrite.",
     "proposed_unapproved": "Working theatrical proposals. Not canon.",
     "proxy_pipeline_only": "Labeled stand-ins for pipeline tests. Not Pip. Not Goat.",
-    "intake_candidate": "Next uploaded Pip package. Replacement candidate only."
+    "intake_candidate": "Next uploaded Pip package. Replacement candidate only.",
+    "approved_visual_foundation": "Justin-selected official Pip visual identity. Not production-ready. Not production-library. Not theatrical-bound.",
+    "superseded_archive": "Earlier Pip models kept for rollback. Do not delete."
   },
   "assets": [
     {
@@ -60,7 +62,33 @@
       "path": "theatrical-foundation/proposed/final-character-production/high-resolution/pip_highres_candidate.blend",
       "characterCode": "CHAR_PIP_001",
       "immutable": true,
-      "notes": "Current Prism working Pip. Do not overwrite, merge, canonize, or rig as final."
+      "notes": "Superseded Prism working Pip. Keep for rollback. Do not overwrite or delete."
+    },
+    {
+      "id": "PIP_OFFICIAL_VISUAL_SOURCE",
+      "class": "approved_visual_foundation",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_backpack_replacement.glb.part{1,2,3}.bin",
+      "characterCode": "CHAR_PIP_001",
+      "sha256WhenReassembled": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "immutable": true,
+      "notes": "Justin official permanent Pip design source. Fused mesh. Not production-ready."
+    },
+    {
+      "id": "PIP_OFFICIAL_WORKING_COPY",
+      "class": "approved_visual_foundation",
+      "path": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+      "characterCode": "CHAR_PIP_001",
+      "immutable": true,
+      "notes": "Protected production-prep working copy. Object-level normalize only. Do not overwrite the approved source."
+    },
+    {
+      "id": "PIP_SATCHEL_SUPERSEDED",
+      "class": "superseded_archive",
+      "path": "theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_replacement.glb.part{1,2,3}.bin",
+      "characterCode": "CHAR_PIP_001",
+      "sha256WhenReassembled": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+      "immutable": true,
+      "notes": "Satchel / cross-body candidate. Superseded. Keep for rollback."
     },
     {
       "id": "PIP_STRAP_REPAIR_EVIDENCE",

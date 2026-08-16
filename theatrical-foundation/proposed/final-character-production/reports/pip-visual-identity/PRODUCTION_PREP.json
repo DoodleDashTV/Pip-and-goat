@@ -1,0 +1,99 @@
+{
+  "schema": "tivvlejoy.pip_visual_identity.prep.v1",
+  "blender": "4.2.3 LTS",
+  "sourceSha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+  "normalize": {
+    "workingObject": "pip_backpack_working",
+    "nativeObject": "pip_approved_native",
+    "nativeMeshDatablockPreserved": true,
+    "appliedToMeshDatablock": false,
+    "objectScale": 2.0934990993763565,
+    "feetOnGround": true,
+    "facing": "+X",
+    "autoRotated": false,
+    "heightAfter": 2.0500001907348633,
+    "scaleCheck": {
+      "nativeHeight": 0.9792218208312988,
+      "targetHeight": 2.05,
+      "suggestedFactor": 2.0934990993763565,
+      "withinTenPercent": false,
+      "appliedToOriginal": false
+    }
+  },
+  "intersections": {
+    "checked": true,
+    "method": "spatial_region_kdtree",
+    "destructiveCleanup": false,
+    "meshEdited": false,
+    "reason": "Fused Tripo source. Isolated backpack/body pairs were probed only. Destructive cleanup is refused until Justin authorizes it.",
+    "backpackRegionVerts": 160862,
+    "bodyRegionSample": 4024,
+    "closePairsUnderFourMmScaled": 17,
+    "minObservedGap": 0.0011055031791329384,
+    "correctionApplied": false,
+    "requiresLaterSeparationOrWeighting": true
+  },
+  "retopo": {
+    "productionReady": false,
+    "objectSeparation": "single_or_fused",
+    "vertices": 1006107,
+    "faces": 1930054,
+    "rigPresent": false,
+    "shapeKeys": false,
+    "recommendation": "Do not retopo this fused source by voxel remesh or primitive rebuild. Build a later animation retopo using this likeness as the target.",
+    "deformationRisks": [
+      "fused backpack and straps will collapse or tear without separate objects or controlled weights",
+      "no eyelid, mouth, or wing-fold loops",
+      "non-manifold generated surface is not animation topology"
+    ],
+    "accessoryPlan": {
+      "preferred": "separate backpack, two straps, and scarf after a clean retopo",
+      "fallback": "controlled vertex-group weighting on a later rig, never on this fused source as-is",
+      "doNotBindNow": true
+    }
+  },
+  "textures": [
+    {
+      "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        8192,
+        8192
+      ],
+      "bytes": 74428330,
+      "sha256": "c6dcdd394f4bc594892723444c3f74db036f0e4aab47b4ec8b028458cd3cb61f",
+      "relative": "textures/Color_72aab415-8aae-46cc-aa12-6d00f03117fe.png"
+    },
+    {
+      "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        4096,
+        4096
+      ],
+      "bytes": 6061850,
+      "sha256": "41e2f91006bef8cb82eeae2a8383057189ffe775906611b10646caff11c53815",
+      "relative": "textures/NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe.png"
+    },
+    {
+      "name": "ORM_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        4096,
+        4096
+      ],
+      "bytes": 10718424,
+      "sha256": "585ba31bd09f330b37a0478ab6d8fb42d4f50d55c2aa72c641db4fed5e583bec",
+      "relative": "textures/ORM_72aab415-8aae-46cc-aa12-6d00f03117fe.png"
+    }
+  ],
+  "renders": [
+    "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/front.png",
+    "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/rear.png",
+    "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/left.png",
+    "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/right.png",
+    "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/three_quarter.png"
+  ],
+  "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
+  "nativeHighresPreserved": true,
+  "productionReady": false,
+  "productionLibraryTouched": false,
+  "theatricalBound": false
+}

@@ -32,6 +32,10 @@ import {
   buildPendingChecklist,
   choosePrimaryModel,
   evaluatePipReplacementGate,
+  evaluatePipPromotionGate,
+  parsePipVisualIdentity,
+  assertPipVisualIdentityDoesNotPromote,
+  APPROVED_PIP_SOURCE_SHA256,
   isSupportedIntakeFilename,
   parseCanonReferenceDb,
   parseDurableAssetManifest,
@@ -74,6 +78,7 @@ describe('Pip replacement intake gate', () => {
       requestRigBindToCurrentPip: true,
     });
     expect(gate.autoReplaceCurrentPip).toBe(false);
+    expect(gate.visualIdentityApproved).toBe(true);
     expect(gate.approved).toBe(false);
     expect(gate.canonicalMutated).toBe(false);
     expect(gate.theatricalBound).toBe(false);
@@ -204,6 +209,33 @@ describe('story / shot planning stay blocked for final Pip framing', () => {
         'Pip identity may be planned; Pip geometry may not be locked.',
       ]),
     );
+  });
+});
+
+describe('official backpack Pip visual identity', () => {
+  it('records Justin’s selection without opening later gates', () => {
+    const identity = parsePipVisualIdentity(readJson('catalogs/pip-visual-identity.json'));
+    assertPipVisualIdentityDoesNotPromote(identity);
+    expect(identity.sourceSha256).toBe(APPROVED_PIP_SOURCE_SHA256);
+    expect(identity.boundDesignElements).toEqual(
+      expect.arrayContaining([
+        'centered_backpack',
+        'two_symmetrical_shoulder_straps',
+        'no_satchel',
+        'no_cross_body_strap',
+      ]),
+    );
+    const gate = evaluatePipPromotionGate({
+      justinSelectedBackpackPip: true,
+      requestProductionLibraryReplace: true,
+      requestTheatricalBind: true,
+      requestMerge: true,
+    });
+    expect(gate.visualIdentityApproved).toBe(true);
+    expect(gate.productionReady).toBe(false);
+    expect(gate.productionLibraryReplaced).toBe(false);
+    expect(gate.theatricalBound).toBe(false);
+    expect(gate.mergeAuthorized).toBe(false);
   });
 });
 
