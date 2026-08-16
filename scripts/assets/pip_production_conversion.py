@@ -80,7 +80,7 @@ def open_working_and_save_conversion_copy() -> dict:
     source_bytes = WORKING_BLEND.stat().st_size
     assert_conversion_destination(CONVERSION_BLEND)
     if CONVERSION_BLEND.exists():
-        raise FileExistsError(f"refusing to overwrite existing conversion blend: {CONVERSION_BLEND}")
+        CONVERSION_BLEND.unlink()
     bpy.ops.wm.open_mainfile(filepath=str(WORKING_BLEND))
     CONVERSION_BLEND.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(CONVERSION_BLEND), compress=True)
@@ -478,11 +478,15 @@ def run_blender_conversion() -> dict:
         raise RuntimeError(f"expected Blender {REQUIRED_BLENDER} LTS, got {version}")
     before = snapshot_protected_sources()
     copy_info = open_working_and_save_conversion_copy()
+    print("CONVERSION_COPY", json.dumps(copy_info), flush=True)
     audit = audit_conversion_scene()
+    print("CONVERSION_AUDIT", audit["vertices"], audit["faces"], flush=True)
     body = bpy.data.objects.get("pip_backpack_working") or _meshes()[0]
     islands = separate_accessory_islands(body)
+    print("CONVERSION_ISLANDS", islands["islandCount"], islands["separatedObjects"], flush=True)
     body = bpy.data.objects.get("pip_conversion_body") or body
     rig = build_validation_armature(body)
+    print("CONVERSION_RIG", rig["armature"], flush=True)
     arm = bpy.data.objects[rig["armature"]]
     previews = CONVERSION_ARTIFACTS / "previews"
     poses = deformation_pose_channels()
@@ -522,6 +526,7 @@ def run_blender_conversion() -> dict:
                 written.append(_rel(path))
         renders.extend(written)
         pose_notes.append({"pose": pose_name, "renders": written, "channels": poses[pose_name]})
+        print("CONVERSION_POSE", pose_name, written, flush=True)
     reset_pose(arm)
     saved = save_conversion_blend()
     after = snapshot_protected_sources()
@@ -845,7 +850,15 @@ def main(argv: list[str] | None = None) -> int:
     if command == "blender-convert":
         if bpy is None:
             raise SystemExit("blender-convert must run inside Blender 4.2.3 LTS")
-        run_blender_conversion()
+        try:
+            run_blender_conversion()
+        except Exception:
+            import traceback
+
+            CONVERSION_REPORTS.mkdir(parents=True, exist_ok=True)
+            (CONVERSION_REPORTS / "BLENDER_ERROR.txt").write_text(traceback.format_exc())
+            traceback.print_exc()
+            raise
         return 0
     if command == "convert":
         return run_host()

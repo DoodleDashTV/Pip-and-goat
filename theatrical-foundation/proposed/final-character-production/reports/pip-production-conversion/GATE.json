@@ -17,7 +17,7 @@
   "voxelRemesh": false,
   "primitiveRebuild": false,
   "stopForJustin": true,
-  "conversionArtifactsPresent": false,
+  "conversionArtifactsPresent": true,
   "blockers": [
     "Official backpack Pip is the visual identity, not a production-ready mesh.",
     "Safe conversion may separate disconnected islands and add a validation armature only.",

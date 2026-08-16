@@ -1,0 +1,69 @@
+{
+  "schema": "tivvlejoy.pip_production_conversion.comparison.v1",
+  "compared": true,
+  "method": "downscaled_mean_channel_delta",
+  "note": "Numeric closeness is not visual approval. Framing can differ even when likeness matches. Justin still reviews the stills.",
+  "approvedVsRest": [
+    {
+      "view": "front",
+      "compared": true,
+      "meanChannelDelta": 0.07565754861615429,
+      "official": "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/front.png",
+      "conversion": "artifacts/theatrical-v2/final-character-production/pip-production-conversion/previews/rest_front.png"
+    },
+    {
+      "view": "rear",
+      "compared": true,
+      "meanChannelDelta": 0.07226967844751069,
+      "official": "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/rear.png",
+      "conversion": "artifacts/theatrical-v2/final-character-production/pip-production-conversion/previews/rest_rear.png"
+    },
+    {
+      "view": "left",
+      "compared": true,
+      "meanChannelDelta": 0.06100200718147341,
+      "official": "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/left.png",
+      "conversion": "artifacts/theatrical-v2/final-character-production/pip-production-conversion/previews/rest_left.png"
+    },
+    {
+      "view": "right",
+      "compared": true,
+      "meanChannelDelta": 0.06180280198499153,
+      "official": "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/right.png",
+      "conversion": "artifacts/theatrical-v2/final-character-production/pip-production-conversion/previews/rest_right.png"
+    },
+    {
+      "view": "three_quarter",
+      "compared": true,
+      "meanChannelDelta": 0.062127904865649966,
+      "official": "artifacts/theatrical-v2/final-character-production/pip-visual-identity/previews/three_quarter.png",
+      "conversion": "artifacts/theatrical-v2/final-character-production/pip-production-conversion/previews/rest_three_quarter.png"
+    }
+  ],
+  "restVsDeformFront": [
+    {
+      "pose": "wing_fold",
+      "meanChannelDeltaVsRestFront": 0.00018125151295085936
+    },
+    {
+      "pose": "head_turn",
+      "meanChannelDeltaVsRestFront": 0.00018125151295085936
+    },
+    {
+      "pose": "foot_lift",
+      "meanChannelDeltaVsRestFront": 0.00018125151295085936
+    },
+    {
+      "pose": "backpack_sway",
+      "meanChannelDeltaVsRestFront": 0.059842521988219155
+    },
+    {
+      "pose": "strap_shift",
+      "meanChannelDeltaVsRestFront": 0.00018125151295085936
+    },
+    {
+      "pose": "scarf_sway",
+      "meanChannelDeltaVsRestFront": 0.00018125151295085936
+    }
+  ]
+}

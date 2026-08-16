@@ -1,0 +1,1624 @@
+{
+  "schema": "tivvlejoy.pip_production_conversion.audit.v1",
+  "objectName": "pip_backpack_working",
+  "objectCount": 1,
+  "vertices": 1006107,
+  "faces": 1930054,
+  "edges": 2935698,
+  "objectScale": [
+    2.093499183654785,
+    2.093499183654785,
+    2.093499183654785
+  ],
+  "objectLocation": [
+    0.0,
+    0.0,
+    1.025046706199646
+  ],
+  "height": 2.0500001907348633,
+  "boundsMin": [
+    -0.4302152097225189,
+    -0.48714956641197205,
+    0.0
+  ],
+  "boundsMax": [
+    0.429525226354599,
+    0.48730161786079407,
+    2.0500001907348633
+  ],
+  "facing": "+X",
+  "uvLayers": [
+    "UVMap"
+  ],
+  "hasUVs": true,
+  "materials": [
+    {
+      "name": "tripo_material_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "useNodes": true,
+      "images": [
+        {
+          "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+          "size": [
+            8192,
+            8192
+          ]
+        },
+        {
+          "name": "ORM_72aab415-8aae-46cc-aa12-6d00f03117fe",
+          "size": [
+            4096,
+            4096
+          ]
+        },
+        {
+          "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+          "size": [
+            4096,
+            4096
+          ]
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        8192,
+        8192
+      ]
+    },
+    {
+      "name": "ORM_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        4096,
+        4096
+      ]
+    },
+    {
+      "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        4096,
+        4096
+      ]
+    }
+  ],
+  "smoothFaces": 1930054,
+  "flatFaces": 0,
+  "shapeKeys": false,
+  "armaturesBefore": [],
+  "meshDatablockEdited": false,
+  "voxelRemesh": false,
+  "primitiveRebuild": false,
+  "islands": {
+    "islandCount": 463,
+    "islandsKeptWithBody": 412,
+    "separatedObjects": {
+      "backpack": "pip_conversion_backpack"
+    },
+    "geometryRewritten": false,
+    "likenessRemeshed": false,
+    "islands": [
+      {
+        "verts": 27216,
+        "centroid": [
+          0.09973643720149994,
+          0.16255390644073486,
+          1.6319313049316406
+        ],
+        "rel_z": 0.7960639771192618,
+        "rearward": false,
+        "lateral": 0.16247788071632385,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 19974,
+        "centroid": [
+          0.017765851691365242,
+          -0.18933114409446716,
+          1.6330541372299194
+        ],
+        "rel_z": 0.7966117001406321,
+        "rearward": false,
+        "lateral": -0.18940716981887817,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 18968,
+        "centroid": [
+          0.20657826960086823,
+          -0.10038423538208008,
+          0.4715782105922699
+        ],
+        "rel_z": 0.23003813010535543,
+        "rearward": false,
+        "lateral": -0.10046026110649109,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 17269,
+        "centroid": [
+          0.20184680819511414,
+          0.23910103738307953,
+          1.2905070781707764
+        ],
+        "rel_z": 0.6295155893171739,
+        "rearward": false,
+        "lateral": 0.23902501165866852,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 13837,
+        "centroid": [
+          0.20047464966773987,
+          -0.24273987114429474,
+          1.2547268867492676
+        ],
+        "rel_z": 0.6120618390281641,
+        "rearward": false,
+        "lateral": -0.24281589686870575,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 12124,
+        "centroid": [
+          0.336945116519928,
+          0.08327867835760117,
+          0.7278284430503845
+        ],
+        "rel_z": 0.3550382318693736,
+        "rearward": false,
+        "lateral": 0.08320265263319016,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 11950,
+        "centroid": [
+          0.09125293046236038,
+          0.22219012677669525,
+          0.46012184023857117
+        ],
+        "rel_z": 0.22444965728204705,
+        "rearward": false,
+        "lateral": 0.22211410105228424,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 11743,
+        "centroid": [
+          0.0468863770365715,
+          -0.16926135122776031,
+          0.15906639397144318
+        ],
+        "rel_z": 0.07759335569350492,
+        "rearward": false,
+        "lateral": -0.16933737695217133,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 11620,
+        "centroid": [
+          0.20609256625175476,
+          -0.25153282284736633,
+          0.8126699328422546
+        ],
+        "rel_z": 0.39642432060015415,
+        "rearward": false,
+        "lateral": -0.25160884857177734,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 10971,
+        "centroid": [
+          0.3335227072238922,
+          -0.09622292965650558,
+          0.7082739472389221
+        ],
+        "rel_z": 0.345499454312259,
+        "rearward": false,
+        "lateral": -0.0962989553809166,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 10861,
+        "centroid": [
+          -0.12909148633480072,
+          0.08835902065038681,
+          1.6338073015213013
+        ],
+        "rel_z": 0.7969790973217571,
+        "rearward": true,
+        "lateral": 0.0882829949259758,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 10775,
+        "centroid": [
+          -0.15057265758514404,
+          0.12108111381530762,
+          1.1803396940231323
+        ],
+        "rel_z": 0.5757754069281409,
+        "rearward": true,
+        "lateral": 0.1210050880908966,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 10485,
+        "centroid": [
+          0.2440377026796341,
+          0.21802614629268646,
+          0.7129255533218384
+        ],
+        "rel_z": 0.34776853023914894,
+        "rearward": false,
+        "lateral": 0.21795012056827545,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 10478,
+        "centroid": [
+          -0.1195245161652565,
+          -0.06071685999631882,
+          1.6565545797348022
+        ],
+        "rel_z": 0.8080753295642267,
+        "rearward": true,
+        "lateral": -0.06079288572072983,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 10190,
+        "centroid": [
+          0.03603583201766014,
+          -0.21876008808612823,
+          0.4253280460834503
+        ],
+        "rel_z": 0.2074770763465066,
+        "rearward": false,
+        "lateral": -0.21883611381053925,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 10015,
+        "centroid": [
+          0.04622189328074455,
+          0.17320972681045532,
+          0.13815811276435852
+        ],
+        "rel_z": 0.06739419507801753,
+        "rearward": false,
+        "lateral": 0.1731337010860443,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 9770,
+        "centroid": [
+          0.021815411746501923,
+          0.27985507249832153,
+          1.1869536638259888
+        ],
+        "rel_z": 0.5790017333610596,
+        "rearward": false,
+        "lateral": 0.2797790467739105,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 9743,
+        "centroid": [
+          -0.31234753131866455,
+          -0.08192656189203262,
+          0.9144995212554932
+        ],
+        "rel_z": 0.4460972859361894,
+        "rearward": true,
+        "lateral": -0.08200258761644363,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 9669,
+        "centroid": [
+          0.11284729838371277,
+          0.2892973721027374,
+          0.6254903078079224
+        ],
+        "rel_z": 0.30511719493240774,
+        "rearward": false,
+        "lateral": 0.2892213463783264,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 8813,
+        "centroid": [
+          0.14989274740219116,
+          -0.04722098261117935,
+          1.706336498260498
+        ],
+        "rel_z": 0.8323591900002838,
+        "rearward": false,
+        "lateral": -0.04729700833559036,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 8105,
+        "centroid": [
+          -0.16458362340927124,
+          -0.08931057900190353,
+          1.1828322410583496
+        ],
+        "rel_z": 0.576991283417559,
+        "rearward": true,
+        "lateral": -0.08938660472631454,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 7954,
+        "centroid": [
+          0.2696666121482849,
+          0.10919643938541412,
+          0.938969075679779
+        ],
+        "rel_z": 0.45803365283745995,
+        "rearward": false,
+        "lateral": 0.10912041366100311,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 7807,
+        "centroid": [
+          -0.19435732066631317,
+          -0.1374317854642868,
+          1.4376280307769775
+        ],
+        "rel_z": 0.7012819009844244,
+        "rearward": true,
+        "lateral": -0.13750781118869781,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 7759,
+        "centroid": [
+          -0.05354796350002289,
+          0.10816561430692673,
+          0.42255693674087524
+        ],
+        "rel_z": 0.20612531581736163,
+        "rearward": true,
+        "lateral": 0.10808958858251572,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 7403,
+        "centroid": [
+          0.2410949170589447,
+          0.10058743506669998,
+          1.1125680208206177
+        ],
+        "rel_z": 0.5427160572223145,
+        "rearward": false,
+        "lateral": 0.10051140934228897,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 7291,
+        "centroid": [
+          0.2360115498304367,
+          -0.1733674257993698,
+          0.9382344484329224
+        ],
+        "rel_z": 0.45767529811623753,
+        "rearward": false,
+        "lateral": -0.17344345152378082,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 6868,
+        "centroid": [
+          -0.02587110735476017,
+          0.18125511705875397,
+          1.0579075813293457
+        ],
+        "rel_z": 0.5160524306830029,
+        "rearward": false,
+        "lateral": 0.18117909133434296,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 6821,
+        "centroid": [
+          0.06525568664073944,
+          -0.28634294867515564,
+          0.5867832899093628
+        ],
+        "rel_z": 0.2862357245435273,
+        "rearward": false,
+        "lateral": -0.28641897439956665,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 6788,
+        "centroid": [
+          0.1330612152814865,
+          0.09311672300100327,
+          0.4173879325389862
+        ],
+        "rel_z": 0.20360385058762615,
+        "rearward": false,
+        "lateral": 0.09304069727659225,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 6725,
+        "centroid": [
+          -0.2751893997192383,
+          0.035890039056539536,
+          0.4812970459461212
+        ],
+        "rel_z": 0.23477902495881756,
+        "rearward": true,
+        "lateral": 0.035814013332128525,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 6629,
+        "centroid": [
+          -0.22433757781982422,
+          0.06891541182994843,
+          1.388404369354248
+        ],
+        "rel_z": 0.6772703610610626,
+        "rearward": true,
+        "lateral": 0.06883938610553741,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 6599,
+        "centroid": [
+          -0.11002136766910553,
+          0.2132030427455902,
+          0.6093559861183167
+        ],
+        "rel_z": 0.2972467948404829,
+        "rearward": true,
+        "lateral": 0.2131270170211792,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 5822,
+        "centroid": [
+          -0.07133198529481888,
+          -0.2769581079483032,
+          1.4263055324554443
+        ],
+        "rel_z": 0.6957587315853647,
+        "rearward": true,
+        "lateral": -0.27703413367271423,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 5730,
+        "centroid": [
+          0.022245224565267563,
+          0.15999004244804382,
+          0.311603307723999
+        ],
+        "rel_z": 0.15200159938146085,
+        "rearward": false,
+        "lateral": 0.1599140167236328,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 5469,
+        "centroid": [
+          -0.2669302821159363,
+          -0.10112471878528595,
+          0.6300273537635803
+        ],
+        "rel_z": 0.30733038787559064,
+        "rearward": true,
+        "lateral": -0.10120074450969696,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 5323,
+        "centroid": [
+          0.28055864572525024,
+          0.10545133054256439,
+          0.5216051340103149
+        ],
+        "rel_z": 0.2544415051119265,
+        "rearward": false,
+        "lateral": 0.10537530481815338,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 5237,
+        "centroid": [
+          0.18748943507671356,
+          0.27415573596954346,
+          0.8427122235298157
+        ],
+        "rel_z": 0.4110790951818052,
+        "rearward": false,
+        "lateral": 0.27407971024513245,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 5197,
+        "centroid": [
+          -0.06485848128795624,
+          -0.31871291995048523,
+          1.286806583404541
+        ],
+        "rel_z": 0.6277104700869611,
+        "rearward": true,
+        "lateral": -0.31878894567489624,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 5040,
+        "centroid": [
+          -0.15638504922389984,
+          0.20969679951667786,
+          1.4331037998199463
+        ],
+        "rel_z": 0.6990749592595022,
+        "rearward": true,
+        "lateral": 0.20962077379226685,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4996,
+        "centroid": [
+          0.19155777990818024,
+          -0.1474393904209137,
+          0.05449668690562248
+        ],
+        "rel_z": 0.026583747236670775,
+        "rearward": false,
+        "lateral": -0.1475154161453247,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4811,
+        "centroid": [
+          0.24238111078739166,
+          -0.12260037660598755,
+          1.5984632968902588
+        ],
+        "rel_z": 0.7797381210570804,
+        "rearward": false,
+        "lateral": -0.12267640233039856,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4800,
+        "centroid": [
+          -0.08782560378313065,
+          0.15865081548690796,
+          0.8712224364280701
+        ],
+        "rel_z": 0.4249865148138172,
+        "rearward": true,
+        "lateral": 0.15857478976249695,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4779,
+        "centroid": [
+          -0.02888343669474125,
+          -0.05483495444059372,
+          1.8168001174926758
+        ],
+        "rel_z": 0.8862438772951566,
+        "rearward": false,
+        "lateral": -0.05491098016500473,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4762,
+        "centroid": [
+          -0.026069536805152893,
+          -0.17995032668113708,
+          1.0526765584945679
+        ],
+        "rel_z": 0.5135007124644291,
+        "rearward": false,
+        "lateral": -0.1800263524055481,
+        "classification": {
+          "label": "strap_R",
+          "confidence": 0.74,
+          "reasons": [
+            "thin_shoulder_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 4687,
+        "centroid": [
+          -0.26769015192985535,
+          -0.09415958821773529,
+          0.5122761130332947
+        ],
+        "rel_z": 0.24989076359532392,
+        "rearward": true,
+        "lateral": -0.0942356139421463,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4627,
+        "centroid": [
+          -0.08628694713115692,
+          -0.2640382945537567,
+          1.1988728046417236
+        ],
+        "rel_z": 0.5848159478521628,
+        "rearward": true,
+        "lateral": -0.2641143202781677,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4620,
+        "centroid": [
+          -0.22543129324913025,
+          -0.12086336314678192,
+          0.9809334874153137
+        ],
+        "rel_z": 0.47850409568190266,
+        "rearward": true,
+        "lateral": -0.12093938887119293,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 4575,
+        "centroid": [
+          0.019108081236481667,
+          0.2913095951080322,
+          1.4658482074737549
+        ],
+        "rel_z": 0.7150478395557087,
+        "rearward": false,
+        "lateral": 0.2912335693836212,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4566,
+        "centroid": [
+          0.31636160612106323,
+          -0.06677715480327606,
+          0.8803759813308716
+        ],
+        "rel_z": 0.42945165825339915,
+        "rearward": false,
+        "lateral": -0.06685318052768707,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4542,
+        "centroid": [
+          -0.05172945559024811,
+          -0.32143256068229675,
+          0.9502177834510803
+        ],
+        "rel_z": 0.4635208268495116,
+        "rearward": true,
+        "lateral": -0.32150858640670776,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4527,
+        "centroid": [
+          -0.11784002184867859,
+          -0.21128344535827637,
+          0.6570953726768494
+        ],
+        "rel_z": 0.3205342983120897,
+        "rearward": true,
+        "lateral": -0.21135947108268738,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4508,
+        "centroid": [
+          0.3079177737236023,
+          0.05073653534054756,
+          1.2617253065109253
+        ],
+        "rel_z": 0.6154757020089031,
+        "rearward": false,
+        "lateral": 0.05066050961613655,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4468,
+        "centroid": [
+          0.05594717711210251,
+          0.06502440571784973,
+          1.8406124114990234
+        ],
+        "rel_z": 0.8978596293882389,
+        "rearward": false,
+        "lateral": 0.06494837999343872,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4465,
+        "centroid": [
+          -0.16310767829418182,
+          -0.11319630593061447,
+          0.5406748056411743
+        ],
+        "rel_z": 0.2637437830907512,
+        "rearward": true,
+        "lateral": -0.11327233165502548,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4448,
+        "centroid": [
+          -0.2173144817352295,
+          0.20998051762580872,
+          0.8027041554450989
+        ],
+        "rel_z": 0.39156296622458053,
+        "rearward": true,
+        "lateral": 0.2099044919013977,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4433,
+        "centroid": [
+          0.3420162796974182,
+          0.04506600648164749,
+          1.3322925567626953
+        ],
+        "rel_z": 0.6498987477094373,
+        "rearward": false,
+        "lateral": 0.04498998075723648,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4423,
+        "centroid": [
+          -0.08655720949172974,
+          -0.14609546959400177,
+          0.907446026802063
+        ],
+        "rel_z": 0.44265655725464637,
+        "rearward": true,
+        "lateral": -0.14617149531841278,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4408,
+        "centroid": [
+          0.037832070142030716,
+          -0.3075251281261444,
+          1.425028681755066
+        ],
+        "rel_z": 0.6951358776431313,
+        "rearward": false,
+        "lateral": -0.3076011538505554,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4400,
+        "centroid": [
+          0.12424471229314804,
+          -0.38077059388160706,
+          0.7317407131195068
+        ],
+        "rel_z": 0.35694665611577325,
+        "rearward": false,
+        "lateral": -0.38084661960601807,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4368,
+        "centroid": [
+          -0.007022972218692303,
+          0.1335935890674591,
+          1.8186790943145752
+        ],
+        "rel_z": 0.8871604512693404,
+        "rearward": false,
+        "lateral": 0.1335175633430481,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4268,
+        "centroid": [
+          -0.0004106181731913239,
+          -0.10965604335069656,
+          1.8729431629180908
+        ],
+        "rel_z": 0.9136307261740777,
+        "rearward": false,
+        "lateral": -0.10973206907510757,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4196,
+        "centroid": [
+          0.07181154936552048,
+          -0.3396947383880615,
+          1.3127273321151733
+        ],
+        "rel_z": 0.640354736574244,
+        "rearward": false,
+        "lateral": -0.33977076411247253,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4179,
+        "centroid": [
+          -0.24463452398777008,
+          0.13003826141357422,
+          0.9629582166671753
+        ],
+        "rel_z": 0.4697356717425396,
+        "rearward": true,
+        "lateral": 0.1299622356891632,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 4136,
+        "centroid": [
+          -0.22605805099010468,
+          -0.21648330986499786,
+          0.6894314885139465
+        ],
+        "rel_z": 0.33630801188696774,
+        "rearward": true,
+        "lateral": -0.21655933558940887,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4127,
+        "centroid": [
+          0.1571173518896103,
+          0.2719099819660187,
+          0.03191542252898216
+        ],
+        "rel_z": 0.015568497346110707,
+        "rearward": false,
+        "lateral": 0.27183395624160767,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4119,
+        "centroid": [
+          -0.004749683663249016,
+          -0.010783195495605469,
+          1.9658203125
+        ],
+        "rel_z": 0.9589366485840729,
+        "rearward": false,
+        "lateral": -0.01085922122001648,
+        "classification": {
+          "label": "crest",
+          "confidence": 0.55,
+          "reasons": [
+            "high_z_kept_with_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4100,
+        "centroid": [
+          0.26841750741004944,
+          -0.1995740681886673,
+          0.6129829287528992
+        ],
+        "rel_z": 0.29901603498542273,
+        "rearward": false,
+        "lateral": -0.1996500939130783,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4044,
+        "centroid": [
+          0.05943342670798302,
+          0.34223034977912903,
+          1.3157860040664673
+        ],
+        "rel_z": 0.6418467715336151,
+        "rearward": false,
+        "lateral": 0.342154324054718,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 4035,
+        "centroid": [
+          0.1920369416475296,
+          0.23557184636592865,
+          0.9623309373855591
+        ],
+        "rel_z": 0.469429681877538,
+        "rearward": false,
+        "lateral": 0.23549582064151764,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3989,
+        "centroid": [
+          0.20043760538101196,
+          0.21707221865653992,
+          0.059990715235471725
+        ],
+        "rel_z": 0.029263760806757223,
+        "rearward": false,
+        "lateral": 0.2169961929321289,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3972,
+        "centroid": [
+          0.05627565458416939,
+          -0.020985493436455727,
+          1.8955483436584473
+        ],
+        "rel_z": 0.9246576425824382,
+        "rearward": false,
+        "lateral": -0.021061519160866737,
+        "classification": {
+          "label": "crest",
+          "confidence": 0.55,
+          "reasons": [
+            "high_z_kept_with_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3956,
+        "centroid": [
+          -0.2362993359565735,
+          0.10992186516523361,
+          0.6271571516990662
+        ],
+        "rel_z": 0.30593028943780204,
+        "rearward": true,
+        "lateral": 0.1098458394408226,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3951,
+        "centroid": [
+          0.050965938717126846,
+          -0.41200003027915955,
+          0.6080011129379272
+        ],
+        "rel_z": 0.29658588115544376,
+        "rearward": false,
+        "lateral": -0.41207605600357056,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3818,
+        "centroid": [
+          0.15172091126441956,
+          0.3399999439716339,
+          0.7713987827301025
+        ],
+        "rel_z": 0.3762920541258971,
+        "rearward": false,
+        "lateral": 0.3399239182472229,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3743,
+        "centroid": [
+          0.16476285457611084,
+          -0.279178261756897,
+          0.05363684892654419
+        ],
+        "rel_z": 0.02616431411516942,
+        "rearward": false,
+        "lateral": -0.279254287481308,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3741,
+        "centroid": [
+          -0.1669444888830185,
+          0.12079969793558121,
+          0.5527843832969666
+        ],
+        "rel_z": 0.26965089359275135,
+        "rearward": true,
+        "lateral": 0.1207236722111702,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3740,
+        "centroid": [
+          -0.33448246121406555,
+          0.09463485330343246,
+          0.8578674793243408
+        ],
+        "rel_z": 0.4184719021986145,
+        "rearward": true,
+        "lateral": 0.09455882757902145,
+        "classification": {
+          "label": "backpack",
+          "confidence": 0.72,
+          "reasons": [
+            "rearward_compact_torso_island"
+          ]
+        },
+        "separated": true
+      },
+      {
+        "verts": 3707,
+        "centroid": [
+          0.013712107203900814,
+          -0.12470439821481705,
+          0.3442329466342926
+        ],
+        "rel_z": 0.16791849492994215,
+        "rearward": false,
+        "lateral": -0.12478042393922806,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3705,
+        "centroid": [
+          0.1471952646970749,
+          -0.2859469950199127,
+          0.024566158652305603
+        ],
+        "rel_z": 0.011983490910554196,
+        "rearward": false,
+        "lateral": -0.28602302074432373,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      },
+      {
+        "verts": 3671,
+        "centroid": [
+          0.14325256645679474,
+          0.31778043508529663,
+          0.9638669490814209
+        ],
+        "rel_z": 0.4701789558058059,
+        "rearward": false,
+        "lateral": 0.3177044093608856,
+        "classification": {
+          "label": "body",
+          "confidence": 0.2,
+          "reasons": [
+            "default_body"
+          ]
+        },
+        "separated": false
+      }
+    ]
+  }
+}

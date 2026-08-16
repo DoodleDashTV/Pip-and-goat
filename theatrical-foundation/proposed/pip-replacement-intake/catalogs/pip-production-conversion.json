@@ -48,7 +48,7 @@
     "theatrical_binding_still_closed"
   ],
   "githubBlendByteLimit": 104857600,
-  "createdAt": "2026-08-16T04:02:48Z",
+  "createdAt": "2026-08-16T04:09:50Z",
   "gate": {
     "schema": "tivvlejoy.pip_production_conversion.gate.v1",
     "visualIdentityApproved": true,
@@ -68,7 +68,7 @@
     "voxelRemesh": false,
     "primitiveRebuild": false,
     "stopForJustin": true,
-    "conversionArtifactsPresent": false,
+    "conversionArtifactsPresent": true,
     "blockers": [
       "Official backpack Pip is the visual identity, not a production-ready mesh.",
       "Safe conversion may separate disconnected islands and add a validation armature only.",
