@@ -1,0 +1,8 @@
+{
+  "episodeId": "E1_DRAFT_NONCANONICAL",
+  "cacheKey": "97c781c999abc22c759e4c586a325d513eb31bea6ff95076e494170ed1800f7f",
+  "payloadHash": "433bf5a4bc7c104d59dd6afce7bcc6e7c816efe524a6e7798c054599c6e3df67",
+  "label": "DRAFT_NONCANONICAL",
+  "terminal": "PIPELINE_TEST_COMPLETE",
+  "currentStage": "OUTPUT_GATE"
+}

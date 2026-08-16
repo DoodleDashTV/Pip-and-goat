@@ -1,0 +1,10 @@
+{
+  "title": "Durable persistence validation",
+  "database": "doodle_dash_persist_validate",
+  "url": "postgresql://doodle@localhost:5432/doodle_dash_persist_validate",
+  "productionDatabaseTouched": false,
+  "credentialsCommitted": false,
+  "persistedId": "4e6d0594-6b29-42ad-aecc-d7ed8ee76e9b",
+  "cacheKey": "97c781c999abc22c759e4c586a325d513eb31bea6ff95076e494170ed1800f7f",
+  "label": "DRAFT_NONCANONICAL"
+}

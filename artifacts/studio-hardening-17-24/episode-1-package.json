@@ -1,0 +1,65 @@
+{
+  "label": "DRAFT_NONCANONICAL",
+  "canonical": false,
+  "occupants": [
+    "PROXY_NONCANONICAL_BIRD_A",
+    "PROXY_NONCANONICAL_QUADRUPED_A"
+  ],
+  "continuityOk": true,
+  "canonAllowed": false,
+  "shotCount": 8,
+  "storyNotes": {
+    "label": "DRAFT_NONCANONICAL",
+    "canonical": false,
+    "productionEligible": false,
+    "synthesisedVoices": false,
+    "foundingCharactersAnimated": false,
+    "beats": [
+      {
+        "purpose": "HOOK",
+        "note": "Proxy Bird A spots a tiny gold shimmer on a map stone at the meadow edge."
+      },
+      {
+        "purpose": "SETUP",
+        "note": "Proxy Quadruped A names a careful first look so the glow is treated as a clue, not a prize."
+      },
+      {
+        "purpose": "DISCOVERY",
+        "note": "Both stand-ins see the map glow reframe the problem as a kindness to try together."
+      },
+      {
+        "purpose": "COMPLICATION",
+        "note": "The first try is playful but incomplete; Proxy Bird A pauses instead of rushing."
+      },
+      {
+        "purpose": "TURN",
+        "note": "Proxy Quadruped A offers the kinder step; Proxy Bird A chooses it."
+      },
+      {
+        "purpose": "PAYOFF",
+        "note": "They use the lesson about noticing first, then trying a kind step."
+      },
+      {
+        "purpose": "RESOLUTION",
+        "note": "The map is put away and the meadow is left as they found it."
+      },
+      {
+        "purpose": "BUTTON",
+        "note": "A gentle hook: what will they notice next?"
+      }
+    ]
+  },
+  "validation": {
+    "label": "DRAFT_NONCANONICAL",
+    "continuityOk": true,
+    "dangling": 0,
+    "canonAllowed": false,
+    "shotCount": 8,
+    "missingLinks": 0,
+    "invalidationPaidRerender": false,
+    "occupants": [
+      "PROXY_NONCANONICAL_BIRD_A",
+      "PROXY_NONCANONICAL_QUADRUPED_A"
+    ]
+  }
+}

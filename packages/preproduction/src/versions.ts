@@ -12,7 +12,7 @@ export const PREPRODUCTION_SCHEMA_VERSION = 'ddp-preproduction-bundle-v1' as con
 
 export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
   story: '1.0.0',
-  continuity: '1.0.0',
+  continuity: '1.1.0',
   storyboard: '1.0.0',
   animatic: '1.0.0',
   shotplan: '1.0.0',
@@ -27,10 +27,15 @@ export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
   launchSafety: '1.1.0',
   persist: '1.0.0',
   closedStages: '1.0.0',
-  episode1: '1.0.0',
+  episode1: '1.1.0',
   canon: '1.0.0',
-  cache: '1.0.0',
-  recovery: '1.0.0',
+  cache: '1.1.0',
+  recovery: '1.1.0',
+  versioning: '1.0.0',
+  dependencies: '1.0.0',
+  profile: '1.0.0',
+  provenance: '1.0.0',
+  analytics: '1.0.0',
 } as const;
 
 export type PreproductionSubsystemName = keyof typeof PREPRODUCTION_SUBSYSTEM_VERSIONS;

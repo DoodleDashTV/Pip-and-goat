@@ -1,0 +1,26 @@
+{
+  "reuse": [
+    "clip_panel_beat_002",
+    "clip_panel_beat_003",
+    "clip_panel_beat_004",
+    "clip_panel_beat_005",
+    "clip_panel_beat_006",
+    "clip_panel_beat_007",
+    "clip_panel_beat_008"
+  ],
+  "rerenderLocal": [
+    "clip_panel_beat_001"
+  ],
+  "cacheKeys": {
+    "clip_panel_beat_001": "4fa2919853237027b1afc64f5d2b4bded794008bf9de032584f0c4b6a4b46f23",
+    "clip_panel_beat_002": "4c4ab3bcb58fb28d95630f48c6f7d4131d7bbdf71f2e2350d5d94cc72b36c4ac",
+    "clip_panel_beat_003": "11aea9d25dec27324988553de974be1f8a74ca107f84dc9ec479467968b4ee48",
+    "clip_panel_beat_004": "6a2a772e6e40d7fb53c94405db5ecf87727ab71ad9cfccf3de892d8f9003600f",
+    "clip_panel_beat_005": "deed1acb500421ada7bddac4829a2ef5398ca1cf55d01c25251f325dac88f51d",
+    "clip_panel_beat_006": "9b54ac666571ca157f5936b886667f48bb38ad165e5ca1a82209b60cdba36e82",
+    "clip_panel_beat_007": "0fab70af4a28d1bb7fb5297ebd45cd033b29c4ea413f5839c715d8ba3fae97ab",
+    "clip_panel_beat_008": "e4c557baeaf58ae772119e91a4863e482cc5b56be757922ae799f33161c96424"
+  },
+  "maySkipQc": false,
+  "mayEnterFinal": false
+}

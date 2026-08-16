@@ -1,0 +1,20 @@
+{
+  "info": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_type": "video",
+        "width": 360,
+        "height": 640
+      },
+      {
+        "codec_type": "audio"
+      }
+    ],
+    "format": {
+      "duration": "29.500000",
+      "size": "1035625"
+    }
+  },
+  "fileBytes": 1035625
+}

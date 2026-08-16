@@ -1,0 +1,17 @@
+{
+  "episodeId": "E1_DRAFT_NONCANONICAL",
+  "beatCount": 8,
+  "shotCount": 8,
+  "clipCount": 8,
+  "errorCount": 0,
+  "outputClass": "PIPELINE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "cost": {
+    "estimatedUsd": 0,
+    "paidAuthorized": false,
+    "cloudRenderEnabled": false,
+    "refused": false,
+    "code": "LOCAL_ZERO_COST",
+    "version": "1.0.0"
+  }
+}

@@ -1,0 +1,87 @@
+[
+  {
+    "name": "gates-unchanged",
+    "status": "PASS",
+    "detail": "stage=DDP_STEPS_1_8 theatrical=false"
+  },
+  {
+    "name": "episode-1-draft",
+    "status": "PASS",
+    "detail": "DRAFT_NONCANONICAL"
+  },
+  {
+    "name": "episode-1-continuity-deps",
+    "status": "PASS",
+    "detail": "dangling=0 missingLinks=0"
+  },
+  {
+    "name": "versioning-rollback-not-canon",
+    "status": "PASS",
+    "detail": "version=2"
+  },
+  {
+    "name": "shot-invalidation",
+    "status": "PASS",
+    "detail": "1 dirty"
+  },
+  {
+    "name": "cache-restore-reevaluates",
+    "status": "PASS",
+    "detail": "restore cannot skip QC/safety"
+  },
+  {
+    "name": "profile-local",
+    "status": "PASS",
+    "detail": "2ms"
+  },
+  {
+    "name": "provenance",
+    "status": "PASS",
+    "detail": "035d3992b56e"
+  },
+  {
+    "name": "cost-refuses-spend",
+    "status": "PASS",
+    "detail": "PAID_RESOURCE_REFUSED"
+  },
+  {
+    "name": "recovery-reevaluates",
+    "status": "PASS",
+    "detail": "Local draft checkpoint may resume after re-evaluating current safety gates."
+  },
+  {
+    "name": "corruption-clean",
+    "status": "PASS",
+    "detail": "payload hash matches"
+  },
+  {
+    "name": "references-no-production-library",
+    "status": "PASS",
+    "detail": "planning labels only"
+  },
+  {
+    "name": "episode-1-mux",
+    "status": "PASS",
+    "detail": "revised proxy animatic assembled"
+  },
+  {
+    "name": "episode-1-mp4-duration",
+    "status": "PASS",
+    "detail": "29.500s"
+  },
+  {
+    "name": "episode-1-mp4-resolution",
+    "status": "PASS",
+    "detail": "360x640"
+  },
+  {
+    "name": "episode-1-mp4-audio-stream",
+    "status": "PASS",
+    "detail": "audio stream present"
+  },
+  {
+    "name": "episode-1-mp4-nonzero",
+    "status": "PASS",
+    "detail": "1035625 bytes"
+  }
+]

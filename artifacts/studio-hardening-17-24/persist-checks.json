@@ -1,0 +1,47 @@
+[
+  {
+    "name": "disposable-db-created",
+    "status": "PASS",
+    "detail": "doodle_dash_persist_validate"
+  },
+  {
+    "name": "migrated",
+    "status": "PASS",
+    "detail": "prisma migrate deploy on disposable database"
+  },
+  {
+    "name": "persisted",
+    "status": "PASS",
+    "detail": "Wrote preproduction_runs row."
+  },
+  {
+    "name": "fresh-client-retrieval",
+    "status": "PASS",
+    "detail": "id=4e6d0594-6b29-42ad-aecc-d7ed8ee76e9b"
+  },
+  {
+    "name": "idempotent-reuse",
+    "status": "PASS",
+    "detail": "Reused identical cache key."
+  },
+  {
+    "name": "ephemeral-fixture",
+    "status": "PASS",
+    "detail": "EPHEMERAL_TEST_ONLY"
+  },
+  {
+    "name": "persistence-failed-status",
+    "status": "PASS",
+    "detail": "Refuse: workflow claimed a forbidden terminal."
+  },
+  {
+    "name": "durable-required-fail-closed",
+    "status": "PASS",
+    "detail": "missing delegate throws PERSISTENCE_FAILED"
+  },
+  {
+    "name": "disposable-db-dropped",
+    "status": "PASS",
+    "detail": "doodle_dash_persist_validate"
+  }
+]

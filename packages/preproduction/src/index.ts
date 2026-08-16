@@ -44,3 +44,8 @@ export * from './canon';
 export * from './cache';
 export * from './recovery';
 export * from './audio-timing';
+export * from './versioning';
+export * from './dependencies';
+export * from './profile';
+export * from './provenance';
+export * from './analytics';

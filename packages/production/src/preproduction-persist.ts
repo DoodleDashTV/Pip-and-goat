@@ -29,8 +29,11 @@ type PrismaDelegate = {
 
 const db = prisma as unknown as Record<string, PrismaDelegate | undefined>;
 
-function optionalDelegate(modelName: string): PrismaDelegate | null {
-  return db[modelName] ?? null;
+export type PersistDb = Record<string, PrismaDelegate | undefined>;
+
+function optionalDelegate(modelName: string, client?: PersistDb): PrismaDelegate | null {
+  const source = client ?? db;
+  return source[modelName] ?? null;
 }
 
 export type PersistedPreproductionRun = {
@@ -76,6 +79,7 @@ export async function persistPreproductionRun(input: {
   workflow: WorkflowRun;
   durableRequired?: boolean;
   ephemeralTestOnly?: boolean;
+  client?: PersistDb;
 }): Promise<PersistPreproductionResult> {
   const durableRequired = input.durableRequired === true;
   const ephemeralTestOnly = input.ephemeralTestOnly === true;
@@ -107,7 +111,7 @@ export async function persistPreproductionRun(input: {
     };
   }
 
-  const model = optionalDelegate('preproductionRun');
+  const model = optionalDelegate('preproductionRun', input.client);
   if (!model) {
     const result: PersistPreproductionResult = {
       status: durableRequired ? 'PERSISTENCE_FAILED' : 'EPHEMERAL_TEST_ONLY',
@@ -185,12 +189,26 @@ export function assertDurableWorkflowPersisted(result: PersistPreproductionResul
 
 export async function loadLatestPreproductionRun(
   episodeId: string,
+  client?: PersistDb,
 ): Promise<PersistedPreproductionRun | null> {
-  const model = optionalDelegate('preproductionRun');
+  const model = optionalDelegate('preproductionRun', client);
   if (!model) return null;
   const row = (await model.findFirst({
     where: { episodeId },
     orderBy: { createdAt: 'desc' },
+  })) as Record<string, unknown> | null;
+  return asPersisted(row);
+}
+
+export async function loadPreproductionRunByCacheKey(
+  episodeId: string,
+  cacheKey: string,
+  client?: PersistDb,
+): Promise<PersistedPreproductionRun | null> {
+  const model = optionalDelegate('preproductionRun', client);
+  if (!model) return null;
+  const row = (await model.findFirst({
+    where: { episodeId, cacheKey },
   })) as Record<string, unknown> | null;
   return asPersisted(row);
 }

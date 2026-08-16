@@ -35,15 +35,19 @@ export function planContinuity(draft: StoryDraft): {
   const issues: PlanIssue[] = [];
   const facts: ContinuityFact[] = [];
 
+  const factsByProp = new Map<string, ContinuityFact[]>();
   for (const beat of draft.beats) {
-    if (beat.requiredProps.length > 0) {
-      const factId = `prop_${beat.requiredProps[0]}_${beat.beatId}`;
-      facts.push({
-        factId,
+    for (const prop of beat.requiredProps) {
+      const fact: ContinuityFact = {
+        factId: `prop_${prop}_${beat.beatId}`,
         plantedIn: beat.beatId,
-        statement: `${beat.requiredProps[0]} is visible in ${beat.beatId}`,
+        statement: `${prop} is visible in ${beat.beatId}`,
         status: 'PLANTED',
-      });
+      };
+      facts.push(fact);
+      const planted = factsByProp.get(prop) ?? [];
+      planted.push(fact);
+      factsByProp.set(prop, planted);
     }
     for (const ref of beat.continuityRefs) {
       const exists = draft.beats.some((candidate) => candidate.beatId === ref);
@@ -59,14 +63,12 @@ export function planContinuity(draft: StoryDraft): {
     }
   }
 
-  const mapBeats = draft.beats.filter((beat) => beat.requiredProps.includes('prop_adventure_map_v1'));
-  if (mapBeats.length >= 2) {
-    const first = mapBeats[0]!;
-    const last = mapBeats[mapBeats.length - 1]!;
-    const planted = facts.find((fact) => fact.plantedIn === first.beatId);
-    if (planted) {
-      planted.paidOffIn = last.beatId;
-      planted.status = 'PAID_OFF';
+  for (const planted of factsByProp.values()) {
+    if (planted.length < 2) continue;
+    const lastBeatId = planted[planted.length - 1]!.plantedIn;
+    for (const fact of planted) {
+      fact.paidOffIn = lastBeatId;
+      fact.status = 'PAID_OFF';
     }
   }
 

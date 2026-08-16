@@ -1,0 +1,109 @@
+{
+  "dependencies": [
+    {
+      "shotId": "shot_001",
+      "beatId": "beat_001",
+      "panelId": "panel_beat_001",
+      "clipId": "clip_panel_beat_001",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": []
+    },
+    {
+      "shotId": "shot_002",
+      "beatId": "beat_002",
+      "panelId": "panel_beat_002",
+      "clipId": "clip_panel_beat_002",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": [
+        "prop_adventure_map_v1"
+      ]
+    },
+    {
+      "shotId": "shot_003",
+      "beatId": "beat_003",
+      "panelId": "panel_beat_003",
+      "clipId": "clip_panel_beat_003",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": [
+        "prop_adventure_map_v1"
+      ]
+    },
+    {
+      "shotId": "shot_004",
+      "beatId": "beat_004",
+      "panelId": "panel_beat_004",
+      "clipId": "clip_panel_beat_004",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": [
+        "prop_adventure_map_v1"
+      ]
+    },
+    {
+      "shotId": "shot_005",
+      "beatId": "beat_005",
+      "panelId": "panel_beat_005",
+      "clipId": "clip_panel_beat_005",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": [
+        "prop_adventure_map_v1"
+      ]
+    },
+    {
+      "shotId": "shot_006",
+      "beatId": "beat_006",
+      "panelId": "panel_beat_006",
+      "clipId": "clip_panel_beat_006",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": [
+        "prop_adventure_map_v1"
+      ]
+    },
+    {
+      "shotId": "shot_007",
+      "beatId": "beat_007",
+      "panelId": "panel_beat_007",
+      "clipId": "clip_panel_beat_007",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": []
+    },
+    {
+      "shotId": "shot_008",
+      "beatId": "beat_008",
+      "panelId": "panel_beat_008",
+      "clipId": "clip_panel_beat_008",
+      "occupants": [
+        "PROXY_NONCANONICAL_BIRD_A",
+        "PROXY_NONCANONICAL_QUADRUPED_A"
+      ],
+      "props": []
+    }
+  ],
+  "invalidated": {
+    "dirtyShotIds": [
+      "shot_001"
+    ],
+    "paidRerender": false
+  },
+  "paidRerender": false
+}
