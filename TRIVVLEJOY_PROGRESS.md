@@ -32,7 +32,11 @@ Milestone 5 hardening tip. Theatrical / Steps 9–16 stay closed.
 
 ## Tests / validation
 
-Recorded after the local run.
+- `pnpm validate:persist` — 9/9 PASS (disposable `doodle_dash_persist_validate`, then dropped)
+- `pnpm validate:studio-hardening` — 16/16 PASS (Episode 1 mux 29.500s, 360×640, audio present, 1,035,625 bytes)
+- `pnpm test` — 453 / 453
+- `pnpm typecheck` — PASS
+- `pnpm lint` — PASS
 
 ## Protections
 

@@ -1,0 +1,238 @@
+{
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "PROXY — NOT FOR FINAL PRODUCTION",
+  "productionEligible": false,
+  "canonical": false,
+  "camera": [
+    {
+      "shotId": "shot_001",
+      "beatId": "beat_001",
+      "composition": "ESTABLISHING",
+      "move": "LOCKED",
+      "lensMm": 28,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    },
+    {
+      "shotId": "shot_002",
+      "beatId": "beat_002",
+      "composition": "MEDIUM",
+      "move": "PAN",
+      "lensMm": 35,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    },
+    {
+      "shotId": "shot_003",
+      "beatId": "beat_003",
+      "composition": "TWO_SHOT",
+      "move": "PUSH_IN",
+      "lensMm": 35,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    },
+    {
+      "shotId": "shot_004",
+      "beatId": "beat_004",
+      "composition": "OVER_SHOULDER",
+      "move": "LOCKED",
+      "lensMm": 35,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    },
+    {
+      "shotId": "shot_005",
+      "beatId": "beat_005",
+      "composition": "TWO_SHOT",
+      "move": "PUSH_IN",
+      "lensMm": 35,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    },
+    {
+      "shotId": "shot_006",
+      "beatId": "beat_006",
+      "composition": "MEDIUM",
+      "move": "PULL_OUT",
+      "lensMm": 35,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    },
+    {
+      "shotId": "shot_007",
+      "beatId": "beat_007",
+      "composition": "ESTABLISHING",
+      "move": "LOCKED",
+      "lensMm": 28,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    },
+    {
+      "shotId": "shot_008",
+      "beatId": "beat_008",
+      "composition": "CLOSE_UP",
+      "move": "LOCKED",
+      "lensMm": 55,
+      "captionSafe": true,
+      "aspect": "9:16",
+      "renderTier": "DRAFT",
+      "productionEligible": false
+    }
+  ],
+  "lighting": [
+    {
+      "beatId": "beat_001",
+      "recipe": "MEADOW_DAY_KEY",
+      "writesProductionLibrary": false
+    },
+    {
+      "beatId": "beat_002",
+      "recipe": "MEADOW_DAY_SOFT",
+      "writesProductionLibrary": false
+    },
+    {
+      "beatId": "beat_003",
+      "recipe": "DISCOVERY_GOLDEN",
+      "writesProductionLibrary": false
+    },
+    {
+      "beatId": "beat_004",
+      "recipe": "GENTLE_OVERCAST",
+      "writesProductionLibrary": false
+    },
+    {
+      "beatId": "beat_005",
+      "recipe": "MEADOW_DAY_SOFT",
+      "writesProductionLibrary": false
+    },
+    {
+      "beatId": "beat_006",
+      "recipe": "DISCOVERY_GOLDEN",
+      "writesProductionLibrary": false
+    },
+    {
+      "beatId": "beat_007",
+      "recipe": "MEADOW_DAY_KEY",
+      "writesProductionLibrary": false
+    },
+    {
+      "beatId": "beat_008",
+      "recipe": "MEADOW_DAY_SOFT",
+      "writesProductionLibrary": false
+    }
+  ],
+  "environment": [
+    {
+      "id": "env_meadow_edge_v1",
+      "kind": "ENVIRONMENT",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    },
+    {
+      "id": "env_meadow_path_v1",
+      "kind": "ENVIRONMENT",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    },
+    {
+      "id": "env_creek_bank_v1",
+      "kind": "ENVIRONMENT",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    },
+    {
+      "id": "env_meadow_clearing_v1",
+      "kind": "ENVIRONMENT",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    }
+  ],
+  "props": [
+    {
+      "id": "prop_adventure_map_v1",
+      "kind": "PROP",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    }
+  ],
+  "vfx": [
+    {
+      "id": "vfx_map_glow_v1",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    },
+    {
+      "id": "vfx_dust_puff_v1",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    },
+    {
+      "id": "vfx_discovery_burst_v1",
+      "writesProductionLibrary": false,
+      "label": "DRAFT_NONCANONICAL"
+    }
+  ],
+  "audioCues": [
+    {
+      "trackId": "dialogue_PROXY_NONCANONICAL_BIRD_A",
+      "kind": "PLACEHOLDER",
+      "voiceId": "proxy_voice_placeholder_v1",
+      "synthesised": false,
+      "requiresPaidProvider": false,
+      "lockedVoicesUntouched": true
+    },
+    {
+      "trackId": "dialogue_PROXY_NONCANONICAL_QUADRUPED_A",
+      "kind": "PLACEHOLDER",
+      "voiceId": "proxy_voice_placeholder_v1",
+      "synthesised": false,
+      "requiresPaidProvider": false,
+      "lockedVoicesUntouched": true
+    },
+    {
+      "trackId": "music_bed",
+      "kind": "MUSIC",
+      "synthesised": false,
+      "requiresPaidProvider": false,
+      "lockedVoicesUntouched": true
+    },
+    {
+      "trackId": "ambience_meadow",
+      "kind": "AMBIENCE",
+      "synthesised": false,
+      "requiresPaidProvider": false,
+      "lockedVoicesUntouched": true
+    },
+    {
+      "trackId": "foley_steps",
+      "kind": "FOLEY",
+      "synthesised": false,
+      "requiresPaidProvider": false,
+      "lockedVoicesUntouched": true
+    }
+  ],
+  "purposeByBeat": {
+    "beat_001": "HOOK",
+    "beat_002": "SETUP",
+    "beat_003": "DISCOVERY",
+    "beat_004": "COMPLICATION",
+    "beat_005": "TURN",
+    "beat_006": "PAYOFF",
+    "beat_007": "RESOLUTION",
+    "beat_008": "BUTTON"
+  }
+}

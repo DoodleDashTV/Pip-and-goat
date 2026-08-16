@@ -41,25 +41,27 @@ const repoRoot = path.resolve(__dirname, '../../../..');
 const pack = buildEpisode1DraftPackage();
 const proxy = advanceWorkflow(PROXY_PIPELINE_BRIEF);
 
-function memoryPersistDb(): PersistDb & { rows: Array<Record<string, unknown>> } {
+function memoryPersistDb(): { client: PersistDb; rows: Array<Record<string, unknown>> } {
   const rows: Array<Record<string, unknown>> = [];
   return {
     rows,
-    preproductionRun: {
-      async findFirst(args?: Record<string, unknown>) {
-        const where = (args?.where ?? {}) as { episodeId?: string; cacheKey?: string };
-        const matches = rows.filter((row) => {
-          if (where.episodeId && row.episodeId !== where.episodeId) return false;
-          if (where.cacheKey && row.cacheKey !== where.cacheKey) return false;
-          return true;
-        });
-        return matches[matches.length - 1] ?? null;
-      },
-      async create(args: Record<string, unknown>) {
-        const data = args.data as Record<string, unknown>;
-        const row = { id: `mem-${rows.length + 1}`, ...data };
-        rows.push(row);
-        return row;
+    client: {
+      preproductionRun: {
+        async findFirst(args?: Record<string, unknown>) {
+          const where = (args?.where ?? {}) as { episodeId?: string; cacheKey?: string };
+          const matches = rows.filter((row) => {
+            if (where.episodeId && row.episodeId !== where.episodeId) return false;
+            if (where.cacheKey && row.cacheKey !== where.cacheKey) return false;
+            return true;
+          });
+          return matches[matches.length - 1] ?? null;
+        },
+        async create(args: Record<string, unknown>) {
+          const data = args.data as Record<string, unknown>;
+          const row = { id: `mem-${rows.length + 1}`, ...data };
+          rows.push(row);
+          return row;
+        },
       },
     },
   };
@@ -235,28 +237,32 @@ describe('Episode 1 draft package', () => {
 
 describe('persist contracts', () => {
   it('writes, reloads, and reuses an identical cache key on an injected client', async () => {
-    const client = memoryPersistDb();
+    const memory = memoryPersistDb();
     const first = await persistPreproductionRun({
       episodeId: pack.workflow.episodeId,
       workflow: pack.workflow,
       durableRequired: true,
-      client,
+      client: memory.client,
     });
     expect(first.status).toBe('PERSISTED');
     expect(first.persisted).toBe(true);
-    const loaded = await loadLatestPreproductionRun(pack.workflow.episodeId, client);
+    const loaded = await loadLatestPreproductionRun(pack.workflow.episodeId, memory.client);
     expect(loaded?.id).toBe(first.id);
     const reused = await persistPreproductionRun({
       episodeId: pack.workflow.episodeId,
       workflow: pack.workflow,
       durableRequired: true,
-      client,
+      client: memory.client,
     });
     expect(reused.id).toBe(first.id);
     expect(reused.reason).toMatch(/Reused/);
-    const byKey = await loadPreproductionRunByCacheKey(pack.workflow.episodeId, pack.workflow.cacheKey, client);
+    const byKey = await loadPreproductionRunByCacheKey(
+      pack.workflow.episodeId,
+      pack.workflow.cacheKey,
+      memory.client,
+    );
     expect(byKey?.id).toBe(first.id);
-    expect(client.rows).toHaveLength(1);
+    expect(memory.rows).toHaveLength(1);
   });
 
   it('preserves EPHEMERAL_TEST_ONLY for fixtures', async () => {
@@ -270,11 +276,11 @@ describe('persist contracts', () => {
   });
 
   it('returns PERSISTENCE_FAILED and fail-closes when durableRequired', async () => {
-    const forbidden = { ...pack.workflow, mayContinueToFinal: true } as typeof pack.workflow;
+    const forbidden = { ...pack.workflow, mayContinueToFinal: true } as unknown as typeof pack.workflow;
     const failed = await persistPreproductionRun({
       episodeId: 'forbidden',
       workflow: forbidden,
-      client: memoryPersistDb(),
+      client: memoryPersistDb().client,
     });
     expect(failed.status).toBe('PERSISTENCE_FAILED');
     await expect(

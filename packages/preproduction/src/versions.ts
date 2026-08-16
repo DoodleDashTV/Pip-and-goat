@@ -12,7 +12,7 @@ export const PREPRODUCTION_SCHEMA_VERSION = 'ddp-preproduction-bundle-v1' as con
 
 export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
   story: '1.0.0',
-  continuity: '1.0.0',
+  continuity: '1.1.0',
   storyboard: '1.0.0',
   animatic: '1.0.0',
   shotplan: '1.0.0',
