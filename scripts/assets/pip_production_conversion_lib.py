@@ -120,7 +120,7 @@ PROTECTED_CONVERSION_SOURCES = (
 )
 
 REMAINING_AFTER_SAFE_CONVERSION = (
-    "justin_path_decision_human_artist_or_paid_service_or_pause",
+    "justin_will_assign_professional_retopo_separately",
     "animation_retopo_with_clean_deformation_loops",
     "isolated_backpack_straps_and_scarf",
     "production_weights_on_retopo_not_envelopes",
@@ -137,6 +137,14 @@ RETOPO_PATH_CHOICES = (
     "external_retopo_service_paid_needs_yes",
     "pause_keep_checkpoint",
     "refuse_automated_remesh",
+)
+
+AUTOMATED_REMESH_REFUSALS = (
+    "voxel_remesh",
+    "quadriflow_replacement",
+    "primitive_reconstruction",
+    "envelope_rig_on_fused_source",
+    "destructive_edits_to_approved_pip",
 )
 
 
@@ -184,8 +192,8 @@ def evaluate_conversion_gate(
     blockers = [
         "Official backpack Pip is the visual identity, not a production-ready mesh.",
         "Justin rejected the envelope conversion as animation-ready. Do not repeat that approach.",
-        "Voxel remesh, Quadriflow of this density, primitive rebuild, and envelope-on-fused remain refused.",
-        "A new animation retopo is required. Justin must choose artist, paid service, or pause.",
+        "Voxel remesh, Quadriflow replacement, primitive reconstruction, and envelope-on-fused remain refused.",
+        "Justin paused conversion at the protected checkpoint. Do not resume until Justin assigns a professional retopo.",
     ]
     if not justinApprovedVisualIdentity:
         blockers.append("Justin has not approved the backpack Pip visual identity.")
@@ -214,7 +222,10 @@ def evaluate_conversion_gate(
         "conversionComplete": False,
         "justinConversionApproved": False,
         "conversionCheckpointOnly": True,
+        "conversionPaused": True,
         "envelopeApproachRejected": True,
+        "automatedRemeshRefused": True,
+        "destructiveEditsToApprovedPip": False,
         "productionReady": False,
         "productionLibraryReplaced": False,
         "theatricalBound": False,
@@ -241,28 +252,45 @@ def evaluate_conversion_gate(
     }
 
 
-def evaluate_retopo_path_decision(choice: str | None = None) -> dict[str, Any]:
+def evaluate_retopo_path_decision(
+    choice: str | None = None,
+    also_confirm: tuple[str, ...] | list[str] = (),
+) -> dict[str, Any]:
     """Record Justin's next-path choice. Does not start conversion or spend money."""
     if choice is not None and choice not in RETOPO_PATH_CHOICES:
         raise ValueError(f"unknown retopo path choice: {choice}")
+    confirmed = []
+    for item in also_confirm:
+        if item not in RETOPO_PATH_CHOICES:
+            raise ValueError(f"unknown retopo path confirmation: {item}")
+        if item != choice:
+            confirmed.append(item)
+    paused = choice == "pause_keep_checkpoint"
+    refused_automated = paused or choice == "refuse_automated_remesh" or "refuse_automated_remesh" in confirmed
     paid = choice == "external_retopo_service_paid_needs_yes"
     return {
         "schema": "tivvlejoy.pip_retopo_path.v1",
         "choice": choice,
+        "alsoConfirmed": confirmed,
         "chosen": choice is not None,
+        "paused": paused,
         "startsConversion": False,
         "productionReady": False,
+        "animationReady": False,
         "paidResourcesAuthorized": False,
         "paidResourcesRequested": paid,
         "envelopeApproachRejected": True,
-        "automatedRemeshRefused": True,
+        "automatedRemeshRefused": refused_automated,
+        "refused": list(AUTOMATED_REMESH_REFUSALS) if refused_automated else [],
+        "destructiveEditsToApprovedPip": False,
+        "retopoOwner": "justin_will_assign_separately" if paused else None,
         "goatTouched": False,
         "productionLibraryReplaced": False,
         "theatricalBound": False,
         "mergeAuthorized": False,
-        "stopForJustin": choice is None,
+        "stopForJustin": True,
         "choices": list(RETOPO_PATH_CHOICES),
-        "note": "A paid service still needs a separate explicit Justin yes before any purchase.",
+        "note": "Pause keeps the checkpoint. Justin will separately decide who creates the professional animation retopo. Paid work still needs a later explicit yes.",
     }
 
 
@@ -463,7 +491,10 @@ def build_conversion_record(*, started: bool = True, artifacts_present: bool = F
         "conversionComplete": False,
         "justinConversionApproved": False,
         "conversionCheckpointOnly": True,
+        "conversionPaused": True,
         "envelopeApproachRejected": True,
+        "automatedRemeshRefused": True,
+        "destructiveEditsToApprovedPip": False,
         "productionReady": False,
         "productionLibraryReplaced": False,
         "theatricalBound": False,

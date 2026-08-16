@@ -227,25 +227,22 @@ from the frozen backpack high-res. They are not a schedule.
 An agent session here can prepare the bake/compare harness and stop
 again. It cannot spend those artist hours.
 
-## Decision Justin needs to make
+## Decision recorded
 
-Pick one. Do not ask for another envelope pass.
+Justin chose **Option 3: pause** at the protected checkpoint, and
+confirmed **Option 4: refuse automated remesh**.
 
-1. **Human artist path (unpaid unless Justin later says otherwise).**
-   Justin, or someone Justin assigns, retopos in Blender against the
-   frozen working copy. This environment then bakes and renders.
-2. **External retopo service (paid).**
-   Needs a named vendor and an explicit paid-resource yes. Deliverable:
-   quad mesh with the object list above, UVs, and a rest pose matching
-   the official stills.
-3. **Pause.**
-   Keep the checkpoint. No more conversion until 1 or 2 is available.
-4. **Refuse automated remesh.**
-   Confirm that voxel / Quadriflow / primitive / envelope-on-fused stay
-   closed even if a later agent offers them.
+Recorded refusals:
 
-Recommended: 1 if an artist is available, otherwise 3. Use 2 only if
-Justin wants to pay. Never 4-by-accident.
+- no voxel remesh
+- no Quadriflow replacement
+- no primitive reconstruction
+- no envelope rig on the fused source
+- no destructive edits to the approved Pip
+
+Justin will separately decide who creates the professional animation
+retopo. Do not resume conversion in this environment until that
+assignment exists. Paid services stay unauthorized.
 
 ## Still closed after any of those choices
 

@@ -55,7 +55,9 @@ class ConversionGateTests(unittest.TestCase):
         self.assertFalse(gate["conversionComplete"])
         self.assertFalse(gate["justinConversionApproved"])
         self.assertTrue(gate["conversionCheckpointOnly"])
+        self.assertTrue(gate["conversionPaused"])
         self.assertTrue(gate["envelopeApproachRejected"])
+        self.assertTrue(gate["automatedRemeshRefused"])
         self.assertFalse(gate["productionReady"])
         self.assertFalse(gate["productionLibraryReplaced"])
         self.assertFalse(gate["theatricalBound"])
@@ -151,6 +153,24 @@ class ConversionGateTests(unittest.TestCase):
         self.assertTrue(paid["paidResourcesRequested"])
         self.assertFalse(paid["paidResourcesAuthorized"])
         self.assertTrue(paid["envelopeApproachRejected"])
+
+    def test_pause_records_checkpoint_and_refuses_automated_remesh(self) -> None:
+        path = evaluate_retopo_path_decision(
+            "pause_keep_checkpoint",
+            also_confirm=("refuse_automated_remesh",),
+        )
+        self.assertEqual(path["choice"], "pause_keep_checkpoint")
+        self.assertTrue(path["paused"])
+        self.assertTrue(path["chosen"])
+        self.assertFalse(path["startsConversion"])
+        self.assertFalse(path["animationReady"])
+        self.assertFalse(path["paidResourcesAuthorized"])
+        self.assertTrue(path["automatedRemeshRefused"])
+        self.assertIn("voxel_remesh", path["refused"])
+        self.assertIn("envelope_rig_on_fused_source", path["refused"])
+        self.assertIn("destructive_edits_to_approved_pip", path["refused"])
+        self.assertEqual(path["retopoOwner"], "justin_will_assign_separately")
+        self.assertTrue(path["stopForJustin"])
 
 
 if __name__ == "__main__":

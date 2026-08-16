@@ -1,13 +1,27 @@
 {
   "schema": "tivvlejoy.pip_retopo_path.v1",
-  "choice": null,
-  "chosen": false,
+  "choice": "pause_keep_checkpoint",
+  "alsoConfirmed": [
+    "refuse_automated_remesh"
+  ],
+  "chosen": true,
+  "paused": true,
   "startsConversion": false,
   "productionReady": false,
+  "animationReady": false,
   "paidResourcesAuthorized": false,
   "paidResourcesRequested": false,
   "envelopeApproachRejected": true,
   "automatedRemeshRefused": true,
+  "refused": [
+    "voxel_remesh",
+    "quadriflow_replacement",
+    "primitive_reconstruction",
+    "envelope_rig_on_fused_source",
+    "destructive_edits_to_approved_pip"
+  ],
+  "destructiveEditsToApprovedPip": false,
+  "retopoOwner": "justin_will_assign_separately",
   "goatTouched": false,
   "productionLibraryReplaced": false,
   "theatricalBound": false,
@@ -19,5 +33,5 @@
     "pause_keep_checkpoint",
     "refuse_automated_remesh"
   ],
-  "note": "A paid service still needs a separate explicit Justin yes before any purchase."
+  "note": "Pause keeps the checkpoint. Justin will separately decide who creates the professional animation retopo. Paid work still needs a later explicit yes."
 }

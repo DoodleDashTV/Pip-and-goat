@@ -45,8 +45,8 @@ topology.
 ## Status
 
 PIP VISUAL IDENTITY: APPROVED — backpack source `dca239475c78…8696`  
-PIP PRODUCTION CONVERSION: CHECKPOINT ONLY — Justin rejected the envelope conversion as animation-ready  
-PIP PRODUCTION ASSET: BLOCKED — needs a new animation retopo; see `reports/pip-production-conversion/FEASIBILITY.md`  
+PIP PRODUCTION CONVERSION: PAUSED — protected checkpoint; Justin will assign professional retopo separately  
+PIP PRODUCTION ASSET: NOT READY — fused 1.9M-tri source; no animation-ready claim  
 GOAT PRODUCTION ASSET: BLOCKED — unchanged
 
 ## Official Pip source

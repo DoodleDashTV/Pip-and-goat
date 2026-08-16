@@ -41,6 +41,11 @@
       "id": "PIP_CONVERSION_CHECKPOINT_NOT_ANIMATION_READY",
       "sha256": "581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe",
       "note": "Justin accepted the audit and official working copy as a checkpoint only. Envelope conversion is not animation-ready. Do not repeat that approach."
+    },
+    {
+      "id": "PIP_CONVERSION_PAUSED",
+      "sha256": "581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe",
+      "note": "Justin paused Pip conversion. Official backpack working copy is the immutable high-res reference. No voxel, Quadriflow, primitive, envelope-on-fused, or destructive edits. Justin will assign professional retopo separately."
     }
   ],
   "rules": [

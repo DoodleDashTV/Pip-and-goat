@@ -19,7 +19,7 @@
     "pause_keep_checkpoint",
     "refuse_automated_remesh"
   ],
-  "recommendedDecision": "human_artist_if_available_else_pause",
+  "recommendedDecision": "pause_keep_checkpoint",
   "doNotRepeat": [
     "envelope_or_automatic_weights_on_fused_1_9m_mesh",
     "voxel_remesh_of_approved_source",
@@ -79,5 +79,12 @@
     "bake_miss_repair",
     "weight_paint",
     "facial_shapes"
-  ]
+  ],
+  "decisionRecorded": {
+    "choice": "pause_keep_checkpoint",
+    "alsoConfirmed": [
+      "refuse_automated_remesh"
+    ],
+    "recommendedDecision": "pause_keep_checkpoint"
+  }
 }

@@ -9,5 +9,8 @@
   "overwritesApprovedSource": false,
   "overwritesHighresCandidate": false,
   "overwritesProductionLibrary": false,
-  "goatTouched": false
+  "goatTouched": false,
+  "paused": true,
+  "animationReady": false,
+  "retopoOwner": "justin_will_assign_separately"
 }

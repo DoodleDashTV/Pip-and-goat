@@ -1,4 +1,4 @@
-TIVVLEJOY — PIP CONVERSION FEASIBILITY STOP FOR JUSTIN
+TIVVLEJOY — PIP CONVERSION PAUSED
 SELECT-ALL COPY BLOCK
 
 Working branch: cursor/theatrical-final-character-production-1ebc
@@ -9,109 +9,50 @@ production-library replaced: no
 Theatrical binding: not declared
 Goat touched: no
 
-JUSTIN REVIEW RECORDED
-Visual identity: APPROVED — backpack Pip stays the official permanent design.
-Production conversion: NOT APPROVED as animation-ready.
-Audit and official working copy: accepted as a checkpoint only.
-Envelope-rig approach: rejected. Do not repeat it.
+JUSTIN DECISION RECORDED
+Option 3: pause production conversion at the protected checkpoint.
+Option 4 confirmed:
+- no voxel remesh
+- no Quadriflow replacement
+- no primitive reconstruction
+- no envelope rig on the fused source
+- no destructive edits to the approved Pip
 
-PRESERVED
-Official source SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
-Official working copy: theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend
+OFFICIAL IDENTITY
+The backpack Pip remains TivvleJoy’s official visual identity and the
+immutable high-resolution reference.
+Package: 20260816T025617Z_pip_backpack_replacement.glb_dca239475c78
+Source SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
+Working copy: theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend
 Working copy SHA-256: 581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe
-Conversion evidence kept: conversion/pip_backpack_production_conversion.blend plus audit and comparison stills
-Those files were not overwritten. No new remesh. No new rig pass.
 
-WHAT IS NOT ACCEPTABLE AS FINAL
-- fused 1.93-million-triangle body
-- partial backpack island split
-- fused straps and scarf
-- validation-only envelope armature
-- body, face, wings, and feet that do not deform
-- marker facial bones
-- unstable backpack movement
+PRESERVED CHECKPOINT
+Conversion evidence kept, not continued:
+theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend
+Audit, comparison stills, and the feasibility plan stay on disk.
+No new remesh. No new rig. No destructive edit.
 
-SAFEST REALISTIC PATH
-Build a new 15k–30k-quad animation mesh beside the frozen high-res.
-Keep the official working blend as shrinkwrap and bake target only.
-Do not remesh, voxel, Quadriflow, or primitive-rebuild the approved source.
-Do not wrap the locked prototype library mesh or the old 80k primary onto Pip.
+NOT CLAIMED
+Pip is not animation-ready.
+The fused 1.9M-tri source is not a production mesh.
 
-1. TOPOLOGY
-Manual retopo with separate objects: body, eyes, beak, three crest feathers,
-wings, feet, backpack, two straps, scarf.
-Required loops: lids, beak hinge, neck, shoulders, wing fold, toes/hallux.
-
-2. TEXTURE TRANSFER
-New planned UVs. Cage-bake Color 8K, Normal 4K, and ORM 4K from the frozen
-high-res. Repair misses by hand, especially face, lashes, crest, and the
-scarf knot. Keep Khronos PBR Neutral.
-
-3. ACCESSORIES
-Model new backpack, straps, and scarf to the approved silhouette.
-Do not cut them out of the fused generate. Design clearance in. The audit
-already found 17 close backpack/body pairs.
-
-4. DEFORMATION
-Rig the retopo only. Independent eyes, lids, brows, beak, wing fold, feet,
-backpack, straps, scarf. Shape keys for the face. Not marker bones on the
-generate.
-
-5. WEIGHTS AND TESTS
-Human weight paint after a heat first pass. Then rest five-views, head turn,
-blink, beak open, wing fold, foot plant, backpack settle, strap stretch,
-scarf follow. Justin reviews the stills. Numbers are not approval.
-
-LIKENESS RISKS
-Face flatten, crest count loss, wing layers collapsing, backpack silhouette
-drift, scarf/strap intersection, bake smear on the smile, color shift if
-the view transform changes. Contain by face-first Justin reviews and by
-never using the wrong source mesh.
-
-WHAT THIS ENVIRONMENT CAN DO RELIABLY
-Lock sources. Run unpaid local cage bakes after a retopo is delivered.
-Render comparison stills. Keep gates closed. Test pipeline on
-PROXY_PIPELINE_BIRD only.
-
-WHAT IT CANNOT DO RELIABLY
-Invent eyelid or wing-fold loops. Isolate fused straps without holes.
-Production weight paint. A likeness-safe full retopo. Another envelope pass.
-
-WHAT NEEDS A HUMAN ARTIST OR A PAID SERVICE
-The retopo, accessory remodel, UVs, bake repair, weights, and facial shapes.
-Quad Remesher, a hired retopo service, paid GPU, and any generative provider
-need a named Justin yes first.
-
-EFFORT, NOT A CALENDAR
-Specialist-hours for one character TD / retopo artist:
-face/head 6–10, body/wings/feet 12–24, accessories 8–14, UVs 4–8,
-bake/repair 4–8, rig/weights 12–20, facial shapes 8–16, tests 3–6.
-First animation-ready candidate for Justin review: 57–106 specialist-hours.
-An agent session here cannot spend those artist hours.
-
-DECISION NEEDED
-1. Human artist path — Justin or someone Justin assigns retopos against the
-   frozen working copy. This environment then bakes and renders.
-2. External retopo service — paid. Needs a named vendor and an explicit yes.
-3. Pause — keep the checkpoint. No more conversion until 1 or 2 exists.
-4. Refuse automated remesh — confirm voxel / Quadriflow / primitive /
-   envelope-on-fused stay closed.
-
-Recommended: 1 if an artist is available, otherwise 3.
+NEXT RETOPO
+Justin will separately decide who creates the professional animation
+retopo. Do not resume conversion in this environment until that
+assignment exists.
 
 STILL CLOSED
-- production-ready claim
 - production-library replace
 - theatrical bind
 - Draft PR #24 merge
+- paid services
 - Goat
-- paid resources without a fresh yes
-- repeating the envelope conversion
+- voxel / Quadriflow / primitive / envelope-on-fused / destructive edits
 
 STATUS
 PIP VISUAL IDENTITY: APPROVED — backpack design is official
-PIP PRODUCTION CONVERSION: CHECKPOINT ONLY — not animation-ready
-PIP PRODUCTION ASSET: NOT READY — needs a new animation retopo
+PIP PRODUCTION CONVERSION: PAUSED — protected checkpoint
+PIP PRODUCTION ASSET: NOT READY
 PIP SATCHEL / PRISM / LONG-WING: ARCHIVED FOR ROLLBACK
 GOAT: UNCHANGED
 CANON / PRODUCTION-LIBRARY: UNTOUCHED
@@ -120,5 +61,4 @@ MERGE: NOT PERFORMED
 PAID RESOURCES: NOT USED
 
 STOP
-Choose 1, 2, 3, or 4. Do not ask for another envelope pass.
-Full plan: theatrical-foundation/proposed/final-character-production/reports/pip-production-conversion/FEASIBILITY.md
+Checkpoint recorded. Waiting for Justin to assign the professional retopo.

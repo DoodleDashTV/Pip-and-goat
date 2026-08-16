@@ -61,6 +61,8 @@ describe('Pip production conversion gate', () => {
     expect(gate.conversionComplete).toBe(false);
     expect(gate.justinConversionApproved).toBe(false);
     expect(gate.envelopeApproachRejected).toBe(true);
+    expect(gate.conversionPaused).toBe(true);
+    expect(gate.automatedRemeshRefused).toBe(true);
     expect(gate.productionReady).toBe(false);
     expect(gate.productionLibraryReplaced).toBe(false);
     expect(gate.theatricalBound).toBe(false);
@@ -88,11 +90,20 @@ describe('Pip production conversion gate', () => {
     );
     expect(conversion.justinConversionApproved).toBe(false);
     expect(conversion.envelopeApproachRejected).toBe(true);
-    const retopoPath = evaluatePipRetopoPathDecision();
-    expect(retopoPath.choice).toBeNull();
-    expect(retopoPath.startsConversion).toBe(false);
-    expect(retopoPath.paidResourcesAuthorized).toBe(false);
-    expect(retopoPath.envelopeApproachRejected).toBe(true);
+    const pending = evaluatePipRetopoPathDecision();
+    expect(pending.choice).toBeNull();
+    expect(pending.startsConversion).toBe(false);
+    expect(pending.paidResourcesAuthorized).toBe(false);
+    const paused = evaluatePipRetopoPathDecision('pause_keep_checkpoint', [
+      'refuse_automated_remesh',
+    ]);
+    expect(paused.paused).toBe(true);
+    expect(paused.animationReady).toBe(false);
+    expect(paused.automatedRemeshRefused).toBe(true);
+    expect(paused.refused).toEqual(
+      expect.arrayContaining(['voxel_remesh', 'envelope_rig_on_fused_source', 'destructive_edits_to_approved_pip']),
+    );
+    expect(paused.retopoOwner).toBe('justin_will_assign_separately');
   });
 
   it('keeps the modular spec unbound and the prototype rig as default', () => {

@@ -5,7 +5,10 @@
   "conversionComplete": false,
   "justinConversionApproved": false,
   "conversionCheckpointOnly": true,
+  "conversionPaused": true,
   "envelopeApproachRejected": true,
+  "automatedRemeshRefused": true,
+  "destructiveEditsToApprovedPip": false,
   "productionReady": false,
   "productionLibraryReplaced": false,
   "theatricalBound": false,
@@ -24,8 +27,8 @@
   "blockers": [
     "Official backpack Pip is the visual identity, not a production-ready mesh.",
     "Justin rejected the envelope conversion as animation-ready. Do not repeat that approach.",
-    "Voxel remesh, Quadriflow of this density, primitive rebuild, and envelope-on-fused remain refused.",
-    "A new animation retopo is required. Justin must choose artist, paid service, or pause."
+    "Voxel remesh, Quadriflow replacement, primitive reconstruction, and envelope-on-fused remain refused.",
+    "Justin paused conversion at the protected checkpoint. Do not resume until Justin assigns a professional retopo."
   ],
   "protected": {
     "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",

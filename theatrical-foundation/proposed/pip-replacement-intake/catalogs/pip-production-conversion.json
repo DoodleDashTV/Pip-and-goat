@@ -41,7 +41,7 @@
     "no_hip_bag"
   ],
   "remaining": [
-    "justin_path_decision_human_artist_or_paid_service_or_pause",
+    "justin_will_assign_professional_retopo_separately",
     "animation_retopo_with_clean_deformation_loops",
     "isolated_backpack_straps_and_scarf",
     "production_weights_on_retopo_not_envelopes",
@@ -61,7 +61,10 @@
     "conversionComplete": false,
     "justinConversionApproved": false,
     "conversionCheckpointOnly": true,
+    "conversionPaused": true,
     "envelopeApproachRejected": true,
+    "automatedRemeshRefused": true,
+    "destructiveEditsToApprovedPip": false,
     "productionReady": false,
     "productionLibraryReplaced": false,
     "theatricalBound": false,
@@ -80,8 +83,8 @@
     "blockers": [
       "Official backpack Pip is the visual identity, not a production-ready mesh.",
       "Justin rejected the envelope conversion as animation-ready. Do not repeat that approach.",
-      "Voxel remesh, Quadriflow of this density, primitive rebuild, and envelope-on-fused remain refused.",
-      "A new animation retopo is required. Justin must choose artist, paid service, or pause."
+      "Voxel remesh, Quadriflow replacement, primitive reconstruction, and envelope-on-fused remain refused.",
+      "Justin paused conversion at the protected checkpoint. Do not resume until Justin assigns a professional retopo."
     ],
     "protected": {
       "workingBlend": "theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend",
@@ -90,5 +93,7 @@
       "currentGoat": "theatrical-foundation/proposed/final-character-production/high-resolution/goat_highres_candidate.blend",
       "productionLibraryFingerprint": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7"
     }
-  }
+  },
+  "conversionPaused": true,
+  "automatedRemeshRefused": true
 }
