@@ -28,6 +28,7 @@ stay closed. This increment is UI-only.
 - Collapsible mobile navigation and visible keyboard focus
 - Temporary local preview for iPhone visual review
 - Public-preview safety: no database, no secrets, no production-library upload
+- Vercel preview must deploy `apps/web` from `cursor/tivvlejoy-welcoming-ui-73f1`, not `main`
 - Draft PR #32 stays draft and unmerged
 
 ## Tests / validation

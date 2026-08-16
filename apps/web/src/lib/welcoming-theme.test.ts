@@ -191,11 +191,16 @@ describe('protected production state is unchanged', () => {
 
   it('keeps public preview from bundling secrets or protected assets', () => {
     const ignore = readRepo('.vercelignore');
+    const vercel = readRepo('vercel.json');
     expect(ignore).toContain('production-library');
     expect(ignore).toContain('**/*.blend');
     expect(ignore).toContain('.env');
     expect(ignore).toContain('artifacts');
     expect(ignore).toContain('workers/runpod-blender');
+    expect(vercel).toContain('"rootDirectory": "apps/web"');
+    expect(vercel).toContain('"framework": "nextjs"');
+    expect(vercel).toContain('"deploymentEnabled": true');
+    expect(vercel).not.toContain('DATABASE_URL');
     expect(isPublicWebsitePreview({ DATABASE_URL: 'postgresql://local' })).toBe(false);
     expect(isPublicWebsitePreview({})).toBe(true);
     const home = readRepo('apps/web/src/app/page.tsx');
