@@ -1,0 +1,64 @@
+{
+  "label": "DRAFT_NONCANONICAL",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "advisoryOnly": true,
+  "claimsRealAudienceData": false,
+  "firstSecondVisualHook": "Proxy Bird A notices something small that does not match notice first, then try a kind step.",
+  "firstThreeSecondStoryQuestion": "What will they notice about notice first, then try a kind step?",
+  "pacingIntervals": [
+    {
+      "beatId": "beat_001",
+      "startSeconds": 0,
+      "durationSeconds": 3
+    },
+    {
+      "beatId": "beat_002",
+      "startSeconds": 3,
+      "durationSeconds": 4
+    },
+    {
+      "beatId": "beat_003",
+      "startSeconds": 7,
+      "durationSeconds": 5
+    },
+    {
+      "beatId": "beat_004",
+      "startSeconds": 12,
+      "durationSeconds": 4
+    },
+    {
+      "beatId": "beat_005",
+      "startSeconds": 16,
+      "durationSeconds": 5
+    },
+    {
+      "beatId": "beat_006",
+      "startSeconds": 21,
+      "durationSeconds": 5
+    },
+    {
+      "beatId": "beat_007",
+      "startSeconds": 26,
+      "durationSeconds": 2.5
+    },
+    {
+      "beatId": "beat_008",
+      "startSeconds": 28.5,
+      "durationSeconds": 1
+    }
+  ],
+  "curiosityGaps": [
+    "Proxy Bird A and Proxy Quadruped A find a clue that reframes the problem as a kindness."
+  ],
+  "escalationPoints": [
+    "The first try is playful but incomplete, and Proxy Bird A pauses to think."
+  ],
+  "quietMoments": [
+    "Proxy Bird A and Proxy Quadruped A put the map away and leave the place as they found it."
+  ],
+  "payoffTimingSeconds": 21,
+  "endingLoopPotential": true,
+  "retentionRiskFlags": [],
+  "version": "1.0.0",
+  "cacheKey": "a00e331603d6178351e7e688e86f9d13bf545f66ec636b254667ede20e40a144"
+}

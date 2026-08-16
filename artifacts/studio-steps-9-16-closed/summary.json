@@ -1,0 +1,19 @@
+{
+  "title": "TIVVLEJOY CLOSED-GATE STEPS 9-16",
+  "acceptanceRender": false,
+  "theatricalGateAllowed": false,
+  "currentDirectionStage": "DDP_STEPS_1_8",
+  "paidGpu": false,
+  "productionLibraryWritten": false,
+  "voicesSynthesised": false,
+  "pipGoatAssetsTouched": false,
+  "draftPr24Merged": false,
+  "draftPr26Merged": false,
+  "draftPr27Merged": false,
+  "draftPr28Merged": false,
+  "draftPr29Merged": false,
+  "label": "DRAFT_NONCANONICAL",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "sourceCommit": "ab06021a8d00984cbe045c9969d1d40e9127b820",
+  "muxHash": "6ded63a2d8dd12fb5cb21735d38df4c303447814a3a847eb9e0805d16c8fd298"
+}

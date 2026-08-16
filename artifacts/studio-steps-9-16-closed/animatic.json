@@ -1,0 +1,77 @@
+{
+  "clips": [
+    {
+      "clipId": "clip_panel_beat_001",
+      "panelId": "panel_beat_001",
+      "beatId": "beat_001",
+      "startFrame": 0,
+      "endFrame": 90,
+      "holdFrames": 90,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "clipId": "clip_panel_beat_002",
+      "panelId": "panel_beat_002",
+      "beatId": "beat_002",
+      "startFrame": 90,
+      "endFrame": 210,
+      "holdFrames": 120,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "clipId": "clip_panel_beat_003",
+      "panelId": "panel_beat_003",
+      "beatId": "beat_003",
+      "startFrame": 210,
+      "endFrame": 360,
+      "holdFrames": 150,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "clipId": "clip_panel_beat_004",
+      "panelId": "panel_beat_004",
+      "beatId": "beat_004",
+      "startFrame": 360,
+      "endFrame": 480,
+      "holdFrames": 120,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "clipId": "clip_panel_beat_005",
+      "panelId": "panel_beat_005",
+      "beatId": "beat_005",
+      "startFrame": 480,
+      "endFrame": 630,
+      "holdFrames": 150,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "clipId": "clip_panel_beat_006",
+      "panelId": "panel_beat_006",
+      "beatId": "beat_006",
+      "startFrame": 630,
+      "endFrame": 780,
+      "holdFrames": 150,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "clipId": "clip_panel_beat_007",
+      "panelId": "panel_beat_007",
+      "beatId": "beat_007",
+      "startFrame": 780,
+      "endFrame": 855,
+      "holdFrames": 75,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "clipId": "clip_panel_beat_008",
+      "panelId": "panel_beat_008",
+      "beatId": "beat_008",
+      "startFrame": 855,
+      "endFrame": 885,
+      "holdFrames": 30,
+      "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+    }
+  ],
+  "resolution": "360x640"
+}

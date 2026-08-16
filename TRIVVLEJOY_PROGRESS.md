@@ -31,7 +31,12 @@ gate. Theatrical / Steps 9–16 stay closed.
 
 ## Tests / validation
 
-Recorded after the local run.
+- `pnpm validate:steps-9-16-closed` — 25/25 PASS
+- `pnpm validate:persist` — 9/9 PASS
+- `pnpm validate:studio-hardening` — 16/16 PASS
+- `pnpm test` — 465 / 465
+- `pnpm typecheck` — PASS
+- `pnpm lint` — PASS
 
 ## Protections
 

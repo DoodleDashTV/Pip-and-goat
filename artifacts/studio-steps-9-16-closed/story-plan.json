@@ -1,0 +1,76 @@
+{
+  "label": "DRAFT_NONCANONICAL",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "canonical": false,
+  "productionEligible": false,
+  "theatricalEligible": false,
+  "premise": "Two labeled stand-ins notice a tiny map glow at the meadow edge, pause when the first try is incomplete, and choose a kinder step together.",
+  "episodeGoal": "Notice first, then try a kind step about notice first, then try a kind step.",
+  "openingHook": "Proxy Bird A notices something small that does not match notice first, then try a kind step.",
+  "placeholderRoles": [
+    "PROXY_NONCANONICAL_BIRD_A",
+    "PROXY_NONCANONICAL_QUADRUPED_A"
+  ],
+  "eightBeatStructure": [
+    {
+      "purpose": "HOOK",
+      "beatId": "beat_001",
+      "summary": "Proxy Bird A notices something small that does not match notice first, then try a kind step."
+    },
+    {
+      "purpose": "SETUP",
+      "beatId": "beat_002",
+      "summary": "Proxy Quadruped A names a careful first step so Proxy Bird A feels safe to try."
+    },
+    {
+      "purpose": "DISCOVERY",
+      "beatId": "beat_003",
+      "summary": "Proxy Bird A and Proxy Quadruped A find a clue that reframes the problem as a kindness."
+    },
+    {
+      "purpose": "COMPLICATION",
+      "beatId": "beat_004",
+      "summary": "The first try is playful but incomplete, and Proxy Bird A pauses to think."
+    },
+    {
+      "purpose": "TURN",
+      "beatId": "beat_005",
+      "summary": "Proxy Quadruped A offers the kinder solution and Proxy Bird A chooses it."
+    },
+    {
+      "purpose": "PAYOFF",
+      "beatId": "beat_006",
+      "summary": "Proxy Bird A and Proxy Quadruped A use the lesson about notice first, then try a kind step together."
+    },
+    {
+      "purpose": "RESOLUTION",
+      "beatId": "beat_007",
+      "summary": "Proxy Bird A and Proxy Quadruped A put the map away and leave the place as they found it."
+    },
+    {
+      "purpose": "BUTTON",
+      "beatId": "beat_008",
+      "summary": "A gentle hook: Proxy Bird A wonders what they will notice next, and Proxy Quadruped A smiles."
+    }
+  ],
+  "escalation": "The first try is playful but incomplete, and Proxy Bird A pauses to think.",
+  "setback": "pause and think",
+  "discovery": "Proxy Bird A and Proxy Quadruped A find a clue that reframes the problem as a kindness.",
+  "payoff": "Proxy Bird A and Proxy Quadruped A use the lesson about notice first, then try a kind step together.",
+  "closingButton": "A gentle hook: Proxy Bird A wonders what they will notice next, and Proxy Quadruped A smiles.",
+  "ageAppropriate": {
+    "safe": true,
+    "refusedNeedles": [],
+    "preschoolReadable": true
+  },
+  "seed": "tivvlejoy-episode-1-draft-noncanonical-v2",
+  "promotion": {
+    "allowed": false,
+    "canonical": false,
+    "code": "PROXY_CANNOT_ENTER_CANON",
+    "reason": "Proxy / noncanonical drafts cannot enter canon.",
+    "version": "1.0.0"
+  },
+  "version": "1.0.0",
+  "cacheKey": "e3faeb575374c7eedcce95755e6c76d6459eb430647e311f638a59b76e7bc28e"
+}

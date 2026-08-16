@@ -1,0 +1,21 @@
+{
+  "info": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_type": "video",
+        "width": 360,
+        "height": 640
+      },
+      {
+        "codec_type": "audio"
+      }
+    ],
+    "format": {
+      "duration": "29.500000",
+      "size": "1034737"
+    }
+  },
+  "fileBytes": 1034737,
+  "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+}

@@ -1,0 +1,51 @@
+{
+  "identities": [
+    "PROXY_NONCANONICAL_BIRD_A",
+    "PROXY_NONCANONICAL_QUADRUPED_A"
+  ],
+  "locations": [
+    "env_meadow_edge_v1",
+    "env_meadow_path_v1",
+    "env_creek_bank_v1",
+    "env_meadow_clearing_v1"
+  ],
+  "props": [
+    "prop_adventure_map_v1"
+  ],
+  "mapClues": [
+    "prop_adventure_map_v1"
+  ],
+  "setupPayoffLinks": [
+    {
+      "factId": "prop_prop_adventure_map_v1_beat_002",
+      "plantedIn": "beat_002",
+      "paidOffIn": "beat_006"
+    },
+    {
+      "factId": "prop_prop_adventure_map_v1_beat_003",
+      "plantedIn": "beat_003",
+      "paidOffIn": "beat_006"
+    },
+    {
+      "factId": "prop_prop_adventure_map_v1_beat_004",
+      "plantedIn": "beat_004",
+      "paidOffIn": "beat_006"
+    },
+    {
+      "factId": "prop_prop_adventure_map_v1_beat_005",
+      "plantedIn": "beat_005",
+      "paidOffIn": "beat_006"
+    },
+    {
+      "factId": "prop_prop_adventure_map_v1_beat_006",
+      "plantedIn": "beat_006",
+      "paidOffIn": "beat_006"
+    }
+  ],
+  "unresolved": [],
+  "readiness": {
+    "ok": true,
+    "dangling": 0,
+    "canPromote": false
+  }
+}
