@@ -967,3 +967,4 @@ export * from './performance';
 export * from './audit-fast';
 export * from './cloud';
 export * from './direction-service';
+export * from './proxy-output-gate';
