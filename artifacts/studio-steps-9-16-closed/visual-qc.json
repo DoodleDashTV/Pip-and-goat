@@ -1,0 +1,75 @@
+{
+  "label": "DRAFT_NONCANONICAL",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "theatricalCharacterQualityApproved": false,
+  "checks": [
+    {
+      "item": "RESOLUTION",
+      "status": "PASS",
+      "detail": "360x640 probe=n/axn/a"
+    },
+    {
+      "item": "ASPECT_RATIO",
+      "status": "PASS",
+      "detail": "9:16"
+    },
+    {
+      "item": "FRAME_DURATION",
+      "status": "PASS",
+      "detail": "29.500s planned"
+    },
+    {
+      "item": "BLANK_FRAMES",
+      "status": "PASS",
+      "detail": "every clip has hold frames"
+    },
+    {
+      "item": "EXCESSIVE_BLACK_FRAMES",
+      "status": "PASS",
+      "detail": "no clip longer than 15s hold"
+    },
+    {
+      "item": "CLIPPING",
+      "status": "PASS",
+      "detail": "endFrame > startFrame"
+    },
+    {
+      "item": "UNSAFE_TITLE_AREA",
+      "status": "PASS",
+      "detail": "caption-safe on every panel"
+    },
+    {
+      "item": "WATERMARK_PRESENCE",
+      "status": "PASS",
+      "detail": "PROXY — NOT FOR FINAL PRODUCTION"
+    },
+    {
+      "item": "MISSING_PANELS",
+      "status": "PASS",
+      "detail": "8 panels / 8 clips"
+    },
+    {
+      "item": "INVALID_TRANSITIONS",
+      "status": "PASS",
+      "detail": "CUT or DISSOLVE only"
+    },
+    {
+      "item": "CACHE_PROVENANCE",
+      "status": "PASS",
+      "detail": "cache keys present"
+    },
+    {
+      "item": "FORBIDDEN_FINAL_OR_CANONICAL_LABEL",
+      "status": "PASS",
+      "detail": "renderTier=DRAFT"
+    },
+    {
+      "item": "FORBIDDEN_PRODUCTION_LIBRARY_PATH",
+      "status": "PASS",
+      "detail": "no production-library path"
+    }
+  ],
+  "technical": "PASS",
+  "cacheKey": "9c85c143bba4b89602a3746ed298d56e06c36544b90755996690318a307c62df",
+  "version": "1.0.0"
+}

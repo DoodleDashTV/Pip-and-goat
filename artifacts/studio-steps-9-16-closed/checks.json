@@ -1,0 +1,127 @@
+[
+  {
+    "name": "gates-unchanged",
+    "status": "PASS",
+    "detail": "stage=DDP_STEPS_1_8 theatrical=false"
+  },
+  {
+    "name": "steps-9-16-still-closed",
+    "status": "PASS",
+    "detail": "assertSteps9To16StillClosed"
+  },
+  {
+    "name": "draft-classification",
+    "status": "PASS",
+    "detail": "DRAFT_NONCANONICAL / PIPELINE_TEST_ONLY"
+  },
+  {
+    "name": "story-brain",
+    "status": "PASS",
+    "detail": "8 beats"
+  },
+  {
+    "name": "continuity-db",
+    "status": "PASS",
+    "detail": "dangling=0"
+  },
+  {
+    "name": "retention-advisory",
+    "status": "PASS",
+    "detail": "no real audience claims"
+  },
+  {
+    "name": "storyboard-placeholders",
+    "status": "PASS",
+    "detail": "8 panels"
+  },
+  {
+    "name": "animatic-proxy",
+    "status": "PASS",
+    "detail": "360x640"
+  },
+  {
+    "name": "visual-qc",
+    "status": "PASS",
+    "detail": "PASS"
+  },
+  {
+    "name": "motion-audio-qc",
+    "status": "PASS",
+    "detail": "PASS"
+  },
+  {
+    "name": "auto-repair",
+    "status": "PASS",
+    "detail": "3 actions"
+  },
+  {
+    "name": "protected-repair-refused",
+    "status": "PASS",
+    "detail": "protected path refused"
+  },
+  {
+    "name": "resume-reevaluates",
+    "status": "PASS",
+    "detail": "Local draft checkpoint may resume after re-evaluating current safety gates."
+  },
+  {
+    "name": "cost-zero",
+    "status": "PASS",
+    "detail": "PAID_RESOURCE_REFUSED"
+  },
+  {
+    "name": "episode-1-mux",
+    "status": "PASS",
+    "detail": "proxy animatic assembled"
+  },
+  {
+    "name": "mp4-duration",
+    "status": "PASS",
+    "detail": "29.500s"
+  },
+  {
+    "name": "mp4-resolution",
+    "status": "PASS",
+    "detail": "360x640"
+  },
+  {
+    "name": "mp4-aspect",
+    "status": "PASS",
+    "detail": "0.563"
+  },
+  {
+    "name": "mp4-video-stream",
+    "status": "PASS",
+    "detail": "video present"
+  },
+  {
+    "name": "mp4-audio-stream",
+    "status": "PASS",
+    "detail": "audio present"
+  },
+  {
+    "name": "mp4-nonzero",
+    "status": "PASS",
+    "detail": "1034737 bytes"
+  },
+  {
+    "name": "mp4-draft-watermark",
+    "status": "PASS",
+    "detail": "drawtext watermark in graph"
+  },
+  {
+    "name": "mp4-not-final",
+    "status": "PASS",
+    "detail": "DRAFT"
+  },
+  {
+    "name": "continuity-persist",
+    "status": "PASS",
+    "detail": "Wrote draft continuity record."
+  },
+  {
+    "name": "continuity-durable-fail-closed",
+    "status": "PASS",
+    "detail": "missing delegate throws"
+  }
+]

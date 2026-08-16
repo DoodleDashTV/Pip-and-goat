@@ -1,0 +1,8 @@
+{
+  "database": "doodle_dash_steps916_validate",
+  "url": "postgresql://doodle@localhost:5432/doodle_dash_steps916_validate",
+  "productionDatabaseTouched": false,
+  "credentialsCommitted": false,
+  "continuityId": "b06206b4-e340-4d1d-bcb7-09a53e086506",
+  "workflowId": "9d0c79b6-7c23-4376-a179-15d1bb1c754f"
+}

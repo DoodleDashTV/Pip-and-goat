@@ -27,7 +27,7 @@ export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
   launchSafety: '1.1.0',
   persist: '1.0.0',
   closedStages: '1.0.0',
-  episode1: '1.1.0',
+  episode1: '1.2.0',
   canon: '1.0.0',
   cache: '1.1.0',
   recovery: '1.1.0',
@@ -36,6 +36,15 @@ export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
   profile: '1.0.0',
   provenance: '1.0.0',
   analytics: '1.0.0',
+  storyBrain: '1.0.0',
+  continuityDb: '1.0.0',
+  retention: '1.0.0',
+  storyboardCompiler: '1.0.0',
+  animaticCompiler: '1.0.0',
+  visualQc: '1.0.0',
+  motionAudioQc: '1.0.0',
+  autoRepair: '1.0.0',
+  stepsClosed: '1.0.0',
 } as const;
 
 export type PreproductionSubsystemName = keyof typeof PREPRODUCTION_SUBSYSTEM_VERSIONS;

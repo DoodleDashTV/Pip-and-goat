@@ -1,0 +1,20 @@
+{
+  "actions": [
+    {
+      "action": "AUDIO_PADDING",
+      "applied": true,
+      "detail": "audio already padded / at or below 0 dB"
+    },
+    {
+      "action": "STALE_DEPENDENCY_INVALIDATION",
+      "applied": true,
+      "detail": "1 dirty shots; paidRerender=false"
+    },
+    {
+      "action": "CACHE_KEY_REGENERATION",
+      "applied": true,
+      "detail": "draft cache keys regenerated"
+    }
+  ],
+  "refused": []
+}

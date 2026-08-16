@@ -1,0 +1,77 @@
+{
+  "label": "DRAFT_NONCANONICAL",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "audioKind": "NON_VOICE_TEST_AUDIO",
+  "synthesisedVoices": false,
+  "lockedVoicesUntouched": true,
+  "checks": [
+    {
+      "item": "CLIP_TIMING",
+      "status": "PASS",
+      "detail": "29.500s"
+    },
+    {
+      "item": "DUPLICATE_CLIPS",
+      "status": "PASS",
+      "detail": "unique clip ids"
+    },
+    {
+      "item": "MISSING_CLIPS",
+      "status": "PASS",
+      "detail": "8 clips"
+    },
+    {
+      "item": "DISCONTINUITIES",
+      "status": "PASS",
+      "detail": "contiguous frame ranges"
+    },
+    {
+      "item": "EXCESSIVE_HOLDS",
+      "status": "PASS",
+      "detail": "0 long holds"
+    },
+    {
+      "item": "INVALID_FRAME_RANGES",
+      "status": "PASS",
+      "detail": "0 invalid"
+    },
+    {
+      "item": "AUDIO_STREAM_PRESENCE",
+      "status": "PASS",
+      "detail": "planned audio tracks present"
+    },
+    {
+      "item": "NONZERO_AUDIO_DURATION",
+      "status": "PASS",
+      "detail": "29.500s"
+    },
+    {
+      "item": "PEAK_SAFETY",
+      "status": "PASS",
+      "detail": "gains <= 0 dB"
+    },
+    {
+      "item": "SILENCE_RANGES",
+      "status": "PASS",
+      "detail": "placeholder/dialogue tracks are silence beds"
+    },
+    {
+      "item": "CUE_ALIGNMENT",
+      "status": "PASS",
+      "detail": "mix duration matches animatic"
+    },
+    {
+      "item": "PROHIBITED_VOICE_SYNTHESIS",
+      "status": "PASS",
+      "detail": "no paid voice provider"
+    },
+    {
+      "item": "PROHIBITED_LOCKED_VOICE_CLAIMS",
+      "status": "PASS",
+      "detail": "proxies stay on proxy_voice_placeholder_v1"
+    }
+  ],
+  "technical": "PASS",
+  "cacheKey": "989c7aea7c232144b9a2c105e9f49f1f92c4e5d8b8118630532bfda7035216b3",
+  "version": "1.0.0"
+}

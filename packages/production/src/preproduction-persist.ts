@@ -212,3 +212,108 @@ export async function loadPreproductionRunByCacheKey(
   })) as Record<string, unknown> | null;
   return asPersisted(row);
 }
+
+export async function persistDraftContinuity(input: {
+  episodeId: string;
+  cacheKey: string;
+  content: Record<string, unknown>;
+  occupants?: readonly string[];
+  durableRequired?: boolean;
+  ephemeralTestOnly?: boolean;
+  client?: PersistDb;
+}): Promise<PersistPreproductionResult> {
+  const durableRequired = input.durableRequired === true;
+  const ephemeralTestOnly = input.ephemeralTestOnly === true;
+  const serialized = JSON.stringify(input.content);
+  if (serialized.includes('production-library')) {
+    const failed: PersistPreproductionResult = {
+      status: 'PERSISTENCE_FAILED',
+      persisted: false,
+      reason: 'Refuse: draft continuity cannot write production-library/.',
+    };
+    if (durableRequired) throw new Error(`PERSISTENCE_FAILED: ${failed.reason}`);
+    return failed;
+  }
+  if (input.content.promoted === true || input.content.canonical === true) {
+    const failed: PersistPreproductionResult = {
+      status: 'PERSISTENCE_FAILED',
+      persisted: false,
+      reason: 'Refuse: continuity persist cannot promote canon.',
+    };
+    if (durableRequired) throw new Error(`PERSISTENCE_FAILED: ${failed.reason}`);
+    return failed;
+  }
+  if (ephemeralTestOnly && !durableRequired) {
+    return {
+      status: 'EPHEMERAL_TEST_ONLY',
+      persisted: false,
+      reason: 'Fixture continuity record is ephemeral and was not written as a durable workflow.',
+    };
+  }
+  const model = optionalDelegate('preproductionRun', input.client);
+  if (!model) {
+    const result: PersistPreproductionResult = {
+      status: durableRequired ? 'PERSISTENCE_FAILED' : 'EPHEMERAL_TEST_ONLY',
+      persisted: false,
+      reason: 'Prisma model preproductionRun is not available. This is not a durable continuity record.',
+    };
+    if (durableRequired) throw new Error(`PERSISTENCE_FAILED: ${result.reason}`);
+    return result;
+  }
+  try {
+    const cacheKey = input.cacheKey.startsWith('continuity:') ? input.cacheKey : `continuity:${input.cacheKey}`;
+    const existing = (await model.findFirst({
+      where: { episodeId: input.episodeId, cacheKey },
+    })) as Record<string, unknown> | null;
+    if (existing?.id) {
+      return {
+        status: 'PERSISTED',
+        persisted: true,
+        id: String(existing.id),
+        reason: 'Reused identical continuity cache key.',
+      };
+    }
+    const created = (await model.create({
+      data: {
+        episodeId: input.episodeId,
+        schemaVersion: PREPRODUCTION_SCHEMA_VERSION,
+        characterMode: 'PROXY',
+        outputClass: 'PIPELINE_TEST',
+        terminalState: 'PIPELINE_TEST_COMPLETE',
+        status: 'DRAFT_NONCANONICAL',
+        cacheKey,
+        scenePlanEmitted: false,
+        paidGpu: false,
+        content: {
+          kind: 'DRAFT_CONTINUITY',
+          canonical: false,
+          promoted: false,
+          occupants: [...(input.occupants ?? [])],
+          ...input.content,
+        },
+      },
+    })) as { id?: string };
+    if (!created.id) {
+      const failed: PersistPreproductionResult = {
+        status: 'PERSISTENCE_FAILED',
+        persisted: false,
+        reason: 'Continuity create returned no id.',
+      };
+      if (durableRequired) throw new Error(`PERSISTENCE_FAILED: ${failed.reason}`);
+      return failed;
+    }
+    return {
+      status: 'PERSISTED',
+      persisted: true,
+      id: created.id,
+      reason: 'Wrote draft continuity record.',
+    };
+  } catch (error) {
+    if (durableRequired) throw error;
+    return {
+      status: 'PERSISTENCE_FAILED',
+      persisted: false,
+      reason: error instanceof Error ? error.message : 'Continuity persist failed.',
+    };
+  }
+}

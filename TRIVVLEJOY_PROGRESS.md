@@ -5,7 +5,8 @@ Updated: 2026-08-16
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/studio-hardening-17-24-73f1`
+- Working branch: `cursor/studio-steps-9-16-closed-73f1`
+- Accepted studio hardening 17–24 (Draft PR #29, keep unmerged): `cursor/studio-hardening-17-24-73f1` @ `b4e311ac3b72d004923506b104a27cd9ccec0480`
 - Accepted Milestone 5 hardening (Draft PR #28, keep unmerged): `cursor/studio-m5-hardening-73f1` @ `82f26c81fc3564321289831a95ae93468b2f1369`
 - Milestone 5 checkpoint (Draft PR #27, keep unmerged): `cursor/studio-milestone-5-workflow-73f1` @ `ec8d1ed8a7699855692031894e8782e78c21e66c`
 - Milestone 4 (Draft PR #26, keep unmerged): `cursor/studio-character-independent-73f1`
@@ -14,27 +15,26 @@ Updated: 2026-08-16
 
 ## Current milestone
 
-Character-independent studio hardening 17–24, stacked on the accepted
-Milestone 5 hardening tip. Theatrical / Steps 9–16 stay closed.
+Character-independent Steps 9–16 infrastructure behind the closed theatrical
+gate. Theatrical / Steps 9–16 stay closed.
 
 ## Completed this increment
 
-- Disposable local persist validation (`doodle_dash_persist_validate`)
-- Explicit `PERSISTED` / `EPHEMERAL_TEST_ONLY` / `PERSISTENCE_FAILED` close-out
-- Versioning and rollback for story, storyboard, animatic, shot-plan
-- Shot dependency tracking and invalidation
-- Deterministic render-cache keys and partial-rerender planning
-- Local performance profiling
-- Dataset / reference provenance without Pip or Goat assets
-- Draft analytics with $0 cost estimation
-- Crash recovery checkpoints and corruption detection
-- Revised DRAFT_NONCANONICAL Episode 1 package and proxy animatic
+- Story brain (deterministic eight-beat draft, canon refuse)
+- Continuity / canon database (readiness only, no auto-promote)
+- Hook and retention planner (advisory only)
+- Storyboard compiler (placeholders, no Pip/Goat assets)
+- Animatic compiler (proxy 9:16 holds + non-voice test audio)
+- Visual QC and motion/audio QC contracts
+- Local unpaid auto-repair with QC re-run and protected-path refuse
+- Episode 1 DRAFT_NONCANONICAL / PIPELINE_TEST_ONLY package
 
 ## Tests / validation
 
-- `pnpm validate:persist` — 9/9 PASS (disposable `doodle_dash_persist_validate`, then dropped)
-- `pnpm validate:studio-hardening` — 16/16 PASS (Episode 1 mux 29.500s, 360×640, audio present, 1,035,625 bytes)
-- `pnpm test` — 453 / 453
+- `pnpm validate:steps-9-16-closed` — 25/25 PASS
+- `pnpm validate:persist` — 9/9 PASS
+- `pnpm validate:studio-hardening` — 16/16 PASS
+- `pnpm test` — 465 / 465
 - `pnpm typecheck` — PASS
 - `pnpm lint` — PASS
 
@@ -43,7 +43,7 @@ Milestone 5 hardening tip. Theatrical / Steps 9–16 stay closed.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, or #28.
+- Do not merge Draft PR #24, #26, #27, #28, or #29.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

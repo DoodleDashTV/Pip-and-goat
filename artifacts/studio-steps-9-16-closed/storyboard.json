@@ -1,0 +1,140 @@
+[
+  {
+    "panelId": "panel_beat_001",
+    "beatId": "beat_001",
+    "framing": "WIDE",
+    "cameraAngle": "HIGH",
+    "cameraMovementIntent": "LOCKED",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "Proxy Bird A notices something small that does not match notice first, then try a kind step.",
+    "emotionIntent": "curious",
+    "environment": "env_meadow_edge_v1",
+    "propState": [],
+    "transition": "CUT",
+    "durationSeconds": 3,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  },
+  {
+    "panelId": "panel_beat_002",
+    "beatId": "beat_002",
+    "framing": "MEDIUM",
+    "cameraAngle": "EYE",
+    "cameraMovementIntent": "PAN",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "Proxy Quadruped A names a careful first step so Proxy Bird A feels safe to try.",
+    "emotionIntent": "determined",
+    "environment": "env_meadow_path_v1",
+    "propState": [
+      "prop_adventure_map_v1"
+    ],
+    "transition": "CUT",
+    "durationSeconds": 4,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  },
+  {
+    "panelId": "panel_beat_003",
+    "beatId": "beat_003",
+    "framing": "TWO_SHOT",
+    "cameraAngle": "EYE",
+    "cameraMovementIntent": "PUSH_IN",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "Proxy Bird A and Proxy Quadruped A find a clue that reframes the problem as a kindness.",
+    "emotionIntent": "surprised",
+    "environment": "env_creek_bank_v1",
+    "propState": [
+      "prop_adventure_map_v1"
+    ],
+    "transition": "CUT",
+    "durationSeconds": 5,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  },
+  {
+    "panelId": "panel_beat_004",
+    "beatId": "beat_004",
+    "framing": "MEDIUM",
+    "cameraAngle": "OVER_SHOULDER",
+    "cameraMovementIntent": "LOCKED",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "The first try is playful but incomplete, and Proxy Bird A pauses to think.",
+    "emotionIntent": "confused",
+    "environment": "env_creek_bank_v1",
+    "propState": [
+      "prop_adventure_map_v1"
+    ],
+    "transition": "CUT",
+    "durationSeconds": 4,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  },
+  {
+    "panelId": "panel_beat_005",
+    "beatId": "beat_005",
+    "framing": "TWO_SHOT",
+    "cameraAngle": "EYE",
+    "cameraMovementIntent": "PUSH_IN",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "Proxy Quadruped A offers the kinder solution and Proxy Bird A chooses it.",
+    "emotionIntent": "tender",
+    "environment": "env_meadow_path_v1",
+    "propState": [
+      "prop_adventure_map_v1"
+    ],
+    "transition": "CUT",
+    "durationSeconds": 5,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  },
+  {
+    "panelId": "panel_beat_006",
+    "beatId": "beat_006",
+    "framing": "MEDIUM",
+    "cameraAngle": "EYE",
+    "cameraMovementIntent": "PULL_OUT",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "Proxy Bird A and Proxy Quadruped A use the lesson about notice first, then try a kind step together.",
+    "emotionIntent": "proud",
+    "environment": "env_meadow_clearing_v1",
+    "propState": [
+      "prop_adventure_map_v1"
+    ],
+    "transition": "CUT",
+    "durationSeconds": 5,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  },
+  {
+    "panelId": "panel_beat_007",
+    "beatId": "beat_007",
+    "framing": "WIDE",
+    "cameraAngle": "HIGH",
+    "cameraMovementIntent": "LOCKED",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "Proxy Bird A and Proxy Quadruped A put the map away and leave the place as they found it.",
+    "emotionIntent": "happy",
+    "environment": "env_meadow_clearing_v1",
+    "propState": [],
+    "transition": "CUT",
+    "durationSeconds": 2.5,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  },
+  {
+    "panelId": "panel_beat_008",
+    "beatId": "beat_008",
+    "framing": "CLOSE_UP",
+    "cameraAngle": "EYE",
+    "cameraMovementIntent": "LOCKED",
+    "subjectBlocking": "PROXY_NONCANONICAL_BIRD_A + PROXY_NONCANONICAL_QUADRUPED_A",
+    "action": "A gentle hook: Proxy Bird A wonders what they will notice next, and Proxy Quadruped A smiles.",
+    "emotionIntent": "curious",
+    "environment": "env_meadow_edge_v1",
+    "propState": [],
+    "transition": "DISSOLVE",
+    "durationSeconds": 1,
+    "safetyNotes": "Caption-safe 9:16. Placeholder occupants only. No founding-character assets.",
+    "watermark": "PROXY — NOT FOR FINAL PRODUCTION"
+  }
+]
