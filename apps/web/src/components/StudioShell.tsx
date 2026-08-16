@@ -5,18 +5,22 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { STUDIO_SHORT_NAME } from '@doodle-dash/domain';
 
-const NAV = [
+const PRIMARY_NAV = [
   { href: '/', label: 'Dashboard' },
   { href: '/production-setup', label: 'Production Setup' },
   { href: '/new-episode', label: 'New Episode' },
+  { href: '/asset-intake', label: 'Assets' },
+  { href: '/voices', label: 'Voices' },
+  { href: '/workflow', label: 'Episode Workflow' },
+  { href: '/readiness', label: 'Readiness' },
+  { href: '/render-queue', label: 'Render Queue' },
+];
+
+const ADVANCED_NAV = [
   { href: '/production', label: 'Continue Episode' },
   { href: '/direction', label: 'Direction' },
   { href: '/preproduction', label: 'Pre-Production' },
-  { href: '/workflow', label: 'Episode Workflow' },
-  { href: '/asset-intake', label: 'Assets' },
   { href: '/animations', label: 'Animations' },
-  { href: '/render-queue', label: 'Render Queue' },
-  { href: '/readiness', label: 'Readiness' },
   { href: '/costs', label: 'Costs' },
   { href: '/production-settings', label: 'Production Settings' },
   { href: '/universe', label: 'Universe' },
@@ -30,7 +34,6 @@ const NAV = [
   { href: '/storyboards', label: 'Storyboards' },
   { href: '/episodes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/readiness', label: 'Meadow Mystery' },
   { href: '/vertical-slice', label: 'Vertical Slice' },
-  { href: '/voices', label: 'Voices' },
   { href: '/blender-worker', label: 'Blender Worker' },
   { href: '/audio', label: 'Audio' },
   { href: '/poses', label: 'Poses' },
@@ -45,6 +48,10 @@ const NAV = [
   { href: '/debug', label: 'Debug' },
   { href: '/settings', label: 'Settings' },
 ];
+
+function navActive(pathname: string, href: string) {
+  return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -78,8 +85,13 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
         />
       ) : null}
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-4 pb-10 pt-5 md:px-6 lg:flex-row lg:gap-8 lg:px-8">
-        <header className="mb-4 flex items-center justify-between gap-3 lg:hidden">
-          <div>
+        <header
+          className={[
+            'mb-4 flex items-center justify-between gap-3 lg:hidden',
+            navOpen ? 'relative z-[60]' : '',
+          ].join(' ')}
+        >
+          <div className="min-w-0">
             <p className="font-display text-xl font-bold text-[var(--color-navigation)]">
               {STUDIO_SHORT_NAME}
             </p>
@@ -89,7 +101,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
           </div>
           <button
             type="button"
-            className="inline-flex min-h-touch min-w-touch items-center justify-center rounded-2xl bg-[var(--color-navigation)] px-3 text-sm font-bold text-[var(--color-navigation-text)]"
+            className="inline-flex min-h-touch min-w-touch shrink-0 items-center justify-center rounded-2xl bg-[var(--color-navigation)] px-3 text-sm font-bold text-[var(--color-navigation-text)]"
             aria-expanded={navOpen}
             aria-controls="studio-navigation"
             onClick={() => setNavOpen((open) => !open)}
@@ -114,27 +126,62 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
             <p className="mt-3 text-sm text-[var(--color-navigation-text)]/80">
               Create once. Validate. Version. Lock. Reuse. Assemble. Render.
             </p>
+            <button
+              type="button"
+              className="mt-4 inline-flex min-h-touch w-full items-center justify-center rounded-2xl bg-[var(--color-highlight)] px-3 text-sm font-bold text-[var(--color-highlight-foreground)] lg:hidden"
+              onClick={() => setNavOpen(false)}
+            >
+              Close menu
+            </button>
             <nav aria-label="Studio" className="mt-6 grid flex-1 grid-cols-1 gap-2 overflow-y-auto pb-2">
-              {NAV.map((item) => {
-                const active =
-                  item.href === '/'
-                    ? pathname === '/'
-                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              {PRIMARY_NAV.map((item) => {
+                const active = navActive(pathname, item.href);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
+                    aria-current={active ? 'page' : undefined}
                     className={[
                       'inline-flex min-h-touch items-center rounded-2xl px-3 py-2 text-sm font-semibold transition-colors duration-150',
                       active
-                        ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
+                        ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] ring-2 ring-[var(--color-highlight)]'
                         : 'text-[var(--color-navigation-text)] hover:bg-[var(--color-navigation-hover)]',
                     ].join(' ')}
                   >
                     {item.label}
+                    {active ? <span className="sr-only"> (current)</span> : null}
                   </Link>
                 );
               })}
+              <details className="mt-2 rounded-2xl bg-[var(--color-navigation-hover)]/40 p-2">
+                <summary className="flex min-h-touch cursor-pointer list-none items-center px-2 text-sm font-bold text-[var(--color-highlight)]">
+                  Advanced / debug
+                </summary>
+                <p className="px-2 pb-2 text-xs text-[var(--color-navigation-text)]/70">
+                  These tools need the local studio database. Preview shows an honest unavailable
+                  state if they cannot run.
+                </p>
+                <div className="grid gap-2">
+                  {ADVANCED_NAV.map((item) => {
+                    const active = navActive(pathname, item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-current={active ? 'page' : undefined}
+                        className={[
+                          'inline-flex min-h-touch items-center rounded-2xl px-3 py-2 text-sm font-semibold',
+                          active
+                            ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
+                            : 'text-[var(--color-navigation-text)] hover:bg-[var(--color-navigation-hover)]',
+                        ].join(' ')}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </details>
             </nav>
           </div>
         </aside>

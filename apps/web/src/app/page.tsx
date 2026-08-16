@@ -58,12 +58,15 @@ export default async function HomePage() {
         {publicPreview || !setup ? (
           <>
             <p className="mt-3 text-sm text-[var(--color-text)]">
-              Public preview only. Database-backed studio actions are not available yet. Closed
-              gates stay closed. Paid resources stay unauthorized.
+              Use the Preview workspace in this browser. Production database actions stay
+              unavailable. Closed gates stay closed. Paid resources stay unauthorized.
             </p>
+            <Link href="/production-setup" className="btn-primary mt-5 w-full px-5 py-4 text-center text-base">
+              Open Preview Production Setup
+            </Link>
             <p className="status-warning mt-5 inline-flex min-h-touch items-center gap-2 rounded-full px-3 py-2 text-sm font-bold">
               <span aria-hidden="true">!</span>
-              <span>Not available yet</span>
+              <span>Not available yet — production database</span>
             </p>
           </>
         ) : (

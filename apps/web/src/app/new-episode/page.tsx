@@ -2,12 +2,18 @@ import Link from 'next/link';
 import { prisma } from '@doodle-dash/database';
 import { STUDIO_DISPLAY_NAME } from '@doodle-dash/domain';
 import { StudioActionForm } from '../../components/StudioActionForm';
+import { PreviewNewEpisode } from '@/components/preview/PreviewNewEpisode';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
 
 export const dynamic = 'force-dynamic';
 
 const DURATIONS = [15, 30, 45, 60] as const;
 
 export default async function NewEpisodePage() {
+  if (isPublicWebsitePreview()) {
+    return <PreviewNewEpisode />;
+  }
+
   const universe = await prisma.universe.findFirst({ orderBy: { createdAt: 'asc' } });
   const recent = universe
     ? await prisma.episode.findMany({

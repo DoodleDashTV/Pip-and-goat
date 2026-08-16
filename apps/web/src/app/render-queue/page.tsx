@@ -1,7 +1,16 @@
 import { prisma } from '@doodle-dash/database';
 import { resolveCloudCostLimitsFromEnv } from '@doodle-dash/production';
+import { PreviewRenderQueue } from '@/components/preview/PreviewRenderQueue';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
 
 export const dynamic = 'force-dynamic';
+
+export default async function RenderQueuePreviewOrProduction() {
+  if (isPublicWebsitePreview()) {
+    return <PreviewRenderQueue />;
+  }
+  return RenderQueuePage();
+}
 
 function mapStage(status: string, meta: Record<string, unknown>) {
   if (typeof meta.cloudStage === 'string') return meta.cloudStage;
@@ -27,7 +36,7 @@ function mapStage(status: string, meta: Record<string, unknown>) {
   }
 }
 
-export default async function Page() {
+async function RenderQueuePage() {
   const limits = resolveCloudCostLimitsFromEnv();
   const rows = await prisma.renderJob.findMany({
     orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],

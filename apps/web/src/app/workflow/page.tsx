@@ -19,10 +19,27 @@ import {
 } from '@doodle-dash/preproduction';
 import { StudioStatusPanel } from '@/components/StudioStatusPanel';
 import { currentStage as directionCurrentStage, evaluateTheatricalGate as directionTheatricalGate } from '@doodle-dash/direction';
+import { PreviewWorkflow } from '@/components/preview/PreviewWorkflow';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function WorkflowPage() {
+  if (isPublicWebsitePreview()) {
+    return (
+      <div className="space-y-6">
+        <StudioStatusPanel />
+        <Suspense fallback={<p className="text-sm text-[var(--color-text-muted)]">Loading Preview workflow…</p>}>
+          <PreviewWorkflow />
+        </Suspense>
+      </div>
+    );
+  }
+  return WorkflowProductionPage();
+}
+
+async function WorkflowProductionPage() {
   const provider = readProviderStatus();
   const run = advanceWorkflow(PROXY_PIPELINE_BRIEF);
   const summary = summarizeWorkflow(run);

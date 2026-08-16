@@ -121,6 +121,10 @@ describe('primary components use semantic tokens', () => {
     expect(shell).toContain('min-h-touch');
     expect(shell).toContain('Skip to main content');
     expect(shell).toContain('id="studio-main"');
+    expect(shell).toContain('Close menu');
+    expect(shell).toContain('z-[60]');
+    expect(shell).toContain('PRIMARY_NAV');
+    expect(shell).toContain('Advanced / debug');
   });
 
   it('uses semantic button and field classes on shared forms', () => {
@@ -208,6 +212,13 @@ describe('protected production state is unchanged', () => {
     expect(home).toContain('isPublicWebsitePreview');
     expect(home).toContain('Not available yet');
     expect(home).toContain('StudioStatusPanel');
+    expect(readRepo('apps/web/src/app/new-episode/page.tsx')).toContain('isPublicWebsitePreview');
+    expect(readRepo('apps/web/src/app/production-setup/page.tsx')).toContain(
+      'isPublicWebsitePreview',
+    );
+    expect(readRepo('apps/web/src/app/loading.tsx')).toContain('Loading studio');
+    expect(readRepo('apps/web/src/app/not-found.tsx')).toContain('Not available yet');
+    expect(readRepo('apps/web/src/app/error.tsx')).toContain('Not available yet');
   });
 
   it('keeps required lineage strings in the progress file', () => {
