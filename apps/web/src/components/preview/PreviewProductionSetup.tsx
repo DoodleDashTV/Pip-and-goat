@@ -1,27 +1,35 @@
 'use client';
 
+import Link from 'next/link';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
+import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
 
 export function PreviewProductionSetup() {
   const { workspace, message, busy, saveSettings, reset } = usePreviewWorkspace();
 
   return (
-    <div className="space-y-6 overflow-x-hidden">
-      <header>
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-primary)]">
-          Production Setup
-        </p>
-        <h1 className="mt-2 font-display text-4xl font-bold">Preview studio workspace</h1>
-        <p className="mt-3 max-w-2xl text-sm text-[var(--color-text-muted)]">
-          Create or update this browser’s Preview workspace. Format and resource policy are locked
-          to safe defaults.
-        </p>
-      </header>
+    <div className="space-y-5 overflow-x-hidden">
+      <PreviewPageIntro
+        kicker="Production Setup"
+        title="Start your Preview studio"
+        instruction="Type a project name and save it. Format and paid-resource policy stay locked. This does not connect a production database."
+      />
       <PreviewBanner busy={busy} onReset={() => reset()} />
       <PreviewMessage message={message} />
+      {!workspace.settingsSaved ? (
+        <PreviewEmptyState
+          title="Nothing saved yet"
+          body="This is step 1 of 7. Enter a project name below, then tap Create Preview workspace. The save stays in this browser only."
+        />
+      ) : (
+        <p className="status-success inline-flex min-h-touch items-center gap-2 rounded-full px-3 py-2 text-sm font-bold">
+          <span aria-hidden="true">✓</span>
+          <span>Preview settings saved in this browser</span>
+        </p>
+      )}
       <form
-        className="studio-card space-y-4 p-6"
+        className="studio-card space-y-4 p-4 sm:p-6"
         onSubmit={(event) => {
           event.preventDefault();
           const form = new FormData(event.currentTarget);
@@ -57,9 +65,14 @@ export function PreviewProductionSetup() {
             <dd className="mt-1 font-semibold">Not completed</dd>
           </div>
         </dl>
-        <button type="submit" disabled={busy} className="btn-primary px-5 py-3 text-sm">
+        <button type="submit" disabled={busy} className="btn-primary w-full px-5 text-sm sm:w-auto">
           {busy ? 'Saving…' : workspace.settingsSaved ? 'Save Preview settings' : 'Create Preview workspace'}
         </button>
+        {workspace.settingsSaved ? (
+          <Link href="/new-episode" className="btn-highlight mt-2 w-full px-5 text-sm sm:mt-0 sm:w-auto">
+            Next: New Episode
+          </Link>
+        ) : null}
       </form>
     </div>
   );

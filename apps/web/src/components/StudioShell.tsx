@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { STUDIO_SHORT_NAME } from '@doodle-dash/domain';
+import { FOUNDATION_STAGE_LABEL, PREVIEW_PUBLIC_BANNER } from '@/lib/preview-workspace/types';
 
 const PRIMARY_NAV = [
   { href: '/', label: 'Dashboard' },
@@ -53,7 +54,13 @@ function navActive(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function StudioShell({ children }: { children: React.ReactNode }) {
+export function StudioShell({
+  children,
+  isPreview = false,
+}: {
+  children: React.ReactNode;
+  isPreview?: boolean;
+}) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
 
@@ -69,13 +76,21 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
   }, [navOpen]);
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)]">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--color-background)] text-[var(--color-text)]">
       <a
         href="#studio-main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[80] focus:rounded-xl focus:bg-[var(--color-highlight)] focus:px-4 focus:py-3 focus:font-bold"
       >
         Skip to main content
       </a>
+      {isPreview ? (
+        <p
+          role="status"
+          className="sticky top-0 z-[70] break-words bg-[var(--color-highlight)] px-4 py-3 text-center text-sm font-bold leading-5 text-[var(--color-highlight-foreground)]"
+        >
+          {PREVIEW_PUBLIC_BANNER}
+        </p>
+      ) : null}
       {navOpen ? (
         <button
           type="button"
@@ -84,7 +99,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
           onClick={() => setNavOpen(false)}
         />
       ) : null}
-      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-4 pb-10 pt-5 md:px-6 lg:flex-row lg:gap-8 lg:px-8">
+      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col overflow-x-hidden px-4 pb-10 pt-5 md:px-6 lg:flex-row lg:gap-8 lg:px-8">
         <header
           className={[
             'mb-4 flex items-center justify-between gap-3 lg:hidden',
@@ -96,7 +111,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
               {STUDIO_SHORT_NAME}
             </p>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
-              Stage DDP_STEPS_1_8 · Gate closed
+              {FOUNDATION_STAGE_LABEL} · Gate closed
             </p>
           </div>
           <button
@@ -106,7 +121,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
             aria-controls="studio-navigation"
             onClick={() => setNavOpen((open) => !open)}
           >
-            {navOpen ? 'Close' : 'Menu'}
+            {navOpen ? 'Close menu' : 'Menu'}
           </button>
         </header>
         <aside
@@ -124,7 +139,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
               Studios
             </p>
             <p className="mt-3 text-sm text-[var(--color-navigation-text)]/80">
-              Create once. Validate. Version. Lock. Reuse. Assemble. Render.
+              {FOUNDATION_STAGE_LABEL} · Gate closed
             </p>
             <button
               type="button"
@@ -157,9 +172,12 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
                 <summary className="flex min-h-touch cursor-pointer list-none items-center px-2 text-sm font-bold text-[var(--color-highlight)]">
                   Advanced / debug
                 </summary>
-                <p className="px-2 pb-2 text-xs text-[var(--color-navigation-text)]/70">
-                  These tools need the local studio database. Preview shows an honest unavailable
-                  state if they cannot run.
+                <p className="px-2 pb-2 text-xs leading-5 text-[var(--color-navigation-text)]/70">
+                  Technical tools, not the normal Preview workflow. Use the seven primary pages
+                  above. These pages need a local studio database.
+                </p>
+                <p className="break-all px-2 pb-2 font-mono text-[11px] text-[var(--color-navigation-text)]/60">
+                  Technical stage: DDP_STEPS_1_8
                 </p>
                 <div className="grid gap-2">
                   {ADVANCED_NAV.map((item) => {
@@ -185,7 +203,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
             </nav>
           </div>
         </aside>
-        <main id="studio-main" className="min-w-0 flex-1">
+        <main id="studio-main" className="min-w-0 flex-1 overflow-x-hidden">
           {children}
         </main>
       </div>

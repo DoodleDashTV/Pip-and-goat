@@ -28,12 +28,9 @@ export const dynamic = 'force-dynamic';
 export default async function WorkflowPage() {
   if (isPublicWebsitePreview()) {
     return (
-      <div className="space-y-6">
-        <StudioStatusPanel />
-        <Suspense fallback={<p className="text-sm text-[var(--color-text-muted)]">Loading Preview workflow…</p>}>
-          <PreviewWorkflow />
-        </Suspense>
-      </div>
+      <Suspense fallback={<p className="text-sm text-[var(--color-text-muted)]">Loading Preview workflow…</p>}>
+        <PreviewWorkflow />
+      </Suspense>
     );
   }
   return WorkflowProductionPage();

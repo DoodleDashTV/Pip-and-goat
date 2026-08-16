@@ -2,26 +2,36 @@
 
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
+import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewVoices() {
   const { workspace, message, busy, saveVoice, reset } = usePreviewWorkspace();
+  const hasEpisode = workspace.episodes.length > 0;
 
   return (
-    <div className="space-y-6 overflow-x-hidden">
-      <header>
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-primary)]">
-          Voice Setup
-        </p>
-        <h1 className="mt-2 font-display text-4xl font-bold">Preview voice profiles</h1>
-        <p className="mt-3 max-w-2xl text-sm text-[var(--color-text-muted)]">
-          Save editable metadata only. A saved profile is not a provider voice ID. Audition
-          generation stays disabled because no credentials are configured.
-        </p>
-      </header>
+    <div className="space-y-5 overflow-x-hidden">
+      <PreviewPageIntro
+        kicker="Voices"
+        title="Add a Preview voice note"
+        instruction="Save a character label and a display name. This is not a provider voice ID. Audition generation stays disabled."
+      />
       <PreviewBanner busy={busy} onReset={() => reset()} />
       <PreviewMessage message={message} />
+      {!hasEpisode ? (
+        <PreviewEmptyState
+          title="Create an episode first"
+          body="Voice notes belong to the Preview episode from step 2. Paid ElevenLabs stays blocked."
+          href="/new-episode"
+          actionLabel="Go to New Episode"
+        />
+      ) : workspace.voices.length === 0 ? (
+        <PreviewEmptyState
+          title="No Preview voice profiles yet"
+          body="This is step 4 of 7. Add a label such as “Preview occupant A.” No audio is generated."
+        />
+      ) : null}
       <form
-        className="studio-card space-y-4 p-6"
+        className="studio-card space-y-4 p-4 sm:p-6"
         onSubmit={(event) => {
           event.preventDefault();
           const form = new FormData(event.currentTarget);
@@ -45,13 +55,13 @@ export function PreviewVoices() {
           Notes
           <textarea name="notes" rows={3} className="field-input mt-2" />
         </label>
-        <button type="submit" disabled={busy} className="btn-primary px-5 py-3 text-sm">
+        <button type="submit" disabled={busy} className="btn-primary w-full px-5 text-sm sm:w-auto">
           Save Preview voice profile
         </button>
       </form>
-      <section className="studio-card space-y-3 p-6">
+      <section className="studio-card space-y-3 p-4 sm:p-6">
         <h2 className="font-display text-2xl font-semibold">Audition generation</h2>
-        <button type="button" disabled className="btn-primary px-5 py-3 text-sm" aria-disabled="true">
+        <button type="button" disabled className="btn-primary w-full px-5 text-sm sm:w-auto" aria-disabled="true">
           Generate audition — unavailable
         </button>
         <p className="text-sm text-[var(--color-text-muted)]">
@@ -59,7 +69,7 @@ export function PreviewVoices() {
           voice ID or audio file.
         </p>
       </section>
-      <section className="studio-card p-6">
+      <section className="studio-card p-4 sm:p-6">
         <h2 className="font-display text-2xl font-semibold">Saved profiles</h2>
         {workspace.voices.length === 0 ? (
           <p className="mt-3 text-sm text-[var(--color-text-muted)]">No Preview voice profiles yet.</p>
@@ -67,8 +77,8 @@ export function PreviewVoices() {
           <ul className="mt-4 space-y-3">
             {workspace.voices.map((voice) => (
               <li key={voice.id} className="rounded-2xl border border-[var(--color-border)] p-4">
-                <p className="font-semibold">{voice.displayName}</p>
-                <p className="text-sm text-[var(--color-text-muted)]">
+                <p className="break-words font-semibold">{voice.displayName}</p>
+                <p className="break-words text-sm text-[var(--color-text-muted)]">
                   {voice.characterLabel} · provider voice ID: none · audition: unavailable
                 </p>
               </li>

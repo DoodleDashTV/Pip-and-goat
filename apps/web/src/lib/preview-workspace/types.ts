@@ -1,6 +1,10 @@
 export const PREVIEW_WORKSPACE_KIND = 'PREVIEW_WORKSPACE' as const;
 export const PREVIEW_STORAGE_KEY = 'tivvlejoy.preview-workspace.v1';
 export const PREVIEW_CLASSIFICATION = 'PREVIEW_NONCANONICAL' as const;
+export const PREVIEW_PUBLIC_BANNER =
+  'PREVIEW — Work is stored only in this browser. It is not a production render.';
+export const FOUNDATION_STAGE_LABEL = 'Foundation Stage';
+
 
 export const PREVIEW_DRAFT_STAGES = [
   'BRIEF',

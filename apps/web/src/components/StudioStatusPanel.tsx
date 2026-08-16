@@ -1,3 +1,4 @@
+import { FOUNDATION_STAGE_LABEL } from '@/lib/preview-workspace/types';
 import { readStudioDashboardStatus } from '@/lib/studio-status';
 
 function StatusRow({
@@ -47,7 +48,7 @@ export function StudioStatusPanel() {
         </p>
       </header>
       <div className="grid gap-3">
-        <StatusRow label="Stage" value={status.stageId} tone="closed" />
+        <StatusRow label="Stage" value={FOUNDATION_STAGE_LABEL} tone="closed" />
         <StatusRow
           label="Theatrical gate"
           value={status.theatricalGateLabel}
@@ -83,6 +84,17 @@ export function StudioStatusPanel() {
           tone={status.theatricalBindingCompleted ? 'success' : 'closed'}
         />
       </div>
+      <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-3">
+        <summary className="flex min-h-touch cursor-pointer list-none items-center text-sm font-bold text-[var(--color-primary)]">
+          Advanced / debug — technical values
+        </summary>
+        <p className="mt-2 text-xs leading-5 text-[var(--color-text-muted)]">
+          Technical tools, not the normal Preview workflow.
+        </p>
+        <p className="mt-2 break-all font-mono text-xs text-[var(--color-text)]">
+          Technical stage: {status.stageId}
+        </p>
+      </details>
     </section>
   );
 }

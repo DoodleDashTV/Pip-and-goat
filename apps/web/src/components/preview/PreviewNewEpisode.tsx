@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { PreviewWorkspaceError } from '@/lib/preview-workspace/service';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
+import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewNewEpisode() {
   const router = useRouter();
@@ -12,21 +13,30 @@ export function PreviewNewEpisode() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <div className="space-y-6 overflow-x-hidden">
-      <header>
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-primary)]">
-          New Episode
-        </p>
-        <h1 className="mt-2 font-display text-4xl font-bold">Create a Preview episode</h1>
-        <p className="mt-3 max-w-2xl text-sm text-[var(--color-text-muted)]">
-          Saved in this browser only. Classification is PREVIEW_NONCANONICAL. This does not create a
-          production episode.
-        </p>
-      </header>
+    <div className="space-y-5 overflow-x-hidden">
+      <PreviewPageIntro
+        kicker="New Episode"
+        title="Create a Preview episode"
+        instruction="Give the episode a title and a short premise. This creates a browser-only record. It is not a production episode."
+      />
       <PreviewBanner busy={busy} onReset={() => reset()} />
       <PreviewMessage message={message} />
+      {!workspace.settingsSaved ? (
+        <PreviewEmptyState
+          title="Production Setup is not saved yet"
+          body="Save a project name on Production Setup first. You can still draft an episode here, but the guided path marks this step blocked until setup is saved."
+          href="/production-setup"
+          actionLabel="Go to Production Setup"
+        />
+      ) : null}
+      {workspace.settingsSaved && workspace.episodes.length === 0 ? (
+        <PreviewEmptyState
+          title="No episode yet"
+          body="This is step 2 of 7. Fill in the form below, then tap Create Preview episode. After that you can add assets and voices."
+        />
+      ) : null}
       <form
-        className="studio-card space-y-4 p-6"
+        className="studio-card space-y-4 p-4 sm:p-6"
         onSubmit={(event) => {
           event.preventDefault();
           if (submitted || busy) return;
@@ -74,20 +84,23 @@ export function PreviewNewEpisode() {
             className="field-input mt-2"
           />
         </label>
-        <button type="submit" disabled={busy || submitted} className="btn-primary px-5 py-3 text-sm">
+        <button type="submit" disabled={busy || submitted} className="btn-primary w-full px-5 text-sm sm:w-auto">
           {busy || submitted ? 'Creating…' : 'Create Preview episode'}
         </button>
       </form>
       {workspace.episodes.length ? (
-        <section className="studio-card p-6">
+        <section className="studio-card p-4 sm:p-6">
           <h2 className="font-display text-2xl font-semibold">Existing Preview episodes</h2>
           <ul className="mt-3 space-y-2 text-sm">
             {workspace.episodes.map((episode) => (
-              <li key={episode.id} className="flex flex-wrap justify-between gap-2 border-b border-[var(--color-border)] py-2">
-                <span>
+              <li
+                key={episode.id}
+                className="flex min-h-touch flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] py-2"
+              >
+                <span className="min-w-0 break-words">
                   E{episode.episodeNumber} · {episode.title}
                 </span>
-                <span className="text-[var(--color-text-muted)]">{episode.currentStage}</span>
+                <span className="break-all text-[var(--color-text-muted)]">{episode.currentStage}</span>
               </li>
             ))}
           </ul>

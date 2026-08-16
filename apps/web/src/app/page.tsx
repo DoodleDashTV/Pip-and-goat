@@ -6,6 +6,7 @@ import {
   productionSetupService,
 } from '@doodle-dash/production';
 import { STUDIO_DISPLAY_NAME, resolveStudioDisplayName } from '@doodle-dash/domain';
+import { PreviewDashboard } from '@/components/preview/PreviewDashboard';
 import { StudioStatusPanel } from '@/components/StudioStatusPanel';
 import { isPublicWebsitePreview } from '@/lib/public-preview';
 
@@ -33,6 +34,10 @@ export default async function HomePage() {
 
   const draftsAwaiting = draftReviews.filter((d) => d.status === 'PENDING').length;
   const readyCount = setup ? setup.steps.filter((s) => s.state === 'READY').length : 0;
+
+  if (publicPreview) {
+    return <PreviewDashboard />;
+  }
 
   return (
     <div className="space-y-8 overflow-x-hidden">

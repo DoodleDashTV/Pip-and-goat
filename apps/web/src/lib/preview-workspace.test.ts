@@ -9,7 +9,10 @@ import {
 } from '@doodle-dash/preproduction';
 import { isPublicWebsitePreview } from './public-preview';
 import {
+  FOUNDATION_STAGE_LABEL,
   PREVIEW_DRAFT_STAGES,
+  PREVIEW_PUBLIC_BANNER,
+  PREVIEW_STORAGE_KEY,
   PREVIEW_WORKSPACE_KIND,
   advancePreviewEpisode,
   assertProductionPersistenceAvailable,
@@ -18,9 +21,11 @@ import {
   createPreviewEpisode,
   createPreviewRenderRequest,
   emptyPreviewWorkspace,
+  evaluatePreviewGuide,
   loadPreviewWorkspace,
   memoryBackend,
   previewSafetySnapshot,
+  previewStepLabel,
   registerPreviewAsset,
   resetPreviewStudio,
   savePreviewSettings,
@@ -232,6 +237,9 @@ describe('Preview navigation and primary workflow wiring', () => {
     expect(shell).toContain('Advanced / debug');
     expect(shell).toContain('aria-current');
     expect(shell).toContain('Close menu');
+    expect(shell).toContain(FOUNDATION_STAGE_LABEL);
+    expect(shell).toContain(PREVIEW_PUBLIC_BANNER);
+    expect(shell).toContain('Technical tools, not the normal Preview workflow');
     for (const file of [
       'apps/web/src/app/production-setup/page.tsx',
       'apps/web/src/app/new-episode/page.tsx',
@@ -247,6 +255,110 @@ describe('Preview navigation and primary workflow wiring', () => {
       'Generate audition — unavailable',
     );
     expect(readRepo('apps/web/src/components/preview/PreviewVoices.tsx')).toContain('disabled');
+  });
+
+  it('keeps the Preview storage key and public banner copy stable', () => {
+    expect(PREVIEW_STORAGE_KEY).toBe('tivvlejoy.preview-workspace.v1');
+    expect(PREVIEW_PUBLIC_BANNER).toBe(
+      'PREVIEW — Work is stored only in this browser. It is not a production render.',
+    );
+    expect(readRepo('apps/web/src/components/preview/PreviewBanner.tsx')).toContain(
+      'PREVIEW_PUBLIC_BANNER',
+    );
+    expect(readRepo('apps/web/src/app/layout.tsx')).toContain('isPreview={isPublicWebsitePreview()}');
+  });
+
+  it('hides the technical stage from primary Preview pages', () => {
+    for (const file of [
+      'apps/web/src/components/preview/PreviewDashboard.tsx',
+      'apps/web/src/components/preview/PreviewProductionSetup.tsx',
+      'apps/web/src/components/preview/PreviewNewEpisode.tsx',
+      'apps/web/src/components/preview/PreviewAssetIntake.tsx',
+      'apps/web/src/components/preview/PreviewVoices.tsx',
+      'apps/web/src/components/preview/PreviewWorkflow.tsx',
+      'apps/web/src/components/preview/PreviewReadiness.tsx',
+      'apps/web/src/components/preview/PreviewRenderQueue.tsx',
+    ]) {
+      expect(readRepo(file)).not.toContain('DDP_STEPS_1_8');
+    }
+    for (const file of [
+      'apps/web/src/components/preview/PreviewProductionSetup.tsx',
+      'apps/web/src/components/preview/PreviewNewEpisode.tsx',
+      'apps/web/src/components/preview/PreviewAssetIntake.tsx',
+      'apps/web/src/components/preview/PreviewVoices.tsx',
+      'apps/web/src/components/preview/PreviewWorkflow.tsx',
+      'apps/web/src/components/preview/PreviewReadiness.tsx',
+      'apps/web/src/components/preview/PreviewRenderQueue.tsx',
+    ]) {
+      expect(readRepo(file)).toContain('PreviewEmptyState');
+    }
+    expect(readRepo('apps/web/src/components/preview/PreviewWorkflow.tsx')).toContain(
+      FOUNDATION_STAGE_LABEL,
+    );
+    expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).toContain('Available');
+    expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).toContain(
+      'Not connected',
+    );
+    expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).toContain(
+      'Stored only in this browser and non-durable',
+    );
+    expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).not.toContain(
+      'Open Preview Production Setup',
+    );
+    expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).not.toContain(
+      'Not available yet — production database',
+    );
+  });
+});
+
+describe('Preview guided path status', () => {
+  it('labels empty, in-progress, completed, and blocked steps', () => {
+    expect(previewStepLabel('not_started')).toBe('Not started');
+    expect(previewStepLabel('in_progress')).toBe('In progress');
+    expect(previewStepLabel('completed')).toBe('Completed');
+    expect(previewStepLabel('blocked')).toBe('Blocked');
+
+    const empty = evaluatePreviewGuide(emptyPreviewWorkspace());
+    expect(empty.find((step) => step.id === 'production-setup')?.status).toBe('not_started');
+    expect(empty.filter((step) => step.id !== 'production-setup').every((step) => step.status === 'blocked')).toBe(
+      true,
+    );
+
+    const backend = memoryBackend();
+    savePreviewSettings({ projectName: 'Guide Studio' }, backend);
+    const afterSetup = evaluatePreviewGuide(loadFrom(backend));
+    expect(afterSetup.find((step) => step.id === 'production-setup')?.status).toBe('completed');
+    expect(afterSetup.find((step) => step.id === 'new-episode')?.status).toBe('not_started');
+    expect(afterSetup.find((step) => step.id === 'assets')?.status).toBe('blocked');
+
+    const { episode } = createPreviewEpisode(
+      { title: 'Guide Walk', episodeNumber: 1, durationSec: 30, premise: 'Guide the path.' },
+      backend,
+    );
+    const afterEpisode = evaluatePreviewGuide(loadFrom(backend));
+    expect(afterEpisode.find((step) => step.id === 'new-episode')?.status).toBe('completed');
+    expect(afterEpisode.find((step) => step.id === 'assets')?.status).toBe('not_started');
+    expect(afterEpisode.find((step) => step.id === 'workflow')?.status).toBe('not_started');
+    expect(afterEpisode.find((step) => step.id === 'readiness')?.status).toBe('in_progress');
+    expect(afterEpisode.find((step) => step.id === 'render-queue')?.status).toBe('blocked');
+
+    registerPreviewAsset({ name: 'Stand-in', type: 'PROP', version: 'v1' }, backend);
+    savePreviewVoiceProfile({ characterLabel: 'A', displayName: 'Voice' }, backend);
+    const afterNotes = evaluatePreviewGuide(loadFrom(backend));
+    expect(afterNotes.find((step) => step.id === 'assets')?.status).toBe('completed');
+    expect(afterNotes.find((step) => step.id === 'voices')?.status).toBe('completed');
+    expect(afterNotes.find((step) => step.id === 'readiness')?.status).toBe('completed');
+    expect(afterNotes.find((step) => step.id === 'render-queue')?.status).toBe('not_started');
+
+    let current = episode;
+    current = advancePreviewEpisode(current.id, backend).episode;
+    expect(evaluatePreviewGuide(loadFrom(backend)).find((step) => step.id === 'workflow')?.status).toBe(
+      'in_progress',
+    );
+    createPreviewRenderRequest(current.id, backend);
+    expect(evaluatePreviewGuide(loadFrom(backend)).find((step) => step.id === 'render-queue')?.status).toBe(
+      'completed',
+    );
   });
 });
 

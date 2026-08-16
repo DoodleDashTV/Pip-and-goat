@@ -18,11 +18,13 @@ import type { PreviewAsset, PreviewWorkspace } from './types';
 export function usePreviewWorkspace() {
   const backend = useMemo(() => defaultPreviewBackend(), []);
   const [workspace, setWorkspace] = useState<PreviewWorkspace>(() => loadPreviewWorkspace(backend));
+  const [hydrated, setHydrated] = useState(false);
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     setWorkspace(loadPreviewWorkspace(backend));
+    setHydrated(true);
   }, [backend]);
 
   const run = useCallback(
@@ -47,6 +49,7 @@ export function usePreviewWorkspace() {
 
   return {
     workspace,
+    hydrated,
     message,
     busy,
     readiness: calculatePreviewReadiness(workspace),
