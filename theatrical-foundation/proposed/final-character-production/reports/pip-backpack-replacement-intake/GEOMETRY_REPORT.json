@@ -1,0 +1,136 @@
+{
+  "objectCount": 1,
+  "objectNames": [
+    "tripo_node_72aab415-8aae-46cc-aa12-6d00f03117fe"
+  ],
+  "objectSeparation": "single_or_fused",
+  "armatures": [],
+  "rigPresent": false,
+  "shapeKeys": [],
+  "materials": [
+    "tripo_material_72aab415-8aae-46cc-aa12-6d00f03117fe"
+  ],
+  "textures": [
+    {
+      "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        8192,
+        8192
+      ]
+    },
+    {
+      "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        4096,
+        4096
+      ]
+    },
+    {
+      "name": "ORM_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "size": [
+        4096,
+        4096
+      ]
+    }
+  ],
+  "uvMaps": [
+    "UVMap"
+  ],
+  "objects": [
+    {
+      "name": "tripo_node_72aab415-8aae-46cc-aa12-6d00f03117fe",
+      "vertices": 1006107,
+      "faces": 1930054,
+      "triangles": 1930054,
+      "disconnectedComponents": 463,
+      "nonManifoldEdges": 81234,
+      "boundaryEdges": 81234,
+      "holesEstimate": 27078,
+      "invertedNormalFaces": 278123,
+      "intersections": {
+        "checked": false,
+        "overlappingPairs": 0,
+        "reason": "deferred_high_density"
+      },
+      "uvMaps": [
+        "UVMap"
+      ],
+      "materials": [
+        "tripo_material_72aab415-8aae-46cc-aa12-6d00f03117fe"
+      ],
+      "shapeKeys": []
+    }
+  ],
+  "totals": {
+    "vertices": 1006107,
+    "triangles": 1930054,
+    "faces": 1930054,
+    "disconnectedComponents": 463,
+    "nonManifoldEdges": 81234,
+    "boundaryEdges": 81234,
+    "holesEstimate": 27078,
+    "invertedNormalFaces": 278123
+  },
+  "textureCheck": {
+    "hasImageTextures": true,
+    "colorLike": [
+      {
+        "name": "Color_72aab415-8aae-46cc-aa12-6d00f03117fe",
+        "size": [
+          8192,
+          8192
+        ]
+      }
+    ],
+    "normalLike": [
+      {
+        "name": "NormalGL_72aab415-8aae-46cc-aa12-6d00f03117fe",
+        "size": [
+          4096,
+          4096
+        ]
+      }
+    ]
+  },
+  "dimensions": {
+    "min": [
+      -0.2055005431175232,
+      -0.2326963245868683,
+      -0.4896332025527954
+    ],
+    "max": [
+      0.20517095923423767,
+      0.2327689528465271,
+      0.4895886182785034
+    ],
+    "size": [
+      0.41067150235176086,
+      0.4654652774333954,
+      0.9792218208312988
+    ],
+    "nativeHeight": 0.9792218208312988
+  },
+  "scaleCheck": {
+    "nativeHeight": 0.9792218208312988,
+    "targetHeight": 2.05,
+    "suggestedFactor": 2.0934990993763565,
+    "withinTenPercent": false,
+    "appliedToOriginal": false
+  },
+  "orientationCheck": {
+    "charactersFace": "+X",
+    "characterLeft": "+Y",
+    "characterRight": "-Y",
+    "strapShoulder": "character-right (\u2212Y)",
+    "satchelHip": "character-left (+Y)",
+    "whenFacingCamera": {
+      "cameraLooksToward": "\u2212X",
+      "strapViewerSide": "viewer-left",
+      "bagViewerSide": "viewer-right"
+    },
+    "autoCorrectOriginal": false,
+    "heuristic": "Reviewers must confirm +X facing against the binding front sheet. Intake does not auto-rotate the original.",
+    "appliedToOriginal": false
+  },
+  "highDensity": true
+}

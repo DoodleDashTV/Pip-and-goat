@@ -23,6 +23,7 @@ from pip_replacement_intake_lib import (  # noqa: E402
     LONG_WING_ORIGINAL_SHA256,
     PIP_COMPARISON_ITEMS,
     PRODUCTION_LIBRARY,
+    backpack_closeup_cameras,
     detect_accessory_profile,
     apply_measured_hints,
     assert_not_protected_write,
@@ -142,6 +143,23 @@ class ProtectionAndGateTests(unittest.TestCase):
         result = suggested_scale(0.98)
         self.assertAlmostEqual(result["suggestedFactor"], 2.05 / 0.98, places=5)
         self.assertFalse(result["appliedToOriginal"])
+
+    def test_backpack_closeups_track_centered_mesh(self) -> None:
+        center = (0.0, 0.0, 0.0)
+        height = 0.98
+        cams = backpack_closeup_cameras(center, height)
+        required = {
+            "shoulder_left",
+            "shoulder_right",
+            "backpack_attachment",
+            "backpack_wing_clearance",
+        }
+        self.assertEqual(required, set(cams))
+        for spec in cams.values():
+            look = spec["look"]
+            self.assertLess(abs(look[2]), height * 0.40)
+            self.assertGreater(spec["ortho"], 0.2)
+            self.assertLess(spec["ortho"], height)
 
 
 class PreparePackageTests(unittest.TestCase):

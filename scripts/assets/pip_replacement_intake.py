@@ -35,6 +35,7 @@ from pip_replacement_intake_lib import (  # noqa: E402
     apply_measured_hints,
     assert_intake_destination,
     assert_not_protected_write,
+    backpack_closeup_cameras,
     blender_command,
     classify_file,
     detect_accessory_profile,
@@ -295,27 +296,10 @@ def render_comparison_views(dest: Path, profile: str = "satchel") -> list[str]:
             "right": (center + right * radius, height * 1.28, focus),
             "front_three_quarter": (center + (facing * 0.72 + left * 0.72) * radius, height * 1.32, focus),
             "rear_three_quarter": (center + (-facing * 0.72 + left * 0.72) * radius, height * 1.32, focus),
-            "shoulder_left": (
-                Vector((height * 0.55, height * 0.35, height * 0.78)),
-                height * 0.62,
-                Vector((0.05, 0.12, height * 0.78)),
-            ),
-            "shoulder_right": (
-                Vector((height * 0.55, -height * 0.35, height * 0.78)),
-                height * 0.62,
-                Vector((0.05, -0.12, height * 0.78)),
-            ),
-            "backpack_attachment": (
-                Vector((-height * 0.85, 0.0, height * 0.72)),
-                height * 0.68,
-                Vector((0.0, 0.0, height * 0.68)),
-            ),
-            "backpack_wing_clearance": (
-                Vector((-height * 0.72, height * 0.55, height * 0.78)),
-                height * 0.72,
-                Vector((-0.05, 0.08, height * 0.70)),
-            ),
         }
+        closeups = backpack_closeup_cameras((center.x, center.y, center.z), height)
+        for name, spec in closeups.items():
+            views[name] = (Vector(spec["location"]), spec["ortho"], Vector(spec["look"]))
     else:
         views = {
             "front": (center + facing * radius, height * 1.28, focus),

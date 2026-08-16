@@ -236,6 +236,49 @@ def detect_accessory_profile(name: str) -> str:
     return "satchel"
 
 
+def backpack_closeup_cameras(
+    center: tuple[float, float, float],
+    height: float,
+    facing: tuple[float, float, float] = FACING,
+    left: tuple[float, float, float] = CHAR_LEFT,
+    right: tuple[float, float, float] = CHAR_RIGHT,
+) -> dict[str, dict[str, tuple[float, float, float] | float]]:
+    """Close-up cameras relative to mesh bounds, not world origin.
+
+    Uploaded Tripo meshes are often centered on the origin (feet below z=0).
+    Origin-relative close-ups then frame empty sky above the crest.
+    """
+    cx, cy, cz = center
+    h = max(float(height), 0.001)
+    fx, fy, fz = facing
+    lx, ly, lz = left
+    rx, ry, rz = right
+    shoulder_z = cz + h * 0.22
+    pack_z = cz + h * 0.10
+    return {
+        "shoulder_left": {
+            "location": (cx + fx * h * 0.42 + lx * h * 0.28, cy + fy * h * 0.42 + ly * h * 0.28, shoulder_z),
+            "look": (cx + lx * h * 0.08, cy + ly * h * 0.08, shoulder_z),
+            "ortho": h * 0.48,
+        },
+        "shoulder_right": {
+            "location": (cx + fx * h * 0.42 + rx * h * 0.28, cy + fy * h * 0.42 + ry * h * 0.28, shoulder_z),
+            "look": (cx + rx * h * 0.08, cy + ry * h * 0.08, shoulder_z),
+            "ortho": h * 0.48,
+        },
+        "backpack_attachment": {
+            "location": (cx - fx * h * 0.70, cy - fy * h * 0.70, pack_z + h * 0.04),
+            "look": (cx, cy, pack_z),
+            "ortho": h * 0.52,
+        },
+        "backpack_wing_clearance": {
+            "location": (cx - fx * h * 0.48 + lx * h * 0.42, cy - fy * h * 0.48 + ly * h * 0.42, pack_z + h * 0.10),
+            "look": (cx - fx * h * 0.04 + lx * h * 0.08, cy - fy * h * 0.04 + ly * h * 0.08, pack_z + h * 0.04),
+            "ortho": h * 0.56,
+        },
+    }
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 

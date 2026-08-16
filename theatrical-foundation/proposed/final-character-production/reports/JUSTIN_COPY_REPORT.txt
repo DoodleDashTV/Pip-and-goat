@@ -1,4 +1,4 @@
-TIVVLEJOY — PRODUCTION CONTINUED WHILE PIP REPLACEMENT IS PENDING
+TIVVLEJOY — PIP BACKPACK CANDIDATE READY FOR VISUAL APPROVAL
 SELECT-ALL COPY BLOCK
 
 Working branch: cursor/theatrical-final-character-production-1ebc
@@ -12,128 +12,103 @@ production-library touched: no
 Canon / merge / theatrical binding: unchanged / not performed / not declared
 
 WHAT THIS PASS DID
-Copied the exact bytes of pip_replacement.glb.part1.bin and part2.bin
-from main, and part3.bin from the theatrical upload path, into
-theatrical-foundation/proposed/pip-replacement-intake/inbox/.
-Reassembled only those three inbox files. Full SHA-256 and size
-matched. Ran ingest-next-pip.sh on the reconstructed GLB. Wrote the
-comparison package and phone previews. Did not overwrite current Pip.
+Located the three backpack split uploads, copied exact bytes into
+theatrical-foundation/proposed/pip-replacement-intake/inbox/, and
+reassembled only those inbox parts to /tmp/pip_backpack_replacement.glb.
+Size 62876180 and SHA-256
+dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
+matched. Ran scripts/tivvlejoy/ingest-next-pip.sh on that file.
+Wrote the backpack comparison package and phone-viewable stills.
+Did not overwrite current Pip. Did not delete the earlier satchel
+candidate.
 
-Stopped all destructive work on the fused Tripo Pip. Preserved the
-conditionally approved long-wing candidate and strap-repair evidence
-for comparison only. Did not paint, flatten, remesh, or cover the
-fused left-front riser.
+This backpack version supersedes the satchel replacement candidate
+for visual review. Satchel inbox parts, reports, and phone stills
+remain for comparison only.
 
-COMPLETED PRODUCTION SYSTEMS
-1. Durable asset manifest and repository classification
-   (locked library, preserved comparison, proposed, proxy, intake).
-2. Canon/reference database structure. Binding five-views remain
-   authority. Locked canon is not mutated. Theatrical gate stays closed.
-3. Character-candidate ingestion and comparison tools.
-4. Automated Pip replacement intake for BLEND, GLB, GLTF, FBX, OBJ,
-   textures, and ZIP.
-5. SHA-256 hashing, provenance, license/source fields, Blender 4.2.3
-   import validation, scale, orientation, and texture checks.
-6. Automatic five-view, shoulder/satchel close-ups, and 8-frame
-   turntable preview rendering (proved on a local fixture).
-7. Geometry reports: verts/tris, disconnected components, non-manifold,
-   holes, intersections, normals, UVs, materials/textures, armature,
-   shape keys, object separation, dimensions.
-8. Reference-comparison checklist for face/eyes, yellow finish, three
-   coral feathers, long wings, teal scarf, one continuous cross-body
-   strap, right-shoulder origin, diagonal front/rear path, left-hip
-   satchel, copper spiral, feet/toes/hallux, fused vs separated
-   accessories. Every visual item stays REQUIRES_JUSTIN.
-9. Non-destructive material, lighting, camera, and render presets
-   (Khronos PBR Neutral, 1080×1920, EEVEE). They do not rewrite
-   uploaded meshes or claim final character framing.
-10. Director AI, Story Brain, continuity, storyboard, animatic,
-    shot-planning QC, cost-control, recovery, and provenance continued.
-    Final Pip framing is an error until a replacement is approved.
-11. Episode/season catalogs, reusable meadow/map indexes, creek marked
-    missing, sound plan stays local/mock, no paid providers.
-12. Modular Pip rig specification written and unbound. Not registered
-    as the live Pip rig. Not bound to the current candidate.
-13. PROXY_PIPELINE_BIRD built and labeled. Pipeline tests only.
-    Not Pip. Not canon.
-14. Automated tests added. Existing thresholds not weakened.
-15. One command to ingest the next Pip and build its comparison package.
+BINDING USED
+Identity still binds to the ten five-view JPEGs (Pip front, 3/4, back,
+both profiles, plus Goat equivalents). Accessory binding is Justin’s
+written backpack spec: true backpack centered on the back, two
+symmetrical shoulder straps, no satchel, no cross-body strap, no hip
+bag, long wings remain visible, no intersection with wings/scarf/neck/
+tail/body, preserve approved face, eyes, bright-yellow finish, three
+coral crest feathers, wings, feet, proportions, and CGI appearance.
 
-HONEST LIMIT
-These systems are ready to receive and compare the next Pip upload.
-They are not a production-ready Pip, not a theatrical bind, and not
-a finished episode pipeline.
-
-TESTS AND VALIDATION
-- python3 scripts/assets/test_pip_replacement_intake.py — 11/11 PASS
-- pnpm test:color — 19/19 PASS
-- blender test_rig_gates.py — 57/57 PASS (includes 2 new proxy tests)
-- vitest pip-replacement-intake.test.ts — 11/11 PASS
-- vitest theatrical-foundation + theatrical-v1 + direction-steps-1-8
-  — 121/121 PASS
-- direction / production / story typecheck — PASS
-- Fixture OBJ ingest + Blender 4.2.3 validation — PASS
-- Fixture five-view + turntable (16 stills) — PASS
-- Approved library fingerprint unchanged:
-  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+The four newest dedicated Pip backpack photographs were not found on
+this branch, in the inbox, or in the source package. They were not used.
 
 INTAKE CANDIDATE (WAITING FOR JUSTIN)
-Package: 20260816T022327Z_pip_replacement.glb_2e06f4285448
-SHA-256: 2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e
-Size: 64634144 bytes
-Mesh: 1 fused Tripo object, 1,034,925 verts, 1,988,526 tris
+Package: 20260816T025617Z_pip_backpack_replacement.glb_dca239475c78
+SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
+Size: 62876180 bytes
+Mesh: 1 fused Tripo object, 1,006,107 verts, 1,930,054 tris
+Native height 0.979; suggested scale 2.093; not applied
 Approved: no
 Auto-replace current Pip: no
 
-Phone previews:
-artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/contact_sheet_phone.jpg
-artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/front.jpg
-artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/rear.jpg
-artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/three_quarter.jpg
-artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/face.jpg
-artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/shoulder_right.jpg
-artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/satchel_left.jpg
+PHONE-VIEWABLE COMPARISON
+1. front
+2. back
+3. left side
+4. right side
+5. front three-quarter
+6. rear three-quarter
+7. left shoulder close-up
+8. right shoulder close-up
+9. backpack attachment close-up
+10. backpack/wing-clearance close-up
+11. turntable (8 frames)
 
-COMMITS
-- 9337f66 Add Pip replacement intake gate and character-independent production systems.
-- efb17d9 Add labeled pipeline proxy and Justin intake report.
-- b10c2de Record intake checkpoint SHAs in the Justin copy report.
-- c6cb896 docs(assets): place split Pip replacement parts in the intake inbox.
-- 62a4ac4 docs(assets): ingest reconstructed Pip replacement for Justin review.
+Folder:
+artifacts/theatrical-v2/final-character-production/pip-backpack-replacement-intake/phone/
 
-REMAINING CHARACTER-DEPENDENT BLOCKERS
-- Current Pip still has a fused left-front satchel riser.
-- Replacement candidate is ingested but not visually approved.
-- No final Pip retopo, UVs, texture lock, rig, facial rig, groom,
-  animation, collision, or Pip–Goat scale bind.
-- Goat remains unchanged and unapproved.
-- No hero shots or final episode renders.
-- Season 1 public canon is not approved.
+Contact sheet:
+artifacts/theatrical-v2/final-character-production/pip-backpack-replacement-intake/phone/contact_sheet_phone.jpg
 
-HOW TO UPLOAD AND PROCESS THE NEXT PIP MODEL
-1. Put the file on this machine (BLEND, GLB, GLTF, FBX, OBJ, or ZIP).
-2. Run: scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
+HONEST VISUAL NOTES (NOT AN APPROVAL)
+Front and turntable show two green shoulder straps and no satchel,
+cross-body strap, or hip bag. Rear views show a centered green
+backpack with a circular gold clasp. Long yellow wings stay visible.
+Face, green/teal eyes, bright-yellow finish, three coral crest
+feathers, teal scarf, and orange feet are present. Shoulder close-ups
+show each strap passing under the scarf. Attachment and wing-clearance
+close-ups show the pack on the upper back with space beside the wing
+roots in these camera angles. Accessories are fused into one object.
+Justin must still decide intersection and identity match.
 
-   Optional:
-   PIP_LICENSE="in-house sculpt" PIP_ORIGIN="Justin upload" \
-     scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
+Close-up cameras were first aimed too high because the mesh is
+centered on the origin. Those four stills were re-rendered from the
+saved preview blend using bounds-relative cameras. Wide views and the
+turntable were not replaced.
 
-3. Review inbox/<package-id>/reports/COMPARISON_PACKAGE.md
-   and inbox/<package-id>/previews/.
-4. Approve or reject visually against the ten binding five-views
-   and the conditionally approved long-wing look.
-5. Do not retopo, rig, replace canon, bind theatrically, or merge
-   until that visual approval.
+PRESERVED FOR COMPARISON ONLY
+- Current pip_highres_candidate.blend (unchanged)
+- Long-wing original parts (SHA-256 9158dea0e23e5ebb…c4f2)
+- Satchel candidate inbox parts and
+  artifacts/theatrical-v2/final-character-production/pip-replacement-intake/
+- Strap-repair evidence
 
-The command copies the file unchanged, records filename + SHA-256,
-opens it in Blender 4.2.3 LTS, and stops. It will not replace
-current Pip.
+NOT DONE
+- No retopo, UV, texture lock, rig, facial rig, groom, or animation
+- Goat untouched
+- Canon untouched
+- production-library untouched
+- No theatrical bind
+- No merge
+- Draft PR #24 stays draft
+- No paid resources
+
+TESTS
+- python3 scripts/assets/test_pip_replacement_intake.py — 13/13 PASS
+- Approved library fingerprint unchanged:
+  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
 
 STATUS
-PIP VISUAL CANDIDATE: INTAKE COMPLETE — waiting for Justin visual approval of pip_replacement.glb; current Pip unchanged
-GOAT VISUAL CANDIDATE: UNCHANGED — do not work unless separately authorized
-PIP PRODUCTION ASSET: BLOCKED
-GOAT PRODUCTION ASSET: BLOCKED
+PIP BACKPACK CANDIDATE: INTAKE COMPLETE — waiting for Justin visual approval
+PIP SATCHEL CANDIDATE: PRESERVED FOR COMPARISON ONLY — superseded for review
+PIP CURRENT WORKING: UNCHANGED — do not overwrite
+GOAT: UNCHANGED
 CANON: UNCHANGED
 MERGE: NOT PERFORMED
 THEATRICAL BINDING: NOT DECLARED

@@ -1,0 +1,72 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.manifest.v1",
+  "packageId": "20260816T025617Z_pip_backpack_replacement.glb_dca239475c78",
+  "createdAt": "2026-08-16T02:56:18Z",
+  "original": {
+    "filename": "pip_backpack_replacement.glb",
+    "relative": "pip_backpack_replacement.glb",
+    "extension": ".glb",
+    "kind": "model",
+    "bytes": 62876180,
+    "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+    "magic": "glb",
+    "supported": true
+  },
+  "classification": {
+    "files": [
+      {
+        "filename": "pip_backpack_replacement.glb",
+        "relative": "pip_backpack_replacement.glb",
+        "extension": ".glb",
+        "kind": "model",
+        "bytes": 62876180,
+        "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+        "magic": "glb",
+        "supported": true
+      }
+    ],
+    "modelCount": 1,
+    "textureCount": 0,
+    "otherCount": 0,
+    "primaryModel": {
+      "filename": "pip_backpack_replacement.glb",
+      "relative": "pip_backpack_replacement.glb",
+      "extension": ".glb",
+      "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
+      "bytes": 62876180
+    },
+    "supported": true
+  },
+  "paths": {
+    "root": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T025617Z_pip_backpack_replacement.glb_dca239475c78",
+    "original": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T025617Z_pip_backpack_replacement.glb_dca239475c78/original",
+    "unpacked": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T025617Z_pip_backpack_replacement.glb_dca239475c78/unpacked",
+    "reports": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T025617Z_pip_backpack_replacement.glb_dca239475c78/reports",
+    "previews": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T025617Z_pip_backpack_replacement.glb_dca239475c78/previews",
+    "preview_blend": "/workspace/theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T025617Z_pip_backpack_replacement.glb_dca239475c78/preview"
+  },
+  "blenderValidation": "complete",
+  "accessoryProfile": "backpack",
+  "renders": [
+    "previews/front.png",
+    "previews/rear.png",
+    "previews/left.png",
+    "previews/right.png",
+    "previews/front_three_quarter.png",
+    "previews/rear_three_quarter.png",
+    "previews/shoulder_left.png",
+    "previews/shoulder_right.png",
+    "previews/backpack_attachment.png",
+    "previews/backpack_wing_clearance.png",
+    "previews/turntable_00.png",
+    "previews/turntable_01.png",
+    "previews/turntable_02.png",
+    "previews/turntable_03.png",
+    "previews/turntable_04.png",
+    "previews/turntable_05.png",
+    "previews/turntable_06.png",
+    "previews/turntable_07.png"
+  ],
+  "approved": false,
+  "autoReplaceCurrentPip": false
+}

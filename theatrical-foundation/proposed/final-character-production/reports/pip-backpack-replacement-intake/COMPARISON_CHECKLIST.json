@@ -1,0 +1,128 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.checklist.v1",
+  "items": [
+    {
+      "id": "face_and_green_eyes",
+      "label": "Face and green/teal glossy eyes",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "bright_yellow_cgi_finish",
+      "label": "Bright yellow CGI feather finish",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "three_coral_crest_feathers",
+      "label": "Exactly three coral crown/crest feathers",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect exactly three coral crest feathers"
+    },
+    {
+      "id": "long_layered_wings_visible",
+      "label": "Long layered wings remain visible",
+      "authority": "conditionally approved long-wing appearance + backpack accessory refs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 long layered wings must remain visible"
+    },
+    {
+      "id": "teal_scarf",
+      "label": "Teal neckerchief/scarf, not intersected by backpack",
+      "authority": "binding five-view JPEGs + backpack accessory refs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "true_backpack_centered_on_back",
+      "label": "True backpack centered on Pip\u2019s back",
+      "authority": "four newest Pip backpack pictures + written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm a true backpack centered on the back"
+    },
+    {
+      "id": "two_symmetrical_shoulder_straps",
+      "label": "Two symmetrical shoulder straps",
+      "authority": "four newest Pip backpack pictures + written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm two symmetrical shoulder straps"
+    },
+    {
+      "id": "no_satchel",
+      "label": "No satchel",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm no satchel"
+    },
+    {
+      "id": "no_cross_body_strap",
+      "label": "No cross-body strap",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm no cross-body strap"
+    },
+    {
+      "id": "no_hip_bag",
+      "label": "No hip bag",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm no hip bag"
+    },
+    {
+      "id": "backpack_no_intersection",
+      "label": "Backpack must not intersect wings, scarf, neck, tail, or body",
+      "authority": "written accessory spec",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 backpack must not intersect wings, scarf, neck, tail, or body"
+    },
+    {
+      "id": "feet_toes_rear_hallux",
+      "label": "Feet, toes, and rear hallux",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "accessories_separated_or_fused",
+      "label": "Accessories are separate objects vs fused into the body",
+      "authority": "production suitability",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "single_or_fused"
+    },
+    {
+      "id": "proportions_and_cgi_appearance",
+      "label": "Preserve approved face, eyes, yellow finish, crest, wings, feet, proportions, CGI appearance",
+      "authority": "conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    }
+  ],
+  "approved": false,
+  "autoReplace": false
+}
