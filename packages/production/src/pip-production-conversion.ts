@@ -20,14 +20,23 @@ export const APPROVED_PIP_CONVERSION_BLEND =
   'theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend';
 
 export const PIP_CONVERSION_REMAINING = [
+  'justin_path_decision_human_artist_or_paid_service_or_pause',
   'animation_retopo_with_clean_deformation_loops',
+  'isolated_backpack_straps_and_scarf',
   'production_weights_on_retopo_not_envelopes',
   'production_facial_rig_with_lid_and_viseme_targets',
   'groom_or_feather_cards_that_deform',
   'uv_rebuild_if_retopo_changes_seams',
-  'justin_visual_approval_of_this_conversion',
+  'envelope_approach_rejected_do_not_repeat',
   'production_library_replace_still_closed',
   'theatrical_binding_still_closed',
+] as const;
+
+export const PIP_RETOPO_PATH_CHOICES = [
+  'human_artist_unpaid_unless_later_approved',
+  'external_retopo_service_paid_needs_yes',
+  'pause_keep_checkpoint',
+  'refuse_automated_remesh',
 ] as const;
 
 export const PipProductionConversionSchema = z.object({
@@ -43,6 +52,9 @@ export const PipProductionConversionSchema = z.object({
   visualIdentityApproved: z.literal(true),
   conversionStarted: z.boolean(),
   conversionComplete: z.literal(false),
+  justinConversionApproved: z.literal(false).optional(),
+  conversionCheckpointOnly: z.literal(true).optional(),
+  envelopeApproachRejected: z.literal(true).optional(),
   productionReady: z.literal(false),
   productionLibraryReplaced: z.literal(false),
   theatricalBound: z.literal(false),
@@ -112,9 +124,9 @@ export function evaluatePipConversionGate(
   const approved = raw.justinApprovedVisualIdentity !== false;
   const blockers = [
     'Official backpack Pip is the visual identity, not a production-ready mesh.',
-    'Safe conversion may separate disconnected islands and add a validation armature only.',
-    'Voxel remesh, Quadriflow of this density, and primitive rebuild remain refused.',
-    'A later animation retopo is still required for eyelid, mouth, and wing-fold loops.',
+    'Justin rejected the envelope conversion as animation-ready. Do not repeat that approach.',
+    'Voxel remesh, Quadriflow of this density, primitive rebuild, and envelope-on-fused remain refused.',
+    'A new animation retopo is required. Justin must choose artist, paid service, or pause.',
   ];
   if (!approved) blockers.push('Justin has not approved the backpack Pip visual identity.');
   if (raw.requestProductionReady) blockers.push('Production-ready claim requested and refused.');
@@ -131,6 +143,9 @@ export function evaluatePipConversionGate(
     visualIdentityApproved: approved,
     conversionStarted: raw.conversionStarted === true,
     conversionComplete: false,
+    justinConversionApproved: false,
+    conversionCheckpointOnly: true,
+    envelopeApproachRejected: true,
     productionReady: false,
     productionLibraryReplaced: false,
     theatricalBound: false,
@@ -149,5 +164,31 @@ export function evaluatePipConversionGate(
     boundDesignElements: PIP_BOUND_DESIGN_ELEMENTS,
     remaining: PIP_CONVERSION_REMAINING,
     conversionBlend: APPROVED_PIP_CONVERSION_BLEND,
+  };
+}
+
+export function evaluatePipRetopoPathDecision(
+  choice?: (typeof PIP_RETOPO_PATH_CHOICES)[number],
+) {
+  if (choice && !PIP_RETOPO_PATH_CHOICES.includes(choice)) {
+    throw new Error(`unknown retopo path choice: ${choice}`);
+  }
+  return {
+    schema: 'tivvlejoy.pip_retopo_path.v1' as const,
+    choice: choice ?? null,
+    chosen: Boolean(choice),
+    startsConversion: false,
+    productionReady: false,
+    paidResourcesAuthorized: false,
+    paidResourcesRequested: choice === 'external_retopo_service_paid_needs_yes',
+    envelopeApproachRejected: true,
+    automatedRemeshRefused: true,
+    goatTouched: false,
+    productionLibraryReplaced: false,
+    theatricalBound: false,
+    mergeAuthorized: false,
+    stopForJustin: !choice,
+    choices: PIP_RETOPO_PATH_CHOICES,
+    note: 'A paid service still needs a separate explicit Justin yes before any purchase.',
   };
 }

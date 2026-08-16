@@ -120,14 +120,23 @@ PROTECTED_CONVERSION_SOURCES = (
 )
 
 REMAINING_AFTER_SAFE_CONVERSION = (
+    "justin_path_decision_human_artist_or_paid_service_or_pause",
     "animation_retopo_with_clean_deformation_loops",
+    "isolated_backpack_straps_and_scarf",
     "production_weights_on_retopo_not_envelopes",
     "production_facial_rig_with_lid_and_viseme_targets",
     "groom_or_feather_cards_that_deform",
     "uv_rebuild_if_retopo_changes_seams",
-    "justin_visual_approval_of_this_conversion",
+    "envelope_approach_rejected_do_not_repeat",
     "production_library_replace_still_closed",
     "theatrical_binding_still_closed",
+)
+
+RETOPO_PATH_CHOICES = (
+    "human_artist_unpaid_unless_later_approved",
+    "external_retopo_service_paid_needs_yes",
+    "pause_keep_checkpoint",
+    "refuse_automated_remesh",
 )
 
 
@@ -174,9 +183,9 @@ def evaluate_conversion_gate(
 ) -> dict[str, Any]:
     blockers = [
         "Official backpack Pip is the visual identity, not a production-ready mesh.",
-        "Safe conversion may separate disconnected islands and add a validation armature only.",
-        "Voxel remesh, Quadriflow of this density, and primitive rebuild remain refused.",
-        "A later animation retopo is still required for eyelid, mouth, and wing-fold loops.",
+        "Justin rejected the envelope conversion as animation-ready. Do not repeat that approach.",
+        "Voxel remesh, Quadriflow of this density, primitive rebuild, and envelope-on-fused remain refused.",
+        "A new animation retopo is required. Justin must choose artist, paid service, or pause.",
     ]
     if not justinApprovedVisualIdentity:
         blockers.append("Justin has not approved the backpack Pip visual identity.")
@@ -203,6 +212,9 @@ def evaluate_conversion_gate(
         "visualIdentityApproved": bool(justinApprovedVisualIdentity),
         "conversionStarted": bool(conversionStarted),
         "conversionComplete": False,
+        "justinConversionApproved": False,
+        "conversionCheckpointOnly": True,
+        "envelopeApproachRejected": True,
         "productionReady": False,
         "productionLibraryReplaced": False,
         "theatricalBound": False,
@@ -226,6 +238,31 @@ def evaluate_conversion_gate(
             "currentGoat": str(CURRENT_GOAT.relative_to(REPO_ROOT)),
             "productionLibraryFingerprint": APPROVED_LIBRARY_FINGERPRINT,
         },
+    }
+
+
+def evaluate_retopo_path_decision(choice: str | None = None) -> dict[str, Any]:
+    """Record Justin's next-path choice. Does not start conversion or spend money."""
+    if choice is not None and choice not in RETOPO_PATH_CHOICES:
+        raise ValueError(f"unknown retopo path choice: {choice}")
+    paid = choice == "external_retopo_service_paid_needs_yes"
+    return {
+        "schema": "tivvlejoy.pip_retopo_path.v1",
+        "choice": choice,
+        "chosen": choice is not None,
+        "startsConversion": False,
+        "productionReady": False,
+        "paidResourcesAuthorized": False,
+        "paidResourcesRequested": paid,
+        "envelopeApproachRejected": True,
+        "automatedRemeshRefused": True,
+        "goatTouched": False,
+        "productionLibraryReplaced": False,
+        "theatricalBound": False,
+        "mergeAuthorized": False,
+        "stopForJustin": choice is None,
+        "choices": list(RETOPO_PATH_CHOICES),
+        "note": "A paid service still needs a separate explicit Justin yes before any purchase.",
     }
 
 
@@ -424,6 +461,9 @@ def build_conversion_record(*, started: bool = True, artifacts_present: bool = F
         "visualIdentityApproved": True,
         "conversionStarted": started,
         "conversionComplete": False,
+        "justinConversionApproved": False,
+        "conversionCheckpointOnly": True,
+        "envelopeApproachRejected": True,
         "productionReady": False,
         "productionLibraryReplaced": False,
         "theatricalBound": False,

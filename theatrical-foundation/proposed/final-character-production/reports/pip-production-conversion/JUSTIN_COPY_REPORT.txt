@@ -1,4 +1,4 @@
-TIVVLEJOY — PIP PRODUCTION CONVERSION STOP FOR JUSTIN
+TIVVLEJOY — PIP CONVERSION FEASIBILITY STOP FOR JUSTIN
 SELECT-ALL COPY BLOCK
 
 Working branch: cursor/theatrical-final-character-production-1ebc
@@ -9,114 +9,109 @@ production-library replaced: no
 Theatrical binding: not declared
 Goat touched: no
 
-RESUMED FROM
-Last completed checkpoint: official backpack visual identity.
-Working copy: theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend
-Approved source SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
-That working copy hash stayed 581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe.
-Approved inbox parts, Prism high-res, long-wing parts, and Goat were not overwritten.
+JUSTIN REVIEW RECORDED
+Visual identity: APPROVED — backpack Pip stays the official permanent design.
+Production conversion: NOT APPROVED as animation-ready.
+Audit and official working copy: accepted as a checkpoint only.
+Envelope-rig approach: rejected. Do not repeat it.
 
-WHAT THIS PASS DID
-1. Created a protected conversion copy. The official working blend stayed put.
-2. Audited topology, materials, textures, UVs, normals, scale, and orientation.
-3. Classified 463 disconnected islands. Created one separate object,
-   pip_conversion_backpack, from high-confidence rearward islands
-   (about 77k verts). Did not cut fused geometry.
-4. Straps and scarf stayed on the body. One strap_R island was classified
-   for split but did not become its own object after the backpack split.
-5. Preserved the approved high-res likeness. No voxel remesh. No primitive rebuild.
-6. Added a validation-only armature with envelope deform on the body and
-   bone-parent on the separated backpack object. Not added to the rig registry.
-7. Posed rest, wing fold, head turn, foot lift, backpack sway, strap shift,
-   and scarf sway.
-8. Rendered front, back, left, right, three-quarter rest views plus
-   deformation-test views.
-9. Compared rest stills to the approved identity stills.
+PRESERVED
+Official source SHA-256: dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696
+Official working copy: theatrical-foundation/proposed/final-character-production/working/pip_backpack_canonical_working.blend
+Working copy SHA-256: 581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe
+Conversion evidence kept: conversion/pip_backpack_production_conversion.blend plus audit and comparison stills
+Those files were not overwritten. No new remesh. No new rig pass.
 
-CONVERSION COPY
-theatrical-foundation/proposed/final-character-production/conversion/pip_backpack_production_conversion.blend
-Bytes: 99374550
-Under GitHub 100 MB limit: yes
+WHAT IS NOT ACCEPTABLE AS FINAL
+- fused 1.93-million-triangle body
+- partial backpack island split
+- fused straps and scarf
+- validation-only envelope armature
+- body, face, wings, and feet that do not deform
+- marker facial bones
+- unstable backpack movement
 
-AUDIT
-Vertices: 1006107
-Faces: 1930054
-UVs: yes, one UVMap
-Textures: Color 8192x8192, Normal 4096x4096, ORM 4096x4096
-Object scale: 2.0935
-Height: 2.05
-Facing: +X
-Feet on ground: yes
+SAFEST REALISTIC PATH
+Build a new 15k–30k-quad animation mesh beside the frozen high-res.
+Keep the official working blend as shrinkwrap and bake target only.
+Do not remesh, voxel, Quadriflow, or primitive-rebuild the approved source.
+Do not wrap the locked prototype library mesh or the old 80k primary onto Pip.
 
-ACCESSORIES
-Island count: 463
-Actual separated object: pip_conversion_backpack only
-Straps: still fused to the body
-Scarf: still fused to the body
-The main backpack volume is not fully isolated. Only disconnected rearward
-islands were split. Do not treat the backpack as a finished production accessory.
+1. TOPOLOGY
+Manual retopo with separate objects: body, eyes, beak, three crest feathers,
+wings, feet, backpack, two straps, scarf.
+Required loops: lids, beak hinge, neck, shoulders, wing fold, toes/hallux.
 
-RENDERS — REST
-artifacts/theatrical-v2/final-character-production/pip-production-conversion/phone/
-1. rest_front.jpg
-2. rest_rear.jpg
-3. rest_left.jpg
-4. rest_right.jpg
-5. rest_three_quarter.jpg
-Side-by-side with the approved identity: approved_vs_conversion.jpg
-Contact sheet: contact_sheet_phone.jpg
+2. TEXTURE TRANSFER
+New planned UVs. Cage-bake Color 8K, Normal 4K, and ORM 4K from the frozen
+high-res. Repair misses by hand, especially face, lashes, crest, and the
+scarf knot. Keep Khronos PBR Neutral.
 
-RENDERS — DEFORMATION TESTS
-wing_fold_front.jpg / wing_fold_three_quarter.jpg
-head_turn_front.jpg / head_turn_three_quarter.jpg
-foot_lift_front.jpg / foot_lift_three_quarter.jpg
-backpack_sway_front.jpg / backpack_sway_three_quarter.jpg
-strap_shift_front.jpg / strap_shift_three_quarter.jpg
-scarf_sway_front.jpg / scarf_sway_three_quarter.jpg
+3. ACCESSORIES
+Model new backpack, straps, and scarf to the approved silhouette.
+Do not cut them out of the fused generate. Design clearance in. The audit
+already found 17 close backpack/body pairs.
 
-COMPARE AGAINST
-artifacts/theatrical-v2/final-character-production/pip-visual-identity/phone/
-front, rear, left, right, three_quarter
+4. DEFORMATION
+Rig the retopo only. Independent eyes, lids, brows, beak, wing fold, feet,
+backpack, straps, scarf. Shape keys for the face. Not marker bones on the
+generate.
 
-VALIDATION RESULTS
-Approved vs conversion rest, downscaled mean channel delta:
-front 0.0757, rear 0.0723, left 0.0610, right 0.0618, three_quarter 0.0621
-Those numbers are mostly framing. The conversion cameras fill more of the
-frame than the identity stills. The likeness, backpack, straps, scarf,
-crest, wings, and colors match the approved backpack Pip. Numeric closeness
-is not visual approval.
+5. WEIGHTS AND TESTS
+Human weight paint after a heat first pass. Then rest five-views, head turn,
+blink, beak open, wing fold, foot plant, backpack settle, strap stretch,
+scarf follow. Justin reviews the stills. Numbers are not approval.
 
-Rest vs deformation, same front camera math:
-wing_fold 0.0002, head_turn 0.0002, foot_lift 0.0002,
-strap_shift 0.0002, scarf_sway 0.0002, backpack_sway 0.0598
-Envelope bones did not visibly move the fused body, wings, face, feet,
-straps, or scarf. backpack_sway changed the frame because the bone-parented
-backpack islands shifted the bounds. That is not a finished deformation-safe
-backpack. It is evidence that a few islands can move, and that the parent
-transform is not rest-stable.
+LIKENESS RISKS
+Face flatten, crest count loss, wing layers collapsing, backpack silhouette
+drift, scarf/strap intersection, bake smear on the smile, color shift if
+the view transform changes. Contain by face-first Justin reviews and by
+never using the wrong source mesh.
 
-HONEST LIMITS
-This is still the fused Tripo source plus one island-split backpack object.
-There are no clean eyelid, mouth, or wing-fold loops.
-Envelope weights are validation-only. They are not production weights.
-Facial bones are markers, not a production face rig.
-The conversion is not animation-ready in the production sense.
+WHAT THIS ENVIRONMENT CAN DO RELIABLY
+Lock sources. Run unpaid local cage bakes after a retopo is delivered.
+Render comparison stills. Keep gates closed. Test pipeline on
+PROXY_PIPELINE_BIRD only.
 
-NOT DONE / STILL CLOSED
+WHAT IT CANNOT DO RELIABLY
+Invent eyelid or wing-fold loops. Isolate fused straps without holes.
+Production weight paint. A likeness-safe full retopo. Another envelope pass.
+
+WHAT NEEDS A HUMAN ARTIST OR A PAID SERVICE
+The retopo, accessory remodel, UVs, bake repair, weights, and facial shapes.
+Quad Remesher, a hired retopo service, paid GPU, and any generative provider
+need a named Justin yes first.
+
+EFFORT, NOT A CALENDAR
+Specialist-hours for one character TD / retopo artist:
+face/head 6–10, body/wings/feet 12–24, accessories 8–14, UVs 4–8,
+bake/repair 4–8, rig/weights 12–20, facial shapes 8–16, tests 3–6.
+First animation-ready candidate for Justin review: 57–106 specialist-hours.
+An agent session here cannot spend those artist hours.
+
+DECISION NEEDED
+1. Human artist path — Justin or someone Justin assigns retopos against the
+   frozen working copy. This environment then bakes and renders.
+2. External retopo service — paid. Needs a named vendor and an explicit yes.
+3. Pause — keep the checkpoint. No more conversion until 1 or 2 exists.
+4. Refuse automated remesh — confirm voxel / Quadriflow / primitive /
+   envelope-on-fused stay closed.
+
+Recommended: 1 if an artist is available, otherwise 3.
+
+STILL CLOSED
 - production-ready claim
 - production-library replace
 - theatrical bind
 - Draft PR #24 merge
-- live rig registry bind
-- voxel remesh or primitive rebuild
 - Goat
-- paid resources
-- hero shots / episode renders
+- paid resources without a fresh yes
+- repeating the envelope conversion
 
 STATUS
 PIP VISUAL IDENTITY: APPROVED — backpack design is official
-PIP PRODUCTION CONVERSION: STARTED — protected copy + audit + partial island split + validation armature + comparison renders
-PIP PRODUCTION ASSET: NOT READY — fused 1.9M-tri source, not a production retopo
+PIP PRODUCTION CONVERSION: CHECKPOINT ONLY — not animation-ready
+PIP PRODUCTION ASSET: NOT READY — needs a new animation retopo
 PIP SATCHEL / PRISM / LONG-WING: ARCHIVED FOR ROLLBACK
 GOAT: UNCHANGED
 CANON / PRODUCTION-LIBRARY: UNTOUCHED
@@ -125,5 +120,5 @@ MERGE: NOT PERFORMED
 PAID RESOURCES: NOT USED
 
 STOP
-Please review the conversion stills against the approved backpack Pip.
-Do not treat this as the final theatrical Pip until you say so.
+Choose 1, 2, 3, or 4. Do not ask for another envelope pass.
+Full plan: theatrical-foundation/proposed/final-character-production/reports/pip-production-conversion/FEASIBILITY.md

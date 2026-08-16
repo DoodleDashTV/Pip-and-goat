@@ -27,6 +27,7 @@ from pip_production_conversion_lib import (  # noqa: E402
     CONVERSION_BLEND,
     classify_island,
     evaluate_conversion_gate,
+    evaluate_retopo_path_decision,
     should_separate_island,
     assert_conversion_destination,
     validation_bone_layout,
@@ -52,6 +53,9 @@ class ConversionGateTests(unittest.TestCase):
         self.assertTrue(gate["visualIdentityApproved"])
         self.assertTrue(gate["conversionStarted"])
         self.assertFalse(gate["conversionComplete"])
+        self.assertFalse(gate["justinConversionApproved"])
+        self.assertTrue(gate["conversionCheckpointOnly"])
+        self.assertTrue(gate["envelopeApproachRejected"])
         self.assertFalse(gate["productionReady"])
         self.assertFalse(gate["productionLibraryReplaced"])
         self.assertFalse(gate["theatricalBound"])
@@ -136,6 +140,17 @@ class ConversionGateTests(unittest.TestCase):
         for required in ("backpack", "strap_L", "strap_R", "scarf", "head", "beak", "wing_L", "foot_L"):
             self.assertIn(required, names)
         self.assertEqual(bones[0]["name"], "root")
+
+    def test_retopo_path_stays_closed_until_justin_chooses(self) -> None:
+        pending = evaluate_retopo_path_decision()
+        self.assertIsNone(pending["choice"])
+        self.assertTrue(pending["stopForJustin"])
+        self.assertFalse(pending["startsConversion"])
+        self.assertFalse(pending["paidResourcesAuthorized"])
+        paid = evaluate_retopo_path_decision("external_retopo_service_paid_needs_yes")
+        self.assertTrue(paid["paidResourcesRequested"])
+        self.assertFalse(paid["paidResourcesAuthorized"])
+        self.assertTrue(paid["envelopeApproachRejected"])
 
 
 if __name__ == "__main__":

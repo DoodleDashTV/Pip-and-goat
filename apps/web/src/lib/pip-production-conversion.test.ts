@@ -26,6 +26,7 @@ import {
   assertManifestDoesNotPromote,
   assertPipConversionDoesNotPromote,
   evaluatePipConversionGate,
+  evaluatePipRetopoPathDecision,
   parseDurableAssetManifest,
   parsePipProductionConversion,
   parseRecoveryLedger,
@@ -58,6 +59,8 @@ describe('Pip production conversion gate', () => {
     expect(gate.visualIdentityApproved).toBe(true);
     expect(gate.conversionStarted).toBe(true);
     expect(gate.conversionComplete).toBe(false);
+    expect(gate.justinConversionApproved).toBe(false);
+    expect(gate.envelopeApproachRejected).toBe(true);
     expect(gate.productionReady).toBe(false);
     expect(gate.productionLibraryReplaced).toBe(false);
     expect(gate.theatricalBound).toBe(false);
@@ -83,6 +86,13 @@ describe('Pip production conversion gate', () => {
     expect(conversion.boundDesignElements).toEqual(
       expect.arrayContaining(['centered_backpack', 'two_symmetrical_shoulder_straps', 'no_satchel']),
     );
+    expect(conversion.justinConversionApproved).toBe(false);
+    expect(conversion.envelopeApproachRejected).toBe(true);
+    const retopoPath = evaluatePipRetopoPathDecision();
+    expect(retopoPath.choice).toBeNull();
+    expect(retopoPath.startsConversion).toBe(false);
+    expect(retopoPath.paidResourcesAuthorized).toBe(false);
+    expect(retopoPath.envelopeApproachRejected).toBe(true);
   });
 
   it('keeps the modular spec unbound and the prototype rig as default', () => {

@@ -36,6 +36,11 @@
       "id": "PIP_PRODUCTION_CONVERSION_START",
       "sha256": "dca239475c78c9158ac87c36d674ceb23ef334358ee4394607758fc8f6728696",
       "note": "Production conversion starts from the official backpack working copy. Do not overwrite that working copy or the approved source."
+    },
+    {
+      "id": "PIP_CONVERSION_CHECKPOINT_NOT_ANIMATION_READY",
+      "sha256": "581bf48d1d7972e1e7cbea96300bac685a0d38aae82b0f140a2f3bef4cde2dfe",
+      "note": "Justin accepted the audit and official working copy as a checkpoint only. Envelope conversion is not animation-ready. Do not repeat that approach."
     }
   ],
   "rules": [

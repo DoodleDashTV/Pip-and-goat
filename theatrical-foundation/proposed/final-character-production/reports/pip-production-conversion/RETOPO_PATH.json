@@ -1,0 +1,23 @@
+{
+  "schema": "tivvlejoy.pip_retopo_path.v1",
+  "choice": null,
+  "chosen": false,
+  "startsConversion": false,
+  "productionReady": false,
+  "paidResourcesAuthorized": false,
+  "paidResourcesRequested": false,
+  "envelopeApproachRejected": true,
+  "automatedRemeshRefused": true,
+  "goatTouched": false,
+  "productionLibraryReplaced": false,
+  "theatricalBound": false,
+  "mergeAuthorized": false,
+  "stopForJustin": true,
+  "choices": [
+    "human_artist_unpaid_unless_later_approved",
+    "external_retopo_service_paid_needs_yes",
+    "pause_keep_checkpoint",
+    "refuse_automated_remesh"
+  ],
+  "note": "A paid service still needs a separate explicit Justin yes before any purchase."
+}
