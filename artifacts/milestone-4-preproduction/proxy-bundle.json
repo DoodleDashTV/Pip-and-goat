@@ -1,0 +1,102 @@
+{
+  "episodeId": "M4_PROXY_PIPELINE_TEST",
+  "outputClass": "PIPELINE_TEST",
+  "occupants": [
+    "PROXY_NONCANONICAL_BIRD_A",
+    "PROXY_NONCANONICAL_QUADRUPED_A"
+  ],
+  "status": "PASS",
+  "cacheKey": "15462e0a2f0c785c3aaf132a11556a606cfbf7e16693ec609d7ef63b7508ce8e",
+  "scenePlanEmitted": false,
+  "qc": {
+    "episodeId": "M4_PROXY_PIPELINE_TEST",
+    "technical": "PASS",
+    "artistic": "NOT_RENDERED",
+    "checks": [
+      {
+        "item": "ASPECT_9_16",
+        "status": "PASS",
+        "detail": "Storyboard, animatic and shots are 9:16."
+      },
+      {
+        "item": "PROXY_WATERMARK",
+        "status": "PASS",
+        "detail": "Every proxy panel, clip and shot carries the watermark."
+      },
+      {
+        "item": "NO_FINAL_CLAIM",
+        "status": "PASS",
+        "detail": "No pre-production document claims FINAL."
+      },
+      {
+        "item": "MOTION_PLANNED",
+        "status": "PASS",
+        "detail": "8 shots for 8 beats."
+      },
+      {
+        "item": "AUDIO_LOCKED_VOICES",
+        "status": "PASS",
+        "detail": "Locked voices were not cloned or reassigned."
+      },
+      {
+        "item": "CAPTION_SAFE",
+        "status": "PASS",
+        "detail": "9:16 caption-safe region reserved on every shot."
+      },
+      {
+        "item": "DRAFT_TIER_ONLY",
+        "status": "PASS",
+        "detail": "Animatic render tier is DRAFT."
+      }
+    ],
+    "cacheKey": "d719b7da94924937c074bf278c5054aaef17794b87c37641e7c53d0810fc8171",
+    "version": "1.0.0"
+  },
+  "gate": {
+    "allowed": true,
+    "blockers": [],
+    "codes": [
+      "THEATRICAL_GATE_STILL_CLOSED",
+      "STEPS_9_16_STILL_BLOCKED"
+    ],
+    "version": "1.0.0"
+  },
+  "issues": [
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_003 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_003"
+      }
+    },
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_004 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_004"
+      }
+    },
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_005 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_005"
+      }
+    },
+    {
+      "code": "CONTINUITY_UNPAID_FACT",
+      "severity": "WARNING",
+      "system": "continuity",
+      "message": "prop_prop_adventure_map_v1_beat_006 is planted and never paid off.",
+      "measured": {
+        "factId": "prop_prop_adventure_map_v1_beat_006"
+      }
+    }
+  ]
+}

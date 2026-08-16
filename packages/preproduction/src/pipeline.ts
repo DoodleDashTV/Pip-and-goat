@@ -3,7 +3,7 @@
  *
  * Order: story → continuity → storyboard → animatic → shots → library →
  * audio → orchestration → QC → output gates. Same brief, same seed, same
- * bundle. Nothing here writes production-library or launches a paid provider.
+ * bundle. Nothing here writes canonical character assets or launches a paid provider.
  */
 import { FOUNDING_CODES } from '@doodle-dash/domain';
 import {

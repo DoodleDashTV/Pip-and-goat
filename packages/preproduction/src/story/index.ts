@@ -174,7 +174,7 @@ const DEFAULT_BEAT_TEMPLATES: ReadonlyArray<{
     purpose: 'RESOLUTION',
     summary: (a, b) => `${a} and ${b} put the map away and leave the place as they found it.`,
     locationId: 'env_meadow_clearing_v1',
-    durationSeconds: 3,
+    durationSeconds: 2.5,
     emotion: 'happy',
     musicIntent: 'PLAYFUL',
     requiredProps: [],

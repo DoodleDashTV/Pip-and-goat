@@ -30,7 +30,7 @@ export function assertManifestSafeForFinal(input: {
     outputClass: renderTier === 'FINAL' ? 'FINAL_PRODUCTION' : 'PIPELINE_TEST',
     renderTier,
     assetQuality: 'PROTOTYPE',
-    occupants: occupants.length > 0 ? occupants : ['PROXY_NONCANONICAL_BIRD_A'],
+    occupants: occupants.length > 0 ? [...occupants] : ['PROXY_NONCANONICAL_BIRD_A'],
     writeProductionLibrary: input.writeProductionLibrary ?? false,
     launchPaidGpu: input.launchPaidGpu ?? false,
     claimMaster: renderTier === 'FINAL',

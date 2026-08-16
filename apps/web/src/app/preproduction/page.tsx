@@ -65,7 +65,7 @@ export default async function PreproductionPage() {
           </div>
           <div>
             <dt className="text-xs uppercase text-leaf-300">Paid GPU</dt>
-            <dd>{provider.authorized ? 'authorized' : 'not authorized'}</dd>
+            <dd>{provider.requiresAuthorization ? 'not authorized' : 'authorized'}</dd>
           </div>
           <div>
             <dt className="text-xs uppercase text-leaf-300">Proxy output gate</dt>

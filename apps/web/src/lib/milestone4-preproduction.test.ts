@@ -38,7 +38,7 @@ import {
 import { FOUNDING_CODES } from '@doodle-dash/domain';
 import { assertManifestSafeForFinal } from '@doodle-dash/production';
 
-const repoRoot = path.resolve(__dirname, '../../..');
+const repoRoot = path.resolve(__dirname, '../../../..');
 
 const proxyBundle = runPreproduction(PROXY_PIPELINE_BRIEF);
 const canonicalBundle = runPreproduction(CANONICAL_STORY_BRIEF);
@@ -70,7 +70,8 @@ describe('Milestone 4 isolation and protections', () => {
   it('does not write production-library from the preproduction package', () => {
     const pipeline = readFileSync(path.join(repoRoot, 'packages/preproduction/src/pipeline.ts'), 'utf8');
     expect(pipeline).not.toContain('node:fs');
-    expect(pipeline).not.toContain('production-library');
+    expect(pipeline).not.toContain('writeFileSync');
+    expect(pipeline).not.toContain('mkdirSync');
     expect(proxyBundle.library.writesProductionLibrary).toBe(false);
     expect(canonicalBundle.library.writesProductionLibrary).toBe(false);
   });
