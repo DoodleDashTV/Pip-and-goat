@@ -14,9 +14,11 @@ import {
   REQUIRED_MOUTH_CONTROLS,
   CANONICAL_AUDITION_SCRIPT,
   VERTICAL_SLICE_EPISODE_ID,
+  loadLatestPreproductionRun,
 } from '@doodle-dash/production';
 import { AppError } from '@doodle-dash/shared';
 import { prisma } from '@doodle-dash/database';
+import { evaluateEpisodeLaunchSafety } from '@doodle-dash/preproduction';
 import { z } from 'zod';
 
 export async function GET(request: Request) {
@@ -147,7 +149,36 @@ const BodySchema = z.discriminatedUnion('action', [
 
 export async function POST(request: Request) {
   try {
-    const body = BodySchema.parse(await request.json());
+    const raw = (await request.json()) as Record<string, unknown>;
+    const body = BodySchema.parse(raw);
+    if (body.action === 'generate-final') {
+      const episodeId = body.episodeId || VERTICAL_SLICE_EPISODE_ID;
+      const persisted = await loadLatestPreproductionRun(episodeId);
+      const safety = evaluateEpisodeLaunchSafety({
+        command: 'generate-final',
+        intent:
+          raw.intent === 'THEATRICAL' || raw.intent === 'PUBLISH' || raw.intent === 'DRAFT'
+            ? raw.intent
+            : 'FINAL',
+        characterMode:
+          raw.characterMode === 'PROXY' || raw.characterMode === 'CANONICAL'
+            ? raw.characterMode
+            : persisted?.characterMode,
+        persistedCharacterMode: persisted?.characterMode,
+        occupants: Array.isArray(raw.occupants)
+          ? raw.occupants.map(String)
+          : persisted?.occupants,
+        characterCodes: Array.isArray(raw.characterCodes) ? raw.characterCodes.map(String) : undefined,
+        allowPaidGpu: raw.allowPaidGpu === true,
+        writeProductionLibrary: raw.writeProductionLibrary === true,
+      });
+      if (!safety.allowed) {
+        return NextResponse.json(
+          { error: safety.reason, code: safety.code, safety },
+          { status: 409 },
+        );
+      }
+    }
     switch (body.action) {
       case 'save-facial-map':
         return NextResponse.json({ map: await facialMappingService.saveMappings(body) });

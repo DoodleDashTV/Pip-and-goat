@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@doodle-dash/database';
 import { episodeService } from '@doodle-dash/story';
+import { evaluateEpisodeCreateSafety } from '@doodle-dash/preproduction';
 import { z } from 'zod';
 
 const BodySchema = z.object({
@@ -12,7 +13,27 @@ const BodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const body = BodySchema.parse(await request.json());
+  const raw = (await request.json()) as Record<string, unknown>;
+  const safety = evaluateEpisodeCreateSafety({
+    command: 'create-episode',
+    intent:
+      raw.intent === 'FINAL' || raw.intent === 'THEATRICAL' || raw.intent === 'PUBLISH' || raw.intent === 'DRAFT'
+        ? raw.intent
+        : 'DRAFT',
+    characterMode:
+      raw.characterMode === 'PROXY' || raw.characterMode === 'CANONICAL' ? raw.characterMode : undefined,
+    characterCodes: Array.isArray(raw.characterCodes) ? raw.characterCodes.map(String) : undefined,
+    allowPaidGpu: raw.allowPaidGpu === true,
+    writeProductionLibrary: raw.writeProductionLibrary === true,
+  });
+  if (!safety.allowed) {
+    return NextResponse.json(
+      { error: safety.reason, code: safety.code, safety },
+      { status: 409 },
+    );
+  }
+
+  const body = BodySchema.parse(raw);
   const universe = await prisma.universe.findFirst({
     where: { status: 'ACTIVE' },
     orderBy: { createdAt: 'asc' },

@@ -16,6 +16,9 @@
  *   orchestration  local cache, retry, recovery, spend refuse
  *   qc             visual / motion / audio checks on drafts
  *   gates          fail-closed proxy → final production blockers
+ *   workflow       episode-production stages and terminals
+ *   assembly       pure FFmpeg argv for local draft animatics / mixes
+ *   launchSafety   create-episode / generate-final / paid-resource refuse
  */
 export * from './versions';
 export * from './schema';
@@ -32,3 +35,6 @@ export * from './qc';
 export * from './gates';
 export * from './pipeline';
 export * from './fixtures';
+export * from './workflow';
+export * from './assembly';
+export * from './launch-safety';

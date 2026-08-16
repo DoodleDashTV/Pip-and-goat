@@ -11,6 +11,7 @@ const NAV = [
   { href: '/production', label: 'Continue Episode' },
   { href: '/direction', label: 'Direction' },
   { href: '/preproduction', label: 'Pre-Production' },
+  { href: '/workflow', label: 'Episode Workflow' },
   { href: '/asset-intake', label: 'Assets' },
   { href: '/animations', label: 'Animations' },
   { href: '/render-queue', label: 'Render Queue' },

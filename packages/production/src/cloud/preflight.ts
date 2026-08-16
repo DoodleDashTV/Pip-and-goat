@@ -22,6 +22,10 @@ import { buildCloudCacheKey } from './cloud-cache';
 import { batchProductionOrchestrator, seasonProductionQueue } from './season-queue';
 import { evaluateGpuHealth } from './gpu-health';
 import { chooseRenderProvider } from './routing-policy';
+import {
+  evaluateEpisodeLaunchSafety,
+  FORBIDDEN_FINAL_INTENT,
+} from '@doodle-dash/preproduction';
 
 export type GateResult = 'PASS' | 'FAIL';
 
@@ -273,6 +277,7 @@ export async function buildPreDeploymentReport(input?: {
     BATCH_EPISODES: passFail(batchPlan.includes('shutdown_gpu') && batchPlan.length >= 5),
     SEASON_QUEUE_FOUNDATION: passFail(seasonProductionQueue.list('season_01').length === 1),
     SECRET_LEAK_CHECK: passFail(secrets.RUNPOD_API_KEY === 'YES' ? true : true),
+    PROXY_PAID_LAUNCH_REFUSED: passFail(true),
     COST_GUARD_DEFAULTS: passFail(
       DEFAULT_CLOUD_COST_LIMITS.cloudRenderEnabled === false &&
         DEFAULT_CLOUD_COST_LIMITS.maxGpuHourlyPrice === 0.8,
@@ -283,6 +288,18 @@ export async function buildPreDeploymentReport(input?: {
 
   // SECRET_LEAK_CHECK: structural — no secrets in manifest
   gates.SECRET_LEAK_CHECK = passFail(!JSON.stringify(manifest).includes('RUNPOD_API_KEY'));
+
+  // Additive Milestone 5 proof: a proxy FINAL / paid / library-write intent is
+  // refused. Not part of requiredForReady — must not flip GPU-ready.
+  const proxyLaunch = evaluateEpisodeLaunchSafety({
+    command: 'generate-final',
+    intent: 'FINAL',
+    characterMode: 'PROXY',
+    occupants: FORBIDDEN_FINAL_INTENT.occupants,
+    allowPaidGpu: true,
+    writeProductionLibrary: true,
+  });
+  gates.PROXY_PAID_LAUNCH_REFUSED = passFail(!proxyLaunch.allowed);
 
   const remainingBlockers: string[] = [];
   if (!r2SecretsOk) remainingBlockers.push('R2 secrets missing (R2_BUCKET/ENDPOINT/ACCESS_KEY_ID/SECRET_ACCESS_KEY)');
