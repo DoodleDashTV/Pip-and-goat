@@ -3,13 +3,26 @@
  * Preserves FINAL_1080P quality; AUDIT_FAST is for automated tests only.
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { prisma } from '@doodle-dash/database';
-import { AppError } from '@doodle-dash/shared';
+import { AppError, ensureWritableDir, resolveWritableRuntimeDir, type RuntimeEnv } from '@doodle-dash/shared';
+
+export function resolveCacheRoot(
+  env: RuntimeEnv = process.env,
+  cwd = process.cwd(),
+  tmpdir = os.tmpdir(),
+): string {
+  return resolveWritableRuntimeDir('.doodle-dash-cache', {
+    env,
+    cwd,
+    tmpdir,
+    explicitRoot: env.DDP_CACHE_ROOT,
+  });
+}
 
 export const PERFORMANCE_MODES = ['AUDIT_FAST', 'DRAFT_FAST', 'DRAFT_HD', 'FINAL_1080P'] as const;
 export type PerformanceMode = (typeof PERFORMANCE_MODES)[number];
@@ -49,7 +62,7 @@ const DEFAULTS: DdpPerformanceConfig = {
   maxVramPercent: Number(process.env.MAX_VRAM_PERCENT || 80),
   auditFastMode: String(process.env.AUDIT_FAST_MODE ?? 'false').toLowerCase() === 'true',
   selectedRenderDevice: (process.env.BLENDER_RENDER_DEVICE as DdpPerformanceConfig['selectedRenderDevice']) || 'AUTO',
-  cacheRoot: process.env.DDP_CACHE_ROOT || path.resolve(process.cwd(), '.doodle-dash-cache'),
+  cacheRoot: resolveCacheRoot(),
   // FINAL quality floor — do not lower below polished EEVEE for toon characters
   finalQualitySamples: Number(process.env.FINAL_EEVEE_SAMPLES || 20),
   draftFastSamples: Number(process.env.DRAFT_EEVEE_SAMPLES || 8),
@@ -60,6 +73,7 @@ export function resolvePerformanceConfig(overrides: Partial<DdpPerformanceConfig
   const mode = overrides.mode || (process.env.DDP_PERFORMANCE_MODE as PerformanceMode) || DEFAULTS.mode;
   return {
     ...DEFAULTS,
+    cacheRoot: resolveCacheRoot(),
     ...overrides,
     mode,
     auditFastMode: mode === 'AUDIT_FAST' || overrides.auditFastMode || DEFAULTS.auditFastMode,
@@ -216,8 +230,12 @@ export class PerformanceProfiler {
 }
 
 export class ContentAddressedCache {
-  constructor(private readonly root = resolvePerformanceConfig().cacheRoot) {
-    mkdirSync(this.root, { recursive: true });
+  readonly root: string;
+  readonly writable: boolean;
+
+  constructor(root = resolveCacheRoot()) {
+    this.root = root;
+    this.writable = ensureWritableDir(this.root);
   }
 
   pathFor(namespace: string, fingerprint: string, fileName: string) {
@@ -226,24 +244,35 @@ export class ContentAddressedCache {
   }
 
   async has(namespace: string, fingerprint: string, fileName: string) {
+    if (!this.writable) return false;
     return existsSync(this.pathFor(namespace, fingerprint, fileName));
   }
 
   async get(namespace: string, fingerprint: string, fileName: string) {
+    if (!this.writable) return null;
     const p = this.pathFor(namespace, fingerprint, fileName);
     if (!existsSync(p)) return null;
     return { path: p, bytes: await fs.readFile(p) };
   }
 
   async put(namespace: string, fingerprint: string, fileName: string, bytes: Uint8Array | Buffer) {
+    if (!this.writable) return null;
     const p = this.pathFor(namespace, fingerprint, fileName);
-    mkdirSync(path.dirname(p), { recursive: true });
-    await fs.writeFile(p, bytes);
-    writeFileSync(
-      path.join(path.dirname(p), 'meta.json'),
-      JSON.stringify({ namespace, fingerprint, fileName, bytes: bytes.length, at: new Date().toISOString() }, null, 2),
-    );
-    return p;
+    if (!ensureWritableDir(path.dirname(p))) return null;
+    try {
+      await fs.writeFile(p, bytes);
+      writeFileSync(
+        path.join(path.dirname(p), 'meta.json'),
+        JSON.stringify(
+          { namespace, fingerprint, fileName, bytes: bytes.length, at: new Date().toISOString() },
+          null,
+          2,
+        ),
+      );
+      return p;
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -346,7 +375,17 @@ except Exception as e:
 print("DDP_DEVICES:" + json.dumps({"eevee":"CPU", "cycles": devices}))
 `;
   const tmp = path.join(os.tmpdir(), `ddp-devices-${Date.now()}.py`);
-  writeFileSync(tmp, script);
+  try {
+    writeFileSync(tmp, script);
+  } catch {
+    return {
+      available: false as const,
+      selected: 'CPU' as const,
+      devices: [],
+      note: 'GPU devices unavailable — EEVEE/Cycles will use CPU in this environment.',
+      raw: 'temp script write failed',
+    };
+  }
   const res = spawnSync(blenderBin, ['-b', '--factory-startup', '-P', tmp], {
     encoding: 'utf8',
     timeout: 60_000,
