@@ -12,13 +12,17 @@ production-library touched: no
 Canon / merge / theatrical binding: unchanged / not performed / not declared
 
 WHAT THIS PASS DID
+Copied the exact bytes of pip_replacement.glb.part1.bin and part2.bin
+from main, and part3.bin from the theatrical upload path, into
+theatrical-foundation/proposed/pip-replacement-intake/inbox/.
+Reassembled only those three inbox files. Full SHA-256 and size
+matched. Ran ingest-next-pip.sh on the reconstructed GLB. Wrote the
+comparison package and phone previews. Did not overwrite current Pip.
+
 Stopped all destructive work on the fused Tripo Pip. Preserved the
 conditionally approved long-wing candidate and strap-repair evidence
 for comparison only. Did not paint, flatten, remesh, or cover the
 fused left-front riser.
-
-Built character-independent production systems and one documented
-command to ingest the next Pip model as a replacement candidate.
 
 COMPLETED PRODUCTION SYSTEMS
 1. Durable asset manifest and repository classification
@@ -73,14 +77,32 @@ TESTS AND VALIDATION
 - Approved library fingerprint unchanged:
   7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
 
+INTAKE CANDIDATE (WAITING FOR JUSTIN)
+Package: 20260816T022327Z_pip_replacement.glb_2e06f4285448
+SHA-256: 2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e
+Size: 64634144 bytes
+Mesh: 1 fused Tripo object, 1,034,925 verts, 1,988,526 tris
+Approved: no
+Auto-replace current Pip: no
+
+Phone previews:
+artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/contact_sheet_phone.jpg
+artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/front.jpg
+artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/rear.jpg
+artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/three_quarter.jpg
+artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/face.jpg
+artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/shoulder_right.jpg
+artifacts/theatrical-v2/final-character-production/pip-replacement-intake/phone/satchel_left.jpg
+
 COMMITS
 - 9337f66 Add Pip replacement intake gate and character-independent production systems.
 - efb17d9 Add labeled pipeline proxy and Justin intake report.
 - b10c2de Record intake checkpoint SHAs in the Justin copy report.
+- c6cb896 docs(assets): place split Pip replacement parts in the intake inbox.
 
 REMAINING CHARACTER-DEPENDENT BLOCKERS
 - Current Pip still has a fused left-front satchel riser.
-- No approved replacement mesh.
+- Replacement candidate is ingested but not visually approved.
 - No final Pip retopo, UVs, texture lock, rig, facial rig, groom,
   animation, collision, or Pip–Goat scale bind.
 - Goat remains unchanged and unapproved.
@@ -89,9 +111,7 @@ REMAINING CHARACTER-DEPENDENT BLOCKERS
 
 HOW TO UPLOAD AND PROCESS THE NEXT PIP MODEL
 1. Put the file on this machine (BLEND, GLB, GLTF, FBX, OBJ, or ZIP).
-2. Run:
-
-   scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
+2. Run: scripts/tivvlejoy/ingest-next-pip.sh /path/to/pip_model
 
    Optional:
    PIP_LICENSE="in-house sculpt" PIP_ORIGIN="Justin upload" \
@@ -109,7 +129,7 @@ opens it in Blender 4.2.3 LTS, and stops. It will not replace
 current Pip.
 
 STATUS
-PIP VISUAL CANDIDATE: BLOCKED — original appearance conditionally approved; left-front riser still fused; waiting for a new upload
+PIP VISUAL CANDIDATE: INTAKE COMPLETE — waiting for Justin visual approval of pip_replacement.glb; current Pip unchanged
 GOAT VISUAL CANDIDATE: UNCHANGED — do not work unless separately authorized
 PIP PRODUCTION ASSET: BLOCKED
 GOAT PRODUCTION ASSET: BLOCKED

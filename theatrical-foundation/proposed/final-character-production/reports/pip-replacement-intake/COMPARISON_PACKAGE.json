@@ -1,0 +1,344 @@
+{
+  "schema": "tivvlejoy.pip_replacement_intake.comparison.v1",
+  "blender": "4.2.3 LTS",
+  "source": "theatrical-foundation/proposed/pip-replacement-intake/inbox/20260816T022327Z_pip_replacement.glb_2e06f4285448/original/pip_replacement.glb",
+  "sourceRecord": {
+    "filename": "pip_replacement.glb",
+    "relative": "pip_replacement.glb",
+    "extension": ".glb",
+    "kind": "model",
+    "bytes": 64634144,
+    "sha256": "2e06f4285448167e0441c97ed73d2f1e14166db35e8d6f9eadc0fb9b14a7fb7e",
+    "magic": "glb",
+    "supported": true
+  },
+  "geometry": {
+    "objectCount": 1,
+    "objectNames": [
+      "tripo_node_847a1470-ffb9-477e-9ba8-0a8f6c2cd736"
+    ],
+    "objectSeparation": "single_or_fused",
+    "armatures": [],
+    "rigPresent": false,
+    "shapeKeys": [],
+    "materials": [
+      "tripo_material_847a1470-ffb9-477e-9ba8-0a8f6c2cd736"
+    ],
+    "textures": [
+      {
+        "name": "Color_847a1470-ffb9-477e-9ba8-0a8f6c2cd736",
+        "size": [
+          8192,
+          8192
+        ]
+      },
+      {
+        "name": "NormalGL_847a1470-ffb9-477e-9ba8-0a8f6c2cd736",
+        "size": [
+          4096,
+          4096
+        ]
+      },
+      {
+        "name": "ORM_847a1470-ffb9-477e-9ba8-0a8f6c2cd736",
+        "size": [
+          4096,
+          4096
+        ]
+      }
+    ],
+    "uvMaps": [
+      "UVMap"
+    ],
+    "objects": [
+      {
+        "name": "tripo_node_847a1470-ffb9-477e-9ba8-0a8f6c2cd736",
+        "vertices": 1034925,
+        "faces": 1988526,
+        "triangles": 1988526,
+        "disconnectedComponents": 425,
+        "nonManifoldEdges": 80474,
+        "boundaryEdges": 80474,
+        "holesEstimate": 26824,
+        "invertedNormalFaces": 264253,
+        "intersections": {
+          "checked": false,
+          "overlappingPairs": 0,
+          "reason": "deferred_high_density"
+        },
+        "uvMaps": [
+          "UVMap"
+        ],
+        "materials": [
+          "tripo_material_847a1470-ffb9-477e-9ba8-0a8f6c2cd736"
+        ],
+        "shapeKeys": []
+      }
+    ],
+    "totals": {
+      "vertices": 1034925,
+      "triangles": 1988526,
+      "faces": 1988526,
+      "disconnectedComponents": 425,
+      "nonManifoldEdges": 80474,
+      "boundaryEdges": 80474,
+      "holesEstimate": 26824,
+      "invertedNormalFaces": 264253
+    },
+    "textureCheck": {
+      "hasImageTextures": true,
+      "colorLike": [
+        {
+          "name": "Color_847a1470-ffb9-477e-9ba8-0a8f6c2cd736",
+          "size": [
+            8192,
+            8192
+          ]
+        }
+      ],
+      "normalLike": [
+        {
+          "name": "NormalGL_847a1470-ffb9-477e-9ba8-0a8f6c2cd736",
+          "size": [
+            4096,
+            4096
+          ]
+        }
+      ]
+    },
+    "dimensions": {
+      "min": [
+        -0.2472708374261856,
+        -0.2982983887195587,
+        -0.4896201491355896
+      ],
+      "max": [
+        0.2460440695285797,
+        0.2986190915107727,
+        0.49053648114204407
+      ],
+      "size": [
+        0.4933149069547653,
+        0.5969174802303314,
+        0.9801566302776337
+      ],
+      "nativeHeight": 0.9801566302776337
+    },
+    "scaleCheck": {
+      "nativeHeight": 0.9801566302776337,
+      "targetHeight": 2.05,
+      "suggestedFactor": 2.091502456519963,
+      "withinTenPercent": false,
+      "appliedToOriginal": false
+    },
+    "orientationCheck": {
+      "charactersFace": "+X",
+      "characterLeft": "+Y",
+      "characterRight": "-Y",
+      "strapShoulder": "character-right (\u2212Y)",
+      "satchelHip": "character-left (+Y)",
+      "whenFacingCamera": {
+        "cameraLooksToward": "\u2212X",
+        "strapViewerSide": "viewer-left",
+        "bagViewerSide": "viewer-right"
+      },
+      "autoCorrectOriginal": false,
+      "heuristic": "Reviewers must confirm +X facing against the binding front sheet. Intake does not auto-rotate the original.",
+      "appliedToOriginal": false
+    },
+    "highDensity": true
+  },
+  "renders": [
+    "previews/front.png",
+    "previews/rear.png",
+    "previews/left.png",
+    "previews/right.png",
+    "previews/three_quarter.png",
+    "previews/face.png",
+    "previews/shoulder_right.png",
+    "previews/satchel_left.png",
+    "previews/turntable_00.png",
+    "previews/turntable_01.png",
+    "previews/turntable_02.png",
+    "previews/turntable_03.png",
+    "previews/turntable_04.png",
+    "previews/turntable_05.png",
+    "previews/turntable_06.png",
+    "previews/turntable_07.png"
+  ],
+  "previewBlend": "preview/candidate_preview.blend",
+  "checklist": [
+    {
+      "id": "face_and_green_eyes",
+      "label": "Face and green/teal glossy eyes",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "bright_yellow_cgi_finish",
+      "label": "Bright yellow CGI feather finish (warm chartreuse / golden-lime, cream face/chest)",
+      "authority": "binding five-view JPEGs + conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "three_coral_crest_feathers",
+      "label": "Exactly three coral crown/crest feathers",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect exactly three coral crest feathers"
+    },
+    {
+      "id": "long_layered_wings",
+      "label": "Long layered wings",
+      "authority": "conditionally approved long-wing appearance",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "teal_scarf",
+      "label": "Teal neckerchief/scarf, separate from strap tails",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "one_continuous_cross_body_strap",
+      "label": "Exactly one continuous cross-body strap (not two backpack risers)",
+      "authority": "Justin strap addendum + binding sheets",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 automated strap classification is a hint only"
+    },
+    {
+      "id": "character_right_shoulder_origin",
+      "label": "Strap originates over character-right shoulder (\u2212Y)",
+      "authority": "binding laterality",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect character-right shoulder (\u2212Y) and character-left hip (+Y)"
+    },
+    {
+      "id": "diagonal_front_and_rear_path",
+      "label": "Diagonal strap path on both front and rear",
+      "authority": "Justin strap addendum",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "character_left_hip_satchel",
+      "label": "Satchel/bag on character-left hip (+Y)",
+      "authority": "binding laterality",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "Expect satchel on +Y"
+    },
+    {
+      "id": "copper_spiral",
+      "label": "Copper spiral clasp",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "feet_toes_rear_hallux",
+      "label": "Feet, toes, and rear hallux",
+      "authority": "binding five-view JPEGs",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Visual comparison only. Intake never auto-approves this item."
+    },
+    {
+      "id": "accessories_separated_or_fused",
+      "label": "Accessories are separate objects vs fused into the body",
+      "authority": "production suitability",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "single_or_fused"
+    },
+    {
+      "id": "front_exactly_one_diagonal_strap",
+      "label": "Front has exactly one diagonal cross-body strap",
+      "authority": "Justin strap addendum",
+      "status": "REQUIRES_JUSTIN",
+      "automated": false,
+      "notes": "Automated hint only. Status stays REQUIRES_JUSTIN until Justin visually approves against the binding five-views.",
+      "measuredHint": "REQUIRES_JUSTIN \u2014 confirm exactly one front diagonal"
+    }
+  ],
+  "gate": {
+    "role": "replacement_candidate_only",
+    "autoReplaceCurrentPip": false,
+    "approved": false,
+    "canonicalMutated": false,
+    "theatricalBound": false,
+    "merge": false,
+    "productionLibraryTouched": false,
+    "paidResources": false,
+    "currentPipOverwritten": false,
+    "goatTouched": false,
+    "stopForJustin": true,
+    "forbidden": {
+      "autoReplaceCurrentPip": false,
+      "canonReplace": false,
+      "theatricalBind": false,
+      "merge": false,
+      "productionLibraryWrite": false,
+      "finalRigBindToCurrentPip": false,
+      "paidResources": false
+    },
+    "blockers": [
+      "Current fused Tripo Pip is preserved for comparison only.",
+      "Next upload is a replacement candidate, not automatic canon.",
+      "Justin visual approval is required before retopo, rigging, canon replacement, theatrical binding, or merging.",
+      "Justin has not visually approved this candidate.",
+      "Reference-comparison checklist is not fully approved."
+    ],
+    "nextAllowed": [
+      "Preserve the uploaded file unchanged.",
+      "Record filename and SHA-256.",
+      "Open in Blender 4.2.3 LTS.",
+      "Generate geometry report, five-views, close-ups, and turntable.",
+      "Fill the reference-comparison checklist as REQUIRES_JUSTIN.",
+      "Stop for Justin visual approval."
+    ],
+    "nextForbidden": [
+      "final Pip retopology",
+      "final Pip UV replacement",
+      "final Pip texture lock",
+      "final Pip rig binding",
+      "final Pip facial rig",
+      "final Pip groom/feather lock",
+      "final Pip animation",
+      "final Pip collision fitting",
+      "final character-dependent camera framing",
+      "final Pip-and-Goat scale binding",
+      "hero shots or final episode renders",
+      "canonical replacement",
+      "theatrical binding",
+      "merging an unapproved character",
+      "deployment or paid rendering"
+    ]
+  },
+  "strengths": [],
+  "defects": [
+    "Visual strengths and defects require Justin review against the ten binding five-views."
+  ],
+  "repairability": "Not assessed automatically. Fused accessories are usually not paint-repairable.",
+  "productionSuitability": "NOT_PRODUCTION_READY",
+  "approved": false,
+  "autoReplaceCurrentPip": false
+}
