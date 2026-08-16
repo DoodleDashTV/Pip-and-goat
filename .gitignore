@@ -56,4 +56,8 @@ artifacts/steps-1-8-validation/render/
 theatrical-foundation/proposed/pip-replacement-intake/inbox/**
 !theatrical-foundation/proposed/pip-replacement-intake/inbox/README.md
 !theatrical-foundation/proposed/pip-replacement-intake/inbox/.gitkeep
+# Corrected split-part locations for the pending Pip replacement candidate.
+!theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_replacement.glb.part1.bin
+!theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_replacement.glb.part2.bin
+!theatrical-foundation/proposed/pip-replacement-intake/inbox/pip_replacement.glb.part3.bin
 artifacts/theatrical-v2/pip-replacement-intake/
