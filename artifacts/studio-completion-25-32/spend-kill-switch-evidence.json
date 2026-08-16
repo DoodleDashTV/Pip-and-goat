@@ -1,0 +1,48 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "canonical": false,
+  "productionEligible": false,
+  "final": false,
+  "publishable": false,
+  "paidAuthorizationDefault": "DENIED",
+  "realProviderCalled": false,
+  "decisions": [
+    {
+      "allowed": false,
+      "reason": "Refuse: missing spend authorization.",
+      "estimatedUsd": 1,
+      "actualUsd": 0,
+      "authorized": false,
+      "newWorkStopped": true
+    },
+    {
+      "allowed": false,
+      "reason": "Refuse: expired spend authorization.",
+      "estimatedUsd": 1,
+      "actualUsd": 0,
+      "authorized": false,
+      "newWorkStopped": true
+    },
+    {
+      "allowed": false,
+      "reason": "Refuse: authorization reuse is forbidden.",
+      "estimatedUsd": 1,
+      "actualUsd": 0,
+      "authorized": false,
+      "newWorkStopped": true
+    },
+    {
+      "allowed": false,
+      "reason": "Refuse: stop new work; ceiling would be exceeded.",
+      "estimatedUsd": 50,
+      "actualUsd": 0,
+      "authorized": false,
+      "newWorkStopped": true
+    }
+  ],
+  "cacheKey": "d154f460e5f0928c848bcf3fa7780303499025c0716eac75f22401651220f13c",
+  "version": "1.0.0"
+}

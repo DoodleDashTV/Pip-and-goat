@@ -50,3 +50,4 @@ export * from './profile';
 export * from './provenance';
 export * from './analytics';
 export * from './steps-closed';
+export * from './studio-completion';

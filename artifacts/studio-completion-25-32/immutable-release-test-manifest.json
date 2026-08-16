@@ -1,0 +1,36 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "sealed": {
+    "releaseId": "rel-studio-completion-25-32",
+    "version": 1,
+    "branch": "cursor/studio-completion-25-32-73f1",
+    "commit": "e3d69e22521a62693345c565289ddd03e37a5e08",
+    "dependencyFingerprint": "75dcc1251d4b947864e156281d0a8a8a94350105b765db02eedaea3f169853a6",
+    "configFingerprint": "54cdcc390201c4c0d7628ad78da8179e5bd74634d0d7b6eef74a87c3206d0479",
+    "artifactHashes": {
+      "report": "pending"
+    },
+    "testEvidence": [
+      "validate:studio-completion"
+    ],
+    "gateState": {
+      "currentStage": "DDP_STEPS_1_8",
+      "theatricalAllowed": false,
+      "steps9To16Opened": false
+    },
+    "provenanceRef": "studio-completion",
+    "rollbackTarget": "e3d69e22521a62693345c565289ddd03e37a5e08",
+    "classification": "INFRASTRUCTURE_TEST",
+    "approvalStatus": "UNAPPROVED",
+    "securityStatus": "INFRASTRUCTURE_TEST",
+    "spendAuthorized": false,
+    "sealed": true,
+    "sealHash": "b12b0bfe07511b402b93e8a3ec6e644f0a1a4a2e13b69a39285596d4d9c3ca31"
+  },
+  "verification": {
+    "ok": true,
+    "reason": "seal intact"
+  }
+}

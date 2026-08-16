@@ -1,0 +1,28 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "canonical": false,
+  "productionEligible": false,
+  "final": false,
+  "publishable": false,
+  "complete": true,
+  "restoreOk": true,
+  "restoreOrder": [
+    "workflow.json",
+    "continuity.json",
+    "dependencies.json",
+    "cache.json",
+    "checkpoint.json",
+    "provenance.json",
+    "audit.json",
+    "release.json",
+    "config-fingerprint.json"
+  ],
+  "productionDataTouched": false,
+  "recoveryTimeMs": 0,
+  "recoveryPoint": "last-complete-local-fixture",
+  "cacheKey": "05c99ddb327015cda043f1efc1e7a175414011ebdd3810d9caef7980d135dc85",
+  "version": "1.0.0"
+}

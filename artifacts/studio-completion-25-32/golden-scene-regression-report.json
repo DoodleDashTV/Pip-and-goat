@@ -1,0 +1,32 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "outputClass": "PIPELINE_TEST_ONLY",
+  "canonical": false,
+  "productionEligible": false,
+  "final": false,
+  "publishable": false,
+  "seed": "tivvlejoy-studio-completion-golden-v1",
+  "expectedHash": "b822e619148a0e53ea2b9ebd9193b4fba03196e0ba471ebdb6983301b5deb8f0",
+  "actualHash": "b822e619148a0e53ea2b9ebd9193b4fba03196e0ba471ebdb6983301b5deb8f0",
+  "structure": {
+    "beats": 8,
+    "panels": 8,
+    "clips": 8,
+    "terminal": "PIPELINE_TEST_COMPLETE",
+    "storyCacheKey": "d82d324c325149c0241f711a776ffe8408f610bbaeeabdcad0ec127ef7534c05",
+    "continuityCacheKey": "6dd9aaa2c6c8a11d38f8dc7abf16d09601b07e852077b06e737119e5dac963cf",
+    "storyboardCacheKey": "bf80594611229c0c93e313dc98ccf3db04e9498e51a70e39e64ecaf2d9e38e4d",
+    "animaticCacheKey": "f7aea6449d7be9f31136823bdb9e93779b9e2a619258efe4de3121b7058c8430",
+    "qcTechnical": "PASS",
+    "repairPaid": false,
+    "provenanceIncludesPipGoat": false
+  },
+  "regression": {
+    "regressed": false,
+    "reasons": []
+  },
+  "tolerance": "Exact hashes for planner documents. Media mux bytes may vary by ffmpeg build.",
+  "version": "1.0.0"
+}

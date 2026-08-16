@@ -5,7 +5,8 @@ Updated: 2026-08-16
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/studio-steps-9-16-closed-73f1`
+- Working branch: `cursor/studio-completion-25-32-73f1`
+- Closed-gate Steps 9–16 (Draft PR #30, keep unmerged): `cursor/studio-steps-9-16-closed-73f1` @ `e3d69e22521a62693345c565289ddd03e37a5e08`
 - Accepted studio hardening 17–24 (Draft PR #29, keep unmerged): `cursor/studio-hardening-17-24-73f1` @ `b4e311ac3b72d004923506b104a27cd9ccec0480`
 - Accepted Milestone 5 hardening (Draft PR #28, keep unmerged): `cursor/studio-m5-hardening-73f1` @ `82f26c81fc3564321289831a95ae93468b2f1369`
 - Milestone 5 checkpoint (Draft PR #27, keep unmerged): `cursor/studio-milestone-5-workflow-73f1` @ `ec8d1ed8a7699855692031894e8782e78c21e66c`
@@ -15,26 +16,27 @@ Updated: 2026-08-16
 
 ## Current milestone
 
-Character-independent Steps 9–16 infrastructure behind the closed theatrical
-gate. Theatrical / Steps 9–16 stay closed.
+Studio Completion 25–32 closed-gate infrastructure. Theatrical / Steps 9–16
+and Steps 25–32 stay closed.
 
 ## Completed this increment
 
-- Story brain (deterministic eight-beat draft, canon refuse)
-- Continuity / canon database (readiness only, no auto-promote)
-- Hook and retention planner (advisory only)
-- Storyboard compiler (placeholders, no Pip/Goat assets)
-- Animatic compiler (proxy 9:16 holds + non-voice test audio)
-- Visual QC and motion/audio QC contracts
-- Local unpaid auto-repair with QC re-run and protected-path refuse
-- Episode 1 DRAFT_NONCANONICAL / PIPELINE_TEST_ONLY package
+- Security and secret-rotation metadata with redaction
+- Deny-by-default least-privilege policies
+- Hash-chained audit log and tamper detection
+- Immutable sealed release manifests
+- CI-compatible fail-closed quality gates
+- Disposable local backup/restore
+- Vulnerability/supply-chain policy with UNKNOWN when no feed
+- Spend kill switch and synthetic golden-scene regression
 
 ## Tests / validation
 
-- `pnpm validate:steps-9-16-closed` — 25/25 PASS
+- `pnpm validate:studio-completion` — 35/35 PASS
 - `pnpm validate:persist` — 9/9 PASS
 - `pnpm validate:studio-hardening` — 16/16 PASS
-- `pnpm test` — 465 / 465
+- `pnpm validate:steps-9-16-closed` — 25/25 PASS
+- `pnpm test` — 476 / 476
 - `pnpm typecheck` — PASS
 - `pnpm lint` — PASS
 
@@ -43,7 +45,7 @@ gate. Theatrical / Steps 9–16 stay closed.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, or #29.
+- Do not merge Draft PR #24, #26, #27, #28, #29, or #30.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

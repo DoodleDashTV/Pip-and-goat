@@ -1,0 +1,20 @@
+{
+  "classification": "INFRASTRUCTURE_TEST",
+  "label": "DRAFT_NONCANONICAL",
+  "watermark": "NOT FOR FINAL PRODUCTION",
+  "beforeHashes": {
+    "production-library/characters/pip_production.blend": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0",
+    "production-library/characters/goat_production.blend": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8",
+    "production-library/environments/meadow_production.blend": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015",
+    "production-library/props/adventure_map.blend": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea",
+    "production-library/library_manifest.json": "10d5290585e10338bbd5852f9c412fc6feb1ea5deccb58184d879c6bf9ca49f4"
+  },
+  "afterHashes": {
+    "production-library/characters/pip_production.blend": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0",
+    "production-library/characters/goat_production.blend": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8",
+    "production-library/environments/meadow_production.blend": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015",
+    "production-library/props/adventure_map.blend": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea",
+    "production-library/library_manifest.json": "10d5290585e10338bbd5852f9c412fc6feb1ea5deccb58184d879c6bf9ca49f4"
+  },
+  "unchanged": true
+}
