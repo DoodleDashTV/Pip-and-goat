@@ -10,7 +10,7 @@
  *   pnpm validate:persist
  */
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import { buildEpisode1DraftPackage, PROXY_PIPELINE_BRIEF, advanceWorkflow } from '../../packages/preproduction/src/index';
@@ -40,7 +40,29 @@ function write(relative: string, value: unknown): void {
   writeFileSync(target, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function loadLocalEnv(file: string): void {
+  if (!existsSync(file)) return;
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq < 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (key && process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  }
+}
+
 function requireDatabaseUrl(): string {
+  loadLocalEnv(path.join(REPO_ROOT, '.env'));
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error('DATABASE_URL is required for disposable local persist validation.');
