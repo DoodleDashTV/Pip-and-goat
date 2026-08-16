@@ -33,7 +33,11 @@ import {
   voiceIdForOccupant,
 } from '@doodle-dash/preproduction';
 import { currentStage, evaluateTheatricalGate, FINAL_1080P_ACCEPTANCE } from '@doodle-dash/direction';
-import { assertProductionLaunchSafe, persistPreproductionRun } from '@doodle-dash/production';
+import {
+  assertDurableWorkflowPersisted,
+  assertProductionLaunchSafe,
+  persistPreproductionRun,
+} from '@doodle-dash/production';
 
 const repoRoot = path.resolve(__dirname, '../../../..');
 const proxy = advanceWorkflow(PROXY_PIPELINE_BRIEF);
@@ -176,17 +180,14 @@ describe('persistence statuses', () => {
     expect(result.persisted).toBe(false);
   });
 
-  it('fails closed when durable persistence is required and the write cannot happen', async () => {
-    await expect(
-      persistPreproductionRun({
-        episodeId: proxy.episodeId,
-        workflow: {
-          ...proxy,
-          mayContinueToFinal: true,
-        } as typeof proxy,
-        durableRequired: true,
+  it('fails closed when durable persistence is required and the write cannot happen', () => {
+    expect(() =>
+      assertDurableWorkflowPersisted({
+        status: 'PERSISTENCE_FAILED',
+        persisted: false,
+        reason: 'Prisma model preproductionRun is not available.',
       }),
-    ).rejects.toThrow(/PERSISTENCE_FAILED|forbidden terminal/);
+    ).toThrow(/must persist durably/);
   });
 });
 

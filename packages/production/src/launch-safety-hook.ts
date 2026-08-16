@@ -14,7 +14,7 @@ import {
 } from '@doodle-dash/preproduction';
 import { loadLatestPreproductionRun } from './preproduction-persist';
 
-export function readLaunchEnvFlags(env: NodeJS.ProcessEnv = process.env): {
+export function readLaunchEnvFlags(env: Record<string, string | undefined> = process.env): {
   allowPaidGpu: boolean;
   cloudRenderEnabled: boolean;
 } {
@@ -33,7 +33,7 @@ export async function evaluateProductionLaunchSafety(input: {
   writeProductionLibrary?: boolean;
   synthesizeLockedVoice?: boolean;
   publish?: boolean;
-  env?: NodeJS.ProcessEnv;
+  env?: Record<string, string | undefined>;
 }): Promise<LaunchSafety> {
   const flags = readLaunchEnvFlags(input.env);
   const persisted = input.episodeId ? await loadLatestPreproductionRun(input.episodeId) : null;
@@ -60,7 +60,7 @@ export async function assertProductionLaunchSafe(input: {
   writeProductionLibrary?: boolean;
   synthesizeLockedVoice?: boolean;
   publish?: boolean;
-  env?: NodeJS.ProcessEnv;
+  env?: Record<string, string | undefined>;
 }): Promise<LaunchSafety> {
   const safety = await evaluateProductionLaunchSafety(input);
   if (!safety.allowed) {
