@@ -220,7 +220,7 @@ describe('First episode launch prep', () => {
       code: 'DRAFT_GATED',
     });
     await expect(draftFinalOrchestrator.generateFinal(VERTICAL_SLICE_EPISODE_ID)).rejects.toMatchObject({
-      code: 'DRAFT_APPROVAL_REQUIRED',
+      code: 'FINAL_RENDER_REFUSED',
     });
   });
 

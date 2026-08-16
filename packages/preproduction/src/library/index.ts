@@ -163,3 +163,27 @@ export function planLibrary(draft: StoryDraft): { library: LibraryBinding; issue
 
   return { library, issues: issues.map((issue) => PlanIssueSchema.parse(issue)) };
 }
+
+/** Planning-only reusable specs. Never writes production-library. */
+export function specifyReusableLibrary(draft: StoryDraft) {
+  const planned = planLibrary(draft);
+  return {
+    ...planned.library,
+    specifications: {
+      environments: planned.library.environments.map((id) => ({
+        id,
+        kind: 'ENVIRONMENT' as const,
+        writesProductionLibrary: false as const,
+      })),
+      props: planned.library.props.map((id) => ({
+        id,
+        kind: 'PROP' as const,
+        writesProductionLibrary: false as const,
+      })),
+      lighting: { recipe: planned.library.lightingRecipe, writesProductionLibrary: false as const },
+      vfx: planned.library.vfxIds.map((id) => ({ id, writesProductionLibrary: false as const })),
+    },
+    writesProductionLibrary: false as const,
+    issues: planned.issues,
+  };
+}

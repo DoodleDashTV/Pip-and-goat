@@ -193,12 +193,12 @@ describe('create-episode and generate-final safety', () => {
     });
     expect(safety.allowed).toBe(false);
     expect(safety.blockers.length).toBeGreaterThan(0);
-    expect(
-      evaluateEpisodeLaunchSafety({
-        command: 'generate-final',
-        intent: 'FINAL',
-      }).allowed,
-    ).toBe(true);
+    const unmarked = evaluateEpisodeLaunchSafety({
+      command: 'generate-final',
+      intent: 'FINAL',
+    });
+    expect(unmarked.allowed).toBe(false);
+    expect(unmarked.code).toBe('FINAL_RENDER_REFUSED');
   });
 
   it('wires create-episode and generate-final to the safety helpers', () => {
@@ -214,12 +214,18 @@ describe('create-episode and generate-final safety', () => {
       path.join(repoRoot, 'packages/production/src/cloud/preflight.ts'),
       'utf8',
     );
+    const launchPrep = readFileSync(
+      path.join(repoRoot, 'packages/production/src/launch-prep.ts'),
+      'utf8',
+    );
     expect(createEpisode).toContain('[15, 30, 45, 60]');
     expect(createEpisode).toContain('evaluateEpisodeCreateSafety');
     expect(launch).toContain('evaluateEpisodeLaunchSafety');
     expect(launch).toContain("action: z.literal('generate-final')");
     expect(preflight).toContain('PROXY_PAID_LAUNCH_REFUSED');
     expect(preflight).toContain('requiredForReady');
-    expect(preflight).not.toMatch(/requiredForReady = \[[^\]]*PROXY_PAID_LAUNCH_REFUSED/s);
+    expect(preflight).toMatch(/requiredForReady = \[[\s\S]*PROXY_PAID_LAUNCH_REFUSED/);
+    expect(launch).toContain('readLaunchEnvFlags');
+    expect(launchPrep).toContain('assertProductionLaunchSafe');
   });
 });

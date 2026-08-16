@@ -9,19 +9,22 @@
  *
  *   pnpm validate:milestone5
  */
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-
 import {
   CANONICAL_STORY_BRIEF,
   FORBIDDEN_FINAL_INTENT,
   PROXY_PIPELINE_BRIEF,
   advanceWorkflow,
+  buildEpisode1DraftPackage,
   compileAnimaticAssembly,
   compileAudioMix,
+  compileDraftMux,
+  evaluateAudioTiming,
   evaluateEpisodeCreateSafety,
   evaluateEpisodeLaunchSafety,
+  planSteps9To16Infrastructure,
   summarizeWorkflow,
 } from '../../packages/preproduction/src/index';
 import { currentStage, evaluateTheatricalGate } from '../../packages/direction/src/index';
@@ -86,12 +89,24 @@ const mixCmd = compileAudioMix({
   durationSeconds: proxy.bundle.animatic.totalFrames / proxy.bundle.animatic.fps,
   outputPath: path.join(OUT_DIR, 'proxy-mix.wav'),
 });
+const muxCmd = compileDraftMux({
+  animatic: proxy.bundle.animatic,
+  audio: proxy.bundle.audio,
+  outputPath: path.join(OUT_DIR, 'proxy-draft.mp4'),
+  fontFile,
+});
+const unmarkedFinal = evaluateEpisodeLaunchSafety({ command: 'generate-final', intent: 'FINAL' });
+const episode1 = buildEpisode1DraftPackage();
+const closed = planSteps9To16Infrastructure();
 
 write('proxy-workflow.json', summarizeWorkflow(proxy));
 write('canonical-workflow.json', summarizeWorkflow(canonical));
 write('forbidden-launch.json', forbiddenLaunch);
 write('animatic-command.json', animaticCmd);
 write('audio-mix-command.json', mixCmd);
+write('mux-command.json', muxCmd);
+write('episode-1-draft.json', episode1.summary);
+write('steps-9-16-closed.json', closed);
 write('summary.json', {
   title: 'TIVVLEJOY STUDIO MILESTONE 5 — episode workflow + launch safety',
   acceptanceRender: false,
@@ -137,6 +152,11 @@ record(
   forbiddenLaunch.allowed ? 'generate-final incorrectly allowed a proxy' : forbiddenLaunch.code,
 );
 record(
+  'unmarked-generate-final-refused',
+  unmarkedFinal.allowed ? 'FAIL' : 'PASS',
+  unmarkedFinal.allowed ? 'unmarked generate-final bypassed FINAL_RENDER refusal' : unmarkedFinal.code,
+);
+record(
   'theatrical-still-closed',
   theatrical.allowed ? 'FAIL' : 'PASS',
   theatrical.allowed ? 'theatrical gate opened' : `stage=${currentStage().id}`,
@@ -152,20 +172,94 @@ record(
   `animatic ${animaticCmd.args.length} args · mix ${mixCmd.args.length} args`,
 );
 
-const ffmpegAvailable = have('ffmpeg');
-if (!ffmpegAvailable) {
-  record('ffmpeg-animatic', 'SKIPPED', 'ffmpeg not installed; argv written but not executed');
-} else {
-  const result = spawnSync('ffmpeg', animaticCmd.args, { encoding: 'utf8' });
+function runFfmpeg(name: string, args: readonly string[]): boolean {
+  const ffmpegAvailable = have('ffmpeg');
+  if (!ffmpegAvailable) {
+    record(name, 'SKIPPED', 'ffmpeg not installed; argv written but not executed');
+    return false;
+  }
+  const result = spawnSync('ffmpeg', [...args], { encoding: 'utf8' });
   const stderr = result.stderr || '';
   if (result.status === 0) {
-    record('ffmpeg-animatic', 'PASS', 'local draft animatic assembled');
-  } else if (/font|drawtext/i.test(stderr) && !fontFile) {
-    record('ffmpeg-animatic', 'SKIPPED', 'ffmpeg present but no drawtext font in this environment');
-  } else {
-    record('ffmpeg-animatic', 'FAIL', stderr.slice(0, 240));
+    record(name, 'PASS', 'executed');
+    return true;
   }
+  if (/font|drawtext/i.test(stderr) && !fontFile) {
+    record(name, 'SKIPPED', 'ffmpeg present but no drawtext font in this environment');
+    return false;
+  }
+  record(name, 'FAIL', stderr.slice(0, 240));
+  return false;
 }
+
+const videoOk = runFfmpeg('ffmpeg-visual-holds', animaticCmd.args);
+const audioOk = runFfmpeg('ffmpeg-synthetic-audio', mixCmd.args);
+const muxOk = runFfmpeg('ffmpeg-draft-mux', muxCmd.args);
+
+if (muxOk && have('ffprobe')) {
+  const probed = spawnSync(
+    'ffprobe',
+    [
+      '-v',
+      'error',
+      '-show_entries',
+      'format=duration,size',
+      '-show_entries',
+      'stream=codec_type,width,height',
+      '-of',
+      'json',
+      muxCmd.outputPath,
+    ],
+    { encoding: 'utf8' },
+  );
+  const info = JSON.parse(probed.stdout || '{}') as {
+    format?: { duration?: string; size?: string };
+    streams?: Array<{ codec_type?: string; width?: number; height?: number }>;
+  };
+  const duration = Number(info.format?.duration ?? 0);
+  const size = Number(info.format?.size ?? 0);
+  const video = info.streams?.find((stream) => stream.codec_type === 'video');
+  const audio = info.streams?.find((stream) => stream.codec_type === 'audio');
+  const fileBytes = existsSync(muxCmd.outputPath) ? statSync(muxCmd.outputPath).size : 0;
+  const timing = evaluateAudioTiming({
+    animatic: proxy.bundle.animatic,
+    audio: proxy.bundle.audio,
+    measuredDurationSeconds: duration,
+  });
+  write('draft-mux-probe.json', { info, timing, fileBytes });
+  record(
+    'draft-mp4-duration',
+    timing.withinTolerance ? 'PASS' : 'FAIL',
+    `planned=${timing.plannedSeconds.toFixed(3)}s measured=${duration.toFixed(3)}s`,
+  );
+  record(
+    'draft-mp4-resolution',
+    video?.width === 360 && video?.height === 640 ? 'PASS' : 'FAIL',
+    `${video?.width ?? 0}x${video?.height ?? 0}`,
+  );
+  record('draft-mp4-audio-stream', audio ? 'PASS' : 'FAIL', audio ? 'audio stream present' : 'missing audio');
+  record('draft-mp4-nonzero', fileBytes > 0 && size > 0 ? 'PASS' : 'FAIL', `${fileBytes} bytes`);
+} else if (!have('ffprobe')) {
+  record('draft-mp4-duration', 'SKIPPED', 'ffprobe not installed');
+  record('draft-mp4-resolution', 'SKIPPED', 'ffprobe not installed');
+  record('draft-mp4-audio-stream', 'SKIPPED', 'ffprobe not installed');
+  record('draft-mp4-nonzero', existsSync(muxCmd.outputPath) && statSync(muxCmd.outputPath).size > 0 ? 'PASS' : 'SKIPPED', 'file check only');
+}
+
+record(
+  'episode-1-draft-noncanonical',
+  episode1.canonical === false && episode1.productionEligible === false ? 'PASS' : 'FAIL',
+  episode1.label,
+);
+record(
+  'steps-9-16-still-closed',
+  closed.opened === false && closed.gateAllowed === false && closed.currentStage === 'DDP_STEPS_1_8'
+    ? 'PASS'
+    : 'FAIL',
+  `opened=${closed.opened} stage=${closed.currentStage}`,
+);
+void videoOk;
+void audioOk;
 
 const failed = checks.filter((check) => check.status === 'FAIL');
 write('checks.json', checks);

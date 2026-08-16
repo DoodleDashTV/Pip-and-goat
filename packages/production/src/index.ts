@@ -642,6 +642,15 @@ export class PublishingService {
   }
 
   async createRelease(input: PublishReleaseInput) {
+    const { assertProductionLaunchSafe } = await import('./launch-safety-hook');
+    await assertProductionLaunchSafe({
+      episodeId: input.episodeId,
+      command: 'generate-final',
+      intent: 'PUBLISH',
+      publish: true,
+      writeProductionLibrary: false,
+      synthesizeLockedVoice: false,
+    });
     const data = PublishReleaseSchema.parse(input);
     return delegate('publishingRelease').create({
       data: {
@@ -969,3 +978,4 @@ export * from './cloud';
 export * from './direction-service';
 export * from './proxy-output-gate';
 export * from './preproduction-persist';
+export * from './launch-safety-hook';

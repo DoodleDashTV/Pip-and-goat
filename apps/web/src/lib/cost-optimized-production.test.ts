@@ -292,7 +292,7 @@ describe('Cost-optimized 1080p Doodle Dash Production', () => {
 
   it('final requires approved draft; pipeline resume remains available', async () => {
     await expect(draftFinalOrchestrator.generateFinal(VERTICAL_SLICE_EPISODE_ID)).rejects.toMatchObject({
-      code: 'DRAFT_APPROVAL_REQUIRED',
+      code: 'FINAL_RENDER_REFUSED',
     });
     const { buildEpisodeOrchestrator } = await import('@doodle-dash/production');
     expect(typeof buildEpisodeOrchestrator.resume).toBe('function');

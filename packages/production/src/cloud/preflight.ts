@@ -289,8 +289,8 @@ export async function buildPreDeploymentReport(input?: {
   // SECRET_LEAK_CHECK: structural — no secrets in manifest
   gates.SECRET_LEAK_CHECK = passFail(!JSON.stringify(manifest).includes('RUNPOD_API_KEY'));
 
-  // Additive Milestone 5 proof: a proxy FINAL / paid / library-write intent is
-  // refused. Not part of requiredForReady — must not flip GPU-ready.
+  // Fail-closed proof: a proxy FINAL / paid / library-write intent is refused.
+  // In requiredForReady so a broken refuse-check cannot mark GPU deployment ready.
   const proxyLaunch = evaluateEpisodeLaunchSafety({
     command: 'generate-final',
     intent: 'FINAL',
@@ -317,6 +317,9 @@ export async function buildPreDeploymentReport(input?: {
   if (!limits.allowPaidGpuLaunch) {
     remainingBlockers.push('ALLOW_PAID_GPU_LAUNCH=false — required safety gate before first paid GPU');
   }
+  if (gates.PROXY_PAID_LAUNCH_REFUSED === 'FAIL') {
+    remainingBlockers.push('PROXY_PAID_LAUNCH_REFUSED failed — proxy/paid/library launch is not fail-closed');
+  }
 
   const requiredForReady = [
     'R2',
@@ -338,6 +341,7 @@ export async function buildPreDeploymentReport(input?: {
     'BATCH_EPISODES',
     'SEASON_QUEUE_FOUNDATION',
     'SECRET_LEAK_CHECK',
+    'PROXY_PAID_LAUNCH_REFUSED',
   ] as const;
 
   const ready = requiredForReady.every((k) => gates[k] === 'PASS') && remainingBlockers.length === 0;

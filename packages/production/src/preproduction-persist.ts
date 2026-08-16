@@ -1,9 +1,16 @@
 /**
- * Optional persistence for character-independent pre-production runs.
+ * Persistence for character-independent pre-production runs.
  *
- * Uses `optionalDelegate` so a missing Prisma model does not crash older
- * databases. Never writes production-library. Never records a paid GPU as
- * authorized. Proxy runs may be stored as PIPELINE_TEST evidence only.
+ * `optionalDelegate` means a missing Prisma model does not crash older
+ * databases. That absence is never reported as a durable write.
+ *
+ * Status is always one of:
+ *   PERSISTED            — a row exists and was written or reused
+ *   EPHEMERAL_TEST_ONLY  — caller asked not to require durability (fixtures)
+ *   PERSISTENCE_FAILED   — durable write was required or attempted and failed
+ *
+ * Production-intended runs (`durableRequired: true`) fail closed on
+ * PERSISTENCE_FAILED. They must not be treated as a stored workflow.
  */
 import { prisma } from '@doodle-dash/database';
 import {
@@ -11,6 +18,9 @@ import {
   summarizeWorkflow,
   type WorkflowRun,
 } from '@doodle-dash/preproduction';
+
+export const PERSISTENCE_STATUSES = ['PERSISTED', 'EPHEMERAL_TEST_ONLY', 'PERSISTENCE_FAILED'] as const;
+export type PersistenceStatus = (typeof PERSISTENCE_STATUSES)[number];
 
 type PrismaDelegate = {
   findFirst(args?: Record<string, unknown>): Promise<unknown | null>;
@@ -36,6 +46,13 @@ export type PersistedPreproductionRun = {
   occupants: string[];
 };
 
+export type PersistPreproductionResult = {
+  status: PersistenceStatus;
+  persisted: boolean;
+  id?: string;
+  reason: string;
+};
+
 function asPersisted(row: Record<string, unknown> | null): PersistedPreproductionRun | null {
   if (!row) return null;
   const content = (row.content as { occupants?: string[] } | null) ?? {};
@@ -57,43 +74,113 @@ function asPersisted(row: Record<string, unknown> | null): PersistedPreproductio
 export async function persistPreproductionRun(input: {
   episodeId: string;
   workflow: WorkflowRun;
-}): Promise<{ persisted: boolean; id?: string; reason?: string }> {
+  durableRequired?: boolean;
+  ephemeralTestOnly?: boolean;
+}): Promise<PersistPreproductionResult> {
+  const durableRequired = input.durableRequired === true;
+  const ephemeralTestOnly = input.ephemeralTestOnly === true;
+
   if (input.workflow.bundle.library.writesProductionLibrary) {
-    return { persisted: false, reason: 'Refuse: pre-production must not write production-library/.' };
+    const failed: PersistPreproductionResult = {
+      status: 'PERSISTENCE_FAILED',
+      persisted: false,
+      reason: 'Refuse: pre-production must not write production-library/.',
+    };
+    if (durableRequired) throw new Error(`PERSISTENCE_FAILED: ${failed.reason}`);
+    return failed;
   }
   if (input.workflow.mayContinueToFinal || input.workflow.mayContinueToTheatrical || input.workflow.mayPublish) {
-    return { persisted: false, reason: 'Refuse: workflow claimed a forbidden terminal.' };
+    const failed: PersistPreproductionResult = {
+      status: 'PERSISTENCE_FAILED',
+      persisted: false,
+      reason: 'Refuse: workflow claimed a forbidden terminal.',
+    };
+    if (durableRequired) throw new Error(`PERSISTENCE_FAILED: ${failed.reason}`);
+    return failed;
+  }
+
+  if (ephemeralTestOnly && !durableRequired) {
+    return {
+      status: 'EPHEMERAL_TEST_ONLY',
+      persisted: false,
+      reason: 'Fixture / pipeline-test run is ephemeral and was not written as a durable workflow.',
+    };
   }
 
   const model = optionalDelegate('preproductionRun');
   if (!model) {
-    return { persisted: false, reason: 'Prisma model preproductionRun is not generated yet.' };
+    const result: PersistPreproductionResult = {
+      status: durableRequired ? 'PERSISTENCE_FAILED' : 'EPHEMERAL_TEST_ONLY',
+      persisted: false,
+      reason: 'Prisma model preproductionRun is not available. This is not a durable workflow run.',
+    };
+    if (durableRequired) {
+      throw new Error(`PERSISTENCE_FAILED: ${result.reason}`);
+    }
+    return result;
   }
 
-  const summary = summarizeWorkflow(input.workflow);
-  const existing = (await model.findFirst({
-    where: { episodeId: input.episodeId, cacheKey: input.workflow.cacheKey },
-  })) as Record<string, unknown> | null;
-  if (existing?.id) {
-    return { persisted: true, id: String(existing.id), reason: 'Reused identical cache key.' };
+  try {
+    const summary = summarizeWorkflow(input.workflow);
+    const existing = (await model.findFirst({
+      where: { episodeId: input.episodeId, cacheKey: input.workflow.cacheKey },
+    })) as Record<string, unknown> | null;
+    if (existing?.id) {
+      return {
+        status: 'PERSISTED',
+        persisted: true,
+        id: String(existing.id),
+        reason: 'Reused identical cache key.',
+      };
+    }
+
+    const created = (await model.create({
+      data: {
+        episodeId: input.episodeId,
+        schemaVersion: PREPRODUCTION_SCHEMA_VERSION,
+        characterMode: input.workflow.bundle.draft.characterMode,
+        outputClass: input.workflow.bundle.outputClass,
+        terminalState: input.workflow.terminal,
+        status: input.workflow.bundle.status,
+        cacheKey: input.workflow.cacheKey,
+        scenePlanEmitted: input.workflow.bundle.scenePlan !== null,
+        paidGpu: false,
+        content: summary,
+      },
+    })) as { id?: string };
+
+    if (!created.id) {
+      const failed: PersistPreproductionResult = {
+        status: 'PERSISTENCE_FAILED',
+        persisted: false,
+        reason: 'Create returned no id.',
+      };
+      if (durableRequired) throw new Error(`PERSISTENCE_FAILED: ${failed.reason}`);
+      return failed;
+    }
+
+    return {
+      status: 'PERSISTED',
+      persisted: true,
+      id: created.id,
+      reason: 'Wrote preproduction_runs row.',
+    };
+  } catch (error) {
+    if (durableRequired) throw error;
+    return {
+      status: 'PERSISTENCE_FAILED',
+      persisted: false,
+      reason: error instanceof Error ? error.message : 'Persist failed.',
+    };
   }
+}
 
-  const created = (await model.create({
-    data: {
-      episodeId: input.episodeId,
-      schemaVersion: PREPRODUCTION_SCHEMA_VERSION,
-      characterMode: input.workflow.bundle.draft.characterMode,
-      outputClass: input.workflow.bundle.outputClass,
-      terminalState: input.workflow.terminal,
-      status: input.workflow.bundle.status,
-      cacheKey: input.workflow.cacheKey,
-      scenePlanEmitted: input.workflow.bundle.scenePlan !== null,
-      paidGpu: false,
-      content: summary,
-    },
-  })) as { id?: string };
-
-  return { persisted: true, id: created.id };
+export function assertDurableWorkflowPersisted(result: PersistPreproductionResult): void {
+  if (result.status !== 'PERSISTED' || !result.persisted || !result.id) {
+    throw new Error(
+      `Production-intended workflow runs must persist durably. Status=${result.status}. ${result.reason}`,
+    );
+  }
 }
 
 export async function loadLatestPreproductionRun(

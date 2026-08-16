@@ -37,6 +37,8 @@ const ActionSchema = z.discriminatedUnion('action', [
     action: z.literal('persist'),
     fixture: z.enum(['proxy', 'canonical']).default('proxy'),
     episodeId: z.string().optional(),
+    durableRequired: z.boolean().optional(),
+    ephemeralTestOnly: z.boolean().optional(),
   }),
 ]);
 
@@ -115,11 +117,19 @@ export async function POST(request: Request) {
     const run = advanceWorkflow(brief);
     const summary = summarizeWorkflow(run);
     if (parsed.data.action === 'persist') {
+      const proxyFixture = parsed.data.fixture === 'proxy';
       const persisted = await persistPreproductionRun({
         episodeId: parsed.data.episodeId ?? run.episodeId,
         workflow: run,
+        durableRequired: parsed.data.durableRequired === true,
+        ephemeralTestOnly: parsed.data.ephemeralTestOnly ?? proxyFixture,
       });
-      return NextResponse.json({ summary, persisted, paid: paidEnvelope() });
+      return NextResponse.json({
+        summary,
+        persisted,
+        persistenceStatus: persisted.status,
+        paid: paidEnvelope(),
+      });
     }
     return NextResponse.json({ summary, paid: paidEnvelope() });
   } catch (error) {

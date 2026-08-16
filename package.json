@@ -22,6 +22,7 @@
     "validate:steps1-8": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/direction/validate-scene.ts",
     "validate:milestone4": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-milestone4.ts",
     "validate:milestone5": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-milestone5.ts",
+    "validate:hardening": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-milestone5.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
