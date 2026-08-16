@@ -22,6 +22,9 @@ export const PREPRODUCTION_SUBSYSTEM_VERSIONS = {
   qc: '1.0.0',
   gates: '1.0.0',
   proxy: '1.0.0',
+  workflow: '1.0.0',
+  assembly: '1.0.0',
+  launchSafety: '1.0.0',
 } as const;
 
 export type PreproductionSubsystemName = keyof typeof PREPRODUCTION_SUBSYSTEM_VERSIONS;

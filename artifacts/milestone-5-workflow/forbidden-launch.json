@@ -1,0 +1,16 @@
+{
+  "allowed": false,
+  "code": "PROXY_GENERATE_FINAL_REFUSED",
+  "reason": "Paid GPU launch is refused from the character-independent track.",
+  "blockers": [
+    "Paid GPU launch is refused from the character-independent track.",
+    "Pre-production and proxy paths must not write production-library/.",
+    "Proxy occupants cannot enter generate-final / FINAL production output.",
+    "Proxy occupants PROXY_NONCANONICAL_BIRD_A, PROXY_NONCANONICAL_QUADRUPED_A cannot enter FINAL production output.",
+    "Pre-production must not write production-library/.",
+    "Pre-production output cannot be labeled master, final, or production ready.",
+    "Paid GPU launch is refused from this package. Justin’s explicit approval is required elsewhere."
+  ],
+  "theatricalAllowed": false,
+  "version": "1.0.0"
+}

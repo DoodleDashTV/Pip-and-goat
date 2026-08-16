@@ -1,0 +1,89 @@
+{
+  "episodeId": "M4_CANONICAL_STORY_DRAFT",
+  "title": "Map Glow Kindness",
+  "characterMode": "CANONICAL",
+  "occupants": [
+    "CHAR_PIP_001",
+    "CHAR_GOAT_001"
+  ],
+  "outputClass": "STORY_APPROVED_PLAN",
+  "terminal": "STORY_PLAN_READY",
+  "currentStage": "OUTPUT_GATE",
+  "status": "PASS",
+  "issueStatus": "PASS",
+  "errorCount": 0,
+  "scenePlanEmitted": true,
+  "qcTechnical": "PASS",
+  "qcArtistic": "NOT_RENDERED",
+  "mayContinueToFinal": false,
+  "mayContinueToTheatrical": false,
+  "mayPublish": false,
+  "readiness": {
+    "canCreateStudioEpisode": true,
+    "canEmitDraftScenePlan": true,
+    "canLaunchFinal": false,
+    "canLaunchPaidGpu": false,
+    "canOpenTheatrical": false,
+    "artistic": "NOT_RENDERED"
+  },
+  "stages": [
+    {
+      "id": "BRIEF",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "STORY",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "CONTINUITY",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "STORYBOARD",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "ANIMATIC",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "SHOTS",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "LIBRARY",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "AUDIO",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "ORCHESTRATION",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "QC",
+      "status": "DONE",
+      "errorCount": 0
+    },
+    {
+      "id": "OUTPUT_GATE",
+      "status": "DONE",
+      "errorCount": 0
+    }
+  ],
+  "cacheKey": "466b1e27babf6cb34b4c1fe1cf83dda84545b2379d2a4c76b9669b763a02d7b4",
+  "paidGpu": false,
+  "writesProductionLibrary": false
+}

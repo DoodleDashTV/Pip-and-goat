@@ -2307,3 +2307,27 @@ model DirectorOverrideRecord {
   @@index([blueprintId])
   @@map("director_overrides")
 }
+
+/// Character-independent pre-production run (Studio Milestone 5).
+/// `episode_id` is TEXT, not a UUID foreign key — planning can precede an
+/// Episode row, and proxy pipeline tests use logical ids such as
+/// `M4_PROXY_PIPELINE_TEST`. Nothing here writes production-library.
+model PreproductionRun {
+  id                 String   @id @default(uuid()) @db.Uuid
+  episodeId          String   @map("episode_id")
+  schemaVersion      String   @map("schema_version")
+  characterMode      String   @map("character_mode")
+  outputClass        String   @map("output_class")
+  terminalState      String   @map("terminal_state")
+  status             String
+  cacheKey           String   @map("cache_key")
+  scenePlanEmitted   Boolean  @default(false) @map("scene_plan_emitted")
+  paidGpu            Boolean  @default(false) @map("paid_gpu")
+  content            Json
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@unique([episodeId, cacheKey])
+  @@index([episodeId, createdAt])
+  @@map("preproduction_runs")
+}

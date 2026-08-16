@@ -2,7 +2,7 @@
   "name": "@doodle-dash/preproduction",
   "version": "0.1.0",
   "private": true,
-  "description": "TivvleJoy Studios character-independent pre-production: story, continuity, storyboard, animatic, shot planning, reusable libraries, audio infrastructure, local orchestration, proxy QC, and fail-closed proxy output gates",
+  "description": "TivvleJoy Studios character-independent pre-production: story, continuity, storyboard, animatic, shot planning, reusable libraries, audio infrastructure, local orchestration, proxy QC, fail-closed proxy output gates, episode workflow, and local FFmpeg assembly",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "exports": {

@@ -1,0 +1,47 @@
+[
+  {
+    "name": "proxy-workflow",
+    "status": "PASS",
+    "detail": "PIPELINE_TEST_COMPLETE · final=false · scenePlan=false"
+  },
+  {
+    "name": "canonical-workflow",
+    "status": "PASS",
+    "detail": "STORY_PLAN_READY · scenePlan=true"
+  },
+  {
+    "name": "forbidden-terminals",
+    "status": "PASS",
+    "detail": "workflow cannot reach THEATRICAL or PUBLISHING"
+  },
+  {
+    "name": "proxy-create-refused",
+    "status": "PASS",
+    "detail": "PROXY_CREATE_EPISODE_REFUSED"
+  },
+  {
+    "name": "plain-create-allowed",
+    "status": "PASS",
+    "detail": "Studio episode create may proceed as DRAFT."
+  },
+  {
+    "name": "proxy-final-launch-refused",
+    "status": "PASS",
+    "detail": "PROXY_GENERATE_FINAL_REFUSED"
+  },
+  {
+    "name": "theatrical-still-closed",
+    "status": "PASS",
+    "detail": "stage=DDP_STEPS_1_8"
+  },
+  {
+    "name": "assembly-compiled",
+    "status": "PASS",
+    "detail": "animatic 65 args · mix 46 args"
+  },
+  {
+    "name": "ffmpeg-animatic",
+    "status": "PASS",
+    "detail": "local draft animatic assembled"
+  }
+]
