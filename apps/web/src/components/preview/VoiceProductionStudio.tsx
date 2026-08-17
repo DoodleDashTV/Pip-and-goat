@@ -349,12 +349,16 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
   async function downloadPackage() {
     if (!episode) return;
     await Promise.all(orderedLines.map((line) => flushSave(line.characterId)));
-    let pack;
+    const localPack = buildLocalPackage(episode.id, sortVoiceLines(linesRef.current));
+    let pack = localPack;
     try {
       const data = await postVoice({ action: 'package', episodeId: episode.id });
-      pack = data.pack;
+      const remote = data.pack;
+      if (remote?.readyForLipSync?.length || remote?.rejectedExcluded?.length) {
+        pack = remote;
+      }
     } catch {
-      pack = buildLocalPackage(episode.id, sortVoiceLines(linesRef.current));
+      pack = localPack;
     }
     const blob = new Blob([`${JSON.stringify(pack, null, 2)}\n`], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
