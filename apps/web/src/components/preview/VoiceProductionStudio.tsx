@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CandidateVoiceTest } from './CandidateVoiceTest';
+import { ConfirmedScriptToVoice } from './ConfirmedScriptToVoice';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewPageIntro } from './PreviewEmptyState';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
@@ -443,6 +444,8 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
           </div>
         </dl>
       </section>
+
+      <ConfirmedScriptToVoice />
 
       <CandidateVoiceTest />
 

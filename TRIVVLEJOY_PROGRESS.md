@@ -5,7 +5,9 @@ Updated: 2026-08-17
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-voice-candidate-preview-73f1`
+- Working branch: `cursor/tivvlejoy-script-to-voice-73f1`
+- Voice approval lock (keep unmerged): `cursor/tivvlejoy-voice-approval-lock-73f1` @ `109ac281319f2dc8f44e52b67cd5139b76626b08`
+- Voice candidate preview (Draft PR #38, keep draft and unmerged): `cursor/tivvlejoy-voice-candidate-preview-73f1` @ `109ac281319f2dc8f44e52b67cd5139b76626b08`
 - Voice preview stability (Draft PR #37, keep draft and unmerged): `cursor/tivvlejoy-voice-preview-stability-73f1` @ `a9f7aa3e12a1c9888f1d085afee810143aa832a0`
 - Voice preview flow (Draft PR #36, keep draft and unmerged): `cursor/tivvlejoy-voice-preview-flow-73f1` @ `35bfce6daf3ace87747ebea39cf0c79647b669cf`
 - Voice generation (Draft PR #35, keep draft and unmerged): `cursor/tivvlejoy-voice-generation-73f1` @ `3d0567df0c02585c5d716973d0038a86f190136c`
@@ -24,9 +26,9 @@ Updated: 2026-08-17
 ## Current milestone
 
 Controlled ElevenLabs approved-voice Preview path, default closed. Justin
-can review the locked Pip and Goat sample actions. Live generation stays
-off until Vercel Preview gates are set later. Playback-test chimes stay
-available.
+can review locked Pip and Goat samples and confirm one script line at a
+time. Live generation stays off until Vercel Preview gates are set.
+Playback-test chimes stay available.
 Theatrical / Steps 9–16 and Steps 25–32 stay closed. Public Preview stays
 browser-only. Paid ElevenLabs stays disabled. No Preview or production
 database is connected.
@@ -81,7 +83,8 @@ database is connected.
 - Approved ElevenLabs model and sample voice settings are recorded server-side
 - Checkpoint TIVVLEJOY_VOICE_IDENTITY_LOCK_V1 records the approved sample model and settings
 - Pip and Goat cannot share or swap Voice IDs
-- Automatic episode script-to-voice generation is not started
+- Preview-only confirmed script-to-voice converts one user-confirmed line at a time
+- Automatic whole-script or batch episode voice generation is not started
 
 ## Tests / validation
 
@@ -100,7 +103,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, or #38.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, or later stacked voice drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

@@ -775,6 +775,7 @@ describe('legacy brand canon stays out of ElevenLabs', () => {
     'apps/web/src/lib/voice-production/sample-episode.ts',
     'apps/web/src/lib/voice-production/candidates.ts',
     'apps/web/src/components/preview/CandidateVoiceTest.tsx',
+    'apps/web/src/components/preview/ConfirmedScriptToVoice.tsx',
     'apps/web/src/components/preview/VoiceProductionStudio.tsx',
     'apps/web/src/components/preview/PreviewNewEpisode.tsx',
   ];
