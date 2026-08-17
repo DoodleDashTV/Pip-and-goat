@@ -30,6 +30,20 @@ No foreign keys point at canonical `production-library` files, Pip, or Goat.
 
 ## Adapters
 
-- `preview-localStorage` — current browser Preview. Non-durable.
+- `preview-localStorage` — current browser Preview. Non-durable. Active whenever
+  a Preview database is not explicitly connected.
+- `preview-database` — application-side adapter for a future Preview database.
+  Requires explicit `TIVVLEJOY_PERSISTENCE_MODE=preview-database` plus
+  `TIVVLEJOY_PREVIEW_DATABASE_CONNECT=1`. This increment never authorizes a
+  live connection. Missing configuration shows
+  `Preview database: Not connected` and keeps the browser Preview workspace.
+  Failed preview-database writes are not rewritten to localStorage.
 - `production-database` — boundary only. Writes throw
   `PRODUCTION_PERSISTENCE_UNAVAILABLE` until a later authorized connect.
+
+## Validation
+
+Record IDs, schema version, workspace ownership, import size, malformed
+backups, idempotent writes, redacted database errors, and secret-stripped
+audit details are enforced in `validation.ts`. Tests use an in-process
+memory store only. No remote database is opened.

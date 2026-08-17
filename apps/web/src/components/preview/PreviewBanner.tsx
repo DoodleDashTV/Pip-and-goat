@@ -20,8 +20,8 @@ export function PreviewBanner({
         {PREVIEW_PUBLIC_BANNER}
       </p>
       <p className="text-sm leading-6 text-[var(--color-text-muted)]">
-        Work is stored only in this browser and is non-durable. Production database actions stay
-        blocked.
+        Work is stored only in this browser and is non-durable. Preview database: Not connected.
+        Production database actions stay blocked.
       </p>
       {onExport && onImport ? (
         <PreviewBackupControls busy={busy} onExport={onExport} onImport={onImport} />

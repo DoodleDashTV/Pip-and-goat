@@ -8,6 +8,7 @@ import {
 import { STUDIO_DISPLAY_NAME, resolveStudioDisplayName } from '@doodle-dash/domain';
 import { PreviewDashboard } from '@/components/preview/PreviewDashboard';
 import { StudioStatusPanel } from '@/components/StudioStatusPanel';
+import { readSafePersistenceSnapshot } from '@/lib/persistence/env';
 import { isPublicWebsitePreview } from '@/lib/public-preview';
 
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,7 @@ export default async function HomePage() {
   const readyCount = setup ? setup.steps.filter((s) => s.state === 'READY').length : 0;
 
   if (publicPreview) {
-    return <PreviewDashboard />;
+    return <PreviewDashboard snapshot={readSafePersistenceSnapshot()} />;
   }
 
   return (

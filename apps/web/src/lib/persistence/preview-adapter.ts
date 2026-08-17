@@ -109,14 +109,55 @@ export function snapshotPreviewWorkspace(workspace: PreviewWorkspace): Persisten
 export function createPreviewPersistenceAdapter(
   backend: PreviewStoreBackend,
 ): StudioPersistenceAdapter {
+  const read = () => snapshotPreviewWorkspace(loadPreviewWorkspace(backend) ?? emptyPreviewWorkspace());
   return {
     id: PREVIEW_ADAPTER_ID,
     durable: false,
+    connected: true,
     assertWritable() {
       return;
     },
-    readSnapshot() {
-      return snapshotPreviewWorkspace(loadPreviewWorkspace(backend) ?? emptyPreviewWorkspace());
+    readSnapshot: read,
+    saveSettings(input) {
+      return { ...input, durable: false };
+    },
+    saveProduction(input) {
+      return { ...input, durable: false };
+    },
+    saveEpisode(input) {
+      return input;
+    },
+    saveAsset(input) {
+      return { ...input, canonical: false, objectKey: null };
+    },
+    saveVoice(input) {
+      return {
+        ...input,
+        providerVoiceId: null,
+        auditionAvailable: false,
+        consent: {
+          recordedLikeness: false,
+          voiceCloningAuthorized: false,
+          recordedAt: null,
+          notes: input.consent?.notes ?? '',
+        },
+      };
+    },
+    saveWorkflow(input) {
+      return input;
+    },
+    saveReadiness(input) {
+      return { ...input, productionReady: false };
+    },
+    saveRenderRequest(input) {
+      return {
+        ...input,
+        label: 'Draft request — not rendered',
+        status: 'NOT_RENDERED',
+        contactedProvider: false,
+        outputFile: null,
+        progress: null,
+      };
     },
     writeAudit(event) {
       const record: AuditEventRecord = {

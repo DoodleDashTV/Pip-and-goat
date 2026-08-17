@@ -5,7 +5,8 @@ Updated: 2026-08-16
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-production-persistence-73f1`
+- Working branch: `cursor/tivvlejoy-preview-db-ready-73f1`
+- Persistence foundation (Draft PR #33, keep draft and unmerged): `cursor/tivvlejoy-production-persistence-73f1` @ `6e2994a50aef7be16a76c8d00d8b6b05e98119eb`
 - Preview UX branch (Draft PR #32, keep draft and unmerged): `cursor/tivvlejoy-welcoming-ui-73f1` @ `72614b583ca8d064bf823fe80342fe9380f7fe81`
 - Base: Studio Completion 25–32 (Draft PR #31, keep draft and unmerged): `cursor/studio-completion-25-32-73f1` @ `d857a033ed8869200ec22f88cb4b8e657b7c93a6`
 - Closed-gate Steps 9–16 (Draft PR #30, keep unmerged): `cursor/studio-steps-9-16-closed-73f1` @ `e3d69e22521a62693345c565289ddd03e37a5e08`
@@ -18,8 +19,9 @@ Updated: 2026-08-16
 
 ## Current milestone
 
-Production persistence foundation. Theatrical / Steps 9–16 and Steps 25–32
-stay closed. Public Preview stays browser-only. No paid provider is connected.
+Preview cloud persistence connection-ready adapter. Theatrical / Steps 9–16
+and Steps 25–32 stay closed. Public Preview stays browser-only. No paid
+provider is connected. No Preview or production database is connected.
 
 ## Completed this increment
 
@@ -34,6 +36,11 @@ stay closed. Public Preview stays browser-only. No paid provider is connected.
 - Persistence interface for settings, productions, episodes, assets, voices, workflow, readiness, render requests, and audit events
 - Production database adapter is a disconnected boundary
 - Preview JSON export/import with schema and size checks
+- Explicit persistence modes: preview-localStorage, preview-database, production-database
+- Preview-database adapter interface for settings, productions, episodes, assets, voices, workflow, readiness, draft renders, and sanitized audit events
+- Missing Preview database configuration shows Preview database: Not connected and keeps the browser Preview workspace
+- Connection-readiness panel for mode, browser storage, Preview/Production database, backup, last save, and durability
+- Failed production or preview-database writes stay fail-closed and are not rewritten to localStorage
 
 ## Tests / validation
 
@@ -52,7 +59,7 @@ stay closed. Public Preview stays browser-only. No paid provider is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, or #32.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, or #33.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.
