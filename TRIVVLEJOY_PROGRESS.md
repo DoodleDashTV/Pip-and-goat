@@ -5,7 +5,8 @@ Updated: 2026-08-16
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-welcoming-ui-73f1`
+- Working branch: `cursor/tivvlejoy-production-persistence-73f1`
+- Preview UX branch (Draft PR #32, keep draft and unmerged): `cursor/tivvlejoy-welcoming-ui-73f1` @ `72614b583ca8d064bf823fe80342fe9380f7fe81`
 - Base: Studio Completion 25–32 (Draft PR #31, keep draft and unmerged): `cursor/studio-completion-25-32-73f1` @ `d857a033ed8869200ec22f88cb4b8e657b7c93a6`
 - Closed-gate Steps 9–16 (Draft PR #30, keep unmerged): `cursor/studio-steps-9-16-closed-73f1` @ `e3d69e22521a62693345c565289ddd03e37a5e08`
 - Accepted studio hardening 17–24 (Draft PR #29, keep unmerged): `cursor/studio-hardening-17-24-73f1` @ `b4e311ac3b72d004923506b104a27cd9ccec0480`
@@ -17,8 +18,8 @@ Updated: 2026-08-16
 
 ## Current milestone
 
-Welcoming Studio UI + visual preview. Theatrical / Steps 9–16 and Steps 25–32
-stay closed. This increment is UI-only.
+Production persistence foundation. Theatrical / Steps 9–16 and Steps 25–32
+stay closed. Public Preview stays browser-only. No paid provider is connected.
 
 ## Completed this increment
 
@@ -30,6 +31,9 @@ stay closed. This increment is UI-only.
 - Public-preview safety: no database, no secrets, no production-library upload
 - Vercel preview must deploy `apps/web` from `cursor/tivvlejoy-welcoming-ui-73f1`, not `main`
 - Draft PR #32 stays draft and unmerged
+- Persistence interface for settings, productions, episodes, assets, voices, workflow, readiness, render requests, and audit events
+- Production database adapter is a disconnected boundary
+- Preview JSON export/import with schema and size checks
 
 ## Tests / validation
 

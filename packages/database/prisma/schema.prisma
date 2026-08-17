@@ -2331,3 +2331,168 @@ model PreproductionRun {
   @@index([episodeId, createdAt])
   @@map("preproduction_runs")
 }
+
+// ---------------------------------------------------------------------------
+// TivvleJoy persistence foundation.
+//
+// Additive tables for a future production database and durable asset store.
+// This increment does not connect DATABASE_URL, object storage, or a paid
+// provider. Public Preview keeps using browser localStorage.
+// ---------------------------------------------------------------------------
+
+model TivvleJoyWorkspace {
+  id                            String   @id @default(uuid()) @db.Uuid
+  label                         String
+  projectName                   String   @map("project_name")
+  format                        String   @default("1080x1920")
+  fps                           Int      @default(30)
+  paidResourcesAuthorized       Boolean  @default(false) @map("paid_resources_authorized")
+  theatricalBindingCompleted    Boolean  @default(false) @map("theatrical_binding_completed")
+  durable                       Boolean  @default(false)
+  createdAt                     DateTime @default(now()) @map("created_at")
+  updatedAt                     DateTime @updatedAt @map("updated_at")
+
+  productions TivvleJoyProduction[]
+  auditEvents TivvleJoyAuditEvent[]
+
+  @@map("tivvlejoy_workspaces")
+}
+
+model TivvleJoyProduction {
+  id          String   @id @default(uuid()) @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  name        String
+  status      String   @default("DRAFT")
+  durable     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  workspace       TivvleJoyWorkspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  episodes        TivvleJoyEpisode[]
+  assets          TivvleJoyAsset[]
+  voices          TivvleJoyVoiceProfile[]
+  readiness       TivvleJoyReadinessResult[]
+  renderRequests  TivvleJoyRenderRequest[]
+
+  @@index([workspaceId, createdAt])
+  @@map("tivvlejoy_productions")
+}
+
+model TivvleJoyEpisode {
+  id              String   @id @default(uuid()) @db.Uuid
+  productionId    String   @map("production_id") @db.Uuid
+  title           String
+  episodeNumber   Int      @map("episode_number")
+  durationSec     Int      @map("duration_sec")
+  premise         String
+  classification  String   @default("PREVIEW_NONCANONICAL")
+  currentStage    String   @map("current_stage")
+  completedStages Json     @map("completed_stages")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  production TivvleJoyProduction      @relation(fields: [productionId], references: [id], onDelete: Cascade)
+  workflow   TivvleJoyWorkflowStatus?
+
+  @@index([productionId, episodeNumber])
+  @@map("tivvlejoy_episodes")
+}
+
+model TivvleJoyAsset {
+  id             String   @id @default(uuid()) @db.Uuid
+  productionId   String   @map("production_id") @db.Uuid
+  name           String
+  type           String
+  version        String
+  status         String   @default("REGISTERED_METADATA_ONLY")
+  classification String   @default("PREVIEW_NONCANONICAL")
+  canonical      Boolean  @default(false)
+  objectKey      String?  @map("object_key")
+  contentType    String?  @map("content_type")
+  byteSize       Int?     @map("byte_size")
+  notes          String   @default("")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  production TivvleJoyProduction @relation(fields: [productionId], references: [id], onDelete: Cascade)
+
+  @@index([productionId, createdAt])
+  @@map("tivvlejoy_assets")
+}
+
+model TivvleJoyVoiceProfile {
+  id                           String    @id @default(uuid()) @db.Uuid
+  productionId                 String    @map("production_id") @db.Uuid
+  characterLabel               String    @map("character_label")
+  displayName                  String    @map("display_name")
+  notes                        String    @default("")
+  providerVoiceId              String?   @map("provider_voice_id")
+  auditionAvailable            Boolean   @default(false) @map("audition_available")
+  consentRecordedLikeness      Boolean   @default(false) @map("consent_recorded_likeness")
+  consentVoiceCloningAuthorized Boolean  @default(false) @map("consent_voice_cloning_authorized")
+  consentRecordedAt            DateTime? @map("consent_recorded_at")
+  consentNotes                 String    @default("") @map("consent_notes")
+  createdAt                    DateTime  @default(now()) @map("created_at")
+
+  production TivvleJoyProduction @relation(fields: [productionId], references: [id], onDelete: Cascade)
+
+  @@index([productionId, createdAt])
+  @@map("tivvlejoy_voice_profiles")
+}
+
+model TivvleJoyWorkflowStatus {
+  id               String   @id @default(uuid()) @db.Uuid
+  episodeId        String   @unique @map("episode_id") @db.Uuid
+  currentStage     String   @map("current_stage")
+  completedStages  Json     @map("completed_stages")
+  blockedReason    String?  @map("blocked_reason")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  episode TivvleJoyEpisode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@map("tivvlejoy_workflow_statuses")
+}
+
+model TivvleJoyReadinessResult {
+  id              String   @id @default(uuid()) @db.Uuid
+  productionId    String   @map("production_id") @db.Uuid
+  productionReady Boolean  @default(false) @map("production_ready")
+  items           Json
+  evaluatedAt     DateTime @default(now()) @map("evaluated_at")
+
+  production TivvleJoyProduction @relation(fields: [productionId], references: [id], onDelete: Cascade)
+
+  @@index([productionId, evaluatedAt])
+  @@map("tivvlejoy_readiness_results")
+}
+
+model TivvleJoyRenderRequest {
+  id                String   @id @default(uuid()) @db.Uuid
+  productionId      String   @map("production_id") @db.Uuid
+  episodeId         String   @map("episode_id")
+  label             String   @default("Draft request — not rendered")
+  status            String   @default("NOT_RENDERED")
+  contactedProvider Boolean  @default(false) @map("contacted_provider")
+  outputFile        String?  @map("output_file")
+  progress          String?
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  production TivvleJoyProduction @relation(fields: [productionId], references: [id], onDelete: Cascade)
+
+  @@index([productionId, createdAt])
+  @@map("tivvlejoy_render_requests")
+}
+
+model TivvleJoyAuditEvent {
+  id          String   @id @default(uuid()) @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String?  @map("entity_id")
+  detail      Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  workspace TivvleJoyWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@map("tivvlejoy_audit_events")
+}

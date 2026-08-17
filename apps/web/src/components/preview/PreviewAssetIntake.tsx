@@ -5,7 +5,8 @@ import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewAssetIntake() {
-  const { workspace, message, busy, registerAsset, reset } = usePreviewWorkspace();
+  const { workspace, message, busy, registerAsset, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
   const hasEpisode = workspace.episodes.length > 0;
 
   return (
@@ -15,7 +16,12 @@ export function PreviewAssetIntake() {
         title="Add a Preview asset note"
         instruction="Write a name and type. This is metadata only. No file is uploaded. Canonical Pip and Goat stay unbound."
       />
-      <PreviewBanner busy={busy} onReset={() => reset()} />
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
       <PreviewMessage message={message} />
       <p className="status-error inline-flex min-h-touch items-center gap-2 rounded-full px-3 py-2 text-sm font-bold">
         <span aria-hidden="true">×</span>

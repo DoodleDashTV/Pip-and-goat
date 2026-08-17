@@ -9,7 +9,8 @@ import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewNewEpisode() {
   const router = useRouter();
-  const { workspace, message, busy, createEpisode, reset } = usePreviewWorkspace();
+  const { workspace, message, busy, createEpisode, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
   const [submitted, setSubmitted] = useState(false);
 
   return (
@@ -19,7 +20,12 @@ export function PreviewNewEpisode() {
         title="Create a Preview episode"
         instruction="Give the episode a title and a short premise. This creates a browser-only record. It is not a production episode."
       />
-      <PreviewBanner busy={busy} onReset={() => reset()} />
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
       <PreviewMessage message={message} />
       {!workspace.settingsSaved ? (
         <PreviewEmptyState

@@ -266,6 +266,9 @@ describe('Preview navigation and primary workflow wiring', () => {
     expect(readRepo('apps/web/src/components/preview/PreviewBanner.tsx')).toContain(
       'PREVIEW_PUBLIC_BANNER',
     );
+    expect(readRepo('apps/web/src/components/preview/PreviewBackupControls.tsx')).toContain(
+      'Export Preview Backup',
+    );
     expect(readRepo('apps/web/src/app/layout.tsx')).toContain('isPreview={isPublicWebsitePreview()}');
   });
 

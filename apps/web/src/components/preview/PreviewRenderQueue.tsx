@@ -5,7 +5,8 @@ import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewRenderQueue() {
-  const { workspace, message, busy, requestRender, reset } = usePreviewWorkspace();
+  const { workspace, message, busy, requestRender, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
   const episode = workspace.episodes[0] ?? null;
   const pathReady =
     workspace.settingsSaved &&
@@ -20,7 +21,12 @@ export function PreviewRenderQueue() {
         title="Save a draft request"
         instruction="Preview can record a non-billable draft request only. It does not contact a GPU provider or invent progress, output files, or completion."
       />
-      <PreviewBanner busy={busy} onReset={() => reset()} />
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
       <PreviewMessage message={message} />
       {!episode ? (
         <PreviewEmptyState

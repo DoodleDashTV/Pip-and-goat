@@ -1,12 +1,17 @@
 'use client';
 
 import { PREVIEW_PUBLIC_BANNER } from '@/lib/preview-workspace/types';
+import { PreviewBackupControls } from './PreviewBackupControls';
 
 export function PreviewBanner({
   onReset,
+  onExport,
+  onImport,
   busy,
 }: {
   onReset?: () => void;
+  onExport?: () => void;
+  onImport?: (text: string, byteLength: number, confirm: boolean) => void;
   busy?: boolean;
 }) {
   return (
@@ -14,6 +19,13 @@ export function PreviewBanner({
       <p className="break-words text-sm font-bold leading-6 text-[var(--color-text)]">
         {PREVIEW_PUBLIC_BANNER}
       </p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+        Work is stored only in this browser and is non-durable. Production database actions stay
+        blocked.
+      </p>
+      {onExport && onImport ? (
+        <PreviewBackupControls busy={busy} onExport={onExport} onImport={onImport} />
+      ) : null}
       {onReset ? (
         <button
           type="button"

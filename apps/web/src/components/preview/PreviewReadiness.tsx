@@ -6,7 +6,8 @@ import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewReadiness() {
-  const { workspace, readiness, message, busy, reset } = usePreviewWorkspace();
+  const { workspace, readiness, message, busy, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
   const hasEpisode = workspace.episodes.length > 0;
 
   return (
@@ -16,7 +17,12 @@ export function PreviewReadiness() {
         title="Check the Preview list"
         instruction="This list is calculated from this browser only. Green preview items still do not make the studio production-ready."
       />
-      <PreviewBanner busy={busy} onReset={() => reset()} />
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
       <PreviewMessage message={message} />
       <p className="status-error inline-flex min-h-touch items-center gap-2 rounded-full px-3 py-2 text-sm font-bold">
         <span aria-hidden="true">×</span>

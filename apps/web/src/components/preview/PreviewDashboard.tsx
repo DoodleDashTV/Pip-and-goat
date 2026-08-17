@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FOUNDATION_STAGE_LABEL } from '@/lib/preview-workspace/types';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
 import { evaluatePreviewGuide, previewStepLabel } from '@/lib/preview-workspace/progress';
+import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 
 const STATUS_CLASS: Record<string, string> = {
   completed: 'status-success',
@@ -13,7 +14,8 @@ const STATUS_CLASS: Record<string, string> = {
 };
 
 export function PreviewDashboard() {
-  const { workspace, hydrated } = usePreviewWorkspace();
+  const { workspace, hydrated, busy, message, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
   const steps = evaluatePreviewGuide(workspace);
   const nextStep = steps.find((step) => step.status === 'not_started' || step.status === 'in_progress');
 
@@ -62,6 +64,13 @@ export function PreviewDashboard() {
           </Link>
         ) : null}
       </section>
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
+      <PreviewMessage message={message} />
 
       <section className="studio-card p-4 sm:p-5">
         <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">

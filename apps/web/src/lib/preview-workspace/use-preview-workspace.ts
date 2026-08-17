@@ -12,6 +12,8 @@ import {
   savePreviewSettings,
   savePreviewVoiceProfile,
 } from './service';
+import { exportPreviewBackup, importPreviewBackup, serializePreviewBackup } from '../persistence/backup';
+import { PersistenceError } from '../persistence/types';
 import { defaultPreviewBackend, loadPreviewWorkspace } from './store';
 import type { PreviewAsset, PreviewWorkspace } from './types';
 
@@ -37,7 +39,10 @@ export function usePreviewWorkspace() {
         setMessage(ok ? { tone: 'ok', text: ok } : null);
         return result;
       } catch (error) {
-        const text = error instanceof PreviewWorkspaceError ? error.message : 'Preview workspace error';
+        const text =
+          error instanceof PreviewWorkspaceError || error instanceof PersistenceError
+            ? error.message
+            : 'Preview workspace error';
         setMessage({ tone: 'error', text });
         throw error;
       } finally {
@@ -69,6 +74,26 @@ export function usePreviewWorkspace() {
         'Draft request recorded. Nothing was rendered.',
       ),
     reset: () => run(() => resetPreviewStudio(backend), 'Preview workspace reset. Production data was not touched.'),
+    exportBackup: () => {
+      const backup = exportPreviewBackup(backend);
+      const serialized = serializePreviewBackup(backup);
+      if (typeof window !== 'undefined') {
+        const blob = new Blob([serialized], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'tivvlejoy-preview-backup.json';
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+      setMessage({ tone: 'ok', text: 'Preview backup downloaded. It is not a production export.' });
+      return backup;
+    },
+    importBackup: (text: string, byteLength: number, confirm: boolean) =>
+      run(
+        () => importPreviewBackup(text, backend, { confirm, byteLength }),
+        'Preview backup imported into this browser. Production data was not touched.',
+      ),
     clearMessage: () => setMessage(null),
   };
 }
