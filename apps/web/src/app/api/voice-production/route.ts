@@ -54,6 +54,23 @@ const PackageSchema = z.object({
   episodeId: z.string().min(1),
 });
 
+const SampleSchema = z.object({
+  action: z.literal('create-sample-scene'),
+  episodeId: z.string().min(1),
+  voiceId: z.unknown().optional(),
+  providerVoiceId: z.unknown().optional(),
+  elevenLabsVoiceId: z.unknown().optional(),
+});
+
+const UpdateSchema = z.object({
+  action: z.literal('update-line'),
+  lineId: z.string().min(1),
+  dialogueText: z.string().optional(),
+  performanceDirection: z.string().optional(),
+  pronunciationNotes: z.string().optional(),
+  emotion: z.string().optional(),
+});
+
 const BodySchema = z.discriminatedUnion('action', [
   DraftSchema,
   EstimateSchema,
@@ -61,6 +78,8 @@ const BodySchema = z.discriminatedUnion('action', [
   DecideSchema,
   RegenerateSchema,
   PackageSchema,
+  SampleSchema,
+  UpdateSchema,
 ]);
 
 function fail(error: unknown) {
@@ -102,6 +121,13 @@ export async function POST(request: Request) {
     if (body.action === 'regenerate') {
       const result = service.regenerate(body.lineId);
       return NextResponse.json({ ...result, providerContacted: result.line.providerContacted });
+    }
+    if (body.action === 'create-sample-scene') {
+      const result = service.createSampleScene(body.episodeId, body);
+      return NextResponse.json({ ...result, providerContacted: result.providerContacted });
+    }
+    if (body.action === 'update-line') {
+      return NextResponse.json({ line: service.updateLine(body.lineId, body), providerContacted: false });
     }
     return NextResponse.json({ pack: service.packageApproved(body.episodeId), providerContacted: false });
   } catch (error) {

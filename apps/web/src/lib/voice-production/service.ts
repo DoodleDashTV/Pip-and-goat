@@ -1,5 +1,6 @@
 import { generateOriginalDialogue } from './dialogue';
 import { fixtureObjectKey, fixturePlaybackDataUrl } from './fixtures';
+import { sampleSceneLines } from './sample-episode';
 import { resolveElevenLabsModel } from './models';
 import { generateElevenLabsAudio } from './provider';
 import { assertNoClientVoiceId, publicVoiceDirectory, resolveVoiceAssignment } from './registry';
@@ -205,6 +206,84 @@ export function createVoiceProductionService(
 
     list(episodeId: string) {
       return linesForEpisode(store, episodeId).map(publicLine);
+    },
+
+    createSampleScene(
+      episodeId: string,
+      extra: { voiceId?: unknown; providerVoiceId?: unknown; elevenLabsVoiceId?: unknown } = {},
+    ) {
+      assertNoClientVoiceId(extra);
+      const samples = sampleSceneLines();
+      const existing = this.list(episodeId);
+      const matched = samples
+        .map((sample) =>
+          existing.find(
+            (line) =>
+              line.characterId === sample.characterId &&
+              line.dialogueText === sample.dialogueText &&
+              line.sceneId === sample.sceneId,
+          ),
+        )
+        .filter((line): line is NonNullable<typeof line> => Boolean(line));
+      if (matched.length === samples.length) {
+        return {
+          lines: matched,
+          playback: Object.fromEntries(matched.map((line) => [line.id, fixturePlaybackDataUrl()])),
+          providerContacted: matched.some((line) => line.providerContacted),
+          replayed: true,
+        };
+      }
+      const created = samples.map((sample) =>
+        this.generateDraftAudio({
+          episodeId,
+          sceneId: sample.sceneId,
+          characterId: sample.characterId,
+          dialogueText: sample.dialogueText,
+          performanceDirection: sample.performanceDirection,
+          pronunciationNotes: sample.pronunciationNotes,
+          emotion: sample.emotion,
+        }),
+      );
+      return {
+        lines: created.map((item) => item.line),
+        playback: Object.fromEntries(
+          created.map((item) => [item.line.id, item.playbackDataUrl ?? fixturePlaybackDataUrl()]),
+        ),
+        providerContacted: created.some((item) => item.line.providerContacted),
+        replayed: created.every((item) => item.replayed),
+      };
+    },
+
+    updateLine(
+      lineId: string,
+      patch: {
+        dialogueText?: string;
+        performanceDirection?: string;
+        pronunciationNotes?: string;
+        emotion?: string;
+      },
+    ) {
+      const line = store.lines.get(lineId);
+      if (!line) throw new VoiceProductionError('Voice line not found.', 'LINE_NOT_FOUND');
+      if (patch.dialogueText !== undefined) {
+        assertWithinLimits({
+          text: patch.dialogueText,
+          episodeCharacterCount: episodeCharacterCount(store, line.episodeId) - line.characterCount,
+          ledger: store.ledger,
+          paid: false,
+          env,
+        });
+        line.dialogueText = patch.dialogueText;
+        line.characterCount = Array.from(patch.dialogueText).length;
+        line.approvalStatus = 'PENDING';
+        line.generationStatus = 'DRAFT_TEXT';
+        store.byIdempotency.delete(line.idempotencyKey);
+      }
+      if (patch.performanceDirection !== undefined) line.performanceDirection = patch.performanceDirection;
+      if (patch.pronunciationNotes !== undefined) line.pronunciationNotes = patch.pronunciationNotes;
+      if (patch.emotion !== undefined) line.emotion = patch.emotion;
+      line.updatedAt = nowIso();
+      return publicLine(line);
     },
 
     packageApproved(episodeId: string) {
