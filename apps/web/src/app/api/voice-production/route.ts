@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createVoiceProductionService, VoiceProductionError } from '@/lib/voice-production/service';
+import { createVoiceProductionService } from '@/lib/voice-production/service';
 import { createMemoryVoiceStore } from '@/lib/voice-production/store';
+import { VoiceProductionError } from '@/lib/voice-production/types';
 
 const store = createMemoryVoiceStore();
 const service = createVoiceProductionService(store, process.env);
