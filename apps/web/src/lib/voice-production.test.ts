@@ -532,7 +532,7 @@ describe('voice preview stabilization', () => {
     expect(ui).toContain(FIXTURE_PLAYBACK_LABEL);
     expect(ui).toContain('Saving…');
     expect(ui).toContain('Saved');
-    expect(ui).toContain('localPack');
+    expect(ui).toContain('buildLocalPackage');
     expect(ui).not.toContain('Preview fixture — not the final Pip/Goat voice.');
     expect(fixtures).toContain('Playback test only');
     expect(`${ui}\n${fixtures}\n${guides}\n${readRepo('apps/web/src/lib/voice-production/sample-episode.ts')}`).not.toMatch(
