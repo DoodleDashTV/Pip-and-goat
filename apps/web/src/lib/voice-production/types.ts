@@ -44,6 +44,7 @@ export type VoiceLineRecord = {
   generationStatus: VoiceGenerationStatus;
   approvalStatus: VoiceApprovalStatus;
   audioObjectKey: string | null;
+  fixtureRevision: string;
   characterCount: number;
   usagePaid: false | true;
   providerContacted: boolean;

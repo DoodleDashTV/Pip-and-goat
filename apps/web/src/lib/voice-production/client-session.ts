@@ -1,5 +1,11 @@
 import { fixturePlaybackDataUrl } from './fixtures';
-import { VoiceProductionError, VOICE_PRODUCTION_STORAGE_KEY } from './types';
+import { sortVoiceLines } from './form-state';
+import {
+  PIP_CHARACTER_ID,
+  VoiceProductionError,
+  VOICE_PRODUCTION_STORAGE_KEY,
+  type RegisteredCharacterId,
+} from './types';
 
 export type BrowserVoiceLine = {
   id: string;
@@ -14,6 +20,7 @@ export type BrowserVoiceLine = {
   generationStatus: string;
   approvalStatus: string;
   audioObjectKey: string | null;
+  fixtureRevision?: string;
   characterCount: number;
   providerContacted: boolean;
 };
@@ -91,8 +98,16 @@ export function buildLocalPackage(episodeId: string, lines: BrowserVoiceLine[]) 
   };
 }
 
-export function playbackOrFixture(existing?: string | null): string {
-  return existing || fixturePlaybackDataUrl();
+export function playbackOrFixture(
+  characterId: string = PIP_CHARACTER_ID,
+  existing?: string | null,
+  revision = 'v1',
+): string {
+  return existing || fixturePlaybackDataUrl(characterId as RegisteredCharacterId, revision);
+}
+
+export function persistableLines(lines: BrowserVoiceLine[]): BrowserVoiceLine[] {
+  return sortVoiceLines(lines);
 }
 
 export function readVoiceBrowserSession(episodeId: string): VoiceBrowserSession | null {
@@ -102,7 +117,7 @@ export function readVoiceBrowserSession(episodeId: string): VoiceBrowserSession 
     if (!raw) return null;
     const parsed = JSON.parse(raw) as VoiceBrowserSession;
     if (parsed.episodeId !== episodeId || !Array.isArray(parsed.lines)) return null;
-    return parsed;
+    return { ...parsed, lines: sortVoiceLines(parsed.lines) };
   } catch {
     return null;
   }

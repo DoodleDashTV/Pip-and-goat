@@ -30,8 +30,9 @@ export const GOAT_VOICE_GUIDE: VoiceGuide = {
   personality: ['warm', 'playful', 'adventurous', 'loyal'],
   delivery: ['youthful', 'warm', 'playful', 'steady companion'],
   forbidden: ['deep', 'babyish', 'growling', 'adult-authoritative'],
-  catchphrases: ['Goat-tastic!', 'Hooves up!', 'Map check!', 'I’m gooaating for it!'],
-  pronunciationNotes: 'Goat: warm oh. gooaating stretches the oo without becoming a bleat.',
+  catchphrases: ['Goat-tastic!', 'Hooves up!', 'Map check!', 'I’m going for it!'],
+  pronunciationNotes:
+    'Goat: warm, rounded long-o sound. Keep delivery youthful and natural; do not imitate a bleat.',
   defaultEmotion: 'playful loyalty',
   defaultDirection: 'Warm and playful. Check the map, back Pip up, never growl or go adult.',
 };
