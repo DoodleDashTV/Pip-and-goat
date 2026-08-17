@@ -1,7 +1,10 @@
+import { assertAudienceFacingContent } from '../brand-canon';
+import { APPROVED_ELEVENLABS_MODEL } from './approved-voice-settings';
 import { resolveElevenLabsModel } from './models';
 import { assertNoClientVoiceId, resolveVoiceAssignment } from './registry';
 import { assertPaidProviderReady, type VoiceEnv } from './safety';
 import { VoiceProductionError, type RegisteredCharacterId } from './types';
+import { assertApprovedModel } from './voice-identity';
 
 export type ElevenLabsTransport = (
   url: string,
@@ -26,9 +29,11 @@ export async function generateElevenLabsAudio(
   env: VoiceEnv = process.env,
   transport?: ElevenLabsTransport,
 ): Promise<never> {
+  assertAudienceFacingContent({ dialogue: input.text, text: input.text });
   assertNoClientVoiceId(input);
   assertPaidProviderReady(env);
-  resolveElevenLabsModel(input.model ?? env.ELEVENLABS_MODEL_ID);
+  const model = resolveElevenLabsModel(APPROVED_ELEVENLABS_MODEL);
+  assertApprovedModel(model);
   resolveVoiceAssignment(input.characterId);
   if (!transport) {
     throw new VoiceProductionError(

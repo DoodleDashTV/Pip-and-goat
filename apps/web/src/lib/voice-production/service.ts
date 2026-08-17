@@ -1,3 +1,4 @@
+import { assertAudienceFacingContent, assertNoProhibitedLegacyBrandFields } from '../brand-canon';
 import { generateOriginalDialogue } from './dialogue';
 import { fixtureObjectKey, fixturePlaybackDataUrl } from './fixtures';
 import { sampleSceneLines } from './sample-episode';
@@ -115,6 +116,18 @@ export function createVoiceProductionService(
 
     generateDraftAudio(input: GenerateDraftAudioInput) {
       assertNoClientVoiceId(input);
+      assertAudienceFacingContent({
+        dialogue: input.dialogueText,
+        narration: input.performanceDirection,
+        caption: input.pronunciationNotes,
+        description: input.emotion,
+      });
+      assertNoProhibitedLegacyBrandFields({
+        dialogueText: input.dialogueText,
+        performanceDirection: input.performanceDirection,
+        pronunciationNotes: input.pronunciationNotes,
+        emotion: input.emotion,
+      });
       const assignment = resolveVoiceAssignment(input.characterId);
       const model = resolveElevenLabsModel(input.model ?? env.ELEVENLABS_MODEL_ID);
       const fixtureRevision = input.fixtureRevision ?? (input.forceNew ? `${Date.now()}` : 'v1');
@@ -219,6 +232,7 @@ export function createVoiceProductionService(
     ) {
       const line = store.lines.get(lineId);
       if (!line) throw new VoiceProductionError('Voice line not found.', 'LINE_NOT_FOUND');
+      assertNoProhibitedLegacyBrandFields(overrides);
       if (overrides.dialogueText !== undefined) {
         const { characterCount } = assertWithinLimits({
           text: overrides.dialogueText,
@@ -332,6 +346,7 @@ export function createVoiceProductionService(
     ) {
       const line = store.lines.get(lineId);
       if (!line) throw new VoiceProductionError('Voice line not found.', 'LINE_NOT_FOUND');
+      assertNoProhibitedLegacyBrandFields(patch);
       if (patch.dialogueText !== undefined && patch.dialogueText !== line.dialogueText) {
         assertWithinLimits({
           text: patch.dialogueText,
@@ -358,6 +373,14 @@ export function createVoiceProductionService(
         (line) => line.approvalStatus === 'APPROVED' && line.generationStatus === 'APPROVED_FOR_LIPSYNC',
       );
       const rejected = linesForEpisode(store, episodeId).filter((line) => line.approvalStatus === 'REJECTED');
+      for (const line of [...approved, ...rejected]) {
+        assertNoProhibitedLegacyBrandFields({
+          dialogueText: line.dialogueText,
+          performanceDirection: line.performanceDirection,
+          pronunciationNotes: line.pronunciationNotes,
+          emotion: line.emotion,
+        });
+      }
       return {
         kind: 'TIVVLEJOY_VOICE_PACKAGE',
         episodeId,

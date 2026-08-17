@@ -117,13 +117,13 @@ export const CHARACTER_TEST_POSES = [
 ] as const;
 
 export const CANONICAL_AUDITION_SCRIPT = [
-  'Hi, I am ready for Doodle Dash.',
+  'Hi, I am ready to explore.',
   'Wow — that map is exciting!',
   'Where should we go next?',
   'Hmm… I am a little concerned.',
   'Ha! That made me smile.',
   'Pip and Goat explore together.',
-  'Welcome to Doodle Dash TV.',
+  'Welcome to our adventure.',
 ].join(' ');
 
 function hashBytes(bytes: Uint8Array) {

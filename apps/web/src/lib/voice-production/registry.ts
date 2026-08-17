@@ -7,13 +7,12 @@ import {
   VoiceProductionError,
   type RegisteredCharacterId,
 } from './types';
+import { assertExclusiveVoiceAssignment, lockedVoiceIdFor } from './voice-identity';
 
 /**
  * Server-side voice registry. Provider Voice IDs are resolved here only.
  * Browser clients submit character IDs, never Voice IDs.
  */
-const PIP_PROVIDER_VOICE_ID = '93w5H37WdqeS6HoyL5cV';
-const GOAT_PROVIDER_VOICE_ID = 'SbxjwBKw2PefbSupcoXV';
 
 export type VoiceRegistryEntry = {
   characterId: RegisteredCharacterId;
@@ -29,14 +28,14 @@ const REGISTRY: Record<RegisteredCharacterId, VoiceRegistryEntry> = {
     displayName: 'Pip',
     profile: PIP_VOICE_PROFILE,
     provider: 'elevenlabs',
-    providerVoiceId: PIP_PROVIDER_VOICE_ID,
+    providerVoiceId: lockedVoiceIdFor(PIP_CHARACTER_ID),
   },
   [GOAT_CHARACTER_ID]: {
     characterId: GOAT_CHARACTER_ID,
     displayName: 'Goat',
     profile: GOAT_VOICE_PROFILE,
     provider: 'elevenlabs',
-    providerVoiceId: GOAT_PROVIDER_VOICE_ID,
+    providerVoiceId: lockedVoiceIdFor(GOAT_CHARACTER_ID),
   },
 };
 
@@ -48,7 +47,9 @@ export function resolveVoiceAssignment(characterId: string): VoiceRegistryEntry 
   if (!isRegisteredCharacterId(characterId)) {
     throw new VoiceProductionError('Unknown character. Voice generation refused.', 'UNKNOWN_CHARACTER');
   }
-  return REGISTRY[characterId];
+  const entry = REGISTRY[characterId];
+  assertExclusiveVoiceAssignment(entry.characterId, entry.providerVoiceId);
+  return entry;
 }
 
 export function assertNoClientVoiceId(input: {

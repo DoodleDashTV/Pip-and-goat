@@ -1,3 +1,4 @@
+import { assertNoProhibitedLegacyBrandFields } from '../brand-canon';
 import { fixturePlaybackDataUrl } from './fixtures';
 import { sortVoiceLines } from './form-state';
 import {
@@ -59,6 +60,7 @@ export function applyLocalEdit(
   },
   maxCharsPerRequest: number,
 ): BrowserVoiceLine {
+  assertNoProhibitedLegacyBrandFields(patch);
   const next = { ...line };
   if (patch.dialogueText !== undefined && patch.dialogueText !== line.dialogueText) {
     const characterCount = Array.from(patch.dialogueText).length;
@@ -83,6 +85,14 @@ export function applyLocalEdit(
 }
 
 export function buildLocalPackage(episodeId: string, lines: BrowserVoiceLine[]) {
+  for (const line of lines) {
+    assertNoProhibitedLegacyBrandFields({
+      dialogueText: line.dialogueText,
+      performanceDirection: line.performanceDirection,
+      pronunciationNotes: line.pronunciationNotes,
+      emotion: line.emotion,
+    });
+  }
   const approved = lines.filter(
     (line) => line.approvalStatus === 'APPROVED' && line.generationStatus === 'APPROVED_FOR_LIPSYNC',
   );

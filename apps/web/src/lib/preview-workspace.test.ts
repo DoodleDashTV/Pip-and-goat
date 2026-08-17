@@ -67,6 +67,9 @@ describe('Preview workspace initialization', () => {
     expect(saved.settings.paidResourcesAuthorized).toBe(false);
     const reloaded = savePreviewSettings({ projectName: 'Joy Shorts Preview' }, backend);
     expect(reloaded.settings.projectName).toBe('Joy Shorts Preview');
+    expect(() => savePreviewSettings({ projectName: 'Doodle-Dash Preview' }, backend)).toThrowError(
+      /Legacy brand wording/,
+    );
   });
 });
 
@@ -82,6 +85,18 @@ describe('Preview episode creation', () => {
     expect(() =>
       createPreviewEpisode({ title: 'A', episodeNumber: 1, durationSec: 12, premise: 'x' }, backend),
     ).toThrowError(/Duration/);
+    expect(() =>
+      createPreviewEpisode(
+        { title: 'Doodle Dash Adventure', episodeNumber: 1, durationSec: 30, premise: 'A draft walk.' },
+        backend,
+      ),
+    ).toThrowError(/Legacy brand wording/);
+    expect(() =>
+      createPreviewEpisode(
+        { title: 'Map Walk', episodeNumber: 1, durationSec: 30, premise: 'Let’s Doodle-Dash across the meadow.' },
+        backend,
+      ),
+    ).toThrowError(/Legacy brand wording/);
   });
 
   it('creates a Preview episode and prevents duplicate submissions', () => {
