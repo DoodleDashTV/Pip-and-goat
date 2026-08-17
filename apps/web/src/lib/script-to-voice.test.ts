@@ -363,9 +363,9 @@ describe('preview-only confirmed script-to-voice', () => {
 
   it('allows only one active generation and records failed provider attempts without billing them', async () => {
     const slowCalls: Array<{ url: string; body: string }> = [];
-    let release = () => undefined;
+    let release = () => {};
     const hold = new Promise<void>((resolve) => {
-      release = resolve;
+      release = () => resolve();
     });
     const slow = createScriptToVoiceService(openEnv, async (url, init) => {
       slowCalls.push({ url, body: init.body });
