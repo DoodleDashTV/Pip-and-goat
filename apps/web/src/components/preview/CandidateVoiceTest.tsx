@@ -9,9 +9,9 @@ import {
   type PublicApprovedSample,
 } from '@/lib/voice-production/candidates';
 import { publicVoiceIdentitySnapshot } from '@/lib/voice-production/approved-voice-settings';
+import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from '@/lib/voice-production/types';
 
 const VOICE_IDENTITY = publicVoiceIdentitySnapshot();
-import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from '@/lib/voice-production/types';
 
 type LiveTestSnapshot = {
   status: 'locked' | 'awaiting-confirmation';
