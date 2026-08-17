@@ -182,7 +182,7 @@ export function createPreviewDatabaseAdapter(
         assertRecordId(input.id, 'episode id');
         assertRecordId(input.productionId, 'production id');
         if (!store.productions.has(input.productionId)) {
-          throw new PersistenceError('Episode production is outside this workspace.', 'WORKSPACE_OWNERSHIP');
+          throw new PersistenceError('Episode production is outside this workspace ownership boundary.', 'WORKSPACE_OWNERSHIP');
         }
         return upsert(
           store.episodes,
@@ -199,7 +199,7 @@ export function createPreviewDatabaseAdapter(
       try {
         assertRecordId(input.id, 'asset id');
         if (!store.productions.has(input.productionId)) {
-          throw new PersistenceError('Asset production is outside this workspace.', 'WORKSPACE_OWNERSHIP');
+          throw new PersistenceError('Asset production is outside this workspace ownership boundary.', 'WORKSPACE_OWNERSHIP');
         }
         return upsert(
           store.assets,
@@ -216,7 +216,7 @@ export function createPreviewDatabaseAdapter(
       try {
         assertRecordId(input.id, 'voice id');
         if (!store.productions.has(input.productionId)) {
-          throw new PersistenceError('Voice production is outside this workspace.', 'WORKSPACE_OWNERSHIP');
+          throw new PersistenceError('Voice production is outside this workspace ownership boundary.', 'WORKSPACE_OWNERSHIP');
         }
         return upsert(
           store.voices,
@@ -243,7 +243,7 @@ export function createPreviewDatabaseAdapter(
       try {
         assertRecordId(input.episodeId, 'episode id');
         if (!store.episodes.has(input.episodeId)) {
-          throw new PersistenceError('Workflow episode is outside this workspace.', 'WORKSPACE_OWNERSHIP');
+          throw new PersistenceError('Workflow episode is outside this workspace ownership boundary.', 'WORKSPACE_OWNERSHIP');
         }
         store.workflows.set(input.episodeId, input);
         return input;
@@ -255,7 +255,7 @@ export function createPreviewDatabaseAdapter(
     saveReadiness(input) {
       try {
         if (!store.productions.has(input.productionId)) {
-          throw new PersistenceError('Readiness production is outside this workspace.', 'WORKSPACE_OWNERSHIP');
+          throw new PersistenceError('Readiness production is outside this workspace ownership boundary.', 'WORKSPACE_OWNERSHIP');
         }
         const record: ReadinessResultRecord = { ...input, productionReady: false };
         store.readiness = record;
@@ -269,7 +269,7 @@ export function createPreviewDatabaseAdapter(
       try {
         assertRecordId(input.id, 'render id');
         if (!store.productions.has(input.productionId) || !store.episodes.has(input.episodeId)) {
-          throw new PersistenceError('Render request is outside this workspace.', 'WORKSPACE_OWNERSHIP');
+          throw new PersistenceError('Render request is outside this workspace ownership boundary.', 'WORKSPACE_OWNERSHIP');
         }
         return upsert(
           store.renderRequests,

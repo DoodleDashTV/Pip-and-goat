@@ -5,7 +5,6 @@ import {
   durabilityLabel,
   lastSuccessfulSaveLabel,
   persistenceModeLabel,
-  previewDatabaseHeadline,
 } from '@/lib/persistence/labels';
 import type { SafePersistenceSnapshot } from '@/lib/persistence/types';
 
@@ -62,7 +61,7 @@ export function ConnectionReadinessPanel({ snapshot }: { snapshot: SafePersisten
         Persistence connection status
       </h2>
       <p className="mt-2 break-words text-sm font-bold leading-6 text-[var(--color-text)]">
-        {previewDatabaseHeadline()}
+        Preview database: Not connected
       </p>
       <p className="mt-1 break-words text-sm leading-6 text-[var(--color-text-muted)]">
         Cloud persistence is unavailable. This Preview workspace stays in the selected browser
