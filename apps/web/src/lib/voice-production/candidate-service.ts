@@ -1,3 +1,4 @@
+import { assertNoProhibitedLegacyBrand } from '../brand-canon';
 import {
   assertCandidateOriginAllowed,
   assertLiveApprovedSampleGates,
@@ -73,6 +74,7 @@ export function createCandidateVoiceService(
         throw new VoiceProductionError('Unknown character. Voice generation refused.', 'UNKNOWN_CHARACTER');
       }
       const characterId = input.characterId as RegisteredCharacterId;
+      assertNoProhibitedLegacyBrand(input.text);
       const { characterCount } = estimateUsage(input.text);
       const previewLimit = Math.min(readVoiceTestMaxCharacters(env), REQUIRED_VOICE_TEST_MAX_CHARACTERS);
       if (characterCount > previewLimit) {

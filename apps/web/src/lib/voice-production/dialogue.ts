@@ -1,3 +1,4 @@
+import { PIP_TEMPORARY_NEUTRAL_PHRASE, assertNoProhibitedLegacyBrand } from '../brand-canon';
 import { voiceGuideFor } from './guides';
 import { VoiceProductionError, type RegisteredCharacterId } from './types';
 
@@ -16,6 +17,7 @@ const PIP_LINES = [
   'I packed extra kindness in my backpack. Whatever we find, we can share it.',
   'That sparkle by the stones looks like a trail crumb. Want to peek with me?',
   'The flowers are leaning the same way. I think they are pointing us onward.',
+  `${PIP_TEMPORARY_NEUTRAL_PHRASE} The sunny stones still have a tiny map crumb to find.`,
 ];
 
 const GOAT_LINES = [
@@ -49,6 +51,7 @@ export function generateOriginalDialogue(input: {
   premise?: string;
 }): DialogueDraft {
   const guide = voiceGuideFor(input.characterId);
+  assertNoProhibitedLegacyBrand(input.premise);
   const seed = hashSeed([input.episodeId, input.sceneId, input.characterId, input.premise ?? '']);
   const pool = input.characterId === 'CHAR_PIP_001' ? PIP_LINES : GOAT_LINES;
   let text = pickLine(pool, seed, input.premise ?? '');
@@ -62,6 +65,9 @@ export function generateOriginalDialogue(input: {
       throw new VoiceProductionError('Dialogue must be original, not a guide-line repeat.', 'GUIDE_REPEAT');
     }
   }
+  assertNoProhibitedLegacyBrand(text);
+  assertNoProhibitedLegacyBrand(guide.pronunciationNotes);
+  assertNoProhibitedLegacyBrand(guide.defaultDirection);
   return {
     characterId: input.characterId,
     text,

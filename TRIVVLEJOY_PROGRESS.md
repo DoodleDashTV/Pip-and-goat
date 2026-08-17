@@ -73,6 +73,10 @@ database is connected.
 - Provider is not contacted when any gate is closed
 - Production voice generation remains refused
 - Draft PR #38 stays draft and unmerged
+- Pip’s “Let’s Doodle-Dash!” catchphrase is removed
+- Audience-facing voice text cannot include Doodle Dash or Doodle-Dash
+- Prohibited legacy-brand terms cannot reach ElevenLabs
+- Pip may temporarily use “Let’s explore!” until Justin approves a new catchphrase
 
 ## Tests / validation
 

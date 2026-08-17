@@ -61,11 +61,15 @@ import {
 } from './voice-production/sample-episode';
 import { APPROVED_SAMPLE_AUDIO_LABEL, FIXED_APPROVED_LINES } from './voice-production/candidates';
 import { isProductionVoiceRuntime, publicLiveTestSnapshot, serverGatesOpen } from './voice-production/candidate-gates';
-import { ELEVENLABS_TTS_ENDPOINT } from './voice-production/candidate-provider';
+import { convertCandidateSpeech, ELEVENLABS_TTS_ENDPOINT } from './voice-production/candidate-provider';
 import { createCandidateVoiceService, resetCandidateRequestState } from './voice-production/candidate-service';
 import { canEnterFinalRendering, canPrepareForLipSync, createVoiceProductionService } from './voice-production/service';
 import { createMemoryVoiceStore } from './voice-production/store';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID } from './voice-production/types';
+import {
+  PIP_TEMPORARY_NEUTRAL_PHRASE,
+  containsProhibitedLegacyBrand,
+} from './brand-canon';
 import { memoryBackend } from './preview-workspace/store';
 
 const repoRoot = path.resolve(__dirname, '../../../..');
@@ -285,6 +289,8 @@ describe('sample voice episode and preview workflow', () => {
       dialogueText: SAMPLE_GOAT_DIALOGUE,
     });
     expect(SAMPLE_PIP_DIALOGUE).not.toBe('Let’s Doodle-Dash!');
+    expect(containsProhibitedLegacyBrand(SAMPLE_PIP_DIALOGUE)).toBe(false);
+    expect(containsProhibitedLegacyBrand(SAMPLE_GOAT_DIALOGUE)).toBe(false);
     expect(SAMPLE_GOAT_DIALOGUE).not.toBe('Goat-tastic!');
   });
 
@@ -729,5 +735,140 @@ describe('controlled ElevenLabs approved-voice preview', () => {
     expect(envExample).not.toContain('TIVVLEJOY_VOICE_CANDIDATE_PIP');
     expect(envExample).not.toContain('TIVVLEJOY_VOICE_CANDIDATE_GOAT');
     expect(envExample).toContain('ALLOW_PAID_VOICE_GENERATION=false');
+  });
+});
+
+describe('legacy brand canon stays out of ElevenLabs', () => {
+  const bannedLines = [
+    'Let’s Doodle-Dash!',
+    'Lets Doodle-Dash!',
+    'Welcome to Doodle Dash.',
+    'Hi, I am ready for Doodle-Dash.',
+    'Narrator: Doodle Dash begins.',
+  ];
+
+  const audienceSources = [
+    'apps/web/src/lib/voice-production/guides.ts',
+    'apps/web/src/lib/voice-production/dialogue.ts',
+    'apps/web/src/lib/voice-production/sample-episode.ts',
+    'apps/web/src/lib/voice-production/candidates.ts',
+    'apps/web/src/components/preview/CandidateVoiceTest.tsx',
+    'apps/web/src/components/preview/VoiceProductionStudio.tsx',
+    'apps/web/src/components/preview/PreviewNewEpisode.tsx',
+  ];
+
+  it('removes Pip’s banned catchphrase and does not invent a new signature', () => {
+    expect(PIP_VOICE_GUIDE.catchphrases).toEqual(['Feathers and freckles!']);
+    expect(PIP_VOICE_GUIDE.catchphrases.join(' ')).not.toMatch(/doodle[\s\-_–—]+dash/i);
+    expect(PIP_VOICE_GUIDE.pronunciationNotes).not.toMatch(/doodle[\s\-_–—]+dash/i);
+    expect(PIP_TEMPORARY_NEUTRAL_PHRASE).toBe('Let’s explore!');
+    expect(PIP_VOICE_GUIDE.catchphrases).not.toContain(PIP_TEMPORARY_NEUTRAL_PHRASE);
+  });
+
+  it('keeps generated scripts, titles, templates, and sample lines free of prohibited terms', () => {
+    for (const source of audienceSources) {
+      expect(readRepo(source)).not.toMatch(/doodle[\s\-_–—]+dash/i);
+    }
+    expect(readRepo('packages/production/src/launch-prep.ts')).not.toContain('Hi, I am ready for Doodle Dash.');
+    expect(readRepo('packages/production/src/launch-prep.ts')).not.toContain('Welcome to Doodle Dash TV.');
+    expect(containsProhibitedLegacyBrand(SAMPLE_VOICE_EPISODE_TITLE)).toBe(false);
+    expect(containsProhibitedLegacyBrand(FIXED_APPROVED_LINES[PIP_CHARACTER_ID])).toBe(false);
+    expect(containsProhibitedLegacyBrand(FIXED_APPROVED_LINES[GOAT_CHARACTER_ID])).toBe(false);
+    for (let index = 0; index < 24; index += 1) {
+      const pip = generateOriginalDialogue({
+        characterId: PIP_CHARACTER_ID,
+        episodeId: `ep-brand-${index}`,
+        sceneId: `scene-${index}`,
+        premise: 'Find the meadow map crumb.',
+      });
+      const goat = generateOriginalDialogue({
+        characterId: GOAT_CHARACTER_ID,
+        episodeId: `ep-brand-${index}`,
+        sceneId: `scene-${index}`,
+        premise: 'Find the meadow map crumb.',
+      });
+      expect(containsProhibitedLegacyBrand(pip.text)).toBe(false);
+      expect(containsProhibitedLegacyBrand(goat.text)).toBe(false);
+    }
+    expect(() =>
+      generateOriginalDialogue({
+        characterId: PIP_CHARACTER_ID,
+        episodeId: 'ep-banned',
+        sceneId: 'scene-1',
+        premise: 'Let’s Doodle-Dash into the meadow.',
+      }),
+    ).toThrowError(/Legacy brand wording/);
+  });
+
+  it('never contacts ElevenLabs with prohibited legacy-brand wording', async () => {
+    let contacted = false;
+    const transport = async () => {
+      contacted = true;
+      return { ok: true, status: 200, contentType: 'audio/mpeg', body: new Uint8Array([1, 2, 3]).buffer };
+    };
+    const openEnv = {
+      ALLOW_PAID_VOICE_GENERATION: 'true',
+      TIVVLEJOY_VOICE_AUTHORIZE_PAID: 'true',
+      ELEVENLABS_API_KEY: 'test-key-not-real',
+      TIVVLEJOY_VOICE_TEST_TOKEN: 'preview-token',
+      TIVVLEJOY_VOICE_TEST_MAX_CHARACTERS: '600',
+      VERCEL_ENV: 'preview',
+    };
+
+    for (const text of bannedLines) {
+      await expect(generateElevenLabsAudio({ characterId: PIP_CHARACTER_ID, text }, openEnv, transport)).rejects.toThrow(
+        /Legacy brand wording/,
+      );
+      await expect(convertCandidateSpeech({ voiceId: 'unused', text }, openEnv, transport)).rejects.toThrow(
+        /Legacy brand wording/,
+      );
+    }
+
+    const service = createVoiceProductionService(createMemoryVoiceStore(), openEnv);
+    expect(() =>
+      service.generateDraftAudio({
+        episodeId: 'ep-brand',
+        sceneId: 'scene-1',
+        characterId: PIP_CHARACTER_ID,
+        dialogueText: 'Let’s Doodle-Dash!',
+      }),
+    ).toThrowError(/Legacy brand wording/);
+
+    resetCandidateRequestState();
+    const candidateService = createCandidateVoiceService(openEnv, transport);
+    await expect(
+      candidateService.generate({
+        characterId: PIP_CHARACTER_ID,
+        text: 'Let’s Doodle-Dash!',
+        requestId: 'req_brand_block',
+        testToken: 'preview-token',
+        confirmed: true,
+      }),
+    ).rejects.toThrow(/Legacy brand wording/);
+
+    expect(() =>
+      applyLocalEdit(
+        {
+          id: 'line-1',
+          episodeId: 'ep-1',
+          sceneId: 'scene-1',
+          characterId: PIP_CHARACTER_ID,
+          voiceProfileVersion: 'pip_default_v1',
+          dialogueText: 'The meadow path is bright.',
+          performanceDirection: '',
+          pronunciationNotes: '',
+          emotion: '',
+          generationStatus: 'DRAFT_TEXT',
+          approvalStatus: 'PENDING',
+          audioObjectKey: null,
+          characterCount: 26,
+          providerContacted: false,
+        },
+        { dialogueText: 'Caption: Welcome to Doodle Dash.' },
+        280,
+      ),
+    ).toThrowError(/Legacy brand wording/);
+
+    expect(contacted).toBe(false);
   });
 });

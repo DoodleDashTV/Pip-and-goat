@@ -1,3 +1,4 @@
+import { assertNoProhibitedLegacyBrand } from '../brand-canon';
 import { resolveElevenLabsModel } from './models';
 import { sanitizeVoiceErrorMessage } from './candidate-gates';
 import { type VoiceEnv } from './safety';
@@ -54,6 +55,7 @@ export async function convertCandidateSpeech(
   env: VoiceEnv,
   transport: CandidateTransport,
 ): Promise<{ audioBase64: string; contentType: string }> {
+  assertNoProhibitedLegacyBrand(input.text);
   const model = resolveElevenLabsModel(input.model ?? env.ELEVENLABS_MODEL_ID ?? DEFAULT_ELEVENLABS_MODEL);
   const apiKey = String(env.ELEVENLABS_API_KEY ?? '').trim();
   const url = `${ELEVENLABS_TTS_ENDPOINT}/${encodeURIComponent(input.voiceId)}?output_format=${ELEVENLABS_TTS_OUTPUT_FORMAT}`;

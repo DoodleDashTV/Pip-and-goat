@@ -1,3 +1,4 @@
+import { assertNoProhibitedLegacyBrand } from '../brand-canon';
 import { resolveElevenLabsModel } from './models';
 import { assertNoClientVoiceId, resolveVoiceAssignment } from './registry';
 import { assertPaidProviderReady, type VoiceEnv } from './safety';
@@ -26,6 +27,7 @@ export async function generateElevenLabsAudio(
   env: VoiceEnv = process.env,
   transport?: ElevenLabsTransport,
 ): Promise<never> {
+  assertNoProhibitedLegacyBrand(input.text);
   assertNoClientVoiceId(input);
   assertPaidProviderReady(env);
   resolveElevenLabsModel(input.model ?? env.ELEVENLABS_MODEL_ID);

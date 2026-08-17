@@ -18,8 +18,8 @@ export const PIP_VOICE_GUIDE: VoiceGuide = {
   personality: ['curious', 'cheerful', 'kind', 'enthusiastic'],
   delivery: ['youthful', 'bright', 'sweet', 'short explorer sentences'],
   forbidden: ['squeaky', 'shrill', 'adult', 'breathy-whisper', 'gravelly'],
-  catchphrases: ['Let’s Doodle-Dash!', 'Feathers and freckles!'],
-  pronunciationNotes: 'Pip: short i, bright. Doodle-Dash is two clear beats.',
+  catchphrases: ['Feathers and freckles!'],
+  pronunciationNotes: 'Pip: short i, bright.',
   defaultEmotion: 'curious wonder',
   defaultDirection: 'Bright, kind, and a little breathless from exploring. Stay youthful, never shrill.',
 };
