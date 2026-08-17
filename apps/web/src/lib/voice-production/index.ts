@@ -19,3 +19,9 @@ export {
 } from './approved-voice-settings';
 export { publicLiveTestSnapshot, serverGatesOpen, isProductionVoiceRuntime } from './candidate-gates';
 export { publicVoiceDirectory, isRegisteredCharacterId, assertNoClientVoiceId } from './registry';
+export {
+  SCRIPT_TO_VOICE_COPY,
+  SCRIPT_TO_VOICE_MAX_CHARS,
+  publicScriptCharacters,
+  isSingleDialogueLine,
+} from './script-line';

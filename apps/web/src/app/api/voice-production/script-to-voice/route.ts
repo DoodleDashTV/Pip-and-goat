@@ -1,0 +1,100 @@
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { defaultCandidateTransport } from '@/lib/voice-production/candidate-provider';
+import { sanitizeVoiceErrorMessage } from '@/lib/voice-production/candidate-gates';
+import { createScriptToVoiceService } from '@/lib/voice-production/script-to-voice';
+import { SCRIPT_TO_VOICE_MAX_CHARS } from '@/lib/voice-production/script-line';
+import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError } from '@/lib/voice-production/types';
+
+const service = createScriptToVoiceService(process.env, defaultCandidateTransport);
+
+const SharedFields = {
+  characterId: z.enum([PIP_CHARACTER_ID, GOAT_CHARACTER_ID]),
+  text: z.string().min(1).max(SCRIPT_TO_VOICE_MAX_CHARS),
+  title: z.string().max(200).optional(),
+  description: z.string().max(400).optional(),
+  caption: z.string().max(280).optional(),
+  narration: z.string().max(280).optional(),
+  metadata: z.string().max(200).optional(),
+  voiceId: z.unknown().optional(),
+  providerVoiceId: z.unknown().optional(),
+  elevenLabsVoiceId: z.unknown().optional(),
+  lines: z.unknown().optional(),
+  script: z.unknown().optional(),
+  queue: z.unknown().optional(),
+};
+
+const ValidateSchema = z.object({
+  action: z.literal('validate-line'),
+  ...SharedFields,
+});
+
+const GenerateSchema = z.object({
+  action: z.literal('generate-confirmed-line'),
+  requestId: z.string().regex(/^[A-Za-z0-9_-]{8,80}$/),
+  testToken: z.string().min(1).max(200),
+  confirmed: z.literal(true),
+  ...SharedFields,
+});
+
+const BodySchema = z.discriminatedUnion('action', [ValidateSchema, GenerateSchema]);
+
+function publicError(error: unknown) {
+  if (error instanceof VoiceProductionError) {
+    return NextResponse.json(
+      {
+        error: sanitizeVoiceErrorMessage(error.message),
+        code: error.code,
+        providerContacted: false,
+      },
+      { status: 400 },
+    );
+  }
+  if (error instanceof z.ZodError) {
+    return NextResponse.json(
+      { error: 'Malformed preview voice-generation request.', providerContacted: false },
+      { status: 400 },
+    );
+  }
+  return NextResponse.json({ error: 'Preview voice generation refused.', providerContacted: false }, { status: 400 });
+}
+
+function stripSecrets<T extends Record<string, unknown>>(payload: T) {
+  return {
+    ...payload,
+    testToken: undefined,
+    voiceId: undefined,
+    providerVoiceId: undefined,
+    elevenLabsVoiceId: undefined,
+  };
+}
+
+export async function GET() {
+  return NextResponse.json(
+    stripSecrets({
+      ...service.snapshot(),
+      providerContacted: false,
+    }),
+  );
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = BodySchema.parse(await request.json());
+    if (body.action === 'validate-line') {
+      return NextResponse.json(
+        stripSecrets({
+          ...service.validate(body),
+          providerContacted: false,
+        }),
+      );
+    }
+    const result = await service.generate(body, {
+      origin: request.headers.get('origin'),
+      host: request.headers.get('host'),
+    });
+    return NextResponse.json(stripSecrets(result));
+  } catch (error) {
+    return publicError(error);
+  }
+}
