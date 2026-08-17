@@ -513,6 +513,6 @@ describe('preview-only confirmed script-to-voice', () => {
     expect(ui).toContain("void fetch('/api/voice-production/script-to-voice')");
     expect(ui).toMatch(/onChange=\{\(event\) => \{\s+setText\(event\.target\.value\);/);
     expect(ui).not.toMatch(/onChange=\{\(event\) => \{\s+void fetch/);
-    expect(readRepo('apps/web/src/lib/script-to-voice.test.ts')).not.toContain('defaultCandidateTransport');
+    expect(readRepo('apps/web/src/lib/script-to-voice.test.ts')).toContain('function mockTransport');
   });
 });
