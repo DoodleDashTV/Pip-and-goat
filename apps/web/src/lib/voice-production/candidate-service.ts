@@ -98,7 +98,7 @@ export function createCandidateVoiceService(
       inFlight = true;
       try {
         const converted = await convertCandidateSpeech(
-          { voiceId: assignment.providerVoiceId, text: input.text, model: env.ELEVENLABS_MODEL_ID },
+          { characterId, text: input.text },
           env,
           transport,
         );

@@ -8,6 +8,9 @@ import {
   publicApprovedSamples,
   type PublicApprovedSample,
 } from '@/lib/voice-production/candidates';
+import { publicVoiceIdentitySnapshot } from '@/lib/voice-production/approved-voice-settings';
+
+const VOICE_IDENTITY = publicVoiceIdentitySnapshot();
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from '@/lib/voice-production/types';
 
 type LiveTestSnapshot = {
@@ -104,8 +107,17 @@ export function CandidateVoiceTest() {
   return (
     <section className="studio-card space-y-3 overflow-x-hidden p-4 sm:p-5">
       <h2 className="font-display text-xl font-semibold">Approved Pip and Goat voices</h2>
+      <p className="status-success inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
+        Final voice identity approved
+      </p>
       <p className="status-error inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
         {liveTest.locked ? 'Live voice test locked' : 'Live voice test ready after confirmation'}
+      </p>
+      <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
+        Model {VOICE_IDENTITY.model}. Output {VOICE_IDENTITY.outputFormat}. Stability{' '}
+        {VOICE_IDENTITY.settings.stability}, similarity {VOICE_IDENTITY.settings.similarity}, style{' '}
+        {VOICE_IDENTITY.settings.style}, speed {VOICE_IDENTITY.settings.speed}, speaker boost{' '}
+        {VOICE_IDENTITY.settings.speakerBoost ? 'on' : 'off'}.
       </p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{liveTest.message}</p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">

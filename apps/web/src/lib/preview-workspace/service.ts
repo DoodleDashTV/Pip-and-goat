@@ -1,4 +1,4 @@
-import { assertNoProhibitedLegacyBrand } from '../brand-canon';
+import { assertAudienceFacingContent } from '../brand-canon';
 import { isPublicWebsitePreview } from '../public-preview';
 import {
   emptyPreviewWorkspace,
@@ -62,7 +62,10 @@ export function savePreviewSettings(
   if (!projectName) {
     throw new PreviewWorkspaceError('Project name is required.', 'SETTINGS_INVALID');
   }
-  assertNoProhibitedLegacyBrand(projectName, (message, code) => new PreviewWorkspaceError(message, code));
+  assertAudienceFacingContent(
+    { title: projectName },
+    (message, code) => new PreviewWorkspaceError(message, code),
+  );
   const settings: PreviewSettings = {
     projectName,
     format: '1080x1920',
@@ -85,8 +88,7 @@ export function createPreviewEpisode(
   if (!title) throw new PreviewWorkspaceError('Title is required.', 'EPISODE_INVALID');
   if (!premise) throw new PreviewWorkspaceError('Premise is required.', 'EPISODE_INVALID');
   const refuseLegacy = (message: string, code: string) => new PreviewWorkspaceError(message, code);
-  assertNoProhibitedLegacyBrand(title, refuseLegacy);
-  assertNoProhibitedLegacyBrand(premise, refuseLegacy);
+  assertAudienceFacingContent({ title, description: premise }, refuseLegacy);
   if (!Number.isInteger(episodeNumber) || episodeNumber < 1) {
     throw new PreviewWorkspaceError('Episode number must be a positive integer.', 'EPISODE_INVALID');
   }

@@ -68,8 +68,20 @@ import { createMemoryVoiceStore } from './voice-production/store';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID } from './voice-production/types';
 import {
   PIP_TEMPORARY_NEUTRAL_PHRASE,
+  assertAudienceFacingContent,
   containsProhibitedLegacyBrand,
 } from './brand-canon';
+import {
+  APPROVED_ELEVENLABS_MODEL,
+  APPROVED_OUTPUT_FORMAT,
+  publicVoiceIdentitySnapshot,
+} from './voice-production/approved-voice-settings';
+import { assertApprovedModel, assertExclusiveVoiceAssignment, lockedVoiceIdsAreDistinct } from './voice-production/voice-identity';
+import {
+  DEFAULT_MAX_CHARS_PER_EPISODE,
+  DEFAULT_MAX_CHARS_PER_REQUEST,
+  DEFAULT_MONTHLY_CHAR_LIMIT,
+} from './voice-production/types';
 import { memoryBackend } from './preview-workspace/store';
 
 const repoRoot = path.resolve(__dirname, '../../../..');
@@ -643,7 +655,16 @@ describe('controlled ElevenLabs approved-voice preview', () => {
       calls += 1;
       expect(url.startsWith(`${ELEVENLABS_TTS_ENDPOINT}/93w5H37WdqeS6HoyL5cV`)).toBe(true);
       expect(init.headers['xi-api-key']).toBe('test-key-not-real');
-      expect(JSON.parse(init.body).text).toBe(FIXED_APPROVED_LINES[PIP_CHARACTER_ID]);
+      const body = JSON.parse(init.body);
+      expect(body.text).toBe(FIXED_APPROVED_LINES[PIP_CHARACTER_ID]);
+      expect(body.model_id).toBe('eleven_multilingual_v2');
+      expect(body.voice_settings).toEqual({
+        stability: 0.5,
+        similarity_boost: 0.75,
+        style: 0,
+        speed: 1,
+        use_speaker_boost: true,
+      });
       return { ok: true, status: 200, contentType: 'audio/mpeg', body: new Uint8Array([9, 8, 7]).buffer };
     };
     const service = createCandidateVoiceService(openEnv, transport);
@@ -718,6 +739,7 @@ describe('controlled ElevenLabs approved-voice preview', () => {
     const studio = readRepo('apps/web/src/components/preview/VoiceProductionStudio.tsx');
     const envExample = readRepo('.env.example');
     expect(ui).toContain('Live voice test locked');
+    expect(ui).toContain('Final voice identity approved');
     expect(ui).toContain('Generate approved Pip sample');
     expect(ui).toContain('Generate approved Goat sample');
     expect(ui).toContain(APPROVED_SAMPLE_AUDIO_LABEL);
@@ -819,9 +841,9 @@ describe('legacy brand canon stays out of ElevenLabs', () => {
       await expect(generateElevenLabsAudio({ characterId: PIP_CHARACTER_ID, text }, openEnv, transport)).rejects.toThrow(
         /Legacy brand wording/,
       );
-      await expect(convertCandidateSpeech({ voiceId: 'unused', text }, openEnv, transport)).rejects.toThrow(
-        /Legacy brand wording/,
-      );
+      await expect(
+        convertCandidateSpeech({ characterId: PIP_CHARACTER_ID, text }, openEnv, transport),
+      ).rejects.toThrow(/Legacy brand wording/);
     }
 
     const service = createVoiceProductionService(createMemoryVoiceStore(), openEnv);
@@ -870,5 +892,78 @@ describe('legacy brand canon stays out of ElevenLabs', () => {
     ).toThrowError(/Legacy brand wording/);
 
     expect(contacted).toBe(false);
+  });
+});
+
+describe('final voice identity lock', () => {
+  it('locks Pip and Goat to distinct approved Voice IDs and refuses swaps', () => {
+    expect(lockedVoiceIdsAreDistinct()).toBe(true);
+    const pip = resolveVoiceAssignment(PIP_CHARACTER_ID);
+    const goat = resolveVoiceAssignment(GOAT_CHARACTER_ID);
+    expect(pip.providerVoiceId).toBe('93w5H37WdqeS6HoyL5cV');
+    expect(goat.providerVoiceId).toBe('SbxjwBKw2PefbSupcoXV');
+    expect(() => assertExclusiveVoiceAssignment(PIP_CHARACTER_ID, goat.providerVoiceId)).toThrowError(
+      /cannot share or swap/,
+    );
+    expect(() => assertExclusiveVoiceAssignment(GOAT_CHARACTER_ID, pip.providerVoiceId)).toThrowError(
+      /cannot share or swap/,
+    );
+    expect(() => assertExclusiveVoiceAssignment(PIP_CHARACTER_ID, 'unknown-voice')).toThrowError(
+      /Voice assignment is locked/,
+    );
+  });
+
+  it('records the approved model and effective sample settings without exposing Voice IDs publicly', () => {
+    const identity = publicVoiceIdentitySnapshot();
+    expect(identity.status).toBe('final-approved');
+    expect(identity.model).toBe(APPROVED_ELEVENLABS_MODEL);
+    expect(identity.outputFormat).toBe(APPROVED_OUTPUT_FORMAT);
+    expect(identity.settings).toEqual({
+      stability: 0.5,
+      similarity: 0.75,
+      style: 0,
+      speed: 1,
+      speakerBoost: true,
+    });
+    expect(identity.productionEnabled).toBe(false);
+    expect(JSON.stringify(identity)).not.toContain('93w5H37WdqeS6HoyL5cV');
+    expect(JSON.stringify(identity)).not.toContain('SbxjwBKw2PefbSupcoXV');
+    expect(assertApprovedModel(APPROVED_ELEVENLABS_MODEL)).toBeUndefined();
+    expect(() => assertApprovedModel('eleven_turbo_v2_5')).toThrowError(/approved ElevenLabs model/);
+    expect(readRepo('apps/web/src/lib/voice-production/approved-voice-settings.ts')).not.toContain(
+      '93w5H37WdqeS6HoyL5cV',
+    );
+    expect(readRepo('apps/web/src/components/preview/CandidateVoiceTest.tsx')).not.toContain('voice-identity');
+    expect(PIP_VOICE_GUIDE.personality).toEqual(['curious', 'cheerful', 'kind', 'enthusiastic']);
+    expect(GOAT_VOICE_GUIDE.personality).toEqual(['warm', 'playful', 'adventurous', 'loyal']);
+  });
+
+  it('keeps spending limits and Production gates default-closed', () => {
+    expect(DEFAULT_MAX_CHARS_PER_REQUEST).toBe(280);
+    expect(DEFAULT_MAX_CHARS_PER_EPISODE).toBe(2000);
+    expect(DEFAULT_MONTHLY_CHAR_LIMIT).toBe(20_000);
+    expect(isPaidVoiceGenerationEnabled({})).toBe(false);
+    expect(isPaidVoiceGenerationAuthorized({})).toBe(false);
+    expect(isProductionVoiceRuntime({})).toBe(false);
+    expect(isProductionVoiceRuntime({ VERCEL_ENV: 'production' })).toBe(true);
+    expect(publicLiveTestSnapshot({ VERCEL_ENV: 'production' }).productionEnabled).toBe(false);
+    expect(publicLiveTestSnapshot({ VERCEL_ENV: 'production' }).voiceIdentity.productionEnabled).toBe(false);
+    expect(canEnterFinalRendering()).toBe(false);
+    expect(() =>
+      assertWithinLimits({
+        text: 'x'.repeat(281),
+        episodeCharacterCount: 0,
+        ledger: emptyLedger(),
+        paid: false,
+      }),
+    ).toThrowError(/per-request limit/);
+    expect(() =>
+      assertAudienceFacingContent({
+        narration: 'Doodle-Dash begins.',
+        caption: 'Safe caption',
+        title: 'Safe title',
+        description: 'Safe description',
+      }),
+    ).toThrowError(/Legacy brand wording/);
   });
 });

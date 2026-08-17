@@ -1,4 +1,4 @@
-import { assertNoProhibitedLegacyBrandFields } from '../brand-canon';
+import { assertAudienceFacingContent, assertNoProhibitedLegacyBrandFields } from '../brand-canon';
 import { generateOriginalDialogue } from './dialogue';
 import { fixtureObjectKey, fixturePlaybackDataUrl } from './fixtures';
 import { sampleSceneLines } from './sample-episode';
@@ -116,6 +116,12 @@ export function createVoiceProductionService(
 
     generateDraftAudio(input: GenerateDraftAudioInput) {
       assertNoClientVoiceId(input);
+      assertAudienceFacingContent({
+        dialogue: input.dialogueText,
+        narration: input.performanceDirection,
+        caption: input.pronunciationNotes,
+        description: input.emotion,
+      });
       assertNoProhibitedLegacyBrandFields({
         dialogueText: input.dialogueText,
         performanceDirection: input.performanceDirection,

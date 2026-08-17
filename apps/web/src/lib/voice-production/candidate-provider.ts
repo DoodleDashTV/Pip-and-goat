@@ -1,11 +1,18 @@
-import { assertNoProhibitedLegacyBrand } from '../brand-canon';
-import { resolveElevenLabsModel } from './models';
+import { assertAudienceFacingContent } from '../brand-canon';
+import {
+  APPROVED_ELEVENLABS_MODEL,
+  APPROVED_OUTPUT_FORMAT,
+  elevenLabsVoiceSettingsBody,
+} from './approved-voice-settings';
 import { sanitizeVoiceErrorMessage } from './candidate-gates';
+import { resolveElevenLabsModel } from './models';
+import { assertNoClientVoiceId, resolveVoiceAssignment } from './registry';
 import { type VoiceEnv } from './safety';
-import { DEFAULT_ELEVENLABS_MODEL, VoiceProductionError } from './types';
+import { VoiceProductionError, type RegisteredCharacterId } from './types';
+import { assertApprovedModel, assertExclusiveVoiceAssignment } from './voice-identity';
 
 export const ELEVENLABS_TTS_ENDPOINT = 'https://api.elevenlabs.io/v1/text-to-speech';
-export const ELEVENLABS_TTS_OUTPUT_FORMAT = 'mp3_44100_128';
+export const ELEVENLABS_TTS_OUTPUT_FORMAT = APPROVED_OUTPUT_FORMAT;
 
 export type CandidateTransport = (
   url: string,
@@ -13,9 +20,11 @@ export type CandidateTransport = (
 ) => Promise<{ ok: boolean; status: number; contentType?: string; body?: ArrayBuffer | string }>;
 
 export type CandidateConvertInput = {
-  voiceId: string;
+  characterId: RegisteredCharacterId;
   text: string;
-  model?: string;
+  voiceId?: unknown;
+  providerVoiceId?: unknown;
+  elevenLabsVoiceId?: unknown;
 };
 
 function encodeAudio(body: ArrayBuffer | string | undefined): string {
@@ -45,20 +54,24 @@ export function mapProviderFailure(status: number): VoiceProductionError {
 }
 
 /**
- * Official ElevenLabs convert contract:
+ * Official ElevenLabs convert contract used for the approved samples:
  * POST /v1/text-to-speech/{voice_id}?output_format=mp3_44100_128
- * Header xi-api-key, JSON { text, model_id }.
- * This function is only called after live approved-sample gates pass.
+ * Header xi-api-key, JSON { text, model_id, voice_settings }.
+ * Voice IDs are resolved from the locked registry only.
  */
 export async function convertCandidateSpeech(
   input: CandidateConvertInput,
   env: VoiceEnv,
   transport: CandidateTransport,
 ): Promise<{ audioBase64: string; contentType: string }> {
-  assertNoProhibitedLegacyBrand(input.text);
-  const model = resolveElevenLabsModel(input.model ?? env.ELEVENLABS_MODEL_ID ?? DEFAULT_ELEVENLABS_MODEL);
+  assertNoClientVoiceId(input);
+  assertAudienceFacingContent({ dialogue: input.text, text: input.text });
+  const assignment = resolveVoiceAssignment(input.characterId);
+  assertExclusiveVoiceAssignment(assignment.characterId, assignment.providerVoiceId);
+  const model = resolveElevenLabsModel(APPROVED_ELEVENLABS_MODEL);
+  assertApprovedModel(model);
   const apiKey = String(env.ELEVENLABS_API_KEY ?? '').trim();
-  const url = `${ELEVENLABS_TTS_ENDPOINT}/${encodeURIComponent(input.voiceId)}?output_format=${ELEVENLABS_TTS_OUTPUT_FORMAT}`;
+  const url = `${ELEVENLABS_TTS_ENDPOINT}/${encodeURIComponent(assignment.providerVoiceId)}?output_format=${ELEVENLABS_TTS_OUTPUT_FORMAT}`;
   let result: { ok: boolean; status: number; contentType?: string; body?: ArrayBuffer | string };
   try {
     result = await transport(url, {
@@ -68,7 +81,11 @@ export async function convertCandidateSpeech(
         'Content-Type': 'application/json',
         Accept: 'audio/mpeg',
       },
-      body: JSON.stringify({ text: input.text, model_id: model }),
+      body: JSON.stringify({
+        text: input.text,
+        model_id: model,
+        voice_settings: elevenLabsVoiceSettingsBody(),
+      }),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'timeout';

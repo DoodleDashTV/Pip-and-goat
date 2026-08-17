@@ -30,3 +30,17 @@ export function assertNoProhibitedLegacyBrandFields(
     assertNoProhibitedLegacyBrand(value, errorFactory);
   }
 }
+
+export function assertAudienceFacingContent(
+  fields: {
+    dialogue?: string | null;
+    narration?: string | null;
+    caption?: string | null;
+    title?: string | null;
+    description?: string | null;
+    text?: string | null;
+  },
+  errorFactory?: (message: string, code: string) => Error,
+): void {
+  assertNoProhibitedLegacyBrandFields(fields, errorFactory);
+}

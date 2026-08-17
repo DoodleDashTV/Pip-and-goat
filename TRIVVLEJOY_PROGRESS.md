@@ -77,6 +77,10 @@ database is connected.
 - Audience-facing voice text cannot include Doodle Dash or Doodle-Dash
 - Prohibited legacy-brand terms cannot reach ElevenLabs
 - Pip may temporarily use “Let’s explore!” until Justin approves a new catchphrase
+- Final voice-identity approval lock for Pip and Goat
+- Approved ElevenLabs model and sample voice settings are recorded server-side
+- Pip and Goat cannot share or swap Voice IDs
+- Automatic episode script-to-voice generation is not started
 
 ## Tests / validation
 

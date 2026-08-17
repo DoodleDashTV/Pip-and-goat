@@ -11,5 +11,11 @@ export * from './progress';
 export * from './form-state';
 export * from './client-session';
 export * from './candidates';
+export {
+  APPROVED_ELEVENLABS_MODEL,
+  APPROVED_OUTPUT_FORMAT,
+  publicApprovedVoiceSettings,
+  publicVoiceIdentitySnapshot,
+} from './approved-voice-settings';
 export { publicLiveTestSnapshot, serverGatesOpen, isProductionVoiceRuntime } from './candidate-gates';
 export { publicVoiceDirectory, isRegisteredCharacterId, assertNoClientVoiceId } from './registry';

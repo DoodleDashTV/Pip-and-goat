@@ -5,6 +5,7 @@ import {
   REQUIRED_VOICE_TEST_MAX_CHARACTERS,
   publicApprovedSamples,
 } from './candidates';
+import { publicVoiceIdentitySnapshot } from './approved-voice-settings';
 import { hasElevenLabsApiKey, isPaidVoiceGenerationEnabled, type VoiceEnv } from './safety';
 import { VoiceProductionError } from './types';
 
@@ -56,6 +57,7 @@ export type LiveTestPublicStatus = 'locked' | 'awaiting-confirmation';
 export function publicLiveTestSnapshot(env: VoiceEnv = process.env) {
   const samples = publicApprovedSamples();
   const maxCharacters = REQUIRED_VOICE_TEST_MAX_CHARACTERS;
+  const voiceIdentity = publicVoiceIdentitySnapshot();
   if (isProductionVoiceRuntime(env) || !serverGatesOpen(env)) {
     return {
       status: 'locked' as LiveTestPublicStatus,
@@ -65,6 +67,7 @@ export function publicLiveTestSnapshot(env: VoiceEnv = process.env) {
       maxCharacters,
       testMaxCharacters: maxCharacters,
       productionEnabled: false,
+      voiceIdentity,
     };
   }
   return {
@@ -75,6 +78,7 @@ export function publicLiveTestSnapshot(env: VoiceEnv = process.env) {
     maxCharacters,
     testMaxCharacters: maxCharacters,
     productionEnabled: false,
+    voiceIdentity,
   };
 }
 
