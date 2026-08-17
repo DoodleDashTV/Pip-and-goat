@@ -5,7 +5,11 @@ import { publicVoiceIdentitySnapshot } from '@/lib/voice-production/approved-voi
 import {
   SCRIPT_TO_VOICE_COPY,
   SCRIPT_TO_VOICE_LOCKED_MESSAGE,
+  SCRIPT_TO_VOICE_LOCKED_STATUS,
+  SCRIPT_TO_VOICE_READY_STATUS,
   SCRIPT_TO_VOICE_MAX_CHARS,
+  SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+  SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
   publicScriptCharacters,
   type PublicScriptCharacter,
 } from '@/lib/voice-production/script-line';
@@ -14,13 +18,42 @@ import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from 
 const VOICE_IDENTITY = publicVoiceIdentitySnapshot();
 const CHARACTERS = publicScriptCharacters();
 
+export type ScriptToVoiceView = {
+  locked: boolean;
+  message: string;
+  characters?: PublicScriptCharacter[];
+  ledger?: {
+    paidCharactersUsed?: number;
+    paidRequests?: number;
+    remainingRequests?: number;
+    remainingCharacters?: number;
+    monthlyCharLimit?: number;
+  };
+};
+
 type Snapshot = {
   locked: boolean;
   message: string;
   characters: PublicScriptCharacter[];
-  monthlyUsed: number;
+  paidRequests: number;
+  remainingRequests: number;
+  paidCharactersUsed: number;
+  remainingCharacters: number;
   monthlyLimit: number;
 };
+
+function snapshotFromView(data?: ScriptToVoiceView): Snapshot {
+  return {
+    locked: data ? Boolean(data.locked) : true,
+    message: data?.message ?? SCRIPT_TO_VOICE_LOCKED_MESSAGE,
+    characters: Array.isArray(data?.characters) ? data.characters : CHARACTERS,
+    paidRequests: data?.ledger?.paidRequests ?? 0,
+    remainingRequests: data?.ledger?.remainingRequests ?? SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
+    paidCharactersUsed: data?.ledger?.paidCharactersUsed ?? 0,
+    remainingCharacters: data?.ledger?.remainingCharacters ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+    monthlyLimit: data?.ledger?.monthlyCharLimit ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+  };
+}
 
 type Receipt = {
   displayName: string;
@@ -29,7 +62,24 @@ type Receipt = {
   requestId: string;
   audioDataUrl: string;
   label: string;
-  ledger?: { paidCharactersUsed: number; monthlyCharLimit: number; paidRequests: number };
+  model: string;
+  outputFormat: string;
+  settings: {
+    stability: number;
+    similarity: number;
+    style: number;
+    speed: number;
+    speakerBoost: boolean;
+  };
+  createdAt: string;
+  paidCharactersCharged: number;
+  ledger?: {
+    paidCharactersUsed: number;
+    monthlyCharLimit: number;
+    paidRequests: number;
+    remainingRequests: number;
+    remainingCharacters: number;
+  };
 };
 
 function newRequestId() {
@@ -37,14 +87,8 @@ function newRequestId() {
   return `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export function ConfirmedScriptToVoice() {
-  const [snapshot, setSnapshot] = useState<Snapshot>({
-    locked: true,
-    message: SCRIPT_TO_VOICE_LOCKED_MESSAGE,
-    characters: CHARACTERS,
-    monthlyUsed: 0,
-    monthlyLimit: 20000,
-  });
+export function ConfirmedScriptToVoice({ initialSnapshot }: { initialSnapshot?: ScriptToVoiceView }) {
+  const [snapshot, setSnapshot] = useState<Snapshot>(() => snapshotFromView(initialSnapshot));
   const [characterId, setCharacterId] = useState<RegisteredCharacterId>(PIP_CHARACTER_ID);
   const [text, setText] = useState('');
   const [testToken, setTestToken] = useState('');
@@ -62,13 +106,7 @@ export function ConfirmedScriptToVoice() {
     void fetch('/api/voice-production/script-to-voice')
       .then((res) => res.json())
       .then((data) => {
-        setSnapshot({
-          locked: Boolean(data.locked),
-          message: data.message ?? SCRIPT_TO_VOICE_LOCKED_MESSAGE,
-          characters: Array.isArray(data.characters) ? data.characters : CHARACTERS,
-          monthlyUsed: data.ledger?.paidCharactersUsed ?? 0,
-          monthlyLimit: data.ledger?.monthlyCharLimit ?? 20000,
-        });
+        setSnapshot(snapshotFromView(data));
       })
       .catch(() => undefined);
   }, []);
@@ -139,12 +177,20 @@ export function ConfirmedScriptToVoice() {
         requestId: data.requestId,
         audioDataUrl: data.audioDataUrl,
         label: data.label,
+        model: data.model ?? VOICE_IDENTITY.model,
+        outputFormat: data.outputFormat ?? VOICE_IDENTITY.outputFormat,
+        settings: data.settings ?? VOICE_IDENTITY.settings,
+        createdAt: data.createdAt,
+        paidCharactersCharged: data.paidCharactersCharged ?? data.characterCount,
         ledger: data.ledger,
       });
       if (data.ledger) {
         setSnapshot((current) => ({
           ...current,
-          monthlyUsed: data.ledger.paidCharactersUsed,
+          paidRequests: data.ledger.paidRequests,
+          remainingRequests: data.ledger.remainingRequests,
+          paidCharactersUsed: data.ledger.paidCharactersUsed,
+          remainingCharacters: data.ledger.remainingCharacters,
           monthlyLimit: data.ledger.monthlyCharLimit,
         }));
       }
@@ -168,6 +214,11 @@ export function ConfirmedScriptToVoice() {
       <p className="status-error inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
         {SCRIPT_TO_VOICE_COPY.paidWarning}
       </p>
+      <p
+        className={`${snapshot.locked ? 'status-error' : 'status-success'} inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold`}
+      >
+        {snapshot.locked ? SCRIPT_TO_VOICE_LOCKED_STATUS : SCRIPT_TO_VOICE_READY_STATUS}
+      </p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
         Model {VOICE_IDENTITY.model}. Output {VOICE_IDENTITY.outputFormat}. Stability{' '}
         {VOICE_IDENTITY.settings.stability}, similarity {VOICE_IDENTITY.settings.similarity}, style{' '}
@@ -176,7 +227,9 @@ export function ConfirmedScriptToVoice() {
       </p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{snapshot.message}</p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
-        Monthly paid usage {snapshot.monthlyUsed} / {snapshot.monthlyLimit} characters.
+        Temporary Preview allowance {snapshot.paidRequests} / {SCRIPT_TO_VOICE_MAX_PAID_REQUESTS} paid
+        requests and {snapshot.paidCharactersUsed} / {snapshot.monthlyLimit} paid characters. Remaining{' '}
+        {snapshot.remainingRequests} requests and {snapshot.remainingCharacters} characters.
       </p>
 
       <div className="grid gap-3">
@@ -252,7 +305,12 @@ export function ConfirmedScriptToVoice() {
         <div className="space-y-3 rounded-2xl border border-[var(--color-warning)] bg-[var(--color-warning-soft)] p-3 text-[var(--color-warning-foreground)]">
           <p className="font-bold">Confirm one paid preview-voice request</p>
           <p className="break-words text-sm leading-6">
-            Character: {preview.displayName === 'Pip' || characterId === PIP_CHARACTER_ID ? 'Pip' : characterId === GOAT_CHARACTER_ID ? 'Goat' : preview.displayName}
+            Character:{' '}
+            {preview.displayName === 'Pip' || characterId === PIP_CHARACTER_ID
+              ? 'Pip'
+              : characterId === GOAT_CHARACTER_ID
+                ? 'Goat'
+                : preview.displayName}
           </p>
           <p className="break-words text-sm leading-6">Line: {preview.text}</p>
           <p className="text-sm font-bold">
@@ -292,7 +350,20 @@ export function ConfirmedScriptToVoice() {
             {receipt.label}
           </p>
           <p className="break-words text-sm leading-6">
-            Receipt: {receipt.displayName}, {receipt.characterCount} characters, request {receipt.requestId}.
+            Character: {receipt.displayName}. Line: {receipt.text}
+          </p>
+          <p className="break-words text-sm leading-6">
+            Characters: {receipt.characterCount}. Paid characters charged: {receipt.paidCharactersCharged}.
+          </p>
+          <p className="break-words text-sm leading-6">
+            Model {receipt.model}. Output {receipt.outputFormat}. Stability {receipt.settings.stability},
+            similarity {receipt.settings.similarity}, style {receipt.settings.style}, speed{' '}
+            {receipt.settings.speed}, speaker boost {receipt.settings.speakerBoost ? 'on' : 'off'}.
+          </p>
+          <p className="break-words text-sm leading-6">
+            Receipt {receipt.requestId} at {receipt.createdAt}. Remaining{' '}
+            {receipt.ledger?.remainingRequests ?? snapshot.remainingRequests} requests and{' '}
+            {receipt.ledger?.remainingCharacters ?? snapshot.remainingCharacters} characters.
           </p>
           <audio controls src={receipt.audioDataUrl} className="w-full max-w-full" />
         </div>

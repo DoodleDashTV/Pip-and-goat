@@ -31,14 +31,16 @@ function newRequestId() {
   return `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export function CandidateVoiceTest() {
-  const [liveTest, setLiveTest] = useState<LiveTestSnapshot>({
-    status: 'locked',
-    locked: true,
-    message: LIVE_TEST_LOCKED_MESSAGE,
-    samples: publicApprovedSamples(),
-    maxCharacters: REQUIRED_VOICE_TEST_MAX_CHARACTERS,
-  });
+export function CandidateVoiceTest({ initialLiveTest }: { initialLiveTest?: LiveTestSnapshot }) {
+  const [liveTest, setLiveTest] = useState<LiveTestSnapshot>(
+    initialLiveTest ?? {
+      status: 'locked',
+      locked: true,
+      message: LIVE_TEST_LOCKED_MESSAGE,
+      samples: publicApprovedSamples(),
+      maxCharacters: REQUIRED_VOICE_TEST_MAX_CHARACTERS,
+    },
+  );
   const [testToken, setTestToken] = useState('');
   const [pending, setPending] = useState<PendingConfirm | null>(null);
   const [running, setRunning] = useState(false);

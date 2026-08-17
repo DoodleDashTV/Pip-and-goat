@@ -22,6 +22,18 @@ const SharedFields = {
   lines: z.unknown().optional(),
   script: z.unknown().optional(),
   queue: z.unknown().optional(),
+  model: z.unknown().optional(),
+  model_id: z.unknown().optional(),
+  outputFormat: z.unknown().optional(),
+  output_format: z.unknown().optional(),
+  voice_settings: z.unknown().optional(),
+  stability: z.unknown().optional(),
+  similarity: z.unknown().optional(),
+  similarity_boost: z.unknown().optional(),
+  style: z.unknown().optional(),
+  speed: z.unknown().optional(),
+  speakerBoost: z.unknown().optional(),
+  use_speaker_boost: z.unknown().optional(),
 };
 
 const ValidateSchema = z.object({
@@ -66,6 +78,18 @@ function stripSecrets<T extends Record<string, unknown>>(payload: T) {
     voiceId: undefined,
     providerVoiceId: undefined,
     elevenLabsVoiceId: undefined,
+    model: undefined,
+    model_id: undefined,
+    outputFormat: undefined,
+    output_format: undefined,
+    voice_settings: undefined,
+    stability: undefined,
+    similarity: undefined,
+    similarity_boost: undefined,
+    style: undefined,
+    speed: undefined,
+    speakerBoost: undefined,
+    use_speaker_boost: undefined,
   };
 }
 

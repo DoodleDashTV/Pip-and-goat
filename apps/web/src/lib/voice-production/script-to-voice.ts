@@ -13,19 +13,24 @@ import {
 } from './candidate-gates';
 import { convertCandidateSpeech, type CandidateTransport } from './candidate-provider';
 import {
-  getPreviewPaidLedger,
+  assertPreviewVoiceAllowance,
   previewMonthlyCharLimit,
+  publicPreviewVoiceAllowance,
+  recordFailedVoiceAttempt,
   recordSuccessfulPaidUsage,
   resetPreviewPaidLedger,
 } from './preview-paid-ledger';
 import { assertNoClientVoiceId, resolveVoiceAssignment } from './registry';
-import { assertWithinLimits, type VoiceEnv } from './safety';
+import { estimateUsage, type VoiceEnv } from './safety';
 import {
   assertSingleDialogueLine,
   publicScriptCharacters,
   SCRIPT_TO_VOICE_AUDIO_LABEL,
   SCRIPT_TO_VOICE_LOCKED_MESSAGE,
+  SCRIPT_TO_VOICE_READY_MESSAGE,
   SCRIPT_TO_VOICE_MAX_CHARS,
+  SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+  SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
 } from './script-line';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError, type RegisteredCharacterId } from './types';
 
@@ -46,6 +51,18 @@ export type ScriptToVoiceInput = {
   lines?: unknown;
   script?: unknown;
   queue?: unknown;
+  model?: unknown;
+  model_id?: unknown;
+  outputFormat?: unknown;
+  output_format?: unknown;
+  voice_settings?: unknown;
+  stability?: unknown;
+  similarity?: unknown;
+  similarity_boost?: unknown;
+  style?: unknown;
+  speed?: unknown;
+  speakerBoost?: unknown;
+  use_speaker_boost?: unknown;
 };
 
 export type ScriptToVoiceContext = {
@@ -85,21 +102,28 @@ export type ScriptToVoiceReceipt = {
   usagePaid: true;
   persistedAsCanon: false;
   productionEnabled: false;
+  createdAt: string;
+  paidCharactersCharged: number;
   ledger: {
     paidCharactersUsed: number;
     paidRequests: number;
     monthlyCharLimit: number;
+    remainingRequests: number;
+    remainingCharacters: number;
+    failedAttempts: number;
   };
 };
 
 const successCache = new Map<string, ScriptToVoiceReceipt>();
 const failedIds = new Set<string>();
 const inFlightIds = new Set<string>();
+let sessionInFlight = false;
 
 export function resetScriptToVoiceState() {
   successCache.clear();
   failedIds.clear();
   inFlightIds.clear();
+  sessionInFlight = false;
   resetPreviewPaidLedger();
 }
 
@@ -119,9 +143,35 @@ function assertNoBatchPayload(input: ScriptToVoiceInput) {
   }
 }
 
+function assertNoClientOverrides(input: ScriptToVoiceInput) {
+  const overrideKeys = [
+    'model',
+    'model_id',
+    'outputFormat',
+    'output_format',
+    'voice_settings',
+    'stability',
+    'similarity',
+    'similarity_boost',
+    'style',
+    'speed',
+    'speakerBoost',
+    'use_speaker_boost',
+  ] as const;
+  for (const key of overrideKeys) {
+    if (input[key] !== undefined) {
+      throw new VoiceProductionError(
+        'Locked model, settings, and output format cannot be overridden. Provider was not contacted.',
+        'VOICE_SETTINGS_LOCKED',
+      );
+    }
+  }
+}
+
 export function validateConfirmedScriptLine(input: ScriptToVoiceInput): ScriptLinePreview {
   assertNoClientVoiceId(input);
   assertNoBatchPayload(input);
+  assertNoClientOverrides(input);
   const characterId = assertRegisteredCharacter(input.characterId);
   const text = assertSingleDialogueLine(input.text);
   assertAudienceFacingContent({
@@ -134,12 +184,8 @@ export function validateConfirmedScriptLine(input: ScriptToVoiceInput): ScriptLi
     metadata: input.metadata,
   });
   const assignment = resolveVoiceAssignment(characterId);
-  const { characterCount } = assertWithinLimits({
-    text,
-    episodeCharacterCount: 0,
-    ledger: getPreviewPaidLedger(),
-    paid: true,
-  });
+  const { characterCount } = estimateUsage(text);
+  assertPreviewVoiceAllowance(characterCount);
   return {
     characterId,
     displayName: assignment.displayName,
@@ -157,19 +203,24 @@ export function validateConfirmedScriptLine(input: ScriptToVoiceInput): ScriptLi
 
 export function publicScriptToVoiceSnapshot(env: VoiceEnv = process.env) {
   const liveTest = publicLiveTestSnapshot(env);
-  const ledger = getPreviewPaidLedger();
+  const allowance = publicPreviewVoiceAllowance();
   return {
     status: liveTest.status,
     locked: liveTest.locked,
-    message: liveTest.locked ? SCRIPT_TO_VOICE_LOCKED_MESSAGE : liveTest.message,
+    message: liveTest.locked ? SCRIPT_TO_VOICE_LOCKED_MESSAGE : SCRIPT_TO_VOICE_READY_MESSAGE,
     characters: publicScriptCharacters(),
     voiceIdentity: liveTest.voiceIdentity,
     maxCharacters: SCRIPT_TO_VOICE_MAX_CHARS,
+    maxPaidRequests: SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
+    maxPaidCharacters: SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
     monthlyCharLimit: previewMonthlyCharLimit(),
     ledger: {
-      paidCharactersUsed: ledger.paidCharactersUsed,
-      paidRequests: ledger.paidRequests,
+      paidCharactersUsed: allowance.paidCharactersUsed,
+      paidRequests: allowance.paidRequests,
       monthlyCharLimit: previewMonthlyCharLimit(),
+      remainingRequests: allowance.remainingRequests,
+      remainingCharacters: allowance.remainingCharacters,
+      failedAttempts: allowance.failedAttempts,
     },
     productionEnabled: false,
     providerContacted: false,
@@ -210,6 +261,12 @@ export function createScriptToVoiceService(env: VoiceEnv = process.env, transpor
           'DUPLICATE_REQUEST',
         );
       }
+      if (sessionInFlight) {
+        throw new VoiceProductionError(
+          'Only one Preview voice generation can run at a time. Provider was not contacted.',
+          'GENERATION_ALREADY_RUNNING',
+        );
+      }
 
       assertLiveApprovedSampleGates(env, String(input.testToken ?? ''));
       resolveVoiceAssignment(preview.characterId);
@@ -221,6 +278,7 @@ export function createScriptToVoiceService(env: VoiceEnv = process.env, transpor
         );
       }
 
+      sessionInFlight = true;
       inFlightIds.add(requestId);
       try {
         const converted = await convertCandidateSpeech(
@@ -228,7 +286,12 @@ export function createScriptToVoiceService(env: VoiceEnv = process.env, transpor
           env,
           transport,
         );
-        const ledger = recordSuccessfulPaidUsage(preview.characterCount);
+        const ledger = recordSuccessfulPaidUsage({
+          requestId,
+          characterId: preview.characterId,
+          characterCount: preview.characterCount,
+        });
+        const allowance = publicPreviewVoiceAllowance();
         const receipt: ScriptToVoiceReceipt = {
           kind: 'ELEVENLABS_CONFIRMED_LINE',
           characterId: preview.characterId,
@@ -247,16 +310,28 @@ export function createScriptToVoiceService(env: VoiceEnv = process.env, transpor
           usagePaid: true,
           persistedAsCanon: false,
           productionEnabled: false,
+          createdAt: new Date().toISOString(),
+          paidCharactersCharged: preview.characterCount,
           ledger: {
             paidCharactersUsed: ledger.paidCharactersUsed,
             paidRequests: ledger.paidRequests,
             monthlyCharLimit: previewMonthlyCharLimit(),
+            remainingRequests: allowance.remainingRequests,
+            remainingCharacters: allowance.remainingCharacters,
+            failedAttempts: allowance.failedAttempts,
           },
         };
         successCache.set(requestId, receipt);
         return receipt;
       } catch (error) {
         failedIds.add(requestId);
+        const code = error instanceof VoiceProductionError ? error.code : 'PROVIDER_UNSUPPORTED';
+        recordFailedVoiceAttempt({
+          requestId,
+          characterId: preview.characterId,
+          code,
+          providerContacted: code.startsWith('PROVIDER_') && code !== 'PROVIDER_TRANSPORT_UNAVAILABLE',
+        });
         if (error instanceof VoiceProductionError) {
           throw new VoiceProductionError(sanitizeVoiceErrorMessage(error.message), error.code);
         }
@@ -266,6 +341,7 @@ export function createScriptToVoiceService(env: VoiceEnv = process.env, transpor
         );
       } finally {
         inFlightIds.delete(requestId);
+        sessionInFlight = false;
       }
     },
   };
