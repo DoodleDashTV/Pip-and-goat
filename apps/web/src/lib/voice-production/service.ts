@@ -332,7 +332,7 @@ export function createVoiceProductionService(
     ) {
       const line = store.lines.get(lineId);
       if (!line) throw new VoiceProductionError('Voice line not found.', 'LINE_NOT_FOUND');
-      if (patch.dialogueText !== undefined) {
+      if (patch.dialogueText !== undefined && patch.dialogueText !== line.dialogueText) {
         assertWithinLimits({
           text: patch.dialogueText,
           episodeCharacterCount: episodeCharacterCount(store, line.episodeId) - line.characterCount,

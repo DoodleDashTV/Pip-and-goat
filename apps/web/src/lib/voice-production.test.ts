@@ -494,6 +494,14 @@ describe('voice preview stabilization', () => {
     expect(pack.readyForLipSync.map((line) => line.characterId)).toEqual([PIP_CHARACTER_ID]);
     expect(pack.rejectedExcluded).toContain(scene.lines[1].id);
     expect(pack.providerContacted).toBe(false);
+    const unchanged = service.updateLine(scene.lines[0].id, {
+      dialogueText: scene.lines[0].dialogueText,
+      pronunciationNotes: 'Pip: short i, still approved.',
+    });
+    expect(unchanged.approvalStatus).toBe('APPROVED');
+    const stillPack = service.packageApproved('ep-order');
+    expect(stillPack.readyForLipSync.map((line) => line.characterId)).toEqual([PIP_CHARACTER_ID]);
+    expect(stillPack.rejectedExcluded).toContain(scene.lines[1].id);
     const replay = service.regenerate(scene.lines[0].id, { pronunciationNotes: 'Pip: short i.' });
     const afterRegen = replaceLineKeepingOrder(afterReject, { characterId: PIP_CHARACTER_ID }, replay.line);
     expect(sortVoiceLines(afterRegen).map((line) => line.characterId)).toEqual([

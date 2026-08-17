@@ -93,6 +93,8 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
 
   function persist(nextLines: PublicLine[], nextPlayback: Record<string, string>) {
     const ordered = persistableLines(nextLines) as PublicLine[];
+    linesRef.current = ordered;
+    playbackRef.current = nextPlayback;
     setLines(ordered);
     setPlayback(nextPlayback);
     if (episode) {
@@ -206,18 +208,36 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
     const form = formsRef.current[characterId];
     if (!line || !form) return form;
     const fields = visibleFieldsForAction(form);
+    const textChanged = fields.dialogueText !== line.dialogueText;
     try {
       const data = await postVoice({
         action: 'update-line',
         lineId: line.id,
         ...fields,
       });
-      applyIncoming(characterId, data.line as PublicLine, form.revision);
+      const incoming = data.line as PublicLine;
+      applyIncoming(
+        characterId,
+        {
+          ...incoming,
+          approvalStatus: textChanged ? incoming.approvalStatus : line.approvalStatus,
+          generationStatus: textChanged ? incoming.generationStatus : line.generationStatus,
+        },
+        form.revision,
+      );
       markSaved(characterId);
     } catch {
       try {
         const next = applyLocalEdit(line, fields, safety.maxCharsPerRequest) as PublicLine;
-        applyIncoming(characterId, next, form.revision);
+        applyIncoming(
+          characterId,
+          {
+            ...next,
+            approvalStatus: textChanged ? next.approvalStatus : line.approvalStatus,
+            generationStatus: textChanged ? next.generationStatus : line.generationStatus,
+          },
+          form.revision,
+        );
         markSaved(characterId);
       } catch (error) {
         setLocalMessage({

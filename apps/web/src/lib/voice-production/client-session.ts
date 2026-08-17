@@ -60,7 +60,7 @@ export function applyLocalEdit(
   maxCharsPerRequest: number,
 ): BrowserVoiceLine {
   const next = { ...line };
-  if (patch.dialogueText !== undefined) {
+  if (patch.dialogueText !== undefined && patch.dialogueText !== line.dialogueText) {
     const characterCount = Array.from(patch.dialogueText).length;
     if (characterCount <= 0) {
       throw new VoiceProductionError('Dialogue text is empty.', 'EMPTY_DIALOGUE');
