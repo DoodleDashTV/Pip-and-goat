@@ -13,6 +13,7 @@ import {
   publicScriptCharacters,
   type PublicScriptCharacter,
 } from '@/lib/voice-production/script-line';
+import { DURABLE_LEDGER_COPY, type PublicDurableVoiceLedger } from '@/lib/voice-production/durable-voice-ledger-public';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from '@/lib/voice-production/types';
 
 const VOICE_IDENTITY = publicVoiceIdentitySnapshot();
@@ -29,6 +30,7 @@ export type ScriptToVoiceView = {
     remainingCharacters?: number;
     monthlyCharLimit?: number;
   };
+  durableLedger?: PublicDurableVoiceLedger;
 };
 
 type Snapshot = {
@@ -40,6 +42,7 @@ type Snapshot = {
   paidCharactersUsed: number;
   remainingCharacters: number;
   monthlyLimit: number;
+  durableLedger: PublicDurableVoiceLedger;
 };
 
 function snapshotFromView(data?: ScriptToVoiceView): Snapshot {
@@ -52,6 +55,22 @@ function snapshotFromView(data?: ScriptToVoiceView): Snapshot {
     paidCharactersUsed: data?.ledger?.paidCharactersUsed ?? 0,
     remainingCharacters: data?.ledger?.remainingCharacters ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
     monthlyLimit: data?.ledger?.monthlyCharLimit ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+    durableLedger: data?.durableLedger ?? {
+      title: DURABLE_LEDGER_COPY.title,
+      status: 'unavailable',
+      message: DURABLE_LEDGER_COPY.unavailable,
+      available: false,
+      reconciled: false,
+      generateEnabled: false,
+      paidRequests: null,
+      paidCharactersUsed: null,
+      remainingRequests: null,
+      remainingCharacters: null,
+      failedAttempts: null,
+      authoritative: false,
+      providerContacted: false,
+      productionEnabled: false,
+    },
   };
 }
 
@@ -226,11 +245,26 @@ export function ConfirmedScriptToVoice({ initialSnapshot }: { initialSnapshot?: 
         {VOICE_IDENTITY.settings.speakerBoost ? 'on' : 'off'}.
       </p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{snapshot.message}</p>
-      <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
-        Temporary Preview allowance {snapshot.paidRequests} / {SCRIPT_TO_VOICE_MAX_PAID_REQUESTS} paid
-        requests and {snapshot.paidCharactersUsed} / {snapshot.monthlyLimit} paid characters. Remaining{' '}
-        {snapshot.remainingRequests} requests and {snapshot.remainingCharacters} characters.
+      <p className="status-warning inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
+        {DURABLE_LEDGER_COPY.title}
       </p>
+      <p
+        className={`${snapshot.durableLedger.generateEnabled ? 'status-success' : 'status-error'} inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold`}
+      >
+        {snapshot.durableLedger.message}
+      </p>
+      {snapshot.durableLedger.authoritative ? (
+        <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
+          Temporary Preview allowance {snapshot.paidRequests} / {SCRIPT_TO_VOICE_MAX_PAID_REQUESTS} paid
+          requests and {snapshot.paidCharactersUsed} / {snapshot.monthlyLimit} paid characters. Remaining{' '}
+          {snapshot.remainingRequests} requests and {snapshot.remainingCharacters} characters.
+        </p>
+      ) : (
+        <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
+          Authoritative used and remaining totals are hidden until the durable ledger is available and prior
+          usage is reconciled. Zeros from a new deployment are not treated as real usage.
+        </p>
+      )}
 
       <div className="grid gap-3">
         {snapshot.characters.map((character) => {
@@ -327,7 +361,7 @@ export function ConfirmedScriptToVoice({ initialSnapshot }: { initialSnapshot?: 
             <button
               type="button"
               className="btn-primary w-full px-4 text-sm"
-              disabled={running || snapshot.locked}
+              disabled={running || snapshot.locked || !snapshot.durableLedger.generateEnabled}
               onClick={() => void generateOnce()}
             >
               {running ? 'Generating once…' : 'Generate once'}

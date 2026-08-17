@@ -12,6 +12,14 @@ import {
   isExactFixedLine,
 } from './candidates';
 import { convertCandidateSpeech, type CandidateTransport } from './candidate-provider';
+import {
+  assertDurableGenerateReady,
+  maybeImportPriorUsageFromEnv,
+  readDeploymentId,
+  resetDurableVoiceLedgerForTests,
+  resolvePreviewVoiceLedgerStore,
+  speakerFromCharacterId,
+} from './durable-voice-ledger';
 import { assertNoClientVoiceId, resolveVoiceAssignment } from './registry';
 import { estimateUsage, type VoiceEnv } from './safety';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError, type RegisteredCharacterId } from './types';
@@ -40,6 +48,7 @@ let inFlight = false;
 export function resetCandidateRequestState() {
   seenRequestIds.clear();
   inFlight = false;
+  resetDurableVoiceLedgerForTests();
 }
 
 export function createCandidateVoiceService(
@@ -94,6 +103,30 @@ export function createCandidateVoiceService(
         );
       }
 
+      const store = resolvePreviewVoiceLedgerStore(env);
+      await maybeImportPriorUsageFromEnv(store, env);
+      assertDurableGenerateReady(await store.read());
+      const reservation = await store.reserve({
+        requestId: input.requestId,
+        character: speakerFromCharacterId(characterId),
+        characterCount,
+        deploymentId: readDeploymentId(env),
+      });
+      if (reservation.replay) {
+        return {
+          kind: 'ELEVENLABS_APPROVED_SAMPLE',
+          characterId,
+          displayName: assignment.displayName,
+          characterCount,
+          audioContentType: 'audio/mpeg',
+          audioDataUrl: '',
+          label: APPROVED_SAMPLE_AUDIO_LABEL,
+          providerContacted: true,
+          usagePaid: true,
+          persistedAsCanon: false,
+        };
+      }
+
       seenRequestIds.add(input.requestId);
       inFlight = true;
       try {
@@ -102,6 +135,16 @@ export function createCandidateVoiceService(
           env,
           transport,
         );
+        try {
+          await store.finalize({
+            requestId: input.requestId,
+            receiptRef: input.requestId,
+            createdAt: new Date().toISOString(),
+          });
+        } catch (finalizeError) {
+          await store.fail({ requestId: input.requestId, providerContacted: true });
+          throw finalizeError;
+        }
         return {
           kind: 'ELEVENLABS_APPROVED_SAMPLE',
           characterId,
@@ -114,6 +157,9 @@ export function createCandidateVoiceService(
           usagePaid: true,
           persistedAsCanon: false,
         };
+      } catch (error) {
+        await store.fail({ requestId: input.requestId, providerContacted: true }).catch(() => undefined);
+        throw error;
       } finally {
         inFlight = false;
       }

@@ -16,6 +16,7 @@ import {
   type PublicEpisodeVoiceLine,
 } from '@/lib/voice-production/episode-voice-lines';
 import { SAMPLE_GOAT_DIALOGUE, SAMPLE_PIP_DIALOGUE, SAMPLE_VOICE_EPISODE_TITLE } from '@/lib/voice-production/sample-episode';
+import { DURABLE_LEDGER_COPY, type PublicDurableVoiceLedger } from '@/lib/voice-production/durable-voice-ledger-public';
 import {
   SCRIPT_TO_VOICE_LOCKED_MESSAGE,
   SCRIPT_TO_VOICE_MAX_CHARS,
@@ -34,6 +35,24 @@ type Allowance = {
   remainingRequests: number;
   paidCharactersUsed: number;
   remainingCharacters: number;
+  durableLedger: PublicDurableVoiceLedger;
+};
+
+const DEFAULT_DURABLE_LEDGER: PublicDurableVoiceLedger = {
+  title: DURABLE_LEDGER_COPY.title,
+  status: 'unavailable',
+  message: DURABLE_LEDGER_COPY.unavailable,
+  available: false,
+  reconciled: false,
+  generateEnabled: false,
+  paidRequests: null,
+  paidCharactersUsed: null,
+  remainingRequests: null,
+  remainingCharacters: null,
+  failedAttempts: null,
+  authoritative: false,
+  providerContacted: false,
+  productionEnabled: false,
 };
 
 type Review = {
@@ -91,6 +110,7 @@ export function EpisodeVoiceLines({
     remainingRequests: SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
     paidCharactersUsed: 0,
     remainingCharacters: SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+    durableLedger: DEFAULT_DURABLE_LEDGER,
   });
   const [script, setScript] = useState(DEFAULT_SCRIPT);
   const [lines, setLines] = useState<PublicEpisodeVoiceLine[]>([]);
@@ -122,6 +142,7 @@ export function EpisodeVoiceLines({
           remainingRequests: data.ledger?.remainingRequests ?? SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
           paidCharactersUsed: data.ledger?.paidCharactersUsed ?? 0,
           remainingCharacters: data.ledger?.remainingCharacters ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+          durableLedger: data.durableLedger ?? DEFAULT_DURABLE_LEDGER,
         });
       })
       .catch(() => undefined);
@@ -359,10 +380,25 @@ export function EpisodeVoiceLines({
         {EPISODE_VOICE_COPY.paidWarning}
       </p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{allowance.message}</p>
-      <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
-        Remaining Preview allowance {allowance.remainingRequests} / {SCRIPT_TO_VOICE_MAX_PAID_REQUESTS} requests and{' '}
-        {allowance.remainingCharacters} / {SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS} characters.
+      <p className="status-warning inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
+        {DURABLE_LEDGER_COPY.title}
       </p>
+      <p
+        className={`${allowance.durableLedger.generateEnabled ? 'status-success' : 'status-error'} inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold`}
+      >
+        {allowance.durableLedger.message}
+      </p>
+      {allowance.durableLedger.authoritative ? (
+        <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
+          Remaining Preview allowance {allowance.remainingRequests} / {SCRIPT_TO_VOICE_MAX_PAID_REQUESTS} requests and{' '}
+          {allowance.remainingCharacters} / {SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS} characters.
+        </p>
+      ) : (
+        <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
+          Authoritative used and remaining totals are hidden until the durable ledger is available and prior
+          usage is reconciled.
+        </p>
+      )}
       <div className="grid gap-3">
         {CHARACTERS.map((character) => (
           <article key={character.characterId} className="rounded-2xl border border-[var(--color-border)] p-3">
@@ -490,7 +526,7 @@ export function EpisodeVoiceLines({
           <button
             type="button"
             className="btn-primary w-full px-4 text-sm"
-            disabled={running || !confirmed || allowance.locked}
+            disabled={running || !confirmed || allowance.locked || !allowance.durableLedger.generateEnabled}
             onClick={() => void generateOnce()}
           >
             {running ? 'Generating once…' : EPISODE_VOICE_COPY.generateOnce}

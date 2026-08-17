@@ -1,11 +1,18 @@
 import type { VoiceUsageLedger } from './types';
-import { currentUsageMonth, emptyLedger } from './safety';
+import { currentUsageMonth } from './safety';
 import {
   SCRIPT_TO_VOICE_MAX_CHARS,
   SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
   SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
 } from './script-line';
 import { VoiceProductionError } from './types';
+import {
+  durableRecordToUsageLedger,
+  publicDurableLedgerView,
+  resetDurableVoiceLedgerForTests,
+  resolvePreviewVoiceLedgerStore,
+  speakerFromCharacterId,
+} from './durable-voice-ledger';
 
 export type SafeVoiceAttempt = {
   requestId: string;
@@ -16,31 +23,32 @@ export type SafeVoiceAttempt = {
   providerContacted: boolean;
 };
 
-let ledger: VoiceUsageLedger = emptyLedger();
 let attempts: SafeVoiceAttempt[] = [];
 
 export function getPreviewPaidLedger(): VoiceUsageLedger {
-  if (ledger.month !== currentUsageMonth()) {
-    ledger = emptyLedger();
-    attempts = [];
-  }
-  return { ...ledger };
+  return durableRecordToUsageLedger(resolvePreviewVoiceLedgerStore().readSync());
 }
 
 export function resetPreviewPaidLedger(month = currentUsageMonth()): VoiceUsageLedger {
-  ledger = emptyLedger(month);
+  void month;
   attempts = [];
+  resetDurableVoiceLedgerForTests();
   return getPreviewPaidLedger();
 }
 
 export function publicPreviewVoiceAllowance() {
+  const view = publicDurableLedgerView();
   const current = getPreviewPaidLedger();
   return {
-    paidCharactersUsed: current.paidCharactersUsed,
-    paidRequests: current.paidRequests,
-    failedAttempts: attempts.filter((item) => item.outcome === 'failed').length,
-    remainingRequests: Math.max(0, SCRIPT_TO_VOICE_MAX_PAID_REQUESTS - current.paidRequests),
-    remainingCharacters: Math.max(0, SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS - current.paidCharactersUsed),
+    paidCharactersUsed: view.authoritative ? (view.paidCharactersUsed ?? 0) : current.paidCharactersUsed,
+    paidRequests: view.authoritative ? (view.paidRequests ?? 0) : current.paidRequests,
+    failedAttempts: view.failedAttempts ?? 0,
+    remainingRequests: view.authoritative
+      ? (view.remainingRequests ?? 0)
+      : Math.max(0, SCRIPT_TO_VOICE_MAX_PAID_REQUESTS - current.paidRequests),
+    remainingCharacters: view.authoritative
+      ? (view.remainingCharacters ?? 0)
+      : Math.max(0, SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS - current.paidCharactersUsed),
     maxRequests: SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
     maxCharacters: SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
     maxCharsPerLine: SCRIPT_TO_VOICE_MAX_CHARS,
@@ -54,14 +62,17 @@ export function assertPreviewVoiceAllowance(characterCount: number): void {
       'REQUEST_LIMIT',
     );
   }
-  const current = getPreviewPaidLedger();
-  if (current.paidRequests >= SCRIPT_TO_VOICE_MAX_PAID_REQUESTS) {
+  const record = resolvePreviewVoiceLedgerStore().readSync();
+  if (!record.available || !record.reconciled) {
+    return;
+  }
+  if (record.paidRequests >= SCRIPT_TO_VOICE_MAX_PAID_REQUESTS) {
     throw new VoiceProductionError(
       `Temporary Preview allowance of ${SCRIPT_TO_VOICE_MAX_PAID_REQUESTS} successful paid requests is used up.`,
       'PREVIEW_REQUEST_ALLOWANCE',
     );
   }
-  if (current.paidCharactersUsed + characterCount > SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS) {
+  if (record.paidCharactersUsed + characterCount > SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS) {
     throw new VoiceProductionError(
       `Temporary Preview allowance of ${SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS} paid characters would be exceeded.`,
       'PREVIEW_CHARACTER_ALLOWANCE',
@@ -74,15 +85,15 @@ export function recordSuccessfulPaidUsage(input: {
   characterId: string;
   characterCount: number;
 }): VoiceUsageLedger {
-  const current = getPreviewPaidLedger();
-  ledger = {
-    ...current,
-    paidCharactersUsed: current.paidCharactersUsed + input.characterCount,
-    paidRequests: current.paidRequests + 1,
-    hardStopped:
-      current.paidRequests + 1 >= SCRIPT_TO_VOICE_MAX_PAID_REQUESTS ||
-      current.paidCharactersUsed + input.characterCount >= SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
-  };
+  const store = resolvePreviewVoiceLedgerStore();
+  if (!store.seedPaidUsage) {
+    throw new VoiceProductionError('Paid generation paused — durable ledger unavailable', 'DURABLE_LEDGER_UNAVAILABLE');
+  }
+  store.seedPaidUsage({
+    requestId: input.requestId,
+    character: speakerFromCharacterId(input.characterId),
+    characterCount: input.characterCount,
+  });
   attempts.push({
     requestId: input.requestId,
     characterId: input.characterId,
