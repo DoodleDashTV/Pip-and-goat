@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "characterId": "CHAR_PIP_001",
+  "profileName": "Pip Default",
+  "profileVersion": "pip_default_v1",
+  "status": "CANDIDATE_AWAITING_FINAL_APPROVAL",
+  "provider": {
+    "name": "ElevenLabs",
+    "voiceId": "93w5H37WdqeS6HoyL5cV",
+    "modelId": "eleven_multilingual_v2",
+    "apiKeyEnvironmentVariable": "ELEVENLABS_API_KEY"
+  },
+  "commercialGeneration": {
+    "plan": "paid_creator",
+    "generationDate": "2026-08-17",
+    "audioStoredInPublicRepository": false
+  },
+  "referenceMasters": [
+    {
+      "filename": "ElevenLabs_2026-08-17T02_08_19_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "4db87439c1b0ad659435230825281f0f28c095cc89e917e8bc685e724a65bab2"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_09_22_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "0d50889eb8be80250c656c2068d7c06a2ec95fa4effbe562dfee9e5a727f53be"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_10_27_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "eb4b004ebb8db4f69e5818c0317857e09c4922fc49510797c5841a68eb98cb97"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_11_43_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "2834bb9d3cd4e835bed0d92fc9879961c2a6b9d09b4f5ff4498a9db907a2e5ce"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_12_23_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "2739044fed0871a893af1fe7f16e9274e26917eb88c8ee569a93d19c5411a485"
+    }
+  ],
+  "selection": {
+    "legacyDoodleDashRecordedVoiceSelected": false,
+    "reason": "Superseded for TivvleJoy candidate evaluation by the five paid-plan ElevenLabs references."
+  },
+  "safety": {
+    "paidGenerationEnabled": false,
+    "auditionGenerationEnabled": false,
+    "apiKeyCommitted": false
+  }
+}
