@@ -1,10 +1,6 @@
 import { calculatePreviewReadiness } from '../preview-workspace/readiness';
-import {
-  emptyPreviewWorkspace,
-  loadPreviewWorkspace,
-  type PreviewStoreBackend,
-} from '../preview-workspace/store';
-import type { PreviewWorkspace } from '../preview-workspace/types';
+import { emptyPreviewWorkspace, loadPreviewWorkspace } from '../preview-workspace/store';
+import type { PreviewStoreBackend, PreviewWorkspace } from '../preview-workspace/types';
 import {
   PersistenceError,
   PREVIEW_ADAPTER_ID,

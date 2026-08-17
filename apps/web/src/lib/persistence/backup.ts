@@ -2,9 +2,8 @@ import {
   emptyPreviewWorkspace,
   loadPreviewWorkspace,
   savePreviewWorkspace,
-  type PreviewStoreBackend,
 } from '../preview-workspace/store';
-import type { PreviewWorkspace } from '../preview-workspace/types';
+import type { PreviewStoreBackend, PreviewWorkspace } from '../preview-workspace/types';
 import { assertBackupSize, previewBackupSchema, type PreviewBackup } from './schema';
 import { PersistenceError, TIVVLEJOY_BACKUP_KIND, TIVVLEJOY_BACKUP_VERSION } from './types';
 

@@ -1,4 +1,4 @@
-import type { PreviewStoreBackend } from '../preview-workspace/store';
+import type { PreviewStoreBackend } from '../preview-workspace/types';
 import { validatePersistenceEnvironment, type PersistenceEnv } from './env';
 import { createPreviewPersistenceAdapter } from './preview-adapter';
 import { createProductionPersistenceAdapter } from './production-adapter';
