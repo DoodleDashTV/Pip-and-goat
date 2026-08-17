@@ -15,6 +15,7 @@
     "generationDate": "2026-08-17",
     "audioStoredInPublicRepository": false
   },
+  "uniqueReferenceCount": 13,
   "referenceMasters": [
     {
       "filename": "ElevenLabs_2026-08-17T02_08_19_Pip_eleven_multilingual_v2.mp3",
@@ -35,11 +36,49 @@
     {
       "filename": "ElevenLabs_2026-08-17T02_12_23_Pip_eleven_multilingual_v2.mp3",
       "sha256": "2739044fed0871a893af1fe7f16e9274e26917eb88c8ee569a93d19c5411a485"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_28_28_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "5c201a5e803858cba85b5f32219f160820a59dfb6061bb42bcfd0a3bcdba6c32"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_29_24_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "680bb609cb14fbf09fef3a2ee13824f3c388fe1b1c08b2c937761d14e639e958"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_31_12_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "42e2a454471c63f67e98be280f7e7f622a9a339b96ff4c91cc11ded9b411aab0"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_31_51_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "4e589f986f8d7a9bb299463c0f72116672d27bc439f546a448be23c76ddaa6ec"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_32_35_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "7c9a0bb25c4119d3c81acfb2a6066b79827889e93222d2ff91c7b07999594179"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_33_09_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "323611a26337f9e9e8a94d7e7fbc417eeaa47336b62bfc7b31edea0e4bbda986"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_33_52_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "af4833522f7165f9fff992fbf0044df962787c707c404defdfe23c8758d8ac2e"
+    },
+    {
+      "filename": "ElevenLabs_2026-08-17T02_34_48_Pip_eleven_multilingual_v2.mp3",
+      "sha256": "1c579dd8ed39b2a1acc5ead3bfd6dba8e486ce933649d6182ee29b03473cda68"
+    }
+  ],
+  "duplicateUploadsOmitted": [
+    {
+      "filename": "ElevenLabs_2026-08-17T02_12_23_Pip_eleven_multilingual_v2(1).mp3",
+      "matchesSha256": "2739044fed0871a893af1fe7f16e9274e26917eb88c8ee569a93d19c5411a485"
     }
   ],
   "selection": {
     "legacyDoodleDashRecordedVoiceSelected": false,
-    "reason": "Superseded for TivvleJoy candidate evaluation by the five paid-plan ElevenLabs references."
+    "reason": "Superseded for TivvleJoy candidate evaluation by thirteen unique paid-plan ElevenLabs references."
   },
   "safety": {
     "paidGenerationEnabled": false,
