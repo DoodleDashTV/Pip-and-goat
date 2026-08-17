@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { sortVoiceLines } from './form-state';
 import type { VoiceLineRecord, VoiceUsageLedger } from './types';
 import { currentUsageMonth, emptyLedger } from './safety';
 
@@ -31,5 +32,5 @@ export function episodeCharacterCount(store: VoiceProductionStore, episodeId: st
 }
 
 export function linesForEpisode(store: VoiceProductionStore, episodeId: string): VoiceLineRecord[] {
-  return [...store.lines.values()].filter((line) => line.episodeId === episodeId);
+  return sortVoiceLines([...store.lines.values()].filter((line) => line.episodeId === episodeId));
 }

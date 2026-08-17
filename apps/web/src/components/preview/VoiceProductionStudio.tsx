@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewPageIntro } from './PreviewEmptyState';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
@@ -9,19 +9,30 @@ import {
   applyLocalEdit,
   buildLocalPackage,
   playbackOrFixture,
+  persistableLines,
   readVoiceBrowserSession,
   writeVoiceBrowserSession,
   type BrowserVoiceLine,
 } from '@/lib/voice-production/client-session';
+import {
+  actionTarget,
+  applyFormPatch,
+  createFormSnapshot,
+  mergeRemoteLine,
+  replaceLineKeepingOrder,
+  sortVoiceLines,
+  visibleFieldsForAction,
+  type VoiceFormSnapshot,
+} from '@/lib/voice-production/form-state';
 import { evaluateVoiceProgress, FINAL_RENDER_LOCKED_REASON } from '@/lib/voice-production/progress';
 import {
   isSampleVoiceEpisode,
   SAMPLE_VOICE_HREF,
   SAMPLE_VOICE_SCENE_LABEL,
 } from '@/lib/voice-production/sample-episode';
-import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from '@/lib/voice-production/types';
+import { PIP_CHARACTER_ID, type RegisteredCharacterId } from '@/lib/voice-production/types';
 
-type PublicLine = BrowserVoiceLine & { characterId: RegisteredCharacterId };
+type PublicLine = BrowserVoiceLine & { characterId: RegisteredCharacterId; fixtureRevision?: string };
 
 type SafetyInfo = {
   paidGenerationStatus: string;
@@ -58,8 +69,10 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
   } = usePreviewWorkspace();
   const episode = workspace.episodes[0] ?? null;
   const [lines, setLines] = useState<PublicLine[]>([]);
-  const [drafts, setDrafts] = useState<Record<string, PublicLine>>({});
+  const [forms, setForms] = useState<Record<string, VoiceFormSnapshot>>({});
   const [playback, setPlayback] = useState<Record<string, string>>({});
+  const [saveStatus, setSaveStatus] = useState<Record<string, 'saving' | 'saved' | null>>({});
+  const [busyCard, setBusyCard] = useState<string | null>(null);
   const [safety, setSafety] = useState<SafetyInfo>({
     paidGenerationStatus: 'disabled',
     monthlyUsed: 0,
@@ -68,13 +81,61 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
   });
   const [localMessage, setLocalMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
 
-  function remember(nextLines: PublicLine[], nextPlayback: Record<string, string>) {
-    setLines(nextLines);
-    setDrafts(Object.fromEntries(nextLines.map((line) => [line.id, line])));
+  const formsRef = useRef(forms);
+  const linesRef = useRef(lines);
+  const playbackRef = useRef(playback);
+  const requestRef = useRef<Record<string, number>>({});
+  const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const savedTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  formsRef.current = forms;
+  linesRef.current = lines;
+  playbackRef.current = playback;
+
+  function persist(nextLines: PublicLine[], nextPlayback: Record<string, string>) {
+    const ordered = persistableLines(nextLines) as PublicLine[];
+    linesRef.current = ordered;
+    playbackRef.current = nextPlayback;
+    setLines(ordered);
     setPlayback(nextPlayback);
     if (episode) {
-      writeVoiceBrowserSession({ episodeId: episode.id, lines: nextLines, playback: nextPlayback });
+      writeVoiceBrowserSession({ episodeId: episode.id, lines: ordered, playback: nextPlayback });
     }
+  }
+
+  function formFor(line: PublicLine): VoiceFormSnapshot {
+    return (
+      formsRef.current[line.characterId] ??
+      createFormSnapshot({
+        lineId: line.id,
+        characterId: line.characterId,
+        dialogueText: line.dialogueText,
+        performanceDirection: line.performanceDirection,
+        pronunciationNotes: line.pronunciationNotes,
+        emotion: line.emotion,
+      })
+    );
+  }
+
+  function rememberLines(nextLines: PublicLine[], nextPlayback: Record<string, string>) {
+    const ordered = sortVoiceLines(nextLines);
+    setForms((current) => {
+      const next = { ...current };
+      for (const line of ordered) {
+        const existing = current[line.characterId];
+        next[line.characterId] = existing
+          ? { ...existing, lineId: line.id }
+          : createFormSnapshot({
+              lineId: line.id,
+              characterId: line.characterId,
+              dialogueText: line.dialogueText,
+              performanceDirection: line.performanceDirection,
+              pronunciationNotes: line.pronunciationNotes,
+              emotion: line.emotion,
+            });
+      }
+      return next;
+    });
+    persist(ordered, nextPlayback);
   }
 
   useEffect(() => {
@@ -95,15 +156,13 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
     if (!episode || !isSampleVoiceEpisode(episode)) return;
     const persisted = readVoiceBrowserSession(episode.id);
     if (persisted?.lines.length) {
-      setLines(persisted.lines as PublicLine[]);
-      setDrafts(Object.fromEntries(persisted.lines.map((line) => [line.id, line as PublicLine])));
-      setPlayback(persisted.playback ?? {});
+      rememberLines(persisted.lines as PublicLine[], persisted.playback ?? {});
     }
     void postVoice({ action: 'create-sample-scene', episodeId: episode.id })
       .then((data) => {
-        const nextLines = (data.lines ?? []) as PublicLine[];
+        const nextLines = sortVoiceLines((data.lines ?? []) as PublicLine[]);
         const nextPlayback = { ...(persisted?.playback ?? {}), ...(data.playback ?? {}) };
-        remember(nextLines, nextPlayback);
+        rememberLines(nextLines, nextPlayback);
       })
       .catch((error: unknown) => {
         if (persisted?.lines.length) return;
@@ -112,15 +171,110 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
           text: error instanceof Error ? error.message : 'Sample scene could not load.',
         });
       });
-    // remember is local and episode-scoped; avoid retriggering on each render.
+    // episode-scoped bootstrap only
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [episode?.id]);
 
-  const progress = useMemo(() => evaluateVoiceProgress(lines), [lines]);
-  const packageReady = lines.some((line) => line.approvalStatus === 'APPROVED');
+  const orderedLines = useMemo(() => sortVoiceLines(lines), [lines]);
+  const progress = useMemo(() => evaluateVoiceProgress(orderedLines), [orderedLines]);
+  const packageReady = orderedLines.some((line) => line.approvalStatus === 'APPROVED');
 
-  function patchDraft(lineId: string, patch: Partial<PublicLine>) {
-    setDrafts((current) => ({ ...current, [lineId]: { ...current[lineId], ...patch } }));
+  function markSaved(characterId: string) {
+    setSaveStatus((current) => ({ ...current, [characterId]: 'saved' }));
+    if (savedTimers.current[characterId]) clearTimeout(savedTimers.current[characterId]);
+    savedTimers.current[characterId] = setTimeout(() => {
+      setSaveStatus((current) => ({ ...current, [characterId]: null }));
+    }, 1400);
+  }
+
+  function patchForm(line: PublicLine, patch: Partial<VoiceFormSnapshot>) {
+    const current = formFor(line);
+    const next = applyFormPatch(current, patch);
+    formsRef.current = { ...formsRef.current, [line.characterId]: next };
+    setForms(formsRef.current);
+    setSaveStatus((status) => ({ ...status, [line.characterId]: 'saving' }));
+    if (saveTimers.current[line.characterId]) clearTimeout(saveTimers.current[line.characterId]);
+    saveTimers.current[line.characterId] = setTimeout(() => {
+      void flushSave(line.characterId);
+    }, 200);
+  }
+
+  async function flushSave(characterId: string) {
+    if (saveTimers.current[characterId]) {
+      clearTimeout(saveTimers.current[characterId]);
+      delete saveTimers.current[characterId];
+    }
+    const line = linesRef.current.find((item) => item.characterId === characterId);
+    const form = formsRef.current[characterId];
+    if (!line || !form) return form;
+    const fields = visibleFieldsForAction(form);
+    const textChanged = fields.dialogueText !== line.dialogueText;
+    try {
+      const data = await postVoice({
+        action: 'update-line',
+        lineId: line.id,
+        ...fields,
+      });
+      const incoming = data.line as PublicLine;
+      applyIncoming(
+        characterId,
+        {
+          ...incoming,
+          approvalStatus: textChanged ? incoming.approvalStatus : line.approvalStatus,
+          generationStatus: textChanged ? incoming.generationStatus : line.generationStatus,
+        },
+        form.revision,
+      );
+      markSaved(characterId);
+    } catch {
+      try {
+        const next = applyLocalEdit(line, fields, safety.maxCharsPerRequest) as PublicLine;
+        applyIncoming(
+          characterId,
+          {
+            ...next,
+            approvalStatus: textChanged ? next.approvalStatus : line.approvalStatus,
+            generationStatus: textChanged ? next.generationStatus : line.generationStatus,
+          },
+          form.revision,
+        );
+        markSaved(characterId);
+      } catch (error) {
+        setLocalMessage({
+          tone: 'error',
+          text: error instanceof Error ? error.message : 'Edit refused.',
+        });
+      }
+    }
+    return formsRef.current[characterId];
+  }
+
+  function applyIncoming(characterId: string, incoming: PublicLine, localRevision: number) {
+    const form = formsRef.current[characterId];
+    const mergedFields = form
+      ? mergeRemoteLine(form, { ...incoming, revision: incoming.fixtureRevision ? localRevision : -1 })
+      : incoming;
+    const nextLine = {
+      ...incoming,
+      dialogueText: mergedFields.dialogueText,
+      performanceDirection: mergedFields.performanceDirection,
+      pronunciationNotes: mergedFields.pronunciationNotes,
+      emotion: mergedFields.emotion,
+    } as PublicLine;
+    if (form) {
+      const kept = {
+        ...form,
+        lineId: nextLine.id,
+        dialogueText: nextLine.dialogueText,
+        performanceDirection: nextLine.performanceDirection,
+        pronunciationNotes: nextLine.pronunciationNotes,
+        emotion: nextLine.emotion,
+      };
+      formsRef.current = { ...formsRef.current, [characterId]: kept };
+      setForms(formsRef.current);
+    }
+    const nextLines = replaceLineKeepingOrder(linesRef.current, { characterId, id: incoming.id }, nextLine);
+    persist(nextLines as PublicLine[], playbackRef.current);
   }
 
   async function createSample() {
@@ -138,91 +292,73 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
     }
   }
 
-  function replaceLine(previousId: string, next: PublicLine, nextPlayback?: string) {
-    const nextLines = lines.some((item) => item.id === next.id)
-      ? lines.map((item) => (item.id === previousId || item.id === next.id ? next : item))
-      : [...lines.filter((item) => item.id !== previousId), next];
-    const nextMap = { ...playback };
-    if (previousId !== next.id) delete nextMap[previousId];
-    if (nextPlayback) nextMap[next.id] = nextPlayback;
-    remember(nextLines, nextMap);
-  }
-
   async function generateLine(line: PublicLine) {
-    const draft = drafts[line.id] ?? line;
+    const target = actionTarget(line);
+    const seq = (requestRef.current[target.characterId] ?? 0) + 1;
+    requestRef.current[target.characterId] = seq;
+    setBusyCard(target.characterId);
+    const form = (await flushSave(target.characterId)) ?? formFor(line);
+    const fields = visibleFieldsForAction(form);
     try {
-      const sameText = draft.dialogueText === line.dialogueText && Boolean(playback[line.id]);
-      const data = sameText
-        ? await postVoice({ action: 'regenerate', lineId: line.id }).catch(() =>
-            postVoice({
-              action: 'generate-draft-audio',
-              episodeId: line.episodeId,
-              sceneId: line.sceneId,
-              characterId: line.characterId,
-              dialogueText: draft.dialogueText,
-              performanceDirection: draft.performanceDirection,
-              pronunciationNotes: draft.pronunciationNotes,
-              emotion: draft.emotion,
-            }),
-          )
-        : await postVoice({
-            action: 'generate-draft-audio',
-            episodeId: line.episodeId,
-            sceneId: line.sceneId,
-            characterId: line.characterId,
-            dialogueText: draft.dialogueText,
-            performanceDirection: draft.performanceDirection,
-            pronunciationNotes: draft.pronunciationNotes,
-            emotion: draft.emotion,
-          });
-      replaceLine(line.id, data.line, data.playbackDataUrl ?? playbackOrFixture(playback[data.line.id]));
+      const data = await postVoice({
+        action: 'regenerate',
+        lineId: form.lineId || line.id,
+        ...fields,
+      }).catch(() =>
+        postVoice({
+          action: 'generate-draft-audio',
+          episodeId: line.episodeId,
+          sceneId: line.sceneId,
+          characterId: target.characterId,
+          forceNew: true,
+          ...fields,
+        }),
+      );
+      if (requestRef.current[target.characterId] !== seq) return;
+      const incoming = data.line as PublicLine;
+      const nextPlayback = {
+        ...playbackRef.current,
+        [incoming.id]:
+          data.playbackDataUrl ??
+          playbackOrFixture(target.characterId, playbackRef.current[incoming.id], incoming.fixtureRevision),
+      };
+      if (incoming.id !== line.id) delete nextPlayback[line.id];
+      playbackRef.current = nextPlayback;
+      applyIncoming(target.characterId, incoming, form.revision);
+      persist(
+        replaceLineKeepingOrder(linesRef.current, target, {
+          ...incoming,
+          ...fields,
+        } as PublicLine) as PublicLine[],
+        nextPlayback,
+      );
       setLocalMessage({
         tone: 'ok',
-        text: `Preview fixture ready. Provider contacted: ${data.line.providerContacted ? 'true' : 'false'}`,
+        text: `Playback test fixture ready. Provider contacted: ${incoming.providerContacted ? 'true' : 'false'}`,
       });
     } catch (error) {
       setLocalMessage({
         tone: 'error',
         text: error instanceof Error ? error.message : 'Fixture generation refused.',
       });
+    } finally {
+      if (requestRef.current[target.characterId] === seq) setBusyCard(null);
     }
   }
 
-  async function saveEdits(line: PublicLine, patch?: Partial<PublicLine>) {
-    const draft = { ...(drafts[line.id] ?? line), ...patch };
-    try {
-      const data = await postVoice({
-        action: 'update-line',
-        lineId: line.id,
-        dialogueText: draft.dialogueText,
-        performanceDirection: draft.performanceDirection,
-        pronunciationNotes: draft.pronunciationNotes,
-        emotion: draft.emotion,
-      });
-      replaceLine(line.id, data.line, playback[line.id]);
-      setLocalMessage({ tone: 'ok', text: 'Dialogue saved within character limits.' });
-    } catch (error) {
-      try {
-        const next = applyLocalEdit(line, draft, safety.maxCharsPerRequest) as PublicLine;
-        replaceLine(line.id, next, playback[line.id]);
-        setLocalMessage({ tone: 'ok', text: 'Dialogue saved in this browser within character limits.' });
-      } catch (localError) {
-        setLocalMessage({
-          tone: 'error',
-          text: localError instanceof Error ? localError.message : error instanceof Error ? error.message : 'Edit refused.',
-        });
-      }
-    }
-  }
-
-  async function decide(lineId: string, decision: 'APPROVE' | 'REJECT') {
-    const current = lines.find((line) => line.id === lineId);
+  async function decide(line: PublicLine, decision: 'APPROVE' | 'REJECT') {
+    const target = actionTarget(line);
+    await flushSave(target.characterId);
+    const current = linesRef.current.find((item) => item.characterId === target.characterId);
     if (!current) return;
+    setBusyCard(target.characterId);
     try {
-      const data = await postVoice({ action: 'decide', lineId, decision });
-      replaceLine(lineId, data.line, playback[lineId]);
+      const data = await postVoice({ action: 'decide', lineId: current.id, decision });
+      applyIncoming(target.characterId, data.line as PublicLine, formFor(current).revision);
     } catch {
-      replaceLine(lineId, applyLocalDecision(current, decision) as PublicLine, playback[lineId]);
+      applyIncoming(target.characterId, applyLocalDecision(current, decision) as PublicLine, formFor(current).revision);
+    } finally {
+      setBusyCard(null);
     }
     setLocalMessage({
       tone: 'ok',
@@ -232,12 +368,12 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
 
   async function downloadPackage() {
     if (!episode) return;
-    let pack;
+    await Promise.all(orderedLines.map((line) => flushSave(line.characterId)));
+    const pack = buildLocalPackage(episode.id, sortVoiceLines(linesRef.current));
     try {
-      const data = await postVoice({ action: 'package', episodeId: episode.id });
-      pack = data.pack;
+      await postVoice({ action: 'package', episodeId: episode.id });
     } catch {
-      pack = buildLocalPackage(episode.id, lines);
+      // Preview serverless memory may be empty; the downloaded package uses visible lines.
     }
     const blob = new Blob([`${JSON.stringify(pack, null, 2)}\n`], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -254,7 +390,7 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
       <PreviewPageIntro
         kicker="Voice Production"
         title="Pip and Goat draft voices"
-        instruction="Create a sample episode, play fixture audio, edit lines, and approve a test package. Paid ElevenLabs stays disabled."
+        instruction="Create a sample episode, play the playback-test chime, edit lines, and approve a test package. Paid ElevenLabs stays disabled."
       />
       <PreviewBanner
         busy={busy}
@@ -293,7 +429,7 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
           Paid voice generation: Disabled
         </p>
         <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
-          Provider contacted: false. Preview fixtures only.
+          Provider contacted: false. Playback-test fixtures only.
           {publicPreview ? ' This public Preview does not load any voice-provider secret.' : ''}
         </p>
         <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{FINAL_RENDER_LOCKED_REASON}</p>
@@ -328,40 +464,49 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
         </section>
       )}
 
-      {lines.map((line) => {
-        const draft = drafts[line.id] ?? line;
-        const overLimit = Array.from(draft.dialogueText ?? '').length > safety.maxCharsPerRequest;
+      {orderedLines.map((line) => {
+        const form = forms[line.characterId] ?? formFor(line);
+        const overLimit = Array.from(form.dialogueText ?? '').length > safety.maxCharsPerRequest;
+        const cardBusy = busyCard === line.characterId;
+        const status = saveStatus[line.characterId];
+        const audio = playback[line.id];
         return (
-          <section key={line.id} className="studio-card space-y-3 overflow-x-hidden p-4 sm:p-5">
+          <section
+            key={line.characterId}
+            data-character-id={line.characterId}
+            data-line-id={line.id}
+            className="studio-card space-y-3 overflow-x-hidden p-4 sm:p-5"
+          >
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-primary)]">
               {line.characterId === PIP_CHARACTER_ID ? 'Pip' : 'Goat'} · {line.voiceProfileVersion}
             </p>
             <p className="status-warning inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
-              Preview fixture — not the final Pip/Goat voice.
+              Playback test only — not Pip/Goat’s voice.
             </p>
+            {status ? (
+              <p className="text-sm font-bold text-[var(--color-success-foreground)]" aria-live="polite">
+                {status === 'saving' ? 'Saving…' : 'Saved'}
+              </p>
+            ) : null}
             <label className="block text-sm font-semibold">
               Dialogue
               <textarea
                 rows={4}
-                value={draft.dialogueText}
-                onChange={(event) => patchDraft(line.id, { dialogueText: event.target.value })}
-                onBlur={() => void saveEdits(line)}
+                value={form.dialogueText}
+                onChange={(event) => patchForm(line, { dialogueText: event.target.value })}
                 className="field-input mt-2"
               />
             </label>
             <p className="text-sm text-[var(--color-text-muted)]">
-              {Array.from(draft.dialogueText ?? '').length} / {safety.maxCharsPerRequest} characters
+              {Array.from(form.dialogueText ?? '').length} / {safety.maxCharsPerRequest} characters
               {overLimit ? ' — over the per-request limit' : ''}
             </p>
             <label className="block text-sm font-semibold">
               Emotion / delivery
               <select
                 className="field-input mt-2"
-                value={EMOTIONS.includes(draft.emotion) ? draft.emotion : EMOTIONS[0]}
-                onChange={(event) => {
-                  patchDraft(line.id, { emotion: event.target.value });
-                  void saveEdits(line, { emotion: event.target.value });
-                }}
+                value={EMOTIONS.includes(form.emotion) ? form.emotion : EMOTIONS[0]}
+                onChange={(event) => patchForm(line, { emotion: event.target.value })}
               >
                 {EMOTIONS.map((emotion) => (
                   <option key={emotion} value={emotion}>
@@ -374,9 +519,8 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
               Performance direction
               <textarea
                 rows={3}
-                value={draft.performanceDirection}
-                onChange={(event) => patchDraft(line.id, { performanceDirection: event.target.value })}
-                onBlur={() => void saveEdits(line)}
+                value={form.performanceDirection}
+                onChange={(event) => patchForm(line, { performanceDirection: event.target.value })}
                 className="field-input mt-2"
               />
             </label>
@@ -384,16 +528,23 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
               Pronunciation notes
               <textarea
                 rows={2}
-                value={draft.pronunciationNotes}
-                onChange={(event) => patchDraft(line.id, { pronunciationNotes: event.target.value })}
-                onBlur={() => void saveEdits(line)}
+                value={form.pronunciationNotes}
+                onChange={(event) => patchForm(line, { pronunciationNotes: event.target.value })}
                 className="field-input mt-2"
               />
             </label>
-            {playback[line.id] ? (
+            {audio ? (
               <div className="space-y-2">
-                <p className="text-sm font-bold">Play fixture</p>
-                <audio controls src={playback[line.id]} className="w-full max-w-full" />
+                <p className="text-sm font-bold">Play playback-test chime</p>
+                <audio
+                  key={`${line.characterId}-${line.fixtureRevision ?? line.id}`}
+                  controls
+                  src={audio}
+                  className="w-full max-w-full"
+                />
+                <p className="break-words text-xs text-[var(--color-text-muted)]">
+                  Fixture revision {line.fixtureRevision ?? 'v1'}
+                </p>
               </div>
             ) : null}
             <p className="text-sm text-[var(--color-text-muted)]">
@@ -403,22 +554,24 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
               <button
                 type="button"
                 className="btn-primary w-full px-4 text-sm"
-                disabled={overLimit}
+                disabled={overLimit || cardBusy}
                 onClick={() => void generateLine(line)}
               >
-                {playback[line.id] ? 'Regenerate fixture draft' : 'Generate fixture draft'}
+                {audio ? 'Regenerate fixture draft' : 'Generate fixture draft'}
               </button>
               <button
                 type="button"
                 className="inline-flex min-h-touch w-full items-center justify-center rounded-2xl border border-[var(--color-border)] px-4 text-sm font-bold"
-                onClick={() => void decide(line.id, 'APPROVE')}
+                disabled={cardBusy}
+                onClick={() => void decide(line, 'APPROVE')}
               >
                 Approve
               </button>
               <button
                 type="button"
                 className="inline-flex min-h-touch w-full items-center justify-center rounded-2xl border border-[var(--color-border)] px-4 text-sm font-bold"
-                onClick={() => void decide(line.id, 'REJECT')}
+                disabled={cardBusy}
+                onClick={() => void decide(line, 'REJECT')}
               >
                 Reject
               </button>
@@ -431,7 +584,7 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
         <button
           type="button"
           className="btn-primary w-full px-4 text-sm"
-          disabled={!packageReady}
+          disabled={!packageReady || Boolean(busyCard)}
           onClick={() => void downloadPackage()}
         >
           Download approved episode audio package

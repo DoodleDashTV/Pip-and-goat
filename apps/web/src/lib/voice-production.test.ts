@@ -25,6 +25,29 @@ import {
   applyLocalEdit,
   buildLocalPackage,
 } from './voice-production/client-session';
+import {
+  FIXTURE_PLAYBACK_LABEL,
+  PIP_CHIME_HZ,
+  GOAT_CHIME_HZ,
+  buildFixtureWavBase64,
+  decodeWavPcm,
+  fixtureIsAudible,
+  fixtureIsHigherPitched,
+  goertzelPower,
+  maxAbsSample,
+} from './voice-production/fixtures';
+import {
+  actionTarget,
+  applyFormPatch,
+  canApplyRemoteForm,
+  createFormSnapshot,
+  isCanonicalCardOrder,
+  mergeRemoteLine,
+  newestFormValue,
+  replaceLineKeepingOrder,
+  sortVoiceLines,
+  visibleFieldsForAction,
+} from './voice-production/form-state';
 import { evaluateVoiceProgress, FINAL_RENDER_LOCKED_REASON } from './voice-production/progress';
 import {
   SAMPLE_GOAT_DIALOGUE,
@@ -223,7 +246,7 @@ describe('preview fixtures and production lock', () => {
     expect(ui).not.toContain('ELEVENLABS_API_KEY');
     expect(ui).toContain('Generate fixture draft');
     expect(ui).toContain('Create Sample Voice Episode');
-    expect(ui).toContain('Preview fixture — not the final Pip/Goat voice.');
+    expect(ui).toContain('Playback test only — not Pip/Goat’s voice.');
     expect(ui).toContain('Download approved episode audio package');
     expect(envExample).toContain('ALLOW_PAID_VOICE_GENERATION=false');
     expect(envExample).not.toMatch(/ELEVENLABS_API_KEY=\S+/);
@@ -329,7 +352,8 @@ describe('sample voice episode and preview workflow', () => {
     const replay = service.regenerate(regenerated.line.id);
     expect(replay.line.providerContacted).toBe(false);
     expect(replay.line.generationStatus).toBe('FIXTURE_GENERATED');
-    expect(replay.line.id).not.toBe(regenerated.line.id);
+    expect(replay.line.id).toBe(regenerated.line.id);
+    expect(replay.line.fixtureRevision).not.toBe(regenerated.line.fixtureRevision);
   });
 
   it('keeps local approve/package usable when the serverless store is empty', () => {
@@ -395,5 +419,136 @@ describe('sample voice episode and preview workflow', () => {
     expect(FINAL_RENDER_LOCKED_REASON).toMatch(/Final rendering stays locked/);
     expect(isPaidVoiceGenerationAuthorized({})).toBe(false);
     expect(canEnterFinalRendering()).toBe(false);
+  });
+});
+
+describe('voice preview stabilization', () => {
+  it('keeps the newest pronunciation note when regenerate runs immediately after an edit', () => {
+    const service = createVoiceProductionService(createMemoryVoiceStore(), {});
+    const scene = service.createSampleScene('ep-stable');
+    const pip = scene.lines[0];
+    let form = createFormSnapshot({
+      lineId: pip.id,
+      characterId: pip.characterId,
+      dialogueText: pip.dialogueText,
+      performanceDirection: pip.performanceDirection,
+      pronunciationNotes: pip.pronunciationNotes,
+      emotion: pip.emotion,
+    });
+    form = applyFormPatch(form, { pronunciationNotes: 'Pip: hop, short i, keep it bright.' });
+    const payload = visibleFieldsForAction(form);
+    const regenerated = service.regenerate(pip.id, payload);
+    expect(regenerated.line.pronunciationNotes).toBe('Pip: hop, short i, keep it bright.');
+    expect(regenerated.line.id).toBe(pip.id);
+    expect(regenerated.line.characterId).toBe(PIP_CHARACTER_ID);
+    expect(regenerated.line.fixtureRevision).not.toBe(pip.fixtureRevision);
+    expect(regenerated.line.providerContacted).toBe(false);
+  });
+
+  it('resolves rapid consecutive edits to the newest state and ignores stale responses', () => {
+    let form = createFormSnapshot({
+      lineId: 'line-pip',
+      characterId: PIP_CHARACTER_ID,
+      dialogueText: SAMPLE_PIP_DIALOGUE,
+      performanceDirection: 'bright',
+      pronunciationNotes: 'old note',
+      emotion: 'curious wonder',
+    });
+    form = applyFormPatch(form, { pronunciationNotes: 'first' });
+    form = applyFormPatch(form, { pronunciationNotes: 'second' });
+    form = applyFormPatch(form, { emotion: 'careful' });
+    form = applyFormPatch(form, { emotion: 'cheerful' });
+    expect(newestFormValue([
+      { revision: 1, value: 'first' },
+      { revision: 2, value: 'second' },
+      { revision: 4, value: 'cheerful' },
+    ])).toBe('cheerful');
+    expect(form.pronunciationNotes).toBe('second');
+    expect(form.emotion).toBe('cheerful');
+    expect(canApplyRemoteForm(form.revision, form.revision - 1)).toBe(false);
+    const stale = mergeRemoteLine(form, {
+      dialogueText: SAMPLE_PIP_DIALOGUE,
+      performanceDirection: 'bright',
+      pronunciationNotes: 'old note',
+      emotion: 'curious wonder',
+      revision: 1,
+    });
+    expect(stale.pronunciationNotes).toBe('second');
+    expect(stale.emotion).toBe('cheerful');
+  });
+
+  it('keeps Pip first and Goat second through approve, reject, and regenerate', () => {
+    const service = createVoiceProductionService(createMemoryVoiceStore(), {});
+    const scene = service.createSampleScene('ep-order');
+    expect(scene.lines.map((line) => line.characterId)).toEqual([PIP_CHARACTER_ID, GOAT_CHARACTER_ID]);
+    const approved = service.decide(scene.lines[0].id, 'APPROVE');
+    const afterApprove = replaceLineKeepingOrder(scene.lines, actionTarget(scene.lines[0]), approved);
+    expect(afterApprove.map((line) => line.characterId)).toEqual([PIP_CHARACTER_ID, GOAT_CHARACTER_ID]);
+    expect(isCanonicalCardOrder(afterApprove)).toBe(true);
+    const rejected = service.decide(scene.lines[1].id, 'REJECT');
+    const afterReject = replaceLineKeepingOrder(afterApprove, actionTarget(scene.lines[1]), rejected);
+    expect(afterReject.map((line) => line.characterId)).toEqual([PIP_CHARACTER_ID, GOAT_CHARACTER_ID]);
+    expect(afterReject[0].id).toBe(scene.lines[0].id);
+    expect(afterReject[1].id).toBe(scene.lines[1].id);
+    const pack = service.packageApproved('ep-order');
+    expect(pack.readyForLipSync.map((line) => line.characterId)).toEqual([PIP_CHARACTER_ID]);
+    expect(pack.rejectedExcluded).toContain(scene.lines[1].id);
+    expect(pack.providerContacted).toBe(false);
+    const unchanged = service.updateLine(scene.lines[0].id, {
+      dialogueText: scene.lines[0].dialogueText,
+      pronunciationNotes: 'Pip: short i, still approved.',
+    });
+    expect(unchanged.approvalStatus).toBe('APPROVED');
+    const stillPack = service.packageApproved('ep-order');
+    expect(stillPack.readyForLipSync.map((line) => line.characterId)).toEqual([PIP_CHARACTER_ID]);
+    expect(stillPack.rejectedExcluded).toContain(scene.lines[1].id);
+    const replay = service.regenerate(scene.lines[0].id, { pronunciationNotes: 'Pip: short i.' });
+    const afterRegen = replaceLineKeepingOrder(afterReject, { characterId: PIP_CHARACTER_ID }, replay.line);
+    expect(sortVoiceLines(afterRegen).map((line) => line.characterId)).toEqual([
+      PIP_CHARACTER_ID,
+      GOAT_CHARACTER_ID,
+    ]);
+    expect(actionTarget(afterRegen[0])).toEqual({ lineId: scene.lines[0].id, characterId: PIP_CHARACTER_ID });
+    expect(actionTarget(afterRegen[1])).toEqual({ lineId: scene.lines[1].id, characterId: GOAT_CHARACTER_ID });
+  });
+
+  it('uses distinct audible playback-test chimes and never claims they are final voices', () => {
+    const pip = buildFixtureWavBase64(PIP_CHARACTER_ID, 'rev-a');
+    const goat = buildFixtureWavBase64(GOAT_CHARACTER_ID, 'rev-b');
+    const pipAgain = buildFixtureWavBase64(PIP_CHARACTER_ID, 'rev-c');
+    expect(fixtureIsAudible(pip)).toBe(true);
+    expect(fixtureIsAudible(goat)).toBe(true);
+    expect(maxAbsSample(decodeWavPcm(pip).samples)).toBeGreaterThan(2000);
+    expect(maxAbsSample(decodeWavPcm(goat).samples)).toBeGreaterThan(2000);
+    expect(fixtureIsHigherPitched(pip, goat)).toBe(true);
+    const pipDecoded = decodeWavPcm(pip);
+    const goatDecoded = decodeWavPcm(goat);
+    expect(goertzelPower(pipDecoded.samples, pipDecoded.sampleRate, PIP_CHIME_HZ[0])).toBeGreaterThan(
+      goertzelPower(pipDecoded.samples, pipDecoded.sampleRate, GOAT_CHIME_HZ[0]),
+    );
+    expect(goertzelPower(goatDecoded.samples, goatDecoded.sampleRate, GOAT_CHIME_HZ[0])).toBeGreaterThan(
+      goertzelPower(goatDecoded.samples, goatDecoded.sampleRate, PIP_CHIME_HZ[0]),
+    );
+    expect(pip).not.toBe(pipAgain);
+    const service = createVoiceProductionService(createMemoryVoiceStore(), {});
+    const scene = service.createSampleScene('ep-chime');
+    expect(fixtureIsAudible(scene.playback[scene.lines[0].id].replace('data:audio/wav;base64,', ''))).toBe(true);
+    expect(fixtureIsAudible(scene.playback[scene.lines[1].id].replace('data:audio/wav;base64,', ''))).toBe(true);
+    const ui = readRepo('apps/web/src/components/preview/VoiceProductionStudio.tsx');
+    const fixtures = readRepo('apps/web/src/lib/voice-production/fixtures.ts');
+    const guides = readRepo('apps/web/src/lib/voice-production/guides.ts');
+    expect(ui).toContain(FIXTURE_PLAYBACK_LABEL);
+    expect(ui).toContain('Saving…');
+    expect(ui).toContain('Saved');
+    expect(ui).toContain('buildLocalPackage');
+    expect(ui).not.toContain('Preview fixture — not the final Pip/Goat voice.');
+    expect(fixtures).toContain('Playback test only');
+    expect(`${ui}\n${fixtures}\n${guides}\n${readRepo('apps/web/src/lib/voice-production/sample-episode.ts')}`).not.toMatch(
+      /gooaating/i,
+    );
+    expect(GOAT_VOICE_GUIDE.pronunciationNotes).toContain('warm, rounded long-o sound');
+    expect(isPaidVoiceGenerationAuthorized({})).toBe(false);
+    expect(scene.providerContacted).toBe(false);
+    expect(readVoiceSafetySnapshot({}).ledger.paidCharactersUsed).toBe(0);
   });
 });

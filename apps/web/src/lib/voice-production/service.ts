@@ -36,6 +36,8 @@ export type GenerateDraftAudioInput = {
   providerVoiceId?: unknown;
   elevenLabsVoiceId?: unknown;
   model?: string;
+  forceNew?: boolean;
+  fixtureRevision?: string;
 };
 
 function nowIso(): string {
@@ -58,6 +60,7 @@ function publicLine(line: VoiceLineRecord) {
     generationStatus: line.generationStatus,
     approvalStatus: line.approvalStatus,
     audioObjectKey: line.audioObjectKey,
+    fixtureRevision: line.fixtureRevision,
     characterCount: line.characterCount,
     usagePaid: line.usagePaid,
     providerContacted: line.providerContacted,
@@ -114,18 +117,29 @@ export function createVoiceProductionService(
       assertNoClientVoiceId(input);
       const assignment = resolveVoiceAssignment(input.characterId);
       const model = resolveElevenLabsModel(input.model ?? env.ELEVENLABS_MODEL_ID);
+      const fixtureRevision = input.fixtureRevision ?? (input.forceNew ? `${Date.now()}` : 'v1');
       const idempotencyKey = makeIdempotencyKey([
         input.episodeId,
         input.sceneId,
         assignment.characterId,
         assignment.profile,
         input.dialogueText,
+        input.performanceDirection ?? '',
+        input.pronunciationNotes ?? '',
+        input.emotion ?? '',
         model,
+        input.forceNew ? fixtureRevision : 'stable',
       ]);
       const existingId = store.byIdempotency.get(idempotencyKey);
-      if (existingId) {
+      if (existingId && !input.forceNew) {
         const existing = store.lines.get(existingId);
-        if (existing) return { line: publicLine(existing), replayed: true, playbackDataUrl: null };
+        if (existing) {
+          return {
+            line: publicLine(existing),
+            replayed: true,
+            playbackDataUrl: fixturePlaybackDataUrl(existing.characterId, existing.fixtureRevision),
+          };
+        }
       }
 
       const paid = isPaidVoiceGenerationAuthorized(env);
@@ -160,7 +174,8 @@ export function createVoiceProductionService(
         model,
         generationStatus: 'FIXTURE_GENERATED',
         approvalStatus: 'PENDING',
-        audioObjectKey: fixtureObjectKey(assignment.characterId, id),
+        audioObjectKey: fixtureObjectKey(assignment.characterId, id, fixtureRevision),
+        fixtureRevision,
         characterCount,
         usagePaid: false,
         providerContacted: false,
@@ -172,7 +187,11 @@ export function createVoiceProductionService(
       store.byIdempotency.set(idempotencyKey, id);
       store.ledger.fixtureCharactersUsed += characterCount;
       store.ledger.fixtureRequests += 1;
-      return { line: publicLine(line), replayed: false, playbackDataUrl: fixturePlaybackDataUrl() };
+      return {
+        line: publicLine(line),
+        replayed: false,
+        playbackDataUrl: fixturePlaybackDataUrl(assignment.characterId, fixtureRevision),
+      };
     },
 
     decide(lineId: string, decision: 'APPROVE' | 'REJECT') {
@@ -189,19 +208,62 @@ export function createVoiceProductionService(
       return publicLine(line);
     },
 
-    regenerate(lineId: string) {
+    regenerate(
+      lineId: string,
+      overrides: {
+        dialogueText?: string;
+        performanceDirection?: string;
+        pronunciationNotes?: string;
+        emotion?: string;
+      } = {},
+    ) {
       const line = store.lines.get(lineId);
       if (!line) throw new VoiceProductionError('Voice line not found.', 'LINE_NOT_FOUND');
+      if (overrides.dialogueText !== undefined) {
+        const { characterCount } = assertWithinLimits({
+          text: overrides.dialogueText,
+          episodeCharacterCount: episodeCharacterCount(store, line.episodeId) - line.characterCount,
+          ledger: store.ledger,
+          paid: false,
+          env,
+        });
+        line.dialogueText = overrides.dialogueText;
+        line.characterCount = characterCount;
+      }
+      if (overrides.performanceDirection !== undefined) line.performanceDirection = overrides.performanceDirection;
+      if (overrides.pronunciationNotes !== undefined) line.pronunciationNotes = overrides.pronunciationNotes;
+      if (overrides.emotion !== undefined) line.emotion = overrides.emotion;
       store.byIdempotency.delete(line.idempotencyKey);
-      return this.generateDraftAudio({
-        episodeId: line.episodeId,
-        sceneId: line.sceneId,
-        characterId: line.characterId,
-        dialogueText: line.dialogueText,
-        performanceDirection: line.performanceDirection,
-        pronunciationNotes: line.pronunciationNotes,
-        emotion: line.emotion,
-      });
+      const fixtureRevision = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const model = resolveElevenLabsModel(line.model);
+      line.idempotencyKey = makeIdempotencyKey([
+        line.episodeId,
+        line.sceneId,
+        line.characterId,
+        line.voiceProfileVersion,
+        line.dialogueText,
+        line.performanceDirection,
+        line.pronunciationNotes,
+        line.emotion,
+        model,
+        fixtureRevision,
+      ]);
+      line.fixtureRevision = fixtureRevision;
+      line.audioObjectKey = fixtureObjectKey(line.characterId, line.id, fixtureRevision);
+      line.generationStatus = 'FIXTURE_GENERATED';
+      line.approvalStatus = 'PENDING';
+      line.provider = 'fixture';
+      line.usagePaid = false;
+      line.providerContacted = false;
+      line.updatedAt = nowIso();
+      store.byIdempotency.set(line.idempotencyKey, line.id);
+      store.ledger.fixtureRequests += 1;
+      store.ledger.fixtureCharactersUsed += line.characterCount;
+      return {
+        line: publicLine(line),
+        replayed: false,
+        playbackDataUrl: fixturePlaybackDataUrl(line.characterId, fixtureRevision),
+      };
     },
 
     list(episodeId: string) {
@@ -228,7 +290,9 @@ export function createVoiceProductionService(
       if (matched.length === samples.length) {
         return {
           lines: matched,
-          playback: Object.fromEntries(matched.map((line) => [line.id, fixturePlaybackDataUrl()])),
+          playback: Object.fromEntries(
+            matched.map((line) => [line.id, fixturePlaybackDataUrl(line.characterId, line.fixtureRevision)]),
+          ),
           providerContacted: matched.some((line) => line.providerContacted),
           replayed: true,
         };
@@ -247,7 +311,10 @@ export function createVoiceProductionService(
       return {
         lines: created.map((item) => item.line),
         playback: Object.fromEntries(
-          created.map((item) => [item.line.id, item.playbackDataUrl ?? fixturePlaybackDataUrl()]),
+          created.map((item) => [
+            item.line.id,
+            item.playbackDataUrl ?? fixturePlaybackDataUrl(item.line.characterId, item.line.fixtureRevision),
+          ]),
         ),
         providerContacted: created.some((item) => item.line.providerContacted),
         replayed: created.every((item) => item.replayed),
@@ -265,7 +332,7 @@ export function createVoiceProductionService(
     ) {
       const line = store.lines.get(lineId);
       if (!line) throw new VoiceProductionError('Voice line not found.', 'LINE_NOT_FOUND');
-      if (patch.dialogueText !== undefined) {
+      if (patch.dialogueText !== undefined && patch.dialogueText !== line.dialogueText) {
         assertWithinLimits({
           text: patch.dialogueText,
           episodeCharacterCount: episodeCharacterCount(store, line.episodeId) - line.characterCount,

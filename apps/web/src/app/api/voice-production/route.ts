@@ -36,6 +36,8 @@ const GenerateSchema = z.object({
   providerVoiceId: z.unknown().optional(),
   elevenLabsVoiceId: z.unknown().optional(),
   model: z.string().optional(),
+  forceNew: z.boolean().optional(),
+  fixtureRevision: z.string().optional(),
 });
 
 const DecideSchema = z.object({
@@ -47,6 +49,10 @@ const DecideSchema = z.object({
 const RegenerateSchema = z.object({
   action: z.literal('regenerate'),
   lineId: z.string().min(1),
+  dialogueText: z.string().optional(),
+  performanceDirection: z.string().optional(),
+  pronunciationNotes: z.string().optional(),
+  emotion: z.string().optional(),
 });
 
 const PackageSchema = z.object({
@@ -119,7 +125,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ line: service.decide(body.lineId, body.decision), providerContacted: false });
     }
     if (body.action === 'regenerate') {
-      const result = service.regenerate(body.lineId);
+      const result = service.regenerate(body.lineId, body);
       return NextResponse.json({ ...result, providerContacted: result.line.providerContacted });
     }
     if (body.action === 'create-sample-scene') {

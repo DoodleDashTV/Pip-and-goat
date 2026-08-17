@@ -5,7 +5,8 @@ Updated: 2026-08-17
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-voice-preview-flow-73f1`
+- Working branch: `cursor/tivvlejoy-voice-preview-stability-73f1`
+- Voice preview flow (Draft PR #36, keep draft and unmerged): `cursor/tivvlejoy-voice-preview-flow-73f1` @ `35bfce6daf3ace87747ebea39cf0c79647b669cf`
 - Voice generation (Draft PR #35, keep draft and unmerged): `cursor/tivvlejoy-voice-generation-73f1` @ `3d0567df0c02585c5d716973d0038a86f190136c`
 - Preview database connection-ready (Draft PR #34, keep draft and unmerged): `cursor/tivvlejoy-preview-db-ready-73f1` @ `27a4caee84df14f2fe9254755e76ab29e8a2111f`
 - Persistence foundation (Draft PR #33, keep draft and unmerged): `cursor/tivvlejoy-production-persistence-73f1` @ `6e2994a50aef7be16a76c8d00d8b6b05e98119eb`
@@ -21,8 +22,10 @@ Updated: 2026-08-17
 
 ## Current milestone
 
-Voice Production preview usability: Justin can create a sample episode and
-walk the fixture workflow without an API key, database, or paid generation.
+Voice Production preview stabilization: newest form values win, Pip stays
+first, playback-test chimes are audible, and Goat’s pronunciation note is
+corrected. Justin can still create a sample episode and walk the fixture
+workflow without an API key, database, or paid generation.
 Theatrical / Steps 9–16 and Steps 25–32 stay closed. Public Preview stays
 browser-only. Paid ElevenLabs stays disabled. No Preview or production
 database is connected.
@@ -55,6 +58,12 @@ database is connected.
 - Visible progress Draft → Review → Approved → Package Ready
 - Browser-durable approve/reject/package so Preview serverless memory can recycle
 - Draft PR #35 stays draft and unmerged
+- Draft PR #36 stays draft and unmerged
+- Newest visible form values flush before generate, regenerate, approve, reject, and download
+- Stale responses cannot overwrite newer pronunciation, dialogue, emotion, or direction
+- Pip card stays first and Goat stays second
+- Playback-test chimes replace silent fixture WAVs and are labeled Playback test only — not Pip/Goat’s voice
+- Goat pronunciation note no longer uses gooaating
 
 ## Tests / validation
 
@@ -73,7 +82,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, or #35.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, or #36.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.
