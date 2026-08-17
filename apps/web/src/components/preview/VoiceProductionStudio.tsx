@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CandidateVoiceTest } from './CandidateVoiceTest';
 import { ConfirmedScriptToVoice, type ScriptToVoiceView } from './ConfirmedScriptToVoice';
+import { EpisodeVoiceLines } from './EpisodeVoiceLines';
 import {
   SCRIPT_TO_VOICE_PREVIEW_LOCKED_LABEL,
   SCRIPT_TO_VOICE_PREVIEW_READY_LABEL,
@@ -479,6 +480,14 @@ export function VoiceProductionStudio({
       </section>
 
       <ConfirmedScriptToVoice initialSnapshot={scriptToVoice} />
+
+      <EpisodeVoiceLines
+        episodeId={episode?.id ?? 'episode-preview'}
+        episodeTitle={episode?.title ?? 'Sample Voice Episode'}
+        sceneId="scene-1"
+        initialLocked={scriptToVoice?.locked ?? true}
+        initialMessage={scriptToVoice?.message}
+      />
 
       <CandidateVoiceTest initialLiveTest={liveTest} />
 

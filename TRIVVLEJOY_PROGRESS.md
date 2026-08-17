@@ -5,8 +5,8 @@ Updated: 2026-08-17
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-preview-voice-test-73f1`
-- Preview voice test (Draft PR #40, keep draft and unmerged): `cursor/tivvlejoy-preview-voice-test-73f1`
+- Working branch: `cursor/tivvlejoy-episode-line-voice-workflow-73f1`
+- Preview voice test (Draft PR #40, keep draft and unmerged): `cursor/tivvlejoy-preview-voice-test-73f1` @ `1d117582b1dd2a299731483266ba77133d0211f7`
 - Confirmed script-to-voice (Draft PR #39, keep draft and unmerged): `cursor/tivvlejoy-script-to-voice-73f1` @ `d59c51a8daf7fd7b7f136df96d892cdcb52060a2`
 - Voice approval lock (keep unmerged): `cursor/tivvlejoy-voice-approval-lock-73f1` @ `109ac281319f2dc8f44e52b67cd5139b76626b08`
 - Voice candidate preview (Draft PR #38, keep draft and unmerged): `cursor/tivvlejoy-voice-candidate-preview-73f1` @ `109ac281319f2dc8f44e52b67cd5139b76626b08`
@@ -94,6 +94,9 @@ database is connected.
 - Draft PR #39 stays draft and unmerged
 - Draft PR #40 stays draft and unmerged
 - Preview voice-production first paint uses the server readiness snapshot so the visible page matches the unlocked Preview gates
+- Justin approved newly generated Preview dialogue for both Pip and Goat on August 17, 2026
+- That approval locks the existing Pip and Goat voice identities only. It does not approve the complete episode workflow or Production
+- Preview episode scripts split into individual Pip and Goat lines that each require review, confirmation, and Generate this line once
 
 ## Tests / validation
 

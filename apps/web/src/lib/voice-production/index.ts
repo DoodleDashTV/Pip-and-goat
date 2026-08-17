@@ -31,3 +31,10 @@ export {
   publicScriptCharacters,
   isSingleDialogueLine,
 } from './script-line';
+export {
+  EPISODE_VOICE_COPY,
+  EPISODE_LINE_BRAND_MESSAGE,
+  parseEpisodeScript,
+  publicEpisodeCharacters,
+  confirmationKey,
+} from './episode-voice-lines';
