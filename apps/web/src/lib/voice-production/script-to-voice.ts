@@ -43,6 +43,9 @@ export type ScriptToVoiceInput = {
   voiceId?: unknown;
   providerVoiceId?: unknown;
   elevenLabsVoiceId?: unknown;
+  lines?: unknown;
+  script?: unknown;
+  queue?: unknown;
 };
 
 export type ScriptToVoiceContext = {
@@ -108,8 +111,7 @@ function assertRegisteredCharacter(characterId: string): RegisteredCharacterId {
 }
 
 function assertNoBatchPayload(input: ScriptToVoiceInput) {
-  const extra = input as ScriptToVoiceInput & { lines?: unknown; script?: unknown; queue?: unknown };
-  if (Array.isArray(extra.lines) || Array.isArray(extra.script) || Array.isArray(extra.queue)) {
+  if (Array.isArray(input.lines) || Array.isArray(input.script) || Array.isArray(input.queue)) {
     throw new VoiceProductionError(
       'Only one confirmed dialogue line is accepted. Whole scripts, batches, and multi-line text are refused.',
       'SINGLE_LINE_REQUIRED',
