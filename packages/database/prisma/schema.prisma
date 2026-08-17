@@ -2540,3 +2540,34 @@ model TivvleJoyVoiceUsageLedger {
   @@unique([month])
   @@map("tivvlejoy_voice_usage_ledger")
 }
+
+model TivvleJoyPreviewVoiceLedgerState {
+  id                     String   @id
+  month                  String
+  paidRequests           Int      @default(0) @map("paid_requests")
+  paidCharactersUsed     Int      @default(0) @map("paid_characters_used")
+  failedAttempts         Int      @default(0) @map("failed_attempts")
+  reservedRequests       Int      @default(0) @map("reserved_requests")
+  reservedCharacters     Int      @default(0) @map("reserved_characters")
+  unfinalizedCount       Int      @default(0) @map("unfinalized_count")
+  reconciled             Boolean  @default(false)
+  reconciliationStatus   String   @map("reconciliation_status")
+  reconciliationEvidence String?  @map("reconciliation_evidence")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@map("tivvlejoy_preview_voice_ledger_state")
+}
+
+model TivvleJoyPreviewVoiceLedgerEntry {
+  idempotencyKey String   @id @map("idempotency_key")
+  requestId      String   @unique @map("request_id")
+  character      String
+  characterCount Int      @map("character_count")
+  status         String
+  receiptRef     String?  @map("receipt_ref")
+  deploymentId   String   @map("deployment_id")
+  createdAt      DateTime @map("created_at")
+  updatedAt      DateTime @map("updated_at")
+
+  @@map("tivvlejoy_preview_voice_ledger_entries")
+}

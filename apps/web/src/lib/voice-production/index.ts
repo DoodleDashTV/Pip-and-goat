@@ -38,3 +38,4 @@ export {
   publicEpisodeCharacters,
   confirmationKey,
 } from './episode-voice-lines';
+export { DURABLE_LEDGER_COPY } from './durable-voice-ledger-public';

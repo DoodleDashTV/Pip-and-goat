@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { defaultCandidateTransport } from '@/lib/voice-production/candidate-provider';
 import { sanitizeVoiceErrorMessage } from '@/lib/voice-production/candidate-gates';
+import '@/lib/voice-production/durable-voice-ledger-postgres';
 import { createEpisodeLineVoiceService } from '@/lib/voice-production/episode-line-voice';
 import { SCRIPT_TO_VOICE_MAX_CHARS } from '@/lib/voice-production/script-line';
 import { VoiceProductionError } from '@/lib/voice-production/types';

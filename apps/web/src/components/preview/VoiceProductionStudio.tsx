@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CandidateVoiceTest } from './CandidateVoiceTest';
 import { ConfirmedScriptToVoice, type ScriptToVoiceView } from './ConfirmedScriptToVoice';
 import { EpisodeVoiceLines } from './EpisodeVoiceLines';
+import { DURABLE_LEDGER_COPY } from '@/lib/voice-production/durable-voice-ledger-public';
 import {
   SCRIPT_TO_VOICE_PREVIEW_LOCKED_LABEL,
   SCRIPT_TO_VOICE_PREVIEW_READY_LABEL,
@@ -462,6 +463,14 @@ export function VoiceProductionStudio({
           {scriptToVoice && !scriptToVoice.locked
             ? SCRIPT_TO_VOICE_PREVIEW_READY_LABEL
             : SCRIPT_TO_VOICE_PREVIEW_LOCKED_LABEL}
+        </p>
+        <p className="status-warning inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
+          {DURABLE_LEDGER_COPY.title}
+        </p>
+        <p
+          className={`${scriptToVoice?.durableLedger?.generateEnabled ? 'status-success' : 'status-error'} inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold`}
+        >
+          {scriptToVoice?.durableLedger?.message ?? DURABLE_LEDGER_COPY.unavailable}
         </p>
         <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
           Provider contacted: false. Episode draft-audio stays unauthorized. Preview one-line generation

@@ -4,6 +4,7 @@ import {
   publicApprovedVoiceSettings,
   VOICE_IDENTITY_CHECKPOINT,
 } from './approved-voice-settings';
+import { publicDurableLedgerView } from './durable-voice-ledger';
 import { publicPreviewVoiceAllowance } from './preview-paid-ledger';
 import { assertNoClientVoiceId } from './registry';
 import { type VoiceEnv } from './safety';
@@ -138,6 +139,7 @@ export function publicEpisodeLineSnapshot(env: VoiceEnv = process.env) {
     },
     productionEnabled: false,
     providerContacted: false,
+    durableLedger: publicDurableLedgerView(env),
   };
 }
 

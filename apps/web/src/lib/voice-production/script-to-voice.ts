@@ -13,11 +13,19 @@ import {
 } from './candidate-gates';
 import { convertCandidateSpeech, type CandidateTransport } from './candidate-provider';
 import {
+  assertDurableGenerateReady,
+  maybeImportPriorUsageFromEnv,
+  publicDurableLedgerView,
+  readDeploymentId,
+  resetDurableVoiceLedgerForTests,
+  resolvePreviewVoiceLedgerStore,
+  speakerFromCharacterId,
+} from './durable-voice-ledger';
+import {
   assertPreviewVoiceAllowance,
   previewMonthlyCharLimit,
   publicPreviewVoiceAllowance,
   recordFailedVoiceAttempt,
-  recordSuccessfulPaidUsage,
   resetPreviewPaidLedger,
 } from './preview-paid-ledger';
 import { assertNoClientVoiceId, resolveVoiceAssignment } from './registry';
@@ -112,6 +120,7 @@ export type ScriptToVoiceReceipt = {
     remainingCharacters: number;
     failedAttempts: number;
   };
+  durableLedger: ReturnType<typeof publicDurableLedgerView>;
 };
 
 const successCache = new Map<string, ScriptToVoiceReceipt>();
@@ -125,6 +134,7 @@ export function resetScriptToVoiceState() {
   inFlightIds.clear();
   sessionInFlight = false;
   resetPreviewPaidLedger();
+  resetDurableVoiceLedgerForTests();
 }
 
 function assertRegisteredCharacter(characterId: string): RegisteredCharacterId {
@@ -222,6 +232,7 @@ export function publicScriptToVoiceSnapshot(env: VoiceEnv = process.env) {
       remainingCharacters: allowance.remainingCharacters,
       failedAttempts: allowance.failedAttempts,
     },
+    durableLedger: publicDurableLedgerView(env),
     productionEnabled: false,
     providerContacted: false,
   };
@@ -278,19 +289,76 @@ export function createScriptToVoiceService(env: VoiceEnv = process.env, transpor
         );
       }
 
+      const store = resolvePreviewVoiceLedgerStore(env);
+      await maybeImportPriorUsageFromEnv(store, env);
+      assertDurableGenerateReady(await store.read());
+
       sessionInFlight = true;
       inFlightIds.add(requestId);
+      let reserved = false;
+      let providerReached = false;
       try {
+        const reservation = await store.reserve({
+          requestId,
+          character: speakerFromCharacterId(preview.characterId),
+          characterCount: preview.characterCount,
+          deploymentId: readDeploymentId(env),
+        });
+        reserved = true;
+        if (reservation.replay) {
+          const replayed = successCache.get(requestId);
+          if (replayed) return replayed;
+          const allowance = publicPreviewVoiceAllowance();
+          return {
+            kind: 'ELEVENLABS_CONFIRMED_LINE',
+            characterId: preview.characterId,
+            displayName: preview.displayName,
+            text: preview.text,
+            characterCount: preview.characterCount,
+            model: APPROVED_ELEVENLABS_MODEL,
+            outputFormat: APPROVED_OUTPUT_FORMAT,
+            settings: publicApprovedVoiceSettings(),
+            requestId,
+            audioContentType: 'audio/mpeg',
+            audioDataUrl: '',
+            label: SCRIPT_TO_VOICE_AUDIO_LABEL,
+            checkpoint: VOICE_IDENTITY_CHECKPOINT,
+            providerContacted: true,
+            usagePaid: true,
+            persistedAsCanon: false,
+            productionEnabled: false,
+            createdAt: reservation.replay.createdAt,
+            paidCharactersCharged: reservation.replay.characterCount,
+            ledger: {
+              paidCharactersUsed: allowance.paidCharactersUsed,
+              paidRequests: allowance.paidRequests,
+              monthlyCharLimit: previewMonthlyCharLimit(),
+              remainingRequests: allowance.remainingRequests,
+              remainingCharacters: allowance.remainingCharacters,
+              failedAttempts: allowance.failedAttempts,
+            },
+            durableLedger: publicDurableLedgerView(env, await store.read()),
+          };
+        }
+
         const converted = await convertCandidateSpeech(
           { characterId: preview.characterId, text: preview.text },
           env,
           transport,
         );
-        const ledger = recordSuccessfulPaidUsage({
-          requestId,
-          characterId: preview.characterId,
-          characterCount: preview.characterCount,
-        });
+        providerReached = true;
+        let finalized;
+        try {
+          finalized = await store.finalize({
+            requestId,
+            receiptRef: requestId,
+            createdAt: new Date().toISOString(),
+          });
+        } catch (finalizeError) {
+          reserved = false;
+          await store.fail({ requestId, providerContacted: true });
+          throw finalizeError;
+        }
         const allowance = publicPreviewVoiceAllowance();
         const receipt: ScriptToVoiceReceipt = {
           kind: 'ELEVENLABS_CONFIRMED_LINE',
@@ -310,27 +378,33 @@ export function createScriptToVoiceService(env: VoiceEnv = process.env, transpor
           usagePaid: true,
           persistedAsCanon: false,
           productionEnabled: false,
-          createdAt: new Date().toISOString(),
+          createdAt: finalized.receipt.createdAt,
           paidCharactersCharged: preview.characterCount,
           ledger: {
-            paidCharactersUsed: ledger.paidCharactersUsed,
-            paidRequests: ledger.paidRequests,
+            paidCharactersUsed: finalized.record.paidCharactersUsed,
+            paidRequests: finalized.record.paidRequests,
             monthlyCharLimit: previewMonthlyCharLimit(),
-            remainingRequests: allowance.remainingRequests,
-            remainingCharacters: allowance.remainingCharacters,
-            failedAttempts: allowance.failedAttempts,
+            remainingRequests: Math.max(0, SCRIPT_TO_VOICE_MAX_PAID_REQUESTS - finalized.record.paidRequests),
+            remainingCharacters: Math.max(0, SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS - finalized.record.paidCharactersUsed),
+            failedAttempts: finalized.record.failedAttempts,
           },
+          durableLedger: publicDurableLedgerView(env, finalized.record),
         };
+        void allowance;
         successCache.set(requestId, receipt);
         return receipt;
       } catch (error) {
         failedIds.add(requestId);
         const code = error instanceof VoiceProductionError ? error.code : 'PROVIDER_UNSUPPORTED';
+        const providerContacted = providerReached || (code.startsWith('PROVIDER_') && code !== 'PROVIDER_TRANSPORT_UNAVAILABLE');
+        if (reserved && code !== 'DUPLICATE_REQUEST') {
+          await store.fail({ requestId, providerContacted }).catch(() => undefined);
+        }
         recordFailedVoiceAttempt({
           requestId,
           characterId: preview.characterId,
           code,
-          providerContacted: code.startsWith('PROVIDER_') && code !== 'PROVIDER_TRANSPORT_UNAVAILABLE',
+          providerContacted,
         });
         if (error instanceof VoiceProductionError) {
           throw new VoiceProductionError(sanitizeVoiceErrorMessage(error.message), error.code);

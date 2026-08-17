@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { defaultCandidateTransport } from '@/lib/voice-production/candidate-provider';
+import '@/lib/voice-production/durable-voice-ledger-postgres';
 import { createCandidateVoiceService } from '@/lib/voice-production/candidate-service';
 import { sanitizeVoiceErrorMessage } from '@/lib/voice-production/candidate-gates';
 import { REQUIRED_VOICE_TEST_MAX_CHARACTERS } from '@/lib/voice-production/candidates';
