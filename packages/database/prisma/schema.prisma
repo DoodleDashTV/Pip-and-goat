@@ -2373,6 +2373,7 @@ model TivvleJoyProduction {
   voices          TivvleJoyVoiceProfile[]
   readiness       TivvleJoyReadinessResult[]
   renderRequests  TivvleJoyRenderRequest[]
+  voiceLines      TivvleJoyVoiceLine[]
 
   @@index([workspaceId, createdAt])
   @@map("tivvlejoy_productions")
@@ -2495,4 +2496,47 @@ model TivvleJoyAuditEvent {
 
   @@index([workspaceId, createdAt])
   @@map("tivvlejoy_audit_events")
+}
+
+model TivvleJoyVoiceLine {
+  id                    String   @id
+  productionId          String?  @map("production_id") @db.Uuid
+  episodeId             String   @map("episode_id")
+  sceneId               String   @map("scene_id")
+  characterId           String   @map("character_id")
+  voiceProfileVersion   String   @map("voice_profile_version")
+  dialogueText          String   @map("dialogue_text")
+  performanceDirection  String   @default("") @map("performance_direction")
+  pronunciationNotes    String   @default("") @map("pronunciation_notes")
+  emotion               String   @default("")
+  provider              String
+  model                 String
+  generationStatus      String   @map("generation_status")
+  approvalStatus        String   @map("approval_status")
+  audioObjectKey        String?  @map("audio_object_key")
+  characterCount        Int      @map("character_count")
+  usagePaid             Boolean  @default(false) @map("usage_paid")
+  providerContacted     Boolean  @default(false) @map("provider_contacted")
+  idempotencyKey        String   @unique @map("idempotency_key")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  production TivvleJoyProduction? @relation(fields: [productionId], references: [id], onDelete: SetNull)
+
+  @@index([episodeId, createdAt])
+  @@map("tivvlejoy_voice_lines")
+}
+
+model TivvleJoyVoiceUsageLedger {
+  id                    String   @id
+  month                 String
+  paidCharactersUsed    Int      @default(0) @map("paid_characters_used")
+  fixtureCharactersUsed Int      @default(0) @map("fixture_characters_used")
+  paidRequests          Int      @default(0) @map("paid_requests")
+  fixtureRequests       Int      @default(0) @map("fixture_requests")
+  hardStopped           Boolean  @default(false) @map("hard_stopped")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@unique([month])
+  @@map("tivvlejoy_voice_usage_ledger")
 }

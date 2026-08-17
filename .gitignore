@@ -48,6 +48,9 @@ artifacts/local-acceptance-1080p/*.mp4
 # a second, and their measurements are recorded in mix/assembly.json.
 artifacts/steps-1-8-validation/mix/*.wav
 artifacts/steps-1-8-validation/render/
+artifacts/tivvlejoy-voice-generation/**/*.wav
+artifacts/tivvlejoy-voice-generation/**/*.mp3
+artifacts/tivvlejoy-voice-generation/**/*.m4a
 
 # Blender rewrites these backups on every save; they are pure churn in a diff.
 *.blend1
