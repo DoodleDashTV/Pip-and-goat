@@ -79,6 +79,7 @@ database is connected.
 - Pip may temporarily use “Let’s explore!” until Justin approves a new catchphrase
 - Final voice-identity approval lock for Pip and Goat
 - Approved ElevenLabs model and sample voice settings are recorded server-side
+- Checkpoint TIVVLEJOY_VOICE_IDENTITY_LOCK_V1 records the approved sample model and settings
 - Pip and Goat cannot share or swap Voice IDs
 - Automatic episode script-to-voice generation is not started
 
