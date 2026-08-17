@@ -38,5 +38,5 @@ export function assertApprovedModel(model: string): void {
 }
 
 export function lockedVoiceIdsAreDistinct(): boolean {
-  return PIP_LOCKED_VOICE_ID !== GOAT_LOCKED_VOICE_ID;
+  return String(PIP_LOCKED_VOICE_ID) !== String(GOAT_LOCKED_VOICE_ID);
 }
