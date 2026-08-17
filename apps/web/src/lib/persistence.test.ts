@@ -20,18 +20,27 @@ import {
   TIVVLEJOY_BACKUP_KIND,
   TIVVLEJOY_BACKUP_MAX_BYTES,
   TIVVLEJOY_PERSISTENCE_RELATIONSHIPS,
+  TIVVLEJOY_RECORD_SCHEMA_VERSION,
   assertBackupSize,
   assertPreviewAdapterPreservesKey,
   assertProductionActionsBlocked,
+  assertRecordId,
+  assertSchemaVersion,
+  assertWorkspaceOwnership,
+  createMemoryPreviewDatabaseStore,
+  createPreviewDatabaseAdapter,
   createPreviewPersistenceAdapter,
   createProductionPersistenceAdapter,
   exportPreviewBackup,
   importPreviewBackup,
   parsePreviewBackup,
+  previewDatabaseHeadline,
   readSafePersistenceSnapshot,
   resolvePersistenceAdapter,
+  sanitizeAuditDetail,
   serializePreviewBackup,
   validatePersistenceEnvironment,
+  wrapDatabaseError,
 } from './persistence';
 
 const repoRoot = path.resolve(__dirname, '../../../..');
@@ -59,6 +68,7 @@ describe('persistence adapters', () => {
     const snapshot = adapter.readSnapshot();
     expect(adapter.id).toBe('preview-localStorage');
     expect(adapter.durable).toBe(false);
+    expect(adapter.connected).toBe(true);
     expect(snapshot.settings?.projectName).toBe('Persist QA Studio');
     expect(snapshot.productions).toHaveLength(1);
     expect(snapshot.episodes[0]?.title).toBe('Map Walk');
@@ -87,6 +97,7 @@ describe('persistence adapters', () => {
     const adapter = createProductionPersistenceAdapter();
     expect(adapter.id).toBe('production-database');
     expect(adapter.durable).toBe(false);
+    expect(adapter.connected).toBe(false);
     expect(adapter.readSnapshot().episodes).toEqual([]);
     assertProductionActionsBlocked(adapter);
     expect(() =>
@@ -131,14 +142,23 @@ describe('environment separation and secret leakage', () => {
     expect(validation.safe.dataDurability).toBe('browser-only-non-durable');
     expect(validation.safe.productionDatabase).toBe('configured_not_connected');
     expect(validation.safe.durableStorage).toBe('configured_not_connected');
+    expect(validation.selectedPersistenceMode).toBe('production-database');
+    expect(validation.safe.lastSuccessfulSave).toBeNull();
+    expect(validation.safe.previewDatabase).toBe('not_connected');
     expect(validation.checks.every((check) => !('value' in check))).toBe(true);
   });
 
   it('keeps public Preview available when production configuration is absent', () => {
     const safe = readSafePersistenceSnapshot({});
     expect(safe.mode).toBe('preview');
+    expect(safe.selectedPersistenceMode).toBe('preview-localStorage');
+    expect(safe.activePersistenceMode).toBe('preview-localStorage');
     expect(safe.previewWorkspace).toBe('available');
+    expect(safe.browserStorage).toBe('available');
+    expect(safe.previewDatabase).toBe('not_connected');
     expect(safe.productionDatabase).toBe('not_connected');
+    expect(safe.backupAvailable).toBe(true);
+    expect(safe.lastSuccessfulSave).toBe('browser-only');
     expect(safe.durableStorage).toBe('not_configured');
     expect(safe.providerMode).toBe('preview');
     expect(safe.productionActions).toBe('blocked');
@@ -146,9 +166,10 @@ describe('environment separation and secret leakage', () => {
 
   it('does not import Prisma or paid SDKs from the persistence boundary', () => {
     const production = readRepo('apps/web/src/lib/persistence/production-adapter.ts');
+    const previewDatabase = readRepo('apps/web/src/lib/persistence/preview-database-adapter.ts');
     const env = readRepo('apps/web/src/lib/persistence/env.ts');
     const index = readRepo('apps/web/src/lib/persistence/index.ts');
-    for (const source of [production, env, index]) {
+    for (const source of [production, previewDatabase, env, index]) {
       expect(source).not.toContain('@prisma/client');
       expect(source).not.toContain('@doodle-dash/database');
       expect(source).not.toContain('elevenlabs');
@@ -237,5 +258,220 @@ describe('schema relationships and closed production actions', () => {
     expect(readRepo('apps/web/src/components/preview/PreviewBackupControls.tsx')).toContain(
       'Import Preview Backup',
     );
+    expect(readRepo('apps/web/src/components/preview/ConnectionReadinessPanel.tsx')).toContain(
+      'Preview database: Not connected',
+    );
+    expect(previewDatabaseHeadline()).toBe('Preview database: Not connected');
+  });
+});
+
+describe('explicit persistence modes', () => {
+  it('selects preview-localStorage, preview-database, or production-database explicitly', () => {
+    expect(validatePersistenceEnvironment({}).selectedPersistenceMode).toBe('preview-localStorage');
+    expect(
+      validatePersistenceEnvironment({ TIVVLEJOY_PERSISTENCE_MODE: 'preview-database' }).selectedPersistenceMode,
+    ).toBe('preview-database');
+    expect(
+      validatePersistenceEnvironment({ TIVVLEJOY_PERSISTENCE_MODE: 'production-database' })
+        .selectedPersistenceMode,
+    ).toBe('production-database');
+  });
+
+  it('keeps the browser Preview workspace when preview-database configuration is missing', () => {
+    const validation = validatePersistenceEnvironment({
+      TIVVLEJOY_PERSISTENCE_MODE: 'preview-database',
+    });
+    expect(validation.previewDatabaseConnectAuthorized).toBe(false);
+    expect(validation.activePersistenceMode).toBe('preview-localStorage');
+    expect(validation.safe.previewDatabase).toBe('not_connected');
+    expect(validation.safe.lastSuccessfulSave).toBe('browser-only');
+    expect(resolvePersistenceAdapter(memoryBackend(), { TIVVLEJOY_PERSISTENCE_MODE: 'preview-database' }).id).toBe(
+      'preview-database',
+    );
+    expect(
+      resolvePersistenceAdapter(memoryBackend(), { TIVVLEJOY_PERSISTENCE_MODE: 'preview-database' }).connected,
+    ).toBe(false);
+  });
+
+  it('never authorizes a live preview-database connection even when the connect flag is set', () => {
+    const validation = validatePersistenceEnvironment({
+      TIVVLEJOY_PERSISTENCE_MODE: 'preview-database',
+      TIVVLEJOY_PREVIEW_DATABASE_CONNECT: '1',
+    });
+    expect(validation.previewDatabaseConnectAuthorized).toBe(false);
+    expect(validation.safe.previewDatabase).toBe('configured_not_connected');
+    expect(validation.activePersistenceMode).toBe('preview-localStorage');
+  });
+});
+
+describe('preview-database adapter and validation', () => {
+  const settings = {
+    id: 'preview-workspace',
+    projectName: 'Preview DB QA',
+    format: '1080x1920' as const,
+    fps: 30 as const,
+    paidResourcesAuthorized: false as const,
+    theatricalBindingCompleted: false as const,
+  };
+  const production = {
+    id: 'preview-production',
+    workspaceId: 'preview-workspace',
+    name: 'Preview DB QA',
+    status: 'PREVIEW' as const,
+    durable: false,
+  };
+  const episode = {
+    id: 'prv_ep_mapwalk1',
+    productionId: 'preview-production',
+    title: 'Map Walk',
+    episodeNumber: 1,
+    durationSec: 30 as const,
+    premise: 'Adapter coverage.',
+    classification: 'PREVIEW_NONCANONICAL' as const,
+    currentStage: 'BRIEF',
+    completedStages: [],
+  };
+
+  it('refuses writes when the Preview database is not connected and does not fall back to localStorage', () => {
+    const backend = memoryBackend();
+    const adapter = createPreviewDatabaseAdapter();
+    expect(adapter.id).toBe('preview-database');
+    expect(adapter.connected).toBe(false);
+    expect(() => adapter.saveSettings(settings)).toThrowError(/not connected/i);
+    expect(() => adapter.saveProduction(production)).toThrowError(/PREVIEW_DATABASE_NOT_CONNECTED|not connected/i);
+    try {
+      adapter.saveEpisode(episode);
+      throw new Error('expected preview-database write to fail');
+    } catch (error) {
+      expect(error).toMatchObject({ code: 'PREVIEW_DATABASE_NOT_CONNECTED' });
+    }
+    expect(loadPreviewWorkspace(backend).settingsSaved).toBe(false);
+    expect(loadPreviewWorkspace(backend).episodes).toEqual([]);
+  });
+
+  it('writes workspace records through the in-process test store only', () => {
+    const store = createMemoryPreviewDatabaseStore();
+    const adapter = createPreviewDatabaseAdapter(store);
+    expect(adapter.connected).toBe(true);
+    expect(adapter.saveSettings(settings).durable).toBe(false);
+    expect(adapter.saveProduction(production).workspaceId).toBe('preview-workspace');
+    expect(adapter.saveEpisode(episode).classification).toBe('PREVIEW_NONCANONICAL');
+    expect(
+      adapter.saveAsset({
+        id: 'prv_asset_standin1',
+        productionId: 'preview-production',
+        name: 'Stand-in',
+        type: 'ENVIRONMENT',
+        version: 'v1',
+        status: 'REGISTERED_METADATA_ONLY',
+        classification: 'PREVIEW_NONCANONICAL',
+        canonical: false,
+        objectKey: null,
+        notes: '',
+      }).objectKey,
+    ).toBeNull();
+    expect(
+      adapter.saveVoice({
+        id: 'prv_voice_a1',
+        productionId: 'preview-production',
+        characterLabel: 'A',
+        displayName: 'Warm preview',
+        notes: '',
+        providerVoiceId: null,
+        auditionAvailable: false,
+        consent: {
+          recordedLikeness: false,
+          voiceCloningAuthorized: false,
+          recordedAt: null,
+          notes: '',
+        },
+      }).consent.voiceCloningAuthorized,
+    ).toBe(false);
+    expect(
+      adapter.saveWorkflow({
+        episodeId: 'prv_ep_mapwalk1',
+        currentStage: 'BRIEF',
+        completedStages: [],
+        blockedReason: null,
+      }).episodeId,
+    ).toBe('prv_ep_mapwalk1');
+    expect(
+      adapter.saveReadiness({
+        productionId: 'preview-production',
+        productionReady: false,
+        itemCount: 4,
+        evaluatedAt: '2026-08-17T00:00:00.000Z',
+      }).productionReady,
+    ).toBe(false);
+    expect(
+      adapter.saveRenderRequest({
+        id: 'prv_render_draft1',
+        productionId: 'preview-production',
+        episodeId: 'prv_ep_mapwalk1',
+        label: 'Draft request — not rendered',
+        status: 'NOT_RENDERED',
+        contactedProvider: false,
+        outputFile: null,
+        progress: null,
+      }).contactedProvider,
+    ).toBe(false);
+    const audit = adapter.writeAudit({
+      workspaceId: 'preview-workspace',
+      action: 'save',
+      entityType: 'episode',
+      entityId: 'prv_ep_mapwalk1',
+      detail: {
+        note: 'ok',
+        apiKey: 'sk-secretvalue',
+        database_url: 'postgresql://preview:supersecret@db.internal/tivvlejoy',
+        url: 'postgresql://preview:supersecret@db.internal/tivvlejoy',
+      },
+    });
+    expect(audit.detail.note).toBe('ok');
+    expect(audit.detail.apiKey).toBeUndefined();
+    expect(audit.detail.database_url).toBeUndefined();
+    expect(audit.detail.url).toBe('[REDACTED]');
+    expect(JSON.stringify(audit)).not.toContain('supersecret');
+  });
+
+  it('enforces ownership, record IDs, schema version, and idempotent writes', () => {
+    const store = createMemoryPreviewDatabaseStore();
+    const adapter = createPreviewDatabaseAdapter(store);
+    adapter.saveSettings(settings);
+    adapter.saveProduction(production);
+    expect(() => assertRecordId('not a valid id')).toThrowError(/Malformed/);
+    expect(() => adapter.saveEpisode({ ...episode, id: 'bad id' })).toThrowError(/Malformed/);
+    expect(() =>
+      adapter.saveProduction({ ...production, workspaceId: 'prv_ws_other1' }),
+    ).toThrowError(/ownership/i);
+    expect(() =>
+      adapter.saveEpisode({ ...episode, productionId: 'prv_prod_other1' }),
+    ).toThrowError(/ownership/i);
+    expect(() => assertSchemaVersion(99)).toThrowError(/schema version/i);
+    expect(() => assertSchemaVersion(TIVVLEJOY_RECORD_SCHEMA_VERSION)).not.toThrow();
+    expect(() =>
+      assertWorkspaceOwnership({ workspaceId: 'preview-workspace', recordWorkspaceId: 'other' }),
+    ).toThrowError(/ownership/i);
+    const first = adapter.saveEpisode(episode);
+    const second = adapter.saveEpisode(episode);
+    expect(second).toBe(first);
+    expect(() => adapter.saveEpisode({ ...episode, title: 'Changed' })).toThrowError(/Duplicate/);
+  });
+
+  it('redacts secrets from audit details and database errors', () => {
+    const clean = sanitizeAuditDetail({
+      password: 'hunter2',
+      token: 'abc',
+      note: 'safe',
+      href: 'https://user:hunter2@example.com/path',
+    });
+    expect(clean.password).toBeUndefined();
+    expect(clean.token).toBeUndefined();
+    expect(clean.note).toBe('safe');
+    expect(clean.href).toBe('[REDACTED]');
+    const wrapped = wrapDatabaseError(new Error('connect postgresql://preview:supersecret@db.internal/tivvlejoy'));
+    expect(wrapped.code).toBe('DATABASE_ERROR');
+    expect(wrapped.message).not.toContain('supersecret');
+    expect(wrapped.message).toContain('[REDACTED]');
   });
 });

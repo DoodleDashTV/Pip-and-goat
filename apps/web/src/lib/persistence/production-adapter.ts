@@ -30,30 +30,54 @@ const emptySnapshot = (): PersistenceSnapshot => ({
  * Production database adapter boundary.
  *
  * This adapter never opens Prisma, never reads DATABASE_URL values, never
- * contacts object storage, and never spends. It exists so the studio can
- * later attach a real store without changing Preview localStorage.
+ * contacts object storage, and never spends. Failed production writes are
+ * not rewritten to localStorage.
  */
 export function createProductionPersistenceAdapter(): StudioPersistenceAdapter {
   return {
     id: PRODUCTION_ADAPTER_ID,
     durable: false,
+    connected: false,
     assertWritable: blocked,
     readSnapshot() {
       return emptySnapshot();
     },
+    saveSettings: blocked,
+    saveProduction: blocked,
+    saveEpisode: blocked,
+    saveAsset: blocked,
+    saveVoice: blocked,
+    saveWorkflow: blocked,
+    saveReadiness: blocked,
+    saveRenderRequest: blocked,
     writeAudit: blocked,
   };
 }
 
 export function assertProductionActionsBlocked(adapter: StudioPersistenceAdapter): void {
   expectBlocked(() => adapter.assertWritable());
-  expectBlocked(() => adapter.writeAudit({
-    workspaceId: 'x',
-    action: 'connect',
-    entityType: 'database',
-    entityId: null,
-    detail: {},
-  }));
+  expectBlocked(() =>
+    adapter.writeAudit({
+      workspaceId: 'x',
+      action: 'connect',
+      entityType: 'database',
+      entityId: null,
+      detail: {},
+    }),
+  );
+  expectBlocked(() =>
+    adapter.saveEpisode({
+      id: 'prv_ep_blocked',
+      productionId: 'preview-production',
+      title: 'Blocked',
+      episodeNumber: 1,
+      durationSec: 30,
+      premise: 'Must fail closed.',
+      classification: 'PREVIEW_NONCANONICAL',
+      currentStage: 'BRIEF',
+      completedStages: [],
+    }),
+  );
 }
 
 function expectBlocked(fn: () => void): void {

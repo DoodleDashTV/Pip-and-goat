@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { FOUNDATION_STAGE_LABEL } from '@/lib/preview-workspace/types';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
 import { evaluatePreviewGuide, previewStepLabel } from '@/lib/preview-workspace/progress';
+import type { SafePersistenceSnapshot } from '@/lib/persistence/types';
+import { ConnectionReadinessPanel } from './ConnectionReadinessPanel';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 
 const STATUS_CLASS: Record<string, string> = {
@@ -13,7 +15,7 @@ const STATUS_CLASS: Record<string, string> = {
   blocked: 'status-error',
 };
 
-export function PreviewDashboard() {
+export function PreviewDashboard({ snapshot }: { snapshot: SafePersistenceSnapshot }) {
   const { workspace, hydrated, busy, message, reset, exportBackup, importBackup } =
     usePreviewWorkspace();
   const steps = evaluatePreviewGuide(workspace);
@@ -41,6 +43,12 @@ export function PreviewDashboard() {
           </div>
           <div className="rounded-2xl border border-[var(--color-error)] bg-[var(--color-error-soft)] px-3 py-3">
             <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-error-foreground)]">
+              Preview database
+            </dt>
+            <dd className="mt-1 text-sm font-bold text-[var(--color-error-foreground)]">Not connected</dd>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-error)] bg-[var(--color-error-soft)] px-3 py-3">
+            <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-error-foreground)]">
               Production database
             </dt>
             <dd className="mt-1 text-sm font-bold text-[var(--color-error-foreground)]">Not connected</dd>
@@ -64,6 +72,7 @@ export function PreviewDashboard() {
           </Link>
         ) : null}
       </section>
+      <ConnectionReadinessPanel snapshot={snapshot} />
       <PreviewBanner
         busy={busy}
         onReset={() => reset()}

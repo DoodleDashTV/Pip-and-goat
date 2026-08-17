@@ -1,4 +1,8 @@
 import {
+  PREVIEW_ADAPTER_ID,
+  PREVIEW_DATABASE_ADAPTER_ID,
+  PRODUCTION_ADAPTER_ID,
+  type PersistenceAdapterId,
   type ProviderMode,
   type SafePersistenceSnapshot,
   type StudioRuntimeMode,
@@ -30,7 +34,10 @@ export type EnvironmentValidation = {
   mode: StudioRuntimeMode;
   providerMode: ProviderMode;
   preview: boolean;
+  previewDatabaseConnectAuthorized: false;
   productionConnectAuthorized: false;
+  selectedPersistenceMode: PersistenceAdapterId;
+  activePersistenceMode: PersistenceAdapterId;
   checks: EnvironmentCheck[];
   safe: SafePersistenceSnapshot;
 };
@@ -67,6 +74,21 @@ function resolveProviderMode(env: PersistenceEnv): ProviderMode {
   return read(env, 'DATABASE_URL') ? 'local' : 'preview';
 }
 
+export function resolveSelectedPersistenceMode(env: PersistenceEnv): PersistenceAdapterId {
+  const raw = read(env, 'TIVVLEJOY_PERSISTENCE_MODE');
+  if (raw === PREVIEW_ADAPTER_ID || raw === PREVIEW_DATABASE_ADAPTER_ID || raw === PRODUCTION_ADAPTER_ID) {
+    return raw;
+  }
+  return read(env, 'DATABASE_URL') ? PRODUCTION_ADAPTER_ID : PREVIEW_ADAPTER_ID;
+}
+
+export function isPreviewDatabaseExplicitlyConfigured(env: PersistenceEnv): boolean {
+  return (
+    resolveSelectedPersistenceMode(env) === PREVIEW_DATABASE_ADAPTER_ID &&
+    read(env, 'TIVVLEJOY_PREVIEW_DATABASE_CONNECT') === '1'
+  );
+}
+
 export function validatePersistenceEnvironment(
   env: PersistenceEnv = process.env,
 ): EnvironmentValidation {
@@ -89,9 +111,12 @@ export function validatePersistenceEnvironment(
   const preview = !database.present;
   const storageConfigured =
     bucket.configured && endpoint.configured && region.configured && accessKey.configured && secretKey.configured;
+  const selectedPersistenceMode = resolveSelectedPersistenceMode(env);
+  const previewDatabaseExplicit = isPreviewDatabaseExplicitlyConfigured(env);
 
-  // Never authorize a live production connection in this increment.
+  // Never authorize a live Preview or production database connection in this increment.
   const productionConnectAuthorized = false as const;
+  const previewDatabaseConnectAuthorized = false as const;
   void connectFlag;
 
   const mode: StudioRuntimeMode = preview
@@ -100,11 +125,22 @@ export function validatePersistenceEnvironment(
       ? 'production-ready'
       : 'production-incomplete';
 
+  const activePersistenceMode: PersistenceAdapterId =
+    selectedPersistenceMode === PRODUCTION_ADAPTER_ID ? PRODUCTION_ADAPTER_ID : PREVIEW_ADAPTER_ID;
+
   const safe: SafePersistenceSnapshot = {
     mode: preview ? 'preview' : mode === 'production-ready' ? 'production-incomplete' : mode,
+    selectedPersistenceMode,
+    activePersistenceMode,
     previewWorkspace: 'available',
-    productionDatabase: database.present ? 'configured_not_connected' : 'not_connected',
+    browserStorage: 'available',
+    previewDatabase: previewDatabaseExplicit ? 'configured_not_connected' : 'not_connected',
+    productionDatabase: database.present || selectedPersistenceMode === PRODUCTION_ADAPTER_ID
+      ? 'configured_not_connected'
+      : 'not_connected',
     durableStorage: storageConfigured ? 'configured_not_connected' : 'not_configured',
+    backupAvailable: true,
+    lastSuccessfulSave: selectedPersistenceMode === PRODUCTION_ADAPTER_ID ? null : 'browser-only',
     providerMode: preview ? 'preview' : providerMode === 'production' ? 'local' : providerMode,
     dataDurability: 'browser-only-non-durable',
     productionActions: 'blocked',
@@ -114,7 +150,10 @@ export function validatePersistenceEnvironment(
     mode: safe.mode,
     providerMode: safe.providerMode,
     preview,
+    previewDatabaseConnectAuthorized,
     productionConnectAuthorized,
+    selectedPersistenceMode,
+    activePersistenceMode,
     checks: [database, bucket, endpoint, region, accessKey, secretKey],
     safe,
   };

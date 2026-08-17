@@ -1,11 +1,16 @@
 export const PREVIEW_ADAPTER_ID = 'preview-localStorage' as const;
+export const PREVIEW_DATABASE_ADAPTER_ID = 'preview-database' as const;
 export const PRODUCTION_ADAPTER_ID = 'production-database' as const;
+export const TIVVLEJOY_RECORD_SCHEMA_VERSION = 1;
 
 export const TIVVLEJOY_BACKUP_KIND = 'TIVVLEJOY_PREVIEW_BACKUP' as const;
 export const TIVVLEJOY_BACKUP_VERSION = 1;
 export const TIVVLEJOY_BACKUP_MAX_BYTES = 256 * 1024;
 
-export type PersistenceAdapterId = typeof PREVIEW_ADAPTER_ID | typeof PRODUCTION_ADAPTER_ID;
+export type PersistenceAdapterId =
+  | typeof PREVIEW_ADAPTER_ID
+  | typeof PREVIEW_DATABASE_ADAPTER_ID
+  | typeof PRODUCTION_ADAPTER_ID;
 export type StudioRuntimeMode = 'preview' | 'production-incomplete' | 'production-ready';
 export type ProviderMode = 'preview' | 'local' | 'production';
 
@@ -121,9 +126,15 @@ export type PersistenceSnapshot = {
 
 export type SafePersistenceSnapshot = {
   mode: StudioRuntimeMode;
+  selectedPersistenceMode: PersistenceAdapterId;
+  activePersistenceMode: PersistenceAdapterId;
   previewWorkspace: 'available' | 'unavailable';
+  browserStorage: 'available';
+  previewDatabase: 'not_connected' | 'configured_not_connected';
   productionDatabase: 'not_connected' | 'configured_not_connected';
   durableStorage: 'not_configured' | 'configured_not_connected';
+  backupAvailable: true;
+  lastSuccessfulSave: 'browser-only' | null;
   providerMode: ProviderMode;
   dataDurability: 'browser-only-non-durable' | 'production-blocked';
   productionActions: 'blocked';
@@ -142,7 +153,16 @@ export class PersistenceError extends Error {
 export type StudioPersistenceAdapter = {
   readonly id: PersistenceAdapterId;
   readonly durable: boolean;
+  readonly connected: boolean;
   assertWritable(): void;
   readSnapshot(): PersistenceSnapshot;
+  saveSettings(input: Omit<WorkspaceSettingsRecord, 'durable'>): WorkspaceSettingsRecord;
+  saveProduction(input: ProductionRecord): ProductionRecord;
+  saveEpisode(input: EpisodeRecord): EpisodeRecord;
+  saveAsset(input: AssetRecord): AssetRecord;
+  saveVoice(input: VoiceProfileRecord): VoiceProfileRecord;
+  saveWorkflow(input: WorkflowStatusRecord): WorkflowStatusRecord;
+  saveReadiness(input: ReadinessResultRecord): ReadinessResultRecord;
+  saveRenderRequest(input: RenderRequestRecord): RenderRequestRecord;
   writeAudit(event: Omit<AuditEventRecord, 'id' | 'createdAt'>): AuditEventRecord;
 };

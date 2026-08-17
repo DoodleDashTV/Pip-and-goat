@@ -306,6 +306,15 @@ describe('Preview navigation and primary workflow wiring', () => {
     expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).toContain(
       'Stored only in this browser and non-durable',
     );
+    expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).toContain(
+      'Preview database',
+    );
+    expect(readRepo('apps/web/src/components/preview/ConnectionReadinessPanel.tsx')).toContain(
+      'Preview database: Not connected',
+    );
+    expect(readRepo('apps/web/src/components/preview/PreviewBanner.tsx')).toContain(
+      'Preview database: Not connected',
+    );
     expect(readRepo('apps/web/src/components/preview/PreviewDashboard.tsx')).not.toContain(
       'Open Preview Production Setup',
     );
