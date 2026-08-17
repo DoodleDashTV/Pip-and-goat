@@ -93,6 +93,7 @@ database is connected.
 - Failed provider requests are recorded without secrets and are not billed
 - Draft PR #39 stays draft and unmerged
 - Draft PR #40 stays draft and unmerged
+- Draft PR #41 stays draft and unmerged
 - Preview voice-production first paint uses the server readiness snapshot so the visible page matches the unlocked Preview gates
 - Justin approved newly generated Preview dialogue for both Pip and Goat on August 17, 2026
 - That approval locks the existing Pip and Goat voice identities only. It does not approve the complete episode workflow or Production
@@ -115,7 +116,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, or later stacked voice drafts.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, or later stacked voice drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.
