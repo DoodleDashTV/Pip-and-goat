@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import {
-  APPROVED_SAMPLE_AUDIO_LABEL,
   FIXED_APPROVED_LINES,
   LIVE_TEST_LOCKED_MESSAGE,
   REQUIRED_VOICE_TEST_MAX_CHARACTERS,
@@ -134,7 +133,7 @@ export function CandidateVoiceTest() {
           {clips[sample.characterId] ? (
             <div className="space-y-2">
               <p className="status-warning inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
-                {APPROVED_SAMPLE_AUDIO_LABEL}
+                Approved voice sample — Preview test only.
               </p>
               <audio controls src={clips[sample.characterId]} className="w-full max-w-full" />
             </div>
@@ -145,7 +144,9 @@ export function CandidateVoiceTest() {
             disabled={running || liveTest.locked}
             onClick={() => startConfirm(sample)}
           >
-            {sample.actionLabel}
+            {sample.characterId === PIP_CHARACTER_ID
+              ? 'Generate approved Pip sample'
+              : 'Generate approved Goat sample'}
           </button>
         </article>
       ))}
