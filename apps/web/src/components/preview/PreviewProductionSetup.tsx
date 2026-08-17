@@ -6,7 +6,8 @@ import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
 
 export function PreviewProductionSetup() {
-  const { workspace, message, busy, saveSettings, reset } = usePreviewWorkspace();
+  const { workspace, message, busy, saveSettings, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
 
   return (
     <div className="space-y-5 overflow-x-hidden">
@@ -15,7 +16,12 @@ export function PreviewProductionSetup() {
         title="Start your Preview studio"
         instruction="Type a project name and save it. Format and paid-resource policy stay locked. This does not connect a production database."
       />
-      <PreviewBanner busy={busy} onReset={() => reset()} />
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
       <PreviewMessage message={message} />
       {!workspace.settingsSaved ? (
         <PreviewEmptyState

@@ -1,0 +1,58 @@
+export const TIVVLEJOY_PERSISTENCE_RELATIONSHIPS = [
+  {
+    from: 'tivvlejoy_workspaces',
+    to: 'tivvlejoy_productions',
+    type: 'one-to-many',
+    on: 'workspace_id',
+    note: 'A workspace owns one or more productions. Preview maps to a single non-durable production.',
+  },
+  {
+    from: 'tivvlejoy_productions',
+    to: 'tivvlejoy_episodes',
+    type: 'one-to-many',
+    on: 'production_id',
+    note: 'Episodes belong to a production and never bind canonical Pip or Goat.',
+  },
+  {
+    from: 'tivvlejoy_productions',
+    to: 'tivvlejoy_assets',
+    type: 'one-to-many',
+    on: 'production_id',
+    note: 'Assets are metadata rows. object_key stays null until durable storage is authorized.',
+  },
+  {
+    from: 'tivvlejoy_productions',
+    to: 'tivvlejoy_voice_profiles',
+    type: 'one-to-many',
+    on: 'production_id',
+    note: 'Voice profiles store consent metadata only. provider_voice_id stays null.',
+  },
+  {
+    from: 'tivvlejoy_episodes',
+    to: 'tivvlejoy_workflow_statuses',
+    type: 'one-to-one',
+    on: 'episode_id',
+    note: 'Workflow status tracks draft stages and stops at OUTPUT_GATE.',
+  },
+  {
+    from: 'tivvlejoy_productions',
+    to: 'tivvlejoy_readiness_results',
+    type: 'one-to-many',
+    on: 'production_id',
+    note: 'Readiness snapshots. production_ready stays false while gates are closed.',
+  },
+  {
+    from: 'tivvlejoy_productions',
+    to: 'tivvlejoy_render_requests',
+    type: 'one-to-many',
+    on: 'production_id',
+    note: 'Render requests are draft records. contacted_provider stays false.',
+  },
+  {
+    from: 'tivvlejoy_workspaces',
+    to: 'tivvlejoy_audit_events',
+    type: 'one-to-many',
+    on: 'workspace_id',
+    note: 'Audit events store action names only. Secret values are refused.',
+  },
+] as const;

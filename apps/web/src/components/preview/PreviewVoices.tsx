@@ -5,7 +5,8 @@ import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewVoices() {
-  const { workspace, message, busy, saveVoice, reset } = usePreviewWorkspace();
+  const { workspace, message, busy, saveVoice, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
   const hasEpisode = workspace.episodes.length > 0;
 
   return (
@@ -15,7 +16,12 @@ export function PreviewVoices() {
         title="Add a Preview voice note"
         instruction="Save a character label and a display name. This is not a provider voice ID. Audition generation stays disabled."
       />
-      <PreviewBanner busy={busy} onReset={() => reset()} />
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
       <PreviewMessage message={message} />
       {!hasEpisode ? (
         <PreviewEmptyState

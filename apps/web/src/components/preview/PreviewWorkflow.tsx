@@ -9,7 +9,8 @@ import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
 
 export function PreviewWorkflow() {
   const params = useSearchParams();
-  const { workspace, message, busy, advanceEpisode, reset } = usePreviewWorkspace();
+  const { workspace, message, busy, advanceEpisode, reset, exportBackup, importBackup } =
+    usePreviewWorkspace();
   const requested = params.get('episode');
   const episode =
     workspace.episodes.find((item) => item.id === requested) ?? workspace.episodes[0] ?? null;
@@ -22,7 +23,12 @@ export function PreviewWorkflow() {
         title="Walk the draft stages"
         instruction="Advance one draft stage at a time. Final render, theatrical, and publishing stay closed. This is not a production render."
       />
-      <PreviewBanner busy={busy} onReset={() => reset()} />
+      <PreviewBanner
+        busy={busy}
+        onReset={() => reset()}
+        onExport={() => exportBackup()}
+        onImport={(text, byteLength, confirm) => importBackup(text, byteLength, confirm)}
+      />
       <PreviewMessage message={message} />
       <section className="studio-card grid gap-3 p-4 text-sm sm:grid-cols-2 sm:p-5">
         <p>Stage: {FOUNDATION_STAGE_LABEL}</p>

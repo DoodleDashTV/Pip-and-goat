@@ -6,6 +6,8 @@
  * studio shell and label database-backed controls "Not available yet."
  *
  * This does not change stage values or theatrical-gate decisions.
+ * Persistence environment checks live in `lib/persistence/env.ts` and never
+ * return secret values.
  */
 export function isPublicWebsitePreview(env?: Partial<Record<string, string | undefined>>): boolean {
   const databaseUrl = env ? env.DATABASE_URL : process.env.DATABASE_URL;
