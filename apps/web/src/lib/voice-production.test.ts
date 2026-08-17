@@ -59,7 +59,7 @@ import {
   sampleDialogueIsOriginal,
   sampleSceneLines,
 } from './voice-production/sample-episode';
-import { CANDIDATE_AUDIO_LABEL, FIXED_CANDIDATE_LINES } from './voice-production/candidates';
+import { APPROVED_SAMPLE_AUDIO_LABEL, FIXED_APPROVED_LINES } from './voice-production/candidates';
 import { isProductionVoiceRuntime, publicLiveTestSnapshot, serverGatesOpen } from './voice-production/candidate-gates';
 import { ELEVENLABS_TTS_ENDPOINT } from './voice-production/candidate-provider';
 import { createCandidateVoiceService, resetCandidateRequestState } from './voice-production/candidate-service';
@@ -557,27 +557,20 @@ describe('voice preview stabilization', () => {
   });
 });
 
-describe('controlled ElevenLabs candidate preview', () => {
+describe('controlled ElevenLabs approved-voice preview', () => {
   const openEnv = {
     ALLOW_PAID_VOICE_GENERATION: 'true',
     TIVVLEJOY_VOICE_AUTHORIZE_PAID: 'true',
     ELEVENLABS_API_KEY: 'test-key-not-real',
     TIVVLEJOY_VOICE_TEST_TOKEN: 'preview-token',
     TIVVLEJOY_VOICE_TEST_MAX_CHARACTERS: '600',
-    TIVVLEJOY_VOICE_CANDIDATE_PIP_1: 'cand_pip_stock_a',
-    TIVVLEJOY_VOICE_CANDIDATE_PIP_2: 'cand_pip_stock_b',
-    TIVVLEJOY_VOICE_CANDIDATE_PIP_3: 'cand_pip_stock_c',
-    TIVVLEJOY_VOICE_CANDIDATE_GOAT_1: 'cand_goat_stock_a',
-    TIVVLEJOY_VOICE_CANDIDATE_GOAT_2: 'cand_goat_stock_b',
-    TIVVLEJOY_VOICE_CANDIDATE_GOAT_3: 'cand_goat_stock_c',
     VERCEL_ENV: 'preview',
     ELEVENLABS_MODEL_ID: 'eleven_multilingual_v2',
   };
 
   const pipInput = {
     characterId: PIP_CHARACTER_ID,
-    candidateSlot: 'pip-1',
-    text: FIXED_CANDIDATE_LINES[PIP_CHARACTER_ID],
+    text: FIXED_APPROVED_LINES[PIP_CHARACTER_ID],
     requestId: 'req_pip_one',
     testToken: 'preview-token',
     confirmed: true as const,
@@ -599,6 +592,12 @@ describe('controlled ElevenLabs candidate preview', () => {
     expect(serverGatesOpen({})).toBe(false);
     expect(publicLiveTestSnapshot({}).status).toBe('locked');
     expect(isPaidVoiceGenerationAuthorized(openEnv)).toBe(false);
+
+    const missingMax = createCandidateVoiceService({ ...openEnv, TIVVLEJOY_VOICE_TEST_MAX_CHARACTERS: undefined }, transport);
+    await expect(missingMax.generate({ ...pipInput, requestId: 'req_missing_max' })).rejects.toThrow(/Live voice test locked/);
+    const wrongMax = createCandidateVoiceService({ ...openEnv, TIVVLEJOY_VOICE_TEST_MAX_CHARACTERS: '1200' }, transport);
+    await expect(wrongMax.generate({ ...pipInput, requestId: 'req_wrong_max' })).rejects.toThrow(/Live voice test locked/);
+    expect(contacted).toBe(false);
   });
 
   it('never contacts the provider with an invalid test token', async () => {
@@ -623,13 +622,10 @@ describe('controlled ElevenLabs candidate preview', () => {
     await expect(service.generate({ ...pipInput, requestId: 'req_unknown', characterId: 'CHAR_UNKNOWN_001' })).rejects.toThrow(
       /Unknown character/,
     );
-    await expect(service.generate({ ...pipInput, requestId: 'req_slot', candidateSlot: 'pip-99' })).rejects.toThrow(
-      /Unknown candidate/,
-    );
     await expect(
       service.generate({ ...pipInput, requestId: 'req_voice', voiceId: '93w5H37WdqeS6HoyL5cV' }),
     ).rejects.toThrow(/rejected/i);
-    await expect(service.generate({ ...pipInput, requestId: 'req_long', text: 'x'.repeat(301) })).rejects.toThrow(
+    await expect(service.generate({ ...pipInput, requestId: 'req_long', text: 'x'.repeat(601) })).rejects.toThrow(
       /character limit/,
     );
     expect(contacted).toBe(false);
@@ -639,15 +635,15 @@ describe('controlled ElevenLabs candidate preview', () => {
     let calls = 0;
     const transport = async (url: string, init: { headers: Record<string, string>; body: string }) => {
       calls += 1;
-      expect(url.startsWith(`${ELEVENLABS_TTS_ENDPOINT}/cand_pip_stock_a`)).toBe(true);
+      expect(url.startsWith(`${ELEVENLABS_TTS_ENDPOINT}/93w5H37WdqeS6HoyL5cV`)).toBe(true);
       expect(init.headers['xi-api-key']).toBe('test-key-not-real');
-      expect(JSON.parse(init.body).text).toBe(FIXED_CANDIDATE_LINES[PIP_CHARACTER_ID]);
+      expect(JSON.parse(init.body).text).toBe(FIXED_APPROVED_LINES[PIP_CHARACTER_ID]);
       return { ok: true, status: 200, contentType: 'audio/mpeg', body: new Uint8Array([9, 8, 7]).buffer };
     };
     const service = createCandidateVoiceService(openEnv, transport);
     const first = await service.generate(pipInput);
-    expect(first.kind).toBe('ELEVENLABS_CANDIDATE_TEST');
-    expect(first.label).toBe(CANDIDATE_AUDIO_LABEL);
+    expect(first.kind).toBe('ELEVENLABS_APPROVED_SAMPLE');
+    expect(first.label).toBe(APPROVED_SAMPLE_AUDIO_LABEL);
     expect(first.label).not.toBe(FIXTURE_PLAYBACK_LABEL);
     expect(first.providerContacted).toBe(true);
     expect(JSON.stringify(first)).not.toContain('test-key-not-real');
@@ -655,6 +651,7 @@ describe('controlled ElevenLabs candidate preview', () => {
     expect(JSON.stringify(first)).not.toContain('ELEVENLABS_API_KEY');
     expect(JSON.stringify(first)).not.toContain('xi-api-key');
     expect(JSON.stringify(first)).not.toContain('93w5H37WdqeS6HoyL5cV');
+    expect(JSON.stringify(first)).not.toContain('SbxjwBKw2PefbSupcoXV');
     await expect(service.generate(pipInput)).rejects.toThrow(/already submitted/);
     expect(calls).toBe(1);
 
@@ -669,24 +666,29 @@ describe('controlled ElevenLabs candidate preview', () => {
     expect(failedCalls).toBe(1);
 
     resetCandidateRequestState();
-    const goatTransport = async () => ({
-      ok: true,
-      status: 200,
-      contentType: 'audio/mpeg',
-      body: new Uint8Array([4, 5, 6]).buffer,
-    });
+    let goatUrl = '';
+    const goatTransport = async (url: string) => {
+      goatUrl = url;
+      return {
+        ok: true,
+        status: 200,
+        contentType: 'audio/mpeg',
+        body: new Uint8Array([4, 5, 6]).buffer,
+      };
+    };
     const goatService = createCandidateVoiceService(openEnv, goatTransport);
     const goat = await goatService.generate({
       characterId: GOAT_CHARACTER_ID,
-      candidateSlot: 'goat-1',
-      text: FIXED_CANDIDATE_LINES[GOAT_CHARACTER_ID],
+      text: FIXED_APPROVED_LINES[GOAT_CHARACTER_ID],
       requestId: 'req_goat_one',
       testToken: 'preview-token',
       confirmed: true,
     });
     expect(goat.characterId).toBe(GOAT_CHARACTER_ID);
-    expect(Array.from(FIXED_CANDIDATE_LINES[PIP_CHARACTER_ID]).length).toBeLessThanOrEqual(300);
-    expect(Array.from(FIXED_CANDIDATE_LINES[GOAT_CHARACTER_ID]).length).toBeLessThanOrEqual(300);
+    expect(goatUrl.startsWith(`${ELEVENLABS_TTS_ENDPOINT}/SbxjwBKw2PefbSupcoXV`)).toBe(true);
+    expect(JSON.stringify(goat)).not.toContain('SbxjwBKw2PefbSupcoXV');
+    expect(Array.from(FIXED_APPROVED_LINES[PIP_CHARACTER_ID]).length).toBeLessThanOrEqual(600);
+    expect(Array.from(FIXED_APPROVED_LINES[GOAT_CHARACTER_ID]).length).toBeLessThanOrEqual(600);
   });
 
   it('keeps registered Voice IDs unchanged and refuses Production generation', async () => {
@@ -703,12 +705,18 @@ describe('controlled ElevenLabs candidate preview', () => {
     expect(contacted).toBe(false);
     expect(publicLiveTestSnapshot({ ...openEnv, VERCEL_ENV: 'production' }).status).toBe('locked');
     expect(publicLiveTestSnapshot({ ...openEnv, VERCEL_ENV: 'production' }).productionEnabled).toBe(false);
+    expect(JSON.stringify(publicLiveTestSnapshot(openEnv))).not.toContain('93w5H37WdqeS6HoyL5cV');
+    expect(JSON.stringify(publicLiveTestSnapshot(openEnv))).not.toContain('SbxjwBKw2PefbSupcoXV');
 
     const ui = readRepo('apps/web/src/components/preview/CandidateVoiceTest.tsx');
     const studio = readRepo('apps/web/src/components/preview/VoiceProductionStudio.tsx');
     const envExample = readRepo('.env.example');
     expect(ui).toContain('Live voice test locked');
-    expect(ui).toContain('ElevenLabs candidate test — not Pip/Goat’s approved permanent voice.');
+    expect(ui).toContain('Generate approved Pip sample');
+    expect(ui).toContain('Generate approved Goat sample');
+    expect(ui).toContain(APPROVED_SAMPLE_AUDIO_LABEL);
+    expect(ui).not.toContain('Pip candidate A');
+    expect(ui).not.toContain('Candidate voices not configured');
     expect(studio).toContain('CandidateVoiceTest');
     expect(ui).not.toContain('93w5H37WdqeS6HoyL5cV');
     expect(ui).not.toContain('SbxjwBKw2PefbSupcoXV');
@@ -716,7 +724,10 @@ describe('controlled ElevenLabs candidate preview', () => {
     expect(ui).not.toContain('NEXT_PUBLIC_ELEVENLABS');
     expect(ui).not.toContain('localStorage');
     expect(envExample).toContain('TIVVLEJOY_VOICE_TEST_TOKEN=');
+    expect(envExample).toContain('TIVVLEJOY_VOICE_TEST_MAX_CHARACTERS=600');
     expect(envExample).not.toMatch(/ELEVENLABS_API_KEY=\S+/);
+    expect(envExample).not.toContain('TIVVLEJOY_VOICE_CANDIDATE_PIP');
+    expect(envExample).not.toContain('TIVVLEJOY_VOICE_CANDIDATE_GOAT');
     expect(envExample).toContain('ALLOW_PAID_VOICE_GENERATION=false');
   });
 });

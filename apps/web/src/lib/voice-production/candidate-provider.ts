@@ -47,7 +47,7 @@ export function mapProviderFailure(status: number): VoiceProductionError {
  * Official ElevenLabs convert contract:
  * POST /v1/text-to-speech/{voice_id}?output_format=mp3_44100_128
  * Header xi-api-key, JSON { text, model_id }.
- * This function is only called after live-candidate gates pass.
+ * This function is only called after live approved-sample gates pass.
  */
 export async function convertCandidateSpeech(
   input: CandidateConvertInput,

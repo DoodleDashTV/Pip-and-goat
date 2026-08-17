@@ -23,9 +23,10 @@ Updated: 2026-08-17
 
 ## Current milestone
 
-Controlled ElevenLabs candidate-preview path, default closed. Justin can
-review locked candidate UI on Preview. Live generation stays off until
-Vercel Preview gates are set later. Playback-test chimes stay available.
+Controlled ElevenLabs approved-voice Preview path, default closed. Justin
+can review the locked Pip and Goat sample actions. Live generation stays
+off until Vercel Preview gates are set later. Playback-test chimes stay
+available.
 Theatrical / Steps 9–16 and Steps 25–32 stay closed. Public Preview stays
 browser-only. Paid ElevenLabs stays disabled. No Preview or production
 database is connected.
@@ -66,9 +67,12 @@ database is connected.
 - Goat pronunciation note no longer uses gooaating
 - Draft PR #37 stays draft and unmerged
 - Locked ElevenLabs candidate-test UI with fixed Pip/Goat lines and six stock slots
+- Replaced six candidate auditions with two approved-voice sample actions
+- Approved Pip and Goat Voice IDs stay server-side only
 - Live generation requires server-only Preview gates and a timing-safe test token
 - Provider is not contacted when any gate is closed
 - Production voice generation remains refused
+- Draft PR #38 stays draft and unmerged
 
 ## Tests / validation
 
@@ -87,7 +91,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, or #37.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, or #38.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

@@ -2,23 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import {
-  FIXED_CANDIDATE_LINES,
+  APPROVED_SAMPLE_AUDIO_LABEL,
+  FIXED_APPROVED_LINES,
   LIVE_TEST_LOCKED_MESSAGE,
-  publicCandidateDirectory,
-  type PublicCandidate,
+  REQUIRED_VOICE_TEST_MAX_CHARACTERS,
+  publicApprovedSamples,
+  type PublicApprovedSample,
 } from '@/lib/voice-production/candidates';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from '@/lib/voice-production/types';
 
 type LiveTestSnapshot = {
-  status: 'locked' | 'candidates-missing' | 'awaiting-confirmation';
+  status: 'locked' | 'awaiting-confirmation';
   locked: boolean;
   message: string;
-  candidates: PublicCandidate[];
+  samples: PublicApprovedSample[];
   maxCharacters: number;
 };
 
 type PendingConfirm = {
-  candidate: PublicCandidate;
+  sample: PublicApprovedSample;
   requestId: string;
 };
 
@@ -32,8 +34,8 @@ export function CandidateVoiceTest() {
     status: 'locked',
     locked: true,
     message: LIVE_TEST_LOCKED_MESSAGE,
-    candidates: publicCandidateDirectory(),
-    maxCharacters: 300,
+    samples: publicApprovedSamples(),
+    maxCharacters: REQUIRED_VOICE_TEST_MAX_CHARACTERS,
   });
   const [testToken, setTestToken] = useState('');
   const [pending, setPending] = useState<PendingConfirm | null>(null);
@@ -45,33 +47,37 @@ export function CandidateVoiceTest() {
     void fetch('/api/voice-production/candidates')
       .then((res) => res.json())
       .then((data) => {
-        if (data.liveTest) setLiveTest(data.liveTest);
+        if (data.liveTest) {
+          setLiveTest({
+            status: data.liveTest.status === 'awaiting-confirmation' ? 'awaiting-confirmation' : 'locked',
+            locked: Boolean(data.liveTest.locked),
+            message: data.liveTest.message ?? LIVE_TEST_LOCKED_MESSAGE,
+            samples: Array.isArray(data.liveTest.samples) ? data.liveTest.samples : publicApprovedSamples(),
+            maxCharacters: REQUIRED_VOICE_TEST_MAX_CHARACTERS,
+          });
+        }
       })
       .catch(() => undefined);
   }, []);
 
-  const pipCandidates = liveTest.candidates.filter((item) => item.characterId === PIP_CHARACTER_ID);
-  const goatCandidates = liveTest.candidates.filter((item) => item.characterId === GOAT_CHARACTER_ID);
-
-  function startConfirm(candidate: PublicCandidate) {
+  function startConfirm(sample: PublicApprovedSample) {
     setError(null);
-    setPending({ candidate, requestId: newRequestId() });
+    setPending({ sample, requestId: newRequestId() });
   }
 
   async function generateOnce() {
     if (!pending || running) return;
     setRunning(true);
     setError(null);
-    const { candidate, requestId } = pending;
-    const text = FIXED_CANDIDATE_LINES[candidate.characterId as RegisteredCharacterId];
+    const { sample, requestId } = pending;
+    const text = FIXED_APPROVED_LINES[sample.characterId as RegisteredCharacterId];
     try {
       const res = await fetch('/api/voice-production/candidates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'generate-candidate',
-          characterId: candidate.characterId,
-          candidateSlot: candidate.slot,
+          action: 'generate-approved-sample',
+          characterId: sample.characterId,
           text,
           requestId,
           testToken,
@@ -85,7 +91,7 @@ export function CandidateVoiceTest() {
         return;
       }
       if (data.audioDataUrl) {
-        setClips((current) => ({ ...current, [candidate.slot]: data.audioDataUrl }));
+        setClips((current) => ({ ...current, [sample.characterId]: data.audioDataUrl }));
       }
       setPending(null);
     } catch {
@@ -98,13 +104,13 @@ export function CandidateVoiceTest() {
 
   return (
     <section className="studio-card space-y-3 overflow-x-hidden p-4 sm:p-5">
-      <h2 className="font-display text-xl font-semibold">ElevenLabs candidate test</h2>
+      <h2 className="font-display text-xl font-semibold">Approved Pip and Goat voices</h2>
       <p className="status-error inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
         {liveTest.locked ? 'Live voice test locked' : 'Live voice test ready after confirmation'}
       </p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{liveTest.message}</p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
-        Candidate evaluation only. This does not lock, register, clone, or replace Pip or Goat’s permanent voice.
+        These are the final approved Pip and Goat voices. Generate one fixed sample each after confirmation.
         Configure the API key and authorization in Vercel Preview settings. Never paste a key into this page.
       </p>
       <label className="block text-sm font-semibold">
@@ -121,57 +127,39 @@ export function CandidateVoiceTest() {
         Kept in this page only. Cleared on reload. Not stored, downloaded, or put in the URL.
       </p>
 
-      {([
-        ['Pip candidates', pipCandidates],
-        ['Goat candidates', goatCandidates],
-      ] as const).map(([title, list]) => (
-        <div key={title} className="space-y-2">
-          <h3 className="font-display text-lg font-semibold">{title}</h3>
-          {list.length === 0 ? (
-            <p className="text-sm text-[var(--color-text-muted)]">Candidate voices not configured</p>
-          ) : (
-            list.map((candidate) => (
-              <article key={candidate.slot} className="space-y-2 rounded-2xl border border-[var(--color-border)] p-3">
-                <p className="text-sm font-bold">{candidate.label}</p>
-                <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{candidate.direction}</p>
-                <p className="break-words text-sm leading-6">{FIXED_CANDIDATE_LINES[candidate.characterId]}</p>
-                <p className="text-xs text-[var(--color-text-muted)]">
-                  {candidate.configured ? 'Slot reserved on the server' : 'Candidate voices not configured'}
-                </p>
-                {clips[candidate.slot] ? (
-                  <div className="space-y-2">
-                    <p className="status-warning inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
-                      ElevenLabs candidate test — not Pip/Goat’s approved permanent voice.
-                    </p>
-                    <audio controls src={clips[candidate.slot]} className="w-full max-w-full" />
-                  </div>
-                ) : null}
-                <button
-                  type="button"
-                  className="btn-primary w-full px-4 text-sm"
-                  disabled={running || liveTest.locked || !candidate.configured}
-                  onClick={() => startConfirm(candidate)}
-                >
-                  Review and generate once
-                </button>
-              </article>
-            ))
-          )}
-        </div>
+      {liveTest.samples.map((sample) => (
+        <article key={sample.characterId} className="space-y-2 rounded-2xl border border-[var(--color-border)] p-3">
+          <h3 className="font-display text-lg font-semibold">{sample.displayName}</h3>
+          <p className="break-words text-sm leading-6">{sample.text}</p>
+          {clips[sample.characterId] ? (
+            <div className="space-y-2">
+              <p className="status-warning inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
+                {APPROVED_SAMPLE_AUDIO_LABEL}
+              </p>
+              <audio controls src={clips[sample.characterId]} className="w-full max-w-full" />
+            </div>
+          ) : null}
+          <button
+            type="button"
+            className="btn-primary w-full px-4 text-sm"
+            disabled={running || liveTest.locked}
+            onClick={() => startConfirm(sample)}
+          >
+            {sample.actionLabel}
+          </button>
+        </article>
       ))}
 
       {pending ? (
         <div className="space-y-3 rounded-2xl border border-[var(--color-warning)] bg-[var(--color-warning-soft)] p-3 text-[var(--color-warning-foreground)]">
-          <p className="font-bold">Confirm one paid candidate request</p>
+          <p className="font-bold">Confirm one paid approved-voice request</p>
           <p className="break-words text-sm leading-6">
-            Character: {pending.candidate.characterId === PIP_CHARACTER_ID ? 'Pip' : 'Goat'}
+            Character: {pending.sample.characterId === PIP_CHARACTER_ID ? 'Pip' : pending.sample.characterId === GOAT_CHARACTER_ID ? 'Goat' : 'Unknown'}
           </p>
-          <p className="break-words text-sm leading-6">Candidate: {pending.candidate.label}</p>
-          <p className="break-words text-sm leading-6">
-            Text: {FIXED_CANDIDATE_LINES[pending.candidate.characterId]}
-          </p>
+          <p className="break-words text-sm leading-6">Action: {pending.sample.actionLabel}</p>
+          <p className="break-words text-sm leading-6">Text: {FIXED_APPROVED_LINES[pending.sample.characterId]}</p>
           <p className="text-sm font-bold">
-            Characters: {Array.from(FIXED_CANDIDATE_LINES[pending.candidate.characterId]).length} /{' '}
+            Characters: {Array.from(FIXED_APPROVED_LINES[pending.sample.characterId]).length} /{' '}
             {liveTest.maxCharacters}
           </p>
           <p className="break-words text-sm leading-6">ElevenLabs will be contacted for this one request.</p>

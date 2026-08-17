@@ -1,28 +1,22 @@
 import {
   assertCandidateOriginAllowed,
-  assertLiveCandidateGates,
-  candidateSlotsConfigured,
+  assertLiveApprovedSampleGates,
   publicLiveTestSnapshot,
-  readCandidateVoiceId,
   readVoiceTestMaxCharacters,
 } from './candidate-gates';
 import {
-  CANDIDATE_AUDIO_LABEL,
-  CANDIDATE_REQUEST_MAX_CHARS,
-  candidateCharacterId,
+  APPROVED_SAMPLE_AUDIO_LABEL,
+  REQUIRED_VOICE_TEST_MAX_CHARACTERS,
   fixedLineFor,
-  isCandidateSlot,
   isExactFixedLine,
-  type CandidateSlot,
 } from './candidates';
 import { convertCandidateSpeech, type CandidateTransport } from './candidate-provider';
-import { assertNoClientVoiceId } from './registry';
+import { assertNoClientVoiceId, resolveVoiceAssignment } from './registry';
 import { estimateUsage, type VoiceEnv } from './safety';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError, type RegisteredCharacterId } from './types';
 
-export type CandidateGenerateInput = {
+export type ApprovedSampleGenerateInput = {
   characterId: string;
-  candidateSlot: string;
   text: string;
   requestId: string;
   testToken: string;
@@ -31,6 +25,8 @@ export type CandidateGenerateInput = {
   providerVoiceId?: unknown;
   elevenLabsVoiceId?: unknown;
 };
+
+export type CandidateGenerateInput = ApprovedSampleGenerateInput;
 
 export type CandidateRequestContext = {
   origin?: string | null;
@@ -57,12 +53,11 @@ export function createCandidateVoiceService(
           [PIP_CHARACTER_ID]: fixedLineFor(PIP_CHARACTER_ID),
           [GOAT_CHARACTER_ID]: fixedLineFor(GOAT_CHARACTER_ID),
         },
-        candidateSlotsConfigured: candidateSlotsConfigured(env),
         providerContacted: false,
       };
     },
 
-    async generate(input: CandidateGenerateInput, context: CandidateRequestContext = {}) {
+    async generate(input: ApprovedSampleGenerateInput, context: CandidateRequestContext = {}) {
       assertNoClientVoiceId(input);
       assertCandidateOriginAllowed(context, env);
       if (inFlight) {
@@ -78,26 +73,17 @@ export function createCandidateVoiceService(
         throw new VoiceProductionError('Unknown character. Voice generation refused.', 'UNKNOWN_CHARACTER');
       }
       const characterId = input.characterId as RegisteredCharacterId;
-      if (!isCandidateSlot(input.candidateSlot)) {
-        throw new VoiceProductionError('Unknown candidate voice. Voice generation refused.', 'UNKNOWN_CANDIDATE');
-      }
-      const slot = input.candidateSlot as CandidateSlot;
-      if (candidateCharacterId(slot) !== characterId) {
-        throw new VoiceProductionError('Unknown candidate voice. Voice generation refused.', 'UNKNOWN_CANDIDATE');
-      }
       const { characterCount } = estimateUsage(input.text);
-      if (characterCount > CANDIDATE_REQUEST_MAX_CHARS || characterCount > readVoiceTestMaxCharacters(env)) {
+      const previewLimit = Math.min(readVoiceTestMaxCharacters(env), REQUIRED_VOICE_TEST_MAX_CHARACTERS);
+      if (characterCount > previewLimit) {
         throw new VoiceProductionError('Line exceeds the live-test character limit.', 'REQUEST_LIMIT');
       }
       if (!isExactFixedLine(characterId, input.text)) {
         throw new VoiceProductionError('Arbitrary paid dialogue is refused for this test.', 'ARBITRARY_DIALOGUE_REFUSED');
       }
 
-      assertLiveCandidateGates(env, input.testToken);
-      const voiceId = readCandidateVoiceId(slot, env);
-      if (!voiceId) {
-        throw new VoiceProductionError('Candidate voices not configured', 'CANDIDATES_MISSING');
-      }
+      assertLiveApprovedSampleGates(env, input.testToken);
+      const assignment = resolveVoiceAssignment(characterId);
 
       if (!transport) {
         throw new VoiceProductionError(
@@ -110,18 +96,18 @@ export function createCandidateVoiceService(
       inFlight = true;
       try {
         const converted = await convertCandidateSpeech(
-          { voiceId, text: input.text, model: env.ELEVENLABS_MODEL_ID },
+          { voiceId: assignment.providerVoiceId, text: input.text, model: env.ELEVENLABS_MODEL_ID },
           env,
           transport,
         );
         return {
-          kind: 'ELEVENLABS_CANDIDATE_TEST',
+          kind: 'ELEVENLABS_APPROVED_SAMPLE',
           characterId,
-          candidateSlot: slot,
+          displayName: assignment.displayName,
           characterCount,
           audioContentType: converted.contentType,
           audioDataUrl: `data:${converted.contentType};base64,${converted.audioBase64}`,
-          label: CANDIDATE_AUDIO_LABEL,
+          label: APPROVED_SAMPLE_AUDIO_LABEL,
           providerContacted: true,
           usagePaid: true,
           persistedAsCanon: false,
