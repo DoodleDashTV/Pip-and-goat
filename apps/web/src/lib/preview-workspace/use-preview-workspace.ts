@@ -14,6 +14,7 @@ import {
 } from './service';
 import { exportPreviewBackup, importPreviewBackup, serializePreviewBackup } from '../persistence/backup';
 import { PersistenceError } from '../persistence/types';
+import { createSampleVoiceEpisode } from '../voice-production/sample-episode';
 import { defaultPreviewBackend, loadPreviewWorkspace } from './store';
 import type { PreviewAsset, PreviewWorkspace } from './types';
 
@@ -62,6 +63,11 @@ export function usePreviewWorkspace() {
       run(() => savePreviewSettings({ projectName }, backend), 'Preview settings saved in this browser.'),
     createEpisode: (input: { title: string; episodeNumber: number; durationSec: number; premise: string }) =>
       run(() => createPreviewEpisode(input, backend), 'Preview episode created.'),
+    createSampleVoiceEpisode: () =>
+      run(
+        () => createSampleVoiceEpisode(backend),
+        'Sample Voice Episode is ready. This stays in Voice Production.',
+      ),
     registerAsset: (input: { name: string; type: PreviewAsset['type']; version: string; notes?: string }) =>
       run(() => registerPreviewAsset(input, backend), 'Preview asset registered. Not canonical.'),
     saveVoice: (input: { characterLabel: string; displayName: string; notes?: string }) =>

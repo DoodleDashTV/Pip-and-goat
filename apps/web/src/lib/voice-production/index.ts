@@ -6,4 +6,7 @@ export * from './safety';
 export * from './fixtures';
 export * from './store';
 export * from './service';
+export * from './sample-episode';
+export * from './progress';
+export * from './client-session';
 export { publicVoiceDirectory, isRegisteredCharacterId, assertNoClientVoiceId } from './registry';
