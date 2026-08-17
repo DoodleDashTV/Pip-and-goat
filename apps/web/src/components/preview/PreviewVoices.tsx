@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewEmptyState, PreviewPageIntro } from './PreviewEmptyState';
@@ -74,6 +75,9 @@ export function PreviewVoices() {
           Disabled. No voice provider is configured on this Preview. This control does not invent a
           voice ID or audio file.
         </p>
+        <Link href="/voice-production" className="btn-primary mt-3 inline-flex w-full px-4 text-sm sm:w-auto">
+          Open Voice Production
+        </Link>
       </section>
       <section className="studio-card p-4 sm:p-6">
         <h2 className="font-display text-2xl font-semibold">Saved profiles</h2>

@@ -55,4 +55,11 @@ export const TIVVLEJOY_PERSISTENCE_RELATIONSHIPS = [
     on: 'workspace_id',
     note: 'Audit events store action names only. Secret values are refused.',
   },
+  {
+    from: 'tivvlejoy_productions',
+    to: 'tivvlejoy_voice_lines',
+    type: 'one-to-many',
+    on: 'production_id',
+    note: 'Draft voice lines store metadata and fixture object keys. No API keys or signed URLs.',
+  },
 ] as const;

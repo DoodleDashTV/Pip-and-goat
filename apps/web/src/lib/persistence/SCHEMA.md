@@ -47,3 +47,12 @@ Record IDs, schema version, workspace ownership, import size, malformed
 backups, idempotent writes, redacted database errors, and secret-stripped
 audit details are enforced in `validation.ts`. Tests use an in-process
 memory store only. No remote database is opened.
+
+## Voice generation tables
+
+- `tivvlejoy_voice_lines` — draft dialogue metadata, approval, fixture object keys
+- `tivvlejoy_voice_usage_ledger` — monthly paid/fixture character counts
+
+These tables are migration-ready only. Public Preview keeps fixture lines in
+the application store. No API keys, authorization headers, or signed URLs
+are stored.

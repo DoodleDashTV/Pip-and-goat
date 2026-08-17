@@ -225,9 +225,12 @@ describe('schema relationships and closed production actions', () => {
   it('documents the TivvleJoy table relationships', () => {
     expect(TIVVLEJOY_PERSISTENCE_RELATIONSHIPS.length).toBeGreaterThanOrEqual(8);
     const schema = readRepo('packages/database/prisma/schema.prisma');
-    const migration = readRepo(
-      'packages/database/prisma/migrations/20260817010000_tivvlejoy_persistence_foundation/migration.sql',
-    );
+    const migration = [
+      readRepo(
+        'packages/database/prisma/migrations/20260817010000_tivvlejoy_persistence_foundation/migration.sql',
+      ),
+      readRepo('packages/database/prisma/migrations/20260817033000_tivvlejoy_voice_generation/migration.sql'),
+    ].join('\n');
     for (const table of [
       'tivvlejoy_workspaces',
       'tivvlejoy_productions',
@@ -238,6 +241,8 @@ describe('schema relationships and closed production actions', () => {
       'tivvlejoy_readiness_results',
       'tivvlejoy_render_requests',
       'tivvlejoy_audit_events',
+      'tivvlejoy_voice_lines',
+      'tivvlejoy_voice_usage_ledger',
     ]) {
       expect(schema).toContain(`@@map("${table}")`);
       expect(migration).toContain(`CREATE TABLE "${table}"`);
