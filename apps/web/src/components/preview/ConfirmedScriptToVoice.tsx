@@ -5,6 +5,8 @@ import { publicVoiceIdentitySnapshot } from '@/lib/voice-production/approved-voi
 import {
   SCRIPT_TO_VOICE_COPY,
   SCRIPT_TO_VOICE_LOCKED_MESSAGE,
+  SCRIPT_TO_VOICE_LOCKED_STATUS,
+  SCRIPT_TO_VOICE_READY_STATUS,
   SCRIPT_TO_VOICE_MAX_CHARS,
   SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
   SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
@@ -16,6 +18,19 @@ import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, type RegisteredCharacterId } from 
 const VOICE_IDENTITY = publicVoiceIdentitySnapshot();
 const CHARACTERS = publicScriptCharacters();
 
+export type ScriptToVoiceView = {
+  locked: boolean;
+  message: string;
+  characters?: PublicScriptCharacter[];
+  ledger?: {
+    paidCharactersUsed?: number;
+    paidRequests?: number;
+    remainingRequests?: number;
+    remainingCharacters?: number;
+    monthlyCharLimit?: number;
+  };
+};
+
 type Snapshot = {
   locked: boolean;
   message: string;
@@ -26,6 +41,19 @@ type Snapshot = {
   remainingCharacters: number;
   monthlyLimit: number;
 };
+
+function snapshotFromView(data?: ScriptToVoiceView): Snapshot {
+  return {
+    locked: data ? Boolean(data.locked) : true,
+    message: data?.message ?? SCRIPT_TO_VOICE_LOCKED_MESSAGE,
+    characters: Array.isArray(data?.characters) ? data.characters : CHARACTERS,
+    paidRequests: data?.ledger?.paidRequests ?? 0,
+    remainingRequests: data?.ledger?.remainingRequests ?? SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
+    paidCharactersUsed: data?.ledger?.paidCharactersUsed ?? 0,
+    remainingCharacters: data?.ledger?.remainingCharacters ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+    monthlyLimit: data?.ledger?.monthlyCharLimit ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+  };
+}
 
 type Receipt = {
   displayName: string;
@@ -59,17 +87,8 @@ function newRequestId() {
   return `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export function ConfirmedScriptToVoice() {
-  const [snapshot, setSnapshot] = useState<Snapshot>({
-    locked: true,
-    message: SCRIPT_TO_VOICE_LOCKED_MESSAGE,
-    characters: CHARACTERS,
-    paidRequests: 0,
-    remainingRequests: SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
-    paidCharactersUsed: 0,
-    remainingCharacters: SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
-    monthlyLimit: SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
-  });
+export function ConfirmedScriptToVoice({ initialSnapshot }: { initialSnapshot?: ScriptToVoiceView }) {
+  const [snapshot, setSnapshot] = useState<Snapshot>(() => snapshotFromView(initialSnapshot));
   const [characterId, setCharacterId] = useState<RegisteredCharacterId>(PIP_CHARACTER_ID);
   const [text, setText] = useState('');
   const [testToken, setTestToken] = useState('');
@@ -87,16 +106,7 @@ export function ConfirmedScriptToVoice() {
     void fetch('/api/voice-production/script-to-voice')
       .then((res) => res.json())
       .then((data) => {
-        setSnapshot({
-          locked: Boolean(data.locked),
-          message: data.message ?? SCRIPT_TO_VOICE_LOCKED_MESSAGE,
-          characters: Array.isArray(data.characters) ? data.characters : CHARACTERS,
-          paidRequests: data.ledger?.paidRequests ?? 0,
-          remainingRequests: data.ledger?.remainingRequests ?? SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
-          paidCharactersUsed: data.ledger?.paidCharactersUsed ?? 0,
-          remainingCharacters: data.ledger?.remainingCharacters ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
-          monthlyLimit: data.ledger?.monthlyCharLimit ?? SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
-        });
+        setSnapshot(snapshotFromView(data));
       })
       .catch(() => undefined);
   }, []);
@@ -203,6 +213,11 @@ export function ConfirmedScriptToVoice() {
       </p>
       <p className="status-error inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
         {SCRIPT_TO_VOICE_COPY.paidWarning}
+      </p>
+      <p
+        className={`${snapshot.locked ? 'status-error' : 'status-success'} inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold`}
+      >
+        {snapshot.locked ? SCRIPT_TO_VOICE_LOCKED_STATUS : SCRIPT_TO_VOICE_READY_STATUS}
       </p>
       <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
         Model {VOICE_IDENTITY.model}. Output {VOICE_IDENTITY.outputFormat}. Stability{' '}

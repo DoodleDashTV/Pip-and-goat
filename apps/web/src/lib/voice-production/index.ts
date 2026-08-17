@@ -21,6 +21,10 @@ export { publicLiveTestSnapshot, serverGatesOpen, isProductionVoiceRuntime } fro
 export { publicVoiceDirectory, isRegisteredCharacterId, assertNoClientVoiceId } from './registry';
 export {
   SCRIPT_TO_VOICE_COPY,
+  SCRIPT_TO_VOICE_LOCKED_MESSAGE,
+  SCRIPT_TO_VOICE_READY_MESSAGE,
+  SCRIPT_TO_VOICE_READY_STATUS,
+  SCRIPT_TO_VOICE_PREVIEW_READY_LABEL,
   SCRIPT_TO_VOICE_MAX_CHARS,
   SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
   SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,

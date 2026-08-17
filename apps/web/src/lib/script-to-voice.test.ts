@@ -18,9 +18,13 @@ import {
 import { isPaidVoiceGenerationAuthorized, isPaidVoiceGenerationEnabled } from './voice-production/safety';
 import {
   SCRIPT_TO_VOICE_COPY,
+  SCRIPT_TO_VOICE_LOCKED_MESSAGE,
   SCRIPT_TO_VOICE_MAX_CHARS,
   SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
   SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
+  SCRIPT_TO_VOICE_PREVIEW_READY_LABEL,
+  SCRIPT_TO_VOICE_READY_MESSAGE,
+  SCRIPT_TO_VOICE_READY_STATUS,
   isSingleDialogueLine,
 } from './voice-production/script-line';
 import {
@@ -478,6 +482,8 @@ describe('preview-only confirmed script-to-voice', () => {
     const snapshot = publicScriptToVoiceSnapshot(openEnv);
     const identity = publicVoiceIdentitySnapshot();
     const ui = readRepo('apps/web/src/components/preview/ConfirmedScriptToVoice.tsx');
+    const studio = readRepo('apps/web/src/components/preview/VoiceProductionStudio.tsx');
+    const page = readRepo('apps/web/src/app/voice-production/page.tsx');
     const route = readRepo('apps/web/src/app/api/voice-production/script-to-voice/route.ts');
     const barrel = readRepo('apps/web/src/lib/voice-production/index.ts');
     expect(snapshot.characters[0]?.personality).toEqual(PIP_VOICE_GUIDE.personality);
@@ -486,6 +492,11 @@ describe('preview-only confirmed script-to-voice', () => {
     expect(SCRIPT_TO_VOICE_COPY.voicesTitle).toBe('Final approved Pip and Goat voices');
     expect(SCRIPT_TO_VOICE_COPY.cadence).toBe('One confirmed line at a time');
     expect(SCRIPT_TO_VOICE_COPY.paidWarning).toBe('Paid ElevenLabs generation — confirmation required');
+    expect(snapshot.locked).toBe(false);
+    expect(snapshot.message).toBe(SCRIPT_TO_VOICE_READY_MESSAGE);
+    expect(publicScriptToVoiceSnapshot({}).locked).toBe(true);
+    expect(publicScriptToVoiceSnapshot({}).message).toBe(SCRIPT_TO_VOICE_LOCKED_MESSAGE);
+    expect(publicScriptToVoiceSnapshot({ ...openEnv, VERCEL_ENV: 'production' }).locked).toBe(true);
     expect(identity.checkpoint).toBe('TIVVLEJOY_VOICE_IDENTITY_LOCK_V1');
     expect(publicPreviewVoiceAllowance()).toEqual({
       paidCharactersUsed: 0,
@@ -498,6 +509,14 @@ describe('preview-only confirmed script-to-voice', () => {
       maxCharsPerLine: 250,
     });
     expect(ui).toContain(SCRIPT_TO_VOICE_COPY.pageTitle);
+    expect(ui).toContain('SCRIPT_TO_VOICE_READY_STATUS');
+    expect(studio).toContain('Paid voice generation: Disabled');
+    expect(studio).toContain('SCRIPT_TO_VOICE_PREVIEW_READY_LABEL');
+    expect(readRepo('apps/web/src/lib/voice-production/script-line.ts')).toContain(SCRIPT_TO_VOICE_READY_STATUS);
+    expect(readRepo('apps/web/src/lib/voice-production/script-line.ts')).toContain(SCRIPT_TO_VOICE_PREVIEW_READY_LABEL);
+    expect(page).toContain('publicScriptToVoiceSnapshot');
+    expect(page).toContain('publicLiveTestSnapshot');
+    expect(page).toContain('force-dynamic');
     expect(ui).not.toContain("from '@/lib/voice-production/voice-identity'");
     expect(ui).not.toContain("from '@/lib/voice-production/script-to-voice'");
     expect(barrel).not.toContain('./script-to-voice');

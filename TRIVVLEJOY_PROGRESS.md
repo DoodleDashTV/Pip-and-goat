@@ -93,6 +93,7 @@ database is connected.
 - Failed provider requests are recorded without secrets and are not billed
 - Draft PR #39 stays draft and unmerged
 - Draft PR #40 stays draft and unmerged
+- Preview voice-production first paint uses the server readiness snapshot so the visible page matches the unlocked Preview gates
 
 ## Tests / validation
 

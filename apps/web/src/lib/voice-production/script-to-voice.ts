@@ -27,6 +27,7 @@ import {
   publicScriptCharacters,
   SCRIPT_TO_VOICE_AUDIO_LABEL,
   SCRIPT_TO_VOICE_LOCKED_MESSAGE,
+  SCRIPT_TO_VOICE_READY_MESSAGE,
   SCRIPT_TO_VOICE_MAX_CHARS,
   SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
   SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
@@ -206,7 +207,7 @@ export function publicScriptToVoiceSnapshot(env: VoiceEnv = process.env) {
   return {
     status: liveTest.status,
     locked: liveTest.locked,
-    message: liveTest.locked ? SCRIPT_TO_VOICE_LOCKED_MESSAGE : liveTest.message,
+    message: liveTest.locked ? SCRIPT_TO_VOICE_LOCKED_MESSAGE : SCRIPT_TO_VOICE_READY_MESSAGE,
     characters: publicScriptCharacters(),
     voiceIdentity: liveTest.voiceIdentity,
     maxCharacters: SCRIPT_TO_VOICE_MAX_CHARS,

@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CandidateVoiceTest } from './CandidateVoiceTest';
-import { ConfirmedScriptToVoice } from './ConfirmedScriptToVoice';
+import { ConfirmedScriptToVoice, type ScriptToVoiceView } from './ConfirmedScriptToVoice';
+import {
+  SCRIPT_TO_VOICE_PREVIEW_LOCKED_LABEL,
+  SCRIPT_TO_VOICE_PREVIEW_READY_LABEL,
+} from '@/lib/voice-production/script-line';
 import { PreviewBanner, PreviewMessage } from './PreviewBanner';
 import { PreviewPageIntro } from './PreviewEmptyState';
 import { usePreviewWorkspace } from '@/lib/preview-workspace/use-preview-workspace';
@@ -58,7 +62,28 @@ async function postVoice(body: Record<string, unknown>) {
   return data;
 }
 
-export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolean }) {
+type LiveTestView = {
+  status: 'locked' | 'awaiting-confirmation';
+  locked: boolean;
+  message: string;
+  samples: Array<{
+    characterId: RegisteredCharacterId;
+    displayName: 'Pip' | 'Goat';
+    actionLabel: string;
+    text: string;
+  }>;
+  maxCharacters: number;
+};
+
+export function VoiceProductionStudio({
+  publicPreview,
+  scriptToVoice,
+  liveTest,
+}: {
+  publicPreview: boolean;
+  scriptToVoice?: ScriptToVoiceView;
+  liveTest?: LiveTestView;
+}) {
   const {
     workspace,
     hydrated,
@@ -430,8 +455,16 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
         <p className="status-error inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold">
           Paid voice generation: Disabled
         </p>
+        <p
+          className={`${scriptToVoice && !scriptToVoice.locked ? 'status-success' : 'status-error'} inline-flex min-h-touch items-center rounded-full px-3 py-2 text-sm font-bold`}
+        >
+          {scriptToVoice && !scriptToVoice.locked
+            ? SCRIPT_TO_VOICE_PREVIEW_READY_LABEL
+            : SCRIPT_TO_VOICE_PREVIEW_LOCKED_LABEL}
+        </p>
         <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">
-          Provider contacted: false. Playback-test fixtures only.
+          Provider contacted: false. Episode draft-audio stays unauthorized. Preview one-line generation
+          still requires review, confirmation, and Generate once.
           {publicPreview ? ' This public Preview does not load any voice-provider secret.' : ''}
         </p>
         <p className="break-words text-sm leading-6 text-[var(--color-text-muted)]">{FINAL_RENDER_LOCKED_REASON}</p>
@@ -445,9 +478,9 @@ export function VoiceProductionStudio({ publicPreview }: { publicPreview: boolea
         </dl>
       </section>
 
-      <ConfirmedScriptToVoice />
+      <ConfirmedScriptToVoice initialSnapshot={scriptToVoice} />
 
-      <CandidateVoiceTest />
+      <CandidateVoiceTest initialLiveTest={liveTest} />
 
       {!hydrated ? (
         <p className="text-sm text-[var(--color-text-muted)]">Loading this browser&apos;s preview workspace…</p>
