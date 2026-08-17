@@ -10,4 +10,6 @@ export * from './sample-episode';
 export * from './progress';
 export * from './form-state';
 export * from './client-session';
+export * from './candidates';
+export { publicLiveTestSnapshot, serverGatesOpen, isProductionVoiceRuntime } from './candidate-gates';
 export { publicVoiceDirectory, isRegisteredCharacterId, assertNoClientVoiceId } from './registry';

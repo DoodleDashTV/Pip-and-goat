@@ -1,0 +1,136 @@
+import {
+  assertCandidateOriginAllowed,
+  assertLiveCandidateGates,
+  candidateSlotsConfigured,
+  publicLiveTestSnapshot,
+  readCandidateVoiceId,
+  readVoiceTestMaxCharacters,
+} from './candidate-gates';
+import {
+  CANDIDATE_AUDIO_LABEL,
+  CANDIDATE_REQUEST_MAX_CHARS,
+  candidateCharacterId,
+  fixedLineFor,
+  isCandidateSlot,
+  isExactFixedLine,
+  type CandidateSlot,
+} from './candidates';
+import { convertCandidateSpeech, type CandidateTransport } from './candidate-provider';
+import { assertNoClientVoiceId } from './registry';
+import { estimateUsage, type VoiceEnv } from './safety';
+import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError, type RegisteredCharacterId } from './types';
+
+export type CandidateGenerateInput = {
+  characterId: string;
+  candidateSlot: string;
+  text: string;
+  requestId: string;
+  testToken: string;
+  confirmed: boolean;
+  voiceId?: unknown;
+  providerVoiceId?: unknown;
+  elevenLabsVoiceId?: unknown;
+};
+
+export type CandidateRequestContext = {
+  origin?: string | null;
+  host?: string | null;
+};
+
+const seenRequestIds = new Set<string>();
+let inFlight = false;
+
+export function resetCandidateRequestState() {
+  seenRequestIds.clear();
+  inFlight = false;
+}
+
+export function createCandidateVoiceService(
+  env: VoiceEnv = process.env,
+  transport?: CandidateTransport,
+) {
+  return {
+    snapshot() {
+      return {
+        liveTest: publicLiveTestSnapshot(env),
+        fixedLines: {
+          [PIP_CHARACTER_ID]: fixedLineFor(PIP_CHARACTER_ID),
+          [GOAT_CHARACTER_ID]: fixedLineFor(GOAT_CHARACTER_ID),
+        },
+        candidateSlotsConfigured: candidateSlotsConfigured(env),
+        providerContacted: false,
+      };
+    },
+
+    async generate(input: CandidateGenerateInput, context: CandidateRequestContext = {}) {
+      assertNoClientVoiceId(input);
+      assertCandidateOriginAllowed(context, env);
+      if (inFlight) {
+        throw new VoiceProductionError('A live voice test is already running.', 'GENERATION_ALREADY_RUNNING');
+      }
+      if (!input.requestId || seenRequestIds.has(input.requestId)) {
+        throw new VoiceProductionError('This live voice request was already submitted. It was not retried.', 'DUPLICATE_REQUEST');
+      }
+      if (input.confirmed !== true) {
+        throw new VoiceProductionError('Live voice test requires a deliberate confirmation.', 'CONFIRMATION_REQUIRED');
+      }
+      if (input.characterId !== PIP_CHARACTER_ID && input.characterId !== GOAT_CHARACTER_ID) {
+        throw new VoiceProductionError('Unknown character. Voice generation refused.', 'UNKNOWN_CHARACTER');
+      }
+      const characterId = input.characterId as RegisteredCharacterId;
+      if (!isCandidateSlot(input.candidateSlot)) {
+        throw new VoiceProductionError('Unknown candidate voice. Voice generation refused.', 'UNKNOWN_CANDIDATE');
+      }
+      const slot = input.candidateSlot as CandidateSlot;
+      if (candidateCharacterId(slot) !== characterId) {
+        throw new VoiceProductionError('Unknown candidate voice. Voice generation refused.', 'UNKNOWN_CANDIDATE');
+      }
+      const { characterCount } = estimateUsage(input.text);
+      if (characterCount > CANDIDATE_REQUEST_MAX_CHARS || characterCount > readVoiceTestMaxCharacters(env)) {
+        throw new VoiceProductionError('Line exceeds the live-test character limit.', 'REQUEST_LIMIT');
+      }
+      if (!isExactFixedLine(characterId, input.text)) {
+        throw new VoiceProductionError('Arbitrary paid dialogue is refused for this test.', 'ARBITRARY_DIALOGUE_REFUSED');
+      }
+
+      assertLiveCandidateGates(env, input.testToken);
+      const voiceId = readCandidateVoiceId(slot, env);
+      if (!voiceId) {
+        throw new VoiceProductionError('Candidate voices not configured', 'CANDIDATES_MISSING');
+      }
+
+      if (!transport) {
+        throw new VoiceProductionError(
+          'Paid ElevenLabs transport is not attached. Provider was not contacted.',
+          'PROVIDER_TRANSPORT_UNAVAILABLE',
+        );
+      }
+
+      seenRequestIds.add(input.requestId);
+      inFlight = true;
+      try {
+        const converted = await convertCandidateSpeech(
+          { voiceId, text: input.text, model: env.ELEVENLABS_MODEL_ID },
+          env,
+          transport,
+        );
+        return {
+          kind: 'ELEVENLABS_CANDIDATE_TEST',
+          characterId,
+          candidateSlot: slot,
+          characterCount,
+          audioContentType: converted.contentType,
+          audioDataUrl: `data:${converted.contentType};base64,${converted.audioBase64}`,
+          label: CANDIDATE_AUDIO_LABEL,
+          providerContacted: true,
+          usagePaid: true,
+          persistedAsCanon: false,
+        };
+      } finally {
+        inFlight = false;
+      }
+    },
+  };
+}
+
+export type CandidateVoiceService = ReturnType<typeof createCandidateVoiceService>;

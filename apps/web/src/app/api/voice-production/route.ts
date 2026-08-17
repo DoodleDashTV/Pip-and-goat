@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { publicLiveTestSnapshot } from '@/lib/voice-production/candidate-gates';
 import { createVoiceProductionService } from '@/lib/voice-production/service';
 import { createMemoryVoiceStore } from '@/lib/voice-production/store';
 import { VoiceProductionError } from '@/lib/voice-production/types';
@@ -104,6 +105,7 @@ function fail(error: unknown) {
 export async function GET() {
   return NextResponse.json({
     ...service.snapshot(),
+    liveTest: publicLiveTestSnapshot(process.env),
     providerContacted: false,
   });
 }

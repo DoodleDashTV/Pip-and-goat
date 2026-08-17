@@ -5,7 +5,8 @@ Updated: 2026-08-17
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-voice-preview-stability-73f1`
+- Working branch: `cursor/tivvlejoy-voice-candidate-preview-73f1`
+- Voice preview stability (Draft PR #37, keep draft and unmerged): `cursor/tivvlejoy-voice-preview-stability-73f1` @ `a9f7aa3e12a1c9888f1d085afee810143aa832a0`
 - Voice preview flow (Draft PR #36, keep draft and unmerged): `cursor/tivvlejoy-voice-preview-flow-73f1` @ `35bfce6daf3ace87747ebea39cf0c79647b669cf`
 - Voice generation (Draft PR #35, keep draft and unmerged): `cursor/tivvlejoy-voice-generation-73f1` @ `3d0567df0c02585c5d716973d0038a86f190136c`
 - Preview database connection-ready (Draft PR #34, keep draft and unmerged): `cursor/tivvlejoy-preview-db-ready-73f1` @ `27a4caee84df14f2fe9254755e76ab29e8a2111f`
@@ -22,10 +23,9 @@ Updated: 2026-08-17
 
 ## Current milestone
 
-Voice Production preview stabilization: newest form values win, Pip stays
-first, playback-test chimes are audible, and Goat’s pronunciation note is
-corrected. Justin can still create a sample episode and walk the fixture
-workflow without an API key, database, or paid generation.
+Controlled ElevenLabs candidate-preview path, default closed. Justin can
+review locked candidate UI on Preview. Live generation stays off until
+Vercel Preview gates are set later. Playback-test chimes stay available.
 Theatrical / Steps 9–16 and Steps 25–32 stay closed. Public Preview stays
 browser-only. Paid ElevenLabs stays disabled. No Preview or production
 database is connected.
@@ -64,6 +64,11 @@ database is connected.
 - Pip card stays first and Goat stays second
 - Playback-test chimes replace silent fixture WAVs and are labeled Playback test only — not Pip/Goat’s voice
 - Goat pronunciation note no longer uses gooaating
+- Draft PR #37 stays draft and unmerged
+- Locked ElevenLabs candidate-test UI with fixed Pip/Goat lines and six stock slots
+- Live generation requires server-only Preview gates and a timing-safe test token
+- Provider is not contacted when any gate is closed
+- Production voice generation remains refused
 
 ## Tests / validation
 
@@ -82,7 +87,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, or #36.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, or #37.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.
