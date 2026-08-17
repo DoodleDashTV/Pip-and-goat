@@ -22,6 +22,8 @@ export { publicVoiceDirectory, isRegisteredCharacterId, assertNoClientVoiceId } 
 export {
   SCRIPT_TO_VOICE_COPY,
   SCRIPT_TO_VOICE_MAX_CHARS,
+  SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+  SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
   publicScriptCharacters,
   isSingleDialogueLine,
 } from './script-line';

@@ -1,14 +1,11 @@
 import { GOAT_VOICE_GUIDE, PIP_VOICE_GUIDE } from './guides';
 import { estimateUsage } from './safety';
-import {
-  DEFAULT_MAX_CHARS_PER_REQUEST,
-  GOAT_CHARACTER_ID,
-  PIP_CHARACTER_ID,
-  VoiceProductionError,
-  type RegisteredCharacterId,
-} from './types';
+import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError, type RegisteredCharacterId } from './types';
 
-export const SCRIPT_TO_VOICE_MAX_CHARS = DEFAULT_MAX_CHARS_PER_REQUEST;
+/** Temporary Preview testing allowance. Do not raise these without a new increment. */
+export const SCRIPT_TO_VOICE_MAX_CHARS = 250;
+export const SCRIPT_TO_VOICE_MAX_PAID_REQUESTS = 3;
+export const SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS = 750;
 export const SCRIPT_TO_VOICE_AUDIO_LABEL = 'Preview voice generation — one confirmed line.';
 export const SCRIPT_TO_VOICE_LOCKED_MESSAGE =
   'Preview voice generation is locked. Add the API key, paid-generation flag, and private test token in Vercel Preview settings.';

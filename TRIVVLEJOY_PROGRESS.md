@@ -5,7 +5,8 @@ Updated: 2026-08-17
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-script-to-voice-73f1`
+- Working branch: `cursor/tivvlejoy-preview-voice-test-73f1`
+- Confirmed script-to-voice (Draft PR #39, keep draft and unmerged): `cursor/tivvlejoy-script-to-voice-73f1` @ `d59c51a8daf7fd7b7f136df96d892cdcb52060a2`
 - Voice approval lock (keep unmerged): `cursor/tivvlejoy-voice-approval-lock-73f1` @ `109ac281319f2dc8f44e52b67cd5139b76626b08`
 - Voice candidate preview (Draft PR #38, keep draft and unmerged): `cursor/tivvlejoy-voice-candidate-preview-73f1` @ `109ac281319f2dc8f44e52b67cd5139b76626b08`
 - Voice preview stability (Draft PR #37, keep draft and unmerged): `cursor/tivvlejoy-voice-preview-stability-73f1` @ `a9f7aa3e12a1c9888f1d085afee810143aa832a0`
@@ -27,7 +28,8 @@ Updated: 2026-08-17
 
 Controlled ElevenLabs approved-voice Preview path, default closed. Justin
 can review locked Pip and Goat samples and confirm one script line at a
-time. Live generation stays off until Vercel Preview gates are set.
+time. Preview may generate one confirmed line after Justin presses
+Generate once. Production stays disabled.
 Playback-test chimes stay available.
 Theatrical / Steps 9–16 and Steps 25–32 stay closed. Public Preview stays
 browser-only. Paid ElevenLabs stays disabled. No Preview or production
@@ -85,6 +87,10 @@ database is connected.
 - Pip and Goat cannot share or swap Voice IDs
 - Preview-only confirmed script-to-voice converts one user-confirmed line at a time
 - Automatic whole-script or batch episode voice generation is not started
+- Temporary Preview testing allowance is 250 characters per line, 3 successful paid requests, and 750 paid characters
+- Confirmed Preview generation uses the locked ElevenLabs model and settings only
+- Failed provider requests are recorded without secrets and are not billed
+- Draft PR #39 stays draft and unmerged
 
 ## Tests / validation
 
@@ -103,7 +109,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, or later stacked voice drafts.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, or later stacked voice drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

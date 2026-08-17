@@ -9,9 +9,20 @@ import {
 } from './voice-production/approved-voice-settings';
 import { ELEVENLABS_TTS_ENDPOINT } from './voice-production/candidate-provider';
 import { GOAT_VOICE_GUIDE, PIP_VOICE_GUIDE } from './voice-production/guides';
-import { getPreviewPaidLedger } from './voice-production/preview-paid-ledger';
+import {
+  getPreviewPaidLedger,
+  publicPreviewVoiceAllowance,
+  publicSafeAttempts,
+  recordSuccessfulPaidUsage,
+} from './voice-production/preview-paid-ledger';
 import { isPaidVoiceGenerationAuthorized, isPaidVoiceGenerationEnabled } from './voice-production/safety';
-import { SCRIPT_TO_VOICE_COPY, SCRIPT_TO_VOICE_MAX_CHARS, isSingleDialogueLine } from './voice-production/script-line';
+import {
+  SCRIPT_TO_VOICE_COPY,
+  SCRIPT_TO_VOICE_MAX_CHARS,
+  SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS,
+  SCRIPT_TO_VOICE_MAX_PAID_REQUESTS,
+  isSingleDialogueLine,
+} from './voice-production/script-line';
 import {
   createScriptToVoiceService,
   publicScriptToVoiceSnapshot,
@@ -20,7 +31,7 @@ import {
 } from './voice-production/script-to-voice';
 import { createVoiceProductionService } from './voice-production/service';
 import { createMemoryVoiceStore } from './voice-production/store';
-import { DEFAULT_MONTHLY_CHAR_LIMIT, GOAT_CHARACTER_ID, PIP_CHARACTER_ID } from './voice-production/types';
+import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID } from './voice-production/types';
 import { lockedVoiceIdsAreDistinct } from './voice-production/voice-identity';
 
 const repoRoot = path.resolve(__dirname, '../../../..');
@@ -255,7 +266,155 @@ describe('preview-only confirmed script-to-voice', () => {
         lines: [safeLine, safeLine],
       }),
     ).toThrowError(/one confirmed dialogue line/i);
-    expect(SCRIPT_TO_VOICE_MAX_CHARS).toBe(280);
+    expect(SCRIPT_TO_VOICE_MAX_CHARS).toBe(250);
+    expect(SCRIPT_TO_VOICE_MAX_PAID_REQUESTS).toBe(3);
+    expect(SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS).toBe(750);
+    expect(() =>
+      validateConfirmedScriptLine({
+        characterId: PIP_CHARACTER_ID,
+        text: 'A'.repeat(251),
+      }),
+    ).toThrowError(/250/);
+  });
+
+  it('rejects model, settings, and output-format overrides without contacting the provider', async () => {
+    const calls: Array<{ url: string; body: string }> = [];
+    const service = createScriptToVoiceService(openEnv, mockTransport(calls));
+    const overrides: Array<Record<string, unknown>> = [
+      { model: 'eleven_flash_v2_5' },
+      { model_id: 'eleven_turbo_v2_5' },
+      { outputFormat: 'pcm_44100' },
+      { output_format: 'mp3_22050_32' },
+      { voice_settings: { stability: 1 } },
+      { stability: 1 },
+      { similarity: 1 },
+      { similarity_boost: 1 },
+      { style: 1 },
+      { speed: 1.2 },
+      { speakerBoost: false },
+      { use_speaker_boost: false },
+    ];
+    for (const extra of overrides) {
+      expect(() =>
+        validateConfirmedScriptLine({
+          characterId: PIP_CHARACTER_ID,
+          text: safeLine,
+          ...extra,
+        }),
+      ).toThrowError(/cannot be overridden/i);
+      await expect(
+        service.generate({
+          characterId: PIP_CHARACTER_ID,
+          text: safeLine,
+          requestId: `req_override_${Object.keys(extra)[0]}`,
+          testToken: 'preview-token',
+          confirmed: true,
+          ...extra,
+        }),
+      ).rejects.toThrow(/cannot be overridden/i);
+    }
+    expect(calls).toHaveLength(0);
+    expect(getPreviewPaidLedger().paidRequests).toBe(0);
+  });
+
+  it('refuses generation after three successful paid requests or 750 paid characters', async () => {
+    const calls: Array<{ url: string; body: string }> = [];
+    const service = createScriptToVoiceService(openEnv, mockTransport(calls));
+    for (let index = 0; index < 3; index += 1) {
+      await service.generate({
+        characterId: PIP_CHARACTER_ID,
+        text: safeLine,
+        requestId: `req_limit_${index}`,
+        testToken: 'preview-token',
+        confirmed: true,
+      });
+    }
+    expect(getPreviewPaidLedger().paidRequests).toBe(3);
+    await expect(
+      service.generate({
+        characterId: GOAT_CHARACTER_ID,
+        text: safeLine,
+        requestId: 'req_limit_fourth',
+        testToken: 'preview-token',
+        confirmed: true,
+      }),
+    ).rejects.toThrow(/3 successful paid requests/i);
+    expect(calls).toHaveLength(3);
+
+    resetScriptToVoiceState();
+    recordSuccessfulPaidUsage({
+      requestId: 'seed_char_limit',
+      characterId: PIP_CHARACTER_ID,
+      characterCount: 740,
+    });
+    const afterSeed = createScriptToVoiceService(openEnv, mockTransport(calls));
+    await expect(
+      afterSeed.generate({
+        characterId: PIP_CHARACTER_ID,
+        text: safeLine,
+        requestId: 'req_char_limit',
+        testToken: 'preview-token',
+        confirmed: true,
+      }),
+    ).rejects.toThrow(/750 paid characters/i);
+    expect(calls).toHaveLength(3);
+    expect(getPreviewPaidLedger().paidRequests).toBe(1);
+  });
+
+  it('allows only one active generation and records failed provider attempts without billing them', async () => {
+    const slowCalls: Array<{ url: string; body: string }> = [];
+    let release = () => undefined;
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const slow = createScriptToVoiceService(openEnv, async (url, init) => {
+      slowCalls.push({ url, body: init.body });
+      await hold;
+      return { ok: true, status: 200, contentType: 'audio/mpeg', body: new Uint8Array([1, 2, 3]).buffer };
+    });
+    const first = slow.generate({
+      characterId: PIP_CHARACTER_ID,
+      text: safeLine,
+      requestId: 'req_in_flight',
+      testToken: 'preview-token',
+      confirmed: true,
+    });
+    for (let attempt = 0; attempt < 50 && slowCalls.length === 0; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    expect(slowCalls).toHaveLength(1);
+    await expect(
+      slow.generate({
+        characterId: GOAT_CHARACTER_ID,
+        text: safeLine,
+        requestId: 'req_second_active',
+        testToken: 'preview-token',
+        confirmed: true,
+      }),
+    ).rejects.toThrow(/one Preview voice generation/i);
+    release();
+    const receipt = await first;
+    expect(receipt.paidCharactersCharged).toBe(Array.from(safeLine).length);
+    expect(slowCalls).toHaveLength(1);
+
+    const failingCalls: Array<{ url: string; body: string }> = [];
+    const failing = createScriptToVoiceService(openEnv, mockTransport(failingCalls, { ok: false, status: 500 }));
+    await expect(
+      failing.generate({
+        characterId: PIP_CHARACTER_ID,
+        text: safeLine,
+        requestId: 'req_failed_attempt',
+        testToken: 'preview-token',
+        confirmed: true,
+      }),
+    ).rejects.toThrow();
+    expect(getPreviewPaidLedger().paidRequests).toBe(1);
+    const attempts = publicSafeAttempts();
+    expect(attempts.some((item) => item.outcome === 'failed' && item.code === 'PROVIDER_UNSUPPORTED')).toBe(true);
+    expect(JSON.stringify(attempts)).not.toContain(safeLine);
+    expect(JSON.stringify(attempts)).not.toContain('93w5H37WdqeS6HoyL5cV');
+    expect(JSON.stringify(attempts)).not.toContain('SbxjwBKw2PefbSupcoXV');
+    expect(JSON.stringify(attempts)).not.toContain('test-key-not-real');
   });
 
   it('counts successful usage once and does not bill failed or duplicate confirmations', async () => {
@@ -269,9 +428,15 @@ describe('preview-only confirmed script-to-voice', () => {
       confirmed: true,
     });
     expect(first.usagePaid).toBe(true);
+    expect(first.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(first.paidCharactersCharged).toBe(Array.from(safeLine).length);
     expect(first.ledger.paidRequests).toBe(1);
     expect(first.ledger.paidCharactersUsed).toBe(Array.from(safeLine).length);
-    expect(first.ledger.monthlyCharLimit).toBe(DEFAULT_MONTHLY_CHAR_LIMIT);
+    expect(first.ledger.monthlyCharLimit).toBe(SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS);
+    expect(first.ledger.remainingRequests).toBe(2);
+    expect(first.ledger.remainingCharacters).toBe(
+      SCRIPT_TO_VOICE_MAX_PAID_CHARACTERS - Array.from(safeLine).length,
+    );
 
     const duplicate = await service.generate({
       characterId: GOAT_CHARACTER_ID,
@@ -322,6 +487,16 @@ describe('preview-only confirmed script-to-voice', () => {
     expect(SCRIPT_TO_VOICE_COPY.cadence).toBe('One confirmed line at a time');
     expect(SCRIPT_TO_VOICE_COPY.paidWarning).toBe('Paid ElevenLabs generation — confirmation required');
     expect(identity.checkpoint).toBe('TIVVLEJOY_VOICE_IDENTITY_LOCK_V1');
+    expect(publicPreviewVoiceAllowance()).toEqual({
+      paidCharactersUsed: 0,
+      paidRequests: 0,
+      failedAttempts: 0,
+      remainingRequests: 3,
+      remainingCharacters: 750,
+      maxRequests: 3,
+      maxCharacters: 750,
+      maxCharsPerLine: 250,
+    });
     expect(ui).toContain(SCRIPT_TO_VOICE_COPY.pageTitle);
     expect(ui).not.toContain("from '@/lib/voice-production/voice-identity'");
     expect(ui).not.toContain("from '@/lib/voice-production/script-to-voice'");
@@ -338,5 +513,6 @@ describe('preview-only confirmed script-to-voice', () => {
     expect(ui).toContain("void fetch('/api/voice-production/script-to-voice')");
     expect(ui).toMatch(/onChange=\{\(event\) => \{\s+setText\(event\.target\.value\);/);
     expect(ui).not.toMatch(/onChange=\{\(event\) => \{\s+void fetch/);
+    expect(readRepo('apps/web/src/lib/script-to-voice.test.ts')).not.toContain('defaultCandidateTransport');
   });
 });
