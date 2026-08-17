@@ -9,6 +9,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { AppError, assertSafePath } from './errors';
+import { resolveWritableRuntimeDir } from './runtime-fs';
 
 /** Logical durable prefixes for production binaries. */
 export type StorageCategory =
@@ -125,7 +126,9 @@ export function resolveObjectStorageConfig(
   if (provider === 'local') {
     return {
       provider: 'local',
-      root: env.OBJECT_STORAGE_ROOT || `${process.cwd()}/.doodle-dash-storage`,
+      root:
+        env.OBJECT_STORAGE_ROOT ||
+        resolveWritableRuntimeDir('.doodle-dash-storage', { env }),
     };
   }
   if (provider === 's3' || provider === 'r2' || provider === 'b2' || provider === 'minio') {

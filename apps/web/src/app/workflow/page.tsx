@@ -14,27 +14,44 @@ import {
   advanceWorkflow,
   buildEpisode1DraftPackage,
   planSteps9To16Infrastructure,
+  planStudioCompletion25To32Infrastructure,
   summarizeWorkflow,
 } from '@doodle-dash/preproduction';
+import { StudioStatusPanel } from '@/components/StudioStatusPanel';
 import { currentStage as directionCurrentStage, evaluateTheatricalGate as directionTheatricalGate } from '@doodle-dash/direction';
+import { PreviewWorkflow } from '@/components/preview/PreviewWorkflow';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function WorkflowPage() {
+  if (isPublicWebsitePreview()) {
+    return (
+      <Suspense fallback={<p className="text-sm text-[var(--color-text-muted)]">Loading Preview workflow…</p>}>
+        <PreviewWorkflow />
+      </Suspense>
+    );
+  }
+  return WorkflowProductionPage();
+}
+
+async function WorkflowProductionPage() {
   const provider = readProviderStatus();
   const run = advanceWorkflow(PROXY_PIPELINE_BRIEF);
   const summary = summarizeWorkflow(run);
   const theatrical = directionTheatricalGate();
   const episode1 = buildEpisode1DraftPackage();
   const closed = planSteps9To16Infrastructure();
+  const completion = planStudioCompletion25To32Infrastructure();
 
   return (
     <div className="space-y-6 overflow-x-hidden">
       <header>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-sun-400">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-primary)]">
           {STUDIO_DISPLAY_NAME} · Episode Workflow
         </p>
-        <h1 className="mt-2 font-display text-3xl font-bold text-mist-100 sm:text-4xl">
+        <h1 className="mt-2 font-display text-3xl font-bold text-[var(--color-text)] sm:text-4xl">
           Character-independent production walk
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-[var(--muted)]">
@@ -44,7 +61,9 @@ export default async function WorkflowPage() {
         </p>
       </header>
 
-      <section className="rounded-[1.5rem] border border-sun-400/40 bg-sun-500/10 p-5 text-sm text-mist-100">
+      <StudioStatusPanel />
+
+      <section className="studio-card border-[var(--color-highlight)] p-5 text-sm">
         <h2 className="font-semibold">{PROXY_WATERMARK}</h2>
         <p className="mt-2 text-[var(--muted)]">
           Occupants are <span className="font-mono text-xs">{summary.occupants.join(', ')}</span>.
@@ -54,7 +73,7 @@ export default async function WorkflowPage() {
       </section>
 
       <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
-        <h2 className="font-display text-xl font-semibold text-mist-100">Gates still closed</h2>
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Gates still closed</h2>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2">
           <div>
             <dt className="text-xs uppercase text-leaf-300">Direction current stage</dt>
@@ -77,8 +96,8 @@ export default async function WorkflowPage() {
         </dl>
       </section>
 
-      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
-        <h2 className="font-display text-xl font-semibold text-mist-100">Stages</h2>
+      <section className="studio-card p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Stages</h2>
         <ol className="mt-3 space-y-2">
           {summary.stages.map((stage) => (
             <li key={stage.id} className="flex justify-between gap-3 rounded-2xl border border-[var(--line)] px-3 py-2">
@@ -86,7 +105,7 @@ export default async function WorkflowPage() {
                 {stage.id}
                 {summary.currentStage === stage.id ? ' · current' : ''}
               </span>
-              <span className={stage.status === 'DONE' ? 'text-leaf-300' : 'text-sun-300'}>
+              <span className={stage.status === 'DONE' ? 'status-success rounded-full px-2 py-0.5' : 'status-warning rounded-full px-2 py-0.5'}>
                 {stage.status}
               </span>
             </li>
@@ -94,8 +113,8 @@ export default async function WorkflowPage() {
         </ol>
       </section>
 
-      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
-        <h2 className="font-display text-xl font-semibold text-mist-100">Draft Episode 1</h2>
+      <section className="studio-card p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Draft Episode 1</h2>
         <p className="mt-2 text-[var(--muted)]">
           {episode1.label} · productionEligible={String(episode1.productionEligible)} ·
           canonical={String(episode1.canonical)}. Persistence for the proxy fixture is
@@ -103,16 +122,25 @@ export default async function WorkflowPage() {
         </p>
       </section>
 
-      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
-        <h2 className="font-display text-xl font-semibold text-mist-100">Steps 9–16</h2>
-        <p className="mt-2 text-[var(--muted)]">
+      <section className="studio-card p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Steps 9–16</h2>
+        <p className="mt-2 text-[var(--color-text-muted)]">
           Infrastructure is described only. Gate {closed.gateAllowed ? 'OPEN' : 'CLOSED'}. Stage{' '}
-          {closed.currentStage}. Workstreams stay BLOCKED.
+          {closed.currentStage}. Workstreams stay BLOCKED. This page does not open the gate.
         </p>
       </section>
 
-      <section className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-5 text-sm">
-        <h2 className="font-display text-xl font-semibold text-mist-100">Readiness</h2>
+      <section className="studio-card p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Steps 25–32</h2>
+        <p className="mt-2 text-[var(--color-text-muted)]">
+          Studio completion infrastructure is described only. Opened {String(completion.opened)}.
+          Gate {completion.gateAllowed ? 'OPEN' : 'CLOSED'}. Stage {completion.currentStage}.
+          Workstreams stay BLOCKED.
+        </p>
+      </section>
+
+      <section className="studio-card p-5 text-sm">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Readiness</h2>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2">
           <div>
             <dt className="text-xs uppercase text-leaf-300">QC technical</dt>

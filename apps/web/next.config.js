@@ -8,6 +8,7 @@ const nextConfig = {
     '@doodle-dash/characters',
     '@doodle-dash/story',
     '@doodle-dash/direction',
+    '@doodle-dash/preproduction',
     '@doodle-dash/production',
     '@doodle-dash/rendering',
     '@doodle-dash/audio',

@@ -1,0 +1,49 @@
+{
+  "capturedAt": "2026-08-16T17:16:00Z",
+  "baseCommit": "d857a033ed8869200ec22f88cb4b8e657b7c93a6",
+  "branch": "cursor/tivvlejoy-welcoming-ui-73f1",
+  "note": "Before-and-after SHA-256 hashes. UI work did not modify these files.",
+  "files": {
+    "production-library/characters/pip_production.blend": {
+      "before": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0",
+      "after": "e15e6736f9111309d78dd8783cec1286eafdeffdf8481f964f22d7d5037dfca0",
+      "changed": false
+    },
+    "production-library/characters/goat_production.blend": {
+      "before": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8",
+      "after": "e40b341ca0ed62eb5bc476cd761d6d94d72f8e7481957e505662466c84a420d8",
+      "changed": false
+    },
+    "production-library/characters/pip_production.png": {
+      "before": "9f22cbb6c419dce78bbe49ca2e6bb82f2f46a2fe78d1f8af48eebf9fea5bef5a",
+      "after": "9f22cbb6c419dce78bbe49ca2e6bb82f2f46a2fe78d1f8af48eebf9fea5bef5a",
+      "changed": false
+    },
+    "production-library/characters/goat_production.png": {
+      "before": "b2f1d03eff7ef32a9560f40d4c0ec468642ccdf513d406e282b487f0e4278a2c",
+      "after": "b2f1d03eff7ef32a9560f40d4c0ec468642ccdf513d406e282b487f0e4278a2c",
+      "changed": false
+    },
+    "production-library/environments/meadow_production.blend": {
+      "before": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015",
+      "after": "bdfd0656ff719fb3df4d6b84313f807ee6b93a70e17784cc2aac9e4ee24aa015",
+      "changed": false
+    },
+    "production-library/props/adventure_map.blend": {
+      "before": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea",
+      "after": "c42f8300580e0fb3dc89b1ece177dbce6d3f91dbe764411c8ddaa9c6dd7b0aea",
+      "changed": false
+    },
+    "production-library/library_manifest.json": {
+      "before": "10d5290585e10338bbd5852f9c412fc6feb1ea5deccb58184d879c6bf9ca49f4",
+      "after": "10d5290585e10338bbd5852f9c412fc6feb1ea5deccb58184d879c6bf9ca49f4",
+      "changed": false
+    }
+  },
+  "gitEvidence": {
+    "productionLibraryInDiff": false,
+    "envFilesTouched": false,
+    "stageLogicTouched": false,
+    "paidResourcesUsed": false
+  }
+}

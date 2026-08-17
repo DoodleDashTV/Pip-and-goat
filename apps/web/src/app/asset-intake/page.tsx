@@ -11,8 +11,17 @@ import { CanonicalCharacterIntakeCard } from '@/components/CanonicalCharacterInt
 import { StorageHealthPanel } from '@/components/StorageHealthPanel';
 import { UploadDropzone } from '@/components/UploadDropzone';
 import Link from 'next/link';
+import { PreviewAssetIntake } from '@/components/preview/PreviewAssetIntake';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
 
 export const dynamic = 'force-dynamic';
+
+export default async function AssetIntakePreviewOrProduction() {
+  if (isPublicWebsitePreview()) {
+    return <PreviewAssetIntake />;
+  }
+  return AssetIntakePage();
+}
 
 function SlotList({
   title,
@@ -71,7 +80,7 @@ function pickCandidate(
   );
 }
 
-export default async function AssetIntakePage() {
+async function AssetIntakePage() {
   await canonicalCharacterService.bootstrapFoundingCharacters();
   const storage = await durableStorageOpsService.health();
 

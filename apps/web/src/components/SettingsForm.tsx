@@ -12,14 +12,14 @@ export function SettingsForm({
   const [pending, startTransition] = useTransition();
 
   return (
-    <section className="rounded-[1.75rem] border border-[var(--line)] bg-[var(--panel)] p-6">
+    <section className="studio-card p-6">
       <h2 className="font-display text-2xl font-semibold">Character Lock</h2>
-      <p className="mt-2 max-w-2xl text-sm text-[var(--muted)]">
+      <p className="mt-2 max-w-2xl text-sm text-[var(--color-text-muted)]">
         When enabled, native 3D renders require an approved PRODUCTION_READY character model, rig,
         and facial rig. Missing assets block final render.
       </p>
 
-      <label className="mt-6 flex items-center gap-3 text-sm font-semibold">
+      <label className="mt-6 flex min-h-touch items-center gap-3 text-sm font-semibold">
         <input
           type="checkbox"
           checked={strict}
@@ -45,11 +45,20 @@ export function SettingsForm({
               setMessage('Saved');
             });
           }}
-          className="h-4 w-4 accent-[#6fbf88]"
+          className="h-5 w-5 accent-[var(--color-primary)]"
         />
         STRICT_CHARACTER_LOCK
       </label>
-      {message ? <p className="mt-3 text-sm text-leaf-300">{message}</p> : null}
+      {message ? (
+        <p
+          className={`mt-3 text-sm font-semibold ${
+            message === 'Saved' ? 'status-success inline-flex rounded-full px-3 py-1' : 'status-error inline-flex rounded-full px-3 py-1'
+          }`}
+        >
+          <span aria-hidden="true">{message === 'Saved' ? '✓' : '×'}</span>
+          <span className="ml-2">{message}</span>
+        </p>
+      ) : null}
     </section>
   );
 }

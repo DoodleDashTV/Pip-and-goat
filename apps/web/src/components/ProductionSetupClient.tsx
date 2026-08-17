@@ -51,10 +51,10 @@ type StorageHealth = {
 };
 
 const STATE_STYLE: Record<SetupState, string> = {
-  READY: 'bg-leaf-500/15 text-leaf-300',
-  ACTION_REQUIRED: 'bg-sun-500/15 text-sun-300',
-  BLOCKED: 'bg-rose-500/15 text-rose-200',
-  WARNING: 'bg-sun-500/10 text-sun-200',
+  READY: 'status-success',
+  ACTION_REQUIRED: 'status-warning',
+  BLOCKED: 'status-error',
+  WARNING: 'status-warning',
 };
 
 function yn(v: boolean) {

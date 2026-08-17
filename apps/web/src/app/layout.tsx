@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { STUDIO_DISPLAY_NAME } from '@doodle-dash/domain';
 import './globals.css';
 import { StudioShell } from '@/components/StudioShell';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
 
 export const metadata: Metadata = {
   title: STUDIO_DISPLAY_NAME,
@@ -12,8 +13,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <StudioShell>{children}</StudioShell>
+      <body className="overflow-x-hidden bg-[var(--color-background)] text-[var(--color-text)]">
+        <StudioShell isPreview={isPublicWebsitePreview()}>{children}</StudioShell>
       </body>
     </html>
   );

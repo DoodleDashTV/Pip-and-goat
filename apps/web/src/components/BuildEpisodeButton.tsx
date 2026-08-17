@@ -48,13 +48,18 @@ export function BuildEpisodeButton({
         type="button"
         disabled={busy}
         onClick={run}
-        className="rounded-2xl bg-leaf-500 px-5 py-3 text-sm font-extrabold text-ink-950 transition hover:bg-leaf-400 disabled:opacity-50"
+        className="btn-highlight px-5 py-3 text-sm"
       >
         {busy ? 'Building…' : 'BUILD EPISODE'}
       </button>
-      {error ? <pre className="whitespace-pre-wrap text-sm text-rose-300">{error}</pre> : null}
+      {error ? (
+        <pre className="status-error whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm">
+          <span className="font-bold">Error: </span>
+          {error}
+        </pre>
+      ) : null}
       {result ? (
-        <pre className="overflow-x-auto whitespace-pre-wrap rounded-2xl bg-ink-950/50 p-4 text-xs text-mist-100">
+        <pre className="overflow-x-auto whitespace-pre-wrap rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-4 text-xs text-[var(--color-text)]">
           {result}
         </pre>
       ) : null}

@@ -2,8 +2,17 @@ import { prisma } from '@doodle-dash/database';
 import { productionReadinessService } from '@doodle-dash/production';
 import { universeService } from '@doodle-dash/universe';
 import Link from 'next/link';
+import { PreviewReadiness } from '@/components/preview/PreviewReadiness';
+import { isPublicWebsitePreview } from '@/lib/public-preview';
 
 export const dynamic = 'force-dynamic';
+
+export default async function ReadinessPreviewOrProduction() {
+  if (isPublicWebsitePreview()) {
+    return <PreviewReadiness />;
+  }
+  return ReadinessPage();
+}
 
 const STATE_COLOR: Record<string, string> = {
   READY: 'text-leaf-300',
@@ -12,7 +21,7 @@ const STATE_COLOR: Record<string, string> = {
   NOT_CONFIGURED: 'text-mist-200/70',
 };
 
-export default async function ReadinessPage() {
+async function ReadinessPage() {
   const universe = await universeService.getPrimaryUniverse();
   const rows = universe
     ? await productionReadinessService.snapshotUniverse(universe.id)

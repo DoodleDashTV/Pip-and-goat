@@ -7,6 +7,13 @@ export {
 } from './errors';
 
 export {
+  ensureWritableDir,
+  isServerlessRuntime,
+  resolveWritableRuntimeDir,
+  type RuntimeEnv,
+} from './runtime-fs';
+
+export {
   DURABLE_STORAGE_PREFIXES,
   InMemoryObjectStorage,
   LocalFilesystemStorage,

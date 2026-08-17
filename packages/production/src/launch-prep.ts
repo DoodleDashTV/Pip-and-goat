@@ -8,6 +8,7 @@ import {
   migrateLocalUriToStorage,
   normalizeStorageCategory,
   resolveObjectStorageConfig,
+  resolveWritableRuntimeDir,
   runObjectStorageSelfTest,
   sha256Hex,
   storageKeyFor,
@@ -303,7 +304,8 @@ export class DurableStorageOpsService {
       );
     }
     const localRoot =
-      process.env.OBJECT_STORAGE_ROOT || `${process.cwd()}/.doodle-dash-storage`;
+      process.env.OBJECT_STORAGE_ROOT ||
+      resolveWritableRuntimeDir('.doodle-dash-storage');
     const rows = await prisma.storedProductionObject.findMany({
       where: { provider: 'local', uri: { startsWith: 'local://' } },
       orderBy: { createdAt: 'asc' },

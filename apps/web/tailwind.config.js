@@ -5,25 +5,38 @@ module.exports = {
     extend: {
       colors: {
         ink: {
-          950: '#0c1210',
-          900: '#121a17',
-          800: '#1a2621',
-          700: '#24332c',
+          950: 'var(--color-text)',
+          900: 'var(--color-surface-subtle)',
+          800: 'var(--color-surface)',
+          700: 'var(--color-surface-subtle)',
         },
         leaf: {
-          300: '#9fd6b0',
-          400: '#6fbf88',
-          500: '#3f9a5c',
-          600: '#2f7a48',
+          300: 'var(--color-primary)',
+          400: 'var(--color-primary)',
+          500: 'var(--color-primary)',
+          600: 'var(--color-primary-hover)',
         },
         sun: {
-          300: '#ffe08a',
-          400: '#ffc94a',
-          500: '#f0a820',
+          300: 'var(--color-warning)',
+          400: 'var(--color-highlight)',
+          500: 'var(--color-highlight)',
         },
         mist: {
-          100: '#eef6f1',
-          200: '#d7e8de',
+          100: 'var(--color-text)',
+          200: 'var(--color-text-muted)',
+        },
+        joy: {
+          background: 'var(--color-background)',
+          surface: 'var(--color-surface)',
+          primary: 'var(--color-primary)',
+          highlight: 'var(--color-highlight)',
+          coral: 'var(--color-coral)',
+          explorer: 'var(--color-explorer-green)',
+          navigation: 'var(--color-navigation)',
+          success: 'var(--color-success)',
+          warning: 'var(--color-warning)',
+          error: 'var(--color-error)',
+          focus: 'var(--color-focus)',
         },
       },
       fontFamily: {
@@ -31,11 +44,16 @@ module.exports = {
         sans: ['"Nunito"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        studio: '0 18px 50px rgba(12, 18, 16, 0.28)',
+        studio: 'var(--shadow-studio)',
       },
       backgroundImage: {
-        'studio-glow':
-          'radial-gradient(ellipse at 20% 0%, rgba(111,191,136,0.22), transparent 50%), radial-gradient(ellipse at 90% 10%, rgba(240,168,32,0.16), transparent 45%), linear-gradient(160deg, #0c1210 0%, #16221c 45%, #1a2621 100%)',
+        'studio-glow': 'linear-gradient(180deg, var(--color-background) 0%, var(--color-surface-subtle) 100%)',
+      },
+      minHeight: {
+        touch: 'var(--touch-min)',
+      },
+      minWidth: {
+        touch: 'var(--touch-min)',
       },
     },
   },

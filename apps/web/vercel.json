@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "cd ../.. && DATABASE_URL=postgresql://preview:preview@127.0.0.1:5432/preview pnpm db:generate && pnpm --filter @doodle-dash/web build"
+}
