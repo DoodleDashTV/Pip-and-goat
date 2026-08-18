@@ -5,7 +5,8 @@ Updated: 2026-08-18
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-scenery-asset-intake-73f1`
+- Working branch: `cursor/tivvlejoy-scenery-intake-preview-73f1`
+- Scenery asset intake (Draft PR #44, keep draft and unmerged): `cursor/tivvlejoy-scenery-asset-intake-73f1` @ `b7f8c6785cfef661c434e960e3bcd3ccd91ff66c`
 - Scenery foundation (Draft PR #43, keep draft and unmerged): `cursor/tivvlejoy-scenery-foundation-73f1` @ `32a9e222518e2986104bff28442c5f73fca0ef16`
 - Durable Preview voice ledger (Draft PR #42, keep draft and unmerged): `cursor/tivvlejoy-durable-voice-ledger-73f1` @ `f51f8753dd495ab086aa2e81e4fb98aebe895650`
 - Episode line voice workflow (Draft PR #41, keep draft and unmerged): `cursor/tivvlejoy-episode-line-voice-workflow-73f1` @ `0781409f9dc7e17b1c4a97f42f1a634f27116d5e`
@@ -119,6 +120,17 @@ database is connected.
 - Independent server-side SHA-256 of stored R2 objects is unavailable in this serverless environment
 - Blender 4.2 was not available and was not executed
 - Intake UI and multipart session workflow are connection-ready when R2 credentials are absent
+- Checkpoint TIVVLEJOY_SCENERY_ASSET_INTAKE_PREVIEW_V1 deploys Draft PR #45 as a Vercel Preview only
+- Draft PR #44 stayed open, draft, and unmerged
+- Vercel Preview storage configuration is `unavailable`; Preview `R2_*` names are not present on that host
+- Local agent R2 names are present; `TIVVLEJOY_SCENERY_ASSET_PREFIX` and `TIVVLEJOY_SCENERY_INTAKE_TOKEN` are missing here
+- Unauthorized Preview mutations return 401 `INTAKE_UNAUTHORIZED` for create, sign, complete, query, resume, and abort
+- A synthetic 94-byte text fixture completed multipart upload to `quarantine/preview-tests/`, was not inspection-ready, and was deleted
+- `tivvlejoy-assets/source/` object count was 0 before and 0 after synthetic cleanup
+- No purchased scenery bytes were uploaded, inspected, normalized, or approved
+- GET `/` and GET `/scenery` on the Preview returned 200
+- Preview Only Scenery Asset Intake, four collection cards, multiple-file selection, the 27-file checklist, and “Upload does not mean asset approval” rendered with TivvleJoy wording
+- Large synthetic bytes were PUT to a signed storage URL, not a Vercel request body
 
 ## Tests / validation
 
@@ -129,6 +141,7 @@ database is connected.
 - `pnpm validate:studio-completion`
 - `pnpm validate:scenery`
 - `pnpm validate:scenery-intake`
+- `pnpm validate:scenery-intake-preview`
 - `pnpm test`
 - `pnpm typecheck`
 - `pnpm lint`
@@ -139,7 +152,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #43, or later stacked voice or scenery drafts.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #43, #44, #45, or later stacked voice or scenery drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

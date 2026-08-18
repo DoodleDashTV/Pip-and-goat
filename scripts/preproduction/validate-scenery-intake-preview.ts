@@ -215,32 +215,36 @@ async function runLiveSynthetic(): Promise<void> {
   record('purchased source count after', after.count === 0 ? 'PASS' : 'FAIL', String(after.count));
 }
 
-await runLiveSynthetic().catch((error) => {
-  record('live synthetic multipart', 'FAIL', error instanceof Error ? error.message : String(error));
-});
+void (async () => {
+  try {
+    await runLiveSynthetic();
+  } catch (error) {
+    record('live synthetic multipart', 'FAIL', error instanceof Error ? error.message : String(error));
+  }
 
-const failed = checks.filter((item) => item.status === 'FAIL').length;
-writeFileSync(
-  path.join(OUT_DIR, 'validate.json'),
-  `${JSON.stringify(
-    {
-      ok: failed === 0,
-      passed: checks.filter((item) => item.status === 'PASS').length,
-      failed,
-      skipped: checks.filter((item) => item.status === 'SKIP').length,
-      localR2,
-      purchasedSourceCountBefore: purchasedBefore,
-      purchasedSourceCountAfter: purchasedAfter,
-      synthetic,
-      checks,
-    },
-    null,
-    2,
-  )}\n`,
-);
+  const failed = checks.filter((item) => item.status === 'FAIL').length;
+  writeFileSync(
+    path.join(OUT_DIR, 'validate.json'),
+    `${JSON.stringify(
+      {
+        ok: failed === 0,
+        passed: checks.filter((item) => item.status === 'PASS').length,
+        failed,
+        skipped: checks.filter((item) => item.status === 'SKIP').length,
+        localR2,
+        purchasedSourceCountBefore: purchasedBefore,
+        purchasedSourceCountAfter: purchasedAfter,
+        synthetic,
+        checks,
+      },
+      null,
+      2,
+    )}\n`,
+  );
 
-if (failed) {
-  console.error(`scenery intake preview validation failed: ${failed}/${checks.length}`);
-  process.exit(1);
-}
-console.log(`scenery intake preview validation passed: ${checks.filter((item) => item.status === 'PASS').length}/${checks.length}`);
+  if (failed) {
+    console.error(`scenery intake preview validation failed: ${failed}/${checks.length}`);
+    process.exit(1);
+  }
+  console.log(`scenery intake preview validation passed: ${checks.filter((item) => item.status === 'PASS').length}/${checks.length}`);
+})();

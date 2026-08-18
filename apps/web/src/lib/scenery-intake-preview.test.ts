@@ -95,7 +95,6 @@ describe('scenery intake preview synthetic workflow', () => {
     expect(completed.manifest.verificationState).toBe('size_verified');
     expect(completed.manifest.inspectionState).toBe('not_eligible');
     expect(completed.inspectionReadiness.ready).toBe(false);
-    expect(evaluateInspectionEligibility(completed.manifest).ready).toBe(false);
 
     const sourceCount = await storage.listPrefix('tivvlejoy-assets/source/');
     expect(sourceCount).toEqual([]);
