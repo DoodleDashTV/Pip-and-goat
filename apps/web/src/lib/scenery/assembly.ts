@@ -10,7 +10,8 @@ export const AssemblyRequestSchema = z.object({
   approvedSceneOverwrite: z.boolean().default(false),
 });
 
-export type AssemblyRequest = z.infer<typeof AssemblyRequestSchema>;
+export type AssemblyRequest = z.input<typeof AssemblyRequestSchema>;
+export type ParsedAssemblyRequest = z.output<typeof AssemblyRequestSchema>;
 
 export const AssemblyReportSchema = z.object({
   schemaVersion: z.literal(SCENERY_SCHEMA_VERSION),

@@ -10,7 +10,8 @@ export const IngestionInspectRequestSchema = z.object({
   dryRun: z.boolean().default(true),
 });
 
-export type IngestionInspectRequest = z.infer<typeof IngestionInspectRequestSchema>;
+export type IngestionInspectRequest = z.input<typeof IngestionInspectRequestSchema>;
+export type ParsedIngestionInspectRequest = z.output<typeof IngestionInspectRequestSchema>;
 
 export const IngestionReportSchema = z.object({
   schemaVersion: z.literal(SCENERY_SCHEMA_VERSION),

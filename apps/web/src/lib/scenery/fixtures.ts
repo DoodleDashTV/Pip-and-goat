@@ -21,41 +21,21 @@ function boundsFromSize(x: number, y: number, z: number) {
   };
 }
 
-function fixtureAsset(
-  partial: Omit<
-    CatalogAsset,
-    | 'schemaVersion'
-    | 'collection'
-    | 'style'
-    | 'sourceId'
-    | 'normalizedBlendPath'
-    | 'proxyPath'
-    | 'previewPath'
-    | 'originPolicy'
-    | 'surfaceRequirements'
-    | 'allowedScaleRange'
-    | 'materials'
-    | 'textureTierAvailability'
-    | 'estimatedMemoryMb'
-    | 'heroSafe'
-    | 'backgroundSafe'
-    | 'clearanceBounds'
-    | 'animationCapable'
-    | 'geometryNodesCapable'
-    | 'licensingProvenanceRef'
-    | 'compatibilityStatus'
-    | 'validationFindings'
-    | 'bytesInspected'
-  > & {
-    width: number;
-    height: number;
-    depth: number;
-    triangles: number;
-    approvalStatus?: CatalogAsset['approvalStatus'];
-    placementMode?: CatalogAsset['placementMode'];
-    rotationPolicy?: CatalogAsset['rotationPolicy'];
-  },
-): CatalogAsset {
+function fixtureAsset(partial: {
+  assetId: string;
+  displayName: string;
+  assetType: CatalogAsset['assetType'];
+  biome: CatalogAsset['biome'];
+  tags: string[];
+  sourceObjectName: string;
+  width: number;
+  height: number;
+  depth: number;
+  triangles: number;
+  approvalStatus?: CatalogAsset['approvalStatus'];
+  placementMode?: CatalogAsset['placementMode'];
+  rotationPolicy?: CatalogAsset['rotationPolicy'];
+}): CatalogAsset {
   const { width, height, depth, triangles, ...rest } = partial;
   return {
     schemaVersion: SCENERY_SCHEMA_VERSION,
