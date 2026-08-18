@@ -18,12 +18,17 @@ const os = require('node:os');
 
 const { runBlenderPreflight } = require('./blender-preflight');
 const { resolveHeadlessGlConfig } = require('./headless-gl');
+const { buildRenderSubprocessEnvironment } = require('./child-env');
 
-function parseNvidiaSmi() {
+function diagnosticChildEnv(sourceEnv = process.env) {
+  return buildRenderSubprocessEnvironment({ PATH: sourceEnv.PATH || process.env.PATH, ...sourceEnv });
+}
+
+function parseNvidiaSmi(sourceEnv = process.env) {
   const res = spawnSync(
     'nvidia-smi',
     ['--query-gpu=name,memory.total', '--format=csv,noheader,nounits'],
-    { encoding: 'utf8', timeout: 15_000 },
+    { encoding: 'utf8', timeout: 15_000, env: diagnosticChildEnv(sourceEnv) },
   );
   if (res.status !== 0) {
     return { gpuModel: null, vramGb: null, error: res.stderr || 'nvidia-smi failed' };
@@ -37,8 +42,8 @@ function parseNvidiaSmi() {
   };
 }
 
-function blenderVersion() {
-  const res = spawnSync('blender', ['--version'], { encoding: 'utf8', timeout: 15_000 });
+function blenderVersion(sourceEnv = process.env) {
+  const res = spawnSync('blender', ['--version'], { encoding: 'utf8', timeout: 15_000, env: diagnosticChildEnv(sourceEnv) });
   const out = `${res.stdout || ''}\n${res.stderr || ''}`;
   const m = out.match(/Blender\s+([0-9.]+)/i);
   return m ? m[1] : null;
@@ -80,8 +85,8 @@ function evaluateHealth(opts = {}) {
   const env = opts.env || process.env;
   const allowCpuFallback =
     opts.allowCpuFallback ?? String(env.ALLOW_CPU_DIAGNOSTIC_FALLBACK || 'false').toLowerCase() === 'true';
-  const smi = opts.parseNvidiaSmi ? opts.parseNvidiaSmi() : parseNvidiaSmi();
-  const version = opts.blenderVersion ? opts.blenderVersion() : blenderVersion();
+  const smi = opts.parseNvidiaSmi ? opts.parseNvidiaSmi() : parseNvidiaSmi(env);
+  const version = opts.blenderVersion ? opts.blenderVersion() : blenderVersion(env);
   resolveHeadlessGlConfig({ env, forceSoftware: allowCpuFallback && !smi.gpuModel });
   const bench = runTinyEeveeBenchmark({
     env,

@@ -49,7 +49,12 @@ function safeReadWorkerVersion() {
 
 function binVersion(bin, arg = '--version') {
   try {
-    const res = spawnSync(bin, [arg], { encoding: 'utf8', timeout: 15_000 });
+    const { buildRenderSubprocessEnvironment } = require('./child-env');
+    const res = spawnSync(bin, [arg], {
+      encoding: 'utf8',
+      timeout: 15_000,
+      env: buildRenderSubprocessEnvironment(process.env),
+    });
     const out = `${res.stdout || ''}\n${res.stderr || ''}`.trim();
     return out.split('\n')[0] || null;
   } catch {
@@ -185,7 +190,11 @@ function redactMessage(text, max = 500) {
   const s = String(text || '')
     .replace(/\brpa_[A-Za-z0-9]+/g, 'rpa_[REDACTED]')
     .replace(/Bearer\s+\S+/gi, 'Bearer [REDACTED]')
-    .replace(/(secretaccesskey|accesskeyid)["']?\s*[:=]\s*["']?[^\s"',}]+/gi, '$1=[REDACTED]');
+    .replace(/\bghp_[A-Za-z0-9]+/g, 'ghp_[REDACTED]')
+    .replace(
+      /(RUNPOD_API_KEY|R2_SECRET_ACCESS_KEY|OBJECT_STORAGE_SECRET_ACCESS_KEY|GITHUB_TOKEN|secretaccesskey|accesskeyid)["']?\s*[:=]\s*["']?[^\s"',}]+/gi,
+      '$1=[REDACTED]',
+    );
   return s.length > max ? s.slice(0, max) + '...' : s;
 }
 

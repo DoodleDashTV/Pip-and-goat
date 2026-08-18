@@ -18,6 +18,7 @@ const path = require('node:path');
 
 const { runInstrumented } = require('./child-proc');
 const { resolveHeadlessGlConfig, applyHeadlessGlEnv } = require('./headless-gl');
+const { buildRenderSubprocessEnvironment } = require('./child-env');
 
 const PREFLIGHT_SENTINEL = 'DDP_PREFLIGHT_OK';
 
@@ -79,15 +80,21 @@ function looksLikeGlContextFailure(text) {
 function runBlenderPreflight(opts = {}) {
   const blenderBin = opts.blenderBin || (opts.env && opts.env.BLENDER_BIN) || 'blender';
   const timeoutMs = opts.timeoutMs ?? 90_000;
-  const glConfig = resolveHeadlessGlConfig({ env: opts.env, forceSoftware: opts.forceSoftware });
+  const source = opts.env || {};
+  const sanitizedBase = buildRenderSubprocessEnvironment({
+    PATH: source.PATH || process.env.PATH || '/usr/bin',
+    ...source,
+  });
+  const glConfig = resolveHeadlessGlConfig({ env: sanitizedBase, forceSoftware: opts.forceSoftware });
 
   // Injectable path for unit tests (no real Blender).
   if (opts.runCommand) {
-    const res = opts.runCommand(blenderBin, ['--version']);
+    const injectedEnv = applyHeadlessGlEnv(sanitizedBase, glConfig);
+    const res = opts.runCommand(blenderBin, ['--version'], { env: injectedEnv });
     if (!res || res.status !== 0) {
       return { ok: false, code: 'BLENDER_NOT_FOUND', glMode: glConfig.mode, engineUsed: null, durationMs: 0, diagnostic: {}, reason: 'Blender binary not runnable.' };
     }
-    const run = opts.runCommand(blenderBin, ['--background', '--factory-startup', '--python', '<preflight>']);
+    const run = opts.runCommand(blenderBin, ['--background', '--factory-startup', '--python', '<preflight>'], { env: injectedEnv });
     const combined = `${(run && run.stdout) || ''}\n${(run && run.stderr) || ''}`;
     if (run && run.status === 0 && combined.includes(PREFLIGHT_SENTINEL)) {
       return { ok: true, code: null, glMode: glConfig.mode, engineUsed: 'BLENDER_EEVEE_NEXT', durationMs: 0, diagnostic: {}, reason: 'Preflight passed (injected).' };
@@ -109,8 +116,15 @@ function runBlenderPreflight(opts = {}) {
   const outPath = path.join(dir, 'preflight.png');
   fs.writeFileSync(scriptPath, PREFLIGHT_PY);
 
+  const sourceEnv = opts.env || process.env;
   const childEnv = applyHeadlessGlEnv(
-    { ...(opts.env || process.env), DDP_PREFLIGHT_OUT: outPath, DDP_PREFLIGHT_ENGINE: opts.engine || 'BLENDER_EEVEE_NEXT' },
+    buildRenderSubprocessEnvironment(
+      { PATH: sourceEnv.PATH || process.env.PATH || '/usr/bin', ...sourceEnv },
+      {
+        DDP_PREFLIGHT_OUT: outPath,
+        DDP_PREFLIGHT_ENGINE: opts.engine || 'BLENDER_EEVEE_NEXT',
+      },
+    ),
     glConfig,
   );
 

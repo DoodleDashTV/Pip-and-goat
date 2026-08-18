@@ -28,11 +28,18 @@ const { EXIT_CLASS, classifyCode } = require('./exit-codes');
 const { runBlenderPreflight } = require('./blender-preflight');
 const { computeCostAwareMaxRuntime } = require('./watchdog');
 const { resolveHeadlessGlConfig, applyHeadlessGlEnv } = require('./headless-gl');
+const { assertChildEnvIsolated, buildRenderSubprocessEnvironment } = require('./child-env');
 
 function redact(text) {
   return String(text || '')
     .replace(/\brpa_[A-Za-z0-9]+/g, 'rpa_[REDACTED]')
-    .replace(/Bearer\s+\S+/gi, 'Bearer [REDACTED]');
+    .replace(/Bearer\s+\S+/gi, 'Bearer [REDACTED]')
+    .replace(/\bghp_[A-Za-z0-9]+/g, 'ghp_[REDACTED]')
+    .replace(/\bgithub_pat_[A-Za-z0-9_]+/g, 'github_pat_[REDACTED]')
+    .replace(
+      /(RUNPOD_API_KEY|R2_SECRET_ACCESS_KEY|OBJECT_STORAGE_SECRET_ACCESS_KEY|GITHUB_TOKEN|GH_TOKEN|GITHUB_PAT|VERCEL_TOKEN|VERCEL_OIDC_TOKEN|Authorization)\s*[":=]\s*\S+/gi,
+      '$1=[REDACTED]',
+    );
 }
 
 async function runSingleShot(options = {}) {
@@ -194,6 +201,20 @@ async function runSingleShot(options = {}) {
     await setBootStage(BOOT_STAGE.ASSETS_READY, { timings });
     await writeStatus('RENDERING', { timings });
 
+    // Sanitize FIRST, then overlay GL/EGL. Never: process.env → applyHeadlessGlEnv → child.
+    // R2/GitHub/Vercel/launcher secrets and any platform-injected Pod-scoped
+    // RUNPOD_API_KEY stay in the Node worker. Render children get the allowlist only.
+    let childBase;
+    let renderEnv;
+    let glConfig;
+    try {
+      childBase = buildRenderSubprocessEnvironment({ PATH: env.PATH || process.env.PATH, ...env });
+      glConfig = resolveHeadlessGlConfig({ env: childBase });
+      renderEnv = assertChildEnvIsolated(applyHeadlessGlEnv(childBase, glConfig));
+    } catch (e) {
+      return fail(e.code || 'CHILD_ENV_UNSAFE', e.message);
+    }
+
     // 2b. Blender headless preflight — verify Blender launches, EEVEE is
     // available, and a minimal scene (camera+light+mesh) renders BEFORE
     // committing the pod to the real render. Skipped when a runCommand is
@@ -203,7 +224,7 @@ async function runSingleShot(options = {}) {
       await setBootStage(BOOT_STAGE.BLENDER_PREFLIGHT_START, {});
       await checkBudget('blender preflight');
       const preflight = (options.runBlenderPreflight || runBlenderPreflight)({
-        env,
+        env: childBase,
         blenderBin: env.BLENDER_BIN || 'blender',
         timeoutMs: Number(env.BLENDER_PREFLIGHT_TIMEOUT_MS || 90_000),
       });
@@ -226,14 +247,9 @@ async function runSingleShot(options = {}) {
     await checkBudget('render');
     const outputDir = path.join(workDir, 'output');
     const argv = renderCore.buildBlenderArgv({ manifest, assets, outputDir, assembleScript });
-    // Apply the resolved headless GL/EGL config (NVIDIA EGL on GPU, llvmpipe on
-    // CPU) to the REAL render spawn — not just the preflight — so EEVEE gets a
-    // valid off-screen context. Never clobbers operator-set GL env.
-    const glConfig = resolveHeadlessGlConfig({ env });
-    const renderEnv = applyHeadlessGlEnv(env, glConfig);
     log('render_gl_config', { glMode: glConfig.mode, gpuPresent: glConfig.gpuPresent });
     const budgetRunCommand = (bin, args, opts = {}) =>
-      renderCore.defaultRunCommand(bin, args, { timeout: Math.max(1000, remainingMs()), env: renderEnv, ...opts });
+      renderCore.defaultRunCommand(bin, args, { timeout: Math.max(1000, remainingMs()), ...opts, env: renderEnv });
     const renderStart = now();
     try {
       await renderCore.renderWithBlender({
@@ -241,6 +257,7 @@ async function runSingleShot(options = {}) {
         argv,
         outputDir,
         runCommand: options.runCommand || budgetRunCommand,
+        env: renderEnv,
         log: (e, d) => log(e, d),
       });
       await renderCore.verifyFrames({ manifest, outputDir });
@@ -261,6 +278,7 @@ async function runSingleShot(options = {}) {
         fps: manifest.fps,
         mp4Path,
         runCommand: options.runCommand || budgetRunCommand,
+        env: renderEnv,
       });
     } catch (e) {
       return fail(e.code || 'FFMPEG_FAILED', e.message);
@@ -273,7 +291,8 @@ async function runSingleShot(options = {}) {
       outputInfo = await renderCore.validateOutput({
         manifest,
         mp4Path,
-        runCommand: options.runCommand || renderCore.defaultRunCommand,
+        runCommand: options.runCommand || budgetRunCommand,
+        env: renderEnv,
       });
     } catch (e) {
       return fail(e.code || 'OUTPUT_INVALID', e.message);

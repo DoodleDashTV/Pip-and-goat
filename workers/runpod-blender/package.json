@@ -8,7 +8,7 @@
     "start": "node ./src/worker.js",
     "health": "node ./src/health.js",
     "test": "node --test",
-    "check": "node --check ./src/worker.js && node --check ./src/health.js && node --check ./src/gpu-health.js && node --check ./src/render-core.js && node --check ./src/single-shot.js && node --check ./src/manifest.js && node --check ./src/provenance.js"
+    "check": "node --check ./src/worker.js && node --check ./src/health.js && node --check ./src/gpu-health.js && node --check ./src/render-core.js && node --check ./src/single-shot.js && node --check ./src/manifest.js && node --check ./src/provenance.js && node --check ./src/child-env.js && node --check ./src/blender-preflight.js && node --check ./src/headless-gl.js && node --check ./src/child-proc.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.758.0"
