@@ -21,7 +21,7 @@ The phrase is not a secret. Wrong or missing phrase refuses the request and does
 
 ## Idempotency
 
-Before POST, the helper `GET /v1/templates` and runs the PR #57 compatibility rules.
+Before POST, the helper `GET /v1/templates` and runs the compatibility rules, including the provenance-backed normalization for `rc8eyeqhn2`.
 
 - 0 compatible and no intended name+image match → one `POST /v1/templates`
 - 1 compatible → `ALREADY_READY`, zero POST

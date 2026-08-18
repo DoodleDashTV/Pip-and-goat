@@ -18,12 +18,12 @@ import {
   SUGGESTED_CONTAINER_DISK_GB,
   SUGGESTED_TEMPLATE_NAME,
   SUGGESTED_VOLUME_IN_GB,
-  assessTemplateCompatibility,
   isAllowedTemplateRead,
   isForbiddenRunpodMutation,
   normalizeTemplateList,
   redactSecrets,
 } from './tivvlejoy-runpod-template-readiness.mjs';
+import { assessTemplateCompatibilityWithProvenance as assessTemplateCompatibility } from './tivvlejoy-runpod-template-normalization.mjs';
 
 export const CREATE_MODE = 'create-template';
 export const REQUIRED_CREATE_PHRASE = 'CREATE_TIVVLEJOY_TEMPLATE_D791981A';

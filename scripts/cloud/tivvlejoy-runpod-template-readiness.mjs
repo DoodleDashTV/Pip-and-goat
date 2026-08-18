@@ -147,7 +147,7 @@ export function assertNoTemplateMutation(recorder = { attempts: [] }) {
   return true;
 }
 
-function normalizeStringList(value) {
+export function normalizeStringList(value) {
   if (value == null || value === '') return [];
   if (Array.isArray(value)) return value.map((item) => String(item));
   if (typeof value === 'string') {
@@ -260,6 +260,8 @@ export function sanitizeTemplateSummary(template, verdict = {}) {
     envKeyNames: keys,
     envKeyCount: keys.length,
     persistentVolumeRequired: PERSISTENT_VOLUME_REQUIRED,
+    startSsh: typeof template?.startSsh === 'boolean' ? template.startSsh : null,
+    startJupyter: typeof template?.startJupyter === 'boolean' ? template.startJupyter : null,
     compatibilityVerdict: verdict.compatible === true ? 'COMPATIBLE' : verdict.compatible === false ? 'INCOMPATIBLE' : null,
     reasons: Array.isArray(verdict.reasons) ? [...verdict.reasons] : [],
   };
@@ -308,6 +310,7 @@ function emptyResult(overrides) {
     templateDeleted: false,
     rawBodyLogged: false,
     secretExposed: false,
+    observations: [],
     reasons: [],
     ...overrides,
   };
@@ -318,6 +321,7 @@ export async function auditTemplateReadiness({
   fetchFn = globalThis.fetch,
   log = () => {},
   mutationRecorder = { attempts: [] },
+  assessFn = assessTemplateCompatibility,
 } = {}) {
   const say = (line) => log(redactSecrets(line));
   const apiKey = typeof env.RUNPOD_API_KEY === 'string' ? env.RUNPOD_API_KEY.trim() : '';
@@ -371,16 +375,18 @@ export async function auditTemplateReadiness({
           reasons: ['MALFORMED_RESPONSE'],
         });
       }
-      const assessed = assessTemplateCompatibility(parsed);
+      const assessed = assessFn(parsed);
       const summary = { ...assessed.summary, templateConfigured: true, templateId: parsed.id || configuredId };
-      say(`TEMPLATE LOOKUP: ${assessed.compatible ? 'READY' : 'INCOMPATIBLE'}`);
+      const readyCode = assessed.compatible && assessed.provenanceMatched ? 'TEMPLATE_READY' : 'READY';
+      say(`TEMPLATE LOOKUP: ${assessed.compatible ? readyCode : 'INCOMPATIBLE'}`);
       return emptyResult({
         ok: assessed.compatible,
-        code: assessed.compatible ? 'READY' : 'INCOMPATIBLE',
+        code: assessed.compatible ? readyCode : 'INCOMPATIBLE',
         templateConfigured: true,
         configuredTemplateId: configuredId,
         compatibleCount: assessed.compatible ? 1 : 0,
         summaries: [summary],
+        observations: assessed.observations || [],
         reasons: assessed.reasons,
         desiredPlan: assessed.compatible ? null : DESIRED_TEMPLATE_PLAN,
       });
@@ -406,9 +412,24 @@ export async function auditTemplateReadiness({
       });
     }
 
-    const assessed = items.map((item) => assessTemplateCompatibility(item));
+    const intended = items.filter(
+      (item) => item && item.name === SUGGESTED_TEMPLATE_NAME && item.imageName === REQUIRED_IMAGE_NAME,
+    );
+    if (intended.length > 1) {
+      say('TEMPLATE LOOKUP: AMBIGUOUS_TEMPLATE_MATCH');
+      return emptyResult({
+        code: 'AMBIGUOUS_TEMPLATE_MATCH',
+        compatibleCount: 0,
+        summaries: [],
+        observations: [],
+        reasons: ['Multiple templates share the intended name and image. Do not guess.'],
+      });
+    }
+
+    const assessed = items.map((item) => assessFn(item));
     const compatible = assessed.filter((item) => item.compatible);
     const summaries = compatible.map((item) => ({ ...item.summary, templateConfigured: false }));
+    const observations = compatible.flatMap((item) => item.observations || []);
 
     if (compatible.length === 0) {
       say('TEMPLATE LOOKUP: TEMPLATE_REQUIRED');
@@ -421,12 +442,14 @@ export async function auditTemplateReadiness({
       });
     }
     if (compatible.length === 1) {
-      say('TEMPLATE LOOKUP: TEMPLATE_CANDIDATE_FOUND');
+      const readyCode = compatible[0].provenanceMatched ? 'TEMPLATE_READY' : 'TEMPLATE_CANDIDATE_FOUND';
+      say(`TEMPLATE LOOKUP: ${readyCode}`);
       return emptyResult({
         ok: true,
-        code: 'TEMPLATE_CANDIDATE_FOUND',
+        code: readyCode,
         compatibleCount: 1,
         summaries,
+        observations,
         reasons: [],
       });
     }
@@ -435,6 +458,7 @@ export async function auditTemplateReadiness({
       code: 'AMBIGUOUS_TEMPLATE_MATCH',
       compatibleCount: compatible.length,
       summaries,
+      observations,
       reasons: ['Multiple compatible templates found. Do not guess.'],
     });
   } catch (error) {
@@ -485,8 +509,19 @@ export function formatSanitizedAudit(result) {
         `containerDiskInGb=${summary.containerDiskInGb}`,
         `volumeInGb=${summary.volumeInGb}`,
         `volumeMountPath=${summary.volumeMountPath || ''}`,
+        `startSsh=${summary.startSsh}`,
+        `startJupyter=${summary.startJupyter}`,
+        `normalizationApplied=${summary.normalizationApplied === true}`,
+        `provenanceMatched=${summary.provenanceMatched === true}`,
         `reasons=${summary.reasons.join(',')}`,
       ].join(' '),
+    );
+  }
+  if (Array.isArray(result.observations) && result.observations.length > 0) {
+    lines.push(
+      `observations=${result.observations
+        .map((item) => `${item.field}=${item.value}:${item.source}`)
+        .join(';')}`,
     );
   }
   if (result.desiredPlan) {
@@ -508,9 +543,13 @@ async function main(argv = process.argv.slice(2), env = process.env) {
     console.log('usage: node scripts/cloud/tivvlejoy-runpod-template-readiness.mjs audit');
     return 2;
   }
+  const { assessTemplateCompatibilityWithProvenance } = await import(
+    './tivvlejoy-runpod-template-normalization.mjs'
+  );
   const result = await auditTemplateReadiness({
     env,
     log: (line) => console.log(line),
+    assessFn: assessTemplateCompatibilityWithProvenance,
   });
   console.log(formatSanitizedAudit(result));
   if (env.GITHUB_STEP_SUMMARY) {
@@ -518,6 +557,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   }
   const classified = new Set([
     'READY',
+    'TEMPLATE_READY',
     'INCOMPATIBLE',
     'NOT_FOUND',
     'TEMPLATE_REQUIRED',
