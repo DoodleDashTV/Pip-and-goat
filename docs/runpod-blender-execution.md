@@ -1,8 +1,10 @@
 # TivvleJoy remote Blender execution foundation
 
-Checkpoint: `TIVVLEJOY_RUNPOD_JOB_PACKAGE_STAGING_V1`
+Checkpoint: `TIVVLEJOY_WORKER_SECRET_BOUNDARY_HARDENING_V1`
 
 ## CURRENT STATUS
+
+**LEAST-PRIVILEGE WORKER SECRET BOUNDARY**
 
 **REMOTE JOB PACKAGE STAGING FOUNDATION**
 
@@ -124,13 +126,58 @@ Unit tests and dry-run use an in-memory R2 adapter only. Real R2 is not contacte
 
 ## Future worker environment contract
 
-From the job package: `RENDER_JOB_ID`, `RENDER_JOB_MANIFEST_KEY`.
+`buildWorkerEnvironment()` is an explicit allowlist. Unknown fields are refused. There is no `process.env` pass-through.
 
-From server-side secrets, never from the manifest: R2 access keys, `RUNPOD_API_KEY`, `RUNPOD_RENDER_TEMPLATE_ID`.
+## Trust boundary
 
-From guarded RunPod launch metadata: `RUNPOD_GPU_HOURLY_RATE`, pod/worker identity.
+GitHub / TivvleJoy launcher  
+HAS RunPod API credential  
+CAN create/delete Pod  
 
-From image/workspace config: R2 bucket/endpoint, `RENDER_WORKSPACE_DIR`, `BLENDER_BIN`, `BLENDER_ASSEMBLE_SCRIPT`.
+↓  
+
+RunPod worker  
+DOES NOT receive RunPod API credential  
+receives only job identity + scoped storage access + render metadata  
+
+↓  
+
+R2 job/assets/output  
+
+The existing worker `worker.js` can call `podTerminate` **only if** `RUNPOD_API_KEY` is present. TivvleJoy does not pass that key and forces `ALLOW_WORKER_SELF_TERMINATE=false`. Pod cleanup stays on the guarded launcher.
+
+The Blender worker cannot create Pods.  
+The Blender worker cannot delete Pods.  
+The Blender worker cannot query RunPod account resources using launcher credentials.  
+The Blender worker only performs the authorized single-shot render job.
+
+### FROM JOB PACKAGE
+
+`RENDER_JOB_ID`  
+`RENDER_JOB_MANIFEST_KEY`
+
+### WORKER-ALLOWED STORAGE SECRETS
+
+`R2_ACCESS_KEY_ID`  
+`R2_SECRET_ACCESS_KEY`  
+or approved `OBJECT_STORAGE_*` equivalents
+
+### LAUNCHER-ONLY SECRETS
+
+`RUNPOD_API_KEY`  
+`RUNPOD_RENDER_TEMPLATE_ID`  
+`RUNPOD_API_ENDPOINT`  
+`GITHUB_TOKEN`  
+Vercel tokens  
+`LAUNCH_TIVVLEJOY_GPU`
+
+### FROM GUARDED LAUNCH METADATA
+
+`RUNPOD_GPU_HOURLY_RATE`  
+`RUNPOD_POD_ID`  
+`RENDER_WORKER_ID`
+
+Never embed credentials in the job package or worker manifest. Sanitized logs redact R2 secrets, `rpa_` keys, Bearer tokens, GitHub tokens, and the approval phrase.
 
 Pod launch is not implemented here.
 
