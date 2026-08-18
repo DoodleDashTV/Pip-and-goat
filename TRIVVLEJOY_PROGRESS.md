@@ -5,7 +5,7 @@ Updated: 2026-08-18
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-scenery-intake-preview-73f1`
+- Working branch: `cursor/tivvlejoy-scenery-pipeline-hardening-73f1`
 - Scenery asset intake (Draft PR #44, keep draft and unmerged): `cursor/tivvlejoy-scenery-asset-intake-73f1` @ `b7f8c6785cfef661c434e960e3bcd3ccd91ff66c`
 - Scenery foundation (Draft PR #43, keep draft and unmerged): `cursor/tivvlejoy-scenery-foundation-73f1` @ `32a9e222518e2986104bff28442c5f73fca0ef16`
 - Durable Preview voice ledger (Draft PR #42, keep draft and unmerged): `cursor/tivvlejoy-durable-voice-ledger-73f1` @ `f51f8753dd495ab086aa2e81e4fb98aebe895650`
@@ -160,6 +160,7 @@ database is connected.
 - Production frontend build
 - This Preview pass: `pnpm test` 624/624 (40 files); typecheck pass; lint pass; web build pass; `validate:scenery` 15/15; `validate:scenery-intake` 16 tests + 14/14 script; `validate:scenery-intake-preview` 4 tests + 6/6 script; persist / studio-hardening / steps-9-16-closed / studio-completion 35 checks: pass
 - One-tap pass: `pnpm test` 625/625 (40 files); typecheck pass; lint pass; web build pass; `validate:scenery` 15/15; `validate:scenery-intake` 17 tests + 15/15 script; `validate:scenery-intake-preview` 4 tests + 6/6 script; persist pass; studio-hardening pass; steps-9-16-closed pass; studio-completion 35/35
+- Checkpoint TIVVLEJOY_SCENERY_PIPELINE_HARDENING_V1 adds recoverable multipart uploads, bounded large-file intake, complete 27-file validation, token/namespace hardening, duplicate identity cases, verification-before-inspection, non-executing inspection jobs, and redacted lifecycle events
 - Draft PR #46 stays open, draft, and unmerged on `cursor/tivvlejoy-scenery-one-tap-upload-73f1`
 - One-tap Preview deploy `dpl_8QhREWMqkfkQFVNdydnXka1q4h4o` is READY and not Production
 - Incorrect token still returns 401 `INTAKE_UNAUTHORIZED`; rotated token authorizes a safe non-upload query

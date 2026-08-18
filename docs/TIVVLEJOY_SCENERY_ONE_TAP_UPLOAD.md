@@ -17,7 +17,8 @@ It does **not** inspect, extract, convert, normalize, or approve assets. Product
 5. Unexpected, incorrect, and duplicate files are refused individually. Valid matches stay eligible.
 6. Tap **Upload or retry all eligible files**.
 7. Watch overall and per-file hash, multipart progress, stored size, duplicate, quarantine, and inspection-readiness.
-8. Resume, pause, and cancel remain available on eligible rows.
+8. Resume, pause, retry failed parts, and cancel remain available on eligible rows.
+9. Pipeline hardening (`TIVVLEJOY_SCENERY_PIPELINE_HARDENING_V1`) adds refresh recovery, verification, quarantine reasons, and inspection-readiness without changing the primary one-tap control.
 
 Upload does not mean asset approval.
 
