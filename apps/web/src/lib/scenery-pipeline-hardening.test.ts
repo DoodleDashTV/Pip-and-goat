@@ -685,4 +685,14 @@ describe('pipeline hardening ux and accessibility', () => {
       ],
     });
   });
+
+  it('never treats a failed or unverified manifest as an uploaded duplicate', () => {
+    const storeSource = readFileSync(
+      path.join(repoRoot, 'apps/web/src/lib/scenery/intake/store.ts'),
+      'utf8',
+    );
+    expect(storeSource).toContain("item.uploadState === 'completed'");
+    expect(storeSource).toContain("item.verificationState === 'size_verified'");
+    expect(storeSource).toContain("item.verificationState === 'independently_verified'");
+  });
 });

@@ -37,7 +37,14 @@ export class SceneryIntakeStore {
 
   index(): StoredSourceIndexEntry[] {
     return this.listManifests()
-      .filter((item) => item.sha256 && item.sourceId !== 'SRC_PREVIEW_SYNTHETIC')
+      .filter(
+        (item) =>
+          item.sha256 &&
+          item.sourceId !== 'SRC_PREVIEW_SYNTHETIC' &&
+          (item.uploadState === 'completed' || item.uploadState === 'already_present') &&
+          (item.verificationState === 'size_verified' ||
+            item.verificationState === 'independently_verified'),
+      )
       .map((item) => ({
         sourceId: item.sourceId,
         collectionId: item.collectionId,
