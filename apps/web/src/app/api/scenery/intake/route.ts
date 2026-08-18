@@ -45,8 +45,18 @@ export async function GET() {
     body: {},
     publicPreview: isPublicWebsitePreview(),
   });
+  const manifests = Array.isArray(status.manifests)
+    ? (status.manifests as Array<Record<string, unknown>>)
+    : [];
   return NextResponse.json({
     ...publicIntakeSnapshot(getSceneryIntakeStore().listManifests()),
+    inventoryAudit: manifests.map((manifest) => ({
+      sourceId: String(manifest.sourceId ?? ''),
+      originalFilename: String(manifest.originalFilename ?? ''),
+      uploadState: String(manifest.uploadState ?? ''),
+      verificationState: String(manifest.verificationState ?? ''),
+      quarantineState: String(manifest.quarantineState ?? ''),
+    })),
     authorization: status.authorization,
     bytesPath: status.bytesPath,
     purchasedSourceObjectCount: status.purchasedSourceObjectCount,
