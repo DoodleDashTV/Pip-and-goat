@@ -88,6 +88,39 @@ const PROGRESS_STATUSES = new Set([
   'BOOTING',
 ]);
 
+const FAILED_BOOT_KINDS = new Set([
+  'STARTUP_TIMEOUT',
+  'HEALTH_GATE_FAILED',
+  'ENV_VALIDATION_FAILED',
+  'MANIFEST_FETCH_FAILED',
+  'ASSET_DOWNLOAD_FAILED',
+  'BLENDER_PREFLIGHT_FAILED',
+]);
+
+const STARTED_BOOT_STAGES = new Set([
+  'PROCESS_STARTED',
+  'ENV_VALIDATION_START',
+  'ENV_VALIDATION_OK',
+  'R2_CLIENT_CREATED',
+  'MANIFEST_FETCH_START',
+  'MANIFEST_FETCH_OK',
+  'ASSET_DOWNLOAD_START',
+  'ASSET_DOWNLOAD_OK',
+  'ASSETS_READY',
+  'BLENDER_PREFLIGHT_START',
+  'BLENDER_PREFLIGHT_OK',
+  'RENDER_STARTED',
+  'WORKER_READY',
+]);
+
+const READY_BOOT_STAGES = new Set([
+  'WORKER_READY',
+  'ASSETS_READY',
+  'BLENDER_PREFLIGHT_START',
+  'BLENDER_PREFLIGHT_OK',
+  'RENDER_STARTED',
+]);
+
 function fail(reason, code, extras = {}) {
   return {
     ok: false,
@@ -217,11 +250,19 @@ export function interpretStartupStatus(raw) {
   if (raw == null) return { kind: 'ABSENT' };
   if (typeof raw !== 'object' || Array.isArray(raw)) return { kind: 'MALFORMED' };
   const kind = raw.kind || raw.detail?.kind || raw.bootStage;
-  if (raw.result === 'FAILED') {
+  if (raw.result === 'FAILED' || FAILED_BOOT_KINDS.has(kind) || FAILED_BOOT_KINDS.has(raw.bootStage)) {
     return { kind: 'FAILED', classification: raw.classification || raw.code || 'WORKER_FAILED' };
   }
-  if (kind === 'WORKER_READY') return { kind: 'WORKER_READY' };
-  if (kind === 'PROCESS_STARTED' || raw.result === 'RUNNING' || raw.classification === 'BOOTING') {
+  if (kind === 'WORKER_READY' || READY_BOOT_STAGES.has(kind) || READY_BOOT_STAGES.has(raw.bootStage)) {
+    return { kind: 'WORKER_READY' };
+  }
+  if (
+    kind === 'PROCESS_STARTED' ||
+    raw.result === 'RUNNING' ||
+    raw.classification === 'BOOTING' ||
+    STARTED_BOOT_STAGES.has(kind) ||
+    STARTED_BOOT_STAGES.has(raw.bootStage)
+  ) {
     return { kind: 'PROCESS_STARTED' };
   }
   return { kind: 'UNKNOWN' };

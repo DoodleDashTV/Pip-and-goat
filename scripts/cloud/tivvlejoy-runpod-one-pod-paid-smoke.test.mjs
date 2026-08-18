@@ -38,6 +38,7 @@ import {
   REAL_NETWORK_MUTATION_ENABLED as SMOKE_REAL_NETWORK,
   REMOTE_BLENDER_EXECUTION_ENABLED,
   SMOKE_FRAME_END,
+  SMOKE_STARTUP_WATCHDOG_MS,
   buildSmokeJob,
   resolveFoundingAssets,
   runPaidSmokeExecute,
@@ -144,6 +145,8 @@ describe('launch receipt binds the real staged identity', () => {
       'LAUNCH_INTENT_MISMATCH',
     );
     assert.equal(MAX_HOURLY_USD, '0.75');
+    assert.equal(SMOKE_STARTUP_WATCHDOG_MS, MAX_RUNTIME_MINUTES * 60_000);
+    assert.equal(moduleSource.includes('STARTUP_WATCHDOG_MS: String(SMOKE_STARTUP_WATCHDOG_MS)'), true);
   });
 });
 

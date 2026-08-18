@@ -79,6 +79,7 @@ export const REMOTE_BLENDER_EXECUTION_ENABLED = false;
 export const REAL_NETWORK_MUTATION_ENABLED = false;
 export const SMOKE_FRAME_START = 1;
 export const SMOKE_FRAME_END = 8;
+export const SMOKE_STARTUP_WATCHDOG_MS = MAX_RUNTIME_MINUTES * 60_000;
 export const SMOKE_EPISODE_ID = 'meadow-map-mystery';
 export const SMOKE_SHOT_ID = 'meadow-map-smoke';
 
@@ -579,6 +580,10 @@ export async function runPaidSmokeExecute(options = {}) {
       RUNPOD_GPU_HOURLY_RATE: formatUsdFromMicros(receipt.hourlyMicros).replace(/^\$/, ''),
       RENDER_WORKER_ID: `tivvlejoy-worker-${ids.jobId}`,
       REQUIRE_GPU_HEALTH: 'true',
+      // The pinned worker does not clear StartupWatchdog until single-shot
+      // returns. Size it to the 20-minute ceiling so health-gate + render
+      // cannot persist TIMEOUT while the job is still progressing.
+      STARTUP_WATCHDOG_MS: String(SMOKE_STARTUP_WATCHDOG_MS),
     },
   });
   if (!workerEnvironment.ok) return fail(workerEnvironment.reason, workerEnvironment.code);

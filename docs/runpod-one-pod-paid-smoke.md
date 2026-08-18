@@ -47,3 +47,18 @@ Delete exactly once. Confirm absence with a read-only Pod list. Cleanup
 failure returns `RUNPOD_CLEANUP_REQUIRES_ATTENTION`. No automatic paid retry.
 
 Success after artifact readback and confirmed deletion is `PAID_SMOKE_TEST_PASS`.
+
+The pinned worker keeps `StartupWatchdog` armed until single-shot returns.
+Paid-smoke worker env therefore sets `STARTUP_WATCHDOG_MS` to the 20-minute
+runtime ceiling. The observer also recognizes later worker boot stages
+(`RENDER_STARTED`, Blender preflight, asset-ready) as existing
+`PROCESS_STARTED` / `WORKER_READY` evidence. That does not authorize a second
+paid Pod.
+
+## First authorized paid run
+
+Justin authorized exactly one Secure RTX 4090 Pod. The run created Pod
+`71ttvxy4wbxn46` through the PR #59–#62 chain, then the worker default
+180s watchdog persisted `TIMEOUT` while single-shot was still downloading
+assets / starting Blender. The controller deleted that Pod once and
+confirmed absence. Final code: `RENDER_FAILED` / `TIMEOUT`. No retry.

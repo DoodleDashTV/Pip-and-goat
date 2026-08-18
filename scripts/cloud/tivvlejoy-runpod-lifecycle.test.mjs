@@ -280,6 +280,10 @@ describe('13-15. malformed status and COMPLETE evidence', () => {
     assert.equal(result.simulatedDeleteCount, 1);
     assert.equal(interpretStartupStatus({ kind: 'PROCESS_STARTED' }).kind, 'PROCESS_STARTED');
     assert.equal(interpretStartupStatus({ bootStage: 'WORKER_READY' }).kind, 'WORKER_READY');
+    assert.equal(interpretStartupStatus({ bootStage: 'RENDER_STARTED' }).kind, 'WORKER_READY');
+    assert.equal(interpretStartupStatus({ bootStage: 'BLENDER_PREFLIGHT_START' }).kind, 'WORKER_READY');
+    assert.equal(interpretStartupStatus({ bootStage: 'R2_CLIENT_CREATED' }).kind, 'PROCESS_STARTED');
+    assert.equal(interpretStartupStatus({ bootStage: 'STARTUP_TIMEOUT', result: 'FAILED', classification: 'TIMEOUT' }).kind, 'FAILED');
   });
 });
 

@@ -16,6 +16,7 @@ describe('TivvleJoy one-Pod paid smoke contract', () => {
     expect(helper).toContain("export const POD_CREATION_ENABLED = false");
     expect(helper).toContain('runPodLifecycle');
     expect(helper).toContain('createRealRunPodLifecycleAdapter');
+    expect(helper).toContain('STARTUP_WATCHDOG_MS');
     expect(helper.includes('createPodForBenchmark')).toBe(false);
     expect(adapter).toContain('allowRealNetwork');
   });
