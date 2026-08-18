@@ -82,6 +82,9 @@ export type InspectionEligibility = {
 
 export function evaluateInspectionEligibility(manifest: SourceObjectManifest): InspectionEligibility {
   const reasons: string[] = [];
+  if (manifest.sourceId === 'SRC_PREVIEW_SYNTHETIC' || manifest.storageObjectKey.includes('/quarantine/preview-tests/')) {
+    reasons.push('synthetic preview fixture is not a purchased scenery source');
+  }
   if (!manifest.storageObjectKey) reasons.push('storage object key is missing');
   if (manifest.uploadState !== 'completed' && manifest.uploadState !== 'already_present') {
     reasons.push('storage object has not completed upload');

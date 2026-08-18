@@ -269,6 +269,45 @@ describe('multipart session workflow', () => {
       }),
     ).rejects.toThrow(/credentials/);
   });
+
+  it('allows a matching Preview studio token and refuses Production or a wrong token', async () => {
+    const storage = new MemoryMultipartStorage();
+    const previewEnv = {
+      ...configuredEnv,
+      DATABASE_URL: undefined,
+      TIVVLEJOY_SCENERY_INTAKE_TOKEN: 'preview-studio-token',
+      VERCEL_ENV: 'preview',
+    };
+    await expect(
+      handleSceneryIntakeAction({
+        action: 'create-session',
+        body: { collectionId: 'village', filename: 'Village_Blender_4.2.2.zip', byteSize: 10 },
+        env: previewEnv,
+        publicPreview: true,
+        studioToken: 'wrong-token',
+        storage,
+      }),
+    ).rejects.toThrow(/authorized TivvleJoy studio/);
+    await expect(
+      handleSceneryIntakeAction({
+        action: 'create-session',
+        body: { collectionId: 'village', filename: 'Village_Blender_4.2.2.zip', byteSize: 10 },
+        env: { ...previewEnv, VERCEL_ENV: 'production' },
+        publicPreview: true,
+        studioToken: 'preview-studio-token',
+        storage,
+      }),
+    ).rejects.toThrow(/Production/);
+    const created = await handleSceneryIntakeAction({
+      action: 'create-session',
+      body: { collectionId: 'village', filename: 'Village_Blender_4.2.2.zip', byteSize: 10 },
+      env: previewEnv,
+      publicPreview: true,
+      studioToken: 'preview-studio-token',
+      storage,
+    });
+    expect(created.session).toBeTruthy();
+  });
 });
 
 describe('hashing, duplicates, and immutability', () => {
@@ -414,6 +453,8 @@ describe('workspace readiness and git safety', () => {
     expect(BLENDER_INSPECTION_CONTRACT.normalizationBoundary.allowed).toBe(false);
     expect(SCENERY_INTAKE_SCHEMA_VERSION).toBe('TIVVLEJOY_SCENERY_ASSET_INTAKE_V1');
     expect(SCENERY_COPY.intakeTitle).toContain('Preview Only Scenery Asset Intake');
+    expect(snapshot.authorization.mutationsRequireStudioSession).toBe(true);
+    expect(snapshot.bytesPath).toBe('client-to-signed-r2');
   });
 
   it('keeps TivvleJoy intake copy in the scenery workspace and omits licensed binaries from Git', () => {
@@ -424,6 +465,9 @@ describe('workspace readiness and git safety', () => {
     expect(intake).toContain('SCENERY_COPY.uploadNotApproval');
     expect(intake).toContain('Select one or multiple files');
     expect(intake).toContain('Multipart progress');
+    expect(intake).toContain('SCENERY_COPY.studioSession');
+    expect(intake).toContain('x-tivvlejoy-scenery-intake-token');
+    expect(intake).toContain('Expected 27-file source checklist');
     expect(readRepo('apps/web/src/lib/scenery/copy.ts')).toContain('Upload does not mean asset approval');
     expect(intake).not.toMatch(/DoodleDash|Doodle Dash|\bDDP\b/);
     expect(scanTrackedAndStagedFiles(repoRoot).ok).toBe(true);

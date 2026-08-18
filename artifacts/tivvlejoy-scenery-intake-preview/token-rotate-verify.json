@@ -1,0 +1,71 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_PREVIEW_INTAKE_TOKEN_ROTATED",
+  "previewUrl": "https://<git-branch-preview-alias>/ (hostname omitted from git; see agent report)",
+  "deploymentId": "dpl_Btx59tpkKwLT7f57jnJ9tA2bD7uY",
+  "deploymentReadyState": "READY",
+  "deploymentTarget": null,
+  "gitBranch": "cursor/tivvlejoy-scenery-intake-preview-73f1",
+  "gitSha": "fafffbaa9d1e",
+  "productionModified": false,
+  "hiddenProductionEnvCount": 0,
+  "r2SettingsModified": false,
+  "envScope": {
+    "id": "Wo99k0n7XKHNzds3",
+    "key": "TIVVLEJOY_SCENERY_INTAKE_TOKEN",
+    "type": "sensitive",
+    "target": [
+      "preview"
+    ],
+    "gitBranch": "cursor/tivvlejoy-scenery-intake-preview-73f1",
+    "rotatedInPlace": true,
+    "source": "identically named agent runtime secret",
+    "intakeTokenShown": false
+  },
+  "unchangedPreviewStorageNames": [
+    "R2_BUCKET",
+    "R2_ENDPOINT",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "TIVVLEJOY_SCENERY_ASSET_PREFIX"
+  ],
+  "getHome": {
+    "status": 200,
+    "leaks": []
+  },
+  "getScenery": {
+    "status": 200,
+    "leaks": []
+  },
+  "getIntake": {
+    "status": 200,
+    "leaks": [],
+    "storageConfiguration": "configured",
+    "tokenConfigured": true,
+    "bytesPath": "client-to-signed-r2",
+    "prefix": "tivvlejoy-assets",
+    "productionMutationsRefused": false,
+    "publicPreview": true,
+    "purchasedSourceObjectCount": 0,
+    "uploaded": false
+  },
+  "incorrectToken": {
+    "status": 401,
+    "code": "INTAKE_UNAUTHORIZED",
+    "uploaded": false,
+    "leaks": []
+  },
+  "correctTokenSafeQuery": {
+    "action": "query",
+    "uploadAttempted": false,
+    "status": 400,
+    "code": "UNKNOWN_SESSION",
+    "leaks": [],
+    "uploaded": false,
+    "authorizedPast401": true
+  },
+  "credentialsInBrowserHtmlOrJson": false,
+  "bytesPath": "client-to-signed-r2",
+  "purchasedFilesUploaded": false,
+  "assetsInspectedExtractedConvertedNormalizedOrApproved": false,
+  "ok": true
+}

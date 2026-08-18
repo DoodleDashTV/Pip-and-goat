@@ -4,7 +4,15 @@ import { describeSceneryStorageConfiguration, resolveSceneryAssetPrefix } from '
 import { detectDuplicate, type StoredSourceIndexEntry } from './duplicates';
 import type { ExpectedSourceFile } from './inventory';
 import { matchExpectedSourceFile } from './inventory';
-import { assertAllowedExtension, assertCollectionId, planMultipartParts, sanitizeFilename, sceneryObjectKey } from './keys';
+import { PREVIEW_SYNTHETIC_SOURCE_ID } from './fixtures';
+import {
+  assertAllowedExtension,
+  assertCollectionId,
+  planMultipartParts,
+  sanitizeFilename,
+  sceneryInternalObjectKey,
+  sceneryObjectKey,
+} from './keys';
 import { resolveIntakeLimits } from './limits';
 import { createEmptyManifestRecord, type SourceObjectManifest } from './manifest';
 
@@ -28,9 +36,12 @@ export type MultipartPartRecord = {
   failed: boolean;
 };
 
+export type IntakePurpose = 'purchased' | 'preview-synthetic';
+
 export type UploadSession = {
   sessionId: string;
   uploadId: string | null;
+  purpose: IntakePurpose;
   collectionId: ReturnType<typeof assertCollectionId>;
   expectedSourceId: string;
   originalFilename: string;
@@ -64,6 +75,10 @@ export type MultipartStoragePort = {
   }): Promise<{ size: number }>;
   abortMultipartUpload(input: { key: string; uploadId: string }): Promise<void>;
   headObject(key: string): Promise<{ exists: boolean; size: number | null }>;
+  putObject?(key: string, body: Uint8Array, contentType?: string): Promise<void>;
+  getObject?(key: string): Promise<Uint8Array | null>;
+  deleteObject?(key: string): Promise<void>;
+  listPrefix?(prefix: string): Promise<Array<{ key: string; size: number }>>;
 };
 
 export class ConnectionReadyMultipartStorage implements MultipartStoragePort {
@@ -87,6 +102,18 @@ export class ConnectionReadyMultipartStorage implements MultipartStoragePort {
   }
   async headObject(): Promise<{ exists: boolean; size: number | null }> {
     return { exists: false, size: null };
+  }
+  async putObject(): Promise<void> {
+    return;
+  }
+  async getObject(): Promise<Uint8Array | null> {
+    return null;
+  }
+  async deleteObject(): Promise<void> {
+    return;
+  }
+  async listPrefix(): Promise<Array<{ key: string; size: number }>> {
+    return [];
   }
 }
 
@@ -153,6 +180,25 @@ export class MemoryMultipartStorage implements MultipartStoragePort {
     const body = this.objects.get(key);
     return body ? { exists: true, size: body.byteLength } : { exists: false, size: null };
   }
+
+  async putObject(key: string, body: Uint8Array): Promise<void> {
+    this.objects.set(key, new Uint8Array(body));
+  }
+
+  async getObject(key: string): Promise<Uint8Array | null> {
+    const body = this.objects.get(key);
+    return body ? new Uint8Array(body) : null;
+  }
+
+  async deleteObject(key: string): Promise<void> {
+    this.objects.delete(key);
+  }
+
+  async listPrefix(prefix: string): Promise<Array<{ key: string; size: number }>> {
+    return [...this.objects.entries()]
+      .filter(([key]) => key.startsWith(prefix))
+      .map(([key, body]) => ({ key, size: body.byteLength }));
+  }
 }
 
 export function createUploadSession(input: {
@@ -166,18 +212,83 @@ export function createUploadSession(input: {
   existingIndex?: StoredSourceIndexEntry[];
   env?: Record<string, string | undefined>;
   now?: string;
-}): { session: UploadSession; expected: ExpectedSourceFile; manifest: SourceObjectManifest } {
+  purpose?: IntakePurpose;
+}): { session: UploadSession; expected: ExpectedSourceFile | null; manifest: SourceObjectManifest } {
   const env = input.env ?? process.env;
   const limits = resolveIntakeLimits(env);
   const config = describeSceneryStorageConfiguration(env);
   const collectionId = assertCollectionId(input.collectionId);
   const normalizedFilename = sanitizeFilename(input.originalFilename);
   const extension = assertAllowedExtension(normalizedFilename);
+  const purpose = input.purpose === 'preview-synthetic' ? 'preview-synthetic' : 'purchased';
   if (input.byteSize <= 0) {
     throw new SceneryError('Zero-byte files are rejected before upload.', 'ZERO_BYTE_FILE');
   }
   if (input.byteSize > limits.maxUploadBytes) {
     throw new SceneryError('File exceeds the configured scenery upload size limit.', 'FILE_TOO_LARGE');
+  }
+  if (purpose === 'preview-synthetic') {
+    if (!normalizedFilename.startsWith('tivvlejoy-preview-synthetic-') || extension !== '.txt') {
+      throw new SceneryError(
+        'Preview synthetic fixtures must be newly generated tiny text files under the preview-tests prefix.',
+        'SYNTHETIC_FIXTURE_REQUIRED',
+      );
+    }
+    if (matchExpectedSourceFile({ collectionId, filename: normalizedFilename })) {
+      throw new SceneryError('Preview synthetic fixtures cannot use a purchased inventory filename.', 'PURCHASED_FILENAME_REFUSED');
+    }
+    const objectKey = sceneryInternalObjectKey({
+      prefix: resolveSceneryAssetPrefix(env),
+      folder: 'preview-tests',
+      filename: normalizedFilename,
+    });
+    const parts = planMultipartParts(input.byteSize, limits.multipartPartBytes).map((part) => ({
+      ...part,
+      signed: false,
+      failed: false,
+    }));
+    const session: UploadSession = {
+      sessionId: randomUUID(),
+      uploadId: null,
+      purpose,
+      collectionId,
+      expectedSourceId: PREVIEW_SYNTHETIC_SOURCE_ID,
+      originalFilename: input.originalFilename,
+      normalizedFilename,
+      objectKey,
+      byteSize: input.byteSize,
+      sha256: input.sha256 ?? null,
+      mimeType: input.mimeType || 'text/plain',
+      extension,
+      lastModified: input.lastModified ?? null,
+      state: 'created',
+      parts,
+      createdAt: input.now ?? new Date().toISOString(),
+      updatedAt: input.now ?? new Date().toISOString(),
+      publicAcl: false,
+      storageConfigured: config.configured,
+      connectionReadyOnly: !config.configured,
+      notes: [
+        'Preview-only synthetic fixture. This is not a purchased scenery source.',
+        'Upload does not mean asset approval.',
+      ],
+    };
+    return {
+      session,
+      expected: null,
+      manifest: createEmptyManifestRecord({
+        sourceId: PREVIEW_SYNTHETIC_SOURCE_ID,
+        collectionId,
+        originalFilename: input.originalFilename,
+        normalizedFilename,
+        objectKey,
+        byteSize: input.byteSize,
+        sha256: input.sha256 ?? '',
+        mimeType: session.mimeType,
+        extension,
+        now: session.createdAt,
+      }),
+    };
   }
   const expected = matchExpectedSourceFile({
     collectionId,
@@ -200,6 +311,7 @@ export function createUploadSession(input: {
     const session: UploadSession = {
       sessionId: randomUUID(),
       uploadId: null,
+      purpose,
       collectionId,
       expectedSourceId: expected.sourceId,
       originalFilename: input.originalFilename,
@@ -256,6 +368,7 @@ export function createUploadSession(input: {
   const session: UploadSession = {
     sessionId: randomUUID(),
     uploadId: null,
+    purpose,
     collectionId,
     expectedSourceId: expected.sourceId,
     originalFilename: input.originalFilename,

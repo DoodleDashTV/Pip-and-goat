@@ -1,11 +1,66 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { isPublicWebsitePreview } from '../../public-preview';
 import { SceneryError } from '../types';
 import { resolveIntakeLimits } from './limits';
 
 const RATE_WINDOW = new Map<string, number[]>();
 
-export function assertStudioIntakeAccess(env: Record<string, string | undefined> = process.env): void {
-  if (isPublicWebsitePreview(env)) {
+export const SCENERY_INTAKE_TOKEN_ENV = 'TIVVLEJOY_SCENERY_INTAKE_TOKEN';
+export const SCENERY_INTAKE_TOKEN_HEADER = 'x-tivvlejoy-scenery-intake-token';
+
+export function isProductionRuntime(env: Record<string, string | undefined> = process.env): boolean {
+  return String(env.VERCEL_ENV ?? '').trim() === 'production';
+}
+
+export function sceneryIntakeTokenConfigured(env: Record<string, string | undefined> = process.env): boolean {
+  return Boolean(String(env[SCENERY_INTAKE_TOKEN_ENV] ?? '').trim());
+}
+
+export function intakeTokensMatch(provided: string, expected: string): boolean {
+  if (!provided || !expected) return false;
+  const left = createHash('sha256').update(provided).digest();
+  const right = createHash('sha256').update(expected).digest();
+  return timingSafeEqual(left, right);
+}
+
+export function publicIntakeAuthorizationSnapshot(env: Record<string, string | undefined> = process.env) {
+  const publicPreview = isPublicWebsitePreview(env);
+  const tokenConfigured = sceneryIntakeTokenConfigured(env);
+  const productionRefused = isProductionRuntime(env);
+  return {
+    mutationsRequireStudioSession: true,
+    publicPreview,
+    tokenConfigured,
+    productionMutationsRefused: productionRefused,
+    authorizedMutations: false,
+    message: productionRefused
+      ? 'Scenery intake mutations are refused on Production.'
+      : !publicPreview
+        ? 'Authorized TivvleJoy studio session can create intake sessions.'
+        : tokenConfigured
+          ? 'Unauthorized browsers cannot create, sign, complete, query, resume, or abort upload sessions.'
+          : 'Preview intake token is not configured. Unauthorized browsers cannot mutate upload sessions.',
+  };
+}
+
+export function assertStudioIntakeAccess(
+  env: Record<string, string | undefined> = process.env,
+  providedToken = '',
+): void {
+  if (isProductionRuntime(env)) {
+    throw new SceneryError('Scenery asset intake mutations are refused on Production.', 'PRODUCTION_INTAKE_REFUSED');
+  }
+  if (!isPublicWebsitePreview(env)) {
+    return;
+  }
+  const expected = String(env[SCENERY_INTAKE_TOKEN_ENV] ?? '').trim();
+  if (!expected) {
+    throw new SceneryError(
+      'Scenery asset intake mutations require the authorized TivvleJoy studio. The Preview intake token is not configured.',
+      'INTAKE_UNAUTHORIZED',
+    );
+  }
+  if (!intakeTokensMatch(providedToken, expected)) {
     throw new SceneryError(
       'Scenery asset intake mutations require the authorized TivvleJoy studio, not the public website preview.',
       'INTAKE_UNAUTHORIZED',

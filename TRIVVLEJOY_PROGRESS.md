@@ -5,7 +5,8 @@ Updated: 2026-08-18
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-scenery-asset-intake-73f1`
+- Working branch: `cursor/tivvlejoy-scenery-intake-preview-73f1`
+- Scenery asset intake (Draft PR #44, keep draft and unmerged): `cursor/tivvlejoy-scenery-asset-intake-73f1` @ `b7f8c6785cfef661c434e960e3bcd3ccd91ff66c`
 - Scenery foundation (Draft PR #43, keep draft and unmerged): `cursor/tivvlejoy-scenery-foundation-73f1` @ `32a9e222518e2986104bff28442c5f73fca0ef16`
 - Durable Preview voice ledger (Draft PR #42, keep draft and unmerged): `cursor/tivvlejoy-durable-voice-ledger-73f1` @ `f51f8753dd495ab086aa2e81e4fb98aebe895650`
 - Episode line voice workflow (Draft PR #41, keep draft and unmerged): `cursor/tivvlejoy-episode-line-voice-workflow-73f1` @ `0781409f9dc7e17b1c4a97f42f1a634f27116d5e`
@@ -119,6 +120,24 @@ database is connected.
 - Independent server-side SHA-256 of stored R2 objects is unavailable in this serverless environment
 - Blender 4.2 was not available and was not executed
 - Intake UI and multipart session workflow are connection-ready when R2 credentials are absent
+- Checkpoint TIVVLEJOY_SCENERY_ASSET_INTAKE_PREVIEW_V1 deploys Draft PR #45 as a Vercel Preview only
+- Checkpoint TIVVLEJOY_SCENERY_PREVIEW_STORAGE_CONFIG sets Preview-only storage names on the `pip-and-goat` Vercel project, git-branch limited to `cursor/tivvlejoy-scenery-intake-preview-73f1`
+- Draft PR #44 stayed open, draft, and unmerged
+- Draft PR #45 stays open, draft, and unmerged
+- Preview alias is the existing git-branch Vercel Preview for `cursor/tivvlejoy-scenery-intake-preview-73f1` (hostname omitted from git)
+- Production Vercel env was not modified (`hiddenProductionEnvCount=0`, no production targets)
+- Preview host now reports `storageConfiguration=configured`, `tokenConfigured=true`, prefix `tivvlejoy-assets`, and `bytesPath=client-to-signed-r2`
+- `TIVVLEJOY_SCENERY_INTAKE_TOKEN` is a Vercel sensitive Preview env var; the value is not printed
+- Checkpoint `TIVVLEJOY_SCENERY_PREVIEW_INTAKE_TOKEN_ROTATED` replaced that Preview-only, git-branch-limited variable in place with the identically named agent runtime secret
+- Existing R2 Preview settings were not modified; Production was not modified (`hiddenProductionEnvCount=0`)
+- Branch `cursor/tivvlejoy-scenery-intake-preview-73f1` was redeployed as `dpl_Btx59tpkKwLT7f57jnJ9tA2bD7uY` (READY, not production)
+- Incorrect intake token returns 401 `INTAKE_UNAUTHORIZED`
+- The rotated token authorizes a safe non-upload `query` of an unknown session (400 `UNKNOWN_SESSION`, `uploaded=false`)
+- No credentials appeared in Preview HTML or JSON
+- Purchased source object count on this Preview remains 0
+- No purchased scenery bytes were uploaded, inspected, extracted, converted, normalized, or approved
+- GET `/` and GET `/scenery` on the Preview returned 200
+- Preview Only Scenery Asset Intake, four collection cards, multiple-file selection, the 27-file checklist, and “Upload does not mean asset approval” rendered with TivvleJoy wording
 
 ## Tests / validation
 
@@ -129,17 +148,19 @@ database is connected.
 - `pnpm validate:studio-completion`
 - `pnpm validate:scenery`
 - `pnpm validate:scenery-intake`
+- `pnpm validate:scenery-intake-preview`
 - `pnpm test`
 - `pnpm typecheck`
 - `pnpm lint`
 - Production frontend build
+- This Preview pass: `pnpm test` 624/624 (40 files); typecheck pass; lint pass; web build pass; `validate:scenery` 15/15; `validate:scenery-intake` 16 tests + 14/14 script; `validate:scenery-intake-preview` 4 tests + 6/6 script; persist / studio-hardening / steps-9-16-closed / studio-completion 35 checks: pass
 
 ## Protections
 
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #43, or later stacked voice or scenery drafts.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #43, #44, #45, or later stacked voice or scenery drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

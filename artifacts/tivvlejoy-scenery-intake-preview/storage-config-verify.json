@@ -1,0 +1,78 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_PREVIEW_STORAGE_CONFIG",
+  "previewUrl": "https://<git-branch-preview-alias>/ (hostname omitted from git; see agent report)",
+  "deploymentId": "dpl_Aq3jBhFdCiBbAp2Wv4ziKAQPmWJj",
+  "deploymentReadyState": "READY",
+  "deploymentTarget": null,
+  "gitBranch": "cursor/tivvlejoy-scenery-intake-preview-73f1",
+  "productionModified": false,
+  "hiddenProductionEnvCount": 0,
+  "envScope": {
+    "target": [
+      "preview"
+    ],
+    "gitBranch": "cursor/tivvlejoy-scenery-intake-preview-73f1",
+    "namesConfigured": [
+      "R2_BUCKET",
+      "R2_ENDPOINT",
+      "R2_ACCESS_KEY_ID",
+      "R2_SECRET_ACCESS_KEY",
+      "TIVVLEJOY_SCENERY_ASSET_PREFIX",
+      "TIVVLEJOY_SCENERY_INTAKE_TOKEN"
+    ],
+    "prefixValue": "tivvlejoy-assets",
+    "intakeTokenShown": false,
+    "supersededBy": "token-rotate-verify.json"
+  },
+  "getScenery": {
+    "status": 200,
+    "bytes": 50536,
+    "leaks": [],
+    "hasPreviewOnly": true,
+    "hasIntakeHeading": true,
+    "hasApprovalWarning": true,
+    "storageConfigurationMention": true,
+    "tokenConfiguredTrue": false,
+    "bytesPath": "client-to-signed-r2"
+  },
+  "getIntake": {
+    "status": 200,
+    "leaks": [],
+    "storageConfiguration": "configured",
+    "tokenConfigured": true,
+    "bytesPath": "client-to-signed-r2",
+    "prefix": "tivvlejoy-assets",
+    "productionMutationsRefused": false,
+    "publicPreview": true,
+    "secretNameLabelsPresent": null,
+    "missingNames": null,
+    "purchasedSourceObjectCount": 0,
+    "uploaded": false,
+    "approved": false
+  },
+  "incorrectToken": {
+    "status": 401,
+    "code": "INTAKE_UNAUTHORIZED",
+    "leaks": [],
+    "uploaded": false
+  },
+  "correctTokenSafeQuery": {
+    "action": "query",
+    "uploadAttempted": false,
+    "status": 400,
+    "code": "UNKNOWN_SESSION",
+    "leaks": [],
+    "uploaded": false,
+    "authorizedPast401": true
+  },
+  "getHome": {
+    "status": 200,
+    "leaks": []
+  },
+  "credentialsInBrowserHtmlOrJson": false,
+  "leakNames": [],
+  "bytesPath": "client-to-signed-r2",
+  "purchasedFilesUploaded": false,
+  "assetsInspectedExtractedConvertedNormalizedOrApproved": false,
+  "ok": true
+}

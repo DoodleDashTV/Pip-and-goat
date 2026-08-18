@@ -67,6 +67,14 @@ export function assertCollectionId(value: string): SceneryCollectionId {
   return value as SceneryCollectionId;
 }
 
+export const SCENERY_INTERNAL_FOLDERS = {
+  'upload-sessions': { kind: 'quarantine' as const, extensions: ['.json'] },
+  'intake-manifests': { kind: 'catalogs' as const, extensions: ['.json'] },
+  'preview-tests': { kind: 'quarantine' as const, extensions: ['.txt'] },
+} as const;
+
+export type SceneryInternalFolder = keyof typeof SCENERY_INTERNAL_FOLDERS;
+
 export function sceneryObjectKey(input: {
   prefix: string;
   kind:
@@ -102,6 +110,28 @@ export function sceneryObjectKey(input: {
   const versioned = input.version && input.version > 1 ? `${stem}.v${input.version}${ext}` : filename;
   const parts = [prefix, input.kind, input.collection, versioned].filter(Boolean) as string[];
   const key = parts.join('/');
+  if (key.includes('..') || key.startsWith('/') || key.includes('\\') || key.includes('\0')) {
+    throw new SceneryError('Constructed object key is unsafe.', 'UNSAFE_OBJECT_KEY');
+  }
+  return key;
+}
+
+export function sceneryInternalObjectKey(input: {
+  prefix: string;
+  folder: SceneryInternalFolder;
+  filename: string;
+}): string {
+  const prefix = input.prefix.replace(/^\/+|\/+$/g, '');
+  if (!prefix || prefix.includes('..') || prefix.startsWith('/')) {
+    throw new SceneryError('Unsafe scenery storage prefix.', 'UNSAFE_OBJECT_KEY');
+  }
+  const spec = SCENERY_INTERNAL_FOLDERS[input.folder];
+  const filename = sanitizeFilename(input.filename);
+  const ext = fileExtension(filename);
+  if (!(spec.extensions as readonly string[]).includes(ext)) {
+    throw new SceneryError(`Internal scenery object must use ${spec.extensions.join(' or ')}.`, 'UNSAFE_OBJECT_KEY');
+  }
+  const key = `${prefix}/${spec.kind}/${input.folder}/${filename}`;
   if (key.includes('..') || key.startsWith('/') || key.includes('\\') || key.includes('\0')) {
     throw new SceneryError('Constructed object key is unsafe.', 'UNSAFE_OBJECT_KEY');
   }

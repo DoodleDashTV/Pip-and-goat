@@ -1,4 +1,5 @@
 import { listRegisteredSources } from '../source-registry';
+import { publicIntakeAuthorizationSnapshot } from './access';
 import { describeSceneryStorageConfiguration } from './config';
 import { EXPECTED_SOURCE_COUNT, listExpectedSourceFiles } from './inventory';
 import type { SourceObjectManifest } from './manifest';
@@ -21,15 +22,16 @@ export function buildRealAssetReadiness(
 ) {
   const storage = describeSceneryStorageConfiguration(env);
   const expected = listExpectedSourceFiles();
-  const uploaded = manifests.filter((item) => item.uploadState === 'completed' || item.uploadState === 'already_present');
-  const verified = manifests.filter(
+  const purchased = manifests.filter((item) => item.sourceId !== 'SRC_PREVIEW_SYNTHETIC');
+  const uploaded = purchased.filter((item) => item.uploadState === 'completed' || item.uploadState === 'already_present');
+  const verified = purchased.filter(
     (item) => item.verificationState === 'size_verified' || item.verificationState === 'independently_verified',
   );
-  const quarantined = manifests.filter((item) => item.quarantineState === 'quarantined');
-  const inspectionReady = manifests.filter((item) => item.inspectionState === 'inspection_ready');
-  const inspected = manifests.filter((item) => item.inspectionState === 'inspected');
-  const normalized = manifests.filter((item) => item.uploadState === 'completed' && item.notes.some((note) => note.includes('normalized/')));
-  const approved = manifests.filter((item) => item.inspectionState === 'inspected' && item.verificationState === 'independently_verified');
+  const quarantined = purchased.filter((item) => item.quarantineState === 'quarantined');
+  const inspectionReady = purchased.filter((item) => item.inspectionState === 'inspection_ready');
+  const inspected = purchased.filter((item) => item.inspectionState === 'inspected');
+  const normalized = purchased.filter((item) => item.uploadState === 'completed' && item.notes.some((note) => note.includes('normalized/')));
+  const approved = purchased.filter((item) => item.inspectionState === 'inspected' && item.verificationState === 'independently_verified');
   const blender = describeBlenderAvailability();
   return {
     storageConfiguration: storage.state,
@@ -43,7 +45,7 @@ export function buildRealAssetReadiness(
     inspectedFiles: inspected.length,
     normalizedFiles: normalized.length,
     approvedFiles: approved.length,
-    duplicateFiles: manifests.filter((item) => item.uploadState === 'already_present').length,
+    duplicateFiles: purchased.filter((item) => item.uploadState === 'already_present').length,
     collectionCount: 4,
     inspectionJobCount: SCENERY_INSPECTION_JOBS.length,
     registeredCollections: listRegisteredSources().length,
@@ -74,5 +76,7 @@ export function publicIntakeSnapshot(
     })),
     expectedSourceCount: EXPECTED_SOURCE_COUNT,
     warning: 'Upload does not mean asset approval. Real scenery production is not ready while only the framework exists.',
+    authorization: publicIntakeAuthorizationSnapshot(env),
+    bytesPath: 'client-to-signed-r2' as const,
   };
 }

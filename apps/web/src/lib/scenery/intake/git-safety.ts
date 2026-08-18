@@ -47,7 +47,7 @@ export function scanTrackedAndStagedFiles(cwd = process.cwd()): { ok: boolean; v
       '-I',
       '-n',
       '-E',
-      'R2_SECRET_ACCESS_KEY=[A-Za-z0-9/+]{12,}|OBJECT_STORAGE_SECRET_ACCESS_KEY=[A-Za-z0-9/+]{12,}|X-Amz-Signature=[A-Za-z0-9]+',
+      'R2_SECRET_ACCESS_KEY=[A-Za-z0-9/+]{12,}|OBJECT_STORAGE_SECRET_ACCESS_KEY=[A-Za-z0-9/+]{12,}|X-Amz-Signature=[A-Za-z0-9]+|TIVVLEJOY_SCENERY_INTAKE_TOKEN=[^\\s]{8,}',
       '--',
       '*.ts',
       '*.tsx',
