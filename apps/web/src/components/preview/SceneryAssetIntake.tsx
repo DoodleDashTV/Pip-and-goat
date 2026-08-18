@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { hashFileChunked } from '@/lib/scenery/intake/client-hash';
+import { reviewOneTapPurchasedSelection, type OneTapPurchasedReview } from '@/lib/scenery/intake/one-tap';
 import { SCENERY_COPY } from '@/lib/scenery/copy';
 import type { PublicScenerySnapshot } from '@/lib/scenery/public';
 
@@ -21,6 +22,7 @@ type FileRow = {
   multipartProgress: string;
   error: string | null;
   sessionId: string | null;
+  eligible: boolean;
 };
 
 const COLLECTIONS = [
@@ -36,26 +38,72 @@ function intakeHeaders(token: string): HeadersInit {
   return headers;
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} bytes`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapshot }) {
   const [rows, setRows] = useState<FileRow[]>([]);
   const [busy, setBusy] = useState(false);
   const [collectionId, setCollectionId] = useState<(typeof COLLECTIONS)[number]['id']>('village');
   const [studioToken, setStudioToken] = useState('');
+  const [review, setReview] = useState<OneTapPurchasedReview | null>(null);
+  const oneTapInputRef = useRef<HTMLInputElement>(null);
+  const singleCollectionInputRef = useRef<HTMLInputElement>(null);
 
   const intake = snapshot.intake;
-
   const checklist = useMemo(() => intake.expectedInventory, [intake.expectedInventory]);
+  const overallProgress = rows.length
+    ? Math.round(rows.reduce((sum, row) => sum + row.progress, 0) / rows.length)
+    : 0;
+  const completedCount = rows.filter(
+    (row) => row.uploadStatus === 'completed' || row.uploadStatus === 'already_present',
+  ).length;
 
   function updateRow(id: string, patch: Partial<FileRow>) {
     setRows((current) => current.map((row) => (row.id === id ? { ...row, ...patch } : row)));
   }
 
-  async function onSelect(files: FileList | null) {
+  function applyOneTapSelection(files: FileList | null) {
+    if (!files?.length) return;
+    const selected = Array.from(files);
+    const nextReview = reviewOneTapPurchasedSelection(
+      selected.map((file) => ({ filename: file.name, byteSize: file.size })),
+    );
+    const nextRows: FileRow[] = selected.map((file, index) => {
+      const classified = nextReview.items[index];
+      const matched = classified?.eligible ? classified : null;
+      return {
+        id: `${file.name}-${file.size}-${file.lastModified}-${index}`,
+        file,
+        collectionId: matched?.collectionId ?? classified?.collectionId ?? collectionId,
+        expectedSourceId: matched?.sourceId ?? '',
+        sha256: '',
+        hashStatus: 'pending',
+        uploadStatus: matched ? 'not_started' : 'refused',
+        storageStatus: 'not_verified',
+        duplicateStatus: classified?.classification === 'duplicate' ? 'duplicate_selection' : 'unknown',
+        quarantineStatus: 'not_quarantined',
+        inspectionStatus: 'not_eligible',
+        progress: 0,
+        multipartProgress: '0 / 0',
+        error: matched ? null : classified?.reason ?? 'File refused.',
+        sessionId: null,
+        eligible: Boolean(matched),
+      };
+    });
+    setReview(nextReview);
+    setRows(nextRows);
+  }
+
+  function onSelectSingleCollection(files: FileList | null) {
     if (!files?.length) return;
     const next: FileRow[] = [...rows];
     for (const file of Array.from(files)) {
       next.push({
-        id: `${file.name}-${file.size}-${file.lastModified}`,
+        id: `${file.name}-${file.size}-${file.lastModified}-${next.length}`,
         file,
         collectionId,
         expectedSourceId: '',
@@ -70,12 +118,14 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         multipartProgress: '0 / 0',
         error: null,
         sessionId: null,
+        eligible: true,
       });
     }
     setRows(next);
   }
 
   async function processRow(row: FileRow) {
+    if (!row.eligible) return;
     updateRow(row.id, { hashStatus: 'hashing', error: null });
     const hashed = await hashFileChunked(row.file, (offset, total) => {
       updateRow(row.id, { progress: Math.round((offset / total) * 40), hashStatus: 'hashing' });
@@ -188,10 +238,12 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     });
   }
 
-  async function uploadAll() {
+  async function uploadEligible() {
     setBusy(true);
     try {
-      for (const row of rows.filter((item) => item.uploadStatus === 'not_started' || item.uploadStatus === 'failed')) {
+      for (const row of rows.filter(
+        (item) => item.eligible && (item.uploadStatus === 'not_started' || item.uploadStatus === 'failed'),
+      )) {
         await processRow(row);
       }
     } finally {
@@ -200,7 +252,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
   }
 
   async function resume(row: FileRow) {
-    if (!row.sessionId) return;
+    if (!row.sessionId || !row.eligible) return;
     await fetch('/api/scenery/intake', {
       method: 'POST',
       headers: intakeHeaders(studioToken),
@@ -218,6 +270,8 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     });
     updateRow(row.id, { uploadStatus: 'aborted' });
   }
+
+  const eligibleCount = rows.filter((row) => row.eligible).length;
 
   return (
     <section className="studio-card space-y-4 p-4 sm:p-5">
@@ -243,6 +297,95 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         />
       </label>
       <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.studioTokenHelp}</p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.oneTapNoCollectionRequired}</p>
+
+      <label className="btn-primary block w-full cursor-pointer px-4 text-center text-sm">
+        {SCENERY_COPY.oneTapSelectUpload}
+        <input
+          ref={oneTapInputRef}
+          className="sr-only"
+          type="file"
+          multiple
+          onChange={(event) => {
+            applyOneTapSelection(event.target.files);
+            event.target.value = '';
+          }}
+        />
+      </label>
+
+      {review ? (
+        <div className="space-y-3 rounded-2xl border border-[var(--color-border)] px-3 py-3">
+          <h3 className="font-bold">{SCENERY_COPY.oneTapReviewTitle}</h3>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            {review.selectedCount} selected · {review.matched.length} matched · {review.missing.length} missing ·{' '}
+            {review.unexpected.length} unexpected · {review.duplicates.length} duplicate · {review.incorrect.length}{' '}
+            incorrect
+          </p>
+          <div>
+            <h4 className="font-bold">{SCENERY_COPY.oneTapMatched}</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+              {review.matched.map((item) => (
+                <li key={`${item.sourceId}-${item.filename}`}>
+                  {item.collectionName}: {item.filename} · {formatBytes(item.byteSize)} · {item.sourceId}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold">{SCENERY_COPY.oneTapMissing}</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+              {review.missing.map((item) => (
+                <li key={item.sourceId}>
+                  {item.collectionName}: {item.expectedFilename} · {item.sourceId}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold">{SCENERY_COPY.oneTapUnexpected}</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+              {review.unexpected.length === 0 ? <li>None</li> : null}
+              {review.unexpected.map((item, index) => (
+                <li key={`unexpected-${item.filename}-${index}`}>
+                  {item.filename} · {formatBytes(item.byteSize)} · refused individually
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold">{SCENERY_COPY.oneTapDuplicates}</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+              {review.duplicates.length === 0 ? <li>None</li> : null}
+              {review.duplicates.map((item, index) => (
+                <li key={`duplicate-${item.filename}-${index}`}>
+                  {item.filename} · {formatBytes(item.byteSize)} · refused individually
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold">{SCENERY_COPY.oneTapIncorrect}</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+              {review.incorrect.length === 0 ? <li>None</li> : null}
+              {review.incorrect.map((item) => (
+                <li key={`incorrect-${item.filename}`}>
+                  {item.filename} · expected {item.expectedFilename} · refused individually
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold">{SCENERY_COPY.oneTapCollectionTotals}</h4>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+              {review.collectionTotals.map((item) => (
+                <li key={item.collectionId}>
+                  {item.collectionName}: {item.matched}/{item.expected} matched · {formatBytes(item.bytes)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
         {COLLECTIONS.map((collection) => (
@@ -280,40 +423,62 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       <label className="block text-sm font-bold">
         Select one or multiple files
         <input
+          ref={singleCollectionInputRef}
           className="field-input mt-1"
           type="file"
           multiple
-          onChange={(event) => onSelect(event.target.files)}
+          onChange={(event) => {
+            onSelectSingleCollection(event.target.files);
+            event.target.value = '';
+          }}
         />
       </label>
+
+      {rows.length > 0 ? (
+        <p className="text-sm font-bold">
+          {SCENERY_COPY.oneTapOverallProgress}: {overallProgress}% · {completedCount}/{eligibleCount || rows.length} eligible
+          completed
+        </p>
+      ) : null}
 
       <ul className="space-y-3">
         {rows.map((row) => (
           <li key={row.id} className="rounded-2xl border border-[var(--color-border)] px-3 py-3 text-sm">
             <p className="font-bold">{row.file.name}</p>
             <p className="text-[var(--color-text-muted)]">{row.file.size} bytes</p>
+            <p>Collection: {row.collectionId || 'unmapped'}</p>
             <p>Upload progress: {row.progress}%</p>
             <p>Multipart progress: {row.multipartProgress}</p>
-            <p>SHA-256: {row.hashStatus}{row.sha256 ? ` · ${row.sha256.slice(0, 12)}…` : ''}</p>
+            <p>
+              SHA-256: {row.hashStatus}
+              {row.sha256 ? ` · ${row.sha256.slice(0, 12)}…` : ''}
+            </p>
             <p>Storage: {row.storageStatus}</p>
             <p>Duplicate: {row.duplicateStatus}</p>
             <p>Quarantine: {row.quarantineStatus}</p>
             <p>Inspection readiness: {row.inspectionStatus}</p>
             {row.error ? <p className="text-[var(--color-danger-foreground)]">{row.error}</p> : null}
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" className="btn-secondary px-3 py-2" onClick={() => resume(row)}>
-                Resume
-              </button>
-              <button type="button" className="btn-secondary px-3 py-2" onClick={() => cancel(row)}>
-                Pause / cancel
-              </button>
-            </div>
+            {row.eligible ? (
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button type="button" className="btn-secondary px-3 py-2" onClick={() => resume(row)}>
+                  Resume
+                </button>
+                <button type="button" className="btn-secondary px-3 py-2" onClick={() => cancel(row)}>
+                  Pause / cancel
+                </button>
+              </div>
+            ) : null}
           </li>
         ))}
       </ul>
 
-      <button type="button" className="btn-primary w-full px-4 text-sm sm:w-auto" disabled={busy || rows.length === 0} onClick={uploadAll}>
-        Start or retry direct upload
+      <button
+        type="button"
+        className="btn-primary w-full px-4 text-sm sm:w-auto"
+        disabled={busy || eligibleCount === 0}
+        onClick={uploadEligible}
+      >
+        {SCENERY_COPY.oneTapUploadEligible}
       </button>
     </section>
   );

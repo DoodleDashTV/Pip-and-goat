@@ -138,6 +138,11 @@ database is connected.
 - No purchased scenery bytes were uploaded, inspected, extracted, converted, normalized, or approved
 - GET `/` and GET `/scenery` on the Preview returned 200
 - Preview Only Scenery Asset Intake, four collection cards, multiple-file selection, the 27-file checklist, and “Upload does not mean asset approval” rendered with TivvleJoy wording
+- Checkpoint TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD_V1 adds a one-tap picker that matches exact inventory filenames across all four collections
+- Pre-upload review lists matched, missing, unexpected, duplicate, and incorrect filenames plus sizes and collection totals
+- Unexpected files are refused individually; valid matches stay eligible
+- Purchased files were not present in this agent environment and were not uploaded
+- Draft PR #44 and Draft PR #45 stay open, draft, and unmerged
 
 ## Tests / validation
 

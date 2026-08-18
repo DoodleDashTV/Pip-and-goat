@@ -219,6 +219,8 @@ describe('scenery intake preview synthetic workflow', () => {
   it('keeps TivvleJoy preview copy and omits bucket or prefix controls', () => {
     expect(SCENERY_COPY.studioSession).toContain('TivvleJoy');
     expect(SCENERY_COPY.uploadNotApproval).toContain('Upload does not mean asset approval');
+    expect(SCENERY_COPY.oneTapSelectUpload).toBe('Select and upload all 27 purchased files');
+    expect(SCENERY_COPY.oneTapReviewTitle).toBe('Pre-upload review');
     expect(JSON.stringify(SCENERY_COPY)).not.toMatch(/DoodleDash|Doodle Dash|\bDDP\b/);
     expect(SCENERY_COPY.studioTokenHelp).not.toMatch(/prefixOverride|secretAccessKey|R2_SECRET_ACCESS_KEY/i);
   });

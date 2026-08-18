@@ -25,6 +25,18 @@ export const SCENERY_COPY = {
   intakeTitle: 'Preview Only Scenery Asset Intake',
   intakeInstruction:
     'Select the purchased TivvleJoy scenery files and upload them directly to private storage. Upload does not mean asset approval.',
+  oneTapSelectUpload: 'Select and upload all 27 purchased files',
+  oneTapNoCollectionRequired:
+    'Collection cards are not required. Exact filenames are matched to the TivvleJoy inventory automatically.',
+  oneTapReviewTitle: 'Pre-upload review',
+  oneTapMatched: 'Matched files',
+  oneTapMissing: 'Missing files',
+  oneTapUnexpected: 'Unexpected files',
+  oneTapDuplicates: 'Duplicate filenames',
+  oneTapIncorrect: 'Incorrect filenames',
+  oneTapCollectionTotals: 'Collection totals',
+  oneTapUploadEligible: 'Upload or retry all eligible files',
+  oneTapOverallProgress: 'Overall upload progress',
   uploadNotApproval: 'Upload does not mean asset approval.',
   studioSession: 'Authorized TivvleJoy studio session',
   studioTokenLabel: 'Studio session token',

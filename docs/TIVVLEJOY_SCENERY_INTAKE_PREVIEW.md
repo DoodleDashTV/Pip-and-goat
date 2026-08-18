@@ -104,8 +104,10 @@ Verified after Preview token-rotation redeploy `dpl_Btx59tpkKwLT7f57jnJ9tA2bD7uY
 1. Confirm this Preview is not Production.
 2. Confirm storage configuration is `configured` on `/scenery`.
 3. Enter the Preview intake token in Authorized TivvleJoy studio session.
-4. Choose a collection card.
-5. Select one or multiple purchased files that match the expected 27-file checklist.
-6. Start the direct upload. Watch hash, multipart progress, stored size, duplicate, and quarantine states.
-7. Repeat for Village (7), Sky/HDRI (7), Stylized Forest (4), and Procedural Nature (9).
+4. Tap **Select and upload all 27 purchased files** and choose every purchased file in one picker. Collection cards are not required.
+5. Review matched, missing, unexpected, duplicate, and incorrect filenames, plus sizes and collection totals.
+6. Tap **Upload or retry all eligible files**. Watch overall and per-file hash, multipart progress, stored size, duplicate, and quarantine states.
+7. Unexpected files are refused individually. Valid matches still upload.
 8. Upload does not mean asset approval. Do not inspect, normalize, or approve from this pass.
+
+See `docs/TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD.md`.

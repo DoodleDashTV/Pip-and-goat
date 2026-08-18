@@ -419,13 +419,32 @@ export const VILLAGE_NATIVE_MODELS = [
   'Tree03',
 ] as const;
 
-function normalizeMatch(value: string): string {
+export function normalizeInventoryFilename(value: string): string {
   return String(value ?? '')
     .toLowerCase()
     .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function normalizeMatch(value: string): string {
+  return normalizeInventoryFilename(value);
+}
+
+export function matchExactExpectedFilename(filename: string): ExpectedSourceFile | null {
+  const needle = normalizeMatch(filename);
+  const exact = EXPECTED_SCENERY_SOURCE_FILES.find((item) => normalizeMatch(item.expectedFilename) === needle);
+  return exact ? { ...exact, aliases: [...exact.aliases] } : null;
+}
+
+export function matchAliasOnlyExpectedFilename(filename: string): ExpectedSourceFile | null {
+  if (matchExactExpectedFilename(filename)) return null;
+  const needle = normalizeMatch(filename);
+  const alias = EXPECTED_SCENERY_SOURCE_FILES.find((item) =>
+    item.aliases.some((name) => normalizeMatch(name) === needle),
+  );
+  return alias ? { ...alias, aliases: [...alias.aliases] } : null;
 }
 
 export function listExpectedSourceFiles(): ExpectedSourceFile[] {

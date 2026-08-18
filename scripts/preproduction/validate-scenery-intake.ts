@@ -17,6 +17,8 @@ import {
   sanitizeFilename,
   sceneryInternalObjectKey,
   sceneryObjectKey,
+  reviewOneTapPurchasedSelection,
+  ONE_TAP_UPLOAD_CHECKPOINT,
   syntheticExecutableZip,
   syntheticFixtureZip,
   syntheticTraversalZip,
@@ -80,6 +82,21 @@ check('storage invalid when s3 is incomplete', () => {
 check('source inventory is 27 files across 4 collections', () => {
   const counts = assertInventoryCounts();
   if (counts.sourceCount !== 27 || counts.collectionCount !== 4) throw new Error(JSON.stringify(counts));
+});
+
+check('one-tap review maps four collections and refuses unexpected files individually', () => {
+  const review = reviewOneTapPurchasedSelection([
+    { filename: 'Village_Textures.zip', byteSize: 2 },
+    { filename: 'HDRI_part_sk1.zip', byteSize: 3 },
+    { filename: 'Stylized_Forest_Textures_2048.zip', byteSize: 4 },
+    { filename: 'Swarm.blend', byteSize: 5 },
+    { filename: 'readme.txt', byteSize: 6 },
+  ]);
+  if (review.checkpoint !== ONE_TAP_UPLOAD_CHECKPOINT) throw new Error(review.checkpoint);
+  if (review.eligible.length !== 4) throw new Error(String(review.eligible.length));
+  if (review.unexpected.length !== 1 || review.unexpected[0]?.eligible) throw new Error('unexpected was not refused');
+  const collections = new Set(review.matched.map((item) => item.collectionId));
+  if (collections.size !== 4) throw new Error('expected all four collections');
 });
 
 check('object-key safety and filename sanitization', () => {
