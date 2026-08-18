@@ -28,7 +28,10 @@ import {
   SCENERY_INTAKE_SCHEMA_VERSION,
 } from '../../apps/web/src/lib/scenery/intake';
 import { scanTrackedAndStagedFiles } from '../../apps/web/src/lib/scenery/intake/git-safety';
-import { assertAllowedExtension, assertSafeRelativeArchivePath } from '../../apps/web/src/lib/scenery/intake/keys';
+import {
+  assertAllowedExtension,
+  assertSafeRelativeArchivePath,
+} from '../../apps/web/src/lib/scenery/intake/keys';
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const OUT_DIR = path.join(REPO_ROOT, 'artifacts/tivvlejoy-scenery-intake');
@@ -58,7 +61,10 @@ check('storage unavailable without credentials', () => {
 });
 
 check('storage partially configured', () => {
-  const status = describeSceneryStorageConfiguration({ R2_BUCKET: 'bucket', R2_ENDPOINT: 'https://example.r2.cloudflarestorage.com' });
+  const status = describeSceneryStorageConfiguration({
+    R2_BUCKET: 'bucket',
+    R2_ENDPOINT: 'https://example.r2.cloudflarestorage.com',
+  });
   if (status.state !== 'partially_configured') throw new Error(status.state);
 });
 
@@ -81,20 +87,22 @@ check('storage invalid when s3 is incomplete', () => {
 
 check('source inventory is 27 files across 4 collections', () => {
   const counts = assertInventoryCounts();
-  if (counts.sourceCount !== 27 || counts.collectionCount !== 4) throw new Error(JSON.stringify(counts));
+  if (counts.sourceCount !== 27 || counts.collectionCount !== 4)
+    throw new Error(JSON.stringify(counts));
 });
 
 check('one-tap review maps four collections and refuses unexpected files individually', () => {
   const review = reviewOneTapPurchasedSelection([
-    { filename: 'Village_Textures.zip', byteSize: 2 },
-    { filename: 'HDRI_part_sk1.zip', byteSize: 3 },
-    { filename: 'Stylized_Forest_Textures_2048.zip', byteSize: 4 },
-    { filename: 'Swarm.blend', byteSize: 5 },
-    { filename: 'readme.txt', byteSize: 6 },
+    { filename: 'Village_Textures.zip', byteSize: 128 },
+    { filename: 'HDRI_part_sk1.zip', byteSize: 128 },
+    { filename: 'Stylized_Forest_Textures_2048.zip', byteSize: 128 },
+    { filename: 'Swarm.blend', byteSize: 128 },
+    { filename: 'readme.txt', byteSize: 64 },
   ]);
   if (review.checkpoint !== ONE_TAP_UPLOAD_CHECKPOINT) throw new Error(review.checkpoint);
   if (review.eligible.length !== 4) throw new Error(String(review.eligible.length));
-  if (review.unexpected.length !== 1 || review.unexpected[0]?.eligible) throw new Error('unexpected was not refused');
+  if (review.unexpected.length !== 1 || review.unexpected[0]?.eligible)
+    throw new Error('unexpected was not refused');
   const collections = new Set(review.matched.map((item) => item.collectionId));
   if (collections.size !== 4) throw new Error('expected all four collections');
 });
@@ -170,25 +178,36 @@ check('duplicate detection', () => {
 });
 
 check('quarantine rejects executables and traversal', () => {
-  if (evaluateQuarantine({
-    filename: 'payload.exe',
-    collectionValid: true,
-    byteSize: 1,
-    sha256: 'aa',
-    objectAvailable: true,
-    sizeMatchesStored: true,
-    unityPreservationOnly: false,
-  }).state !== 'quarantined') {
+  if (
+    evaluateQuarantine({
+      filename: 'payload.exe',
+      collectionValid: true,
+      byteSize: 1,
+      sha256: 'aa',
+      objectAvailable: true,
+      sizeMatchesStored: true,
+      unityPreservationOnly: false,
+    }).state !== 'quarantined'
+  ) {
     throw new Error('exe not quarantined');
   }
-  if (!inventoryZipBytes(syntheticTraversalZip()).findings.some((item) => item.code === 'ARCHIVE_PATH_TRAVERSAL')) {
+  if (
+    !inventoryZipBytes(syntheticTraversalZip()).findings.some(
+      (item) => item.code === 'ARCHIVE_PATH_TRAVERSAL',
+    )
+  ) {
     throw new Error('traversal not flagged');
   }
-  if (!inventoryZipBytes(syntheticExecutableZip()).findings.some((item) => item.code === 'PROHIBITED_EXTENSION')) {
+  if (
+    !inventoryZipBytes(syntheticExecutableZip()).findings.some(
+      (item) => item.code === 'PROHIBITED_EXTENSION',
+    )
+  ) {
     throw new Error('exe archive not flagged');
   }
   assertSafeRelativeArchivePath('safe/path.blend');
-  if (inventoryZipBytes(syntheticFixtureZip('village')).fileCount !== 2) throw new Error('fixture zip');
+  if (inventoryZipBytes(syntheticFixtureZip('village')).fileCount !== 2)
+    throw new Error('fixture zip');
 });
 
 check('inspection readiness stays closed without verified storage', () => {

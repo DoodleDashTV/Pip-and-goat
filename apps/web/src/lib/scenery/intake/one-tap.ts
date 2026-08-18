@@ -1,3 +1,4 @@
+import { assessFilenameSafety } from './filename-safety';
 import { sanitizeFilename } from './keys';
 import {
   EXPECTED_COLLECTION_COUNT,
@@ -8,6 +9,8 @@ import {
   normalizeInventoryFilename,
   type SceneryCollectionId,
 } from './inventory';
+import { assessSourceSize } from './size-validation';
+import { shouldExcludeWorldShadersGiveaway } from './world-shaders';
 
 export const ONE_TAP_UPLOAD_CHECKPOINT = 'TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD_V1';
 
@@ -60,6 +63,19 @@ export type OneTapPurchasedReview = {
   eligible: OneTapReviewItem[];
   collectionTotals: OneTapCollectionTotal[];
   totalMatchedBytes: number;
+  overallTotals: {
+    expected: number;
+    selected: number;
+    matched: number;
+    missing: number;
+    unexpected: number;
+    duplicates: number;
+    incorrect: number;
+    eligible: number;
+    refused: number;
+    totalMatchedBytes: number;
+    totalSelectedBytes: number;
+  };
 };
 
 function sanitizedOrNull(filename: string): string | null {
@@ -70,17 +86,77 @@ function sanitizedOrNull(filename: string): string | null {
   }
 }
 
-export function reviewOneTapPurchasedSelection(inputs: OneTapSelectionInput[]): OneTapPurchasedReview {
+export function reviewOneTapPurchasedSelection(
+  inputs: OneTapSelectionInput[],
+  options?: { approvedManifestFilenames?: readonly string[] },
+): OneTapPurchasedReview {
   const expected = listExpectedSourceFiles();
   const seenExact = new Map<string, number>();
   const classified: OneTapReviewItem[] = inputs.map((input) => {
     const sanitizedFilename = sanitizedOrNull(input.filename);
-    const exact = matchExactExpectedFilename(input.filename);
-    const aliasOnly = matchAliasOnlyExpectedFilename(input.filename);
-    const key = exact ? normalizeInventoryFilename(exact.expectedFilename) : normalizeInventoryFilename(input.filename);
+    const safety = assessFilenameSafety(input.filename);
+    const size = assessSourceSize({ filename: input.filename, declaredBytes: input.byteSize });
+    const exact =
+      safety.safe && safety.exactPurchasedMatch ? matchExactExpectedFilename(input.filename) : null;
+    const aliasOnly = safety.safe ? matchAliasOnlyExpectedFilename(input.filename) : null;
+    const acceptedAlias = Boolean(
+      aliasOnly && /\.[a-z0-9]+(?:\.[a-z0-9]+)?$/i.test(input.filename),
+    );
+    const key =
+      exact || acceptedAlias
+        ? normalizeInventoryFilename((exact ?? aliasOnly)!.expectedFilename)
+        : normalizeInventoryFilename(input.filename);
     const occurrence = (seenExact.get(key) ?? 0) + 1;
     seenExact.set(key, occurrence);
 
+    if (!safety.safe) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'incorrect',
+        collectionId: exact?.collectionId ?? aliasOnly?.collectionId ?? null,
+        collectionName: exact?.collectionName ?? aliasOnly?.collectionName ?? null,
+        sourceId: exact?.sourceId ?? aliasOnly?.sourceId ?? null,
+        expectedFilename: exact?.expectedFilename ?? aliasOnly?.expectedFilename ?? null,
+        eligible: false,
+        reason: `Unsafe filename refused (${safety.issues.join(', ')}). Source files are not renamed.`,
+      };
+    }
+    if (
+      !exact &&
+      shouldExcludeWorldShadersGiveaway({
+        filename: input.filename,
+        approvedManifestFilenames: options?.approvedManifestFilenames,
+      })
+    ) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'unexpected',
+        collectionId: null,
+        collectionName: null,
+        sourceId: null,
+        expectedFilename: null,
+        eligible: false,
+        reason: 'The free World Shaders giveaway is outside the purchased 27-file requirement.',
+      };
+    }
+    if (!size.ok) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'incorrect',
+        collectionId: exact?.collectionId ?? aliasOnly?.collectionId ?? null,
+        collectionName: exact?.collectionName ?? aliasOnly?.collectionName ?? null,
+        sourceId: exact?.sourceId ?? aliasOnly?.sourceId ?? null,
+        expectedFilename: exact?.expectedFilename ?? aliasOnly?.expectedFilename ?? null,
+        eligible: false,
+        reason: `Incorrect size (${size.issues.join(', ')}). Eligible files are not blocked.`,
+      };
+    }
     if (occurrence > 1) {
       return {
         filename: input.filename,
@@ -109,6 +185,24 @@ export function reviewOneTapPurchasedSelection(inputs: OneTapSelectionInput[]): 
         reason: 'Exact inventory filename matched. Collection card selection is not required.',
       };
     }
+    // Human-readable inventory aliases (for example, "village blender") are
+    // useful for discovery but must not make an arbitrary file uploadable.
+    // Only a known alias that still looks like a complete filename is an
+    // accepted download-name variant.
+    if (aliasOnly && acceptedAlias) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'matched',
+        collectionId: aliasOnly.collectionId,
+        collectionName: aliasOnly.collectionName,
+        sourceId: aliasOnly.sourceId,
+        expectedFilename: aliasOnly.expectedFilename,
+        eligible: true,
+        reason: `Known purchased filename variant matched ${aliasOnly.expectedFilename}. Source bytes are preserved without renaming.`,
+      };
+    }
     if (aliasOnly) {
       return {
         filename: input.filename,
@@ -120,7 +214,7 @@ export function reviewOneTapPurchasedSelection(inputs: OneTapSelectionInput[]): 
         sourceId: aliasOnly.sourceId,
         expectedFilename: aliasOnly.expectedFilename,
         eligible: false,
-        reason: `Incorrect filename. Use the exact inventory name ${aliasOnly.expectedFilename}.`,
+        reason: `Filename resembles ${aliasOnly.expectedFilename}, but it is not a complete approved download filename.`,
       };
     }
     return {
@@ -148,19 +242,19 @@ export function reviewOneTapPurchasedSelection(inputs: OneTapSelectionInput[]): 
       expectedFilename: item.expectedFilename,
     }));
 
-  const collectionTotals = (['village', 'sky-hdri', 'stylized-forest', 'procedural-nature'] as const).map(
-    (collectionId) => {
-      const collectionExpected = expected.filter((item) => item.collectionId === collectionId);
-      const collectionMatched = matched.filter((item) => item.collectionId === collectionId);
-      return {
-        collectionId,
-        collectionName: collectionExpected[0]?.collectionName ?? collectionId,
-        expected: collectionExpected.length,
-        matched: collectionMatched.length,
-        bytes: collectionMatched.reduce((sum, item) => sum + item.byteSize, 0),
-      };
-    },
-  );
+  const collectionTotals = (
+    ['village', 'sky-hdri', 'stylized-forest', 'procedural-nature'] as const
+  ).map((collectionId) => {
+    const collectionExpected = expected.filter((item) => item.collectionId === collectionId);
+    const collectionMatched = matched.filter((item) => item.collectionId === collectionId);
+    return {
+      collectionId,
+      collectionName: collectionExpected[0]?.collectionName ?? collectionId,
+      expected: collectionExpected.length,
+      matched: collectionMatched.length,
+      bytes: collectionMatched.reduce((sum, item) => sum + item.byteSize, 0),
+    };
+  });
 
   return {
     checkpoint: ONE_TAP_UPLOAD_CHECKPOINT,
@@ -176,5 +270,18 @@ export function reviewOneTapPurchasedSelection(inputs: OneTapSelectionInput[]): 
     eligible: classified.filter((item) => item.eligible),
     collectionTotals,
     totalMatchedBytes: matched.reduce((sum, item) => sum + item.byteSize, 0),
+    overallTotals: {
+      expected: EXPECTED_SOURCE_COUNT,
+      selected: inputs.length,
+      matched: matched.length,
+      missing: missing.length,
+      unexpected: classified.filter((item) => item.classification === 'unexpected').length,
+      duplicates: classified.filter((item) => item.classification === 'duplicate').length,
+      incorrect: classified.filter((item) => item.classification === 'incorrect').length,
+      eligible: classified.filter((item) => item.eligible).length,
+      refused: classified.filter((item) => !item.eligible).length,
+      totalMatchedBytes: matched.reduce((sum, item) => sum + item.byteSize, 0),
+      totalSelectedBytes: inputs.reduce((sum, item) => sum + item.byteSize, 0),
+    },
   };
 }

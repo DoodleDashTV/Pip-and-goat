@@ -1,0 +1,23 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_PIPELINE_HARDENING_V1",
+  "gitBranch": "cursor/tivvlejoy-scenery-pipeline-hardening-73f1",
+  "deploymentId": "dpl_9QBsVLnpRDMVu1yjYFy1wS2vvF4j",
+  "readyState": "READY",
+  "target": null,
+  "productionModified": false,
+  "existingPreviewR2Modified": false,
+  "newBranchScopedEnvCreated": true,
+  "purchasedSourceObjectCount": 0,
+  "purchased_files_uploaded": false,
+  "purchased_files_invented": false,
+  "licensed_files_committed": false,
+  "token_printed": false,
+  "credentials_in_html_or_json": false,
+  "tokenConfigured": true,
+  "storageConfiguration": "configured",
+  "bytesPath": "client-to-signed-r2",
+  "wrongToken": { "status": 401, "code": "INTAKE_UNAUTHORIZED" },
+  "correctTokenQuery": { "status": 400, "code": "UNKNOWN_SESSION", "uploaded": false },
+  "tokenInBody": { "status": 400, "code": "TOKEN_LOCATION_REFUSED" },
+  "synthetic_fixtures_deleted": true
+}

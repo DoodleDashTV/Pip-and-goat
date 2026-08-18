@@ -26,7 +26,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_BLEND_ZIP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_Blender_4.2.2.zip',
+    expectedFilename: 'Village (Blender 4.2.2)(2).zip',
     aliases: ['village blender 4.2.2 zip', 'village blender 4.2.2', 'village blender'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -39,7 +39,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_TEXTURES_ZIP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_Textures.zip',
+    expectedFilename: 'Village (Textures).zip',
     aliases: ['village textures zip', 'village textures'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -52,8 +52,13 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_PROJECT_ZIP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_Project_File.zip',
-    aliases: ['project file zip', 'village project', 'assembled project'],
+    expectedFilename: 'Project File.zip',
+    aliases: [
+      'project file zip',
+      'Village_Project_File.zip',
+      'village project',
+      'assembled project',
+    ],
     extension: '.zip',
     mimeType: 'application/zip',
     notes: 'Village assembled project file package.',
@@ -65,7 +70,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_FBX_ZIP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_FBX.zip',
+    expectedFilename: 'Village (FBX)(1).zip',
     aliases: ['village fbx zip', 'village fbx'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -78,9 +83,14 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_UNITY_BUILTIN',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_Built_in.unitypackage',
-    aliases: ['village built-in unity', 'village builtin', 'unity built-in'],
-    extension: '.unitypackage',
+    expectedFilename: 'Village - Built-in (Unity 2022.3.16f1).unitypackage.gz',
+    aliases: [
+      'village built-in unity',
+      'village builtin',
+      'unity built-in',
+      'Village_Built_in.unitypackage',
+    ],
+    extension: '.unitypackage.gz',
     mimeType: 'application/octet-stream',
     notes: 'Unity Built-in preservation backup. Not imported into the Blender pipeline.',
     unityPreservationOnly: true,
@@ -91,9 +101,9 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_UNITY_URP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_URP.unitypackage',
-    aliases: ['village urp unity', 'village urp'],
-    extension: '.unitypackage',
+    expectedFilename: 'Village - URP (Unity 2022.3.16f1).unitypackage.gz',
+    aliases: ['village urp unity', 'village urp', 'Village_URP.unitypackage'],
+    extension: '.unitypackage.gz',
     mimeType: 'application/octet-stream',
     notes: 'Unity URP preservation backup. Not imported into the Blender pipeline.',
     unityPreservationOnly: true,
@@ -104,9 +114,9 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_UNITY_HDRP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_HDRP.unitypackage',
-    aliases: ['village hdrp unity', 'village hdrp'],
-    extension: '.unitypackage',
+    expectedFilename: 'Village - HDRP (Unity 2022.3.16f1).unitypackage.gz',
+    aliases: ['village hdrp unity', 'village hdrp', 'Village_HDRP.unitypackage'],
+    extension: '.unitypackage.gz',
     mimeType: 'application/octet-stream',
     notes: 'Unity HDRP preservation backup. Not imported into the Blender pipeline.',
     unityPreservationOnly: true,
@@ -117,8 +127,8 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_SKY_MACHINE_V1_ZIP',
     collectionId: 'sky-hdri',
     collectionName: 'Sky and HDRI Lighting',
-    expectedFilename: 'SkyMachine_V1.zip',
-    aliases: ['skymachine v1 zip', 'skymachine v1'],
+    expectedFilename: 'SkyMachineV1(2).zip',
+    aliases: ['SkyMachineV1.zip', 'skymachine v1 zip', 'skymachine v1'],
     extension: '.zip',
     mimeType: 'application/zip',
     notes: 'SkyMachine V1 Blender source package.',
@@ -130,7 +140,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_SKY_MACHINE_V2_ZIP',
     collectionId: 'sky-hdri',
     collectionName: 'Sky and HDRI Lighting',
-    expectedFilename: 'SkyMachine_V2.zip',
+    expectedFilename: 'SkyMachineV2.zip',
     aliases: ['skymachine v2 zip', 'skymachine v2'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -143,8 +153,8 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_SKY_EXTRA_UPDATE_ZIP',
     collectionId: 'sky-hdri',
     collectionName: 'Sky and HDRI Lighting',
-    expectedFilename: 'Extra_Sky_Update.zip',
-    aliases: ['extra sky update zip', 'extra sky update'],
+    expectedFilename: 'Extra Update 1(3).zip',
+    aliases: ['extra sky update zip', 'extra sky update', 'extra update 1 zip', 'extra update 1'],
     extension: '.zip',
     mimeType: 'application/zip',
     notes: 'Extra sky update package. Combined contents include stylized JPG skies.',
@@ -156,7 +166,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_SKY_HDRI_SK1_ZIP',
     collectionId: 'sky-hdri',
     collectionName: 'Sky and HDRI Lighting',
-    expectedFilename: 'HDRI_part_sk1.zip',
+    expectedFilename: 'sk1.zip',
     aliases: ['hdri part sk1 zip', 'hdri sk1', 'sk1'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -169,7 +179,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_SKY_HDRI_SK2_ZIP',
     collectionId: 'sky-hdri',
     collectionName: 'Sky and HDRI Lighting',
-    expectedFilename: 'HDRI_part_sk2.zip',
+    expectedFilename: 'sk2.zip',
     aliases: ['hdri part sk2 zip', 'hdri sk2', 'sk2'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -182,7 +192,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_SKY_HDRI_SK3_ZIP',
     collectionId: 'sky-hdri',
     collectionName: 'Sky and HDRI Lighting',
-    expectedFilename: 'HDRI_part_sk3.zip',
+    expectedFilename: 'sk3.zip',
     aliases: ['hdri part sk3 zip', 'hdri sk3', 'sk3'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -195,7 +205,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_SKY_HDRI_SK4_ZIP',
     collectionId: 'sky-hdri',
     collectionName: 'Sky and HDRI Lighting',
-    expectedFilename: 'HDRI_part_sk4.zip',
+    expectedFilename: 'sk4.zip',
     aliases: ['hdri part sk4 zip', 'hdri sk4', 'sk4'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -208,16 +218,18 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_FOREST_MODEL_PACKAGE',
     collectionId: 'stylized-forest',
     collectionName: 'Stylized Forest',
-    expectedFilename: 'Stylized_Forest_Nature_Kit.zip',
+    expectedFilename: 'HDRI_Part_2.zip',
     aliases: [
       'stylized_forest_nature_kit.blend',
+      'Stylized_Forest_Nature_Kit.zip',
       'stylized forest nature kit',
       'forest model package',
       'stylized forest',
     ],
     extension: '.zip',
     mimeType: 'application/zip',
-    notes: 'Forest model package expected to contain Stylized_Forest_Nature_Kit.blend plus FBX, OBJ, and MTL.',
+    notes:
+      'Forest model package expected to contain Stylized_Forest_Nature_Kit.blend plus FBX, OBJ, and MTL.',
     unityPreservationOnly: false,
     inspectionJobId: 'INSPECT_STYLIZED_FOREST',
     textureTier: null,
@@ -226,7 +238,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_FOREST_TEXTURES_1024',
     collectionId: 'stylized-forest',
     collectionName: 'Stylized Forest',
-    expectedFilename: 'Stylized_Forest_Textures_1024.zip',
+    expectedFilename: '1024.zip',
     aliases: ['1024 texture zip', 'forest 1024', 'textures 1024'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -239,11 +251,12 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_FOREST_TEXTURES_2048',
     collectionId: 'stylized-forest',
     collectionName: 'Stylized Forest',
-    expectedFilename: 'Stylized_Forest_Textures_2048.zip',
+    expectedFilename: '2048.zip',
     aliases: ['2048 texture zip', 'forest 2048', 'textures 2048'],
     extension: '.zip',
     mimeType: 'application/zip',
-    notes: '2048 texture tier. Standard final. Only one selected tier may materialize for ordinary assembly.',
+    notes:
+      '2048 texture tier. Standard final. Only one selected tier may materialize for ordinary assembly.',
     unityPreservationOnly: false,
     inspectionJobId: null,
     textureTier: '2048',
@@ -252,7 +265,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_FOREST_TEXTURES_4096',
     collectionId: 'stylized-forest',
     collectionName: 'Stylized Forest',
-    expectedFilename: 'Stylized_Forest_Textures_4096.zip',
+    expectedFilename: '4096.zip',
     aliases: ['4096 texture zip', 'forest 4096', 'textures 4096'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -356,7 +369,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_NATURE_ASSETS_LIBRARY_ZIP',
     collectionId: 'procedural-nature',
     collectionName: 'Procedural Nature Library',
-    expectedFilename: 'assets_library.zip',
+    expectedFilename: 'assets library.zip',
     aliases: ['assets library.zip', 'assets library', 'asset preview library'],
     extension: '.zip',
     mimeType: 'application/zip',
@@ -380,7 +393,55 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
   },
 ];
 
-export const EXPECTED_SOURCE_COUNT = 27;
+/** Additional files confirmed by Justin as part of the official purchase-site delivery. */
+export const OPTIONAL_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
+  {
+    sourceId: 'SRC_SKY_HDRI_JPG_PACK',
+    collectionId: 'sky-hdri',
+    collectionName: 'Sky and HDRI Lighting',
+    expectedFilename: 'HDRi_JPG_Pack.zip',
+    aliases: ['hdri jpg pack'],
+    extension: '.zip',
+    mimeType: 'application/zip',
+    notes: 'Official JPG sky and HDRI package.',
+    unityPreservationOnly: false,
+    inspectionJobId: null,
+    textureTier: null,
+  },
+  {
+    sourceId: 'SRC_FOREST_STYLISED_ECOKIT',
+    collectionId: 'stylized-forest',
+    collectionName: 'Stylized Forest',
+    expectedFilename: 'Stylised EcoKit.zip',
+    aliases: ['stylised ecokit', 'stylized ecokit'],
+    extension: '.zip',
+    mimeType: 'application/zip',
+    notes: 'Official stylized environment kit.',
+    unityPreservationOnly: false,
+    inspectionJobId: null,
+    textureTier: null,
+  },
+  {
+    sourceId: 'SRC_SKY_WORLD_SHADERS_GIVEAWAY',
+    collectionId: 'sky-hdri',
+    collectionName: 'Sky and HDRI Lighting',
+    expectedFilename: 'Giveaway_World Shaders.zip',
+    aliases: ['world shaders giveaway'],
+    extension: '.zip',
+    mimeType: 'application/zip',
+    notes: 'Official purchase-site World Shaders bonus package.',
+    unityPreservationOnly: false,
+    inspectionJobId: null,
+    textureTier: null,
+  },
+];
+
+const ALL_SCENERY_SOURCE_FILES = [
+  ...EXPECTED_SCENERY_SOURCE_FILES,
+  ...OPTIONAL_SCENERY_SOURCE_FILES,
+];
+
+export const EXPECTED_SOURCE_COUNT = 30;
 export const EXPECTED_COLLECTION_COUNT = 4;
 
 export const VILLAGE_NATIVE_MODELS = [
@@ -434,25 +495,27 @@ function normalizeMatch(value: string): string {
 
 export function matchExactExpectedFilename(filename: string): ExpectedSourceFile | null {
   const needle = normalizeMatch(filename);
-  const exact = EXPECTED_SCENERY_SOURCE_FILES.find((item) => normalizeMatch(item.expectedFilename) === needle);
+  const exact = ALL_SCENERY_SOURCE_FILES.find(
+    (item) => normalizeMatch(item.expectedFilename) === needle,
+  );
   return exact ? { ...exact, aliases: [...exact.aliases] } : null;
 }
 
 export function matchAliasOnlyExpectedFilename(filename: string): ExpectedSourceFile | null {
   if (matchExactExpectedFilename(filename)) return null;
   const needle = normalizeMatch(filename);
-  const alias = EXPECTED_SCENERY_SOURCE_FILES.find((item) =>
+  const alias = ALL_SCENERY_SOURCE_FILES.find((item) =>
     item.aliases.some((name) => normalizeMatch(name) === needle),
   );
   return alias ? { ...alias, aliases: [...alias.aliases] } : null;
 }
 
 export function listExpectedSourceFiles(): ExpectedSourceFile[] {
-  return EXPECTED_SCENERY_SOURCE_FILES.map((item) => ({ ...item, aliases: [...item.aliases] }));
+  return ALL_SCENERY_SOURCE_FILES.map((item) => ({ ...item, aliases: [...item.aliases] }));
 }
 
 export function getExpectedSourceFile(sourceId: string): ExpectedSourceFile {
-  const found = EXPECTED_SCENERY_SOURCE_FILES.find((item) => item.sourceId === sourceId);
+  const found = ALL_SCENERY_SOURCE_FILES.find((item) => item.sourceId === sourceId);
   if (!found) {
     throw new Error(`Unknown expected scenery source: ${sourceId}`);
   }
@@ -465,23 +528,27 @@ export function matchExpectedSourceFile(input: {
   expectedSourceId?: string;
 }): ExpectedSourceFile | null {
   if (input.expectedSourceId) {
-    const exact = EXPECTED_SCENERY_SOURCE_FILES.find((item) => item.sourceId === input.expectedSourceId);
+    const exact = ALL_SCENERY_SOURCE_FILES.find((item) => item.sourceId === input.expectedSourceId);
     if (exact && exact.collectionId === input.collectionId) {
       return { ...exact, aliases: [...exact.aliases] };
     }
     return null;
   }
   const needle = normalizeMatch(input.filename);
-  const collection = EXPECTED_SCENERY_SOURCE_FILES.filter((item) => item.collectionId === input.collectionId);
+  const collection = ALL_SCENERY_SOURCE_FILES.filter(
+    (item) => item.collectionId === input.collectionId,
+  );
   const exactName = collection.find((item) => normalizeMatch(item.expectedFilename) === needle);
   if (exactName) return { ...exactName, aliases: [...exactName.aliases] };
-  const alias = collection.find((item) => item.aliases.some((name) => normalizeMatch(name) === needle));
+  const alias = collection.find((item) =>
+    item.aliases.some((name) => normalizeMatch(name) === needle),
+  );
   return alias ? { ...alias, aliases: [...alias.aliases] } : null;
 }
 
 export function assertInventoryCounts(): { sourceCount: number; collectionCount: number } {
-  const sourceCount = EXPECTED_SCENERY_SOURCE_FILES.length;
-  const collectionCount = new Set(EXPECTED_SCENERY_SOURCE_FILES.map((item) => item.collectionId)).size;
+  const sourceCount = ALL_SCENERY_SOURCE_FILES.length;
+  const collectionCount = new Set(ALL_SCENERY_SOURCE_FILES.map((item) => item.collectionId)).size;
   if (sourceCount !== EXPECTED_SOURCE_COUNT) {
     throw new Error(`Expected ${EXPECTED_SOURCE_COUNT} production files, found ${sourceCount}.`);
   }

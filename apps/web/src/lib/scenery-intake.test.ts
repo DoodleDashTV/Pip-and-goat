@@ -42,7 +42,10 @@ import { resetIntakeRateLimit } from './scenery/intake/access';
 import { SCENERY_INTAKE_SCHEMA_VERSION } from './scenery/intake/config';
 import { createEmptyManifestRecord } from './scenery/intake/manifest';
 import { scanTrackedAndStagedFiles } from './scenery/intake/git-safety';
-import { BLENDER_INSPECTION_CONTRACT, describeBlenderAvailability } from './scenery/intake/blender-contract';
+import {
+  BLENDER_INSPECTION_CONTRACT,
+  describeBlenderAvailability,
+} from './scenery/intake/blender-contract';
 import { buildPublicScenerySnapshot } from './scenery/snapshot';
 import { SCENERY_COPY } from './scenery/copy';
 
@@ -117,6 +120,10 @@ describe('object keys, filenames, and allowlists', () => {
     expect(() => sanitizeFilename('../secret.zip')).not.toThrow();
     expect(sanitizeFilename('../secret.zip')).toBe('secret.zip');
     expect(() => assertAllowedExtension('payload.exe')).toThrow(/Unsupported executable/);
+    expect(assertAllowedExtension('Village - Built-in.unitypackage.gz')).toBe('.unitypackage.gz');
+    expect(() => assertAllowedExtension('unrelated-archive.gz')).toThrow(
+      /Unsupported scenery file extension/,
+    );
     expect(() => assertSafeRelativeArchivePath('../escape/file.blend')).toThrow(/traversal/);
     expect(() => assertSafeRelativeArchivePath('/abs/file.blend')).toThrow(/absolute/);
     expect(() =>
@@ -129,29 +136,67 @@ describe('object keys, filenames, and allowlists', () => {
     ).toThrow(/Unknown scenery collection/);
   });
 
-  it('keeps the expected inventory at 27 files and 4 collections', () => {
+  it('keeps the expected official inventory at 30 files and 4 collections', () => {
     expect(assertInventoryCounts()).toEqual({
       sourceCount: EXPECTED_SOURCE_COUNT,
       collectionCount: EXPECTED_COLLECTION_COUNT,
     });
-    expect(listExpectedSourceFiles()).toHaveLength(27);
+    expect(listExpectedSourceFiles()).toHaveLength(30);
   });
 });
 
 describe('one-tap purchased selection review', () => {
+  it('auto-maps the exact saved filenames and known download-name variants', () => {
+    const review = reviewOneTapPurchasedSelection([
+      { filename: 'Extra Update 1.zip', byteSize: 10_659_392 },
+      { filename: 'SkyMachineV1.zip', byteSize: 46_914_963 },
+      { filename: 'SkyMachineV2.zip', byteSize: 51_240_289 },
+      { filename: 'HDRI_Part_2.zip', byteSize: 107_061_098 },
+    ]);
+    expect(review.eligible).toHaveLength(4);
+    expect(review.eligible.slice(0, 3).every((item) => item.collectionId === 'sky-hdri')).toBe(
+      true,
+    );
+    expect(review.eligible[3]?.collectionId).toBe('stylized-forest');
+  });
+
+  it('includes the three confirmed purchase-site files in the official 30-file count', () => {
+    const review = reviewOneTapPurchasedSelection([
+      { filename: 'HDRi_JPG_Pack.zip', byteSize: 94_319_192 },
+      { filename: 'Stylised EcoKit.zip', byteSize: 669_481_428 },
+      { filename: 'Giveaway_World Shaders.zip', byteSize: 711_398 },
+    ]);
+    expect(review.expectedCount).toBe(30);
+    expect(review.eligible).toHaveLength(3);
+    expect(review.eligible.map((item) => item.collectionId)).toEqual([
+      'sky-hdri',
+      'stylized-forest',
+      'sky-hdri',
+    ]);
+    expect(() =>
+      createUploadSession({
+        collectionId: 'sky-hdri',
+        originalFilename: 'Giveaway_World Shaders.zip',
+        byteSize: 711_398,
+        sha256: 'a'.repeat(64),
+        env: configuredEnv,
+      }),
+    ).not.toThrow();
+  });
+
   it('maps mixed exact filenames into all four collections and refuses others individually', () => {
     const review = reviewOneTapPurchasedSelection([
-      { filename: 'Village_Blender_4.2.2.zip', byteSize: 11 },
-      { filename: 'SkyMachine_V2.zip', byteSize: 22 },
-      { filename: 'Stylized_Forest_Nature_Kit.zip', byteSize: 33 },
-      { filename: 'Rock_Models.blend', byteSize: 44 },
-      { filename: 'Village_Blender_4.2.2.zip', byteSize: 55 },
-      { filename: 'village blender', byteSize: 66 },
-      { filename: 'not-a-purchased-file.exe', byteSize: 77 },
-      { filename: 'Flora_Mat&GN&Models.blend.zip', byteSize: 88 },
+      { filename: 'Village_Blender_4.2.2.zip', byteSize: 1024 },
+      { filename: 'SkyMachine_V2.zip', byteSize: 1024 },
+      { filename: 'Stylized_Forest_Nature_Kit.zip', byteSize: 1024 },
+      { filename: 'Rock_Models.blend', byteSize: 128 },
+      { filename: 'Village_Blender_4.2.2.zip', byteSize: 1024 },
+      { filename: 'village blender', byteSize: 1024 },
+      { filename: 'not-a-purchased-file.exe', byteSize: 1024 },
+      { filename: 'Flora_Mat&GN&Models.blend.zip', byteSize: 1024 },
     ]);
     expect(review.checkpoint).toBe(ONE_TAP_UPLOAD_CHECKPOINT);
-    expect(review.expectedCount).toBe(27);
+    expect(review.expectedCount).toBe(30);
     expect(new Set(review.matched.map((item) => item.collectionId))).toEqual(
       new Set(['village', 'sky-hdri', 'stylized-forest', 'procedural-nature']),
     );
@@ -163,15 +208,21 @@ describe('one-tap purchased selection review', () => {
     expect(review.unexpected[0]?.eligible).toBe(false);
     expect(review.incorrect[0]?.eligible).toBe(false);
     expect(review.duplicates[0]?.eligible).toBe(false);
-    expect(review.missing).toHaveLength(22);
+    expect(review.missing).toHaveLength(25);
     expect(review.collectionTotals.map((item) => item.collectionId)).toEqual([
       'village',
       'sky-hdri',
       'stylized-forest',
       'procedural-nature',
     ]);
-    expect(review.collectionTotals.find((item) => item.collectionId === 'village')?.matched).toBe(1);
-    expect(review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes).toBe(132);
+    expect(review.collectionTotals.find((item) => item.collectionId === 'village')?.matched).toBe(
+      1,
+    );
+    expect(
+      review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes,
+    ).toBe(1152);
+    expect(review.overallTotals.expected).toBe(30);
+    expect(review.overallTotals.eligible).toBe(5);
   });
 });
 
@@ -217,7 +268,12 @@ describe('multipart session workflow', () => {
       env: configuredEnv,
       publicPreview: false,
       storage,
-    })) as { session: { sessionId: string; parts: Array<{ partNumber: number; start: number; end: number }> } };
+    })) as {
+      session: {
+        sessionId: string;
+        parts: Array<{ partNumber: number; start: number; end: number }>;
+      };
+    };
 
     const signed = await handleSceneryIntakeAction({
       action: 'sign-part',
@@ -245,6 +301,31 @@ describe('multipart session workflow', () => {
     })) as { storedSize: number; manifest: { verificationState: string } };
     expect(completed.storedSize).toBe(bytes.byteLength);
     expect(completed.manifest.verificationState).toBe('size_verified');
+
+    const duplicateRetry = (await handleSceneryIntakeAction({
+      action: 'create-session',
+      body: {
+        collectionId: 'village',
+        filename: 'Village_Blender_4.2.2.zip',
+        byteSize: bytes.byteLength,
+        sha256,
+      },
+      env: configuredEnv,
+      publicPreview: false,
+      storage,
+    })) as {
+      alreadyPresent: boolean;
+      manifest: { uploadState: string; verificationState: string };
+    };
+    expect(duplicateRetry.alreadyPresent).toBe(true);
+    expect(duplicateRetry.manifest).toMatchObject({
+      uploadState: 'completed',
+      verificationState: 'size_verified',
+    });
+    expect(getSceneryIntakeStore().listManifests()[0]).toMatchObject({
+      uploadState: 'completed',
+      verificationState: 'size_verified',
+    });
 
     const second = createUploadSession({
       collectionId: 'village',
@@ -418,10 +499,24 @@ describe('archive inventory, quarantine, and manifests', () => {
     expect(ok.fileCount).toBe(2);
     expect(ok.executedAgainstStoredBytes).toBe(true);
     expect(ok.jpgFiles.length).toBe(1);
-    expect(() => inventoryZipBytes(syntheticTraversalZip()).findings.some((item) => item.code === 'ARCHIVE_PATH_TRAVERSAL')).not.toThrow();
-    expect(inventoryZipBytes(syntheticTraversalZip()).findings.some((item) => item.code === 'ARCHIVE_PATH_TRAVERSAL')).toBe(true);
-    expect(inventoryZipBytes(syntheticExecutableZip()).findings.some((item) => item.code === 'PROHIBITED_EXTENSION')).toBe(true);
-    const nested = inventoryZipBytes(buildMinimalZip([{ path: 'inner.zip', content: new Uint8Array([1, 2, 3]) }]));
+    expect(() =>
+      inventoryZipBytes(syntheticTraversalZip()).findings.some(
+        (item) => item.code === 'ARCHIVE_PATH_TRAVERSAL',
+      ),
+    ).not.toThrow();
+    expect(
+      inventoryZipBytes(syntheticTraversalZip()).findings.some(
+        (item) => item.code === 'ARCHIVE_PATH_TRAVERSAL',
+      ),
+    ).toBe(true);
+    expect(
+      inventoryZipBytes(syntheticExecutableZip()).findings.some(
+        (item) => item.code === 'PROHIBITED_EXTENSION',
+      ),
+    ).toBe(true);
+    const nested = inventoryZipBytes(
+      buildMinimalZip([{ path: 'inner.zip', content: new Uint8Array([1, 2, 3]) }]),
+    );
     expect(nested.nestedArchives).toEqual(['inner.zip']);
   });
 
@@ -458,7 +553,9 @@ describe('archive inventory, quarantine, and manifests', () => {
     ]);
     expect(jobs).toHaveLength(10);
     expect(jobs.find((job) => job.jobId === 'INSPECT_VILLAGE_BLENDER')?.ready).toBe(true);
-    expect(jobs.find((job) => job.jobId === 'INSPECT_VILLAGE_BLENDER')?.dryRunReport?.realExecution).toBe('not_run');
+    expect(
+      jobs.find((job) => job.jobId === 'INSPECT_VILLAGE_BLENDER')?.dryRunReport?.realExecution,
+    ).toBe('not_run');
     expect(
       evaluateQuarantine({
         filename: 'payload.exe',
@@ -480,13 +577,15 @@ describe('workspace readiness and git safety', () => {
     const snapshot = publicIntakeSnapshot([]);
     expect(snapshot.softwareFoundation.available).toBe(true);
     expect(snapshot.softwareFoundation.previewPlanningEnabled).toBe(true);
-    expect(snapshot.realAssetReadiness.expectedFiles).toBe(27);
+    expect(snapshot.realAssetReadiness.expectedFiles).toBe(30);
     expect(snapshot.realAssetReadiness.uploadedFiles).toBe(0);
     expect(snapshot.realAssetReadiness.verifiedFiles).toBe(0);
     expect(snapshot.realAssetReadiness.inspectedFiles).toBe(0);
     expect(snapshot.realAssetReadiness.realSceneryProductionReady).toBe(false);
     expect(snapshot.warning).toContain('Upload does not mean asset approval');
-    expect(buildPublicScenerySnapshot().intake.realAssetReadiness.purchasedBytesInspected).toBe(false);
+    expect(buildPublicScenerySnapshot().intake.realAssetReadiness.purchasedBytesInspected).toBe(
+      false,
+    );
     expect(describeBlenderAvailability().available).toBe(false);
     expect(BLENDER_INSPECTION_CONTRACT.paidGpu).toBe(false);
     expect(BLENDER_INSPECTION_CONTRACT.normalizationBoundary.allowed).toBe(false);
@@ -510,8 +609,10 @@ describe('workspace readiness and git safety', () => {
     expect(intake).toContain('Multipart progress');
     expect(intake).toContain('SCENERY_COPY.studioSession');
     expect(intake).toContain('x-tivvlejoy-scenery-intake-token');
-    expect(intake).toContain('Expected 27-file source checklist');
-    expect(readRepo('apps/web/src/lib/scenery/copy.ts')).toContain('Upload does not mean asset approval');
+    expect(intake).toContain('Expected 30-file source checklist');
+    expect(readRepo('apps/web/src/lib/scenery/copy.ts')).toContain(
+      'Upload does not mean asset approval',
+    );
     expect(intake).not.toMatch(/DoodleDash|Doodle Dash|\bDDP\b/);
     expect(scanTrackedAndStagedFiles(repoRoot).ok).toBe(true);
   });

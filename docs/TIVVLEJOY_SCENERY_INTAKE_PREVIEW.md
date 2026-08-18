@@ -110,4 +110,6 @@ Verified after Preview token-rotation redeploy `dpl_Btx59tpkKwLT7f57jnJ9tA2bD7uY
 7. Unexpected files are refused individually. Valid matches still upload.
 8. Upload does not mean asset approval. Do not inspect, normalize, or approve from this pass.
 
-See `docs/TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD.md`.
+See `docs/TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD.md` and `docs/TIVVLEJOY_SCENERY_PIPELINE_HARDENING.md`.
+
+Recovery, verification, quarantine, and inspection-readiness are documented in the hardening guide. Upload still does not mean asset approval. Licensed files are not committed.

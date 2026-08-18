@@ -1,23 +1,34 @@
 export const SCENERY_INTAKE_LIMITS = {
   maxUploadBytes: 2 * 1024 * 1024 * 1024,
   maxConcurrentParts: 4,
-  multipartPartBytes: 16 * 1024 * 1024,
+  maxConcurrentFiles: 2,
+  // A 2 GiB file now needs 32 signing calls instead of 128. This keeps a single
+  // large mobile upload below the authenticated Preview request-rate window.
+  multipartPartBytes: 64 * 1024 * 1024,
   minMultipartPartBytes: 5 * 1024 * 1024,
+  maxParts: 400,
   maxRetries: 3,
   signedOperationTtlSeconds: 15 * 60,
+  sessionTtlMs: 12 * 60 * 60 * 1000,
+  maxJsonBodyBytes: 64 * 1024,
   maxTemporaryWorkspaceBytes: 2 * 1024 * 1024 * 1024,
   maxInspectionConcurrency: 1,
   maxMaterializedBytesPerJob: 2 * 1024 * 1024 * 1024,
   hashChunkBytes: 4 * 1024 * 1024,
   rateLimitWindowMs: 60_000,
-  rateLimitMaxRequests: 40,
+  // Two bounded file workers can legitimately sign more than 40 parts/minute.
+  // Mutations still require the private studio token.
+  rateLimitMaxRequests: 240,
 } as const;
+
+export const SCENERY_INTAKE_SESSION_TTL_MS = SCENERY_INTAKE_LIMITS.sessionTtlMs;
 
 export const SCENERY_ALLOWED_EXTENSIONS = [
   '.zip',
   '.blend',
   '.txt',
   '.unitypackage',
+  '.unitypackage.gz',
   '.hdr',
   '.exr',
   '.jpg',
@@ -78,15 +89,27 @@ export function envNumber(
 export function resolveIntakeLimits(env: Record<string, string | undefined> = process.env) {
   const multipartPartBytes = Math.max(
     SCENERY_INTAKE_LIMITS.minMultipartPartBytes,
-    envNumber(env, 'TIVVLEJOY_SCENERY_MULTIPART_PART_BYTES', SCENERY_INTAKE_LIMITS.multipartPartBytes),
+    envNumber(
+      env,
+      'TIVVLEJOY_SCENERY_MULTIPART_PART_BYTES',
+      SCENERY_INTAKE_LIMITS.multipartPartBytes,
+    ),
   );
   return {
-    maxUploadBytes: envNumber(env, 'TIVVLEJOY_SCENERY_MAX_UPLOAD_BYTES', SCENERY_INTAKE_LIMITS.maxUploadBytes),
+    maxUploadBytes: envNumber(
+      env,
+      'TIVVLEJOY_SCENERY_MAX_UPLOAD_BYTES',
+      SCENERY_INTAKE_LIMITS.maxUploadBytes,
+    ),
     maxConcurrentParts: envNumber(
       env,
       'TIVVLEJOY_SCENERY_MAX_CONCURRENT_PARTS',
       SCENERY_INTAKE_LIMITS.maxConcurrentParts,
     ),
+    maxConcurrentFiles: SCENERY_INTAKE_LIMITS.maxConcurrentFiles,
+    maxParts: SCENERY_INTAKE_LIMITS.maxParts,
+    maxJsonBodyBytes: SCENERY_INTAKE_LIMITS.maxJsonBodyBytes,
+    sessionTtlMs: SCENERY_INTAKE_LIMITS.sessionTtlMs,
     multipartPartBytes,
     minMultipartPartBytes: SCENERY_INTAKE_LIMITS.minMultipartPartBytes,
     maxRetries: envNumber(env, 'TIVVLEJOY_SCENERY_MAX_RETRIES', SCENERY_INTAKE_LIMITS.maxRetries),
@@ -110,7 +133,11 @@ export function resolveIntakeLimits(env: Record<string, string | undefined> = pr
       'TIVVLEJOY_SCENERY_MAX_MATERIALIZED_BYTES',
       SCENERY_INTAKE_LIMITS.maxMaterializedBytesPerJob,
     ),
-    hashChunkBytes: envNumber(env, 'TIVVLEJOY_SCENERY_HASH_CHUNK_BYTES', SCENERY_INTAKE_LIMITS.hashChunkBytes),
+    hashChunkBytes: envNumber(
+      env,
+      'TIVVLEJOY_SCENERY_HASH_CHUNK_BYTES',
+      SCENERY_INTAKE_LIMITS.hashChunkBytes,
+    ),
     rateLimitWindowMs: SCENERY_INTAKE_LIMITS.rateLimitWindowMs,
     rateLimitMaxRequests: SCENERY_INTAKE_LIMITS.rateLimitMaxRequests,
   };
