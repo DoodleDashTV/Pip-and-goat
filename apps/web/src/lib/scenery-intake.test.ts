@@ -141,14 +141,14 @@ describe('object keys, filenames, and allowlists', () => {
 describe('one-tap purchased selection review', () => {
   it('maps mixed exact filenames into all four collections and refuses others individually', () => {
     const review = reviewOneTapPurchasedSelection([
-      { filename: 'Village_Blender_4.2.2.zip', byteSize: 11 },
-      { filename: 'SkyMachine_V2.zip', byteSize: 22 },
-      { filename: 'Stylized_Forest_Nature_Kit.zip', byteSize: 33 },
-      { filename: 'Rock_Models.blend', byteSize: 44 },
-      { filename: 'Village_Blender_4.2.2.zip', byteSize: 55 },
-      { filename: 'village blender', byteSize: 66 },
-      { filename: 'not-a-purchased-file.exe', byteSize: 77 },
-      { filename: 'Flora_Mat&GN&Models.blend.zip', byteSize: 88 },
+      { filename: 'Village_Blender_4.2.2.zip', byteSize: 1024 },
+      { filename: 'SkyMachine_V2.zip', byteSize: 1024 },
+      { filename: 'Stylized_Forest_Nature_Kit.zip', byteSize: 1024 },
+      { filename: 'Rock_Models.blend', byteSize: 128 },
+      { filename: 'Village_Blender_4.2.2.zip', byteSize: 1024 },
+      { filename: 'village blender', byteSize: 1024 },
+      { filename: 'not-a-purchased-file.exe', byteSize: 1024 },
+      { filename: 'Flora_Mat&GN&Models.blend.zip', byteSize: 1024 },
     ]);
     expect(review.checkpoint).toBe(ONE_TAP_UPLOAD_CHECKPOINT);
     expect(review.expectedCount).toBe(27);
@@ -171,7 +171,9 @@ describe('one-tap purchased selection review', () => {
       'procedural-nature',
     ]);
     expect(review.collectionTotals.find((item) => item.collectionId === 'village')?.matched).toBe(1);
-    expect(review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes).toBe(132);
+    expect(review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes).toBe(1152);
+    expect(review.overallTotals.expected).toBe(27);
+    expect(review.overallTotals.eligible).toBe(5);
   });
 });
 

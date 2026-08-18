@@ -86,11 +86,11 @@ check('source inventory is 27 files across 4 collections', () => {
 
 check('one-tap review maps four collections and refuses unexpected files individually', () => {
   const review = reviewOneTapPurchasedSelection([
-    { filename: 'Village_Textures.zip', byteSize: 2 },
-    { filename: 'HDRI_part_sk1.zip', byteSize: 3 },
-    { filename: 'Stylized_Forest_Textures_2048.zip', byteSize: 4 },
-    { filename: 'Swarm.blend', byteSize: 5 },
-    { filename: 'readme.txt', byteSize: 6 },
+    { filename: 'Village_Textures.zip', byteSize: 128 },
+    { filename: 'HDRI_part_sk1.zip', byteSize: 128 },
+    { filename: 'Stylized_Forest_Textures_2048.zip', byteSize: 128 },
+    { filename: 'Swarm.blend', byteSize: 128 },
+    { filename: 'readme.txt', byteSize: 64 },
   ]);
   if (review.checkpoint !== ONE_TAP_UPLOAD_CHECKPOINT) throw new Error(review.checkpoint);
   if (review.eligible.length !== 4) throw new Error(String(review.eligible.length));
