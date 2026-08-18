@@ -30,6 +30,7 @@ import {
   deleteGuardedPod,
   extractPodId,
   isConfirmPaidGpu,
+  listPodsReadonly,
   parseUsdToMicros,
   projectedComputeMicros,
   recoverPodByExactName,
@@ -121,14 +122,14 @@ export function runIdFromPodPayload(payload) {
   return null;
 }
 
-function wrapRecordingFetch(fetchFn, operations) {
+function wrapRecordingFetch(fetchFn, operations, realNetwork = false) {
   return async function recordedFetch(url, opts = {}) {
     const method = String(opts.method || 'GET').toUpperCase();
     operations.push({
       op: 'HTTP',
       method,
       url: String(url || ''),
-      realNetwork: false,
+      realNetwork: realNetwork === true,
     });
     return fetchFn(url, opts);
   };
@@ -208,7 +209,15 @@ export function evaluatePaidSmokeGate(input = {}) {
     return fail('Lifecycle controller is not ready.', 'LIFECYCLE_NOT_READY');
   }
   const expectedIntent = input.expectedLaunchIntentSha256 ?? APPROVED_LAUNCH_INTENT_SHA256;
-  if (launchIntentSha256 !== APPROVED_LAUNCH_INTENT_SHA256 || expectedIntent !== APPROVED_LAUNCH_INTENT_SHA256) {
+  const receiptIntent = input.paidSmokeReceipt?.launchIntentSha256;
+  if (receiptIntent) {
+    if (launchIntentSha256 !== receiptIntent || input.paidSmokeReceipt.templateId !== APPROVED_TEMPLATE_ID) {
+      return fail('launchIntentSha256 does not match the paid-smoke launch receipt.', 'LAUNCH_INTENT_MISMATCH');
+    }
+    if (input.paidSmokeReceipt.imageName !== REQUIRED_IMAGE_NAME) {
+      return fail('Paid-smoke launch receipt image does not match the pinned digest.', 'IMAGE_MISMATCH');
+    }
+  } else if (launchIntentSha256 !== APPROVED_LAUNCH_INTENT_SHA256 || expectedIntent !== APPROVED_LAUNCH_INTENT_SHA256) {
     return fail('launchIntentSha256 does not match the approved launch intent.', 'LAUNCH_INTENT_MISMATCH');
   }
   return {
@@ -257,6 +266,7 @@ export function createRealRunPodLifecycleAdapter({
   let created = false;
   let deleted = false;
   let assignedId = null;
+  const resolvedFetch = fetchFn || globalThis.fetch;
   const usesRealNetworkFetch = !fetchFn || fetchFn === globalThis.fetch;
   const gateInput = {
     ...authorization,
@@ -268,14 +278,20 @@ export function createRealRunPodLifecycleAdapter({
     allowRealNetwork,
   };
   const gate = evaluatePaidSmokeGate(gateInput);
-  const authorized = gate.ok === true && usesRealNetworkFetch === false && allowRealNetwork !== true;
+  const mockAuthorized = gate.ok === true && usesRealNetworkFetch === false && allowRealNetwork !== true;
+  const realAuthorized =
+    gate.ok === true &&
+    allowRealNetwork === true &&
+    authorization.realNetworkMutationEnabled === true &&
+    typeof resolvedFetch === 'function';
+  const authorized = mockAuthorized || realAuthorized;
   const mode = authorized ? 'REAL_AUTHORIZED' : 'REAL_BUT_BLOCKED';
-  const recordedFetch = fetchFn && !usesRealNetworkFetch ? wrapRecordingFetch(fetchFn, operations) : null;
+  const recordedFetch = authorized ? wrapRecordingFetch(resolvedFetch, operations, realAuthorized) : null;
 
   const adapter = {
     kind: 'real',
     mode,
-    realNetwork: false,
+    realNetwork: realAuthorized === true,
     lastPodId: null,
     operations,
     authorizationCode: authorized ? gate.code : gate.code || 'PAID_EXECUTION_NOT_AUTHORIZED',
@@ -288,6 +304,25 @@ export function createRealRunPodLifecycleAdapter({
     },
     recordedMutations() {
       return countRecordedPodMutations(operations);
+    },
+    async inspectPod(id) {
+      if (!recordedFetch || !extractPodId({ id })) return { ok: false, hourlyMicros: null };
+      const listed = await listPodsReadonly(apiKey, recordedFetch);
+      operations.push({ op: 'INSPECT', method: 'GET', url: REST_PODS_URL, realNetwork: realAuthorized });
+      if (!listed.ok) return { ok: false, hourlyMicros: null, reason: listed.reason };
+      const match = (listed.items || []).find((item) => item && item.id === id);
+      if (!match) return { ok: true, present: false, hourlyMicros: null };
+      const raw = match.costPerHr ?? match.costPerHour ?? match.machine?.costPerHr;
+      const hourlyMicros = parseUsdToMicros(raw);
+      return { ok: true, present: true, hourlyMicros, gpu: match.gpuTypeId || match.machine?.gpuTypeId || null };
+    },
+    async confirmAbsence(id) {
+      if (!recordedFetch) return { ok: false, reason: 'Absence check is unavailable.' };
+      const listed = await listPodsReadonly(apiKey, recordedFetch);
+      operations.push({ op: 'CONFIRM_ABSENCE', method: 'GET', url: REST_PODS_URL, realNetwork: realAuthorized });
+      if (!listed.ok) return { ok: false, reason: listed.reason, remaining: null };
+      const remaining = (listed.items || []).filter((item) => item && item.id === id);
+      return { ok: remaining.length === 0, remaining: remaining.length, total: listed.items.length };
     },
     async createPod(payload) {
       const liveGate = evaluatePaidSmokeGate(gateInput);
@@ -377,6 +412,7 @@ export function createRealRunPodLifecycleAdapter({
           runId,
           fetchFn: recordedFetch,
           env,
+          payload,
         });
       } catch (error) {
         operations.push({ op: 'CREATE', url: REST_PODS_URL, ok: false, realNetwork: false });

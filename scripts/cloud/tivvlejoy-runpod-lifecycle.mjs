@@ -198,9 +198,9 @@ export function sanitizeObservedStatus(raw) {
   };
 }
 
-function readJsonObject(adapter, key) {
-  const got = adapter.get(key);
-  if (!got.ok) return { present: false, value: null, malformed: false };
+async function readJsonObject(adapter, key) {
+  const got = await Promise.resolve(adapter.get(key));
+  if (!got || got.ok !== true) return { present: false, value: null, malformed: false };
   try {
     const text = Buffer.isBuffer(got.body) ? got.body.toString('utf8') : String(got.body);
     const parsed = JSON.parse(text);
@@ -417,7 +417,18 @@ export async function runPodLifecycle(input = {}) {
     const receiptCheck = costGuards(input.renderPlanReceipt, input.now);
     if (!receiptCheck.ok) return fail(receiptCheck.reason, receiptCheck.code, { history });
 
-    const expectedIntent = input.expectedLaunchIntentSha256 ?? APPROVED_LAUNCH_INTENT_SHA256;
+    const expectedIntent =
+      input.paidSmokeReceipt?.launchIntentSha256 ?? input.expectedLaunchIntentSha256 ?? APPROVED_LAUNCH_INTENT_SHA256;
+    if (input.paidSmokeReceipt) {
+      if (input.paidSmokeReceipt.templateId !== bound.templateId) {
+        return fail('Paid-smoke launch receipt templateId is not the approved template.', 'LAUNCH_INTENT_MISMATCH', { history });
+      }
+      if (input.paidSmokeReceipt.imageName !== REQUIRED_IMAGE_NAME) {
+        return fail('Paid-smoke launch receipt image does not match the pinned digest.', 'LAUNCH_INTENT_MISMATCH', { history });
+      }
+    } else if (!input.expectedLaunchIntentSha256 && built.launchIntentSha256 !== APPROVED_LAUNCH_INTENT_SHA256) {
+      return fail('launchIntentSha256 does not match the approved launch intent.', 'LAUNCH_INTENT_MISMATCH', { history });
+    }
     if (built.launchIntentSha256 !== expectedIntent) {
       return fail('launchIntentSha256 does not match the approved launch intent.', 'LAUNCH_INTENT_MISMATCH', { history });
     }
@@ -509,11 +520,20 @@ export async function runPodLifecycle(input = {}) {
     let ready = false;
     let running = false;
     let terminal = null;
+    let effectiveRenderTimeoutMs = renderTimeoutMs;
+    if (input.liveObserve && typeof adapter.inspectPod === 'function') {
+      const inspected = await adapter.inspectPod(podId);
+      if (inspected?.hourlyMicros && Number.isSafeInteger(inspected.hourlyMicros) && inspected.hourlyMicros > 0) {
+        const hourlyUsd = inspected.hourlyMicros / 1_000_000;
+        const killMinutes = Math.max(1, Math.floor((Number(MAX_COMPUTE_USD) / hourlyUsd) * 60 * 0.9));
+        effectiveRenderTimeoutMs = Math.min(effectiveRenderTimeoutMs, killMinutes * 60_000);
+      }
+    }
 
     for (let i = 0; i < (input.maxTicks || 12); i += 1) {
-      tick({ now: clock.now(), podId });
-      const startupRead = readJsonObject(r2, jobPackage.startupStatusKey);
-      const statusRead = readJsonObject(r2, jobPackage.statusKey);
+      await Promise.resolve(tick({ now: clock.now(), podId }));
+      const startupRead = await readJsonObject(r2, jobPackage.startupStatusKey);
+      const statusRead = await readJsonObject(r2, jobPackage.statusKey);
       if (startupRead.malformed || statusRead.malformed) {
         terminal = { kind: 'MALFORMED', reason: 'Malformed worker status was refused.' };
         break;
@@ -560,12 +580,17 @@ export async function runPodLifecycle(input = {}) {
         terminal = { kind: 'TIMEOUT', phase: 'worker-ready' };
         break;
       }
-      if (ready && elapsed >= renderTimeoutMs) {
+      if (ready && elapsed >= effectiveRenderTimeoutMs) {
         enter(history, 'TIMED_OUT');
         terminal = { kind: 'TIMEOUT', phase: 'render' };
         break;
       }
-      clock.advance(input.tickMs || 1);
+      if (input.liveObserve) {
+        const interval = running ? input.activePollMs || 4_000 : input.idlePollMs || 20_000;
+        await (input.sleep || ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(interval);
+      } else {
+        clock.advance(input.tickMs || 1);
+      }
     }
 
     if (!terminal) {
@@ -588,7 +613,9 @@ export async function runPodLifecycle(input = {}) {
       },
     });
 
-    assertNoLaunchMutation(recorder);
+    if (input.allowPaidNetwork !== true) {
+      assertNoLaunchMutation(recorder);
+    }
     const real = countLaunchMutations(recorder);
     if (!cleaned.ok) {
       return {

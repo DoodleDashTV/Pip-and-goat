@@ -531,22 +531,51 @@ export async function recoverPodByExactName({ apiKey, exactName, fetchFn = globa
   };
 }
 
-export async function createGuardedPod({ apiKey, templateId, runId, fetchFn = globalThis.fetch, env = process.env }) {
-  const payload = buildCreatePodPayload({ templateId, runId });
-  persistLaunchIntent({ podName: payload.name, env });
+function resolveGuardedCreateBody({ templateId, runId, payload }) {
+  if (payload && typeof payload === 'object') {
+    if (templateId && payload.templateId && payload.templateId !== templateId) {
+      throw new Error('Guarded create payload templateId does not match the approved template.');
+    }
+    return {
+      name: payload.name,
+      cloudType: payload.cloudType,
+      computeType: payload.computeType,
+      gpuTypeIds: payload.gpuTypeIds,
+      gpuTypePriority: payload.gpuTypePriority,
+      gpuCount: payload.gpuCount,
+      interruptible: payload.interruptible,
+      locked: payload.locked ?? false,
+      templateId: payload.templateId || templateId,
+      ports: payload.ports ?? [],
+      ...(payload.env ? { env: payload.env } : {}),
+    };
+  }
+  return buildCreatePodPayload({ templateId, runId });
+}
+
+export async function createGuardedPod({
+  apiKey,
+  templateId,
+  runId,
+  fetchFn = globalThis.fetch,
+  env = process.env,
+  payload,
+} = {}) {
+  const body = resolveGuardedCreateBody({ templateId, runId, payload });
+  persistLaunchIntent({ podName: body.name, env });
   let response;
   try {
     response = await fetchFn(REST_PODS_URL, {
       method: 'POST',
       headers: jsonHeaders(apiKey),
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     });
   } catch {
     return {
       ok: false,
       recover: true,
       reason: 'Pod create transport was ambiguous after the request was sent.',
-      podName: payload.name,
+      podName: body.name,
     };
   }
   if (createHttpStatusRequiresRecovery(response.status)) {
@@ -554,12 +583,12 @@ export async function createGuardedPod({ apiKey, templateId, runId, fetchFn = gl
       ok: false,
       recover: true,
       reason: `Pod create HTTP ${response.status} was ambiguous after the request was sent.`,
-      podName: payload.name,
+      podName: body.name,
     };
   }
   const { ok, parsed } = await readJsonSilently(response);
   if (!ok) {
-    return { ok: false, recover: true, reason: 'Pod create response could not be parsed.', podName: payload.name };
+    return { ok: false, recover: true, reason: 'Pod create response could not be parsed.', podName: body.name };
   }
   const podId = extractPodId(parsed);
   if (!podId) {
@@ -567,10 +596,10 @@ export async function createGuardedPod({ apiKey, templateId, runId, fetchFn = gl
       ok: false,
       recover: true,
       reason: 'Pod create response did not include a usable Pod ID.',
-      podName: payload.name,
+      podName: body.name,
     };
   }
-  return { ok: true, recover: false, podId, podName: payload.name };
+  return { ok: true, recover: false, podId, podName: body.name };
 }
 
 export async function deleteGuardedPod({ apiKey, podId, fetchFn = globalThis.fetch }) {
