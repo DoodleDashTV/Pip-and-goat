@@ -66,11 +66,29 @@ These names are set on the Vercel `pip-and-goat` project for **Preview only**, g
 - `R2_ACCESS_KEY_ID`
 - `R2_SECRET_ACCESS_KEY`
 - `TIVVLEJOY_SCENERY_ASSET_PREFIX=tivvlejoy-assets`
-- `TIVVLEJOY_SCENERY_INTAKE_TOKEN` (48 characters, server-only, not printed)
+- `TIVVLEJOY_SCENERY_INTAKE_TOKEN` (server-only, not printed)
 
 The live host is the existing git-branch Vercel Preview alias for `cursor/tivvlejoy-scenery-intake-preview-73f1`. The hostname is omitted from git.
 
-Verified after Preview redeploy `dpl_Aq3jBhFdCiBbAp2Wv4ziKAQPmWJj`:
+Verified after Preview storage-config redeploy `dpl_Aq3jBhFdCiBbAp2Wv4ziKAQPmWJj`.
+
+## Preview intake token rotation (verified)
+
+Checkpoint: `TIVVLEJOY_SCENERY_PREVIEW_TOKEN_ROTATE`
+
+`TIVVLEJOY_SCENERY_INTAKE_TOKEN` was rotated in place on the same Preview-only, git-branch-limited sensitive variable. The new value is the identically named Runtime Secret from the agent environment. Neither the previous value nor the new value is printed.
+
+Other Preview storage names were not modified:
+
+- `R2_BUCKET`
+- `R2_ENDPOINT`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `TIVVLEJOY_SCENERY_ASSET_PREFIX`
+
+Production was not modified (`hiddenProductionEnvCount=0`). Draft PR #45 stays open, draft, and unmerged.
+
+Verified after Preview token-rotation redeploy `dpl_CUpG3UWEc4UWSgkh9L5BferJVtNu` of branch `cursor/tivvlejoy-scenery-intake-preview-73f1`:
 
 - GET `/scenery` = 200
 - GET `/api/scenery/intake` = 200, `storageConfiguration=configured`, `tokenConfigured=true`, `bytesPath=client-to-signed-r2`

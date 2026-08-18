@@ -128,6 +128,9 @@ database is connected.
 - Production Vercel env was not modified (`hiddenProductionEnvCount=0`, no production targets)
 - Preview host now reports `storageConfiguration=configured`, `tokenConfigured=true`, prefix `tivvlejoy-assets`, and `bytesPath=client-to-signed-r2`
 - A 48-character `TIVVLEJOY_SCENERY_INTAKE_TOKEN` was generated and stored as a Vercel sensitive Preview env var; the value is not printed
+- Checkpoint `TIVVLEJOY_SCENERY_PREVIEW_TOKEN_ROTATE` rotated that same Preview-only, git-branch-limited variable to the identically named Runtime Secret; neither value is printed
+- Other R2 Preview names and Production were not changed (`hiddenProductionEnvCount=0`)
+- Token-rotation redeploy `dpl_CUpG3UWEc4UWSgkh9L5BferJVtNu` of `cursor/tivvlejoy-scenery-intake-preview-73f1` is READY and not Production
 - Incorrect intake token returns 401 `INTAKE_UNAUTHORIZED`
 - Correct token authorizes a safe non-upload `query` of an unknown session (400 `UNKNOWN_SESSION`, `uploaded=false`)
 - No credentials appeared in Preview HTML or JSON
