@@ -1,6 +1,6 @@
 # TivvleJoy RunPod GitHub Actions
 
-Checkpoint: `TIVVLEJOY_RUNPOD_GUARDED_RENDER_LAUNCH_V1`
+Checkpoint: `TIVVLEJOY_RUNPOD_GUARDED_RENDER_SAFETY_HARDENING_V1`
 
 This is a **manual-only** GitHub Actions path for TivvleJoy RunPod work. It can plan a GPU launch and, only after explicit paid approval plus every safety gate, create exactly one RunPod Pod. Accidental paid compute must remain impossible.
 
@@ -54,7 +54,7 @@ A complete remotely executable TivvleJoy scene command is **not** invoked from t
 3. Immediate `render_plan` PASS (price, stock, GPU count, parseable responses)
 4. Repository secret `RUNPOD_RENDER_TEMPLATE_ID` configured
 
-If `confirm_paid_gpu` is true in `validate`, `connectivity`, or `render_plan`, the workflow refuses paid launch in that mode and does not create a Pod.
+If `confirm_paid_gpu` is true in `validate`, `connectivity`, or `render_plan`, the workflow **fails immediately** (`exit 1`) after printing the refusal. Those modes require `confirm_paid_gpu=false`. Only `render_launch` may accept `confirm_paid_gpu=true`. A later `render_plan` step cannot make an invalid paid request look accepted.
 
 ## Hard refusal thresholds
 
@@ -91,6 +91,8 @@ There is no silent fallback to a more expensive GPU.
 
 GitHub job timeout is `25` minutes so cleanup can still run after the 20-minute Pod runtime cap.
 
+There is **no remote Blender scene command** in this workflow yet. When one is added later, it must have its own hard 20-minute deadline. Timeout or failure must flow into Pod cleanup. The GitHub 25-minute timeout is only an outer emergency guard so cleanup can run before the runner is killed. Do not rely on the job timeout alone.
+
 Once a Pod is successfully created:
 
 - the Pod ID is persisted immediately
@@ -105,7 +107,25 @@ If cleanup cannot be confirmed, the workflow is marked **FAILED** and prints:
 
 `RUNPOD CLEANUP REQUIRES ATTENTION`
 
-plus only the Pod ID needed to locate the resource. A cleanup failure is never hidden behind an earlier render failure.
+plus only the sanitized identifiers needed to locate the resource. A cleanup failure is never hidden behind an earlier render failure.
+
+## Ambiguous create recovery
+
+Every `render_launch` create uses the deterministic name `tivvlejoy-render-${GITHUB_RUN_ID}`.
+
+Before `POST /v1/pods`, the helper persists that intended name and records that a create attempt is about to occur.
+
+After the POST:
+
+- If a valid Pod ID is returned, it is persisted immediately and later cleanup uses that ID.
+- If HTTP 2xx succeeds but the body is malformed, truncated, or missing a usable top-level ID, the helper enters recovery.
+- If the create transport fails after the request may have been sent, the helper enters recovery.
+
+Recovery uses a non-mutating `GET /v1/pods` list and an **exact name match only**. It never deletes another TivvleJoy run and never deletes by prefix or fuzzy match.
+
+- Exactly one match: capture that Pod ID and delete it immediately.
+- Zero matches, after a successful list: fail safely. Do not claim no Pod exists unless that list confirmed zero exact-name matches.
+- More than one exact match, or a failed/ambiguous recovery lookup: print `RUNPOD CLEANUP REQUIRES ATTENTION` and only sanitized Pod IDs / the exact name. Never log raw API bodies.
 
 ## Secret handling
 
