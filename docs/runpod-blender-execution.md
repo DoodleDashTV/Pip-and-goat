@@ -1,18 +1,21 @@
 # TivvleJoy remote Blender execution foundation
 
-Checkpoint: `TIVVLEJOY_REMOTE_RENDER_WORKER_CONTRACT_ALIGNMENT_V1`
+Checkpoint: `TIVVLEJOY_RUNPOD_JOB_PACKAGE_STAGING_V1`
 
 ## CURRENT STATUS
 
+**REMOTE JOB PACKAGE STAGING FOUNDATION**
+
 **REMOTE EXECUTION FOUNDATION ONLY**
 
-**WORKER CONTRACT ALIGNMENT COMPLETE** — a TivvleJoy job compiled today is structurally executable by the existing RunPod worker later. Remote GPU execution is still not enabled.
+**WORKER CONTRACT ALIGNMENT COMPLETE** — a TivvleJoy job compiled today is structurally executable by the existing RunPod worker later. This revision adds an immutable job-package staging layer. Remote GPU execution is still not enabled.
 
-This branch defines the software contract that will eventually send an approved TivvleJoy scene to a guarded RunPod RTX 4090 worker. It does **not** launch a GPU and does **not** run Blender remotely.
+This branch defines the software contract that will eventually send an approved TivvleJoy scene to a guarded RunPod RTX 4090 worker. It does **not** launch a GPU, create a Pod, or run Blender remotely.
 
 ## NOT YET ENABLED
 
 - PAID GPU EXECUTION
+- POD CREATION
 - REMOTE BLENDER EXECUTION
 - AUTOMATIC PRODUCTION RENDERING
 
@@ -24,8 +27,14 @@ TivvleJoy episode / shot
 → `tivvlejoy-remote-render-job-v1` (studio / orchestration contract)  
 → deterministic compiler `compileTivvleJoyJobToWorkerManifest()`  
 → `ddp-cloud-job-manifest-v1` (existing RunPod worker execution contract)  
+→ immutable job package `buildTivvleJoyRemoteJobPackage()`  
+→ stage/verify R2 assets  
+→ publish `jobs/<jobId>/manifest.json` last  
+→ verify manifest SHA-256  
+→ STAGED  
+→ FUTURE guarded Pod launch  
 → existing single-shot RunPod worker  
-→ R2 asset staging  
+→ R2 asset download + SHA verify  
 → Blender  
 → frame verification  
 → FFmpeg encode  
@@ -93,6 +102,38 @@ Authoritative worker Blender version is read from the worker Dockerfile, FINAL_1
 
 Cost and runtime reuse the existing worker `limits.maxRuntimeMinutes` / `limits.maxCostUsd` fields (pilot: 20 minutes, $0.25). No second watchdog is added.
 
+## Job package staging
+
+The existing single-shot worker reads:
+
+| Object | Key |
+| --- | --- |
+| Manifest | `jobs/<jobId>/manifest.json` |
+| Status | `jobs/<jobId>/status.json` |
+| Startup status | `jobs/<jobId>/startup-status.json` |
+| Metadata | `jobs/<jobId>/metadata.json` (written after COMPLETE) |
+| Final output | `renders/finals/<episode>/<job>/final_1080p.mp4` |
+
+`buildTivvleJoyRemoteJobPackage()` locks worker-manifest SHA-256, scene SHA-256, every expected-asset SHA-256, outputKey, Blender version, render settings, runtime limit, and cost limit into `jobPackageSha256`. After finalization, any execution-relevant mutation produces a different package hash.
+
+Staging states: `ALREADY_PRESENT_AND_HASH_MATCHES`, `UPLOAD_REQUIRED`, `HASH_MISMATCH`, `MISSING`, `REFUSED`.
+
+Publish order: verify immutable assets → refuse hash mismatch → upload only missing approved assets → verify uploaded checksums → compile worker manifest → hash worker manifest → upload manifest last → read manifest back → verify manifest SHA-256 → mark `STAGED`. A partial upload stays `NOT_READY`. The exact same job ID + worker manifest + asset hashes + output key is idempotent. The same job ID with different execution content fails closed.
+
+Unit tests and dry-run use an in-memory R2 adapter only. Real R2 is not contacted.
+
+## Future worker environment contract
+
+From the job package: `RENDER_JOB_ID`, `RENDER_JOB_MANIFEST_KEY`.
+
+From server-side secrets, never from the manifest: R2 access keys, `RUNPOD_API_KEY`, `RUNPOD_RENDER_TEMPLATE_ID`.
+
+From guarded RunPod launch metadata: `RUNPOD_GPU_HOURLY_RATE`, pod/worker identity.
+
+From image/workspace config: R2 bucket/endpoint, `RENDER_WORKSPACE_DIR`, `BLENDER_BIN`, `BLENDER_ASSEMBLE_SCRIPT`.
+
+Pod launch is not implemented here.
+
 ## Pilot pins
 
 These are locked. Do not silently alter them.
@@ -136,7 +177,7 @@ Zero-cost local mode for CI:
 node scripts/cloud/tivvlejoy-remote-blender-foundation.mjs dry-run
 ```
 
-It creates a sample manifest, validates it, builds the deterministic argv, simulates success/failure/timeout, and requires cleanup. It never calls paid RunPod mutation endpoints and never creates a GPU.
+It creates a sample orchestration job, compiles the real worker manifest, builds an immutable job package, simulates asset verification and manifest upload/read-back on an in-memory adapter, then simulates success/failure/timeout cleanup. It never calls paid RunPod mutation endpoints, never contacts real R2, and never creates a GPU.
 
 ## Long-term quality / cost goals
 
