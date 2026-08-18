@@ -32,6 +32,7 @@
     "validate:scenery-intake-preview": "pnpm --filter @doodle-dash/web exec vitest run src/lib/scenery-intake-preview.test.ts && pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/validate-scenery-intake-preview.ts",
     "validate:scenery-pipeline-hardening": "pnpm --filter @doodle-dash/web exec vitest run src/lib/scenery-pipeline-hardening.test.ts && pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/validate-scenery-pipeline-hardening.ts",
     "validate:runpod-guarded": "node --test scripts/cloud/tivvlejoy-guarded-render.test.mjs && pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-guarded-render.test.ts",
+    "validate:runpod-blender-foundation": "node --test scripts/cloud/tivvlejoy-remote-blender-foundation.test.mjs && node scripts/cloud/tivvlejoy-remote-blender-foundation.mjs dry-run && pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-remote-blender-foundation.test.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
