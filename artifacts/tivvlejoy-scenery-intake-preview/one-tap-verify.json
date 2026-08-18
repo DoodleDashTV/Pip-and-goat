@@ -1,0 +1,49 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD_V1",
+  "previewUrl": "https://<git-branch-preview-alias>/ (hostname omitted from git; see agent report)",
+  "deploymentId": "dpl_8QhREWMqkfkQFVNdydnXka1q4h4o",
+  "deploymentReadyState": "READY",
+  "deploymentTarget": null,
+  "gitBranch": "cursor/tivvlejoy-scenery-one-tap-upload-73f1",
+  "gitSha": "1f9e1bfd92d6",
+  "stackedOn": "cursor/tivvlejoy-scenery-intake-preview-73f1",
+  "productionModified": false,
+  "hiddenProductionEnvCount": 0,
+  "existingPreviewR2Modified": false,
+  "purchasedFilesPresent": false,
+  "purchasedFilesUploaded": false,
+  "getHome": { "status": 200, "leaks": [] },
+  "getScenery": {
+    "status": 200,
+    "leaks": [],
+    "oneTapControl": true,
+    "reviewCopy": true,
+    "uploadNotApproval": true
+  },
+  "getIntake": {
+    "status": 200,
+    "leaks": [],
+    "storageConfiguration": "configured",
+    "tokenConfigured": true,
+    "bytesPath": "client-to-signed-r2",
+    "prefix": "tivvlejoy-assets",
+    "purchasedSourceObjectCount": 0
+  },
+  "incorrectToken": {
+    "status": 401,
+    "code": "INTAKE_UNAUTHORIZED",
+    "uploaded": false,
+    "leaks": []
+  },
+  "correctTokenSafeQuery": {
+    "action": "query",
+    "uploadAttempted": false,
+    "status": 400,
+    "code": "UNKNOWN_SESSION",
+    "uploaded": false,
+    "authorizedPast401": true,
+    "leaks": []
+  },
+  "licensedFilesCommitted": false,
+  "ok": true
+}

@@ -159,13 +159,17 @@ database is connected.
 - `pnpm lint`
 - Production frontend build
 - This Preview pass: `pnpm test` 624/624 (40 files); typecheck pass; lint pass; web build pass; `validate:scenery` 15/15; `validate:scenery-intake` 16 tests + 14/14 script; `validate:scenery-intake-preview` 4 tests + 6/6 script; persist / studio-hardening / steps-9-16-closed / studio-completion 35 checks: pass
+- One-tap pass: `pnpm test` 625/625 (40 files); typecheck pass; lint pass; web build pass; `validate:scenery` 15/15; `validate:scenery-intake` 17 tests + 15/15 script; `validate:scenery-intake-preview` 4 tests + 6/6 script; persist pass; studio-hardening pass; steps-9-16-closed pass; studio-completion 35/35
+- Draft PR #46 stays open, draft, and unmerged on `cursor/tivvlejoy-scenery-one-tap-upload-73f1`
+- One-tap Preview deploy `dpl_8QhREWMqkfkQFVNdydnXka1q4h4o` is READY and not Production
+- Incorrect token still returns 401 `INTAKE_UNAUTHORIZED`; rotated token authorizes a safe non-upload query
 
 ## Protections
 
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #43, #44, #45, or later stacked voice or scenery drafts.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #43, #44, #45, #46, or later stacked voice or scenery drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.

@@ -38,9 +38,19 @@ If the 27 purchased files are present in the agent environment, upload them only
 
 If they are not present, do not invent them. Synthetic Preview tests may use only newly generated `tivvlejoy-preview-synthetic-` fixtures under `tivvlejoy-assets/quarantine/preview-tests/`. Never use a purchased inventory filename and never write fixtures under `tivvlejoy-assets/source/`.
 
+Verified after Preview deploy `dpl_8QhREWMqkfkQFVNdydnXka1q4h4o` of `cursor/tivvlejoy-scenery-one-tap-upload-73f1` (READY, target not production):
+
+- GET `/` = 200
+- GET `/scenery` = 200
+- GET `/api/scenery/intake` = 200, `storageConfiguration=configured`, `tokenConfigured=true`, `bytesPath=client-to-signed-r2`, prefix `tivvlejoy-assets`
+- One-tap control and “Upload does not mean asset approval.” render
+- Incorrect token = 401 `INTAKE_UNAUTHORIZED`
+- Rotated token authorizes a safe non-upload `query` (400 `UNKNOWN_SESSION`)
+- Purchased source object count = 0
+
 ## Not done in this pass
 
 - No purchased files were present in the agent environment
 - No purchased files were uploaded
 - No assets were inspected, extracted, converted, normalized, or approved
-- Draft PR #44 and Draft PR #45 stay open, draft, and unmerged
+- Draft PR #44, Draft PR #45, and Draft PR #46 stay open, draft, and unmerged

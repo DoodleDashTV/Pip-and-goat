@@ -112,6 +112,7 @@ async function runLiveSynthetic(): Promise<void> {
   const bytes = previewSyntheticBytes(`preview-${Date.now()}`);
   const filename = previewSyntheticFilename(`preview-${Date.now()}`);
   const env = process.env as Record<string, string | undefined>;
+  const studioToken = env.TIVVLEJOY_SCENERY_INTAKE_TOKEN ?? '';
   const created = (await handleSceneryIntakeAction({
     action: 'create-session',
     body: {
@@ -123,6 +124,7 @@ async function runLiveSynthetic(): Promise<void> {
     },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   })) as { session: { sessionId: string; objectKey: string; parts: Array<{ partNumber: number; start: number; end: number }> } };
   synthetic.created = true;
@@ -135,6 +137,7 @@ async function runLiveSynthetic(): Promise<void> {
     body: { sessionId: created.session.sessionId, partNumber: 1 },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   })) as { signedUrl: string };
   if (signedUrlTargetsVercel(signed.signedUrl)) {
@@ -152,6 +155,7 @@ async function runLiveSynthetic(): Promise<void> {
     body: { sessionId: created.session.sessionId, parts: [{ partNumber: 1, etag }] },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   })) as {
     storedSize: number;
@@ -177,6 +181,7 @@ async function runLiveSynthetic(): Promise<void> {
     },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   })) as { session: { sessionId: string } };
   await handleSceneryIntakeAction({
@@ -184,6 +189,7 @@ async function runLiveSynthetic(): Promise<void> {
     body: { sessionId: paused.session.sessionId },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   });
   await handleSceneryIntakeAction({
@@ -191,6 +197,7 @@ async function runLiveSynthetic(): Promise<void> {
     body: { sessionId: paused.session.sessionId },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   });
   await handleSceneryIntakeAction({
@@ -198,6 +205,7 @@ async function runLiveSynthetic(): Promise<void> {
     body: { sessionId: paused.session.sessionId },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   });
 
@@ -206,6 +214,7 @@ async function runLiveSynthetic(): Promise<void> {
     body: { sessionId: created.session.sessionId },
     env,
     publicPreview: false,
+    studioToken,
     storage,
   });
   synthetic.cleaned = Boolean(cleaned.cleaned);
