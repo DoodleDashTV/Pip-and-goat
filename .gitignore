@@ -54,3 +54,11 @@ artifacts/tivvlejoy-voice-generation/**/*.m4a
 
 # Blender rewrites these backups on every save; they are pure churn in a diff.
 *.blend1
+
+# Purchased and generated TivvleJoy scenery binaries stay out of Git.
+# production-library remains tracked. Do not use a global *.blend ignore.
+tivvlejoy-assets/
+**/tivvlejoy-assets/
+scenery-source/
+scenery-normalized/
+artifacts/tivvlejoy-scenery/

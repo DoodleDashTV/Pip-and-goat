@@ -1,11 +1,12 @@
 # TrivvleJoy Studio Progress
 
-Updated: 2026-08-17
+Updated: 2026-08-18
 
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-durable-voice-ledger-73f1`
+- Working branch: `cursor/tivvlejoy-scenery-foundation-73f1`
+- Durable Preview voice ledger (Draft PR #42, keep draft and unmerged): `cursor/tivvlejoy-durable-voice-ledger-73f1` @ `f51f8753dd495ab086aa2e81e4fb98aebe895650`
 - Episode line voice workflow (Draft PR #41, keep draft and unmerged): `cursor/tivvlejoy-episode-line-voice-workflow-73f1` @ `0781409f9dc7e17b1c4a97f42f1a634f27116d5e`
 - Preview voice test (Draft PR #40, keep draft and unmerged): `cursor/tivvlejoy-preview-voice-test-73f1` @ `1d117582b1dd2a299731483266ba77133d0211f7`
 - Confirmed script-to-voice (Draft PR #39, keep draft and unmerged): `cursor/tivvlejoy-script-to-voice-73f1` @ `d59c51a8daf7fd7b7f136df96d892cdcb52060a2`
@@ -104,6 +105,12 @@ database is connected.
 - Justin approved newly generated Preview dialogue for both Pip and Goat on August 17, 2026
 - That approval locks the existing Pip and Goat voice identities only. It does not approve the complete episode workflow or Production
 - Preview episode scripts split into individual Pip and Goat lines that each require review, confirmation, and Generate this line once
+- Checkpoint TIVVLEJOY_SCENERY_FOUNDATION_V1 adds a scenery source registry, catalog schema, recipes, deterministic planner, dry-run Blender inspect/assemble entry points, and a Preview Only / No Render /scenery workspace
+- Village, SkyMachine, Stylized Forest, EcoKit, and HDRI packages were not present in the workspace and were not inspected
+- Purchased scenery sources remain source_unavailable with empty SHA-256 fields
+- Real Blender scenery inspection and assembly were not run
+- Synthetic fixture catalog records contain no commercial geometry
+- Draft PR #42 stays draft and unmerged
 
 ## Tests / validation
 
@@ -112,6 +119,7 @@ database is connected.
 - `pnpm validate:studio-hardening`
 - `pnpm validate:steps-9-16-closed`
 - `pnpm validate:studio-completion`
+- `pnpm validate:scenery`
 - `pnpm test`
 - `pnpm typecheck`
 - `pnpm lint`
@@ -122,7 +130,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, or later stacked voice drafts.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, or later stacked voice or scenery drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.
