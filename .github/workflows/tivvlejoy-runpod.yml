@@ -11,8 +11,9 @@ on:
         options:
           - validate
           - connectivity
+          - render_plan
       confirm_paid_gpu:
-        description: Must remain false unless a future workflow explicitly adds paid GPU launch support
+        description: Must remain false. Paid GPU launch is not enabled on main.
         required: true
         default: false
         type: boolean
@@ -24,6 +25,7 @@ jobs:
   runpod-safety:
     name: TivvleJoy RunPod safety check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
     steps:
@@ -32,6 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Paid GPU execution is not enabled in this workflow."
+          exit 1
 
       - name: Validate configuration
         if: ${{ inputs.mode == 'validate' && !inputs.confirm_paid_gpu }}
@@ -76,3 +79,15 @@ jobs:
               exit 1
               ;;
           esac
+
+      - name: Checkout repository
+        if: ${{ inputs.mode == 'render_plan' && !inputs.confirm_paid_gpu }}
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Render plan
+        if: ${{ inputs.mode == 'render_plan' && !inputs.confirm_paid_gpu }}
+        run: |
+          set -euo pipefail
+          node scripts/cloud/tivvlejoy-render-plan.mjs
