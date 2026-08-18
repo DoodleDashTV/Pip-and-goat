@@ -10,12 +10,19 @@ const { spawnSync } = require('node:child_process');
 
 const DEFAULT_MAX_CAPTURE = 8_000; // chars per stream kept in the diagnostic
 
+function redactSecretText(text) {
+  return String(text || '')
+    .replace(/\brpa_[A-Za-z0-9]+/g, 'rpa_[REDACTED]')
+    .replace(/\bghp_[A-Za-z0-9]+/g, 'ghp_[REDACTED]')
+    .replace(/\bgithub_pat_[A-Za-z0-9_]+/g, 'github_pat_[REDACTED]')
+    .replace(
+      /(RUNPOD_API_KEY|R2_SECRET_ACCESS_KEY|OBJECT_STORAGE_SECRET_ACCESS_KEY|GITHUB_TOKEN|GH_TOKEN|GITHUB_PAT|VERCEL_TOKEN|VERCEL_OIDC_TOKEN|secretaccesskey|accesskeyid|password)=[^\s]+/gi,
+      '$1=[REDACTED]',
+    );
+}
+
 function redactArgs(args) {
-  return (args || []).map((a) =>
-    String(a)
-      .replace(/\brpa_[A-Za-z0-9]+/g, 'rpa_[REDACTED]')
-      .replace(/(secretaccesskey|accesskeyid|password)=[^\s]+/gi, '$1=[REDACTED]'),
-  );
+  return (args || []).map((a) => redactSecretText(a));
 }
 
 function tail(text, max = DEFAULT_MAX_CAPTURE) {
@@ -50,8 +57,8 @@ function runInstrumented(bin, args = [], opts = {}) {
     signal: res.signal ?? null,
     timedOut: Boolean(timedOut),
     runtimeMs,
-    stdoutTail: tail(res.stdout, maxCapture),
-    stderrTail: tail(res.stderr, maxCapture),
+    stdoutTail: redactSecretText(tail(res.stdout, maxCapture)),
+    stderrTail: redactSecretText(tail(res.stderr, maxCapture)),
     spawnError: res.error ? String(res.error.code || res.error.message) : null,
   };
   return {
@@ -64,4 +71,4 @@ function runInstrumented(bin, args = [], opts = {}) {
   };
 }
 
-module.exports = { runInstrumented, redactArgs, tail };
+module.exports = { runInstrumented, redactArgs, redactSecretText, tail };

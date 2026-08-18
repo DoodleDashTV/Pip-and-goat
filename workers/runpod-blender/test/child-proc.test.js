@@ -27,9 +27,10 @@ test('runInstrumented flags a timeout without hanging', () => {
 });
 
 test('redactArgs strips runpod keys and secret assignments', () => {
-  const out = redactArgs(['--key', 'rpa_ABCdef123', 'SecretAccessKey=supersecret']);
+  const out = redactArgs(['--key', 'rpa_ABCdef123', 'SecretAccessKey=supersecret', 'RUNPOD_API_KEY=FAKE_PLATFORM_POD_KEY']);
   assert.ok(!out.join(' ').includes('rpa_ABCdef123'));
   assert.ok(!out.join(' ').toLowerCase().includes('supersecret'));
+  assert.ok(!out.join(' ').includes('FAKE_PLATFORM_POD_KEY'));
 });
 
 test('tail bounds captured output growth', () => {

@@ -16,10 +16,12 @@
  */
 const fs = require('node:fs');
 const { spawnSync } = require('node:child_process');
+const { buildRenderSubprocessEnvironment } = require('./child-env');
 
-function nvidiaGpuPresent() {
+function nvidiaGpuPresent(sourceEnv = process.env) {
   try {
-    const res = spawnSync('nvidia-smi', ['-L'], { encoding: 'utf8', timeout: 15_000 });
+    const env = buildRenderSubprocessEnvironment({ PATH: sourceEnv.PATH || process.env.PATH, ...sourceEnv });
+    const res = spawnSync('nvidia-smi', ['-L'], { encoding: 'utf8', timeout: 15_000, env });
     return res.status === 0 && /GPU\s+\d+/.test(res.stdout || '');
   } catch {
     return false;
@@ -50,7 +52,7 @@ function firstExistingDir(candidates) {
 function resolveHeadlessGlConfig(opts = {}) {
   const env = opts.env || process.env;
   const detectGpu = opts.detectGpu || nvidiaGpuPresent;
-  const gpuPresent = opts.forceSoftware ? false : detectGpu();
+  const gpuPresent = opts.forceSoftware ? false : detectGpu(env);
 
   if (gpuPresent) {
     const eglVendorDir = firstExistingDir([

@@ -155,14 +155,16 @@ async function renderWithBlender({
   outputDir,
   runCommand = defaultRunCommand,
   log = () => {},
+  env,
 }) {
   await fsp.mkdir(outputDir, { recursive: true });
-  const version = runCommand(blenderBin, ['--version']);
+  const childOpts = env ? { env } : {};
+  const version = runCommand(blenderBin, ['--version'], childOpts);
   if (version.status !== 0) {
     throw tagged(`Blender executable not available: ${blenderBin}`, 'BLENDER_NOT_FOUND');
   }
   log('blender_start', { version: (version.stdout || '').split('\n')[0] });
-  const res = runCommand(blenderBin, argv, { stdio: 'inherit' });
+  const res = runCommand(blenderBin, argv, { stdio: 'inherit', ...childOpts });
   if (res.status !== 0) {
     throw tagged(`Blender exited with code ${res.status}`, 'BLENDER_FAILED');
   }
@@ -195,6 +197,7 @@ async function encodeVideo({
   mp4Path,
   runCommand = defaultRunCommand,
   ffmpegBin = 'ffmpeg',
+  env,
 }) {
   const frames = await listFrames(outputDir);
   if (frames.length === 0) throw tagged('No frames to encode', 'NO_FRAMES');
@@ -202,7 +205,7 @@ async function encodeVideo({
   const args = padded
     ? ['-y', '-framerate', String(fps), '-i', path.join(outputDir, 'frame_%04d.png'), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', mp4Path]
     : ['-y', '-framerate', String(fps), '-pattern_type', 'glob', '-i', path.join(outputDir, 'frame_*.png'), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', mp4Path];
-  const enc = runCommand(ffmpegBin, args);
+  const enc = runCommand(ffmpegBin, args, env ? { env } : {});
   if (enc.status !== 0) {
     throw tagged(`ffmpeg encode failed (status ${enc.status})`, 'FFMPEG_FAILED');
   }
@@ -216,7 +219,7 @@ async function encodeVideo({
  * Validate the encoded output with ffprobe: resolution must match the manifest,
  * duration/frames must be > 0. Fails closed on mismatch. ffprobe is injectable.
  */
-async function validateOutput({ manifest, mp4Path, runCommand = defaultRunCommand, ffprobeBin = 'ffprobe' }) {
+async function validateOutput({ manifest, mp4Path, runCommand = defaultRunCommand, ffprobeBin = 'ffprobe', env }) {
   if (!fs.existsSync(mp4Path) || fs.statSync(mp4Path).size <= 0) {
     throw tagged('Output artifact missing or empty', 'OUTPUT_INVALID');
   }
@@ -227,7 +230,7 @@ async function validateOutput({ manifest, mp4Path, runCommand = defaultRunComman
     '-count_frames',
     '-of', 'json',
     mp4Path,
-  ]);
+  ], env ? { env } : {});
   if (probe.status !== 0) {
     throw tagged('ffprobe failed on output', 'OUTPUT_INVALID');
   }
@@ -249,6 +252,11 @@ async function validateOutput({ manifest, mp4Path, runCommand = defaultRunComman
   return { width, height, frames, bytes: fs.statSync(mp4Path).size };
 }
 
+/**
+ * Default spawn. When `opts.env` is omitted, Node inherits process.env.
+ * The TivvleJoy single-shot path MUST pass a sanitized child env explicitly.
+ * Local callers may omit env and keep the previous inherit behavior.
+ */
 function defaultRunCommand(bin, args, opts = {}) {
   return spawnSync(bin, args, { encoding: 'utf8', ...opts });
 }

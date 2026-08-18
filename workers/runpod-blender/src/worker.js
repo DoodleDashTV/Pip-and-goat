@@ -4,7 +4,8 @@
  * Two execution modes, both performing REAL work (no fake progress):
  *  1. SINGLE-SHOT (benchmark / primary cloud path): driven by RENDER_JOB_ID +
  *     an immutable R2 manifest. Requires NO public ingress / RENDER_API_URL.
- *     After the job the pod self-terminates.
+ *     After the job the pod may self-terminate only when
+ *     ALLOW_WORKER_SELF_TERMINATE is not false (TivvleJoy forces false).
  *  2. API CLAIM LOOP (preserved for later development): polls RENDER_API_URL,
  *     renders claimed jobs with the shared render-core, and reports COMPLETE
  *     only after a verified R2 artifact upload.
@@ -32,6 +33,7 @@ const { EXIT_CLASS, exitCodeFor, classifyCode } = require('./exit-codes');
 const { StartupWatchdog } = require('./watchdog');
 
 const { strip } = r2;
+const { buildRenderSubprocessEnvironment } = require('./child-env');
 
 function log(event, detail = {}) {
   console.log(JSON.stringify({ ts: new Date().toISOString(), event, ...detail }));
@@ -79,16 +81,23 @@ function makeDiagnosticPersister(env) {
   };
 }
 
-async function terminateSelf(reason = 'done') {
+function canWorkerSelfTerminate(env = process.env) {
+  return String(env.ALLOW_WORKER_SELF_TERMINATE || 'true').toLowerCase() !== 'false';
+}
+
+async function terminateSelf(reason = 'done', env = process.env) {
   log('terminate_self', { reason });
-  const podId = strip(process.env.RUNPOD_POD_ID);
-  const apiKey = strip(process.env.RUNPOD_API_KEY);
-  if (String(process.env.ALLOW_WORKER_SELF_TERMINATE || 'true').toLowerCase() === 'false' || !podId || !apiKey) {
+  const podId = strip(env.RUNPOD_POD_ID);
+  const apiKey = strip(env.RUNPOD_API_KEY);
+  // TivvleJoy single-shot forces ALLOW_WORKER_SELF_TERMINATE=false.
+  // A platform-injected Pod-scoped RUNPOD_API_KEY must never enable
+  // termination, and the worker must not require that key to render.
+  if (!canWorkerSelfTerminate(env) || !podId || !apiKey) {
     log('terminate_self_skipped', { hint: 'orchestrator should terminate pod' });
     return;
   }
   try {
-    const res = await fetch(process.env.RUNPOD_API_ENDPOINT || 'https://api.runpod.io/graphql', {
+    const res = await fetch(env.RUNPOD_API_ENDPOINT || 'https://api.runpod.io/graphql', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, 'User-Agent': 'DoodleDashProductionWorker/1.0' },
       body: JSON.stringify({ query: 'mutation ($podId: String!) { podTerminate(input: { podId: $podId }) }', variables: { podId } }),
@@ -123,8 +132,11 @@ function healthGate() {
     };
   }
   // Non-GPU mode: still require blender + ffmpeg binaries.
-  const blender = core.defaultRunCommand(process.env.BLENDER_BIN || 'blender', ['--version']);
-  const ffmpeg = core.defaultRunCommand('ffmpeg', ['-version']);
+  const childEnv = buildRenderSubprocessEnvironment({ PATH: process.env.PATH, ...process.env });
+  const blender = core.defaultRunCommand(process.env.BLENDER_BIN || 'blender', ['--version'], {
+    env: childEnv,
+  });
+  const ffmpeg = core.defaultRunCommand('ffmpeg', ['-version'], { env: childEnv });
   const ok = blender.status === 0 && ffmpeg.status === 0;
   return {
     ok,
@@ -216,14 +228,15 @@ async function processApiJob(ctx, apiUrl, job) {
 
   const assembleScript = process.env.BLENDER_ASSEMBLE_SCRIPT || path.resolve(__dirname, '../blender/assemble_scene.py');
   const argv = core.buildBlenderArgv({ manifest, assets, outputDir, assembleScript });
+  const renderEnv = buildRenderSubprocessEnvironment({ PATH: process.env.PATH, ...process.env });
   await reportProgress(apiUrl, jobId, 'RENDERING', 20, 'Blender EEVEE render');
-  await core.renderWithBlender({ blenderBin: process.env.BLENDER_BIN || 'blender', argv, outputDir, log });
+  await core.renderWithBlender({ blenderBin: process.env.BLENDER_BIN || 'blender', argv, outputDir, log, env: renderEnv });
   await core.verifyFrames({ manifest, outputDir });
 
   await reportProgress(apiUrl, jobId, 'ENCODING', 80, 'Encoding + validating');
   const mp4Path = path.join(outputDir, 'shot.mp4');
-  await core.encodeVideo({ outputDir, fps, mp4Path });
-  await core.validateOutput({ manifest, mp4Path });
+  await core.encodeVideo({ outputDir, fps, mp4Path, env: renderEnv });
+  await core.validateOutput({ manifest, mp4Path, env: renderEnv });
 
   await reportProgress(apiUrl, jobId, 'ENCODING', 90, 'Uploading artifact');
   const bytes = await fsp.readFile(mp4Path);
@@ -364,4 +377,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main, processApiJob, downloadUriAsset, terminateSelf };
+module.exports = { main, processApiJob, downloadUriAsset, terminateSelf, canWorkerSelfTerminate };
