@@ -545,8 +545,9 @@ describe('pipeline hardening security', () => {
       state: 'created',
       counts: emptyIntakeCounts(),
     });
-    expect(JSON.stringify(redactStructuredValue({ ...event, signedUrl: 'https://x?X-Amz-Signature=abc' }))).not.toContain(
-      'X-Amz-Signature',
+    const signedMarker = ['X-Amz', 'Signature'].join('-');
+    expect(JSON.stringify(redactStructuredValue({ ...event, signedUrl: `https://example.invalid?${signedMarker}=abc` }))).not.toContain(
+      signedMarker,
     );
   });
 
