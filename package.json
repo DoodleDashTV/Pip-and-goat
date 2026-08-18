@@ -40,6 +40,8 @@
     "validate:runpod-template-normalization": "node --test scripts/cloud/tivvlejoy-runpod-template-normalization.test.mjs",
     "validate:runpod-template-binding": "node --test scripts/cloud/tivvlejoy-runpod-template-binding.test.mjs && pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-runpod-template-binding.test.ts",
     "cloud:runpod-launch-dry-run": "RUNPOD_RENDER_TEMPLATE_ID=rc8eyeqhn2 node scripts/cloud/tivvlejoy-runpod-template-binding.mjs launch-dry-run",
+    "validate:runpod-lifecycle": "node --test scripts/cloud/tivvlejoy-runpod-lifecycle.test.mjs && pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-runpod-lifecycle.test.ts",
+    "cloud:runpod-lifecycle-dry-run": "RUNPOD_RENDER_TEMPLATE_ID=rc8eyeqhn2 node scripts/cloud/tivvlejoy-runpod-lifecycle.mjs lifecycle-dry-run",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
