@@ -120,6 +120,7 @@ After the POST:
 - If a valid Pod ID is returned, it is persisted immediately and later cleanup uses that ID.
 - If HTTP 2xx succeeds but the body is malformed, truncated, or missing a usable top-level ID, the helper enters recovery.
 - If the create transport fails after the request may have been sent, the helper enters recovery.
+- If the POST returns any non-2xx status, including `408`, `429`, and all `5xx`, the helper enters recovery. A non-2xx status is never treated as proof that no Pod was created.
 
 Recovery uses a non-mutating `GET /v1/pods` list and an **exact name match only**. It never deletes another TivvleJoy run and never deletes by prefix or fuzzy match.
 
