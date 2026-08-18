@@ -16,6 +16,17 @@ export class SceneryIntakeStore {
   }
 
   putManifest(manifest: SourceObjectManifest): SourceObjectManifest {
+    const existing = this.manifests.get(manifest.sourceId);
+    if (
+      existing &&
+      (existing.uploadState === 'completed' || existing.uploadState === 'already_present') &&
+      manifest.uploadState === 'not_started' &&
+      existing.sha256 &&
+      existing.sha256 === manifest.sha256 &&
+      existing.byteSize === manifest.byteSize
+    ) {
+      return existing;
+    }
     this.manifests.set(manifest.sourceId, manifest);
     return manifest;
   }

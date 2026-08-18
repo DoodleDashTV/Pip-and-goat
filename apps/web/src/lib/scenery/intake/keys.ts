@@ -151,6 +151,26 @@ export function assertObjectKeyWithinPrefix(key: string, prefix: string, kind?: 
   }
 }
 
+export function assertChunkBoundaries(
+  parts: Array<{ partNumber: number; start: number; end: number }>,
+  byteSize: number,
+  partBytes: number,
+): void {
+  const planned = planMultipartParts(byteSize, partBytes);
+  if (parts.length !== planned.length) {
+    throw new SceneryError('Multipart part count does not match the planned chunk boundaries.', 'INCONSISTENT_PART_COUNT');
+  }
+  for (const [index, part] of parts.entries()) {
+    const expected = planned[index];
+    if (!expected || part.partNumber !== expected.partNumber || part.start !== expected.start || part.end !== expected.end) {
+      throw new SceneryError('Multipart chunk boundaries do not match the planned part map.', 'INCONSISTENT_PART_COUNT');
+    }
+    if (part.end <= part.start || part.start < 0 || part.end > byteSize) {
+      throw new SceneryError('Multipart chunk boundary is invalid.', 'INCONSISTENT_PART_COUNT');
+    }
+  }
+}
+
 export function planMultipartParts(byteSize: number, partBytes: number): Array<{ partNumber: number; start: number; end: number }> {
   if (byteSize <= 0) {
     throw new SceneryError('Cannot plan multipart parts for a zero-byte file.', 'ZERO_BYTE_FILE');

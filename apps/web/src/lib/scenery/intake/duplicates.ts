@@ -17,6 +17,25 @@ export type DuplicateDecision = {
   message: string;
 };
 
+export type ContentIdentityCase =
+  | 'same_name_same_hash'
+  | 'same_name_different_hash'
+  | 'different_name_same_hash'
+  | 'unique';
+
+export function classifyContentIdentity(input: {
+  sha256: string;
+  filename: string;
+  existing: Array<Pick<StoredSourceIndexEntry, 'filename' | 'sha256'>>;
+}): ContentIdentityCase {
+  const sameName = input.existing.find((item) => item.filename === input.filename);
+  const sameHash = input.existing.find((item) => item.sha256 === input.sha256);
+  if (sameName && sameName.sha256 === input.sha256) return 'same_name_same_hash';
+  if (sameName && sameName.sha256 !== input.sha256) return 'same_name_different_hash';
+  if (sameHash && sameHash.filename !== input.filename) return 'different_name_same_hash';
+  return 'unique';
+}
+
 export function detectDuplicate(input: {
   sha256: string;
   filename: string;

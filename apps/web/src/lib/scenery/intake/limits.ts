@@ -1,10 +1,14 @@
 export const SCENERY_INTAKE_LIMITS = {
   maxUploadBytes: 2 * 1024 * 1024 * 1024,
   maxConcurrentParts: 4,
+  maxConcurrentFiles: 2,
   multipartPartBytes: 16 * 1024 * 1024,
   minMultipartPartBytes: 5 * 1024 * 1024,
+  maxParts: 400,
   maxRetries: 3,
   signedOperationTtlSeconds: 15 * 60,
+  sessionTtlMs: 12 * 60 * 60 * 1000,
+  maxJsonBodyBytes: 64 * 1024,
   maxTemporaryWorkspaceBytes: 2 * 1024 * 1024 * 1024,
   maxInspectionConcurrency: 1,
   maxMaterializedBytesPerJob: 2 * 1024 * 1024 * 1024,
@@ -12,6 +16,8 @@ export const SCENERY_INTAKE_LIMITS = {
   rateLimitWindowMs: 60_000,
   rateLimitMaxRequests: 40,
 } as const;
+
+export const SCENERY_INTAKE_SESSION_TTL_MS = SCENERY_INTAKE_LIMITS.sessionTtlMs;
 
 export const SCENERY_ALLOWED_EXTENSIONS = [
   '.zip',
@@ -87,6 +93,10 @@ export function resolveIntakeLimits(env: Record<string, string | undefined> = pr
       'TIVVLEJOY_SCENERY_MAX_CONCURRENT_PARTS',
       SCENERY_INTAKE_LIMITS.maxConcurrentParts,
     ),
+    maxConcurrentFiles: SCENERY_INTAKE_LIMITS.maxConcurrentFiles,
+    maxParts: SCENERY_INTAKE_LIMITS.maxParts,
+    maxJsonBodyBytes: SCENERY_INTAKE_LIMITS.maxJsonBodyBytes,
+    sessionTtlMs: SCENERY_INTAKE_LIMITS.sessionTtlMs,
     multipartPartBytes,
     minMultipartPartBytes: SCENERY_INTAKE_LIMITS.minMultipartPartBytes,
     maxRetries: envNumber(env, 'TIVVLEJOY_SCENERY_MAX_RETRIES', SCENERY_INTAKE_LIMITS.maxRetries),

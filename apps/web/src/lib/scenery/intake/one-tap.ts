@@ -1,3 +1,4 @@
+import { assessFilenameSafety } from './filename-safety';
 import { sanitizeFilename } from './keys';
 import {
   EXPECTED_COLLECTION_COUNT,
@@ -8,6 +9,8 @@ import {
   normalizeInventoryFilename,
   type SceneryCollectionId,
 } from './inventory';
+import { assessSourceSize } from './size-validation';
+import { shouldExcludeWorldShadersGiveaway } from './world-shaders';
 
 export const ONE_TAP_UPLOAD_CHECKPOINT = 'TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD_V1';
 
@@ -60,6 +63,19 @@ export type OneTapPurchasedReview = {
   eligible: OneTapReviewItem[];
   collectionTotals: OneTapCollectionTotal[];
   totalMatchedBytes: number;
+  overallTotals: {
+    expected: number;
+    selected: number;
+    matched: number;
+    missing: number;
+    unexpected: number;
+    duplicates: number;
+    incorrect: number;
+    eligible: number;
+    refused: number;
+    totalMatchedBytes: number;
+    totalSelectedBytes: number;
+  };
 };
 
 function sanitizedOrNull(filename: string): string | null {
@@ -70,17 +86,67 @@ function sanitizedOrNull(filename: string): string | null {
   }
 }
 
-export function reviewOneTapPurchasedSelection(inputs: OneTapSelectionInput[]): OneTapPurchasedReview {
+export function reviewOneTapPurchasedSelection(
+  inputs: OneTapSelectionInput[],
+  options?: { approvedManifestFilenames?: readonly string[] },
+): OneTapPurchasedReview {
   const expected = listExpectedSourceFiles();
   const seenExact = new Map<string, number>();
   const classified: OneTapReviewItem[] = inputs.map((input) => {
     const sanitizedFilename = sanitizedOrNull(input.filename);
-    const exact = matchExactExpectedFilename(input.filename);
-    const aliasOnly = matchAliasOnlyExpectedFilename(input.filename);
+    const safety = assessFilenameSafety(input.filename);
+    const size = assessSourceSize({ filename: input.filename, declaredBytes: input.byteSize });
+    const exact = safety.safe && safety.exactPurchasedMatch ? matchExactExpectedFilename(input.filename) : null;
+    const aliasOnly = safety.safe ? matchAliasOnlyExpectedFilename(input.filename) : null;
     const key = exact ? normalizeInventoryFilename(exact.expectedFilename) : normalizeInventoryFilename(input.filename);
     const occurrence = (seenExact.get(key) ?? 0) + 1;
     seenExact.set(key, occurrence);
 
+    if (!safety.safe) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'incorrect',
+        collectionId: exact?.collectionId ?? aliasOnly?.collectionId ?? null,
+        collectionName: exact?.collectionName ?? aliasOnly?.collectionName ?? null,
+        sourceId: exact?.sourceId ?? aliasOnly?.sourceId ?? null,
+        expectedFilename: exact?.expectedFilename ?? aliasOnly?.expectedFilename ?? null,
+        eligible: false,
+        reason: `Unsafe filename refused (${safety.issues.join(', ')}). Source files are not renamed.`,
+      };
+    }
+    if (shouldExcludeWorldShadersGiveaway({
+      filename: input.filename,
+      approvedManifestFilenames: options?.approvedManifestFilenames,
+    })) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'unexpected',
+        collectionId: null,
+        collectionName: null,
+        sourceId: null,
+        expectedFilename: null,
+        eligible: false,
+        reason: 'The free World Shaders giveaway is outside the purchased 27-file requirement.',
+      };
+    }
+    if (!size.ok) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'incorrect',
+        collectionId: exact?.collectionId ?? aliasOnly?.collectionId ?? null,
+        collectionName: exact?.collectionName ?? aliasOnly?.collectionName ?? null,
+        sourceId: exact?.sourceId ?? aliasOnly?.sourceId ?? null,
+        expectedFilename: exact?.expectedFilename ?? aliasOnly?.expectedFilename ?? null,
+        eligible: false,
+        reason: `Incorrect size (${size.issues.join(', ')}). Eligible files are not blocked.`,
+      };
+    }
     if (occurrence > 1) {
       return {
         filename: input.filename,
@@ -176,5 +242,18 @@ export function reviewOneTapPurchasedSelection(inputs: OneTapSelectionInput[]): 
     eligible: classified.filter((item) => item.eligible),
     collectionTotals,
     totalMatchedBytes: matched.reduce((sum, item) => sum + item.byteSize, 0),
+    overallTotals: {
+      expected: EXPECTED_SOURCE_COUNT,
+      selected: inputs.length,
+      matched: matched.length,
+      missing: missing.length,
+      unexpected: classified.filter((item) => item.classification === 'unexpected').length,
+      duplicates: classified.filter((item) => item.classification === 'duplicate').length,
+      incorrect: classified.filter((item) => item.classification === 'incorrect').length,
+      eligible: classified.filter((item) => item.eligible).length,
+      refused: classified.filter((item) => !item.eligible).length,
+      totalMatchedBytes: matched.reduce((sum, item) => sum + item.byteSize, 0),
+      totalSelectedBytes: inputs.reduce((sum, item) => sum + item.byteSize, 0),
+    },
   };
 }

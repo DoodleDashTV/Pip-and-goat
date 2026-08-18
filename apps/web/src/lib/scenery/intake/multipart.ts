@@ -2,11 +2,13 @@ import { randomUUID } from 'node:crypto';
 import { SceneryError } from '../types';
 import { describeSceneryStorageConfiguration, resolveSceneryAssetPrefix } from './config';
 import { detectDuplicate, type StoredSourceIndexEntry } from './duplicates';
+import { assessFilenameSafety } from './filename-safety';
 import type { ExpectedSourceFile } from './inventory';
 import { matchExpectedSourceFile } from './inventory';
 import { PREVIEW_SYNTHETIC_SOURCE_ID } from './fixtures';
 import {
   assertAllowedExtension,
+  assertChunkBoundaries,
   assertCollectionId,
   planMultipartParts,
   sanitizeFilename,
@@ -15,6 +17,7 @@ import {
 } from './keys';
 import { resolveIntakeLimits } from './limits';
 import { createEmptyManifestRecord, type SourceObjectManifest } from './manifest';
+import { shouldExcludeWorldShadersGiveaway } from './world-shaders';
 
 export type UploadSessionState =
   | 'created'
@@ -218,6 +221,22 @@ export function createUploadSession(input: {
   const limits = resolveIntakeLimits(env);
   const config = describeSceneryStorageConfiguration(env);
   const collectionId = assertCollectionId(input.collectionId);
+  const filenameSafety = assessFilenameSafety(input.originalFilename);
+  if (!filenameSafety.safe && input.purpose !== 'preview-synthetic') {
+    throw new SceneryError(
+      `Filename is unsafe (${filenameSafety.issues.join(', ')}). Source files are not renamed.`,
+      'UNSAFE_FILENAME',
+    );
+  }
+  if (
+    shouldExcludeWorldShadersGiveaway({ filename: input.originalFilename }) &&
+    input.purpose !== 'preview-synthetic'
+  ) {
+    throw new SceneryError(
+      'The free World Shaders giveaway is outside the purchased 27-file requirement.',
+      'UNEXPECTED_SOURCE',
+    );
+  }
   const normalizedFilename = sanitizeFilename(input.originalFilename);
   const extension = assertAllowedExtension(normalizedFilename);
   const purpose = input.purpose === 'preview-synthetic' ? 'preview-synthetic' : 'purchased';
@@ -360,7 +379,12 @@ export function createUploadSession(input: {
     collection: collectionId,
     filename: normalizedFilename,
   });
-  const parts = planMultipartParts(input.byteSize, limits.multipartPartBytes).map((part) => ({
+  const planned = planMultipartParts(input.byteSize, limits.multipartPartBytes);
+  if (planned.length > limits.maxParts) {
+    throw new SceneryError('File would require more multipart parts than Preview allows.', 'PART_COUNT_LIMIT');
+  }
+  assertChunkBoundaries(planned, input.byteSize, limits.multipartPartBytes);
+  const parts = planned.map((part) => ({
     ...part,
     signed: false,
     failed: false,

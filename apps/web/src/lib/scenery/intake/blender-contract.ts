@@ -1,11 +1,16 @@
 import { SUPPORTED_BLENDER_VERSION } from '../types';
 import { SCENERY_INTAKE_SCHEMA_VERSION } from './config';
+import { EXPECTED_INSPECTION_CHECKS } from './inspection-checks';
 
 export const BLENDER_INSPECTION_CONTRACT = {
   schemaVersion: SCENERY_INTAKE_SCHEMA_VERSION,
   supportedBlenderVersion: SUPPORTED_BLENDER_VERSION,
   paidGpu: false,
   sourceImmutable: true,
+  executeEmbeddedScripts: false,
+  extractUntrustedArchives: false,
+  autoApprove: false,
+  expectedChecks: EXPECTED_INSPECTION_CHECKS,
   steps: [
     'Materialize one immutable source into a temporary workspace.',
     'Calculate or verify SHA-256 of the materialized copy.',

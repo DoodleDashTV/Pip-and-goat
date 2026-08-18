@@ -1,5 +1,6 @@
 import { createDryRunInspectReport, type IngestionReport } from '../ingestion';
 import { sceneryStorageUri } from '../storage-policy';
+import { createNonExecutingInspectionJob, type NonExecutingInspectionJob } from './inspection-checks';
 import type { SourceObjectManifest } from './manifest';
 
 export const SCENERY_INSPECTION_JOBS = [
@@ -122,6 +123,9 @@ export function createQueuedInspectionJobs(manifests: SourceObjectManifest[]): A
   sourceId: string;
   ready: boolean;
   queued: boolean;
+  autoApprove: false;
+  executing: false;
+  inspectionJob: NonExecutingInspectionJob | null;
   dryRunReport: IngestionReport | null;
 }> {
   return SCENERY_INSPECTION_JOBS.map((job) => {
@@ -133,6 +137,21 @@ export function createQueuedInspectionJobs(manifests: SourceObjectManifest[]): A
       sourceId: job.sourceId,
       ready,
       queued: ready,
+      autoApprove: false as const,
+      executing: false as const,
+      inspectionJob:
+        ready && manifest
+          ? createNonExecutingInspectionJob({
+              jobId: job.jobId,
+              sourceId: job.sourceId,
+              collectionId: job.collectionId,
+              originalFilename: manifest.originalFilename,
+              objectKey: manifest.storageObjectKey,
+              byteSize: manifest.byteSize,
+              sha256: manifest.sha256,
+              verified: true,
+            })
+          : null,
       dryRunReport: ready
         ? createDryRunInspectReport({
             sourceId: job.sourceId,
