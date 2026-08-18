@@ -152,12 +152,9 @@ describe('one-tap purchased selection review', () => {
     ]);
     expect(review.checkpoint).toBe(ONE_TAP_UPLOAD_CHECKPOINT);
     expect(review.expectedCount).toBe(27);
-    expect(review.matched.map((item) => item.collectionId).sort()).toEqual([
-      'procedural-nature',
-      'sky-hdri',
-      'stylized-forest',
-      'village',
-    ]);
+    expect(new Set(review.matched.map((item) => item.collectionId))).toEqual(
+      new Set(['village', 'sky-hdri', 'stylized-forest', 'procedural-nature']),
+    );
     expect(review.eligible).toHaveLength(5);
     expect(review.duplicates).toHaveLength(1);
     expect(review.incorrect[0]?.filename).toBe('village blender');
