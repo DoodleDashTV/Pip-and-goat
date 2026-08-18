@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const repoRoot = path.resolve(__dirname, '../../..');
+const repoRoot = path.resolve(__dirname, '../../../..');
 const workflow = readFileSync(path.join(repoRoot, '.github/workflows/tivvlejoy-runpod.yml'), 'utf8');
 const docs = readFileSync(path.join(repoRoot, 'docs/runpod-github-actions.md'), 'utf8');
 const helper = readFileSync(path.join(repoRoot, 'scripts/cloud/tivvlejoy-guarded-render.mjs'), 'utf8');
