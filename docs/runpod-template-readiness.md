@@ -47,8 +47,8 @@ If the ID is missing, GET the caller's templates and count compatible candidates
 
 - `imageName` = the verified immutable digest
 - `category` = `NVIDIA`
-- `isServerless` = false
-- `isPublic` = false
+- `isServerless` = false, or the field is absent and a trusted creation receipt proves `isServerless=false`
+- `isPublic` = false, or the field is absent and a trusted creation receipt proves `isPublic=false`
 - `dockerEntrypoint` = `[]`
 - `dockerStartCmd` = `[]`
 - `ports` = `[]`
