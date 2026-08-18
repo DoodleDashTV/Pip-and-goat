@@ -39,27 +39,20 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * All of these constants must be re-pinned together whenever the image is
  * rebuilt.
  *
- * Rebuilt and published at 324ce5c with early R2 boot diagnostics.
- * Anonymous registry read confirms the labels below; preflight refuses any
- * disagreement. Rebuild with `scripts/cloud/build-worker-image.sh` and re-pin
- * all four constants together if the baked render code moves again.
- *
- * STALE AS OF THE STEPS 1-8 TRANCHE, DELIBERATELY NOT RE-PINNED.
- * `assemble_scene.py` gained an opt-in `apply_direction_camera()` hook, so this
- * checkout's render code is now
- * d38208206093ccd1b67d6d02f996d1057ae7f5520989a2830cd9450a4113834f and no longer
- * matches the code baked into the image above. Preflight therefore fails closed
- * with RENDER_CODE_MISMATCH, which is the intended outcome: Steps 1-8 is a
- * planning tranche with no authorized paid render, and the accepted FINAL_1080P
- * artifact is historical evidence that this drift cannot alter. Re-pinning would
- * mean claiming an image contains code it does not. Before the next authorized
- * paid launch, rebuild and re-pin all four constants together.
+ * Verified worker image produced by GitHub Actions on
+ * 3d5fbf78d2b618a40f10ebbf6e24ed7c97079fd3. The immutable digest below was
+ * anonymously registry-verified: linux/amd64, source-commit label, baked
+ * render-code fingerprint, and approved render-asset fingerprint all agree
+ * with this checkout. Blender in the image is 4.2.3. No RunPod render has
+ * been executed with this image yet. Future render-code or asset drift must
+ * fail closed. Rebuild, publish, and re-pin all four constants together
+ * after another verified image build.
  */
 export const WORKER_IMAGE =
-  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830'; // pragma: allowlist secret
-export const WORKER_IMAGE_SOURCE_COMMIT = 'da26bc16806513e7ba58ceb3408728df7712622f';
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = '3d5fbf78d2b618a40f10ebbf6e24ed7c97079fd3';
 export const WORKER_IMAGE_RENDER_CODE_SHA256 =
-  'a4018c0e443e906aab20fb45527d25f5f91984cb041d3bca020d557dd7b32f3a';
+  '8210e3addd656e5d7c318dc8a66e82fe7b8ba5e1642c3f583fabbaf92a646aed';
 
 /**
  * Fingerprint of the approved `.blend` assets this checkout would render, from
