@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "TIVVLEJOY_SCENERY_ASSET_INTAKE_V1",
+  "ok": true,
+  "passed": 13,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "storage unavailable without credentials",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "storage partially configured",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "storage configured via existing R2 aliases",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "storage invalid when s3 is incomplete",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "source inventory is 27 files across 4 collections",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "object-key safety and filename sanitization",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "source immutability",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "multipart policy",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "manifest schema",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "duplicate detection",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "quarantine rejects executables and traversal",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "inspection readiness stays closed without verified storage",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "no licensed binaries or secrets newly tracked",
+      "status": "PASS",
+      "detail": "ok"
+    }
+  ],
+  "blenderExecuted": false,
+  "uploadedSourceCount": 0,
+  "verifiedSourceCount": 0
+}

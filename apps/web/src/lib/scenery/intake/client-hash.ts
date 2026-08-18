@@ -1,8 +1,7 @@
 'use client';
 
-import { CLIENT_SHA256_WORKER_SOURCE } from './hash';
 import { SCENERY_INTAKE_LIMITS } from './limits';
-import { StreamingSha256 } from './sha256-stream';
+import { CLIENT_SHA256_WORKER_SOURCE, StreamingSha256 } from './sha256-stream';
 
 export async function hashFileChunked(
   file: File,
