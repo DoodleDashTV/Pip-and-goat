@@ -36,6 +36,7 @@
     "validate:runpod-pod-payload": "node --test scripts/cloud/tivvlejoy-guarded-pod-payload.test.mjs && node scripts/cloud/tivvlejoy-guarded-pod-payload.mjs pod-payload-dry-run && pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-guarded-pod-payload.test.ts",
     "validate:runpod-worker-image": "node --test scripts/cloud/tivvlejoy-worker-image-build.test.mjs",
     "validate:runpod-template-readiness": "node --test scripts/cloud/tivvlejoy-runpod-template-readiness.test.mjs",
+    "validate:runpod-template-create": "node --test scripts/cloud/tivvlejoy-runpod-template-create.test.mjs",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
