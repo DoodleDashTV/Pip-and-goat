@@ -1,116 +1,55 @@
-"""TivvleJoy scenery source inspection (dry-run safe).
-
-Never overwrites purchased source files. Normalization, when implemented for
-real Blender runs, writes only to a separate output path. This increment records
-command, schema, and dry-run behavior. Real Blender execution is marked not run
-when bpy is unavailable.
-"""
-
+"""Inspect one temporary .blend copy without executing embedded scripts."""
 from __future__ import annotations
-
-import argparse
-import json
-import sys
+import argparse, json, os, sys
 from pathlib import Path
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _common import emit, parse_blender_args  # noqa: E402
+SCHEMA_VERSION = "TIVVLEJOY_SCENERY_BLENDER_INSPECTION_V1"
 
-SCHEMA_VERSION = "TIVVLEJOY_SCENERY_FOUNDATION_V1"
-SUPPORTED_BLENDER = "4.2.2"
-
-
-def blender_available() -> bool:
-    try:
-        import bpy  # type: ignore  # noqa: F401
-
-        return True
-    except Exception:
-        return False
-
-
-def detect_blender_version() -> str | None:
-    try:
-        import bpy  # type: ignore
-
-        return bpy.app.version_string
-    except Exception:
-        return None
-
-
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Inspect a TivvleJoy scenery source without modifying it.")
-    parser.add_argument("--source-id", required=True)
-    parser.add_argument("--source", required=True, help="Purchased source .blend path. Never overwritten.")
-    parser.add_argument("--report", required=True)
-    parser.add_argument("--normalize-out", required=True, help="Separate normalized output directory.")
-    parser.add_argument("--texture-root", action="append", default=[])
-    parser.add_argument("--dry-run", action="store_true")
-    return parser
-
-
-def write_report(path: str, payload: dict) -> None:
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-
+def parser() -> argparse.ArgumentParser:
+    value = argparse.ArgumentParser()
+    value.add_argument("--source-id", required=True)
+    value.add_argument("--source-copy", required=True)
+    value.add_argument("--report", required=True)
+    return value
 
 def main() -> int:
-    args = parse_blender_args(build_parser())
-    source_path = Path(args.source)
-    normalize_out = Path(args.normalize_out)
-    if source_path.resolve() == normalize_out.resolve():
-        emit("REFUSED", "Normalization output must not equal the purchased source path.")
-        return 2
-
-    available = blender_available()
-    dry_run = bool(args.dry_run) or not available
-    report = {
-        "schemaVersion": SCHEMA_VERSION,
-        "kind": "tivvlejoy_scenery_inspect",
-        "sourceId": args.source_id,
-        "blenderExecuted": False,
-        "blenderVersionDetected": detect_blender_version() if available and not dry_run else None,
-        "supportedBlenderVersion": SUPPORTED_BLENDER,
-        "dryRun": True,
-        "sourceModified": False,
-        "normalizedWritten": False,
-        "objects": [],
-        "collections": [],
-        "materials": [],
-        "images": [],
-        "nodeGroups": [],
-        "missingExternalFiles": [],
-        "packedTextures": [],
-        "externalTextures": [],
-        "geometryNodes": [],
-        "unsupportedNodes": [],
-        "duplicateMaterials": [],
-        "duplicateImages": [],
-        "dimensions": {},
-        "triangleCounts": {},
-        "origins": {},
-        "proxyRecords": [],
-        "deterministicAssetIds": [],
-        "realExecution": "not_run",
-        "notes": [
-            "Dry-run only. Purchased source files were not opened.",
-            "Real Blender execution was not run." if dry_run or not available else "Blender was present but dry-run was requested.",
-            "Normalization writes only to a separate output path and never overwrites source.",
-            "Intake inspection jobs open a copy, never the immutable source, and upload reports to inspection/.",
-            f"Texture search roots registered: {len(args.texture_root)}.",
-        ],
+    args = parse_blender_args(parser())
+    source, report_path = Path(args.source_copy).resolve(), Path(args.report).resolve()
+    if not source.is_file() or source.suffix.lower() != ".blend":
+        emit("REFUSED", "A materialized .blend copy is required."); return 2
+    if os.environ.get("TIVVLEJOY_BLENDER_NETWORK_ISOLATED") != "1":
+        emit("REFUSED", "An isolated network namespace is required."); return 2
+    if source == report_path or report_path.suffix.lower() != ".json":
+        emit("REFUSED", "The report must be a separate JSON path."); return 2
+    import bpy  # type: ignore
+    before = (source.stat().st_size, source.stat().st_mtime_ns)
+    bpy.ops.wm.open_mainfile(filepath=str(source), load_ui=False, use_scripts=False)
+    missing_images = sorted(image.filepath for image in bpy.data.images if image.source == "FILE" and image.filepath and not Path(bpy.path.abspath(image.filepath)).exists())
+    geometry_nodes = sorted(group.name for group in bpy.data.node_groups if group.bl_idname == "GeometryNodeTree")
+    triangles = {}
+    for mesh in bpy.data.meshes:
+        mesh.calc_loop_triangles(); triangles[mesh.name] = len(mesh.loop_triangles)
+    payload = {
+        "schemaVersion": SCHEMA_VERSION, "sourceId": args.source_id,
+        "blenderExecuted": True, "blenderVersionDetected": bpy.app.version_string,
+        "factoryStartup": True, "autoExecutionDisabled": True, "networkAccess": False,
+        "sourceWasTemporaryCopy": True, "sourceModified": False, "automaticallyApproved": False,
+        "scenes": len(bpy.data.scenes), "collections": len(bpy.data.collections),
+        "objects": len(bpy.data.objects), "meshes": len(bpy.data.meshes),
+        "materials": len(bpy.data.materials), "images": len(bpy.data.images),
+        "cameras": len(bpy.data.cameras), "lights": len(bpy.data.lights),
+        "armatures": len(bpy.data.armatures), "animations": len(bpy.data.actions),
+        "geometryNodes": geometry_nodes,
+        "linkedLibraries": sorted(lib.filepath for lib in bpy.data.libraries if lib.filepath),
+        "missingExternalFiles": missing_images, "triangleCounts": triangles,
     }
-    write_report(args.report, report)
-    emit(
-        "OK",
-        "TivvleJoy scenery inspection dry-run complete.",
-        blenderExecuted=False,
-        sourceModified=False,
-        report=args.report,
-    )
-    return 0
-
+    payload["sourceModified"] = before != (source.stat().st_size, source.stat().st_mtime_ns)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if payload["sourceModified"]:
+        emit("REFUSED", "The temporary source copy changed during inspection."); return 3
+    emit("OK", "Isolated Blender inspection complete.", report=str(report_path)); return 0
 
 if __name__ == "__main__":
     raise SystemExit(main())
