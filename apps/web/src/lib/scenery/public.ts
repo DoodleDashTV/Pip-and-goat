@@ -49,4 +49,5 @@ export type PublicScenerySnapshot = {
   }>;
   defaultSeed: number;
   missingPrerequisites: string[];
+  intake: ReturnType<typeof import('./intake/readiness').publicIntakeSnapshot>;
 };

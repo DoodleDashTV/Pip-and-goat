@@ -1,5 +1,7 @@
 import { SCENERY_COPY } from './copy';
 import { SYNTHETIC_SCENERY_CATALOG } from './fixtures';
+import { publicIntakeSnapshot } from './intake/readiness';
+import { getSceneryIntakeStore } from './intake/store';
 import { listRecipes } from './recipes';
 import { publicSourceSnapshot } from './source-registry';
 import { publicSceneryStoragePolicy } from './storage-policy';
@@ -45,6 +47,7 @@ export function buildPublicScenerySnapshot(): PublicScenerySnapshot {
         tags: asset.tags,
       })),
     defaultSeed: DEFAULT_SCENERY_SEED,
+    intake: publicIntakeSnapshot(getSceneryIntakeStore().listManifests()),
     missingPrerequisites: [
       'Purchased Village, Sky, Forest, and Nature files are not in this workspace.',
       'No SHA-256 inspection has been recorded.',
