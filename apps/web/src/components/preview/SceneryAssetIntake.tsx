@@ -198,7 +198,17 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     if (!files?.length) return;
     const next: FileRow[] = [...rows];
     for (const file of Array.from(files)) {
-      next.push(emptyRow(file, next.length, { collectionId }));
+      const automatic = reviewOneTapPurchasedSelection([
+        { filename: file.name, byteSize: file.size },
+      ]).items[0];
+      next.push(
+        emptyRow(file, next.length, {
+          collectionId: automatic?.collectionId ?? collectionId,
+          expectedSourceId: automatic?.sourceId ?? '',
+          eligible: automatic?.eligible ?? true,
+          error: automatic && !automatic.eligible ? automatic.reason : null,
+        }),
+      );
     }
     setRows(next);
   }

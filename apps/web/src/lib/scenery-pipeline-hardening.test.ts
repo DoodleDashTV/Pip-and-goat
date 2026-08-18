@@ -169,7 +169,7 @@ describe('pipeline hardening inventory', () => {
   it('refuses an incorrect filename and does not silently rename it', () => {
     const review = reviewOneTapPurchasedSelection([{ filename: 'village blender', byteSize: 128 }]);
     expect(review.incorrect[0]?.filename).toBe('village blender');
-    expect(review.incorrect[0]?.expectedFilename).toBe('Village_Blender_4.2.2.zip');
+    expect(review.incorrect[0]?.expectedFilename).toBe('Village (Blender 4.2.2)(2).zip');
     expect(review.eligible).toHaveLength(0);
   });
 

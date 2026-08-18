@@ -99,9 +99,13 @@ export function reviewOneTapPurchasedSelection(
     const exact =
       safety.safe && safety.exactPurchasedMatch ? matchExactExpectedFilename(input.filename) : null;
     const aliasOnly = safety.safe ? matchAliasOnlyExpectedFilename(input.filename) : null;
-    const key = exact
-      ? normalizeInventoryFilename(exact.expectedFilename)
-      : normalizeInventoryFilename(input.filename);
+    const acceptedAlias = Boolean(
+      aliasOnly && /\.[a-z0-9]+(?:\.[a-z0-9]+)?$/i.test(input.filename),
+    );
+    const key =
+      exact || acceptedAlias
+        ? normalizeInventoryFilename((exact ?? aliasOnly)!.expectedFilename)
+        : normalizeInventoryFilename(input.filename);
     const occurrence = (seenExact.get(key) ?? 0) + 1;
     seenExact.set(key, occurrence);
 
@@ -180,6 +184,24 @@ export function reviewOneTapPurchasedSelection(
         reason: 'Exact inventory filename matched. Collection card selection is not required.',
       };
     }
+    // Human-readable inventory aliases (for example, "village blender") are
+    // useful for discovery but must not make an arbitrary file uploadable.
+    // Only a known alias that still looks like a complete filename is an
+    // accepted download-name variant.
+    if (aliasOnly && acceptedAlias) {
+      return {
+        filename: input.filename,
+        sanitizedFilename,
+        byteSize: input.byteSize,
+        classification: 'matched',
+        collectionId: aliasOnly.collectionId,
+        collectionName: aliasOnly.collectionName,
+        sourceId: aliasOnly.sourceId,
+        expectedFilename: aliasOnly.expectedFilename,
+        eligible: true,
+        reason: `Known purchased filename variant matched ${aliasOnly.expectedFilename}. Source bytes are preserved without renaming.`,
+      };
+    }
     if (aliasOnly) {
       return {
         filename: input.filename,
@@ -191,7 +213,7 @@ export function reviewOneTapPurchasedSelection(
         sourceId: aliasOnly.sourceId,
         expectedFilename: aliasOnly.expectedFilename,
         eligible: false,
-        reason: `Incorrect filename. Use the exact inventory name ${aliasOnly.expectedFilename}.`,
+        reason: `Filename resembles ${aliasOnly.expectedFilename}, but it is not a complete approved download filename.`,
       };
     }
     return {

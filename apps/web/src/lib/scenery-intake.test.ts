@@ -146,6 +146,20 @@ describe('object keys, filenames, and allowlists', () => {
 });
 
 describe('one-tap purchased selection review', () => {
+  it('auto-maps the exact saved filenames and known download-name variants', () => {
+    const review = reviewOneTapPurchasedSelection([
+      { filename: 'Extra Update 1.zip', byteSize: 10_659_392 },
+      { filename: 'SkyMachineV1.zip', byteSize: 46_914_963 },
+      { filename: 'SkyMachineV2.zip', byteSize: 51_240_289 },
+      { filename: 'HDRI_Part_2.zip', byteSize: 107_061_098 },
+    ]);
+    expect(review.eligible).toHaveLength(4);
+    expect(review.eligible.slice(0, 3).every((item) => item.collectionId === 'sky-hdri')).toBe(
+      true,
+    );
+    expect(review.eligible[3]?.collectionId).toBe('stylized-forest');
+  });
+
   it('maps mixed exact filenames into all four collections and refuses others individually', () => {
     const review = reviewOneTapPurchasedSelection([
       { filename: 'Village_Blender_4.2.2.zip', byteSize: 1024 },
