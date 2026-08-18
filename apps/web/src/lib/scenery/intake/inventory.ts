@@ -393,6 +393,55 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
   },
 ];
 
+/** Approved supplemental packs are uploadable, but do not change the purchased
+ * 27-file completion requirement. */
+export const OPTIONAL_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
+  {
+    sourceId: 'SRC_SKY_HDRI_JPG_PACK',
+    collectionId: 'sky-hdri',
+    collectionName: 'Sky and HDRI Lighting',
+    expectedFilename: 'HDRi_JPG_Pack.zip',
+    aliases: ['hdri jpg pack'],
+    extension: '.zip',
+    mimeType: 'application/zip',
+    notes: 'Supplemental JPG sky and HDRI package.',
+    unityPreservationOnly: false,
+    inspectionJobId: null,
+    textureTier: null,
+  },
+  {
+    sourceId: 'SRC_FOREST_STYLISED_ECOKIT',
+    collectionId: 'stylized-forest',
+    collectionName: 'Stylized Forest',
+    expectedFilename: 'Stylised EcoKit.zip',
+    aliases: ['stylised ecokit', 'stylized ecokit'],
+    extension: '.zip',
+    mimeType: 'application/zip',
+    notes: 'Supplemental stylized environment kit.',
+    unityPreservationOnly: false,
+    inspectionJobId: null,
+    textureTier: null,
+  },
+  {
+    sourceId: 'SRC_SKY_WORLD_SHADERS_GIVEAWAY',
+    collectionId: 'sky-hdri',
+    collectionName: 'Sky and HDRI Lighting',
+    expectedFilename: 'Giveaway_World Shaders.zip',
+    aliases: ['world shaders giveaway'],
+    extension: '.zip',
+    mimeType: 'application/zip',
+    notes: 'User-approved supplemental World Shaders giveaway.',
+    unityPreservationOnly: false,
+    inspectionJobId: null,
+    textureTier: null,
+  },
+];
+
+const ALL_SCENERY_SOURCE_FILES = [
+  ...EXPECTED_SCENERY_SOURCE_FILES,
+  ...OPTIONAL_SCENERY_SOURCE_FILES,
+];
+
 export const EXPECTED_SOURCE_COUNT = 27;
 export const EXPECTED_COLLECTION_COUNT = 4;
 
@@ -447,7 +496,7 @@ function normalizeMatch(value: string): string {
 
 export function matchExactExpectedFilename(filename: string): ExpectedSourceFile | null {
   const needle = normalizeMatch(filename);
-  const exact = EXPECTED_SCENERY_SOURCE_FILES.find(
+  const exact = ALL_SCENERY_SOURCE_FILES.find(
     (item) => normalizeMatch(item.expectedFilename) === needle,
   );
   return exact ? { ...exact, aliases: [...exact.aliases] } : null;
@@ -456,7 +505,7 @@ export function matchExactExpectedFilename(filename: string): ExpectedSourceFile
 export function matchAliasOnlyExpectedFilename(filename: string): ExpectedSourceFile | null {
   if (matchExactExpectedFilename(filename)) return null;
   const needle = normalizeMatch(filename);
-  const alias = EXPECTED_SCENERY_SOURCE_FILES.find((item) =>
+  const alias = ALL_SCENERY_SOURCE_FILES.find((item) =>
     item.aliases.some((name) => normalizeMatch(name) === needle),
   );
   return alias ? { ...alias, aliases: [...alias.aliases] } : null;
@@ -467,7 +516,7 @@ export function listExpectedSourceFiles(): ExpectedSourceFile[] {
 }
 
 export function getExpectedSourceFile(sourceId: string): ExpectedSourceFile {
-  const found = EXPECTED_SCENERY_SOURCE_FILES.find((item) => item.sourceId === sourceId);
+  const found = ALL_SCENERY_SOURCE_FILES.find((item) => item.sourceId === sourceId);
   if (!found) {
     throw new Error(`Unknown expected scenery source: ${sourceId}`);
   }
@@ -480,16 +529,14 @@ export function matchExpectedSourceFile(input: {
   expectedSourceId?: string;
 }): ExpectedSourceFile | null {
   if (input.expectedSourceId) {
-    const exact = EXPECTED_SCENERY_SOURCE_FILES.find(
-      (item) => item.sourceId === input.expectedSourceId,
-    );
+    const exact = ALL_SCENERY_SOURCE_FILES.find((item) => item.sourceId === input.expectedSourceId);
     if (exact && exact.collectionId === input.collectionId) {
       return { ...exact, aliases: [...exact.aliases] };
     }
     return null;
   }
   const needle = normalizeMatch(input.filename);
-  const collection = EXPECTED_SCENERY_SOURCE_FILES.filter(
+  const collection = ALL_SCENERY_SOURCE_FILES.filter(
     (item) => item.collectionId === input.collectionId,
   );
   const exactName = collection.find((item) => normalizeMatch(item.expectedFilename) === needle);

@@ -124,6 +124,7 @@ export function reviewOneTapPurchasedSelection(
       };
     }
     if (
+      !exact &&
       shouldExcludeWorldShadersGiveaway({
         filename: input.filename,
         approvedManifestFilenames: options?.approvedManifestFilenames,

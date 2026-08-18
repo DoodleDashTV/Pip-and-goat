@@ -160,6 +160,21 @@ describe('one-tap purchased selection review', () => {
     expect(review.eligible[3]?.collectionId).toBe('stylized-forest');
   });
 
+  it('accepts approved supplemental packs without changing the required 27-file count', () => {
+    const review = reviewOneTapPurchasedSelection([
+      { filename: 'HDRi_JPG_Pack.zip', byteSize: 94_319_192 },
+      { filename: 'Stylised EcoKit.zip', byteSize: 669_481_428 },
+      { filename: 'Giveaway_World Shaders.zip', byteSize: 711_398 },
+    ]);
+    expect(review.expectedCount).toBe(27);
+    expect(review.eligible).toHaveLength(3);
+    expect(review.eligible.map((item) => item.collectionId)).toEqual([
+      'sky-hdri',
+      'stylized-forest',
+      'sky-hdri',
+    ]);
+  });
+
   it('maps mixed exact filenames into all four collections and refuses others individually', () => {
     const review = reviewOneTapPurchasedSelection([
       { filename: 'Village_Blender_4.2.2.zip', byteSize: 1024 },
