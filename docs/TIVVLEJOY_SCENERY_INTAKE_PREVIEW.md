@@ -74,9 +74,9 @@ Verified after Preview storage-config redeploy `dpl_Aq3jBhFdCiBbAp2Wv4ziKAQPmWJj
 
 ## Preview intake token rotation (verified)
 
-Checkpoint: `TIVVLEJOY_SCENERY_PREVIEW_TOKEN_ROTATE`
+Checkpoint: `TIVVLEJOY_SCENERY_PREVIEW_INTAKE_TOKEN_ROTATED`
 
-`TIVVLEJOY_SCENERY_INTAKE_TOKEN` was rotated in place on the same Preview-only, git-branch-limited sensitive variable. The new value is the identically named Runtime Secret from the agent environment. Neither the previous value nor the new value is printed.
+`TIVVLEJOY_SCENERY_INTAKE_TOKEN` was rotated in place on the same Preview-only, git-branch-limited Vercel sensitive variable. The new value is the identically named agent runtime secret. The value was not printed, logged, or committed.
 
 Other Preview storage names were not modified:
 
@@ -88,13 +88,15 @@ Other Preview storage names were not modified:
 
 Production was not modified (`hiddenProductionEnvCount=0`). Draft PR #45 stays open, draft, and unmerged.
 
-Verified after Preview token-rotation redeploy `dpl_CUpG3UWEc4UWSgkh9L5BferJVtNu` of branch `cursor/tivvlejoy-scenery-intake-preview-73f1`:
+Verified after Preview token-rotation redeploy `dpl_Btx59tpkKwLT7f57jnJ9tA2bD7uY` of branch `cursor/tivvlejoy-scenery-intake-preview-73f1` (READY, target not production):
 
+- GET `/` = 200
 - GET `/scenery` = 200
-- GET `/api/scenery/intake` = 200, `storageConfiguration=configured`, `tokenConfigured=true`, `bytesPath=client-to-signed-r2`
+- GET `/api/scenery/intake` = 200, `storageConfiguration=configured`, `tokenConfigured=true`, `bytesPath=client-to-signed-r2`, prefix `tivvlejoy-assets`
 - Incorrect token = 401 `INTAKE_UNAUTHORIZED`
-- Correct token authorizes a safe non-upload `query` (400 `UNKNOWN_SESSION`, no upload)
+- Rotated token authorizes a safe non-upload `query` (400 `UNKNOWN_SESSION`, `uploaded=false`)
 - No credentials in Preview HTML or JSON
+- Purchased source object count = 0
 - Purchased files were not uploaded, inspected, extracted, converted, normalized, or approved
 
 ## Procedure for Justin to upload the 27 purchased files

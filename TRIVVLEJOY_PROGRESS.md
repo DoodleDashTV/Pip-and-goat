@@ -127,12 +127,12 @@ database is connected.
 - Preview alias is the existing git-branch Vercel Preview for `cursor/tivvlejoy-scenery-intake-preview-73f1` (hostname omitted from git)
 - Production Vercel env was not modified (`hiddenProductionEnvCount=0`, no production targets)
 - Preview host now reports `storageConfiguration=configured`, `tokenConfigured=true`, prefix `tivvlejoy-assets`, and `bytesPath=client-to-signed-r2`
-- A 48-character `TIVVLEJOY_SCENERY_INTAKE_TOKEN` was generated and stored as a Vercel sensitive Preview env var; the value is not printed
-- Checkpoint `TIVVLEJOY_SCENERY_PREVIEW_TOKEN_ROTATE` rotated that same Preview-only, git-branch-limited variable to the identically named Runtime Secret; neither value is printed
-- Other R2 Preview names and Production were not changed (`hiddenProductionEnvCount=0`)
-- Token-rotation redeploy `dpl_CUpG3UWEc4UWSgkh9L5BferJVtNu` of `cursor/tivvlejoy-scenery-intake-preview-73f1` is READY and not Production
+- `TIVVLEJOY_SCENERY_INTAKE_TOKEN` is a Vercel sensitive Preview env var; the value is not printed
+- Checkpoint `TIVVLEJOY_SCENERY_PREVIEW_INTAKE_TOKEN_ROTATED` replaced that Preview-only, git-branch-limited variable in place with the identically named agent runtime secret
+- Existing R2 Preview settings were not modified; Production was not modified (`hiddenProductionEnvCount=0`)
+- Branch `cursor/tivvlejoy-scenery-intake-preview-73f1` was redeployed as `dpl_Btx59tpkKwLT7f57jnJ9tA2bD7uY` (READY, not production)
 - Incorrect intake token returns 401 `INTAKE_UNAUTHORIZED`
-- Correct token authorizes a safe non-upload `query` of an unknown session (400 `UNKNOWN_SESSION`, `uploaded=false`)
+- The rotated token authorizes a safe non-upload `query` of an unknown session (400 `UNKNOWN_SESSION`, `uploaded=false`)
 - No credentials appeared in Preview HTML or JSON
 - Purchased source object count on this Preview remains 0
 - No purchased scenery bytes were uploaded, inspected, extracted, converted, normalized, or approved

@@ -1,39 +1,40 @@
 {
-  "checkpoint": "TIVVLEJOY_SCENERY_PREVIEW_STORAGE_CONFIG",
+  "checkpoint": "TIVVLEJOY_SCENERY_PREVIEW_INTAKE_TOKEN_ROTATED",
   "previewUrl": "https://<git-branch-preview-alias>/ (hostname omitted from git; see agent report)",
-  "deploymentId": "dpl_Aq3jBhFdCiBbAp2Wv4ziKAQPmWJj",
+  "deploymentId": "dpl_Btx59tpkKwLT7f57jnJ9tA2bD7uY",
   "deploymentReadyState": "READY",
   "deploymentTarget": null,
   "gitBranch": "cursor/tivvlejoy-scenery-intake-preview-73f1",
+  "gitSha": "fafffbaa9d1e",
   "productionModified": false,
   "hiddenProductionEnvCount": 0,
+  "r2SettingsModified": false,
   "envScope": {
+    "id": "Wo99k0n7XKHNzds3",
+    "key": "TIVVLEJOY_SCENERY_INTAKE_TOKEN",
+    "type": "sensitive",
     "target": [
       "preview"
     ],
     "gitBranch": "cursor/tivvlejoy-scenery-intake-preview-73f1",
-    "namesConfigured": [
-      "R2_BUCKET",
-      "R2_ENDPOINT",
-      "R2_ACCESS_KEY_ID",
-      "R2_SECRET_ACCESS_KEY",
-      "TIVVLEJOY_SCENERY_ASSET_PREFIX",
-      "TIVVLEJOY_SCENERY_INTAKE_TOKEN"
-    ],
-    "prefixValue": "tivvlejoy-assets",
-    "intakeTokenShown": false,
-    "supersededBy": "token-rotate-verify.json"
+    "rotatedInPlace": true,
+    "source": "identically named agent runtime secret",
+    "intakeTokenShown": false
+  },
+  "unchangedPreviewStorageNames": [
+    "R2_BUCKET",
+    "R2_ENDPOINT",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "TIVVLEJOY_SCENERY_ASSET_PREFIX"
+  ],
+  "getHome": {
+    "status": 200,
+    "leaks": []
   },
   "getScenery": {
     "status": 200,
-    "bytes": 50536,
-    "leaks": [],
-    "hasPreviewOnly": true,
-    "hasIntakeHeading": true,
-    "hasApprovalWarning": true,
-    "storageConfigurationMention": true,
-    "tokenConfiguredTrue": false,
-    "bytesPath": "client-to-signed-r2"
+    "leaks": []
   },
   "getIntake": {
     "status": 200,
@@ -44,17 +45,14 @@
     "prefix": "tivvlejoy-assets",
     "productionMutationsRefused": false,
     "publicPreview": true,
-    "secretNameLabelsPresent": null,
-    "missingNames": null,
     "purchasedSourceObjectCount": 0,
-    "uploaded": false,
-    "approved": false
+    "uploaded": false
   },
   "incorrectToken": {
     "status": 401,
     "code": "INTAKE_UNAUTHORIZED",
-    "leaks": [],
-    "uploaded": false
+    "uploaded": false,
+    "leaks": []
   },
   "correctTokenSafeQuery": {
     "action": "query",
@@ -65,12 +63,7 @@
     "uploaded": false,
     "authorizedPast401": true
   },
-  "getHome": {
-    "status": 200,
-    "leaks": []
-  },
   "credentialsInBrowserHtmlOrJson": false,
-  "leakNames": [],
   "bytesPath": "client-to-signed-r2",
   "purchasedFilesUploaded": false,
   "assetsInspectedExtractedConvertedNormalizedOrApproved": false,
