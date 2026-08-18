@@ -1,0 +1,83 @@
+# TivvleJoy RunPod template readiness — read-only GET audit.
+# Never creates a template, Pod, or GPU. Never prints secrets.
+name: TivvleJoy RunPod Template Readiness
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-runpod-template-readiness-73f1
+
+concurrency:
+  group: tivvlejoy-template-readiness-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  template-readiness:
+    name: Read-only template readiness audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+      RUNPOD_RENDER_TEMPLATE_ID: ${{ secrets.RUNPOD_RENDER_TEMPLATE_ID }}
+    steps:
+      - name: Print safe checkout identity
+        run: |
+          set -euo pipefail
+          echo "github.sha=${GITHUB_SHA}"
+          echo "github.ref_name=${GITHUB_REF_NAME}"
+
+      - name: Refuse any other branch
+        run: |
+          set -euo pipefail
+          expected='cursor/tivvlejoy-runpod-template-readiness-73f1'
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "REFUSED: this workflow only runs on ${expected}"
+            exit 1
+          fi
+
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack pnpm
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Zero-cost contract tests
+        run: |
+          set -euo pipefail
+          pnpm validate:runpod-template-readiness
+          pnpm validate:runpod-worker-image
+          pnpm validate:runpod-pod-payload
+          pnpm validate:runpod-blender-foundation
+          pnpm validate:runpod-guarded
+          pnpm --filter @doodle-dash/runpod-blender-worker test
+          pnpm --filter @doodle-dash/runpod-blender-worker check
+          pnpm --filter @doodle-dash/web lint
+
+      - name: Verify pinned worker image
+        run: |
+          set -euo pipefail
+          pnpm cloud:fingerprints
+          pnpm cloud:verify-image
+          pnpm cloud:preflight-offline
+
+      - name: Read-only RunPod template audit
+        run: |
+          set -euo pipefail
+          node scripts/cloud/tivvlejoy-runpod-template-readiness.mjs audit
