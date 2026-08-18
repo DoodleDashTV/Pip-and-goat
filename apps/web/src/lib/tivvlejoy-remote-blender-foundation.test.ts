@@ -11,8 +11,10 @@ const workflow = readFileSync(path.join(repoRoot, '.github/workflows/tivvlejoy-r
 describe('TivvleJoy remote Blender execution foundation contract', () => {
   it('is foundation-only and does not enable paid or remote execution', () => {
     expect(docs).toContain('REMOTE EXECUTION FOUNDATION ONLY');
+    expect(docs).toContain('REMOTE JOB PACKAGE STAGING FOUNDATION');
     expect(docs).toContain('NOT YET ENABLED');
     expect(docs).toContain('PAID GPU EXECUTION');
+    expect(docs).toContain('POD CREATION');
     expect(docs).toContain('REMOTE BLENDER EXECUTION');
     expect(helper).toContain("export const PAID_GPU_ENABLED = false");
     expect(helper).toContain("export const REMOTE_BLENDER_EXECUTION_ENABLED = false");
@@ -24,6 +26,8 @@ describe('TivvleJoy remote Blender execution foundation contract', () => {
     expect(helper).toContain('buildBlenderArgv');
     expect(helper).toContain('validateManifest');
     expect(helper).toContain('compileTivvleJoyJobToWorkerManifest');
+    expect(helper).toContain('buildTivvleJoyRemoteJobPackage');
+    expect(helper).toContain('jobs/${jobId}/manifest.json');
     expect(helper).toContain('ddp-cloud-job-manifest-v1');
     expect(helper).toContain('scripts/blender/assemble_scene.py');
     expect(helper).toContain('timeout');

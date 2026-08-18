@@ -26,7 +26,20 @@ import {
   buildRemoteBlenderCommand,
   buildWorkerOutputKey,
   compileTivvleJoyJobToWorkerManifest,
+  createInMemoryR2Adapter,
   createSampleWorkspace,
+  buildSingleShotR2Keys,
+  buildTivvleJoyRemoteJobPackage,
+  classifyStagedObject,
+  hashJobPackageIdentity,
+  planJobPackageStaging,
+  simulatePublishJobPackage,
+  JOB_PACKAGE_SCHEMA,
+  MANIFEST_PUBLISH_ORDER,
+  PACKAGE_STATE_NOT_READY,
+  PACKAGE_STATE_STAGED,
+  STAGING_FOUNDATION_STATUS,
+  WORKER_ENV_CONTRACT,
   defaultPilotJob,
   expectedOutputPrefix,
   hashJobManifest,
@@ -369,8 +382,19 @@ describe('dry-run', () => {
     assert.equal(result.compiled.schemaVersion, 'ddp-cloud-job-manifest-v1');
     assert.equal(result.compiled.workerManifest.limits.maxRuntimeMinutes, 20);
     assert.equal(result.compiled.workerManifest.limits.maxCostUsd, 0.25);
+    assert.equal(result.packaged.jobPackage.schema_version, JOB_PACKAGE_SCHEMA);
+    assert.equal(result.packaged.jobPackage.manifestKey, `jobs/${result.job.job_id}/manifest.json`);
+    assert.equal(result.staged.state, PACKAGE_STATE_STAGED);
+    assert.equal(result.r2MutationSimulated, true);
+    assert.equal(result.realR2, false);
+    assert.equal(result.gpuLaunched, false);
     assert.equal(result.command.argv[0], 'timeout');
     assert.equal(logs.includes('dry-run PASS'), true);
+    assert.equal(logs.includes('R2 mutation simulated only'), true);
+    assert.equal(logs.includes('GPU launched: false'), true);
+    assert.equal(logs.includes('Pod created: false'), true);
+    assert.equal(logs.includes('Blender executed: false'), true);
+    assert.equal(logs.includes('Paid mutation contacted: false'), true);
     assert.equal(logs.some((line) => /rpa_|Authorization|secret/i.test(line)), false);
     assert.equal(foundationSource.includes("method: 'POST'"), false);
     assert.equal(foundationSource.includes('https://rest.runpod.io/v1/pods'), false);
@@ -391,8 +415,144 @@ describe('existing guarded gates remain intact', () => {
     assert.equal(workflow.includes('\n  push:'), false);
     assert.match(workflow, /LAUNCH_TIVVLEJOY_GPU/);
     assert.equal(FOUNDATION_STATUS, 'REMOTE EXECUTION FOUNDATION ONLY');
+    assert.equal(STAGING_FOUNDATION_STATUS, 'REMOTE JOB PACKAGE STAGING FOUNDATION');
     assert.match(docs, /REMOTE EXECUTION FOUNDATION ONLY/);
+    assert.match(docs, /REMOTE JOB PACKAGE STAGING FOUNDATION/);
     assert.match(docs, /WORKER CONTRACT ALIGNMENT COMPLETE/);
     assert.match(docs, /NOT YET ENABLED/);
+    assert.deepEqual(WORKER_ENV_CONTRACT.fromJobPackage, ['RENDER_JOB_ID', 'RENDER_JOB_MANIFEST_KEY']);
+    assert.equal(WORKER_ENV_CONTRACT.secretsInManifest, false);
+    assert.equal(WORKER_ENV_CONTRACT.podLaunchImplemented, false);
+  });
+});
+
+function localSourcesFor(jobPackage, roots) {
+  return Object.fromEntries(
+    jobPackage.expectedAssets.map((asset) => [asset.r2Key, { body: asset.sha256, sha256: asset.sha256 }]),
+  );
+}
+
+describe('job package staging', () => {
+  it('builds a deterministic worker-compatible package with existing single-shot keys', () => {
+    const roots = workspace();
+    const job = validJob(roots);
+    const first = buildTivvleJoyRemoteJobPackage(job);
+    const second = buildTivvleJoyRemoteJobPackage(job);
+    assert.equal(first.ok, true);
+    assert.equal(first.jobPackage.schema_version, JOB_PACKAGE_SCHEMA);
+    assert.deepEqual(first.jobPackage.identity, second.jobPackage.identity);
+    assert.equal(first.jobPackage.jobPackageSha256, second.jobPackage.jobPackageSha256);
+    assert.equal(first.jobPackage.jobPackageSha256.length, 64);
+    assert.equal(first.jobPackage.manifestKey, `jobs/${job.job_id}/manifest.json`);
+    assert.equal(first.jobPackage.statusKey, `jobs/${job.job_id}/status.json`);
+    assert.equal(first.jobPackage.startupStatusKey, `jobs/${job.job_id}/startup-status.json`);
+    assert.deepEqual(buildSingleShotR2Keys(job.job_id).manifestKey, first.jobPackage.manifestKey);
+    assert.equal(first.jobPackage.workerManifest.schemaVersion, 'ddp-cloud-job-manifest-v1');
+    assert.equal(first.jobPackage.outputKey, first.jobPackage.workerManifest.outputKey);
+    assert.deepEqual(first.jobPackage.expectedAssets, first.jobPackage.workerManifest.expectedAssets);
+    assert.equal(first.jobPackage.sceneSha256, job.scene_sha256);
+    assert.equal(first.jobPackage.blenderVersion, '4.2.3');
+    assert.equal(first.jobPackage.runtimeLimit, 20);
+    assert.equal(first.jobPackage.costLimit, 0.25);
+    assert.equal(JSON.stringify(first.jobPackage).includes('file://'), false);
+    assert.equal(JSON.stringify(first.jobPackage).includes('rpa_'), false);
+    assert.equal(JSON.stringify(first.jobPackage).includes('secret_access_key'), false);
+  });
+
+  it('changes the package hash when execution-relevant fields change', () => {
+    const roots = workspace();
+    const base = buildTivvleJoyRemoteJobPackage(validJob(roots));
+    const assetChanged = buildTivvleJoyRemoteJobPackage(
+      validJob(roots, { assets: [{ ...validJob(roots).assets[0], sha256: 'ab'.repeat(32) }] }),
+    );
+    const settingChanged = buildTivvleJoyRemoteJobPackage(validJob(roots, { frame_end: 89 }));
+    const outputChanged = hashJobPackageIdentity({
+      ...base.jobPackage.identity,
+      outputKey: 'renders/finals/other/job/final_1080p.mp4',
+    });
+    assert.equal(base.ok, true);
+    assert.equal(assetChanged.ok, true);
+    assert.equal(settingChanged.ok, true);
+    assert.notEqual(assetChanged.jobPackage.jobPackageSha256, base.jobPackage.jobPackageSha256);
+    assert.notEqual(settingChanged.jobPackage.jobPackageSha256, base.jobPackage.jobPackageSha256);
+    assert.notEqual(outputChanged, base.jobPackage.jobPackageSha256);
+  });
+
+  it('publishes the manifest last, requires read-back, and stays idempotent', () => {
+    const roots = workspace();
+    const packaged = buildTivvleJoyRemoteJobPackage(validJob(roots));
+    const adapter = createInMemoryR2Adapter();
+    const localSources = localSourcesFor(packaged.jobPackage, roots);
+    const first = simulatePublishJobPackage(packaged, { adapter, localSources });
+    const second = simulatePublishJobPackage(packaged, { adapter, localSources });
+    assert.equal(first.ok, true);
+    assert.equal(first.state, PACKAGE_STATE_STAGED);
+    assert.equal(first.manifestUploadedLast, true);
+    assert.deepEqual(first.publishOrder, [...MANIFEST_PUBLISH_ORDER]);
+    assert.equal(first.realR2, false);
+    assert.equal(first.gpuLaunched, false);
+    assert.equal(first.podCreated, false);
+    assert.equal(first.blenderExecuted, false);
+    assert.equal(first.contactedPaidEndpoint, false);
+    assert.equal(second.ok, true);
+    assert.equal(second.idempotent, true);
+    assert.equal(second.state, PACKAGE_STATE_STAGED);
+    const puts = adapter.mutations.filter((mutation) => mutation.op === 'PUT').map((mutation) => mutation.key);
+    assert.equal(puts[puts.length - 1], packaged.jobPackage.manifestKey);
+  });
+
+  it('refuses missing assets, hash mismatches, identity conflicts, and partial staging', () => {
+    const roots = workspace();
+    const packaged = buildTivvleJoyRemoteJobPackage(validJob(roots));
+    const missing = simulatePublishJobPackage(packaged, { adapter: createInMemoryR2Adapter(), localSources: {} });
+    assert.equal(missing.ok, false);
+    assert.equal(missing.code, 'MISSING_ASSET');
+    assert.equal(missing.state, PACKAGE_STATE_NOT_READY);
+
+    const mismatchAdapter = createInMemoryR2Adapter({
+      [packaged.jobPackage.expectedAssets[0].r2Key]: { body: 'wrong', sha256: 'cd'.repeat(32) },
+    });
+    const mismatch = simulatePublishJobPackage(packaged, {
+      adapter: mismatchAdapter,
+      localSources: localSourcesFor(packaged.jobPackage, roots),
+    });
+    assert.equal(mismatch.ok, false);
+    assert.equal(mismatch.code, 'HASH_MISMATCH');
+    assert.equal(mismatch.state, PACKAGE_STATE_NOT_READY);
+
+    const firstAdapter = createInMemoryR2Adapter();
+    const first = simulatePublishJobPackage(packaged, {
+      adapter: firstAdapter,
+      localSources: localSourcesFor(packaged.jobPackage, roots),
+    });
+    assert.equal(first.ok, true);
+    const changed = buildTivvleJoyRemoteJobPackage(validJob(roots, { frame_end: 80 }));
+    const conflict = simulatePublishJobPackage(changed, {
+      adapter: firstAdapter,
+      localSources: localSourcesFor(changed.jobPackage, roots),
+    });
+    assert.equal(conflict.ok, false);
+    assert.equal(conflict.code, 'JOB_IDENTITY_CONFLICT');
+
+    const partialAdapter = createInMemoryR2Adapter();
+    const partial = simulatePublishJobPackage(packaged, {
+      adapter: partialAdapter,
+      localSources: localSourcesFor(packaged.jobPackage, roots),
+      failOnKey: packaged.jobPackage.expectedAssets[0].r2Key,
+    });
+    assert.equal(partial.ok, false);
+    assert.equal(partial.state, PACKAGE_STATE_NOT_READY);
+    assert.equal(partial.partial, true);
+    assert.equal(partialAdapter.get(packaged.jobPackage.manifestKey).ok, false);
+
+    assert.equal(classifyStagedObject({ key: 'tmp/evil.blend', expectedSha256: 'ab'.repeat(32), head: { exists: false } }), 'REFUSED');
+    const unsafePlan = planJobPackageStaging(
+      {
+        ...packaged.jobPackage,
+        expectedAssets: [{ role: 'pip', r2Key: 'tmp/evil.blend', sha256: packaged.jobPackage.expectedAssets[0].sha256 }],
+      },
+      { adapter: createInMemoryR2Adapter(), localSources: {} },
+    );
+    assert.equal(unsafePlan.objects[0].state, 'REFUSED');
   });
 });
