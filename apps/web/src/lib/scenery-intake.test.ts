@@ -293,6 +293,31 @@ describe('multipart session workflow', () => {
     expect(completed.storedSize).toBe(bytes.byteLength);
     expect(completed.manifest.verificationState).toBe('size_verified');
 
+    const duplicateRetry = (await handleSceneryIntakeAction({
+      action: 'create-session',
+      body: {
+        collectionId: 'village',
+        filename: 'Village_Blender_4.2.2.zip',
+        byteSize: bytes.byteLength,
+        sha256,
+      },
+      env: configuredEnv,
+      publicPreview: false,
+      storage,
+    })) as {
+      alreadyPresent: boolean;
+      manifest: { uploadState: string; verificationState: string };
+    };
+    expect(duplicateRetry.alreadyPresent).toBe(true);
+    expect(duplicateRetry.manifest).toMatchObject({
+      uploadState: 'completed',
+      verificationState: 'size_verified',
+    });
+    expect(getSceneryIntakeStore().listManifests()[0]).toMatchObject({
+      uploadState: 'completed',
+      verificationState: 'size_verified',
+    });
+
     const second = createUploadSession({
       collectionId: 'village',
       originalFilename: 'Village_Blender_4.2.2.zip',

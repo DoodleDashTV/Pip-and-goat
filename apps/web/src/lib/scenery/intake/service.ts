@@ -148,14 +148,14 @@ async function handleSceneryIntakeActionInner(input: {
       prefixForSession(env),
       created.session.purpose === 'preview-synthetic' ? 'quarantine' : 'source',
     );
-    store.putManifest(created.manifest);
-    await persistManifest(created.manifest, storage, env);
+    const retainedManifest = store.putManifest(created.manifest);
+    await persistManifest(retainedManifest, storage, env);
     if (created.session.state === 'already_present') {
       store.putSession(created.session);
       await persistUploadSession(created.session, storage, env);
       return {
         session: publicSession(created.session),
-        manifest: created.manifest,
+        manifest: retainedManifest,
         alreadyPresent: true,
       };
     }
@@ -167,7 +167,7 @@ async function handleSceneryIntakeActionInner(input: {
       await persistUploadSession(created.session, storage, env);
       return {
         session: publicSession(created.session),
-        manifest: created.manifest,
+        manifest: retainedManifest,
         connectionReadyOnly: true,
       };
     }
@@ -186,7 +186,7 @@ async function handleSceneryIntakeActionInner(input: {
         state: created.session.state,
       }),
     );
-    return { session: publicSession(created.session), manifest: created.manifest };
+    return { session: publicSession(created.session), manifest: retainedManifest };
   }
 
   const session = requireSession(String(input.body.sessionId ?? ''));
