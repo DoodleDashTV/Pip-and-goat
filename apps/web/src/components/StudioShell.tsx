@@ -13,6 +13,7 @@ const PRIMARY_NAV = [
   { href: '/asset-intake', label: 'Assets' },
   { href: '/voices', label: 'Voices' },
   { href: '/voice-production', label: 'Voice Production' },
+  { href: '/scenery', label: 'Scenery' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
   { href: '/render-queue', label: 'Render Queue' },
