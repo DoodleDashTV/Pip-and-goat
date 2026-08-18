@@ -7,6 +7,7 @@ const UNSAFE_FILENAME = /[^A-Za-z0-9._@+ -]+/g;
 export function fileExtension(filename: string): string {
   const base = filename.split(/[/\\]/).pop() ?? filename;
   const lower = base.toLowerCase();
+  if (lower.endsWith('.unitypackage.gz')) return '.unitypackage.gz';
   if (lower.endsWith('.blend.zip')) return '.zip';
   const dot = lower.lastIndexOf('.');
   return dot >= 0 ? lower.slice(dot) : '';

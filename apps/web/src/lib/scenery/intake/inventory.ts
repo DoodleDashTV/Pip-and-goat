@@ -78,9 +78,14 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_UNITY_BUILTIN',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_Built_in.unitypackage',
-    aliases: ['village built-in unity', 'village builtin', 'unity built-in'],
-    extension: '.unitypackage',
+    expectedFilename: 'Village - Built-in (Unity 2022.3.16f1).unitypackage.gz',
+    aliases: [
+      'village built-in unity',
+      'village builtin',
+      'unity built-in',
+      'Village_Built_in.unitypackage',
+    ],
+    extension: '.unitypackage.gz',
     mimeType: 'application/octet-stream',
     notes: 'Unity Built-in preservation backup. Not imported into the Blender pipeline.',
     unityPreservationOnly: true,
@@ -91,9 +96,9 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_UNITY_URP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_URP.unitypackage',
-    aliases: ['village urp unity', 'village urp'],
-    extension: '.unitypackage',
+    expectedFilename: 'Village - URP (Unity 2022.3.16f1).unitypackage.gz',
+    aliases: ['village urp unity', 'village urp', 'Village_URP.unitypackage'],
+    extension: '.unitypackage.gz',
     mimeType: 'application/octet-stream',
     notes: 'Unity URP preservation backup. Not imported into the Blender pipeline.',
     unityPreservationOnly: true,
@@ -104,9 +109,9 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     sourceId: 'SRC_VILLAGE_UNITY_HDRP',
     collectionId: 'village',
     collectionName: 'Village Environment',
-    expectedFilename: 'Village_HDRP.unitypackage',
-    aliases: ['village hdrp unity', 'village hdrp'],
-    extension: '.unitypackage',
+    expectedFilename: 'Village - HDRP (Unity 2022.3.16f1).unitypackage.gz',
+    aliases: ['village hdrp unity', 'village hdrp', 'Village_HDRP.unitypackage'],
+    extension: '.unitypackage.gz',
     mimeType: 'application/octet-stream',
     notes: 'Unity HDRP preservation backup. Not imported into the Blender pipeline.',
     unityPreservationOnly: true,
@@ -217,7 +222,8 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     ],
     extension: '.zip',
     mimeType: 'application/zip',
-    notes: 'Forest model package expected to contain Stylized_Forest_Nature_Kit.blend plus FBX, OBJ, and MTL.',
+    notes:
+      'Forest model package expected to contain Stylized_Forest_Nature_Kit.blend plus FBX, OBJ, and MTL.',
     unityPreservationOnly: false,
     inspectionJobId: 'INSPECT_STYLIZED_FOREST',
     textureTier: null,
@@ -243,7 +249,8 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     aliases: ['2048 texture zip', 'forest 2048', 'textures 2048'],
     extension: '.zip',
     mimeType: 'application/zip',
-    notes: '2048 texture tier. Standard final. Only one selected tier may materialize for ordinary assembly.',
+    notes:
+      '2048 texture tier. Standard final. Only one selected tier may materialize for ordinary assembly.',
     unityPreservationOnly: false,
     inspectionJobId: null,
     textureTier: '2048',
@@ -434,7 +441,9 @@ function normalizeMatch(value: string): string {
 
 export function matchExactExpectedFilename(filename: string): ExpectedSourceFile | null {
   const needle = normalizeMatch(filename);
-  const exact = EXPECTED_SCENERY_SOURCE_FILES.find((item) => normalizeMatch(item.expectedFilename) === needle);
+  const exact = EXPECTED_SCENERY_SOURCE_FILES.find(
+    (item) => normalizeMatch(item.expectedFilename) === needle,
+  );
   return exact ? { ...exact, aliases: [...exact.aliases] } : null;
 }
 
@@ -465,23 +474,30 @@ export function matchExpectedSourceFile(input: {
   expectedSourceId?: string;
 }): ExpectedSourceFile | null {
   if (input.expectedSourceId) {
-    const exact = EXPECTED_SCENERY_SOURCE_FILES.find((item) => item.sourceId === input.expectedSourceId);
+    const exact = EXPECTED_SCENERY_SOURCE_FILES.find(
+      (item) => item.sourceId === input.expectedSourceId,
+    );
     if (exact && exact.collectionId === input.collectionId) {
       return { ...exact, aliases: [...exact.aliases] };
     }
     return null;
   }
   const needle = normalizeMatch(input.filename);
-  const collection = EXPECTED_SCENERY_SOURCE_FILES.filter((item) => item.collectionId === input.collectionId);
+  const collection = EXPECTED_SCENERY_SOURCE_FILES.filter(
+    (item) => item.collectionId === input.collectionId,
+  );
   const exactName = collection.find((item) => normalizeMatch(item.expectedFilename) === needle);
   if (exactName) return { ...exactName, aliases: [...exactName.aliases] };
-  const alias = collection.find((item) => item.aliases.some((name) => normalizeMatch(name) === needle));
+  const alias = collection.find((item) =>
+    item.aliases.some((name) => normalizeMatch(name) === needle),
+  );
   return alias ? { ...alias, aliases: [...alias.aliases] } : null;
 }
 
 export function assertInventoryCounts(): { sourceCount: number; collectionCount: number } {
   const sourceCount = EXPECTED_SCENERY_SOURCE_FILES.length;
-  const collectionCount = new Set(EXPECTED_SCENERY_SOURCE_FILES.map((item) => item.collectionId)).size;
+  const collectionCount = new Set(EXPECTED_SCENERY_SOURCE_FILES.map((item) => item.collectionId))
+    .size;
   if (sourceCount !== EXPECTED_SOURCE_COUNT) {
     throw new Error(`Expected ${EXPECTED_SOURCE_COUNT} production files, found ${sourceCount}.`);
   }

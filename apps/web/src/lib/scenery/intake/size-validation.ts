@@ -1,5 +1,6 @@
 function extname(filename: string): string {
   const base = filename.split(/[/\\]/).pop() ?? filename;
+  if (base.toLowerCase().endsWith('.unitypackage.gz')) return '.unitypackage.gz';
   const dot = base.lastIndexOf('.');
   return dot >= 0 ? base.slice(dot).toLowerCase() : '';
 }
@@ -7,6 +8,7 @@ function extname(filename: string): string {
 export const MINIMUM_SOURCE_BYTES_BY_EXTENSION: Readonly<Record<string, number>> = {
   '.zip': 22,
   '.unitypackage': 64,
+  '.unitypackage.gz': 64,
   '.hdr': 64,
   '.exr': 64,
   '.blend': 64,

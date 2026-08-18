@@ -120,6 +120,10 @@ describe('object keys, filenames, and allowlists', () => {
     expect(() => sanitizeFilename('../secret.zip')).not.toThrow();
     expect(sanitizeFilename('../secret.zip')).toBe('secret.zip');
     expect(() => assertAllowedExtension('payload.exe')).toThrow(/Unsupported executable/);
+    expect(assertAllowedExtension('Village - Built-in.unitypackage.gz')).toBe('.unitypackage.gz');
+    expect(() => assertAllowedExtension('unrelated-archive.gz')).toThrow(
+      /Unsupported scenery file extension/,
+    );
     expect(() => assertSafeRelativeArchivePath('../escape/file.blend')).toThrow(/traversal/);
     expect(() => assertSafeRelativeArchivePath('/abs/file.blend')).toThrow(/absolute/);
     expect(() =>

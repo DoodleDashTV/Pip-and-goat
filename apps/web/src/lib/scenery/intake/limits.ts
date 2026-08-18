@@ -28,6 +28,7 @@ export const SCENERY_ALLOWED_EXTENSIONS = [
   '.blend',
   '.txt',
   '.unitypackage',
+  '.unitypackage.gz',
   '.hdr',
   '.exr',
   '.jpg',
