@@ -5,7 +5,8 @@ Updated: 2026-08-18
 ## Repository state
 
 - Repository: `Pip-and-goat`
-- Working branch: `cursor/tivvlejoy-scenery-foundation-73f1`
+- Working branch: `cursor/tivvlejoy-scenery-asset-intake-73f1`
+- Scenery foundation (Draft PR #43, keep draft and unmerged): `cursor/tivvlejoy-scenery-foundation-73f1` @ `32a9e222518e2986104bff28442c5f73fca0ef16`
 - Durable Preview voice ledger (Draft PR #42, keep draft and unmerged): `cursor/tivvlejoy-durable-voice-ledger-73f1` @ `f51f8753dd495ab086aa2e81e4fb98aebe895650`
 - Episode line voice workflow (Draft PR #41, keep draft and unmerged): `cursor/tivvlejoy-episode-line-voice-workflow-73f1` @ `0781409f9dc7e17b1c4a97f42f1a634f27116d5e`
 - Preview voice test (Draft PR #40, keep draft and unmerged): `cursor/tivvlejoy-preview-voice-test-73f1` @ `1d117582b1dd2a299731483266ba77133d0211f7`
@@ -111,6 +112,13 @@ database is connected.
 - Real Blender scenery inspection and assembly were not run
 - Synthetic fixture catalog records contain no commercial geometry
 - Draft PR #42 stays draft and unmerged
+- Draft PR #43 stays draft and unmerged
+- Checkpoint TIVVLEJOY_SCENERY_ASSET_INTAKE_V1 reuses the existing private R2 / OBJECT_STORAGE configuration with prefix `tivvlejoy-assets/`
+- Expected purchased inventory is 27 production files across 4 collections
+- No purchased scenery bytes were uploaded, independently checksum-verified, inspected, normalized, or approved in this environment
+- Independent server-side SHA-256 of stored R2 objects is unavailable in this serverless environment
+- Blender 4.2 was not available and was not executed
+- Intake UI and multipart session workflow are connection-ready when R2 credentials are absent
 
 ## Tests / validation
 
@@ -120,6 +128,7 @@ database is connected.
 - `pnpm validate:steps-9-16-closed`
 - `pnpm validate:studio-completion`
 - `pnpm validate:scenery`
+- `pnpm validate:scenery-intake`
 - `pnpm test`
 - `pnpm typecheck`
 - `pnpm lint`
@@ -130,7 +139,7 @@ database is connected.
 - Do not continue the paused Pip conversion.
 - Do not modify Pip or Goat source files.
 - Do not replace production-library character assets.
-- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, or later stacked voice or scenery drafts.
+- Do not merge Draft PR #24, #26, #27, #28, #29, #30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #43, or later stacked voice or scenery drafts.
 - Do not declare final theatrical character binding.
 - Do not use paid resources.
 - `currentStage()` remains `DDP_STEPS_1_8`.
