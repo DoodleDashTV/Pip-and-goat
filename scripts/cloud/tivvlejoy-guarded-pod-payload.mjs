@@ -32,6 +32,7 @@ import {
   PINNED_GPU_TYPE_ID,
   POD_NAME_PREFIX,
   REQUIRED_APPROVAL_PHRASE,
+  REST_PODS_URL,
   buildCreatePodPayload,
   formatUsdFromMicros,
   parseUsdToMicros,
@@ -456,7 +457,11 @@ export function buildGuardedWorkerPodPayload(input = {}) {
   const fetchFn = input.fetchFn || createPaidMutationTripwire(recorder);
   try {
     if (typeof fetchFn === 'function' && input.invokeNetwork === true) {
-      fetchFn(REST_PODS_URL, { method: 'POST' });
+      const attempted = fetchFn(REST_PODS_URL, { method: 'POST' });
+      if (attempted && typeof attempted.then === 'function') {
+        attempted.catch(() => {});
+      }
+      return fail('Paid Pod mutation attempted during payload construction or dry-run.', 'PAID_MUTATION_TRIPWIRE');
     }
     if (!templateIdIsConfigured(input.templateId)) {
       return fail('RUNPOD_RENDER_TEMPLATE_ID is required to build a launchable payload.', 'TEMPLATE_REQUIRED');

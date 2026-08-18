@@ -13,6 +13,7 @@ import {
   PINNED_GPU_COUNT,
   PINNED_GPU_TYPE_ID,
   REQUIRED_APPROVAL_PHRASE,
+  REST_PODS_URL,
 } from './tivvlejoy-guarded-render.mjs';
 import {
   PACKAGE_STATE_NOT_READY,
@@ -422,6 +423,32 @@ describe('mutation tripwire', () => {
     assert.equal(isPaidPodMutation('https://rest.runpod.io/v1/pods', 'POST'), true);
     assert.equal(isPaidPodMutation('https://rest.runpod.io/v1/pods', 'GET'), false);
     assert.throws(() => assertNoPaidPodMutation(recorder), (error) => error.code === 'PAID_MUTATION_TRIPWIRE');
+  });
+
+  it('integrated invokeNetwork path trips POST /v1/pods without a real fetch', () => {
+    const roots = workspace();
+    const recorder = { attempts: [] };
+    const fetchFn = createPaidMutationTripwire(recorder);
+    const built = buildGuardedWorkerPodPayload({
+      ...validInputs(roots),
+      fetchFn,
+      mutationRecorder: recorder,
+      invokeNetwork: true,
+    });
+    assert.equal(built.ok, false);
+    assert.equal(built.code, 'PAID_MUTATION_TRIPWIRE');
+    assert.notEqual(built.code, 'PAYLOAD_INVALID');
+    assert.equal(String(built.reason || '').includes('ReferenceError'), false);
+    assert.equal(String(built.reason || '').includes('is not defined'), false);
+    assert.equal(recorder.attempts.length, 1);
+    assert.equal(recorder.attempts[0].method, 'POST');
+    assert.equal(recorder.attempts[0].url, REST_PODS_URL);
+    assert.match(recorder.attempts[0].url, /\/v1\/pods$/);
+    assert.equal(built.podCreated, false);
+    assert.equal(built.gpuLaunched, false);
+    assert.equal(built.contactedPaidEndpoint, false);
+    assert.equal(built.postPodsCalled, false);
+    assert.equal(built.deletePodsCalled, false);
   });
 });
 
