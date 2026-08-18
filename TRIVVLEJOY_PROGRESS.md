@@ -121,16 +121,20 @@ database is connected.
 - Blender 4.2 was not available and was not executed
 - Intake UI and multipart session workflow are connection-ready when R2 credentials are absent
 - Checkpoint TIVVLEJOY_SCENERY_ASSET_INTAKE_PREVIEW_V1 deploys Draft PR #45 as a Vercel Preview only
+- Checkpoint TIVVLEJOY_SCENERY_PREVIEW_STORAGE_CONFIG sets Preview-only storage names on the `pip-and-goat` Vercel project, git-branch limited to `cursor/tivvlejoy-scenery-intake-preview-73f1`
 - Draft PR #44 stayed open, draft, and unmerged
-- Vercel Preview storage configuration is `unavailable`; Preview `R2_*` names are not present on that host
-- Local agent R2 names are present; `TIVVLEJOY_SCENERY_ASSET_PREFIX` and `TIVVLEJOY_SCENERY_INTAKE_TOKEN` are missing here
-- Unauthorized Preview mutations return 401 `INTAKE_UNAUTHORIZED` for create, sign, complete, query, resume, and abort
-- A synthetic 94-byte text fixture completed multipart upload to `quarantine/preview-tests/`, was not inspection-ready, and was deleted
-- `tivvlejoy-assets/source/` object count was 0 before and 0 after synthetic cleanup
-- No purchased scenery bytes were uploaded, inspected, normalized, or approved
+- Draft PR #45 stays open, draft, and unmerged
+- Preview alias is the existing git-branch Vercel Preview for `cursor/tivvlejoy-scenery-intake-preview-73f1` (hostname omitted from git)
+- Production Vercel env was not modified (`hiddenProductionEnvCount=0`, no production targets)
+- Preview host now reports `storageConfiguration=configured`, `tokenConfigured=true`, prefix `tivvlejoy-assets`, and `bytesPath=client-to-signed-r2`
+- A 48-character `TIVVLEJOY_SCENERY_INTAKE_TOKEN` was generated and stored as a Vercel sensitive Preview env var; the value is not printed
+- Incorrect intake token returns 401 `INTAKE_UNAUTHORIZED`
+- Correct token authorizes a safe non-upload `query` of an unknown session (400 `UNKNOWN_SESSION`, `uploaded=false`)
+- No credentials appeared in Preview HTML or JSON
+- Purchased source object count on this Preview remains 0
+- No purchased scenery bytes were uploaded, inspected, extracted, converted, normalized, or approved
 - GET `/` and GET `/scenery` on the Preview returned 200
 - Preview Only Scenery Asset Intake, four collection cards, multiple-file selection, the 27-file checklist, and “Upload does not mean asset approval” rendered with TivvleJoy wording
-- Large synthetic bytes were PUT to a signed storage URL, not a Vercel request body
 
 ## Tests / validation
 

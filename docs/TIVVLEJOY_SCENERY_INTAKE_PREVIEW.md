@@ -55,6 +55,30 @@ Set these names on the Vercel **Preview** environment only. Do not retarget Prod
 
 Confirm `/api/scenery/intake` reports `realAssetReadiness.storageConfiguration=configured` and `authorization.tokenConfigured=true` without displaying secret values.
 
+## Preview storage configuration (verified)
+
+Checkpoint: `TIVVLEJOY_SCENERY_PREVIEW_STORAGE_CONFIG`
+
+These names are set on the Vercel `pip-and-goat` project for **Preview only**, git-branch limited to `cursor/tivvlejoy-scenery-intake-preview-73f1`. Production was not modified.
+
+- `R2_BUCKET`
+- `R2_ENDPOINT`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `TIVVLEJOY_SCENERY_ASSET_PREFIX=tivvlejoy-assets`
+- `TIVVLEJOY_SCENERY_INTAKE_TOKEN` (48 characters, server-only, not printed)
+
+The live host is the existing git-branch Vercel Preview alias for `cursor/tivvlejoy-scenery-intake-preview-73f1`. The hostname is omitted from git.
+
+Verified after Preview redeploy `dpl_Aq3jBhFdCiBbAp2Wv4ziKAQPmWJj`:
+
+- GET `/scenery` = 200
+- GET `/api/scenery/intake` = 200, `storageConfiguration=configured`, `tokenConfigured=true`, `bytesPath=client-to-signed-r2`
+- Incorrect token = 401 `INTAKE_UNAUTHORIZED`
+- Correct token authorizes a safe non-upload `query` (400 `UNKNOWN_SESSION`, no upload)
+- No credentials in Preview HTML or JSON
+- Purchased files were not uploaded, inspected, extracted, converted, normalized, or approved
+
 ## Procedure for Justin to upload the 27 purchased files
 
 1. Confirm this Preview is not Production.
