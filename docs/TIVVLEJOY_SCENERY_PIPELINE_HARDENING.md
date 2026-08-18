@@ -92,6 +92,19 @@ Upload does not mean asset approval.
 
 Licensed files are not committed to Git. Purchased source files are not placed under `source/` in the repository or under `production-library/`.
 
+## Preview verification
+
+Verified after Preview deploy `dpl_9QBsVLnpRDMVu1yjYFy1wS2vvF4j` of `cursor/tivvlejoy-scenery-pipeline-hardening-73f1` (READY, target not production):
+
+- GET `/` = 200
+- GET `/scenery` = 200, one-tap control and “Upload does not mean asset approval” present
+- GET `/api/scenery/intake` = 200, `storageConfiguration=configured`, `tokenConfigured=true`, `bytesPath=client-to-signed-r2`, `purchasedSourceObjectCount=0`
+- Incorrect token = 401 `INTAKE_UNAUTHORIZED`
+- Matching token authorizes a safe non-upload `query` (400 `UNKNOWN_SESSION`, `uploaded=false`)
+- Token in the JSON body = 400 `TOKEN_LOCATION_REFUSED`
+- No credentials in Preview HTML or JSON
+- New Preview-only, git-branch-limited env copies were created for this branch. Existing Preview R2 ids and Production were not modified.
+
 ## Observability
 
 Structured lifecycle events record created, resumed, cancelled, completed, duplicate, failed, quarantined, and inspection-ready counts. Events are redacted. Tokens, credentials, signed URLs, raw headers, and licensed file contents are never logged. Correlation ids contain no secrets or personal data.

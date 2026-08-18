@@ -164,6 +164,9 @@ database is connected.
 - Draft PR #46 stays open, draft, and unmerged on `cursor/tivvlejoy-scenery-one-tap-upload-73f1`
 - One-tap Preview deploy `dpl_8QhREWMqkfkQFVNdydnXka1q4h4o` is READY and not Production
 - Incorrect token still returns 401 `INTAKE_UNAUTHORIZED`; rotated token authorizes a safe non-upload query
+- Hardening Preview deploy `dpl_9QBsVLnpRDMVu1yjYFy1wS2vvF4j` is READY and not Production
+- New git-branch-limited Preview env copies were created for `cursor/tivvlejoy-scenery-pipeline-hardening-73f1`; existing Preview R2 ids and Production were not modified
+- Purchased source object count on the hardening Preview remains 0
 
 ## Protections
 
