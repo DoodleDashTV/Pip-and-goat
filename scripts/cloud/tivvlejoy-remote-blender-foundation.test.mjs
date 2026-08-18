@@ -447,6 +447,7 @@ describe('existing guarded gates remain intact', () => {
     assert.equal(WORKER_CAPABILITY_BOUNDARY.canDeletePods, false);
     assert.equal(SECRET_BOUNDARY_STATUS, 'LEAST-PRIVILEGE WORKER SECRET BOUNDARY');
     assert.match(docs, /LEAST-PRIVILEGE WORKER SECRET BOUNDARY/);
+    assert.match(docs, /GUARDED POD LAUNCH PAYLOAD FOUNDATION/);
     assert.equal(PLATFORM_INJECTED_CREDENTIAL_ISOLATION_STATUS, 'PLATFORM-INJECTED CREDENTIAL ISOLATION');
     assert.match(docs, /PLATFORM-INJECTED CREDENTIAL ISOLATION/);
     assert.match(docs, /The worker never receives TivvleJoy's launcher\/account RunPod API credential/);
