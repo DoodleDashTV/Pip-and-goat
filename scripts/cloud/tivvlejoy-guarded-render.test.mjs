@@ -23,6 +23,7 @@ import {
   buildRemoteRenderDeadlineWrapper,
   ceilDiv,
   createGuardedPod,
+  createHttpStatusRequiresRecovery,
   deleteGuardedPod,
   evaluateApprovals,
   evaluateGpuPlan,
@@ -666,6 +667,153 @@ describe('ambiguous create recovery', () => {
     assert.equal(cleaned.confirmedZero, true);
     assert.equal(calls.some((call) => call.method === 'DELETE'), false);
   });
+
+  it('1. POST 500 recovers the exact name and cleanup succeeds', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const logs = [];
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: { status: 500, text: async () => '{"error":"no"}' } },
+      { response: jsonResponse(200, [{ id: 'podrec500', name: `${POD_NAME_PREFIX}500` }]) },
+      { response: { status: 204, text: async () => '' } },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '500',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: (line) => logs.push(line),
+      env,
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.recovered, true);
+    assert.equal(result.cleaned, true);
+    assert.equal(result.podId, 'podrec500');
+    assert.equal(calls.some((call) => call.method === 'DELETE' && call.url === `${REST_PODS_URL}/podrec500`), true);
+    assert.equal(logs.some((line) => line.includes('{') || line.includes('error')), false);
+  });
+
+  it('2. POST 503 recovery confirms zero exact matches', async () => {
+    const dir = tempDir();
+    const logs = [];
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: { status: 503, text: async () => 'unavailable' } },
+      { response: jsonResponse(200, [{ id: 'other503', name: `${POD_NAME_PREFIX}9999` }]) },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '503',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: (line) => logs.push(line),
+      env: launchEnv(dir),
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.confirmedZero, true);
+    assert.equal(calls.some((call) => call.method === 'DELETE'), false);
+    assert.equal(logs.includes(CLEANUP_ATTENTION), false);
+  });
+
+  it('3. POST 429 runs exact-name recovery', async () => {
+    const dir = tempDir();
+    const logs = [];
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: { status: 429, text: async () => 'rate' } },
+      { response: jsonResponse(200, [{ id: 'podrec429', name: `${POD_NAME_PREFIX}429` }]) },
+      { response: { status: 204, text: async () => '' } },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '429',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: (line) => logs.push(line),
+      env: launchEnv(dir),
+    });
+    assert.equal(result.recovered, true);
+    assert.equal(calls.some((call) => call.method === 'GET' && call.url === REST_PODS_URL), true);
+    assert.equal(logs.some((line) => line.includes('Entering exact-name recovery')), true);
+  });
+
+  it('4. POST 408 runs exact-name recovery', async () => {
+    const dir = tempDir();
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: { status: 408, text: async () => 'timeout' } },
+      { response: jsonResponse(200, [{ id: 'podrec408', name: `${POD_NAME_PREFIX}408` }]) },
+      { response: { status: 204, text: async () => '' } },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '408',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: () => {},
+      env: launchEnv(dir),
+    });
+    assert.equal(result.recovered, true);
+    assert.equal(result.cleaned, true);
+    assert.equal(calls.some((call) => call.method === 'GET' && call.url === REST_PODS_URL), true);
+  });
+
+  it('5. non-2xx create responses never bypass launch-intent recovery', async () => {
+    for (const status of [400, 408, 429, 500, 502, 503, 504]) {
+      assert.equal(createHttpStatusRequiresRecovery(status), true, String(status));
+    }
+    assert.equal(createHttpStatusRequiresRecovery(200), false);
+    assert.equal(createHttpStatusRequiresRecovery(201), false);
+    assert.equal(createHttpStatusRequiresRecovery(undefined), true);
+
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const created = await createGuardedPod({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '400',
+      env,
+      fetchFn: async () => ({ status: 400, text: async () => 'bad' }),
+    });
+    assert.equal(created.recover, true);
+    assert.equal(readFileSync(env.TIVVLEJOY_CREATE_ATTEMPTED_FILE, 'utf8'), 'true');
+    assert.equal(readFileSync(env.TIVVLEJOY_POD_NAME_FILE, 'utf8'), `${POD_NAME_PREFIX}400`);
+  });
+
+  it('6. non-2xx recovery still never deletes a non-exact name', async () => {
+    const dir = tempDir();
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: { status: 500, text: async () => 'fail' } },
+      {
+        response: jsonResponse(200, [
+          { id: 'near500', name: `${POD_NAME_PREFIX}501-extra` },
+          { id: 'near50', name: `${POD_NAME_PREFIX}50` },
+        ]),
+      },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '501',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: () => {},
+      env: launchEnv(dir),
+    });
+    assert.equal(result.confirmedZero, true);
+    assert.equal(calls.some((call) => call.method === 'DELETE'), false);
+  });
 });
 
 describe('workflow contract', () => {
@@ -767,5 +915,7 @@ describe('workflow contract', () => {
     assert.match(workflow, /outer emergency guard/);
     assert.equal(workflow.includes('blender -b'), false);
     assert.match(docs, /own hard 20-minute deadline/);
+    assert.match(docs, /non-2xx status is never treated as proof that no Pod was created/);
+    assert.match(moduleSource, /createHttpStatusRequiresRecovery/);
   });
 });

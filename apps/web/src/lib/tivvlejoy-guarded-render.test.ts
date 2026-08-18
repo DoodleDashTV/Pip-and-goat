@@ -97,5 +97,7 @@ describe('TivvleJoy guarded RunPod workflow contract', () => {
     expect(workflow.includes('blender -b')).toBe(false);
     expect(docs).toContain('own hard 20-minute deadline');
     expect(docs).toContain('exact name match only');
+    expect(docs).toContain('non-2xx status is never treated as proof that no Pod was created');
+    expect(helper).toContain('createHttpStatusRequiresRecovery');
   });
 });

@@ -210,6 +210,11 @@ export function buildCreatePodPayload({ templateId, runId }) {
   };
 }
 
+export function createHttpStatusRequiresRecovery(status) {
+  if (!Number.isInteger(status)) return true;
+  return status < 200 || status > 299;
+}
+
 export function extractPodId(parsed) {
   if (!parsed || typeof parsed !== 'object') return null;
   const id = parsed.id;
@@ -544,8 +549,13 @@ export async function createGuardedPod({ apiKey, templateId, runId, fetchFn = gl
       podName: payload.name,
     };
   }
-  if (response.status < 200 || response.status > 299) {
-    return { ok: false, recover: false, reason: 'Pod create was refused by the API.', podName: payload.name };
+  if (createHttpStatusRequiresRecovery(response.status)) {
+    return {
+      ok: false,
+      recover: true,
+      reason: `Pod create HTTP ${response.status} was ambiguous after the request was sent.`,
+      podName: payload.name,
+    };
   }
   const { ok, parsed } = await readJsonSilently(response);
   if (!ok) {
