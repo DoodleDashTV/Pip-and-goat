@@ -97,6 +97,7 @@ def main() -> int:
             "Dry-run only. Purchased source files were not opened.",
             "Real Blender execution was not run." if dry_run or not available else "Blender was present but dry-run was requested.",
             "Normalization writes only to a separate output path and never overwrites source.",
+            "Intake inspection jobs open a copy, never the immutable source, and upload reports to inspection/.",
             f"Texture search roots registered: {len(args.texture_root)}.",
         ],
     }

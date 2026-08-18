@@ -8,6 +8,7 @@ import { SYNTHETIC_SCENERY_CATALOG } from '@/lib/scenery/fixtures';
 import type { PublicScenerySnapshot } from '@/lib/scenery/public';
 import { RECIPE_IDS, DEFAULT_SCENERY_SEED } from '@/lib/scenery/types';
 import { PreviewPageIntro } from './PreviewEmptyState';
+import { SceneryAssetIntake } from './SceneryAssetIntake';
 
 type PlanResponse = {
   plan?: {
@@ -112,6 +113,60 @@ export function SceneryStudio({
             : 'Scenery planning stays preview-only. Purchased files are not assembled here.'}
         </p>
       </section>
+
+      <section className="studio-card grid gap-3 p-4 sm:p-5 sm:grid-cols-2">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.softwareFoundation}
+          </p>
+          <p className="mt-1 text-lg font-bold">
+            {snapshot.intake.softwareFoundation.available ? 'available' : 'unavailable'}
+          </p>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            tested: {snapshot.intake.softwareFoundation.tested ? 'yes' : 'no'} · preview planning:{' '}
+            {snapshot.intake.softwareFoundation.previewPlanningEnabled ? 'enabled' : 'disabled'}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.realAssetReadiness}
+          </p>
+          <p className="mt-1 text-lg font-bold">
+            {snapshot.intake.realAssetReadiness.realSceneryProductionReady ? 'ready' : 'not ready'}
+          </p>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            {snapshot.intake.realAssetReadiness.storageConfiguration} · uploaded{' '}
+            {snapshot.intake.realAssetReadiness.uploadedFiles}/
+            {snapshot.intake.realAssetReadiness.expectedFiles}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.verifiedFiles}
+          </p>
+          <p className="mt-1 text-lg font-bold">{snapshot.intake.realAssetReadiness.verifiedFiles}</p>
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.inspectionReadyFiles}
+          </p>
+          <p className="mt-1 text-lg font-bold">{snapshot.intake.realAssetReadiness.inspectionReadyFiles}</p>
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.inspectedFiles}
+          </p>
+          <p className="mt-1 text-lg font-bold">{snapshot.intake.realAssetReadiness.inspectedFiles}</p>
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.quarantinedAssets}
+          </p>
+          <p className="mt-1 text-lg font-bold">{snapshot.intake.realAssetReadiness.quarantinedFiles}</p>
+        </div>
+      </section>
+
+      <SceneryAssetIntake snapshot={snapshot} />
 
       <section className="studio-card space-y-3 p-4 sm:p-5">
         <h2 className="font-display text-xl font-semibold">Source collections</h2>

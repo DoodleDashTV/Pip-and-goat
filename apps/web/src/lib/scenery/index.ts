@@ -36,3 +36,10 @@ export {
   publicSourceSnapshot,
   REGISTERED_SOURCES,
 } from './source-registry';
+export {
+  SCENERY_INTAKE_SCHEMA_VERSION,
+  describeSceneryStorageConfiguration,
+  listExpectedSourceFiles,
+  handleSceneryIntakeAction,
+  publicIntakeSnapshot,
+} from './intake';

@@ -28,6 +28,7 @@
     "validate:steps-9-16-closed": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-steps-9-16-closed.ts",
     "validate:studio-completion": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/preproduction/validate-studio-completion.ts",
     "validate:scenery": "pnpm --filter @doodle-dash/web exec vitest run src/lib/scenery.test.ts",
+    "validate:scenery-intake": "pnpm --filter @doodle-dash/web exec vitest run src/lib/scenery-intake.test.ts && pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/validate-scenery-intake.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",

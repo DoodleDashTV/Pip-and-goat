@@ -1,21 +1,32 @@
+import { DEFAULT_SCENERY_ASSET_PREFIX, publicSceneryStorageConfiguration } from './intake/config';
+
 export const SCENERY_STORAGE_ENV = {
-  bucket: 'TIVVLEJOY_SCENERY_ASSET_BUCKET',
-  endpoint: 'TIVVLEJOY_SCENERY_ASSET_ENDPOINT',
-  region: 'TIVVLEJOY_SCENERY_ASSET_REGION',
-  accessKeyId: 'TIVVLEJOY_SCENERY_ASSET_ACCESS_KEY_ID',
-  secretAccessKey: 'TIVVLEJOY_SCENERY_ASSET_SECRET_ACCESS_KEY',
+  provider: 'OBJECT_STORAGE_PROVIDER',
+  bucket: 'OBJECT_STORAGE_BUCKET',
+  endpoint: 'OBJECT_STORAGE_ENDPOINT',
+  region: 'OBJECT_STORAGE_REGION',
+  accessKeyId: 'OBJECT_STORAGE_ACCESS_KEY_ID',
+  secretAccessKey: 'OBJECT_STORAGE_SECRET_ACCESS_KEY',
+  r2Bucket: 'R2_BUCKET',
+  r2Endpoint: 'R2_ENDPOINT',
+  r2AccessKeyId: 'R2_ACCESS_KEY_ID',
+  r2SecretAccessKey: 'R2_SECRET_ACCESS_KEY',
+  prefix: 'TIVVLEJOY_SCENERY_ASSET_PREFIX',
 } as const;
 
-export const SCENERY_STORAGE_PREFIX = 'tivvlejoy-assets';
+export const SCENERY_STORAGE_PREFIX = DEFAULT_SCENERY_ASSET_PREFIX;
 
 export const SCENERY_STORAGE_LAYOUT = [
   'source',
+  'quarantine',
+  'inspection',
   'normalized',
   'proxies',
   'previews',
   'catalogs',
   'scenes',
   'licenses',
+  'reports',
   'validation',
 ] as const;
 
@@ -28,14 +39,19 @@ export function localMaterializationPath(kind: (typeof SCENERY_STORAGE_LAYOUT)[n
   return sceneryStorageUri(kind, rest);
 }
 
-export function publicSceneryStoragePolicy() {
+export function publicSceneryStoragePolicy(env: Record<string, string | undefined> = process.env) {
+  const configuration = publicSceneryStorageConfiguration(env);
   return {
-    title: 'Durable private object storage',
+    title: 'Existing private R2 durable storage',
     gitPolicy: 'Purchased binaries stay out of normal Git history.',
-    prefix: SCENERY_STORAGE_PREFIX,
+    prefix: configuration.prefix,
     layout: SCENERY_STORAGE_LAYOUT,
     envPlaceholders: Object.values(SCENERY_STORAGE_ENV),
     secretsPresent: false,
     connected: false,
+    configurationStatus: configuration.state,
+    reusedExistingProvider: configuration.reusedExistingProvider,
+    bucketPresent: configuration.bucketPresent,
+    message: configuration.message,
   };
 }

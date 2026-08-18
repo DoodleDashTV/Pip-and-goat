@@ -21,22 +21,19 @@ Prefix:
 ```
 tivvlejoy-assets/
   source/
+  quarantine/
+  inspection/
   normalized/
   proxies/
   previews/
   catalogs/
   scenes/
   licenses/
+  reports/
   validation/
 ```
 
-Environment placeholders only (never commit secrets):
-
-- `TIVVLEJOY_SCENERY_ASSET_BUCKET`
-- `TIVVLEJOY_SCENERY_ASSET_ENDPOINT`
-- `TIVVLEJOY_SCENERY_ASSET_REGION`
-- `TIVVLEJOY_SCENERY_ASSET_ACCESS_KEY_ID`
-- `TIVVLEJOY_SCENERY_ASSET_SECRET_ACCESS_KEY`
+Asset intake reuses the existing private R2 / `OBJECT_STORAGE_*` configuration. See `docs/TIVVLEJOY_SCENERY_ASSET_INTAKE.md`. Do not create a second bucket.
 
 Git LFS is not enabled for this work.
 
