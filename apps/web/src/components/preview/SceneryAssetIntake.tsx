@@ -742,7 +742,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       </div>
 
       <div>
-        <h3 className="font-bold">Expected 27-file source checklist</h3>
+        <h3 className="font-bold">Expected 30-file source checklist</h3>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
           {checklist.length} expected production files across {COLLECTIONS.length} collections
         </p>

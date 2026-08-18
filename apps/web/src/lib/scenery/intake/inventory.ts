@@ -393,8 +393,7 @@ export const EXPECTED_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
   },
 ];
 
-/** Approved supplemental packs are uploadable, but do not change the purchased
- * 27-file completion requirement. */
+/** Additional files confirmed by Justin as part of the official purchase-site delivery. */
 export const OPTIONAL_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
   {
     sourceId: 'SRC_SKY_HDRI_JPG_PACK',
@@ -404,7 +403,7 @@ export const OPTIONAL_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     aliases: ['hdri jpg pack'],
     extension: '.zip',
     mimeType: 'application/zip',
-    notes: 'Supplemental JPG sky and HDRI package.',
+    notes: 'Official JPG sky and HDRI package.',
     unityPreservationOnly: false,
     inspectionJobId: null,
     textureTier: null,
@@ -417,7 +416,7 @@ export const OPTIONAL_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     aliases: ['stylised ecokit', 'stylized ecokit'],
     extension: '.zip',
     mimeType: 'application/zip',
-    notes: 'Supplemental stylized environment kit.',
+    notes: 'Official stylized environment kit.',
     unityPreservationOnly: false,
     inspectionJobId: null,
     textureTier: null,
@@ -430,7 +429,7 @@ export const OPTIONAL_SCENERY_SOURCE_FILES: ExpectedSourceFile[] = [
     aliases: ['world shaders giveaway'],
     extension: '.zip',
     mimeType: 'application/zip',
-    notes: 'User-approved supplemental World Shaders giveaway.',
+    notes: 'Official purchase-site World Shaders bonus package.',
     unityPreservationOnly: false,
     inspectionJobId: null,
     textureTier: null,
@@ -442,7 +441,7 @@ const ALL_SCENERY_SOURCE_FILES = [
   ...OPTIONAL_SCENERY_SOURCE_FILES,
 ];
 
-export const EXPECTED_SOURCE_COUNT = 27;
+export const EXPECTED_SOURCE_COUNT = 30;
 export const EXPECTED_COLLECTION_COUNT = 4;
 
 export const VILLAGE_NATIVE_MODELS = [
@@ -512,7 +511,7 @@ export function matchAliasOnlyExpectedFilename(filename: string): ExpectedSource
 }
 
 export function listExpectedSourceFiles(): ExpectedSourceFile[] {
-  return EXPECTED_SCENERY_SOURCE_FILES.map((item) => ({ ...item, aliases: [...item.aliases] }));
+  return ALL_SCENERY_SOURCE_FILES.map((item) => ({ ...item, aliases: [...item.aliases] }));
 }
 
 export function getExpectedSourceFile(sourceId: string): ExpectedSourceFile {
@@ -548,9 +547,8 @@ export function matchExpectedSourceFile(input: {
 }
 
 export function assertInventoryCounts(): { sourceCount: number; collectionCount: number } {
-  const sourceCount = EXPECTED_SCENERY_SOURCE_FILES.length;
-  const collectionCount = new Set(EXPECTED_SCENERY_SOURCE_FILES.map((item) => item.collectionId))
-    .size;
+  const sourceCount = ALL_SCENERY_SOURCE_FILES.length;
+  const collectionCount = new Set(ALL_SCENERY_SOURCE_FILES.map((item) => item.collectionId)).size;
   if (sourceCount !== EXPECTED_SOURCE_COUNT) {
     throw new Error(`Expected ${EXPECTED_SOURCE_COUNT} production files, found ${sourceCount}.`);
   }

@@ -243,10 +243,11 @@ export function createUploadSession(input: {
   }
   if (
     shouldExcludeWorldShadersGiveaway({ filename: input.originalFilename }) &&
+    !matchExpectedSourceFile({ collectionId, filename: input.originalFilename }) &&
     input.purpose !== 'preview-synthetic'
   ) {
     throw new SceneryError(
-      'The free World Shaders giveaway is outside the purchased 27-file requirement.',
+      'This World Shaders filename is not part of the approved official delivery.',
       'UNEXPECTED_SOURCE',
     );
   }

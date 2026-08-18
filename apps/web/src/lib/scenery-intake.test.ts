@@ -136,12 +136,12 @@ describe('object keys, filenames, and allowlists', () => {
     ).toThrow(/Unknown scenery collection/);
   });
 
-  it('keeps the expected inventory at 27 files and 4 collections', () => {
+  it('keeps the expected official inventory at 30 files and 4 collections', () => {
     expect(assertInventoryCounts()).toEqual({
       sourceCount: EXPECTED_SOURCE_COUNT,
       collectionCount: EXPECTED_COLLECTION_COUNT,
     });
-    expect(listExpectedSourceFiles()).toHaveLength(27);
+    expect(listExpectedSourceFiles()).toHaveLength(30);
   });
 });
 
@@ -160,19 +160,28 @@ describe('one-tap purchased selection review', () => {
     expect(review.eligible[3]?.collectionId).toBe('stylized-forest');
   });
 
-  it('accepts approved supplemental packs without changing the required 27-file count', () => {
+  it('includes the three confirmed purchase-site files in the official 30-file count', () => {
     const review = reviewOneTapPurchasedSelection([
       { filename: 'HDRi_JPG_Pack.zip', byteSize: 94_319_192 },
       { filename: 'Stylised EcoKit.zip', byteSize: 669_481_428 },
       { filename: 'Giveaway_World Shaders.zip', byteSize: 711_398 },
     ]);
-    expect(review.expectedCount).toBe(27);
+    expect(review.expectedCount).toBe(30);
     expect(review.eligible).toHaveLength(3);
     expect(review.eligible.map((item) => item.collectionId)).toEqual([
       'sky-hdri',
       'stylized-forest',
       'sky-hdri',
     ]);
+    expect(() =>
+      createUploadSession({
+        collectionId: 'sky-hdri',
+        originalFilename: 'Giveaway_World Shaders.zip',
+        byteSize: 711_398,
+        sha256: 'a'.repeat(64),
+        env: configuredEnv,
+      }),
+    ).not.toThrow();
   });
 
   it('maps mixed exact filenames into all four collections and refuses others individually', () => {
@@ -187,7 +196,7 @@ describe('one-tap purchased selection review', () => {
       { filename: 'Flora_Mat&GN&Models.blend.zip', byteSize: 1024 },
     ]);
     expect(review.checkpoint).toBe(ONE_TAP_UPLOAD_CHECKPOINT);
-    expect(review.expectedCount).toBe(27);
+    expect(review.expectedCount).toBe(30);
     expect(new Set(review.matched.map((item) => item.collectionId))).toEqual(
       new Set(['village', 'sky-hdri', 'stylized-forest', 'procedural-nature']),
     );
@@ -199,7 +208,7 @@ describe('one-tap purchased selection review', () => {
     expect(review.unexpected[0]?.eligible).toBe(false);
     expect(review.incorrect[0]?.eligible).toBe(false);
     expect(review.duplicates[0]?.eligible).toBe(false);
-    expect(review.missing).toHaveLength(22);
+    expect(review.missing).toHaveLength(25);
     expect(review.collectionTotals.map((item) => item.collectionId)).toEqual([
       'village',
       'sky-hdri',
@@ -212,7 +221,7 @@ describe('one-tap purchased selection review', () => {
     expect(
       review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes,
     ).toBe(1152);
-    expect(review.overallTotals.expected).toBe(27);
+    expect(review.overallTotals.expected).toBe(30);
     expect(review.overallTotals.eligible).toBe(5);
   });
 });
@@ -568,7 +577,7 @@ describe('workspace readiness and git safety', () => {
     const snapshot = publicIntakeSnapshot([]);
     expect(snapshot.softwareFoundation.available).toBe(true);
     expect(snapshot.softwareFoundation.previewPlanningEnabled).toBe(true);
-    expect(snapshot.realAssetReadiness.expectedFiles).toBe(27);
+    expect(snapshot.realAssetReadiness.expectedFiles).toBe(30);
     expect(snapshot.realAssetReadiness.uploadedFiles).toBe(0);
     expect(snapshot.realAssetReadiness.verifiedFiles).toBe(0);
     expect(snapshot.realAssetReadiness.inspectedFiles).toBe(0);
@@ -600,7 +609,7 @@ describe('workspace readiness and git safety', () => {
     expect(intake).toContain('Multipart progress');
     expect(intake).toContain('SCENERY_COPY.studioSession');
     expect(intake).toContain('x-tivvlejoy-scenery-intake-token');
-    expect(intake).toContain('Expected 27-file source checklist');
+    expect(intake).toContain('Expected 30-file source checklist');
     expect(readRepo('apps/web/src/lib/scenery/copy.ts')).toContain(
       'Upload does not mean asset approval',
     );

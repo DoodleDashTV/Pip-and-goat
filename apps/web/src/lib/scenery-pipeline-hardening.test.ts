@@ -119,22 +119,22 @@ async function completeVillageUpload(storage = new MemoryMultipartStorage()) {
 }
 
 describe('pipeline hardening inventory', () => {
-  it('matches the exact 27 purchased filenames and four collections', () => {
+  it('matches the exact 30 official filenames and four collections', () => {
     const expected = listExpectedSourceFiles();
     const review = reviewOneTapPurchasedSelection(
       expected.map((item) => ({ filename: item.expectedFilename, byteSize: 128 })),
     );
     expect(review.overallTotals.expected).toBe(EXPECTED_SOURCE_COUNT);
-    expect(review.overallTotals.matched).toBe(27);
+    expect(review.overallTotals.matched).toBe(30);
     expect(review.overallTotals.missing).toBe(0);
-    expect(review.overallTotals.eligible).toBe(27);
+    expect(review.overallTotals.eligible).toBe(30);
     expect(review.collectionTotals.map((item) => `${item.collectionId}:${item.expected}`)).toEqual([
       'village:7',
-      'sky-hdri:7',
-      'stylized-forest:4',
+      'sky-hdri:9',
+      'stylized-forest:5',
       'procedural-nature:9',
     ]);
-    expect(review.collectionTotals.reduce((sum, item) => sum + item.matched, 0)).toBe(27);
+    expect(review.collectionTotals.reduce((sum, item) => sum + item.matched, 0)).toBe(30);
   });
 
   it('detects a missing file without renaming the others', () => {
@@ -144,7 +144,7 @@ describe('pipeline hardening inventory', () => {
     );
     expect(review.missing).toHaveLength(1);
     expect(review.missing[0]?.expectedFilename).toBe(expected[0]?.expectedFilename);
-    expect(review.eligible).toHaveLength(26);
+    expect(review.eligible).toHaveLength(29);
   });
 
   it('refuses an unexpected file individually', () => {
