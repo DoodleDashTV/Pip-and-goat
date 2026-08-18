@@ -2,7 +2,9 @@ export const SCENERY_INTAKE_LIMITS = {
   maxUploadBytes: 2 * 1024 * 1024 * 1024,
   maxConcurrentParts: 4,
   maxConcurrentFiles: 2,
-  multipartPartBytes: 16 * 1024 * 1024,
+  // A 2 GiB file now needs 32 signing calls instead of 128. This keeps a single
+  // large mobile upload below the authenticated Preview request-rate window.
+  multipartPartBytes: 64 * 1024 * 1024,
   minMultipartPartBytes: 5 * 1024 * 1024,
   maxParts: 400,
   maxRetries: 3,
@@ -14,7 +16,9 @@ export const SCENERY_INTAKE_LIMITS = {
   maxMaterializedBytesPerJob: 2 * 1024 * 1024 * 1024,
   hashChunkBytes: 4 * 1024 * 1024,
   rateLimitWindowMs: 60_000,
-  rateLimitMaxRequests: 40,
+  // Two bounded file workers can legitimately sign more than 40 parts/minute.
+  // Mutations still require the private studio token.
+  rateLimitMaxRequests: 240,
 } as const;
 
 export const SCENERY_INTAKE_SESSION_TTL_MS = SCENERY_INTAKE_LIMITS.sessionTtlMs;

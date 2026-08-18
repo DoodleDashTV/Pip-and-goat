@@ -3,6 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { hashFileChunked } from '@/lib/scenery/intake/client-hash';
 import {
+  SceneryPartTransferError,
+  uploadRetryDelayMs,
+  uploadSignedPart,
+} from '@/lib/scenery/intake/client-transfer';
+import {
   loadClientRecoverySnapshots,
   matchClientRecoverySnapshot,
   removeClientRecoverySnapshot,
@@ -71,6 +76,10 @@ function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} bytes`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function wait(milliseconds: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
 function emptyRow(file: File, index: number, extras: Partial<FileRow> = {}): FileRow {
@@ -354,50 +363,75 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       if (!needed.includes(part.partNumber) && uploaded.includes(part.partNumber)) {
         continue;
       }
-      const signed = await fetch('/api/scenery/intake', {
-        method: 'POST',
-        headers: intakeHeaders(studioToken),
-        body: JSON.stringify({
-          action: retryFailedOnly ? 'retry-part' : 'sign-part',
-          sessionId,
-          partNumber: part.partNumber,
-        }),
-      });
-      const signedJson = (await signed.json()) as { signedUrl?: string; error?: string };
-      if (!signed.ok || !signedJson.signedUrl) {
+      const blob = row.file.slice(part.start, part.end);
+      let uploadedEtag = '';
+      let lastError = `Part ${part.partNumber} failed.`;
+      for (let attempt = 1; attempt <= 3; attempt += 1) {
+        const signed = await fetch('/api/scenery/intake', {
+          method: 'POST',
+          headers: intakeHeaders(studioToken),
+          body: JSON.stringify({
+            action: attempt > 1 || retryFailedOnly ? 'retry-part' : 'sign-part',
+            sessionId,
+            partNumber: part.partNumber,
+          }),
+        });
+        const signedJson = (await signed.json()) as { signedUrl?: string; error?: string };
+        if (!signed.ok || !signedJson.signedUrl) {
+          lastError = signedJson.error ?? `Part ${part.partNumber} signing failed.`;
+          if ((signed.status === 429 || signed.status >= 500) && attempt < 3) {
+            updateRow(row.id, { error: `${lastError} Retrying…` });
+            await wait(uploadRetryDelayMs(attempt));
+            continue;
+          }
+          break;
+        }
+        if (/vercel\.(app|com)/i.test(signedJson.signedUrl)) {
+          lastError = 'Signed storage URL must not target Vercel.';
+          break;
+        }
+        try {
+          const result = await uploadSignedPart(signedJson.signedUrl, blob, (loaded, total) => {
+            const currentPartFraction = total > 0 ? loaded / total : 0;
+            updateRow(row.id, {
+              progress:
+                45 + Math.round(((uploaded.length + currentPartFraction) / parts.length) * 50),
+              multipartProgress: `${uploaded.length} / ${parts.length} parts (${Math.round(currentPartFraction * 100)}% of current part)`,
+            });
+          });
+          uploadedEtag = result.etag;
+          lastError = '';
+          break;
+        } catch (error) {
+          const transferError =
+            error instanceof SceneryPartTransferError
+              ? error
+              : new SceneryPartTransferError(
+                  'The browser lost its connection to private storage.',
+                  'cors_or_network',
+                  true,
+                );
+          lastError = transferError.message;
+          if (!transferError.retryable || attempt === 3) break;
+          updateRow(row.id, { error: `${lastError} Retrying part ${part.partNumber}…` });
+          await wait(uploadRetryDelayMs(attempt));
+        }
+      }
+      if (!uploadedEtag) {
         const failed = {
-          error: signedJson.error ?? 'Part signing failed.',
+          error: lastError,
           uploadStatus: 'failed',
           recoveredState: 'failed' as const,
           uploadedPartNumbers: uploaded,
         };
         updateRow(row.id, failed);
         await persistRowRecovery(row, failed);
-        return;
-      }
-      if (/vercel\.(app|com)/i.test(signedJson.signedUrl)) {
-        updateRow(row.id, {
-          error: 'Signed storage URL must not target Vercel.',
-          uploadStatus: 'failed',
-          recoveredState: 'failed',
-        });
-        return;
-      }
-      const blob = row.file.slice(part.start, part.end);
-      const uploadedPart = await fetch(signedJson.signedUrl, { method: 'PUT', body: blob });
-      if (!uploadedPart.ok) {
-        const failed = {
-          error: `Part ${part.partNumber} failed.`,
-          uploadStatus: 'failed',
-          recoveredState: 'failed' as const,
-        };
-        updateRow(row.id, failed);
-        await persistRowRecovery(row, failed);
+        announce(announceIntakeState({ filename: row.file.name, state: 'failed' }));
         return;
       }
       completedParts.push({
         partNumber: part.partNumber,
-        etag: uploadedPart.headers.get('ETag') ?? `"part-${part.partNumber}"`,
+        etag: uploadedEtag,
       });
       uploaded.push(part.partNumber);
       transferred += blob.size;

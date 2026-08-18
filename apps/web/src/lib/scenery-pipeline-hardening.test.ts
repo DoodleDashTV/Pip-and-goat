@@ -653,4 +653,20 @@ describe('pipeline hardening ux and accessibility', () => {
     expect(maxInFlight).toBeLessThanOrEqual(SCENERY_INTAKE_MAX_CONCURRENT_FILES);
     expect(SCENERY_INTAKE_MAX_CONCURRENT_FILES).toBe(2);
   });
+
+  it('surfaces browser-to-R2 failures and never invents multipart ETags', () => {
+    const intake = readFileSync(
+      path.join(repoRoot, 'apps/web/src/components/preview/SceneryAssetIntake.tsx'),
+      'utf8',
+    );
+    const transfer = readFileSync(
+      path.join(repoRoot, 'apps/web/src/lib/scenery/intake/client-transfer.ts'),
+      'utf8',
+    );
+    expect(intake).toContain('uploadSignedPart');
+    expect(intake).not.toContain('`"part-${part.partNumber}"`');
+    expect(transfer).toContain('R2 CORS or network problem');
+    expect(transfer).toContain('must expose the ETag header');
+    expect(transfer).toContain('XMLHttpRequest');
+  });
 });
