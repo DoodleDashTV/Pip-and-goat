@@ -1,0 +1,121 @@
+# TivvleJoy RunPod Blender worker image — GHCR publish only.
+# Authoritative image definition: workers/runpod-blender/Dockerfile
+# Authoritative builder: scripts/cloud/build-worker-image.sh
+#
+# This workflow never talks to RunPod. It does not create a Pod, launch a GPU,
+# or execute remote Blender. Pinning the published digest is a later commit.
+name: TivvleJoy Worker Image Build
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-runpod-worker-image-refresh-73f1
+
+concurrency:
+  group: tivvlejoy-worker-image-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-worker-image:
+    name: Build publish and verify worker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      # Public GHCR repository name. Not a credential.
+      IMAGE_REPO: ghcr.io/doodledashtv/ddp-runpod-blender # pragma: allowlist secret
+      IMAGE_TAG: ${{ github.sha }}
+    steps:
+      - name: Print safe checkout identity
+        run: |
+          set -euo pipefail
+          echo "github.sha=${GITHUB_SHA}"
+          echo "github.ref_name=${GITHUB_REF_NAME}"
+
+      - name: Refuse any other branch
+        run: |
+          set -euo pipefail
+          expected='cursor/tivvlejoy-runpod-worker-image-refresh-73f1'
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "REFUSED: this workflow only runs on ${expected}"
+            exit 1
+          fi
+
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack pnpm
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+          node --version
+          pnpm --version
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Zero-cost repository tests
+        run: |
+          set -euo pipefail
+          node --test scripts/cloud/tivvlejoy-worker-image-build.test.mjs
+          pnpm validate:runpod-pod-payload
+          pnpm validate:runpod-blender-foundation
+          pnpm validate:runpod-guarded
+          pnpm --filter @doodle-dash/runpod-blender-worker test
+          pnpm --filter @doodle-dash/runpod-blender-worker check
+          pnpm --filter @doodle-dash/web lint
+
+      - name: Pre-build safety
+        id: preflight
+        run: bash scripts/cloud/gha-worker-image-preflight.sh
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build verify and publish worker image
+        run: bash scripts/cloud/build-worker-image.sh
+
+      - name: Write sanitized workflow summary
+        if: always()
+        run: |
+          set -euo pipefail
+          summary=""
+          if summary_file="$(ls -1 artifacts/worker-image/*/06-summary.txt 2>/dev/null | head -1)" && [ -f "$summary_file" ]; then
+            summary="$(cat "$summary_file")"
+          else
+            summary="$(printf '%s\n' \
+              "SOURCE_COMMIT=${{ steps.preflight.outputs.SOURCE_COMMIT }}" \
+              "RENDER_CODE_SHA256=${{ steps.preflight.outputs.RENDER_CODE_SHA256 }}" \
+              "RENDER_ASSET_SHA256=${{ steps.preflight.outputs.RENDER_ASSET_SHA256 }}" \
+              "ASSEMBLE_SCENE_SHA256=${{ steps.preflight.outputs.ASSEMBLE_SCENE_SHA256 }}" \
+              "BLENDER_VERSION=${{ steps.preflight.outputs.BLENDER_VERSION }}" \
+              "IMAGE_TAG=${IMAGE_REPO}:${IMAGE_TAG}" \
+              "WORKFLOW_RESULT=incomplete")"
+          fi
+          echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "$summary"
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: worker-image-evidence
+          path: artifacts/worker-image/
+          if-no-files-found: ignore
+          retention-days: 14

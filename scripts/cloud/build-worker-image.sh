@@ -44,7 +44,17 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 SOURCE_COMMIT="$(git rev-parse HEAD)"
 SHORT_COMMIT="$(git rev-parse --short HEAD)"
+if [ -n "${GITHUB_SHA:-}" ] && [ "$SOURCE_COMMIT" != "$GITHUB_SHA" ]; then
+  die "HEAD $SOURCE_COMMIT does not match GITHUB_SHA $GITHUB_SHA"
+fi
 echo "source commit: $SOURCE_COMMIT"
+
+IMAGE_TAG="${IMAGE_TAG:-$SHORT_COMMIT}"
+case "$IMAGE_TAG" in
+  latest|production|stable)
+    die "refusing mutable production tag: $IMAGE_TAG"
+    ;;
+esac
 
 step "2. render-code and render-asset fingerprints from the repository"
 FINGERPRINTS="$(pnpm cloud:fingerprints | tail -3)"
@@ -55,12 +65,16 @@ RENDER_ASSET_SHA256="$(printf '%s\n' "$FINGERPRINTS" | awk '/^RENDER_ASSET_SHA25
 echo "render code:   $RENDER_CODE_SHA256"
 echo "render assets: $RENDER_ASSET_SHA256"
 
+EXPECTED_BLENDER="$(sed -n 's/.*BLENDER_VERSION=\([0-9][0-9.]*\).*/\1/p' "$DOCKERFILE" | head -1)"
+[ -n "$EXPECTED_BLENDER" ] || die "could not read BLENDER_VERSION from $DOCKERFILE"
+echo "blender version (Dockerfile): $EXPECTED_BLENDER"
+
 BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 EVIDENCE="artifacts/worker-image/$SHORT_COMMIT"
 mkdir -p "$EVIDENCE"
 
 step "3. build (the build asserts the fingerprint over the files it copied)"
-BUILD_TAG="$IMAGE_REPO:$SHORT_COMMIT"
+BUILD_TAG="$IMAGE_REPO:$IMAGE_TAG"
 docker build \
   -f "$DOCKERFILE" \
   --platform linux/amd64 \
@@ -85,8 +99,42 @@ IMAGE_ASSEMBLE="$(docker run --rm --entrypoint sha256sum "$BUILD_TAG" /opt/ddp-w
 [ "$REPO_ASSEMBLE" = "$IMAGE_ASSEMBLE" ] || die "baked assemble_scene.py differs from this commit"
 echo "baked assemble_scene.py matches: $IMAGE_ASSEMBLE"
 
+step "4b. required worker files, blender version, and architecture"
+IMAGE_ARCH="$(docker image inspect --format '{{.Os}}/{{.Architecture}}' "$BUILD_TAG")"
+[ "$IMAGE_ARCH" = "linux/amd64" ] || die "image architecture is $IMAGE_ARCH, expected linux/amd64"
+echo "architecture: $IMAGE_ARCH"
+
+for required in \
+  /opt/ddp-worker/src/worker.js \
+  /opt/ddp-worker/src/single-shot.js \
+  /opt/ddp-worker/src/render-core.js \
+  /opt/ddp-worker/src/child-env.js \
+  /opt/ddp-worker/src/provenance.js \
+  /opt/ddp-worker/blender/assemble_scene.py
+do
+  docker run --rm --entrypoint /bin/sh "$BUILD_TAG" -c "test -f '$required'" \
+    || die "missing required path in image: $required"
+  echo "present: $required"
+done
+
+BLENDER_OUT="$(docker run --rm --entrypoint /usr/local/bin/blender "$BUILD_TAG" --version | tee "$EVIDENCE/02b-blender-version.txt")"
+printf '%s\n' "$BLENDER_OUT" | grep -q "Blender $EXPECTED_BLENDER" \
+  || die "image Blender version did not report $EXPECTED_BLENDER"
+echo "blender reports: $(printf '%s\n' "$BLENDER_OUT" | head -1)"
+
 step "5. push and read the digest back"
-docker push "$BUILD_TAG" 2>&1 | tee "$EVIDENCE/03-docker-push.txt"
+set +e
+docker push "$BUILD_TAG" >"$EVIDENCE/03-docker-push.txt" 2>&1
+PUSH_RC=$?
+set -e
+cat "$EVIDENCE/03-docker-push.txt"
+if [ "$PUSH_RC" -ne 0 ]; then
+  if grep -qiE 'denied|unauthorized|forbidden|authentication required|insufficient_scope' "$EVIDENCE/03-docker-push.txt"; then
+    echo "GHCR_PACKAGE_WRITE_REFUSED" >&2
+    die "GITHUB_TOKEN could not push to $IMAGE_REPO"
+  fi
+  die "docker push failed"
+fi
 # Prefer the digest docker push itself prints. `buildx imagetools inspect --format`
 # is not reliable across docker versions (some ignore --format and dump the
 # whole inspect text, which is not a valid @sha256 pin).
@@ -106,7 +154,7 @@ EXPECTED_RENDER_CODE="$RENDER_CODE_SHA256" \
 EXPECTED_RENDER_ASSETS="$RENDER_ASSET_SHA256" \
   pnpm cloud:verify-image 2>&1 | tee "$EVIDENCE/04-registry-verification.txt"
 
-step "7. pin these in scripts/cloud/acceptance-1080p/common.ts"
+step "7. suggested pin constants (not applied by this script)"
 cat <<EOF | tee "$EVIDENCE/05-pin.txt"
 export const WORKER_IMAGE =
   '$IMAGE_REF'; // pragma: allowlist secret
@@ -115,6 +163,24 @@ export const WORKER_IMAGE_RENDER_CODE_SHA256 =
   '$RENDER_CODE_SHA256';
 export const WORKER_IMAGE_RENDER_ASSET_SHA256 =
   '$RENDER_ASSET_SHA256';
+EOF
+
+if [ "${PIN_UPDATE:-}" != "apply" ]; then
+  echo "PIN UPDATE DEFERRED — inspect the verified digest before changing common.ts"
+fi
+
+cat <<EOF | tee "$EVIDENCE/06-summary.txt"
+SOURCE_COMMIT=$SOURCE_COMMIT
+RENDER_CODE_SHA256=$RENDER_CODE_SHA256
+RENDER_ASSET_SHA256=$RENDER_ASSET_SHA256
+ASSEMBLE_SCENE_SHA256=$REPO_ASSEMBLE
+BLENDER_VERSION=$EXPECTED_BLENDER
+IMAGE_TAG=$BUILD_TAG
+IMMUTABLE_IMAGE_REF=$IMAGE_REF
+IMAGE_DIGEST=$DIGEST
+REGISTRY_VERIFICATION=PASS
+ARCHITECTURE=$IMAGE_ARCH
+LOCAL_IMAGE_VERIFICATION=PASS
 EOF
 
 echo
