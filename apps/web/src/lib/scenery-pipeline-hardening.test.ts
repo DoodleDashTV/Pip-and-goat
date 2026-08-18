@@ -43,6 +43,7 @@ import {
   shouldExcludeWorldShadersGiveaway,
   syntheticFixtureZip,
 } from './scenery/intake';
+import { sceneryUploadCorsConfiguration } from './scenery/intake/r2-multipart';
 import { resetIntakeRateLimit } from './scenery/intake/access';
 import { evaluateProductionSafety } from './scenery/intake/production-safety';
 import { CLIENT_RECOVERY_STORAGE_KEY } from './scenery/intake/client-recovery';
@@ -668,5 +669,20 @@ describe('pipeline hardening ux and accessibility', () => {
     expect(transfer).toContain('R2 CORS or network problem');
     expect(transfer).toContain('must expose the ETag header');
     expect(transfer).toContain('XMLHttpRequest');
+  });
+
+  it('locks browser upload CORS to one Preview origin and exposes multipart ETags', () => {
+    const origin = 'https://pip-and-goat-git-cursor-tivvlejoy-example.vercel.app';
+    expect(sceneryUploadCorsConfiguration(origin)).toEqual({
+      CORSRules: [
+        {
+          AllowedOrigins: [origin],
+          AllowedMethods: ['PUT'],
+          AllowedHeaders: ['*'],
+          ExposeHeaders: ['ETag'],
+          MaxAgeSeconds: 3600,
+        },
+      ],
+    });
   });
 });

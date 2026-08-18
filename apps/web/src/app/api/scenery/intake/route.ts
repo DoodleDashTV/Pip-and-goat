@@ -73,12 +73,22 @@ export async function POST(request: Request) {
       );
     }
     const body = JSON.parse(raw || '{}') as Record<string, unknown>;
+    const requestOrigin = request.headers.get('origin') ?? '';
+    const requestHost = request.headers.get('host') ?? '';
+    const trustedPreviewOrigin =
+      requestOrigin === `https://${requestHost}` && requestHost.endsWith('.vercel.app')
+        ? requestOrigin
+        : '';
     const action = String(body.action ?? 'status') as Parameters<
       typeof handleSceneryIntakeAction
     >[0]['action'];
     const result = await handleSceneryIntakeAction({
       action,
       body,
+      env: {
+        ...process.env,
+        TIVVLEJOY_SCENERY_CORS_ORIGIN: trustedPreviewOrigin,
+      },
       publicPreview: isPublicWebsitePreview(),
       clientKey: request.headers.get('x-forwarded-for') ?? 'studio',
       studioToken: token,

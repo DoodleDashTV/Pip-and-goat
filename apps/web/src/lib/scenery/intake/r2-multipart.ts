@@ -6,6 +6,7 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
+  PutBucketCorsCommand,
   PutObjectCommand,
   S3Client,
   UploadPartCommand,
@@ -14,6 +15,38 @@ import { resolveObjectStorageConfig } from '@doodle-dash/shared';
 import { SceneryError } from '../types';
 import { sceneryStorageEnvForResolver } from './config';
 import { ConnectionReadyMultipartStorage, type MultipartStoragePort } from './multipart';
+
+export function sceneryUploadCorsConfiguration(origin: string) {
+  return {
+    CORSRules: [
+      {
+        AllowedOrigins: [origin],
+        AllowedMethods: ['PUT'],
+        AllowedHeaders: ['*'],
+        ExposeHeaders: ['ETag'],
+        MaxAgeSeconds: 3600,
+      },
+    ],
+  };
+}
+
+function configuredCorsOrigin(env: Record<string, string | undefined>): string | null {
+  const raw = String(env.TIVVLEJOY_SCENERY_CORS_ORIGIN ?? '').trim();
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    if (
+      url.protocol !== 'https:' ||
+      !url.hostname.endsWith('.vercel.app') ||
+      url.pathname !== '/'
+    ) {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
 
 export async function createConfiguredMultipartStorage(
   env: Record<string, string | undefined> = process.env,
@@ -37,8 +70,29 @@ export async function createConfiguredMultipartStorage(
     },
   });
   const bucket = config.bucket;
+  const corsOrigin = configuredCorsOrigin(env);
+  let corsConfigured = false;
+
+  async function ensureBrowserUploadCors(): Promise<void> {
+    if (!corsOrigin || corsConfigured) return;
+    try {
+      await client.send(
+        new PutBucketCorsCommand({
+          Bucket: bucket,
+          CORSConfiguration: sceneryUploadCorsConfiguration(corsOrigin),
+        }),
+      );
+      corsConfigured = true;
+    } catch {
+      throw new SceneryError(
+        'Private storage rejected the TivvleJoy Preview CORS policy. The R2 access token must allow bucket CORS updates.',
+        'R2_CORS_CONFIGURATION_FAILED',
+      );
+    }
+  }
   return {
     async createMultipartUpload(input) {
+      await ensureBrowserUploadCors();
       const created = await client.send(
         new CreateMultipartUploadCommand({
           Bucket: bucket,
@@ -48,7 +102,10 @@ export async function createConfiguredMultipartStorage(
         }),
       );
       if (!created.UploadId) {
-        throw new SceneryError('R2 did not return a multipart upload id.', 'MULTIPART_CREATE_FAILED');
+        throw new SceneryError(
+          'R2 did not return a multipart upload id.',
+          'MULTIPART_CREATE_FAILED',
+        );
       }
       return { uploadId: created.UploadId };
     },
