@@ -1,8 +1,10 @@
 # TivvleJoy remote Blender execution foundation
 
-Checkpoint: `TIVVLEJOY_PLATFORM_INJECTED_CREDENTIAL_ISOLATION_V1`
+Checkpoint: `TIVVLEJOY_GUARDED_POD_LAUNCH_PAYLOAD_V1`
 
 ## CURRENT STATUS
+
+**GUARDED POD LAUNCH PAYLOAD FOUNDATION**
 
 **PLATFORM-INJECTED CREDENTIAL ISOLATION**
 
@@ -36,17 +38,22 @@ TivvleJoy episode / shot
 → publish `jobs/<jobId>/manifest.json` last  
 → verify manifest SHA-256  
 → STAGED  
-→ FUTURE guarded Pod launch  
+→ least-privilege worker env  
+→ guarded Pod payload  
+→ STOP  
+
+Future only, not enabled here:
+
+fresh `render_plan` PASS  
+→ explicit paid approval  
+→ guarded create  
 → existing single-shot RunPod worker  
 → R2 asset download + SHA verify  
 → Blender  
-→ frame verification  
-→ FFmpeg encode  
-→ ffprobe validation  
-→ R2 upload verification  
-→ COMPLETE only after a verified artifact  
-→ cleanup  
-→ later visual QC
+→ FFmpeg / ffprobe  
+→ verified R2 artifact  
+→ COMPLETE  
+→ launcher cleanup
 
 `tivvlejoy-remote-render-job-v1` is **not** a second worker format. It is only the studio/orchestration schema. The only approved bridge to execution is the compiler. The real worker continues to consume `ddp-cloud-job-manifest-v1` via `renderCore.validateManifest()`.
 
@@ -213,12 +220,31 @@ Vercel tokens
 ### FROM GUARDED LAUNCH METADATA
 
 `RUNPOD_GPU_HOURLY_RATE`  
-`RUNPOD_POD_ID`  
 `RENDER_WORKER_ID`
+
+`RUNPOD_POD_ID` is runtime metadata assigned after create. It must not be fabricated in a pre-launch payload.
 
 Never embed credentials in the job package or worker manifest. Sanitized logs may report variable NAMES. They must never print secret VALUES, including a platform-injected Pod-scoped `RUNPOD_API_KEY`. Redaction covers R2 secrets, `rpa_` keys, `RUNPOD_API_KEY=` assignments, Bearer tokens, GitHub tokens, and the approval phrase.
 
-Pod launch is not implemented here.
+Pod launch is not implemented here. `buildGuardedWorkerPodPayload()` only builds and validates the future `POST /v1/pods` body. It reuses `buildCreatePodPayload()` and attaches `payload.env` from `buildWorkerEnvironment()`. It does not call `createGuardedPod()`, does not `fetch()`, and does not contact RunPod.
+
+### Identity layers
+
+**render identity** — `jobPackageSha256` and `workerManifestSha256` lock immutable render content. Rotating R2 credentials must not change them.
+
+**launch identity** — `launchIntentSha256` binds non-secret launch configuration: those hashes, job ID, manifest key, output key, template identity, intended Pod name, GPU/cloud/count, interruptibility, runtime cap, cost cap, and hourly quote. Raw credentials are excluded.
+
+**credentials** — scoped R2 secrets exist only in the private worker env. They must never be logged or snapshotted.
+
+Private execution payload contains real scoped worker env values and must never be printed. The sanitized payload summary may include Pod name, pins, job identity, hashes, env key names, env key count, and `[REDACTED]` secret placeholders.
+
+`RUNPOD_RENDER_TEMPLATE_ID` stays launcher-side. It is required to build a launchable payload (`TEMPLATE_REQUIRED` if missing) and must not enter `payload.env`. `RUNPOD_POD_ID` must not be fabricated in a pre-launch payload.
+
+A render-plan receipt (`gpu`, `cloud`, `gpuCount`, `hourlyMicros`, `projectedMicros`, `maxRuntimeMinutes`, `checkedAt`, `verdict`) must be a fresh PASS for the pinned RTX 4090 Secure 1-GPU quote. Maximum receipt age is 5 minutes. The receipt is supporting evidence only. A real launch must still run `render_plan` immediately before create.
+
+Worker env key count must be ≤ 50. Overflow refuses; variables are not trimmed to fit.
+
+Ambiguous-create recovery is unchanged and is not executed here: never print the raw create body, extract only safe fields, persist the intended Pod name before create, recover by exact name, delete only that Pod, and fail loudly if cleanup cannot be confirmed.
 
 ## Pilot pins
 
@@ -261,9 +287,14 @@ Zero-cost local mode for CI:
 
 ```bash
 node scripts/cloud/tivvlejoy-remote-blender-foundation.mjs dry-run
+node scripts/cloud/tivvlejoy-guarded-pod-payload.mjs pod-payload-dry-run
 ```
 
-It creates a sample orchestration job, compiles the real worker manifest, builds an immutable job package, simulates asset verification and manifest upload/read-back on an in-memory adapter, then simulates success/failure/timeout cleanup. It never calls paid RunPod mutation endpoints, never contacts real R2, and never creates a GPU.
+The foundation dry-run creates a sample orchestration job, compiles the real worker manifest, builds an immutable job package, simulates asset verification and manifest upload/read-back on an in-memory adapter, then simulates success/failure/timeout cleanup.
+
+The Pod-payload dry-run continues from a simulated STAGED package, builds a least-privilege worker env with fake test storage credentials, attaches a synthetic fresh PASS render-plan receipt, builds and validates the private Pod-create body, prints a sanitized summary, and stops before network.
+
+Neither command calls paid RunPod mutation endpoints, contacts real R2, creates a GPU, or prints secret values.
 
 ## Long-term quality / cost goals
 
