@@ -1,11 +1,18 @@
 /**
  * TivvleJoy remote Blender execution foundation.
  *
+ * Architecture:
+ *   tivvlejoy-remote-render-job-v1 = studio / orchestration contract
+ *   ddp-cloud-job-manifest-v1      = RunPod worker execution contract
+ *   compileTivvleJoyJobToWorkerManifest() = ONLY approved bridge
+ *
+ * Do not invent a second worker manifest. The compiled output must pass the
+ * real workers/runpod-blender/src/render-core.js validateManifest().
+ * Runtime/cost enforcement stays in the existing single-shot watchdog.
+ *
  * CURRENT STATUS: REMOTE EXECUTION FOUNDATION ONLY
  * NOT YET ENABLED: paid GPU execution, remote Blender execution, automatic production rendering.
  *
- * Reuses the accepted RunPod worker command from
- * workers/runpod-blender/src/render-core.js → buildBlenderArgv().
  * This module never creates a Pod, never calls the paid Pods API, and never runs Blender.
  */
 
@@ -49,6 +56,23 @@ export const PILOT_MAX_RUNTIME_MINUTES = MAX_RUNTIME_MINUTES;
 export const PILOT_MAX_FRAMES = 300;
 export const ACCEPTED_ASSEMBLE_SCRIPT = 'scripts/blender/assemble_scene.py';
 export const ACCEPTED_RENDER_CORE = 'workers/runpod-blender/src/render-core.js';
+export const WORKER_MANIFEST_SCHEMA = renderCore.MANIFEST_SCHEMA;
+export const WORKER_COST_WATCHDOG = 'workers/runpod-blender/src/watchdog.js computeCostAwareMaxRuntime';
+export const PILOT_MAX_COST_USD = Number(MAX_COMPUTE_USD);
+export const REQUIRED_REMOTE_ASSET_CLASSES = Object.freeze(['character']);
+export const APPROVED_R2_PREFIXES = Object.freeze([
+  'characters/',
+  'environments/',
+  'props/',
+  'animations/',
+  'vfx/',
+  'audio/',
+  'episodes/',
+  'renders/',
+  'cache/',
+  'tivvlejoy-assets/',
+  'scenery/',
+]);
 export const FFMPEG_FINALIZE_ARGV = ['-y', '-framerate', String(PILOT_FPS), '-i', 'frame_%04d.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18'];
 
 export const LIFECYCLE_STATES = Object.freeze([
@@ -148,12 +172,15 @@ export function defaultPilotJob(overrides = {}) {
     cloud_type: overrides.cloud_type ?? PINNED_CLOUD_TYPE,
     gpu_count: overrides.gpu_count ?? PINNED_GPU_COUNT,
     created_at: overrides.created_at ?? '2026-08-18T00:00:00.000Z',
+    scene_r2_key: overrides.scene_r2_key ?? null,
+    required_asset_classes: overrides.required_asset_classes ?? [...REQUIRED_REMOTE_ASSET_CLASSES],
     assets: overrides.assets ?? [
       {
         id: 'pip',
         role: 'pip',
         kind: 'blend',
         reference: 'pip.blend',
+        r2Key: 'characters/pip/v1/pip.blend',
         sha256: overrides.pip_sha256 ?? null,
       },
     ],
@@ -222,6 +249,202 @@ export function hashJobManifest(job) {
   const { ok, job: normalized, reason, code } = normalizeJob(job);
   if (!ok) return fail(reason, code);
   return { ok: true, sha256: hashCanonical(normalized), job: normalized };
+}
+
+function extractPinnedVersion(text, pattern) {
+  const match = text.match(pattern);
+  return match ? match[1] : null;
+}
+
+export function resolveAuthoritativeBlenderVersion(repoRoot = REPO_ROOT) {
+  const dockerfile = readFileSync(path.join(repoRoot, 'workers/runpod-blender/Dockerfile'), 'utf8');
+  const acceptance = readFileSync(path.join(repoRoot, 'scripts/cloud/acceptance-1080p/common.ts'), 'utf8');
+  const workerManifest = readFileSync(path.join(repoRoot, 'workers/runpod-blender/src/manifest.js'), 'utf8');
+  const productionConfig = readFileSync(path.join(repoRoot, 'packages/production/src/cloud/config.ts'), 'utf8');
+  const productionPreflight = readFileSync(path.join(repoRoot, 'packages/production/src/cloud/preflight.ts'), 'utf8');
+
+  const executionPins = {
+    workerDockerfile: extractPinnedVersion(dockerfile, /BLENDER_VERSION=([0-9]+\.[0-9]+\.[0-9]+)/),
+    acceptance1080p: extractPinnedVersion(acceptance, /export const BLENDER_VERSION = '([0-9]+\.[0-9]+\.[0-9]+)'/),
+    workerManifestDefault: extractPinnedVersion(workerManifest, /blenderVersion: input\.blenderVersion \|\| '([0-9]+\.[0-9]+\.[0-9]+)'/),
+  };
+  const observedNonExecution = {
+    productionRequirement: extractPinnedVersion(productionConfig, /DEFAULT_BLENDER_VERSION = '([0-9.]+)'/),
+    productionGpuHealthExample: extractPinnedVersion(productionPreflight, /blenderVersion: '([0-9.]+)'/),
+  };
+  const values = Object.values(executionPins);
+  if (values.some((value) => !value) || new Set(values).size !== 1) {
+    return fail(
+      `Authoritative Blender execution pins conflict or are missing: ${JSON.stringify(executionPins)}.`,
+      'BLENDER_VERSION_CONFLICT',
+    );
+  }
+  return {
+    ok: true,
+    version: values[0],
+    sources: executionPins,
+    nonExecutionNotes: observedNonExecution,
+  };
+}
+
+export function sanitizeKeyPart(value) {
+  return String(value).replace(/[^A-Za-z0-9._@+-]+/g, '_');
+}
+
+export function isApprovedR2Key(key) {
+  if (typeof key !== 'string' || key.trim() === '') return false;
+  if (key.startsWith('file:') || key.startsWith('/') || key.includes('\\') || key.includes('..')) return false;
+  if (UNSAFE.test(key)) return false;
+  return APPROVED_R2_PREFIXES.some((prefix) => key.startsWith(prefix));
+}
+
+export function buildWorkerOutputKey(job) {
+  if (!SAFE_ID.test(job.episode_id) || !SAFE_ID.test(job.job_id) || !SAFE_ID.test(job.shot_id)) {
+    return fail('outputKey identity is invalid.', 'OUTPUT_KEY');
+  }
+  const outputKey = `renders/finals/${sanitizeKeyPart(job.episode_id)}/${sanitizeKeyPart(job.job_id)}/final_1080p.mp4`;
+  if (outputKey.includes('..') || outputKey.includes('//') || outputKey.includes('\\')) {
+    return fail('outputKey path traversal refused.', 'OUTPUT_KEY');
+  }
+  return {
+    ok: true,
+    outputKey,
+    expected_output_prefix: expectedOutputPrefix(job),
+    layout: 'packages/production/src/cloud/r2-layout.ts renderFinalKey',
+  };
+}
+
+export function classifyRemoteAssetClass(asset) {
+  const role = String(asset?.role || '').toLowerCase();
+  const kind = String(asset?.kind || '').toLowerCase();
+  if (['pip', 'goat', 'character'].includes(role) || kind === 'character') return 'character';
+  if (['scenery', 'environment', 'scene', 'map'].includes(role) || ['scenery', 'environment'].includes(kind)) {
+    return 'scenery';
+  }
+  if (['texture', 'hdri', 'hdr'].includes(role) || ['texture', 'hdri', 'hdr'].includes(kind)) return 'texture';
+  if (role === 'prop' || kind === 'prop') return 'prop';
+  return 'other';
+}
+
+function requiredAssetClassCode(assetClass) {
+  if (assetClass === 'character') return 'MISSING_ASSET';
+  if (assetClass === 'scenery') return 'MISSING_SCENERY';
+  if (assetClass === 'texture') return 'MISSING_TEXTURE';
+  if (assetClass === 'prop') return 'MISSING_PROP';
+  return 'MISSING_ASSET';
+}
+
+export function compileRemoteAsset(asset) {
+  if (!asset || typeof asset !== 'object') return fail('Malformed asset.', 'MISSING_ASSET');
+  if (!asset.role) return fail('Asset role is required.', 'MISSING_ASSET');
+  if (!asset.r2Key) return fail('r2Key is missing.', 'MISSING_R2_KEY');
+  if (String(asset.r2Key).startsWith('file:') || String(asset.uri || '').startsWith('file:') || String(asset.reference || '').startsWith('file:')) {
+    return fail('Local file paths are not allowed in the remote worker manifest.', 'LOCAL_PATH_IN_REMOTE_MANIFEST');
+  }
+  if (!isApprovedR2Key(asset.r2Key)) return fail('Asset R2 key is outside the approved TivvleJoy namespace.', 'UNSAFE_R2_NAMESPACE');
+  if (!asset.sha256) return fail('sha256 is missing.', 'MISSING_SHA256');
+  if (!SHA256.test(asset.sha256)) return fail('sha256 is malformed.', 'MALFORMED_SHA256');
+  return {
+    ok: true,
+    asset: {
+      role: asset.role,
+      r2Key: asset.r2Key,
+      sha256: asset.sha256,
+    },
+  };
+}
+
+export function compileExpectedAssets(assets, requiredClasses = REQUIRED_REMOTE_ASSET_CLASSES) {
+  if (!Array.isArray(assets) || assets.length === 0) {
+    return fail('Remote worker assets are required.', 'MISSING_ASSET');
+  }
+  const seen = new Set();
+  const expectedAssets = [];
+  const resolvedClasses = new Set();
+  for (const asset of assets) {
+    const compiled = compileRemoteAsset(asset);
+    if (!compiled.ok) return compiled;
+    if (seen.has(compiled.asset.role)) return fail('Duplicate asset role is ambiguous.', 'DUPLICATE_ROLE');
+    seen.add(compiled.asset.role);
+    resolvedClasses.add(classifyRemoteAssetClass(asset));
+    expectedAssets.push(compiled.asset);
+  }
+  for (const required of requiredClasses) {
+    if (!resolvedClasses.has(required)) {
+      return fail(`Required ${required} asset cannot be resolved.`, requiredAssetClassCode(required));
+    }
+  }
+  return { ok: true, expectedAssets };
+}
+
+export function compileTivvleJoyJobToWorkerManifest(jobInput) {
+  const parsed = normalizeJob(jobInput);
+  if (!parsed.ok) return parsed;
+  const pins = assertPilotPins(parsed.job);
+  if (!pins.ok) return pins;
+  const frames = validateFrameRange(parsed.job);
+  if (!frames.ok) return frames;
+  const blender = resolveAuthoritativeBlenderVersion();
+  if (!blender.ok) return blender;
+  const remoteAssets = [...parsed.job.assets];
+  if (parsed.job.scene_r2_key) {
+    remoteAssets.push({
+      role: 'scene',
+      kind: 'scenery',
+      r2Key: parsed.job.scene_r2_key,
+      sha256: parsed.job.scene_sha256,
+    });
+  }
+  const assets = compileExpectedAssets(remoteAssets, parsed.job.required_asset_classes);
+  if (!assets.ok) return assets;
+  const output = buildWorkerOutputKey(parsed.job);
+  if (!output.ok) return output;
+
+  const workerManifest = {
+    schemaVersion: WORKER_MANIFEST_SCHEMA,
+    jobId: parsed.job.job_id,
+    episodeId: parsed.job.episode_id,
+    sceneId: parsed.job.shot_id,
+    renderMode: parsed.job.render_profile,
+    resolution: `${parsed.job.resolution_width}x${parsed.job.resolution_height}`,
+    fps: parsed.job.fps,
+    frameRange: { start: parsed.job.frame_start, end: parsed.job.frame_end },
+    blenderVersion: blender.version,
+    eevee: { engine: parsed.job.engine, samples: parsed.job.samples },
+    cameraState: { preset: parsed.job.camera_preset },
+    shotMeta: parsed.job.shot_meta,
+    expectedAssets: assets.expectedAssets,
+    outputKey: output.outputKey,
+    limits: {
+      maxRuntimeMinutes: parsed.job.max_runtime_minutes,
+      maxCostUsd: PILOT_MAX_COST_USD,
+      maxFrames: PILOT_MAX_FRAMES,
+    },
+    createdAt: parsed.job.created_at,
+    credentialsPolicy: {
+      secretsInManifest: false,
+      r2Scoped: true,
+      runpodServerSideOnly: true,
+    },
+  };
+
+  const serialized = JSON.stringify(workerManifest);
+  if (/file:\/\//.test(serialized) || /rpa_[A-Za-z0-9]/.test(serialized) || /secret_access_key|Authorization/i.test(serialized)) {
+    return fail('Compiled worker manifest must not embed secrets or local paths.', 'SECRET_LEAK');
+  }
+
+  try {
+    renderCore.validateManifest(workerManifest);
+  } catch (error) {
+    return fail(error.message, error.code || 'WORKER_MANIFEST_INVALID');
+  }
+  return {
+    ok: true,
+    workerManifest,
+    blenderVersion: blender.version,
+    outputKey: output.outputKey,
+    schemaVersion: WORKER_MANIFEST_SCHEMA,
+  };
 }
 
 function fileSha256(filePath) {
@@ -325,33 +548,33 @@ export function buildRemoteBlenderCommand(preflight) {
   if (!existsSync(assembleScript)) {
     return fail('Accepted Blender assemble script is missing.', 'COMMAND_UNKNOWN');
   }
-  if (typeof renderCore.buildBlenderArgv !== 'function') {
+  if (typeof renderCore.buildBlenderArgv !== 'function' || typeof renderCore.validateManifest !== 'function') {
     return fail('Accepted Blender command cannot be determined.', 'COMMAND_UNKNOWN');
   }
-  const job = preflight.job;
+  const compiled = compileTivvleJoyJobToWorkerManifest(preflight.job);
+  if (!compiled.ok) return compiled;
   const blenderArgv = renderCore.buildBlenderArgv({
-    manifest: {
-      sceneId: job.shot_id,
-      episodeId: job.episode_id,
-      jobId: job.job_id,
-      resolution: PILOT_RESOLUTION,
-      fps: job.fps,
-      frameRange: { start: job.frame_start, end: job.frame_end },
-      eevee: { engine: job.engine, samples: job.samples },
-      cameraState: { preset: job.camera_preset },
-      shotMeta: job.shot_meta,
-    },
-    assets: preflight.assets,
+    manifest: compiled.workerManifest,
+    assets: compiled.workerManifest.expectedAssets.map((asset) => ({
+      id: asset.role,
+      role: asset.role,
+      kind: asset.kind || 'blend',
+      uri: `r2://${asset.r2Key}`,
+      checksum: asset.sha256,
+    })),
     outputDir: preflight.outputDir,
     assembleScript,
   });
   if (!Array.isArray(blenderArgv) || blenderArgv[0] !== '--background' || !blenderArgv.includes('--factory-startup')) {
     return fail('Accepted Blender command cannot be determined.', 'COMMAND_UNKNOWN');
   }
+  if (blenderArgv.some((part) => String(part).startsWith('file://'))) {
+    return fail('Local file paths are not allowed in the remote worker command.', 'LOCAL_PATH_IN_REMOTE_MANIFEST');
+  }
   const wrapped = buildRemoteRenderDeadlineWrapper(['blender', ...blenderArgv]);
   if (!wrapped.ok) return fail(wrapped.reason, 'TIMEOUT_WRAPPER');
   const joined = wrapped.argv.join(' ');
-  if (/rpa_|RUNPOD_|Authorization|secret/i.test(joined)) {
+  if (/rpa_|Authorization|secret_access_key/i.test(joined)) {
     return fail('Command would expose a secret.', 'SECRET_LEAK');
   }
   return {
@@ -361,6 +584,7 @@ export function buildRemoteBlenderCommand(preflight) {
     hardDeadlineMinutes: wrapped.hardDeadlineMinutes,
     reusedComponent: ACCEPTED_RENDER_CORE,
     assembleScript: ACCEPTED_ASSEMBLE_SCRIPT,
+    compiled,
   };
 }
 
@@ -397,7 +621,7 @@ export function simulateLifecycle(kind) {
 export const ASSET_STAGING_PLAN = Object.freeze({
   source: 'Reuse existing R2 + render-core single-shot staging. Do not invent a second pipeline.',
   worker: 'workers/runpod-blender/src/single-shot.js downloads expectedAssets by r2Key and verifies sha256.',
-  layout: 'characters/, environments/, props/, scenery/, cache/{fingerprint}/ via packages/production/src/cloud/r2-layout.ts',
+  layout: 'characters/, environments/, props/, animations/, vfx/, audio/, episodes/, renders/, cache/, tivvlejoy-assets/, scenery/ via packages/production/src/cloud/r2-layout.ts',
   cache: 'Reuse remote checksum when unchanged. Detect missing/corrupt assets before Blender starts.',
   contents: ['Blender scene', 'Pip/Goat assets when production-ready', 'scenery', 'textures', 'HDRIs', 'render configuration', 'audio only if the render stage needs it'],
   secrets: 'Never embed credentials in the job manifest or argv.',
@@ -460,7 +684,16 @@ export function runDryRun({ workspaceRoot, completedJobs = [], log = console.log
   const job = defaultPilotJob({
     scene_sha256: roots.sceneSha256,
     pip_sha256: roots.pipSha256,
-    assets: [{ id: 'pip', role: 'pip', kind: 'blend', reference: 'pip.blend', sha256: roots.pipSha256 }],
+    assets: [
+      {
+        id: 'pip',
+        role: 'pip',
+        kind: 'blend',
+        reference: 'pip.blend',
+        r2Key: 'characters/pip/v1/pip.blend',
+        sha256: roots.pipSha256,
+      },
+    ],
   });
   const preflight = runPreflight(job, { roots, completedJobs });
   if (!preflight.ok) {
@@ -468,23 +701,34 @@ export function runDryRun({ workspaceRoot, completedJobs = [], log = console.log
     log(preflight.reason);
     return { ok: false, preflight, contactedPaidEndpoint: false };
   }
+  const compiled = compileTivvleJoyJobToWorkerManifest(job);
+  if (!compiled.ok) {
+    log('dry-run REFUSE');
+    log(compiled.reason);
+    return { ok: false, preflight, compiled, contactedPaidEndpoint: false };
+  }
   const command = buildRemoteBlenderCommand(preflight);
   if (!command.ok) {
     log('dry-run REFUSE');
     log(command.reason);
-    return { ok: false, preflight, command, contactedPaidEndpoint: false };
+    return { ok: false, preflight, compiled, command, contactedPaidEndpoint: false };
   }
   const success = simulateLifecycle('success');
   const failure = simulateLifecycle('failure');
   const timeout = simulateLifecycle('timeout');
   log('dry-run PASS');
   log(`Status: ${FOUNDATION_STATUS}`);
+  log('Worker contract alignment: compiled ddp-cloud-job-manifest-v1 passed renderCore.validateManifest');
   log(`Reused command: ${ACCEPTED_RENDER_CORE} buildBlenderArgv`);
   log(`Assemble script: ${ACCEPTED_ASSEMBLE_SCRIPT}`);
+  log(`Worker schema: ${compiled.schemaVersion}`);
+  log(`Blender version: ${compiled.blenderVersion}`);
+  log(`outputKey: ${compiled.outputKey}`);
   log(`Resolution: ${PILOT_RESOLUTION}`);
   log(`FPS: ${PILOT_FPS}`);
   log(`Engine: ${PILOT_ENGINE}`);
   log(`Timeout: ${command.hardDeadlineMinutes} minutes`);
+  log(`Cost cap: ${compiled.workerManifest.limits.maxCostUsd}`);
   log(`Manifest sha256: ${preflight.manifestSha256}`);
   log(`Success final state: ${success.finalState}`);
   log(`Failure cleanup confirmed: ${failure.cleanupConfirmed}`);
@@ -495,12 +739,15 @@ export function runDryRun({ workspaceRoot, completedJobs = [], log = console.log
     ok: true,
     job,
     preflight,
+    compiled,
     command,
     success,
     failure,
     timeout,
     contactedPaidEndpoint: false,
     paidMutationUrl: REST_PODS_URL,
+    blenderExecuted: false,
+    podCreated: false,
   };
 }
 

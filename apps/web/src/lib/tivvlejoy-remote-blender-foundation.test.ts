@@ -22,11 +22,18 @@ describe('TivvleJoy remote Blender execution foundation contract', () => {
   it('reuses the accepted render-core Blender command and 20-minute wrapper', () => {
     expect(helper).toContain('workers/runpod-blender/src/render-core.js');
     expect(helper).toContain('buildBlenderArgv');
+    expect(helper).toContain('validateManifest');
+    expect(helper).toContain('compileTivvleJoyJobToWorkerManifest');
+    expect(helper).toContain('ddp-cloud-job-manifest-v1');
     expect(helper).toContain('scripts/blender/assemble_scene.py');
     expect(helper).toContain('timeout');
     expect(helper).toContain('PILOT_MAX_RUNTIME_MINUTES');
     expect(docs).toContain('1080x1920');
     expect(docs).toContain('blender --background --factory-startup');
+    expect(docs).toContain('compileTivvleJoyJobToWorkerManifest()');
+    expect(docs).toContain('ddp-cloud-job-manifest-v1');
+    expect(docs).toContain('WORKER CONTRACT ALIGNMENT COMPLETE');
+    expect(helper).toContain('WORKER_COST_WATCHDOG');
   });
 
   it('does not add paid Pod mutation and leaves guarded gates intact', () => {

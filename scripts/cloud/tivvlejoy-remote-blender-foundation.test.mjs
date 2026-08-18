@@ -1,9 +1,13 @@
+import { createRequire } from 'node:module';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+
+const require = createRequire(import.meta.url);
+const renderCore = require('../../workers/runpod-blender/src/render-core.js');
 
 import {
   ACCEPTED_ASSEMBLE_SCRIPT,
@@ -14,15 +18,20 @@ import {
   OUTPUT_VERIFICATION_CONTRACT,
   PILOT_ENGINE,
   PILOT_FPS,
+  PILOT_MAX_COST_USD,
   PILOT_MAX_RUNTIME_MINUTES,
   PILOT_RESOLUTION,
+  WORKER_MANIFEST_SCHEMA,
   assertPilotPins,
   buildRemoteBlenderCommand,
+  buildWorkerOutputKey,
+  compileTivvleJoyJobToWorkerManifest,
   createSampleWorkspace,
   defaultPilotJob,
   expectedOutputPrefix,
   hashJobManifest,
   rejectUnsafeText,
+  resolveAuthoritativeBlenderVersion,
   runDryRun,
   runPreflight,
   simulateLifecycle,
@@ -56,7 +65,16 @@ function workspace() {
 function validJob(roots, overrides = {}) {
   return defaultPilotJob({
     scene_sha256: roots.sceneSha256,
-    assets: [{ id: 'pip', role: 'pip', kind: 'blend', reference: 'pip.blend', sha256: roots.pipSha256 }],
+    assets: [
+      {
+        id: 'pip',
+        role: 'pip',
+        kind: 'blend',
+        reference: 'pip.blend',
+        r2Key: 'characters/pip/v1/pip.blend',
+        sha256: roots.pipSha256,
+      },
+    ],
     ...overrides,
   });
 }
@@ -182,6 +200,162 @@ describe('state machine', () => {
   });
 });
 
+describe('worker contract compiler', () => {
+  it('compiles a valid TivvleJoy job into ddp-cloud-job-manifest-v1', () => {
+    const roots = workspace();
+    const job = validJob(roots);
+    const first = compileTivvleJoyJobToWorkerManifest(job);
+    const second = compileTivvleJoyJobToWorkerManifest(job);
+    assert.equal(first.ok, true);
+    assert.equal(first.schemaVersion, 'ddp-cloud-job-manifest-v1');
+    assert.equal(first.schemaVersion, WORKER_MANIFEST_SCHEMA);
+    assert.deepEqual(first.workerManifest, second.workerManifest);
+    const manifest = first.workerManifest;
+    assert.equal(manifest.jobId, job.job_id);
+    assert.equal(manifest.episodeId, job.episode_id);
+    assert.equal(manifest.sceneId, job.shot_id);
+    assert.equal(manifest.renderMode, 'FINAL_1080P');
+    assert.equal(manifest.resolution, '1080x1920');
+    assert.equal(manifest.fps, 30);
+    assert.deepEqual(manifest.frameRange, { start: 1, end: 90 });
+    assert.deepEqual(manifest.eevee, { engine: 'EEVEE', samples: 24 });
+    assert.equal(manifest.limits.maxRuntimeMinutes, 20);
+    assert.equal(manifest.limits.maxCostUsd, 0.25);
+    assert.equal(manifest.limits.maxCostUsd, PILOT_MAX_COST_USD);
+    assert.equal(manifest.blenderVersion, '4.2.3');
+    assert.equal(manifest.blenderVersion, resolveAuthoritativeBlenderVersion().version);
+    assert.equal(manifest.outputKey, `renders/finals/${job.episode_id}/${job.job_id}/final_1080p.mp4`);
+    assert.deepEqual(manifest.expectedAssets, [
+      { role: 'pip', r2Key: 'characters/pip/v1/pip.blend', sha256: roots.pipSha256 },
+    ]);
+    assert.equal(JSON.stringify(manifest).includes('file://'), false);
+    assert.equal(JSON.stringify(manifest).includes('rpa_'), false);
+    assert.equal(JSON.stringify(manifest).includes('Authorization'), false);
+    assert.equal(JSON.stringify(manifest).includes('secret_access_key'), false);
+  });
+
+  it('passes the real renderCore.validateManifest and buildBlenderArgv', () => {
+    const roots = workspace();
+    const compiled = compileTivvleJoyJobToWorkerManifest(validJob(roots));
+    assert.equal(renderCore.validateManifest(compiled.workerManifest), compiled.workerManifest);
+    const argv = renderCore.buildBlenderArgv({
+      manifest: compiled.workerManifest,
+      assets: compiled.workerManifest.expectedAssets,
+      outputDir: '/tmp/out',
+      assembleScript: '/tmp/assemble_scene.py',
+    });
+    assert.equal(argv.includes('--background'), true);
+    assert.equal(argv.includes('1080x1920'), true);
+    assert.equal(argv.includes('30'), true);
+    assert.equal(argv.includes('EEVEE'), true);
+    assert.equal(argv.includes('24'), true);
+  });
+
+  it('refuses missing, malformed, duplicate, unsafe, and local remote assets', () => {
+    const roots = workspace();
+    const base = validJob(roots);
+    assert.equal(compileTivvleJoyJobToWorkerManifest({ job_id: 'bad id' }).ok, false);
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(validJob(roots, { assets: [{ ...base.assets[0], r2Key: undefined }] })).code,
+      'MISSING_R2_KEY',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(validJob(roots, { assets: [{ ...base.assets[0], sha256: undefined }] })).code,
+      'MISSING_SHA256',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(validJob(roots, { assets: [{ ...base.assets[0], sha256: 'zzz' }] })).code,
+      'MALFORMED_SHA256',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(
+        validJob(roots, { assets: [base.assets[0], { ...base.assets[0], id: 'pip-2', r2Key: 'characters/pip/v2/pip.blend' }] }),
+      ).code,
+      'DUPLICATE_ROLE',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(validJob(roots, { assets: [{ ...base.assets[0], r2Key: 'tmp/evil.blend' }] })).code,
+      'UNSAFE_R2_NAMESPACE',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(validJob(roots, { assets: [{ ...base.assets[0], r2Key: 'file:///tmp/pip.blend' }] }))
+        .code,
+      'LOCAL_PATH_IN_REMOTE_MANIFEST',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(validJob(roots, { required_asset_classes: ['character', 'scenery'] })).code,
+      'MISSING_SCENERY',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(
+        validJob(roots, {
+          assets: [
+            base.assets[0],
+            { id: 'village', role: 'scenery', kind: 'scenery', reference: 'village.blend', sha256: 'c'.repeat(64) },
+          ],
+        }),
+      ).code,
+      'MISSING_R2_KEY',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(
+        validJob(roots, {
+          assets: [
+            base.assets[0],
+            {
+              id: 'sky',
+              role: 'hdri',
+              kind: 'hdri',
+              reference: 'sky.hdr',
+              r2Key: 'environments/sky/v1/sky.hdr',
+            },
+          ],
+        }),
+      ).code,
+      'MISSING_SHA256',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(
+        validJob(roots, {
+          required_asset_classes: ['character', 'prop'],
+          assets: [base.assets[0]],
+        }),
+      ).code,
+      'MISSING_PROP',
+    );
+    assert.equal(
+      compileTivvleJoyJobToWorkerManifest(
+        validJob(roots, {
+          assets: [
+            { id: 'map', role: 'scenery', kind: 'scenery', reference: 'map.blend', r2Key: 'environments/map/v1/map.blend', sha256: 'd'.repeat(64) },
+          ],
+        }),
+      ).code,
+      'MISSING_ASSET',
+    );
+  });
+
+  it('keeps outputKey deterministic and refuses traversal', () => {
+    const roots = workspace();
+    const job = validJob(roots);
+    const key = buildWorkerOutputKey(job);
+    assert.equal(key.ok, true);
+    assert.equal(key.outputKey, `renders/finals/${job.episode_id}/${job.job_id}/final_1080p.mp4`);
+    assert.equal(buildWorkerOutputKey({ ...job, job_id: '../escape' }).ok, false);
+    assert.equal(buildWorkerOutputKey({ ...job, episode_id: 'ep/../other' }).ok, false);
+  });
+
+  it('reads the authoritative Blender version and fails closed on pin conflict', () => {
+    const resolved = resolveAuthoritativeBlenderVersion();
+    assert.equal(resolved.ok, true);
+    assert.equal(resolved.version, '4.2.3');
+    assert.equal(resolved.sources.workerDockerfile, '4.2.3');
+    assert.equal(resolved.sources.acceptance1080p, '4.2.3');
+    assert.equal(resolved.sources.workerManifestDefault, '4.2.3');
+    assert.equal(resolved.nonExecutionNotes.productionRequirement, '4.2');
+  });
+});
+
 describe('dry-run', () => {
   it('validates, builds argv, simulates lifecycles, and never contacts paid RunPod', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'tivvlejoy-dry-run-'));
@@ -190,6 +364,11 @@ describe('dry-run', () => {
     const result = runDryRun({ workspaceRoot: root, log: (line) => logs.push(line) });
     assert.equal(result.ok, true);
     assert.equal(result.contactedPaidEndpoint, false);
+    assert.equal(result.blenderExecuted, false);
+    assert.equal(result.podCreated, false);
+    assert.equal(result.compiled.schemaVersion, 'ddp-cloud-job-manifest-v1');
+    assert.equal(result.compiled.workerManifest.limits.maxRuntimeMinutes, 20);
+    assert.equal(result.compiled.workerManifest.limits.maxCostUsd, 0.25);
     assert.equal(result.command.argv[0], 'timeout');
     assert.equal(logs.includes('dry-run PASS'), true);
     assert.equal(logs.some((line) => /rpa_|Authorization|secret/i.test(line)), false);
@@ -213,6 +392,7 @@ describe('existing guarded gates remain intact', () => {
     assert.match(workflow, /LAUNCH_TIVVLEJOY_GPU/);
     assert.equal(FOUNDATION_STATUS, 'REMOTE EXECUTION FOUNDATION ONLY');
     assert.match(docs, /REMOTE EXECUTION FOUNDATION ONLY/);
+    assert.match(docs, /WORKER CONTRACT ALIGNMENT COMPLETE/);
     assert.match(docs, /NOT YET ENABLED/);
   });
 });
