@@ -104,6 +104,7 @@ function fail(reason, code, extras = {}) {
     blenderExecuted: false,
     realR2: false,
     secretExposed: false,
+    paidExecutionEnabled: false,
     ...extras,
   };
 }
@@ -131,6 +132,7 @@ export function createSimulatedRunPodAdapter({
 
   return {
     kind: 'simulated',
+    mode: 'SIMULATED',
     realNetwork: false,
     lastPodId: null,
     operations,
@@ -340,9 +342,12 @@ async function cleanupPod({ adapter, podId, history, extra = {} }) {
     });
   }
   enter(history, 'DELETE_REQUEST_READY');
-  const deleted = adapter.deletePod(podId);
+  const deleted = await Promise.resolve(adapter.deletePod(podId));
   extra.simulatedCreateCount = adapter.createCount();
   extra.simulatedDeleteCount = adapter.deleteCount();
+  extra.adapterCreateCount = adapter.createCount();
+  extra.adapterDeleteCount = adapter.deleteCount();
+  extra.adapterMode = adapter.mode || adapter.kind;
   if (!deleted.ok) {
     return fail(deleted.reason || 'Pod delete was not confirmed.', CLEANUP_ATTENTION_CODE, {
       history,
@@ -363,7 +368,7 @@ async function cleanupPod({ adapter, podId, history, extra = {} }) {
   };
 }
 
-export async function runSimulatedPodLifecycle(input = {}) {
+export async function runPodLifecycle(input = {}) {
   const history = [];
   enter(history, 'PRECHECK');
   const recorder = input.mutationRecorder || { attempts: [] };
@@ -425,29 +430,78 @@ export async function runSimulatedPodLifecycle(input = {}) {
     enter(history, 'LAUNCH_AUTHORIZED');
     enter(history, 'CREATE_REQUEST_READY');
 
-    const created = adapter.createPod(payload);
-    const extracted = extractPodId(created.parsed);
-    if (!created.ok || created.code === 'CREATE_FAILED') {
-      return fail('Simulated Pod create failed.', 'CREATE_FAILED', {
+    const created = await Promise.resolve(adapter.createPod(payload));
+    const extracted = extractPodId(created.parsed) || extractPodId({ id: created.podId });
+    const adapterCounts = () => ({
+      simulatedCreateCount: adapter.createCount(),
+      simulatedDeleteCount: adapter.deleteCount(),
+      adapterCreateCount: adapter.createCount(),
+      adapterDeleteCount: adapter.deleteCount(),
+      adapterMode: adapter.mode || adapter.kind,
+    });
+    if (created.code === 'PAID_EXECUTION_NOT_AUTHORIZED') {
+      return fail(created.reason || 'Paid execution is not authorized.', 'PAID_EXECUTION_NOT_AUTHORIZED', {
         history,
         podId: null,
-        simulatedCreateCount: adapter.createCount(),
-        simulatedDeleteCount: adapter.deleteCount(),
+        ...adapterCounts(),
       });
     }
-    if (!extracted) {
+    if (created.code === CLEANUP_ATTENTION_CODE || created.recovered === 'attention') {
+      return fail(created.reason || 'Multiple exact-name Pod matches. Do not guess.', CLEANUP_ATTENTION_CODE, {
+        history,
+        podId: null,
+        cleanupVerified: false,
+        ...adapterCounts(),
+      });
+    }
+    if (!created.ok || created.code === 'CREATE_FAILED' || !extracted) {
+      const recoveredId = extractPodId({ id: created.podId }) || extractPodId({ id: adapter.lastPodId });
+      if (recoveredId && (created.recovered === 'one' || created.cleanupRequired === true)) {
+        enter(history, 'POD_CREATED');
+        const cleaned = await cleanupPod({
+          adapter,
+          podId: recoveredId,
+          history,
+          extra: { ...adapterCounts(), terminal: { kind: 'AMBIGUOUS_CREATE' } },
+        });
+        return {
+          ...cleaned,
+          ok: false,
+          code: cleaned.ok ? 'AMBIGUOUS_CREATE_RECOVERED' : cleaned.code,
+          reason: created.reason || 'Create response was ambiguous. The recovered Pod was deleted.',
+          podId: recoveredId,
+          gpuLaunched: false,
+          paidCompute: false,
+          blenderExecuted: false,
+          paidExecutionEnabled: false,
+        };
+      }
+      if (created.recovered === 'zero') {
+        return fail(created.reason || 'Recovery confirmed zero Pods.', 'CREATE_FAILED', {
+          history,
+          podId: null,
+          confirmedZero: true,
+          ...adapterCounts(),
+        });
+      }
+      if (!created.ok || created.code === 'CREATE_FAILED') {
+        return fail(created.reason || 'Pod create failed.', 'CREATE_FAILED', {
+          history,
+          podId: null,
+          ...adapterCounts(),
+        });
+      }
       return fail('Create response did not include a usable Pod ID. No ID was fabricated.', 'MALFORMED_CREATE', {
         history,
         podId: null,
-        simulatedCreateCount: adapter.createCount(),
-        simulatedDeleteCount: adapter.deleteCount(),
+        ...adapterCounts(),
       });
     }
 
     const podId = extracted;
     enter(history, 'POD_CREATED');
     enter(history, 'WAITING_FOR_WORKER');
-    if (typeof input.afterCreateHook === 'function') input.afterCreateHook({ podId, payload });
+    if (typeof input.afterCreateHook === 'function') await input.afterCreateHook({ podId, payload });
 
     const tick = input.tick || createScriptedWorkerProgress({ r2, jobPackage, mode: input.workerMode || 'complete' });
     const createdAt = clock.now();
@@ -567,9 +621,13 @@ export async function runSimulatedPodLifecycle(input = {}) {
       gpuLaunched: false,
       paidCompute: false,
       blenderExecuted: false,
+      paidExecutionEnabled: false,
       realR2: r2.realR2 === true,
       realR2Writes: 0,
       realR2Deletes: 0,
+      adapterMode: adapter.mode || adapter.kind,
+      adapterCreateCount: adapter.createCount(),
+      adapterDeleteCount: adapter.deleteCount(),
       cleanupVerified: cleaned.cleanupVerified === true,
       terminal,
       envKeyNames: Object.keys(payload.env).sort(),
@@ -602,6 +660,13 @@ export async function runSimulatedPodLifecycle(input = {}) {
       history,
     });
   }
+}
+
+export async function runSimulatedPodLifecycle(input = {}) {
+  return runPodLifecycle({
+    ...input,
+    runpod: input.runpod || createSimulatedRunPodAdapter(),
+  });
 }
 
 export async function runLifecycleDryRun(options = {}) {

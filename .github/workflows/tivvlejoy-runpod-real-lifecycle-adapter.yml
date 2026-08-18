@@ -1,0 +1,92 @@
+# TivvleJoy RunPod real lifecycle adapter — preflight only.
+# Never creates a real Pod or GPU. Never prints secrets.
+name: TivvleJoy RunPod Real Lifecycle Adapter Preflight
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-runpod-real-lifecycle-adapter-73f1
+
+concurrency:
+  group: tivvlejoy-real-lifecycle-adapter-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  real-lifecycle-adapter-preflight:
+    name: Real adapter preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      RUNPOD_RENDER_TEMPLATE_ID: rc8eyeqhn2
+    steps:
+      - name: Print safe checkout identity
+        run: |
+          set -euo pipefail
+          echo "github.sha=${GITHUB_SHA}"
+          echo "github.ref_name=${GITHUB_REF_NAME}"
+
+      - name: Refuse any other branch
+        run: |
+          set -euo pipefail
+          expected='cursor/tivvlejoy-runpod-real-lifecycle-adapter-73f1'
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "REFUSED: this workflow only runs on ${expected}"
+            exit 1
+          fi
+
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack pnpm
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+
+      - name: Install locked dependencies
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+
+      - name: Zero-cost contract tests
+        run: |
+          set -euo pipefail
+          pnpm validate:runpod-real-lifecycle
+          pnpm validate:runpod-lifecycle
+          pnpm validate:runpod-template-binding
+          pnpm validate:runpod-template-normalization
+          pnpm validate:runpod-template-readiness
+          pnpm validate:runpod-template-create
+          pnpm validate:runpod-worker-image
+          pnpm validate:runpod-pod-payload
+          pnpm validate:runpod-blender-foundation
+          pnpm validate:runpod-guarded
+          pnpm --filter @doodle-dash/web lint
+
+      - name: Verify pinned worker image
+        run: |
+          set -euo pipefail
+          pnpm cloud:verify-image
+          pnpm cloud:preflight-offline
+
+      - name: Bound launch and lifecycle dry-runs
+        run: |
+          set -euo pipefail
+          pnpm cloud:runpod-launch-dry-run
+          pnpm cloud:runpod-lifecycle-dry-run
+
+      - name: Real adapter preflight
+        run: |
+          set -euo pipefail
+          pnpm cloud:runpod-real-lifecycle-preflight
