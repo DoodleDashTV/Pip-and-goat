@@ -21,6 +21,8 @@ import {
   inventoryZipBytes,
   listExpectedSourceFiles,
   MemoryMultipartStorage,
+  ONE_TAP_UPLOAD_CHECKPOINT,
+  reviewOneTapPurchasedSelection,
   planHashChunks,
   planMultipartParts,
   publicIntakeSnapshot,
@@ -133,6 +135,43 @@ describe('object keys, filenames, and allowlists', () => {
       collectionCount: EXPECTED_COLLECTION_COUNT,
     });
     expect(listExpectedSourceFiles()).toHaveLength(27);
+  });
+});
+
+describe('one-tap purchased selection review', () => {
+  it('maps mixed exact filenames into all four collections and refuses others individually', () => {
+    const review = reviewOneTapPurchasedSelection([
+      { filename: 'Village_Blender_4.2.2.zip', byteSize: 11 },
+      { filename: 'SkyMachine_V2.zip', byteSize: 22 },
+      { filename: 'Stylized_Forest_Nature_Kit.zip', byteSize: 33 },
+      { filename: 'Rock_Models.blend', byteSize: 44 },
+      { filename: 'Village_Blender_4.2.2.zip', byteSize: 55 },
+      { filename: 'village blender', byteSize: 66 },
+      { filename: 'not-a-purchased-file.exe', byteSize: 77 },
+      { filename: 'Flora_Mat&GN&Models.blend.zip', byteSize: 88 },
+    ]);
+    expect(review.checkpoint).toBe(ONE_TAP_UPLOAD_CHECKPOINT);
+    expect(review.expectedCount).toBe(27);
+    expect(new Set(review.matched.map((item) => item.collectionId))).toEqual(
+      new Set(['village', 'sky-hdri', 'stylized-forest', 'procedural-nature']),
+    );
+    expect(review.eligible).toHaveLength(5);
+    expect(review.duplicates).toHaveLength(1);
+    expect(review.incorrect[0]?.filename).toBe('village blender');
+    expect(review.unexpected[0]?.filename).toBe('not-a-purchased-file.exe');
+    expect(review.eligible.every((item) => item.eligible)).toBe(true);
+    expect(review.unexpected[0]?.eligible).toBe(false);
+    expect(review.incorrect[0]?.eligible).toBe(false);
+    expect(review.duplicates[0]?.eligible).toBe(false);
+    expect(review.missing).toHaveLength(22);
+    expect(review.collectionTotals.map((item) => item.collectionId)).toEqual([
+      'village',
+      'sky-hdri',
+      'stylized-forest',
+      'procedural-nature',
+    ]);
+    expect(review.collectionTotals.find((item) => item.collectionId === 'village')?.matched).toBe(1);
+    expect(review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes).toBe(132);
   });
 });
 
@@ -464,6 +503,10 @@ describe('workspace readiness and git safety', () => {
     expect(studio).toContain('softwareFoundation');
     expect(intake).toContain('SCENERY_COPY.uploadNotApproval');
     expect(intake).toContain('Select one or multiple files');
+    expect(intake).toContain('SCENERY_COPY.oneTapSelectUpload');
+    expect(intake).toContain('SCENERY_COPY.oneTapReviewTitle');
+    expect(intake).toContain('SCENERY_COPY.oneTapUploadEligible');
+    expect(intake).toContain('reviewOneTapPurchasedSelection');
     expect(intake).toContain('Multipart progress');
     expect(intake).toContain('SCENERY_COPY.studioSession');
     expect(intake).toContain('x-tivvlejoy-scenery-intake-token');

@@ -1,5 +1,7 @@
 export { SCENERY_INTAKE_SCHEMA_VERSION, describeSceneryStorageConfiguration, publicSceneryStorageConfiguration } from './config';
 export { EXPECTED_SOURCE_COUNT, EXPECTED_COLLECTION_COUNT, listExpectedSourceFiles, assertInventoryCounts } from './inventory';
+export { ONE_TAP_UPLOAD_CHECKPOINT, reviewOneTapPurchasedSelection } from './one-tap';
+export type { OneTapPurchasedReview, OneTapReviewItem, OneTapSelectionInput } from './one-tap';
 export { sceneryObjectKey, sanitizeFilename, assertAllowedExtension, planMultipartParts, assertSafeRelativeArchivePath } from './keys';
 export { resolveIntakeLimits, SCENERY_ALLOWED_EXTENSIONS } from './limits';
 export { validateSourceObjectManifest, createEmptyManifestRecord } from './manifest';

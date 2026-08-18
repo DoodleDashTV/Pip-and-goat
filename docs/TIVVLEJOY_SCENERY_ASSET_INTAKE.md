@@ -68,9 +68,9 @@ If credentials are absent, intake stays connection-ready. No upload is attempted
 
 The Preview Only Scenery Asset Intake section on `/scenery` is built for an iPhone browser.
 
-1. Choose one of the four collection cards.
-2. Review the expected file checklist (27 production files total).
-3. Select one or multiple files.
+1. Prefer **Select and upload all 27 purchased files**. Collection cards are not required.
+2. Review the expected file checklist (27 production files total) and the pre-upload review.
+3. Unexpected, incorrect, and duplicate filenames are refused individually.
 4. The browser calculates SHA-256 in chunks (Web Worker when available). It does not load a 700 MB file into memory at once.
 5. The studio API creates a short-lived multipart session for one exact object key.
 6. Each part is uploaded directly to private R2 through a signed URL.
