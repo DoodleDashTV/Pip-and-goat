@@ -1,0 +1,103 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "items": [
+    {
+      "sourceId": "SRC_FOREST_MODEL_PACKAGE",
+      "textures": 155,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "textures": 1134,
+      "hdriOrSkyImages": 6,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_SKY_EXTRA_UPDATE_ZIP",
+      "textures": 2,
+      "hdriOrSkyImages": 2,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_SKY_HDRI_JPG_PACK",
+      "textures": 20,
+      "hdriOrSkyImages": 42,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V1_ZIP",
+      "textures": 8,
+      "hdriOrSkyImages": 9,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V2_ZIP",
+      "textures": 8,
+      "hdriOrSkyImages": 9,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_SKY_WORLD_SHADERS_GIVEAWAY",
+      "textures": 0,
+      "hdriOrSkyImages": 1,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_BLEND_ZIP",
+      "textures": 0,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_FBX_ZIP",
+      "textures": 0,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_PROJECT_ZIP",
+      "textures": 0,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_TEXTURES_ZIP",
+      "textures": 77,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_BUILTIN",
+      "textures": 0,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_HDRP",
+      "textures": 0,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_URP",
+      "textures": 0,
+      "hdriOrSkyImages": 0,
+      "colorSpace": "not_measured",
+      "note": "Pixel color-space was not invented. Only listed extensions and paths are recorded."
+    }
+  ]
+}

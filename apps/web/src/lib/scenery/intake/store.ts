@@ -1,6 +1,8 @@
 import type { StoredSourceIndexEntry } from './duplicates';
 import type { SourceObjectManifest } from './manifest';
 import type { UploadSession } from './multipart';
+import { migrateLegacySourceRecord } from './legacy-migration';
+import { cannotDowngradeCompletedManifest } from './pipeline-states';
 
 export class SceneryIntakeStore {
   readonly sessions = new Map<string, UploadSession>();
@@ -17,6 +19,15 @@ export class SceneryIntakeStore {
 
   putManifest(manifest: SourceObjectManifest): SourceObjectManifest {
     const existing = this.manifests.get(manifest.sourceId);
+    if (
+      existing &&
+      cannotDowngradeCompletedManifest({
+        existingUploadState: existing.uploadState,
+        incomingUploadState: manifest.uploadState,
+      })
+    ) {
+      return existing;
+    }
     if (
       existing &&
       (existing.uploadState === 'completed' || existing.uploadState === 'already_present') &&
@@ -45,14 +56,21 @@ export class SceneryIntakeStore {
           (item.verificationState === 'size_verified' ||
             item.verificationState === 'independently_verified'),
       )
-      .map((item) => ({
-        sourceId: item.sourceId,
-        collectionId: item.collectionId,
-        filename: item.normalizedFilename,
-        objectKey: item.storageObjectKey,
-        sha256: item.sha256,
-        byteSize: item.byteSize,
-      }));
+      .map((item) => {
+        const migrated = migrateLegacySourceRecord({
+          sourceId: item.sourceId,
+          collectionId: item.collectionId,
+          originalFilename: item.originalFilename,
+        });
+        return {
+          sourceId: item.sourceId,
+          collectionId: migrated.collectionId ?? item.collectionId,
+          filename: item.normalizedFilename,
+          objectKey: item.storageObjectKey,
+          sha256: item.sha256,
+          byteSize: item.byteSize,
+        };
+      });
   }
 }
 

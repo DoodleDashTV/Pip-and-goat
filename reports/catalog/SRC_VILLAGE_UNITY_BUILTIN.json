@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "originalFilename": "Village - Built-in (Unity 2022.3.16f1).unitypackage.gz",
+  "sourceId": "SRC_VILLAGE_UNITY_BUILTIN",
+  "collection": "village",
+  "collectionName": "Village",
+  "byteSize": 131787128,
+  "sha256RecordedByIntake": "8aaa9d37087c48d17075b61e8f0d9cc1ef657a4efc05b774dda76594b065a23e",
+  "storageVerificationState": "size_verified",
+  "archiveType": "unitypackage.gz",
+  "archiveFileCount": 0,
+  "totalUncompressedSize": 0,
+  "directoryStructure": [],
+  "containedExtensions": [
+    ".unitypackage.gz"
+  ],
+  "modelFiles": [],
+  "textures": [],
+  "materials": [],
+  "hdriOrSkyImages": [],
+  "unityPackages": [
+    "(container)"
+  ],
+  "blenderFiles": [],
+  "fbxFiles": [],
+  "glbFiles": [],
+  "objFiles": [],
+  "mtlFiles": [],
+  "documentationAndLicenseFiles": [],
+  "suspiciousOrUnsupported": [],
+  "missingReferencedDependencies": [],
+  "duplicateInternalFilenames": [],
+  "exactDuplicateInternalContent": [],
+  "inspectionReadiness": "preservation_only",
+  "pipelineState": "preservation_only",
+  "recommendedNextAction": "Keep this Unity package as preservation-only. Do not import it into the Blender pipeline.",
+  "blender": {
+    "available": false,
+    "executed": false,
+    "factoryStartup": false,
+    "autoExecutionDisabled": true,
+    "networkAccess": false,
+    "state": "not_applicable",
+    "scenes": null,
+    "collections": null,
+    "objects": null,
+    "meshes": null,
+    "materials": null,
+    "images": null,
+    "cameras": null,
+    "lights": null,
+    "armatures": null,
+    "animations": null,
+    "geometryNodes": null,
+    "linkedOrMissingLibraries": [],
+    "notes": [
+      "No Blender execution was required or attempted for this source."
+    ]
+  },
+  "findings": [],
+  "executedEmbeddedScripts": false,
+  "extractedIntoRepository": false,
+  "originalSourceOverwritten": false,
+  "automaticallyApproved": false,
+  "storageRead": true,
+  "notes": [
+    "Unity package container header was inspected without importing into Unity or executing package scripts.",
+    "This source remains preservation-only for the Blender pipeline."
+  ]
+}

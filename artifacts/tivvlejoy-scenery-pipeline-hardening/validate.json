@@ -18,12 +18,12 @@
       "detail": "ok"
     },
     {
-      "name": "exact 27-file match",
+      "name": "exact 14-file match",
       "status": "PASS",
       "detail": "ok"
     },
     {
-      "name": "world shaders stay outside the purchased 27",
+      "name": "confirmed World Shaders download is official",
       "status": "PASS",
       "detail": "ok"
     },

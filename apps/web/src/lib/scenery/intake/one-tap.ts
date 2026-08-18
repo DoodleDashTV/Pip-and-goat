@@ -3,14 +3,15 @@ import { sanitizeFilename } from './keys';
 import {
   EXPECTED_COLLECTION_COUNT,
   EXPECTED_SOURCE_COUNT,
+  collectionDisplayOrder,
   listExpectedSourceFiles,
   matchAliasOnlyExpectedFilename,
+  matchArchiveContentFilename,
   matchExactExpectedFilename,
   normalizeInventoryFilename,
   type SceneryCollectionId,
 } from './inventory';
 import { assessSourceSize } from './size-validation';
-import { shouldExcludeWorldShadersGiveaway } from './world-shaders';
 
 export const ONE_TAP_UPLOAD_CHECKPOINT = 'TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD_V1';
 
@@ -123,24 +124,20 @@ export function reviewOneTapPurchasedSelection(
         reason: `Unsafe filename refused (${safety.issues.join(', ')}). Source files are not renamed.`,
       };
     }
-    if (
-      !exact &&
-      shouldExcludeWorldShadersGiveaway({
-        filename: input.filename,
-        approvedManifestFilenames: options?.approvedManifestFilenames,
-      })
-    ) {
+    const archiveContent = matchArchiveContentFilename(input.filename);
+    if (!exact && !aliasOnly && archiveContent) {
       return {
         filename: input.filename,
         sanitizedFilename,
         byteSize: input.byteSize,
         classification: 'unexpected',
-        collectionId: null,
-        collectionName: null,
-        sourceId: null,
-        expectedFilename: null,
+        collectionId: archiveContent.collectionId,
+        collectionName: archiveContent.collectionId,
+        sourceId: archiveContent.formerSourceId,
+        expectedFilename: archiveContent.expectedFilename,
         eligible: false,
-        reason: 'The free World Shaders giveaway is outside the purchased 27-file requirement.',
+        reason:
+          'This filename is internal archive content of a confirmed 14-file download. It is not a missing top-level source.',
       };
     }
     if (!size.ok) {
@@ -242,9 +239,7 @@ export function reviewOneTapPurchasedSelection(
       expectedFilename: item.expectedFilename,
     }));
 
-  const collectionTotals = (
-    ['village', 'sky-hdri', 'stylized-forest', 'procedural-nature'] as const
-  ).map((collectionId) => {
+  const collectionTotals = collectionDisplayOrder().map((collectionId) => {
     const collectionExpected = expected.filter((item) => item.collectionId === collectionId);
     const collectionMatched = matched.filter((item) => item.collectionId === collectionId);
     return {

@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { SceneryError } from '../types';
 import { SCENERY_INTAKE_SCHEMA_VERSION } from './config';
-import type { SceneryCollectionId } from './inventory';
+import type { ManifestCollectionId, SceneryCollectionId } from './inventory';
+import { INSPECTION_STATES } from './pipeline-states';
 
 export const UPLOAD_STATES = [
   'not_started',
@@ -24,14 +25,7 @@ export const VERIFICATION_STATES = [
 ] as const;
 
 export const QUARANTINE_STATES = ['not_quarantined', 'quarantined', 'cleared'] as const;
-export const INSPECTION_STATES = [
-  'not_eligible',
-  'awaiting_verification',
-  'inspection_ready',
-  'queued',
-  'inspected',
-  'failed',
-] as const;
+export { INSPECTION_STATES };
 export const BLENDER_COMPAT_STATES = [
   'unknown',
   'compatible',
@@ -43,7 +37,7 @@ export const BLENDER_COMPAT_STATES = [
 export const SourceObjectManifestSchema = z.object({
   schemaVersion: z.literal(SCENERY_INTAKE_SCHEMA_VERSION),
   sourceId: z.string().regex(/^SRC_[A-Z0-9_]+$/),
-  collectionId: z.enum(['village', 'sky-hdri', 'stylized-forest', 'procedural-nature']),
+  collectionId: z.enum(['village', 'sky-hdri', 'stylized-forest', 'world-shaders', 'procedural-nature']),
   originalFilename: z.string().min(1),
   normalizedFilename: z.string().min(1),
   storageObjectKey: z.string().min(1),
@@ -88,7 +82,7 @@ export function validateSourceObjectManifest(input: unknown): SourceObjectManife
 
 export function createEmptyManifestRecord(input: {
   sourceId: string;
-  collectionId: SceneryCollectionId;
+  collectionId: ManifestCollectionId | SceneryCollectionId;
   originalFilename: string;
   normalizedFilename: string;
   objectKey: string;

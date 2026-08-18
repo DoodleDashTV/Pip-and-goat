@@ -4,7 +4,7 @@ Checkpoint: `TIVVLEJOY_SCENERY_ONE_TAP_UPLOAD_V1`
 
 Stacked on Draft PR #45 (`cursor/tivvlejoy-scenery-intake-preview-73f1`). Keep #44 and #45 draft and unmerged.
 
-This pass adds a mobile-friendly one-tap workflow on Preview `/scenery` so an authorized TivvleJoy studio session can select all 27 purchased source files in one file-picker action. Collection cards are not required.
+This pass adds a mobile-friendly one-tap workflow on Preview `/scenery` so an authorized TivvleJoy studio session can select the confirmed purchased source files in one file-picker action. The later 14-file inspection pass is the official inventory. Collection cards are not required.
 
 It does **not** inspect, extract, convert, normalize, or approve assets. Production is not retargeted. Existing Preview R2 settings are reused.
 

@@ -1,0 +1,42 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "officialDownloads": [
+    "Village (Blender 4.2.2).zip",
+    "Village (Textures).zip",
+    "Project File.zip",
+    "Village (FBX).zip",
+    "Village - Built-in (Unity 2022.3.16f1).unitypackage.gz",
+    "Village - URP (Unity 2022.3.16f1).unitypackage.gz",
+    "Village - HDRP (Unity 2022.3.16f1).unitypackage.gz",
+    "SkyMachineV1.zip",
+    "SkyMachineV2.zip",
+    "Extra Update 1.zip",
+    "HDRi_JPG_Pack.zip",
+    "Stylized_Forest_Nature_Kit.zip",
+    "Stylised EcoKit.zip",
+    "Giveaway_World Shaders.zip"
+  ],
+  "expectedSourceDownloads": 14,
+  "uploaded": 14,
+  "verified": 14,
+  "missing": 0,
+  "confirmedDuplicates": 0,
+  "quarantined": 0,
+  "productionModified": false,
+  "licensedFilesCommitted": false,
+  "secretsExposed": false,
+  "inspectedContainers": 14,
+  "missingObjects": 0,
+  "sizeMismatches": 0,
+  "blenderExecuted": false,
+  "safety": {
+    "productionModified": false,
+    "existingPreviewR2Modified": false,
+    "licensed_files_committed": false,
+    "token_printed": false,
+    "credentials_in_html_or_json": false,
+    "gitSafetyOk": true,
+    "gitSafetyViolations": [],
+    "vercelHasDummyDatabaseUrl": true
+  }
+}

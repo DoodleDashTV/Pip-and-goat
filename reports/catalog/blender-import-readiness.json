@@ -1,0 +1,75 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "items": [
+    {
+      "sourceId": "SRC_FOREST_MODEL_PACKAGE",
+      "ready": false,
+      "reason": "Blender is unavailable in this isolated worker"
+    },
+    {
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "ready": false,
+      "reason": "Blender is unavailable in this isolated worker"
+    },
+    {
+      "sourceId": "SRC_SKY_EXTRA_UPDATE_ZIP",
+      "ready": false,
+      "reason": "Review the inspection catalog, then queue a later Blender-import pass without automatic approval."
+    },
+    {
+      "sourceId": "SRC_SKY_HDRI_JPG_PACK",
+      "ready": false,
+      "reason": "Review the inspection catalog, then queue a later Blender-import pass without automatic approval."
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V1_ZIP",
+      "ready": false,
+      "reason": "Blender is unavailable in this isolated worker"
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V2_ZIP",
+      "ready": false,
+      "reason": "Blender is unavailable in this isolated worker"
+    },
+    {
+      "sourceId": "SRC_SKY_WORLD_SHADERS_GIVEAWAY",
+      "ready": false,
+      "reason": "Blender is unavailable in this isolated worker"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_BLEND_ZIP",
+      "ready": false,
+      "reason": "Blender is unavailable in this isolated worker"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_FBX_ZIP",
+      "ready": false,
+      "reason": "Review the inspection catalog, then queue a later Blender-import pass without automatic approval."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_PROJECT_ZIP",
+      "ready": false,
+      "reason": "Blender is unavailable in this isolated worker"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_TEXTURES_ZIP",
+      "ready": false,
+      "reason": "Review the inspection catalog, then queue a later Blender-import pass without automatic approval."
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_BUILTIN",
+      "ready": false,
+      "reason": "Unity or other preservation-only source"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_HDRP",
+      "ready": false,
+      "reason": "Unity or other preservation-only source"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_URP",
+      "ready": false,
+      "reason": "Unity or other preservation-only source"
+    }
+  ]
+}

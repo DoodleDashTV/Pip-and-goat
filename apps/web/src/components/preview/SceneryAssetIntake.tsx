@@ -60,10 +60,10 @@ type FileRow = {
 };
 
 const COLLECTIONS = [
-  { id: 'village', name: 'Village Environment', expected: 7 },
-  { id: 'sky-hdri', name: 'Sky and HDRI Lighting', expected: 7 },
-  { id: 'stylized-forest', name: 'Stylized Forest', expected: 4 },
-  { id: 'procedural-nature', name: 'Procedural Nature Library', expected: 9 },
+  { id: 'village', name: 'Village', expected: 7 },
+  { id: 'sky-hdri', name: 'Sky/HDRI', expected: 4 },
+  { id: 'stylized-forest', name: 'Stylized Forest/EcoKit', expected: 2 },
+  { id: 'world-shaders', name: 'World Shaders', expected: 1 },
 ] as const;
 
 function intakeHeaders(token: string): HeadersInit {
@@ -742,9 +742,10 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       </div>
 
       <div>
-        <h3 className="font-bold">Expected 30-file source checklist</h3>
+        <h3 className="font-bold">Expected 14-file source checklist</h3>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          {checklist.length} expected production files across {COLLECTIONS.length} collections
+          {checklist.length} expected source downloads across {COLLECTIONS.length} collections.
+          Files inside those archives are not missing downloads.
         </p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
           {checklist.map((item) => (

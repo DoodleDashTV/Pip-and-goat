@@ -35,10 +35,10 @@ describe('TivvleJoy scenery source registry', () => {
     const sources = listRegisteredSources();
     expect(sources).toHaveLength(4);
     expect(sources.map((item) => item.sourceId).sort()).toEqual([
-      'SRC_PROCEDURAL_NATURE',
       'SRC_SKY_HDRI',
       'SRC_STYLIZED_FOREST',
       'SRC_VILLAGE_ENV',
+      'SRC_WORLD_SHADERS',
     ]);
     for (const source of sources) {
       expect(validateSourceRecord(source).ingestionStatus).toBe('source_unavailable');

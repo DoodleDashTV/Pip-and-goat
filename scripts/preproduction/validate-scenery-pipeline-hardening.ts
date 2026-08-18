@@ -47,7 +47,7 @@ check('checkpoint id', () => {
   }
 });
 
-check('exact 27-file match', () => {
+check('exact 14-file match', () => {
   const review = reviewOneTapPurchasedSelection(
     listExpectedSourceFiles().map((item) => ({ filename: item.expectedFilename, byteSize: 128 })),
   );
@@ -55,9 +55,9 @@ check('exact 27-file match', () => {
     throw new Error(String(review.overallTotals.matched));
 });
 
-check('world shaders stay outside the purchased 27', () => {
-  if (!shouldExcludeWorldShadersGiveaway({ filename: 'World Shaders.zip' })) {
-    throw new Error('World Shaders was not excluded');
+check('confirmed World Shaders download is official', () => {
+  if (shouldExcludeWorldShadersGiveaway({ filename: 'Giveaway_World Shaders.zip' })) {
+    throw new Error('Official World Shaders download was excluded');
   }
 });
 

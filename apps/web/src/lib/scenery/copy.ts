@@ -25,7 +25,7 @@ export const SCENERY_COPY = {
   intakeTitle: 'Preview Only Scenery Asset Intake',
   intakeInstruction:
     'Select the purchased TivvleJoy scenery files and upload them directly to private storage. Upload does not mean asset approval.',
-  oneTapSelectUpload: 'Select and upload all 27 purchased files',
+  oneTapSelectUpload: 'Select and upload all 14 purchased source files',
   oneTapNoCollectionRequired:
     'Collection cards are not required. Exact filenames are matched to the TivvleJoy inventory automatically.',
   oneTapReviewTitle: 'Pre-upload review',
@@ -63,11 +63,16 @@ export const SCENERY_COPY = {
   softwareFoundation: 'Software foundation',
   realAssetReadiness: 'Real asset readiness',
   storageConfiguration: 'Storage configuration',
-  expectedFiles: 'Expected files',
-  uploadedFiles: 'Uploaded files',
-  verifiedFiles: 'Verified files',
+  expectedFiles: 'Expected source downloads',
+  uploadedFiles: 'Uploaded',
+  verifiedFiles: 'Verified',
+  missingFiles: 'Missing',
+  confirmedDuplicates: 'Confirmed duplicates',
   inspectionReadyFiles: 'Inspection-ready files',
   inspectedFiles: 'Inspected files',
+  inspectionSummaryTitle: 'Confirmed 14-file Preview inspection',
+  inspectionSummaryBody:
+    'Justin confirmed exactly 14 original purchase-site files. Internal archive files are not counted as missing downloads. Upload is not approval.',
 } as const;
 
 for (const value of Object.values(SCENERY_COPY)) {

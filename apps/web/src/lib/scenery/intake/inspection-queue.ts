@@ -1,83 +1,20 @@
 import { createDryRunInspectReport, type IngestionReport } from '../ingestion';
 import { sceneryStorageUri } from '../storage-policy';
+import { listExpectedSourceFiles } from './inventory';
 import {
   createNonExecutingInspectionJob,
   type NonExecutingInspectionJob,
 } from './inspection-checks';
 import type { SourceObjectManifest } from './manifest';
 
-export const SCENERY_INSPECTION_JOBS = [
-  {
-    jobId: 'INSPECT_VILLAGE_BLENDER',
-    displayName: 'Village Blender',
-    sourceId: 'SRC_VILLAGE_BLEND_ZIP',
-    collectionId: 'village',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_VILLAGE_PROJECT',
-    displayName: 'Village assembled project',
-    sourceId: 'SRC_VILLAGE_PROJECT_ZIP',
-    collectionId: 'village',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_SKYMACHINE_V2',
-    displayName: 'SkyMachine V2',
-    sourceId: 'SRC_SKY_MACHINE_V2_ZIP',
-    collectionId: 'sky-hdri',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_STYLIZED_FOREST',
-    displayName: 'Stylized Forest Blender',
-    sourceId: 'SRC_FOREST_MODEL_PACKAGE',
-    collectionId: 'stylized-forest',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_FLORA',
-    displayName: 'Flora',
-    sourceId: 'SRC_NATURE_FLORA_BLEND_ZIP',
-    collectionId: 'procedural-nature',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_ROCK_MODELS',
-    displayName: 'Rock models',
-    sourceId: 'SRC_NATURE_ROCK_MODELS',
-    collectionId: 'procedural-nature',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_ROCK_MATERIALS',
-    displayName: 'Rock materials',
-    sourceId: 'SRC_NATURE_ROCK_MAT',
-    collectionId: 'procedural-nature',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_ROCK_GN',
-    displayName: 'Rock Geometry Nodes',
-    sourceId: 'SRC_NATURE_ROCK_GN',
-    collectionId: 'procedural-nature',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_WATER_MAT_GN',
-    displayName: 'Water material/Geometry Nodes',
-    sourceId: 'SRC_NATURE_WATER_MAT_GN',
-    collectionId: 'procedural-nature',
-    blenderRequired: true,
-  },
-  {
-    jobId: 'INSPECT_SWARM',
-    displayName: 'Swarm',
-    sourceId: 'SRC_NATURE_SWARM',
-    collectionId: 'procedural-nature',
-    blenderRequired: true,
-  },
-] as const;
+export const SCENERY_INSPECTION_JOBS = listExpectedSourceFiles().map((item) => ({
+  jobId: item.inspectionJobId ?? `INSPECT_${item.sourceId.replace(/^SRC_/, '')}`,
+  displayName: item.expectedFilename,
+  sourceId: item.sourceId,
+  collectionId: item.collectionId,
+  blenderRequired: !item.unityPreservationOnly,
+  preservationOnly: item.unityPreservationOnly,
+}));
 
 export type InspectionEligibility = {
   ready: boolean;

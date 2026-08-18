@@ -4,7 +4,7 @@ Checkpoint: `TIVVLEJOY_SCENERY_PIPELINE_HARDENING_V1`
 
 Stacked on Draft PR #46 (`cursor/tivvlejoy-scenery-one-tap-upload-73f1`). Keep #44, #45, and #46 open, draft, and unmerged.
 
-This pass turns Preview scenery intake into a recoverable, production-oriented workflow that can later process the 27 purchased files without another code change.
+This pass turns Preview scenery intake into a recoverable, production-oriented workflow. The later 14-file inspection pass replaces the incorrect 27/30-file top-level requirement with Justin’s confirmed purchase-site inventory.
 
 It does **not** upload, invent, inspect-execute, extract, convert, normalize, or approve licensed assets. Production is not retargeted. Existing Preview R2 settings are not modified.
 

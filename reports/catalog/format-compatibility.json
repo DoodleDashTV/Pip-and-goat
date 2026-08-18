@@ -1,0 +1,75 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "items": [
+    {
+      "sourceId": "SRC_FOREST_MODEL_PACKAGE",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_SKY_EXTRA_UPDATE_ZIP",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_SKY_HDRI_JPG_PACK",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V1_ZIP",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V2_ZIP",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_SKY_WORLD_SHADERS_GIVEAWAY",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_BLEND_ZIP",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_FBX_ZIP",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_PROJECT_ZIP",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_TEXTURES_ZIP",
+      "format": "zip",
+      "blenderPipeline": "import_later"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_BUILTIN",
+      "format": "unitypackage.gz",
+      "blenderPipeline": "preservation_only"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_HDRP",
+      "format": "unitypackage.gz",
+      "blenderPipeline": "preservation_only"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_URP",
+      "format": "unitypackage.gz",
+      "blenderPipeline": "preservation_only"
+    }
+  ]
+}
