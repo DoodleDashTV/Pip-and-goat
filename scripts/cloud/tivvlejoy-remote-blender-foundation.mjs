@@ -76,6 +76,123 @@ export const SINGLE_SHOT_R2_KEY_CONTRACT = Object.freeze({
   metadata: 'jobs/<jobId>/metadata.json',
   source: 'workers/runpod-blender/src/single-shot.js',
 });
+export const SECRET_BOUNDARY_STATUS = 'LEAST-PRIVILEGE WORKER SECRET BOUNDARY';
+export const REAL_WORKER_ENV_AUDIT = Object.freeze([
+  { name: 'RENDER_JOB_ID', category: 'JOB_IDENTITY', sources: ['single-shot.js', 'worker.js'] },
+  { name: 'RENDER_JOB_MANIFEST_KEY', category: 'JOB_IDENTITY', sources: ['single-shot.js'] },
+  { name: 'RENDER_WORKSPACE_DIR', category: 'RENDER_CONFIGURATION', sources: ['single-shot.js', 'worker.js', 'boot-diagnostics.js'] },
+  { name: 'BLENDER_BIN', category: 'RENDER_CONFIGURATION', sources: ['single-shot.js', 'worker.js', 'blender-preflight.js', 'health.js', 'boot-diagnostics.js'] },
+  { name: 'BLENDER_ASSEMBLE_SCRIPT', category: 'RENDER_CONFIGURATION', sources: ['single-shot.js', 'worker.js'] },
+  { name: 'SKIP_BLENDER_PREFLIGHT', category: 'RENDER_CONFIGURATION', sources: ['single-shot.js'] },
+  { name: 'BLENDER_PREFLIGHT_TIMEOUT_MS', category: 'RENDER_CONFIGURATION', sources: ['single-shot.js'] },
+  { name: 'REQUIRE_GPU_HEALTH', category: 'RENDER_CONFIGURATION', sources: ['worker.js', 'health.js', 'boot-diagnostics.js'] },
+  { name: 'STARTUP_WATCHDOG_MS', category: 'RENDER_CONFIGURATION', sources: ['worker.js'] },
+  { name: 'ALLOW_WORKER_SELF_TERMINATE', category: 'RENDER_CONFIGURATION', sources: ['worker.js'] },
+  { name: 'R2_BUCKET', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'R2_ENDPOINT', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'R2_REGION', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'OBJECT_STORAGE_BUCKET', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'OBJECT_STORAGE_ENDPOINT', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'OBJECT_STORAGE_REGION', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'R2_CONNECT_TIMEOUT_MS', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'R2_REQUEST_TIMEOUT_MS', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'R2_MAX_ATTEMPTS', category: 'STORAGE_CONFIGURATION', sources: ['r2-client.js'] },
+  { name: 'R2_ACCESS_KEY_ID', category: 'STORAGE_SECRET', sources: ['r2-client.js'] },
+  { name: 'R2_SECRET_ACCESS_KEY', category: 'STORAGE_SECRET', sources: ['r2-client.js'] },
+  { name: 'OBJECT_STORAGE_ACCESS_KEY_ID', category: 'STORAGE_SECRET', sources: ['r2-client.js'] },
+  { name: 'OBJECT_STORAGE_SECRET_ACCESS_KEY', category: 'STORAGE_SECRET', sources: ['r2-client.js'] },
+  { name: 'RUNPOD_GPU_HOURLY_RATE', category: 'RUNPOD_METADATA', sources: ['single-shot.js'] },
+  { name: 'GPU_HOURLY_RATE_USD', category: 'RUNPOD_METADATA', sources: ['single-shot.js'] },
+  { name: 'RUNPOD_POD_ID', category: 'RUNPOD_METADATA', sources: ['single-shot.js', 'worker.js'] },
+  { name: 'RUNPOD_GPU_NAME', category: 'RUNPOD_METADATA', sources: ['single-shot.js'] },
+  { name: 'RENDER_WORKER_ID', category: 'RUNPOD_METADATA', sources: ['single-shot.js', 'worker.js'] },
+  { name: 'RUNPOD_API_KEY', category: 'LAUNCHER_ONLY_SECRET', sources: ['worker.js terminateSelf'], tivvlejoy: 'REFUSED' },
+  { name: 'RUNPOD_API_ENDPOINT', category: 'LAUNCHER_ONLY_SECRET', sources: ['worker.js terminateSelf'], tivvlejoy: 'REFUSED' },
+  { name: 'RUNPOD_RENDER_TEMPLATE_ID', category: 'LAUNCHER_ONLY_SECRET', sources: ['tivvlejoy-guarded-render.mjs'], tivvlejoy: 'REFUSED' },
+  { name: 'RENDER_API_URL', category: 'OPTIONAL_DIAGNOSTIC', sources: ['worker.js claim loop'], tivvlejoy: 'REFUSED' },
+  { name: 'OBJECT_STORAGE_ROOT', category: 'OPTIONAL_DIAGNOSTIC', sources: ['worker.js claim loop'], tivvlejoy: 'REFUSED' },
+  { name: 'CLOUD_RENDER_ENABLED', category: 'OPTIONAL_DIAGNOSTIC', sources: ['worker.js claim loop'], tivvlejoy: 'REFUSED' },
+  { name: 'MAX_JOB_RUNTIME_MINUTES', category: 'OPTIONAL_DIAGNOSTIC', sources: ['worker.js claim loop'], tivvlejoy: 'REFUSED' },
+  { name: 'ALLOW_CPU_DIAGNOSTIC_FALLBACK', category: 'OPTIONAL_DIAGNOSTIC', sources: ['worker.js', 'gpu-health.js'] },
+  { name: 'DDP_IMAGE_DIGEST', category: 'OPTIONAL_DIAGNOSTIC', sources: ['boot-diagnostics.js', 'provenance.js'] },
+  { name: 'DDP_RENDER_CODE_SHA256', category: 'OPTIONAL_DIAGNOSTIC', sources: ['provenance.js'] },
+  { name: 'DDP_SOURCE_COMMIT', category: 'OPTIONAL_DIAGNOSTIC', sources: ['provenance.js'] },
+  { name: 'DDP_WORKER_BUILD_TIME', category: 'OPTIONAL_DIAGNOSTIC', sources: ['provenance.js'] },
+  { name: 'RUNPOD_WORKER_IMAGE', category: 'OPTIONAL_DIAGNOSTIC', sources: ['boot-diagnostics.js', 'provenance.js'] },
+  { name: 'NVIDIA_VISIBLE_DEVICES', category: 'OPTIONAL_DIAGNOSTIC', sources: ['boot-diagnostics.js'] },
+  { name: 'EGL_PLATFORM', category: 'OPTIONAL_DIAGNOSTIC', sources: ['headless-gl.js'] },
+  { name: 'MESA_GL_VERSION_OVERRIDE', category: 'OPTIONAL_DIAGNOSTIC', sources: ['headless-gl.js'] },
+]);
+export const WORKER_ENV_ALLOWLIST = Object.freeze([
+  'RENDER_JOB_ID',
+  'RENDER_JOB_MANIFEST_KEY',
+  'RENDER_WORKSPACE_DIR',
+  'BLENDER_BIN',
+  'BLENDER_ASSEMBLE_SCRIPT',
+  'SKIP_BLENDER_PREFLIGHT',
+  'BLENDER_PREFLIGHT_TIMEOUT_MS',
+  'REQUIRE_GPU_HEALTH',
+  'STARTUP_WATCHDOG_MS',
+  'ALLOW_WORKER_SELF_TERMINATE',
+  'R2_BUCKET',
+  'R2_ENDPOINT',
+  'R2_REGION',
+  'OBJECT_STORAGE_BUCKET',
+  'OBJECT_STORAGE_ENDPOINT',
+  'OBJECT_STORAGE_REGION',
+  'R2_CONNECT_TIMEOUT_MS',
+  'R2_REQUEST_TIMEOUT_MS',
+  'R2_MAX_ATTEMPTS',
+  'R2_ACCESS_KEY_ID',
+  'R2_SECRET_ACCESS_KEY',
+  'OBJECT_STORAGE_ACCESS_KEY_ID',
+  'OBJECT_STORAGE_SECRET_ACCESS_KEY',
+  'RUNPOD_GPU_HOURLY_RATE',
+  'GPU_HOURLY_RATE_USD',
+  'RUNPOD_POD_ID',
+  'RUNPOD_GPU_NAME',
+  'RENDER_WORKER_ID',
+  'ALLOW_CPU_DIAGNOSTIC_FALLBACK',
+  'DDP_IMAGE_DIGEST',
+  'DDP_RENDER_CODE_SHA256',
+  'DDP_SOURCE_COMMIT',
+  'DDP_WORKER_BUILD_TIME',
+  'RUNPOD_WORKER_IMAGE',
+  'NVIDIA_VISIBLE_DEVICES',
+  'EGL_PLATFORM',
+  'MESA_GL_VERSION_OVERRIDE',
+]);
+export const LAUNCHER_ONLY_ENV = Object.freeze([
+  'RUNPOD_API_KEY',
+  'RUNPOD_API_ENDPOINT',
+  'RUNPOD_RENDER_TEMPLATE_ID',
+  'GITHUB_TOKEN',
+  'GH_TOKEN',
+  'GITHUB_PAT',
+  'VERCEL_OIDC_TOKEN',
+  'VERCEL_TOKEN',
+  'LAUNCH_TIVVLEJOY_GPU',
+  'confirm_paid_gpu',
+  'RENDER_API_URL',
+  'OBJECT_STORAGE_ROOT',
+  'CLOUD_RENDER_ENABLED',
+  'MAX_JOB_RUNTIME_MINUTES',
+]);
+export const WORKER_SECRET_ENV_KEYS = Object.freeze([
+  'R2_ACCESS_KEY_ID',
+  'R2_SECRET_ACCESS_KEY',
+  'OBJECT_STORAGE_ACCESS_KEY_ID',
+  'OBJECT_STORAGE_SECRET_ACCESS_KEY',
+]);
+export const WORKER_CAPABILITY_BOUNDARY = Object.freeze({
+  canCreatePods: false,
+  canDeletePods: false,
+  canQueryRunPodAccount: false,
+  canUseLauncherRunPodApiKey: false,
+  cleanupOwner: 'guarded launcher',
+  authorizedWork: 'single-shot render job only',
+  allowWorkerSelfTerminate: false,
+});
 export const WORKER_ENV_CONTRACT = Object.freeze({
   fromJobPackage: Object.freeze(['RENDER_JOB_ID', 'RENDER_JOB_MANIFEST_KEY']),
   fromServerSideSecrets: Object.freeze([
@@ -83,9 +200,8 @@ export const WORKER_ENV_CONTRACT = Object.freeze({
     'R2_SECRET_ACCESS_KEY',
     'OBJECT_STORAGE_ACCESS_KEY_ID',
     'OBJECT_STORAGE_SECRET_ACCESS_KEY',
-    'RUNPOD_API_KEY',
-    'RUNPOD_RENDER_TEMPLATE_ID',
   ]),
+  launcherOnlySecrets: LAUNCHER_ONLY_ENV,
   fromGuardedLaunchMetadata: Object.freeze([
     'RUNPOD_GPU_HOURLY_RATE',
     'GPU_HOURLY_RATE_USD',
@@ -108,10 +224,146 @@ export const WORKER_ENV_CONTRACT = Object.freeze({
     'R2_CONNECT_TIMEOUT_MS',
     'R2_REQUEST_TIMEOUT_MS',
     'R2_MAX_ATTEMPTS',
+    'REQUIRE_GPU_HEALTH',
+    'STARTUP_WATCHDOG_MS',
+    'ALLOW_WORKER_SELF_TERMINATE',
   ]),
   secretsInManifest: false,
   podLaunchImplemented: false,
+  capabilityBoundary: WORKER_CAPABILITY_BOUNDARY,
 });
+
+const WORKER_ENV_ALLOWLIST_SET = new Set(WORKER_ENV_ALLOWLIST);
+const LAUNCHER_ONLY_ENV_SET = new Set(LAUNCHER_ONLY_ENV);
+const WORKER_SECRET_ENV_SET = new Set(WORKER_SECRET_ENV_KEYS);
+
+export function redactWorkerSecrets(text) {
+  return String(text ?? '')
+    .replace(/\brpa_[A-Za-z0-9]+/g, 'rpa_[REDACTED]')
+    .replace(/Bearer\s+\S+/gi, 'Bearer [REDACTED]')
+    .replace(/\bghp_[A-Za-z0-9]+/g, 'ghp_[REDACTED]')
+    .replace(/\bgithub_pat_[A-Za-z0-9_]+/g, 'github_pat_[REDACTED]')
+    .replace(/\bghs_[A-Za-z0-9]+/g, 'ghs_[REDACTED]')
+    .replace(/(R2_SECRET_ACCESS_KEY|OBJECT_STORAGE_SECRET_ACCESS_KEY|secret_access_key|SecretAccessKey)\s*[":=]\s*\S+/gi, '$1=[REDACTED]')
+    .replace(/(R2_ACCESS_KEY_ID|OBJECT_STORAGE_ACCESS_KEY_ID|accessKeyId|AccessKeyId)\s*[":=]\s*\S+/gi, '$1=[REDACTED]')
+    .replace(/LAUNCH_TIVVLEJOY_GPU/g, '[REDACTED_APPROVAL_PHRASE]')
+    .replace(/\bvercel_[A-Za-z0-9]+/gi, 'vercel_[REDACTED]');
+}
+
+export function sanitizeWorkerEnvForLog(env) {
+  return Object.fromEntries(
+    Object.entries(env || {}).map(([key, value]) => [
+      key,
+      WORKER_SECRET_ENV_SET.has(key) ? '[REDACTED]' : redactWorkerSecrets(value),
+    ]),
+  );
+}
+
+function collectInputEnvBags(input = {}) {
+  return {
+    ...(input.storageConfig || {}),
+    ...(input.storageCredentials || {}),
+    ...(input.launchMetadata || {}),
+    ...(input.runtimeConfig || {}),
+    ...(input.injected || {}),
+  };
+}
+
+export function buildWorkerEnvironment(input = {}) {
+  const pkg = input.jobPackage?.jobPackage || input.jobPackage || {};
+  const bags = collectInputEnvBags(input);
+  const forbidden = Object.keys(bags).filter((key) => LAUNCHER_ONLY_ENV_SET.has(key) || key === REQUIRED_APPROVAL_PHRASE);
+  if (bags[REQUIRED_APPROVAL_PHRASE] || Object.values(bags).includes(REQUIRED_APPROVAL_PHRASE)) {
+    return fail('Paid approval phrase is refused from worker env.', 'LAUNCHER_ONLY_SECRET');
+  }
+  if (forbidden.length > 0) {
+    return fail(`Launcher-only or refused env variables: ${forbidden.sort().join(', ')}.`, 'LAUNCHER_ONLY_SECRET');
+  }
+  const unknown = Object.keys(bags).filter((key) => !WORKER_ENV_ALLOWLIST_SET.has(key));
+  if (unknown.length > 0) {
+    return fail(`Arbitrary env injection refused: ${unknown.sort().join(', ')}.`, 'ARBITRARY_ENV_INJECTION');
+  }
+
+  const jobId = pkg.jobId || bags.RENDER_JOB_ID;
+  const manifestKey = pkg.manifestKey || bags.RENDER_JOB_MANIFEST_KEY;
+  if (!SAFE_ID.test(String(jobId || ''))) return fail('RENDER_JOB_ID is required.', 'WORKER_ENV_INCOMPLETE');
+  if (!manifestKey || !String(manifestKey).startsWith(`jobs/${jobId}/`)) {
+    return fail('RENDER_JOB_MANIFEST_KEY must stay inside the job namespace.', 'WORKER_ENV_INCOMPLETE');
+  }
+
+  const bucket = bags.R2_BUCKET || bags.OBJECT_STORAGE_BUCKET;
+  const endpoint = bags.R2_ENDPOINT || bags.OBJECT_STORAGE_ENDPOINT;
+  const accessKey = bags.R2_ACCESS_KEY_ID || bags.OBJECT_STORAGE_ACCESS_KEY_ID;
+  const secretKey = bags.R2_SECRET_ACCESS_KEY || bags.OBJECT_STORAGE_SECRET_ACCESS_KEY;
+  if (!bucket || !endpoint || !accessKey || !secretKey) {
+    return fail('Scoped R2 storage configuration and credentials are required.', 'WORKER_ENV_INCOMPLETE');
+  }
+
+  const env = {
+    RENDER_JOB_ID: String(jobId),
+    RENDER_JOB_MANIFEST_KEY: String(manifestKey),
+    R2_BUCKET: String(bucket),
+    R2_ENDPOINT: String(endpoint),
+    R2_ACCESS_KEY_ID: String(accessKey),
+    R2_SECRET_ACCESS_KEY: String(secretKey),
+    ALLOW_WORKER_SELF_TERMINATE: 'false',
+  };
+  const optional = [
+    'R2_REGION',
+    'OBJECT_STORAGE_BUCKET',
+    'OBJECT_STORAGE_ENDPOINT',
+    'OBJECT_STORAGE_REGION',
+    'OBJECT_STORAGE_ACCESS_KEY_ID',
+    'OBJECT_STORAGE_SECRET_ACCESS_KEY',
+    'R2_CONNECT_TIMEOUT_MS',
+    'R2_REQUEST_TIMEOUT_MS',
+    'R2_MAX_ATTEMPTS',
+    'RENDER_WORKSPACE_DIR',
+    'BLENDER_BIN',
+    'BLENDER_ASSEMBLE_SCRIPT',
+    'SKIP_BLENDER_PREFLIGHT',
+    'BLENDER_PREFLIGHT_TIMEOUT_MS',
+    'REQUIRE_GPU_HEALTH',
+    'STARTUP_WATCHDOG_MS',
+    'RUNPOD_GPU_HOURLY_RATE',
+    'GPU_HOURLY_RATE_USD',
+    'RUNPOD_POD_ID',
+    'RUNPOD_GPU_NAME',
+    'RENDER_WORKER_ID',
+    'ALLOW_CPU_DIAGNOSTIC_FALLBACK',
+    'DDP_IMAGE_DIGEST',
+    'DDP_RENDER_CODE_SHA256',
+    'DDP_SOURCE_COMMIT',
+    'DDP_WORKER_BUILD_TIME',
+    'RUNPOD_WORKER_IMAGE',
+    'NVIDIA_VISIBLE_DEVICES',
+    'EGL_PLATFORM',
+    'MESA_GL_VERSION_OVERRIDE',
+  ];
+  for (const key of optional) {
+    if (bags[key] !== undefined && bags[key] !== null && bags[key] !== '') env[key] = String(bags[key]);
+  }
+
+  if (Object.keys(env).some((key) => !WORKER_ENV_ALLOWLIST_SET.has(key))) {
+    return fail('Worker env contain a non-allowlisted key.', 'ARBITRARY_ENV_INJECTION');
+  }
+  if (LAUNCHER_ONLY_ENV.some((key) => key in env)) {
+    return fail('Launcher-only secrets cannot enter worker env.', 'LAUNCHER_ONLY_SECRET');
+  }
+
+  const serialized = JSON.stringify(env);
+  if (/LAUNCH_TIVVLEJOY_GPU|GITHUB_TOKEN|VERCEL_TOKEN|RUNPOD_API_KEY|RUNPOD_RENDER_TEMPLATE_ID/.test(serialized)) {
+    return fail('Worker env leaked a launcher-only secret.', 'SECRET_LEAK');
+  }
+
+  return {
+    ok: true,
+    env,
+    sanitized: sanitizeWorkerEnvForLog(env),
+    allowlist: WORKER_ENV_ALLOWLIST,
+    capabilityBoundary: WORKER_CAPABILITY_BOUNDARY,
+  };
+}
 
 export const PILOT_RENDER_PROFILE = 'FINAL_1080P';
 export const PILOT_RESOLUTION_WIDTH = 1080;
@@ -1111,11 +1363,39 @@ export function runDryRun({ workspaceRoot, completedJobs = [], log = console.log
   log(`Success final state: ${success.finalState}`);
   log(`Failure cleanup confirmed: ${failure.cleanupConfirmed}`);
   log(`Timeout cleanup confirmed: ${timeout.cleanupConfirmed}`);
+  const workerEnv = buildWorkerEnvironment({
+    jobPackage: packaged.jobPackage,
+    storageConfig: {
+      R2_BUCKET: 'tivvlejoy-dry-run-bucket',
+      R2_ENDPOINT: 'https://example.invalid',
+      R2_REGION: 'auto',
+    },
+    storageCredentials: {
+      R2_ACCESS_KEY_ID: 'tj-dry-run-access',
+      R2_SECRET_ACCESS_KEY: 'tj-dry-run-storage',
+    },
+    launchMetadata: {
+      RUNPOD_GPU_HOURLY_RATE: '0.75',
+      RUNPOD_POD_ID: 'dry-run-pod',
+      RENDER_WORKER_ID: 'dry-run-worker',
+    },
+  });
+  if (!workerEnv.ok) {
+    log('dry-run REFUSE');
+    log(workerEnv.reason);
+    return { ok: false, preflight, compiled, packaged, command, staged, workerEnv, contactedPaidEndpoint: false };
+  }
   log('R2 mutation simulated only');
   log('GPU launched: false');
   log('Pod created: false');
   log('Blender executed: false');
   log('Paid mutation contacted: false');
+  const publicWorkerKeys = Object.keys(workerEnv.env)
+    .filter((key) => !WORKER_SECRET_ENV_SET.has(key))
+    .sort();
+  log(`Worker env public keys: ${publicWorkerKeys.join(',')}`);
+  log('Least-privilege worker env allowlist applied');
+  log('Launcher-only credentials excluded');
   log('Paid GPU execution is not enabled.');
   log('Remote Blender execution is not enabled.');
   return {
@@ -1126,6 +1406,7 @@ export function runDryRun({ workspaceRoot, completedJobs = [], log = console.log
     packaged,
     staged,
     command,
+    workerEnv,
     success,
     failure,
     timeout,

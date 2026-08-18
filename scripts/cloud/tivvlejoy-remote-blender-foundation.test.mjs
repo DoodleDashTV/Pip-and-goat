@@ -40,6 +40,13 @@ import {
   PACKAGE_STATE_STAGED,
   STAGING_FOUNDATION_STATUS,
   WORKER_ENV_CONTRACT,
+  WORKER_ENV_ALLOWLIST,
+  WORKER_CAPABILITY_BOUNDARY,
+  LAUNCHER_ONLY_ENV,
+  REAL_WORKER_ENV_AUDIT,
+  SECRET_BOUNDARY_STATUS,
+  buildWorkerEnvironment,
+  redactWorkerSecrets,
   defaultPilotJob,
   expectedOutputPrefix,
   hashJobManifest,
@@ -395,7 +402,13 @@ describe('dry-run', () => {
     assert.equal(logs.includes('Pod created: false'), true);
     assert.equal(logs.includes('Blender executed: false'), true);
     assert.equal(logs.includes('Paid mutation contacted: false'), true);
-    assert.equal(logs.some((line) => /rpa_|Authorization|secret/i.test(line)), false);
+    assert.equal(result.workerEnv.ok, true);
+    assert.equal(result.workerEnv.env.RENDER_JOB_ID, result.job.job_id);
+    assert.equal(result.workerEnv.env.RENDER_JOB_MANIFEST_KEY, result.packaged.jobPackage.manifestKey);
+    assert.equal(result.workerEnv.env.ALLOW_WORKER_SELF_TERMINATE, 'false');
+    assert.equal('RUNPOD_API_KEY' in result.workerEnv.env, false);
+    assert.equal('RUNPOD_RENDER_TEMPLATE_ID' in result.workerEnv.env, false);
+    assert.equal(logs.some((line) => /rpa_|Authorization|secret_access_key|R2_SECRET|ghp_|LAUNCH_TIVVLEJOY_GPU/i.test(line)), false);
     assert.equal(foundationSource.includes("method: 'POST'"), false);
     assert.equal(foundationSource.includes('https://rest.runpod.io/v1/pods'), false);
     assert.equal(ASSET_STAGING_PLAN.productionMutation, false);
@@ -421,8 +434,13 @@ describe('existing guarded gates remain intact', () => {
     assert.match(docs, /WORKER CONTRACT ALIGNMENT COMPLETE/);
     assert.match(docs, /NOT YET ENABLED/);
     assert.deepEqual(WORKER_ENV_CONTRACT.fromJobPackage, ['RENDER_JOB_ID', 'RENDER_JOB_MANIFEST_KEY']);
+    assert.equal(WORKER_ENV_CONTRACT.fromServerSideSecrets.includes('RUNPOD_API_KEY'), false);
     assert.equal(WORKER_ENV_CONTRACT.secretsInManifest, false);
     assert.equal(WORKER_ENV_CONTRACT.podLaunchImplemented, false);
+    assert.equal(WORKER_CAPABILITY_BOUNDARY.canCreatePods, false);
+    assert.equal(WORKER_CAPABILITY_BOUNDARY.canDeletePods, false);
+    assert.equal(SECRET_BOUNDARY_STATUS, 'LEAST-PRIVILEGE WORKER SECRET BOUNDARY');
+    assert.match(docs, /LEAST-PRIVILEGE WORKER SECRET BOUNDARY/);
   });
 });
 
@@ -554,5 +572,99 @@ describe('job package staging', () => {
       { adapter: createInMemoryR2Adapter(), localSources: {} },
     );
     assert.equal(unsafePlan.objects[0].state, 'REFUSED');
+  });
+});
+
+function sampleWorkerEnvInput(jobPackage, extra = {}) {
+  return {
+    jobPackage,
+    storageConfig: {
+      R2_BUCKET: 'tivvlejoy-test-bucket',
+      R2_ENDPOINT: 'https://example.invalid',
+      R2_REGION: 'auto',
+    },
+    storageCredentials: {
+      R2_ACCESS_KEY_ID: 'tj-test-access',
+      R2_SECRET_ACCESS_KEY: 'tj-test-storage',
+    },
+    launchMetadata: {
+      RUNPOD_GPU_HOURLY_RATE: '0.74',
+      RUNPOD_POD_ID: 'pod-test-1',
+      RENDER_WORKER_ID: 'worker-test-1',
+    },
+    ...extra,
+  };
+}
+
+describe('worker secret boundary', () => {
+  it('documents actual worker env variables and builds the minimum allowlist', () => {
+    const names = REAL_WORKER_ENV_AUDIT.map((item) => item.name);
+    assert.equal(names.includes('RENDER_JOB_ID'), true);
+    assert.equal(names.includes('R2_SECRET_ACCESS_KEY'), true);
+    assert.equal(names.includes('RUNPOD_API_KEY'), true);
+    assert.equal(REAL_WORKER_ENV_AUDIT.find((item) => item.name === 'RUNPOD_API_KEY').category, 'LAUNCHER_ONLY_SECRET');
+    assert.equal(REAL_WORKER_ENV_AUDIT.find((item) => item.name === 'RUNPOD_API_KEY').tivvlejoy, 'REFUSED');
+    assert.equal(WORKER_ENV_ALLOWLIST.includes('RENDER_JOB_ID'), true);
+    assert.equal(WORKER_ENV_ALLOWLIST.includes('RUNPOD_API_KEY'), false);
+    assert.equal(LAUNCHER_ONLY_ENV.includes('RUNPOD_API_KEY'), true);
+    assert.equal(LAUNCHER_ONLY_ENV.includes('RUNPOD_RENDER_TEMPLATE_ID'), true);
+    assert.equal(LAUNCHER_ONLY_ENV.includes('GITHUB_TOKEN'), true);
+
+    const roots = workspace();
+    const packaged = buildTivvleJoyRemoteJobPackage(validJob(roots));
+    const built = buildWorkerEnvironment(sampleWorkerEnvInput(packaged.jobPackage));
+    assert.equal(built.ok, true);
+    assert.equal(built.env.RENDER_JOB_ID, packaged.jobPackage.jobId);
+    assert.equal(built.env.RENDER_JOB_MANIFEST_KEY, packaged.jobPackage.manifestKey);
+    assert.equal(built.env.RUNPOD_GPU_HOURLY_RATE, '0.74');
+    assert.equal(built.env.ALLOW_WORKER_SELF_TERMINATE, 'false');
+    assert.equal('RUNPOD_API_KEY' in built.env, false);
+    assert.equal(built.sanitized.R2_SECRET_ACCESS_KEY, '[REDACTED]');
+    assert.equal(JSON.stringify(packaged.jobPackage).includes('tj-test-storage'), false);
+    assert.equal(JSON.stringify(packaged.jobPackage.workerManifest).includes('tj-test-storage'), false);
+  });
+
+  it('refuses launcher secrets, tokens, approval phrase, and arbitrary injection', () => {
+    const roots = workspace();
+    const packaged = buildTivvleJoyRemoteJobPackage(validJob(roots));
+    assert.equal(
+      buildWorkerEnvironment(sampleWorkerEnvInput(packaged.jobPackage, { injected: { RUNPOD_API_KEY: 'rpa_ABC123' } })).code,
+      'LAUNCHER_ONLY_SECRET',
+    );
+    assert.equal(
+      buildWorkerEnvironment(sampleWorkerEnvInput(packaged.jobPackage, { injected: { RUNPOD_RENDER_TEMPLATE_ID: 'tpl' } })).code,
+      'LAUNCHER_ONLY_SECRET',
+    );
+    assert.equal(
+      buildWorkerEnvironment(sampleWorkerEnvInput(packaged.jobPackage, { injected: { LAUNCH_TIVVLEJOY_GPU: REQUIRED_APPROVAL_PHRASE } })).code,
+      'LAUNCHER_ONLY_SECRET',
+    );
+    assert.equal(
+      buildWorkerEnvironment(sampleWorkerEnvInput(packaged.jobPackage, { injected: { GITHUB_TOKEN: 'ghp_abc' } })).code,
+      'LAUNCHER_ONLY_SECRET',
+    );
+    assert.equal(
+      buildWorkerEnvironment(sampleWorkerEnvInput(packaged.jobPackage, { injected: { VERCEL_TOKEN: 'vercel_abc' } })).code,
+      'LAUNCHER_ONLY_SECRET',
+    );
+    assert.equal(
+      buildWorkerEnvironment(sampleWorkerEnvInput(packaged.jobPackage, { injected: { EXTRA_PWN: '1' } })).code,
+      'ARBITRARY_ENV_INJECTION',
+    );
+  });
+
+  it('redacts raw and embedded secret forms', () => {
+    const raw = redactWorkerSecrets('key rpa_ABC123 Bearer tokensecret R2_SECRET_ACCESS_KEY=super R2_ACCESS_KEY_ID=id ghp_AAA github_pat_BBB LAUNCH_TIVVLEJOY_GPU');
+    assert.equal(raw.includes('rpa_ABC123'), false);
+    assert.equal(raw.includes('tokensecret'), false);
+    assert.equal(raw.includes('super'), false);
+    assert.equal(raw.includes('ghp_AAA'), false);
+    assert.equal(raw.includes('LAUNCH_TIVVLEJOY_GPU'), false);
+    assert.match(raw, /rpa_\[REDACTED\]/);
+    assert.match(raw, /Bearer \[REDACTED\]/);
+    assert.match(raw, /\[REDACTED_APPROVAL_PHRASE\]/);
+    const embedded = redactWorkerSecrets(JSON.stringify({ Authorization: 'Bearer xyz', secret_access_key: 'hidden' }));
+    assert.equal(embedded.includes('xyz'), false);
+    assert.equal(embedded.includes('hidden'), false);
   });
 });

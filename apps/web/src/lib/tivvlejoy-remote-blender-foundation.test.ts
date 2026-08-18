@@ -12,6 +12,7 @@ describe('TivvleJoy remote Blender execution foundation contract', () => {
   it('is foundation-only and does not enable paid or remote execution', () => {
     expect(docs).toContain('REMOTE EXECUTION FOUNDATION ONLY');
     expect(docs).toContain('REMOTE JOB PACKAGE STAGING FOUNDATION');
+    expect(docs).toContain('LEAST-PRIVILEGE WORKER SECRET BOUNDARY');
     expect(docs).toContain('NOT YET ENABLED');
     expect(docs).toContain('PAID GPU EXECUTION');
     expect(docs).toContain('POD CREATION');
@@ -27,6 +28,8 @@ describe('TivvleJoy remote Blender execution foundation contract', () => {
     expect(helper).toContain('validateManifest');
     expect(helper).toContain('compileTivvleJoyJobToWorkerManifest');
     expect(helper).toContain('buildTivvleJoyRemoteJobPackage');
+    expect(helper).toContain('buildWorkerEnvironment');
+    expect(helper).toContain('ALLOW_WORKER_SELF_TERMINATE');
     expect(helper).toContain('jobs/${jobId}/manifest.json');
     expect(helper).toContain('ddp-cloud-job-manifest-v1');
     expect(helper).toContain('scripts/blender/assemble_scene.py');
