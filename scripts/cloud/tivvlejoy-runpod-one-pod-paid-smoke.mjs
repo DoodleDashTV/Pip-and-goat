@@ -380,11 +380,10 @@ export async function stageSmokeJobPackage({ env = process.env, jobId, now } = {
   }
 
   const manifestBody = Buffer.from(JSON.stringify(pkg.workerManifest));
-  const manifestSha = sha256Bytes(manifestBody);
-  if (manifestSha !== pkg.workerManifestSha256 && hashCanonical(pkg.workerManifest) !== pkg.workerManifestSha256) {
+  if (hashCanonical(pkg.workerManifest) !== pkg.workerManifestSha256) {
     return fail('Worker manifest hash drifted before upload.', 'HASH_MISMATCH');
   }
-  const putManifest = await r2.put(pkg.manifestKey, manifestBody, pkg.workerManifestSha256);
+  const putManifest = await r2.put(pkg.manifestKey, manifestBody, sha256Bytes(manifestBody));
   if (!putManifest.ok) return fail('Manifest upload failed.', putManifest.code || 'NOT_READY');
   const manifestRead = await r2.get(pkg.manifestKey);
   if (!manifestRead.ok || hashCanonical(JSON.parse(manifestRead.body.toString('utf8'))) !== pkg.workerManifestSha256) {
