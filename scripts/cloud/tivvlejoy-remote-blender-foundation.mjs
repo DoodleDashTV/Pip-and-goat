@@ -10,8 +10,10 @@
  * real workers/runpod-blender/src/render-core.js validateManifest().
  * Runtime/cost enforcement stays in the existing single-shot watchdog.
  *
- * CURRENT STATUS: REMOTE JOB PACKAGE STAGING FOUNDATION
- * REMOTE EXECUTION FOUNDATION ONLY remains true for GPU/Blender execution.
+ * CURRENT STATUS: PLATFORM-INJECTED CREDENTIAL ISOLATION
+ * REMOTE JOB PACKAGE STAGING FOUNDATION and LEAST-PRIVILEGE WORKER SECRET
+ * BOUNDARY remain in force. REMOTE EXECUTION FOUNDATION ONLY remains true
+ * for GPU/Blender execution.
  * NOT YET ENABLED: paid GPU execution, Pod creation, remote Blender execution,
  * automatic production rendering.
  *
@@ -38,6 +40,7 @@ import {
 
 const require = createRequire(import.meta.url);
 const renderCore = require('../../workers/runpod-blender/src/render-core.js');
+const childEnv = require('../../workers/runpod-blender/src/child-env.js');
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -77,6 +80,11 @@ export const SINGLE_SHOT_R2_KEY_CONTRACT = Object.freeze({
   source: 'workers/runpod-blender/src/single-shot.js',
 });
 export const SECRET_BOUNDARY_STATUS = 'LEAST-PRIVILEGE WORKER SECRET BOUNDARY';
+export const PLATFORM_INJECTED_CREDENTIAL_ISOLATION_STATUS = 'PLATFORM-INJECTED CREDENTIAL ISOLATION';
+export const RENDER_SUBPROCESS_ENV_ALLOWLIST = childEnv.CHILD_ENV_ALLOWLIST;
+export const RENDER_SUBPROCESS_ENV_DENY = childEnv.CHILD_ENV_DENY;
+export const buildRenderSubprocessEnvironment = childEnv.buildRenderSubprocessEnvironment;
+export const sanitizeWorkerChildEnvironment = childEnv.sanitizeWorkerChildEnvironment;
 export const REAL_WORKER_ENV_AUDIT = Object.freeze([
   { name: 'RENDER_JOB_ID', category: 'JOB_IDENTITY', sources: ['single-shot.js', 'worker.js'] },
   { name: 'RENDER_JOB_MANIFEST_KEY', category: 'JOB_IDENTITY', sources: ['single-shot.js'] },
@@ -106,7 +114,15 @@ export const REAL_WORKER_ENV_AUDIT = Object.freeze([
   { name: 'RUNPOD_POD_ID', category: 'RUNPOD_METADATA', sources: ['single-shot.js', 'worker.js'] },
   { name: 'RUNPOD_GPU_NAME', category: 'RUNPOD_METADATA', sources: ['single-shot.js'] },
   { name: 'RENDER_WORKER_ID', category: 'RUNPOD_METADATA', sources: ['single-shot.js', 'worker.js'] },
-  { name: 'RUNPOD_API_KEY', category: 'LAUNCHER_ONLY_SECRET', sources: ['worker.js terminateSelf'], tivvlejoy: 'REFUSED' },
+  {
+    name: 'RUNPOD_API_KEY',
+    category: 'LAUNCHER_ONLY_SECRET',
+    sources: ['worker.js terminateSelf'],
+    tivvlejoy: 'REFUSED',
+    inputPayload: 'REFUSED',
+    platformInjected: 'MAY_EXIST_MUST_ISOLATE',
+    note: 'TivvleJoy never injects the launcher/account key. RunPod may inject a Pod-scoped key at runtime. Worker code must not use, forward, log, or depend on it.',
+  },
   { name: 'RUNPOD_API_ENDPOINT', category: 'LAUNCHER_ONLY_SECRET', sources: ['worker.js terminateSelf'], tivvlejoy: 'REFUSED' },
   { name: 'RUNPOD_RENDER_TEMPLATE_ID', category: 'LAUNCHER_ONLY_SECRET', sources: ['tivvlejoy-guarded-render.mjs'], tivvlejoy: 'REFUSED' },
   { name: 'RENDER_API_URL', category: 'OPTIONAL_DIAGNOSTIC', sources: ['worker.js claim loop'], tivvlejoy: 'REFUSED' },
@@ -189,9 +205,24 @@ export const WORKER_CAPABILITY_BOUNDARY = Object.freeze({
   canDeletePods: false,
   canQueryRunPodAccount: false,
   canUseLauncherRunPodApiKey: false,
+  receivesLauncherAccountRunPodApiKey: false,
+  mayReceivePlatformPodScopedRunPodApiKey: true,
+  usesPlatformPodScopedRunPodApiKey: false,
+  forwardsPlatformKeyToRenderSubprocesses: false,
   cleanupOwner: 'guarded launcher',
   authorizedWork: 'single-shot render job only',
   allowWorkerSelfTerminate: false,
+});
+export const PLATFORM_INJECTED_CREDENTIAL_CONTRACT = Object.freeze({
+  launcherAccountKey: 'never enters Pod env from TivvleJoy',
+  inputPayloadRunPodApiKey: 'REFUSED',
+  platformPodKey: 'may be automatically injected by RunPod; ignored by TivvleJoy orchestration; never forwarded to rendering subprocesses',
+  r2Secrets: 'available only to Node worker R2 I/O layer; not forwarded into Blender/FFmpeg/ffprobe',
+  renderSubprocesses: 'receive minimum safe environment only',
+  podCleanup: 'owned by guarded launcher',
+  allowWorkerSelfTerminate: false,
+  preciseStatement:
+    "The worker never receives TivvleJoy's launcher/account RunPod API credential. RunPod may automatically inject a Pod-scoped RUNPOD_API_KEY. TivvleJoy does not use, forward, log, or depend on that platform-injected credential.",
 });
 export const WORKER_ENV_CONTRACT = Object.freeze({
   fromJobPackage: Object.freeze(['RENDER_JOB_ID', 'RENDER_JOB_MANIFEST_KEY']),
@@ -231,6 +262,7 @@ export const WORKER_ENV_CONTRACT = Object.freeze({
   secretsInManifest: false,
   podLaunchImplemented: false,
   capabilityBoundary: WORKER_CAPABILITY_BOUNDARY,
+  platformInjectedCredentialContract: PLATFORM_INJECTED_CREDENTIAL_CONTRACT,
 });
 
 const WORKER_ENV_ALLOWLIST_SET = new Set(WORKER_ENV_ALLOWLIST);
@@ -244,7 +276,10 @@ export function redactWorkerSecrets(text) {
     .replace(/\bghp_[A-Za-z0-9]+/g, 'ghp_[REDACTED]')
     .replace(/\bgithub_pat_[A-Za-z0-9_]+/g, 'github_pat_[REDACTED]')
     .replace(/\bghs_[A-Za-z0-9]+/g, 'ghs_[REDACTED]')
-    .replace(/(R2_SECRET_ACCESS_KEY|OBJECT_STORAGE_SECRET_ACCESS_KEY|secret_access_key|SecretAccessKey)\s*[":=]\s*\S+/gi, '$1=[REDACTED]')
+    .replace(
+      /(RUNPOD_API_KEY|R2_SECRET_ACCESS_KEY|OBJECT_STORAGE_SECRET_ACCESS_KEY|GITHUB_TOKEN|GH_TOKEN|GITHUB_PAT|VERCEL_TOKEN|VERCEL_OIDC_TOKEN|secret_access_key|SecretAccessKey)\s*[":=]\s*\S+/gi,
+      '$1=[REDACTED]',
+    )
     .replace(/(R2_ACCESS_KEY_ID|OBJECT_STORAGE_ACCESS_KEY_ID|accessKeyId|AccessKeyId)\s*[":=]\s*\S+/gi, '$1=[REDACTED]')
     .replace(/LAUNCH_TIVVLEJOY_GPU/g, '[REDACTED_APPROVAL_PHRASE]')
     .replace(/\bvercel_[A-Za-z0-9]+/gi, 'vercel_[REDACTED]');
@@ -254,7 +289,9 @@ export function sanitizeWorkerEnvForLog(env) {
   return Object.fromEntries(
     Object.entries(env || {}).map(([key, value]) => [
       key,
-      WORKER_SECRET_ENV_SET.has(key) ? '[REDACTED]' : redactWorkerSecrets(value),
+      WORKER_SECRET_ENV_SET.has(key) || LAUNCHER_ONLY_ENV_SET.has(key) || key === 'RUNPOD_API_KEY'
+        ? '[REDACTED]'
+        : redactWorkerSecrets(value),
     ]),
   );
 }
@@ -269,6 +306,16 @@ function collectInputEnvBags(input = {}) {
   };
 }
 
+/**
+ * Explicit allowlist for TivvleJoy-injected worker env.
+ *
+ * INPUT / LAUNCH PAYLOAD RUNPOD_API_KEY = REFUSED.
+ * PLATFORM-INJECTED POD-SCOPED RUNPOD_API_KEY may exist later at runtime
+ * because RunPod documents automatically exposing RUNPOD_API_KEY inside Pods.
+ * This builder still refuses any caller-supplied launcher/account key so
+ * TivvleJoy never injects it. Isolation of a later platform key is the
+ * worker child-env sanitizer's job, not a reason to drop this refusal.
+ */
 export function buildWorkerEnvironment(input = {}) {
   const pkg = input.jobPackage?.jobPackage || input.jobPackage || {};
   const bags = collectInputEnvBags(input);

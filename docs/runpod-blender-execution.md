@@ -1,8 +1,10 @@
 # TivvleJoy remote Blender execution foundation
 
-Checkpoint: `TIVVLEJOY_WORKER_SECRET_BOUNDARY_HARDENING_V1`
+Checkpoint: `TIVVLEJOY_PLATFORM_INJECTED_CREDENTIAL_ISOLATION_V1`
 
 ## CURRENT STATUS
+
+**PLATFORM-INJECTED CREDENTIAL ISOLATION**
 
 **LEAST-PRIVILEGE WORKER SECRET BOUNDARY**
 
@@ -130,26 +132,63 @@ Unit tests and dry-run use an in-memory R2 adapter only. Real R2 is not contacte
 
 ## Trust boundary
 
+The worker never receives TivvleJoy's launcher/account RunPod API credential. RunPod may automatically inject a Pod-scoped RUNPOD_API_KEY. TivvleJoy does not use, forward, log, or depend on that platform-injected credential.
+
 GitHub / TivvleJoy launcher  
-HAS RunPod API credential  
+HAS launcher RunPod API credential  
 CAN create/delete Pod  
 
 ↓  
 
 RunPod worker  
-DOES NOT receive RunPod API credential  
+DOES NOT receive launcher/account credential  
+MAY receive platform-provided Pod-scoped credential  
+must not use that credential for TivvleJoy orchestration  
+cannot create/delete Pods through TivvleJoy worker code  
+worker self-termination disabled  
+cleanup belongs to guarded launcher  
 receives only job identity + scoped storage access + render metadata  
 
 ↓  
 
 R2 job/assets/output  
 
-The existing worker `worker.js` can call `podTerminate` **only if** `RUNPOD_API_KEY` is present. TivvleJoy does not pass that key and forces `ALLOW_WORKER_SELF_TERMINATE=false`. Pod cleanup stays on the guarded launcher.
+`buildWorkerEnvironment()` continues to refuse caller-supplied `RUNPOD_API_KEY`, `RUNPOD_API_ENDPOINT`, `RUNPOD_RENDER_TEMPLATE_ID`, `LAUNCH_TIVVLEJOY_GPU`, `GITHUB_TOKEN`, `GH_TOKEN`, `GITHUB_PAT`, and `VERCEL_TOKEN`. That refusal prevents TivvleJoy from injecting launcher credentials. It is not removed merely because RunPod may later add its own runtime key.
+
+INPUT / LAUNCH PAYLOAD `RUNPOD_API_KEY` = REFUSED  
+
+PLATFORM-INJECTED POD-SCOPED `RUNPOD_API_KEY` = may exist at runtime but must be isolated  
+
+The existing worker `worker.js` can call `podTerminate` only in legacy modes where `ALLOW_WORKER_SELF_TERMINATE` is not `false` **and** a `RUNPOD_API_KEY` is present. TivvleJoy never injects the launcher/account key and forces `ALLOW_WORKER_SELF_TERMINATE=false`. Presence of a platform-injected Pod-scoped key does not enable self-termination. Missing platform key does not affect rendering. Pod cleanup stays on the guarded launcher.
 
 The Blender worker cannot create Pods.  
 The Blender worker cannot delete Pods.  
 The Blender worker cannot query RunPod account resources using launcher credentials.  
 The Blender worker only performs the authorized single-shot render job.
+
+### RENDER SUBPROCESS ENVIRONMENT
+
+`buildRenderSubprocessEnvironment()` / `sanitizeWorkerChildEnvironment()` copies only classified execution keys. It never mutates the caller object.
+
+LAUNCHER ACCOUNT KEY  
+never enters Pod env from TivvleJoy  
+
+RUNPOD PLATFORM POD KEY  
+may be automatically injected by RunPod  
+ignored by TivvleJoy orchestration  
+never forwarded to rendering subprocesses  
+
+R2 CREDENTIALS  
+available only to Node worker R2 I/O layer  
+not forwarded into Blender/FFmpeg/ffprobe  
+
+RENDER SUBPROCESSES  
+receive minimum safe environment only  
+
+POD CLEANUP  
+owned by guarded launcher  
+
+Blender, Blender preflight, FFmpeg, and ffprobe must not receive `RUNPOD_API_KEY`, `RUNPOD_API_ENDPOINT`, `RUNPOD_RENDER_TEMPLATE_ID`, R2/object-storage secrets, GitHub tokens, Vercel tokens, `LAUNCH_TIVVLEJOY_GPU`, `PAID_APPROVAL_PHRASE`, or Authorization values. GL/EGL overlays are applied on top of the sanitized child environment, never on full `process.env`.
 
 ### FROM JOB PACKAGE
 
@@ -177,7 +216,7 @@ Vercel tokens
 `RUNPOD_POD_ID`  
 `RENDER_WORKER_ID`
 
-Never embed credentials in the job package or worker manifest. Sanitized logs redact R2 secrets, `rpa_` keys, Bearer tokens, GitHub tokens, and the approval phrase.
+Never embed credentials in the job package or worker manifest. Sanitized logs may report variable NAMES. They must never print secret VALUES, including a platform-injected Pod-scoped `RUNPOD_API_KEY`. Redaction covers R2 secrets, `rpa_` keys, `RUNPOD_API_KEY=` assignments, Bearer tokens, GitHub tokens, and the approval phrase.
 
 Pod launch is not implemented here.
 

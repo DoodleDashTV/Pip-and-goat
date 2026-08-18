@@ -13,6 +13,11 @@ describe('TivvleJoy remote Blender execution foundation contract', () => {
     expect(docs).toContain('REMOTE EXECUTION FOUNDATION ONLY');
     expect(docs).toContain('REMOTE JOB PACKAGE STAGING FOUNDATION');
     expect(docs).toContain('LEAST-PRIVILEGE WORKER SECRET BOUNDARY');
+    expect(docs).toContain('PLATFORM-INJECTED CREDENTIAL ISOLATION');
+    expect(docs).toContain("The worker never receives TivvleJoy's launcher/account RunPod API credential");
+    expect(docs).toContain('RunPod may automatically inject a Pod-scoped RUNPOD_API_KEY');
+    expect(helper).toContain('PLATFORM_INJECTED_CREDENTIAL_CONTRACT');
+    expect(helper).toContain('buildRenderSubprocessEnvironment');
     expect(docs).toContain('NOT YET ENABLED');
     expect(docs).toContain('PAID GPU EXECUTION');
     expect(docs).toContain('POD CREATION');

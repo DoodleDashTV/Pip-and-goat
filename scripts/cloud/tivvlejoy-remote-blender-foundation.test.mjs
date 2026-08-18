@@ -45,8 +45,14 @@ import {
   LAUNCHER_ONLY_ENV,
   REAL_WORKER_ENV_AUDIT,
   SECRET_BOUNDARY_STATUS,
+  PLATFORM_INJECTED_CREDENTIAL_ISOLATION_STATUS,
+  PLATFORM_INJECTED_CREDENTIAL_CONTRACT,
+  RENDER_SUBPROCESS_ENV_ALLOWLIST,
+  RENDER_SUBPROCESS_ENV_DENY,
+  buildRenderSubprocessEnvironment,
   buildWorkerEnvironment,
   redactWorkerSecrets,
+  sanitizeWorkerEnvForLog,
   defaultPilotJob,
   expectedOutputPrefix,
   hashJobManifest,
@@ -441,6 +447,18 @@ describe('existing guarded gates remain intact', () => {
     assert.equal(WORKER_CAPABILITY_BOUNDARY.canDeletePods, false);
     assert.equal(SECRET_BOUNDARY_STATUS, 'LEAST-PRIVILEGE WORKER SECRET BOUNDARY');
     assert.match(docs, /LEAST-PRIVILEGE WORKER SECRET BOUNDARY/);
+    assert.equal(PLATFORM_INJECTED_CREDENTIAL_ISOLATION_STATUS, 'PLATFORM-INJECTED CREDENTIAL ISOLATION');
+    assert.match(docs, /PLATFORM-INJECTED CREDENTIAL ISOLATION/);
+    assert.match(docs, /The worker never receives TivvleJoy's launcher\/account RunPod API credential/);
+    assert.match(docs, /RunPod may automatically inject a Pod-scoped RUNPOD_API_KEY/);
+    assert.match(docs, /TivvleJoy does not use, forward, log, or depend on that platform-injected credential/);
+    assert.equal(docs.includes('DOES NOT receive RunPod API credential\n'), false);
+    assert.equal(WORKER_CAPABILITY_BOUNDARY.receivesLauncherAccountRunPodApiKey, false);
+    assert.equal(WORKER_CAPABILITY_BOUNDARY.mayReceivePlatformPodScopedRunPodApiKey, true);
+    assert.equal(WORKER_CAPABILITY_BOUNDARY.usesPlatformPodScopedRunPodApiKey, false);
+    assert.equal(WORKER_CAPABILITY_BOUNDARY.forwardsPlatformKeyToRenderSubprocesses, false);
+    assert.equal(PLATFORM_INJECTED_CREDENTIAL_CONTRACT.inputPayloadRunPodApiKey, 'REFUSED');
+    assert.equal(PLATFORM_INJECTED_CREDENTIAL_CONTRACT.allowWorkerSelfTerminate, false);
   });
 });
 
@@ -604,6 +622,8 @@ describe('worker secret boundary', () => {
     assert.equal(names.includes('RUNPOD_API_KEY'), true);
     assert.equal(REAL_WORKER_ENV_AUDIT.find((item) => item.name === 'RUNPOD_API_KEY').category, 'LAUNCHER_ONLY_SECRET');
     assert.equal(REAL_WORKER_ENV_AUDIT.find((item) => item.name === 'RUNPOD_API_KEY').tivvlejoy, 'REFUSED');
+    assert.equal(REAL_WORKER_ENV_AUDIT.find((item) => item.name === 'RUNPOD_API_KEY').inputPayload, 'REFUSED');
+    assert.equal(REAL_WORKER_ENV_AUDIT.find((item) => item.name === 'RUNPOD_API_KEY').platformInjected, 'MAY_EXIST_MUST_ISOLATE');
     assert.equal(WORKER_ENV_ALLOWLIST.includes('RENDER_JOB_ID'), true);
     assert.equal(WORKER_ENV_ALLOWLIST.includes('RUNPOD_API_KEY'), false);
     assert.equal(LAUNCHER_ONLY_ENV.includes('RUNPOD_API_KEY'), true);
@@ -666,5 +686,41 @@ describe('worker secret boundary', () => {
     const embedded = redactWorkerSecrets(JSON.stringify({ Authorization: 'Bearer xyz', secret_access_key: 'hidden' }));
     assert.equal(embedded.includes('xyz'), false);
     assert.equal(embedded.includes('hidden'), false);
+  });
+
+  it('redacts a platform-injected Pod credential by assignment and never prints the value', () => {
+    const example = 'FAKE_PLATFORM_POD_KEY';
+    const raw = redactWorkerSecrets(`RUNPOD_API_KEY=${example} GITHUB_TOKEN=FAKE_GITHUB_TOKEN`);
+    assert.equal(raw.includes(example), false);
+    assert.equal(raw.includes('FAKE_GITHUB_TOKEN'), false);
+    assert.match(raw, /RUNPOD_API_KEY=\[REDACTED\]/);
+    const logged = sanitizeWorkerEnvForLog({
+      PATH: '/usr/bin',
+      RUNPOD_API_KEY: example,
+      R2_SECRET_ACCESS_KEY: 'FAKE_R2_SECRET',
+    });
+    assert.equal(logged.RUNPOD_API_KEY, '[REDACTED]');
+    assert.equal(logged.R2_SECRET_ACCESS_KEY, '[REDACTED]');
+    assert.equal(logged.PATH, '/usr/bin');
+    assert.equal(JSON.stringify(logged).includes(example), false);
+  });
+
+  it('strips platform and storage secrets from render subprocess env', () => {
+    const child = buildRenderSubprocessEnvironment({
+      PATH: '/usr/bin',
+      HOME: '/home/worker',
+      EGL_PLATFORM: 'surfaceless',
+      RUNPOD_API_KEY: 'FAKE_PLATFORM_POD_KEY',
+      R2_SECRET_ACCESS_KEY: 'FAKE_R2_SECRET',
+      GITHUB_TOKEN: 'FAKE_GITHUB_TOKEN',
+    });
+    assert.equal('RUNPOD_API_KEY' in child, false);
+    assert.equal('R2_SECRET_ACCESS_KEY' in child, false);
+    assert.equal('GITHUB_TOKEN' in child, false);
+    assert.equal(child.PATH, '/usr/bin');
+    assert.equal(child.EGL_PLATFORM, 'surfaceless');
+    assert.equal(RENDER_SUBPROCESS_ENV_DENY.includes('RUNPOD_API_KEY'), true);
+    assert.equal(RENDER_SUBPROCESS_ENV_ALLOWLIST.includes('PATH'), true);
+    assert.equal(RENDER_SUBPROCESS_ENV_ALLOWLIST.includes('RUNPOD_API_KEY'), false);
   });
 });
