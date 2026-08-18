@@ -50,3 +50,10 @@ Former 27-file and 30-file internals (`sk1.zip`, texture tiers, EcoKit `.blend` 
 ## Reports
 
 Machine-readable reports live under `reports/catalog/`, not inside Production asset folders.
+
+## Preview verification
+
+- Draft PR #48 stays stacked on #47. Earlier scenery PRs stay open, draft, and unmerged.
+- New Preview-only, git-branch-limited env copies were created for `cursor/tivvlejoy-scenery-14-file-inspection-73f1`. Existing Preview R2 ids and Production were not modified.
+- After those copies, Preview `/scenery` and `/scenery/inspection` report expected 14, uploaded 14, verified 14, missing 0, confirmed duplicates 0, quarantined 0.
+- Production modified: false. Licensed files committed: false. Secrets exposed: false.
