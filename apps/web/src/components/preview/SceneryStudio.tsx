@@ -110,7 +110,11 @@ export function SceneryStudio({
         <p className="text-sm leading-6 text-[var(--color-text-muted)]">
           {publicPreview
             ? 'This Preview workspace can plan scenery only. It does not render frames or open purchased files.'
-            : 'Scenery planning stays preview-only. Purchased files are not assembled here.'}
+            : 'Scenery planning stays preview-only. Purchased files are not assembled here.'}{' '}
+          <a className="underline" href="/scenery/inspection">
+            Open the 14-file inspection summary
+          </a>
+          .
         </p>
       </section>
 
@@ -145,6 +149,18 @@ export function SceneryStudio({
             {SCENERY_COPY.verifiedFiles}
           </p>
           <p className="mt-1 text-lg font-bold">{snapshot.intake.realAssetReadiness.verifiedFiles}</p>
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.missingFiles}
+          </p>
+          <p className="mt-1 text-lg font-bold">{snapshot.intake.realAssetReadiness.missingFiles}</p>
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {SCENERY_COPY.confirmedDuplicates}
+          </p>
+          <p className="mt-1 text-lg font-bold">{snapshot.intake.realAssetReadiness.confirmedDuplicates}</p>
         </div>
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">

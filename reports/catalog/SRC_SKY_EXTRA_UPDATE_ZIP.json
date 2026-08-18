@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "originalFilename": "Extra Update 1.zip",
+  "sourceId": "SRC_SKY_EXTRA_UPDATE_ZIP",
+  "collection": "sky-hdri",
+  "collectionName": "Sky/HDRI",
+  "byteSize": 10659392,
+  "sha256RecordedByIntake": "19717ec3b6d11fd0522ed240812458a769934e6ffc643c5d48342bcbcb7f6e17",
+  "storageVerificationState": "size_verified",
+  "archiveType": "zip",
+  "archiveFileCount": 2,
+  "totalUncompressedSize": 11090676,
+  "directoryStructure": [
+    "Extra Update 1/"
+  ],
+  "containedExtensions": [
+    ".jpg"
+  ],
+  "modelFiles": [],
+  "textures": [
+    "Extra Update 1/sky_6.jpg",
+    "Extra Update 1/sky_7.jpg"
+  ],
+  "materials": [],
+  "hdriOrSkyImages": [
+    "Extra Update 1/sky_6.jpg",
+    "Extra Update 1/sky_7.jpg"
+  ],
+  "unityPackages": [],
+  "blenderFiles": [],
+  "fbxFiles": [],
+  "glbFiles": [],
+  "objFiles": [],
+  "mtlFiles": [],
+  "documentationAndLicenseFiles": [],
+  "suspiciousOrUnsupported": [],
+  "missingReferencedDependencies": [],
+  "duplicateInternalFilenames": [],
+  "exactDuplicateInternalContent": [],
+  "inspectionReadiness": "inspection_complete",
+  "pipelineState": "inspection_complete",
+  "recommendedNextAction": "Review the inspection catalog, then queue a later Blender-import pass without automatic approval.",
+  "blender": {
+    "available": false,
+    "executed": false,
+    "factoryStartup": false,
+    "autoExecutionDisabled": true,
+    "networkAccess": false,
+    "state": "not_applicable",
+    "scenes": null,
+    "collections": null,
+    "objects": null,
+    "meshes": null,
+    "materials": null,
+    "images": null,
+    "cameras": null,
+    "lights": null,
+    "armatures": null,
+    "animations": null,
+    "geometryNodes": null,
+    "linkedOrMissingLibraries": [],
+    "notes": [
+      "No Blender execution was required or attempted for this source."
+    ]
+  },
+  "findings": [],
+  "executedEmbeddedScripts": false,
+  "extractedIntoRepository": false,
+  "originalSourceOverwritten": false,
+  "automaticallyApproved": false,
+  "storageRead": true,
+  "notes": [
+    "Archive contents were listed from metadata without extracting into the repository.",
+    "Embedded scripts, installers, and binaries were not executed.",
+    "No refusing archive-safety finding was raised."
+  ]
+}

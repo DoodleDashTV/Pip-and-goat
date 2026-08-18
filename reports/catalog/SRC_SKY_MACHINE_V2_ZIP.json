@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "originalFilename": "SkyMachineV2.zip",
+  "sourceId": "SRC_SKY_MACHINE_V2_ZIP",
+  "collection": "sky-hdri",
+  "collectionName": "Sky/HDRI",
+  "byteSize": 51240289,
+  "sha256RecordedByIntake": "3fc323c67b3d16a9f544250843cc22a2d6443f939b1920eaea0a946347a346c9",
+  "storageVerificationState": "size_verified",
+  "archiveType": "zip",
+  "archiveFileCount": 9,
+  "totalUncompressedSize": 51238417,
+  "directoryStructure": [
+    "SkyMachineV1/",
+    "SkyMachineV1/Skies/"
+  ],
+  "containedExtensions": [
+    ".blend",
+    ".jpg"
+  ],
+  "modelFiles": [
+    "SkyMachineV1/Append_2D_Sky_Machine V1.blend"
+  ],
+  "textures": [
+    "SkyMachineV1/How to use Part1.jpg",
+    "SkyMachineV1/How to use Part2.jpg",
+    "SkyMachineV1/Skies/sky_1.jpg",
+    "SkyMachineV1/Skies/sky_2.jpg",
+    "SkyMachineV1/Skies/sky_3.jpg",
+    "SkyMachineV1/Skies/sky_4.jpg",
+    "SkyMachineV1/Skies/sky_5.jpg",
+    "SkyMachineV1/Skies/sky_6.jpg"
+  ],
+  "materials": [],
+  "hdriOrSkyImages": [
+    "SkyMachineV1/Append_2D_Sky_Machine V1.blend",
+    "SkyMachineV1/How to use Part1.jpg",
+    "SkyMachineV1/How to use Part2.jpg",
+    "SkyMachineV1/Skies/sky_1.jpg",
+    "SkyMachineV1/Skies/sky_2.jpg",
+    "SkyMachineV1/Skies/sky_3.jpg",
+    "SkyMachineV1/Skies/sky_4.jpg",
+    "SkyMachineV1/Skies/sky_5.jpg",
+    "SkyMachineV1/Skies/sky_6.jpg"
+  ],
+  "unityPackages": [],
+  "blenderFiles": [
+    "SkyMachineV1/Append_2D_Sky_Machine V1.blend"
+  ],
+  "fbxFiles": [],
+  "glbFiles": [],
+  "objFiles": [],
+  "mtlFiles": [],
+  "documentationAndLicenseFiles": [],
+  "suspiciousOrUnsupported": [],
+  "missingReferencedDependencies": [],
+  "duplicateInternalFilenames": [],
+  "exactDuplicateInternalContent": [],
+  "inspectionReadiness": "inspection_complete",
+  "pipelineState": "inspection_complete",
+  "recommendedNextAction": "Archive listing is complete. Blender-specific metadata stays blocked until an isolated Blender 4.2 worker is available.",
+  "blender": {
+    "available": false,
+    "executed": false,
+    "factoryStartup": false,
+    "autoExecutionDisabled": true,
+    "networkAccess": false,
+    "state": "inspection_blocked",
+    "scenes": null,
+    "collections": null,
+    "objects": null,
+    "meshes": null,
+    "materials": null,
+    "images": null,
+    "cameras": null,
+    "lights": null,
+    "armatures": null,
+    "animations": null,
+    "geometryNodes": null,
+    "linkedOrMissingLibraries": [],
+    "notes": [
+      "Blender 4.2 is not available in this environment. Inspection jobs stay dry-run and realExecution remains not_run.",
+      "Factory startup, disabled auto-execution, no network, bounded temp storage, and a strict timeout would be required.",
+      "Blender results were not invented."
+    ]
+  },
+  "findings": [],
+  "executedEmbeddedScripts": false,
+  "extractedIntoRepository": false,
+  "originalSourceOverwritten": false,
+  "automaticallyApproved": false,
+  "storageRead": true,
+  "notes": [
+    "Archive contents were listed from metadata without extracting into the repository.",
+    "Embedded scripts, installers, and binaries were not executed.",
+    "No refusing archive-safety finding was raised.",
+    "Container inspection completed. Blend-file script execution was not performed."
+  ]
+}

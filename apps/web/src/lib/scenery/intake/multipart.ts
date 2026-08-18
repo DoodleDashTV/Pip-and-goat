@@ -85,6 +85,7 @@ export type MultipartStoragePort = {
   headObject(key: string): Promise<{ exists: boolean; size: number | null }>;
   putObject?(key: string, body: Uint8Array, contentType?: string): Promise<void>;
   getObject?(key: string): Promise<Uint8Array | null>;
+  getObjectRange?(key: string, offset: number, length: number): Promise<Uint8Array | null>;
   deleteObject?(key: string): Promise<void>;
   listPrefix?(prefix: string): Promise<Array<{ key: string; size: number }>>;
 };
@@ -115,6 +116,9 @@ export class ConnectionReadyMultipartStorage implements MultipartStoragePort {
     return;
   }
   async getObject(): Promise<Uint8Array | null> {
+    return null;
+  }
+  async getObjectRange(): Promise<Uint8Array | null> {
     return null;
   }
   async deleteObject(): Promise<void> {
@@ -200,6 +204,12 @@ export class MemoryMultipartStorage implements MultipartStoragePort {
   async getObject(key: string): Promise<Uint8Array | null> {
     const body = this.objects.get(key);
     return body ? new Uint8Array(body) : null;
+  }
+
+  async getObjectRange(key: string, offset: number, length: number): Promise<Uint8Array | null> {
+    const body = this.objects.get(key);
+    if (!body) return null;
+    return new Uint8Array(body.subarray(offset, offset + length));
   }
 
   async deleteObject(key: string): Promise<void> {
@@ -340,11 +350,12 @@ export function createUploadSession(input: {
       'UNEXPECTED_SOURCE',
     );
   }
+  const officialCollectionId = expected.collectionId;
   const duplicate = input.sha256
     ? detectDuplicate({
         sha256: input.sha256,
         filename: normalizedFilename,
-        collectionId,
+        collectionId: officialCollectionId,
         existing: input.existingIndex ?? [],
       })
     : { status: 'unique' as const };
@@ -354,7 +365,7 @@ export function createUploadSession(input: {
       sessionId: randomUUID(),
       uploadId: null,
       purpose,
-      collectionId,
+      collectionId: officialCollectionId,
       expectedSourceId: expected.sourceId,
       originalFilename: input.originalFilename,
       normalizedFilename,
@@ -378,7 +389,7 @@ export function createUploadSession(input: {
       expected,
       manifest: createEmptyManifestRecord({
         sourceId: expected.sourceId,
-        collectionId,
+        collectionId: officialCollectionId,
         originalFilename: input.originalFilename,
         normalizedFilename,
         objectKey: existing.objectKey,
@@ -399,7 +410,7 @@ export function createUploadSession(input: {
   const objectKey = sceneryObjectKey({
     prefix: resolveSceneryAssetPrefix(env),
     kind: 'source',
-    collection: collectionId,
+    collection: officialCollectionId,
     filename: normalizedFilename,
   });
   const planned = planMultipartParts(input.byteSize, limits.multipartPartBytes);
@@ -419,7 +430,7 @@ export function createUploadSession(input: {
     sessionId: randomUUID(),
     uploadId: null,
     purpose,
-    collectionId,
+    collectionId: officialCollectionId,
     expectedSourceId: expected.sourceId,
     originalFilename: input.originalFilename,
     normalizedFilename,
@@ -448,7 +459,7 @@ export function createUploadSession(input: {
     expected,
     manifest: createEmptyManifestRecord({
       sourceId: expected.sourceId,
-      collectionId,
+      collectionId: officialCollectionId,
       originalFilename: input.originalFilename,
       normalizedFilename,
       objectKey,

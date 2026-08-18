@@ -1,8 +1,8 @@
-import type { SceneryCollectionId } from './inventory';
+import type { ManifestCollectionId, SceneryCollectionId } from './inventory';
 
 export type StoredSourceIndexEntry = {
   sourceId: string;
-  collectionId: SceneryCollectionId;
+  collectionId: ManifestCollectionId;
   filename: string;
   objectKey: string;
   sha256: string;
@@ -37,7 +37,7 @@ export function classifyContentIdentity(input: {
 export function detectDuplicate(input: {
   sha256: string;
   filename: string;
-  collectionId: SceneryCollectionId;
+  collectionId: ManifestCollectionId | SceneryCollectionId;
   existing: StoredSourceIndexEntry[];
 }): DuplicateDecision {
   const hashMatches = input.existing.filter((item) => item.sha256 === input.sha256);

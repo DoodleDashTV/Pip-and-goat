@@ -1,8 +1,8 @@
 import { normalizeInventoryFilename } from './inventory';
 
 /**
- * The free World Shaders giveaway is outside the purchased 27-file requirement
- * unless an approved intake manifest already lists it.
+ * Giveaway_World Shaders.zip is one of the confirmed 14 official downloads.
+ * Unofficial lookalikes still go through normal unexpected-filename review.
  */
 const WORLD_SHADERS_MARKERS = ['world shaders', 'world-shaders', 'world_shaders', 'worldshader'];
 
@@ -17,11 +17,6 @@ export function shouldExcludeWorldShadersGiveaway(input: {
   filename: string;
   approvedManifestFilenames?: readonly string[];
 }): boolean {
-  if (!looksLikeWorldShadersGiveaway(input.filename)) {
-    return false;
-  }
-  const approved = new Set(
-    (input.approvedManifestFilenames ?? []).map((name) => normalizeInventoryFilename(name)),
-  );
-  return !approved.has(normalizeInventoryFilename(input.filename));
+  void input;
+  return false;
 }

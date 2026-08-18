@@ -119,22 +119,22 @@ async function completeVillageUpload(storage = new MemoryMultipartStorage()) {
 }
 
 describe('pipeline hardening inventory', () => {
-  it('matches the exact 30 official filenames and four collections', () => {
+  it('matches the exact 14 official filenames and four collections', () => {
     const expected = listExpectedSourceFiles();
     const review = reviewOneTapPurchasedSelection(
       expected.map((item) => ({ filename: item.expectedFilename, byteSize: 128 })),
     );
     expect(review.overallTotals.expected).toBe(EXPECTED_SOURCE_COUNT);
-    expect(review.overallTotals.matched).toBe(30);
+    expect(review.overallTotals.matched).toBe(14);
     expect(review.overallTotals.missing).toBe(0);
-    expect(review.overallTotals.eligible).toBe(30);
+    expect(review.overallTotals.eligible).toBe(14);
     expect(review.collectionTotals.map((item) => `${item.collectionId}:${item.expected}`)).toEqual([
       'village:7',
-      'sky-hdri:9',
-      'stylized-forest:5',
-      'procedural-nature:9',
+      'sky-hdri:4',
+      'stylized-forest:2',
+      'world-shaders:1',
     ]);
-    expect(review.collectionTotals.reduce((sum, item) => sum + item.matched, 0)).toBe(30);
+    expect(review.collectionTotals.reduce((sum, item) => sum + item.matched, 0)).toBe(14);
   });
 
   it('detects a missing file without renaming the others', () => {
@@ -144,7 +144,7 @@ describe('pipeline hardening inventory', () => {
     );
     expect(review.missing).toHaveLength(1);
     expect(review.missing[0]?.expectedFilename).toBe(expected[0]?.expectedFilename);
-    expect(review.eligible).toHaveLength(29);
+    expect(review.eligible).toHaveLength(13);
   });
 
   it('refuses an unexpected file individually', () => {
@@ -169,7 +169,7 @@ describe('pipeline hardening inventory', () => {
   it('refuses an incorrect filename and does not silently rename it', () => {
     const review = reviewOneTapPurchasedSelection([{ filename: 'village blender', byteSize: 128 }]);
     expect(review.incorrect[0]?.filename).toBe('village blender');
-    expect(review.incorrect[0]?.expectedFilename).toBe('Village (Blender 4.2.2)(2).zip');
+    expect(review.incorrect[0]?.expectedFilename).toBe('Village (Blender 4.2.2).zip');
     expect(review.eligible).toHaveLength(0);
   });
 
@@ -182,25 +182,23 @@ describe('pipeline hardening inventory', () => {
   });
 
   it('refuses an incorrectly sized file below the format minimum', () => {
-    expect(assessSourceSize({ filename: 'Rock_Models.blend', declaredBytes: 8 }).ok).toBe(false);
-    const review = reviewOneTapPurchasedSelection([{ filename: 'Rock_Models.blend', byteSize: 8 }]);
+    expect(assessSourceSize({ filename: 'Village (Blender 4.2.2).zip', declaredBytes: 8 }).ok).toBe(false);
+    const review = reviewOneTapPurchasedSelection([{ filename: 'Village (Blender 4.2.2).zip', byteSize: 8 }]);
     expect(review.incorrect[0]?.eligible).toBe(false);
     expect(review.eligible).toHaveLength(0);
   });
 
-  it('keeps the World Shaders giveaway outside the purchased 27 unless a manifest includes it', () => {
-    expect(shouldExcludeWorldShadersGiveaway({ filename: 'World Shaders.zip' })).toBe(true);
+  it('treats the confirmed World Shaders download as official and leaves lookalikes unexpected', () => {
+    expect(shouldExcludeWorldShadersGiveaway({ filename: 'Giveaway_World Shaders.zip' })).toBe(false);
+    const official = reviewOneTapPurchasedSelection([
+      { filename: 'Giveaway_World Shaders.zip', byteSize: 128 },
+    ]);
+    expect(official.eligible[0]?.collectionId).toBe('world-shaders');
     const review = reviewOneTapPurchasedSelection([
       { filename: 'World Shaders.zip', byteSize: 128 },
     ]);
-    expect(review.unexpected[0]?.reason).toMatch(/World Shaders/);
-    const included = reviewOneTapPurchasedSelection(
-      [{ filename: 'World Shaders.zip', byteSize: 128 }],
-      {
-        approvedManifestFilenames: ['World Shaders.zip'],
-      },
-    );
-    expect(included.unexpected[0]?.reason).not.toMatch(/World Shaders giveaway is outside/);
+    expect(review.unexpected[0]?.filename).toBe('World Shaders.zip');
+    expect(review.eligible).toHaveLength(0);
   });
 });
 
@@ -623,7 +621,7 @@ describe('pipeline hardening ux and accessibility', () => {
     expect(ui).toContain('aria-live="polite"');
     expect(ui).toContain('htmlFor="tivvlejoy-scenery-intake-token"');
     expect(ui).toContain(SCENERY_COPY.oneTapSelectUpload);
-    expect(ui).toContain('Select and upload all 27 purchased files');
+    expect(ui).toContain('Select and upload all 14 purchased source files');
     expect(ui).toContain('motion-safe:transition-all');
     expect(ui).not.toMatch(/DoodleDash|Doodle Dash|\bDDP\b/);
     expect(recoveredStateLabel('quarantined')).toBe('Quarantined');

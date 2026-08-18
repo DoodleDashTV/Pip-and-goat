@@ -1,7 +1,7 @@
 {
   "schemaVersion": "TIVVLEJOY_SCENERY_ASSET_INTAKE_V1",
   "ok": true,
-  "passed": 13,
+  "passed": 15,
   "failed": 0,
   "checks": [
     {
@@ -25,7 +25,12 @@
       "detail": "ok"
     },
     {
-      "name": "source inventory is 27 files across 4 collections",
+      "name": "source inventory is 14 files across 4 collections",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "one-tap review maps four collections and refuses unexpected files individually",
       "status": "PASS",
       "detail": "ok"
     },
@@ -61,6 +66,11 @@
     },
     {
       "name": "inspection readiness stays closed without verified storage",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "internal preview keys stay out of source/",
       "status": "PASS",
       "detail": "ok"
     },

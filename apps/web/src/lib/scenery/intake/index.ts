@@ -6,9 +6,22 @@ export {
 export {
   EXPECTED_SOURCE_COUNT,
   EXPECTED_COLLECTION_COUNT,
+  FILE_INSPECTION_CHECKPOINT,
   listExpectedSourceFiles,
+  listArchiveContentExpectations,
   assertInventoryCounts,
+  matchArchiveContentFilename,
 } from './inventory';
+export { migrateLegacySourceRecord, classifyLegacyInventorySize } from './legacy-migration';
+export { inspectOfficialSource, SOURCE_INSPECTION_SCHEMA } from './source-inspection';
+export { summarizeInspectionCatalog, verificationTable } from './inspection-catalog';
+export {
+  inspectZipByteSource,
+  inspectArchiveEntries,
+  memoryByteSource,
+  ARCHIVE_INSPECTION_LIMITS,
+} from './safe-archive-inspect';
+export { derivePipelineState, cannotDowngradeCompletedManifest } from './pipeline-states';
 export { ONE_TAP_UPLOAD_CHECKPOINT, reviewOneTapPurchasedSelection } from './one-tap';
 export type { OneTapPurchasedReview, OneTapReviewItem, OneTapSelectionInput } from './one-tap';
 export {

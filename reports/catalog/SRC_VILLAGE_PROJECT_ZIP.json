@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "originalFilename": "Project File.zip",
+  "sourceId": "SRC_VILLAGE_PROJECT_ZIP",
+  "collection": "village",
+  "collectionName": "Village",
+  "byteSize": 92573162,
+  "sha256RecordedByIntake": "f6b54526339dcf9ead4e823f1b83d149fadcc60cbc8fad1c85f1487dc6a4a9ce",
+  "storageVerificationState": "size_verified",
+  "archiveType": "zip",
+  "archiveFileCount": 2,
+  "totalUncompressedSize": 136801432,
+  "directoryStructure": [
+    "Project File/"
+  ],
+  "containedExtensions": [
+    ".blend",
+    ".psd"
+  ],
+  "modelFiles": [
+    "Project File/Project File.blend"
+  ],
+  "textures": [],
+  "materials": [],
+  "hdriOrSkyImages": [],
+  "unityPackages": [],
+  "blenderFiles": [
+    "Project File/Project File.blend"
+  ],
+  "fbxFiles": [],
+  "glbFiles": [],
+  "objFiles": [],
+  "mtlFiles": [],
+  "documentationAndLicenseFiles": [],
+  "suspiciousOrUnsupported": [],
+  "missingReferencedDependencies": [],
+  "duplicateInternalFilenames": [],
+  "exactDuplicateInternalContent": [],
+  "inspectionReadiness": "inspection_complete",
+  "pipelineState": "inspection_complete",
+  "recommendedNextAction": "Archive listing is complete. Blender-specific metadata stays blocked until an isolated Blender 4.2 worker is available.",
+  "blender": {
+    "available": false,
+    "executed": false,
+    "factoryStartup": false,
+    "autoExecutionDisabled": true,
+    "networkAccess": false,
+    "state": "inspection_blocked",
+    "scenes": null,
+    "collections": null,
+    "objects": null,
+    "meshes": null,
+    "materials": null,
+    "images": null,
+    "cameras": null,
+    "lights": null,
+    "armatures": null,
+    "animations": null,
+    "geometryNodes": null,
+    "linkedOrMissingLibraries": [],
+    "notes": [
+      "Blender 4.2 is not available in this environment. Inspection jobs stay dry-run and realExecution remains not_run.",
+      "Factory startup, disabled auto-execution, no network, bounded temp storage, and a strict timeout would be required.",
+      "Blender results were not invented."
+    ]
+  },
+  "findings": [],
+  "executedEmbeddedScripts": false,
+  "extractedIntoRepository": false,
+  "originalSourceOverwritten": false,
+  "automaticallyApproved": false,
+  "storageRead": true,
+  "notes": [
+    "Archive contents were listed from metadata without extracting into the repository.",
+    "Embedded scripts, installers, and binaries were not executed.",
+    "No refusing archive-safety finding was raised.",
+    "Container inspection completed. Blend-file script execution was not performed."
+  ]
+}

@@ -1,6 +1,6 @@
 import { SceneryError } from '../types';
 import { resolveSceneryAssetPrefix } from './config';
-import { getExpectedSourceFile } from './inventory';
+import { lookupSourceOrArchive } from './inventory';
 import { sceneryInternalObjectKey } from './keys';
 import type { SourceObjectManifest } from './manifest';
 import { validateSourceObjectManifest } from './manifest';
@@ -140,10 +140,19 @@ export async function hydrateIntakeStore(
       continue;
     const storedSize = storedObjects.get(manifest.storageObjectKey);
     if (storedSize !== manifest.byteSize || !manifest.sha256) continue;
-    const expected = getExpectedSourceFile(manifest.sourceId);
+    let lookup;
+    try {
+      lookup = lookupSourceOrArchive(manifest.sourceId);
+    } catch {
+      continue;
+    }
+    if (lookup.kind !== 'official' || !lookup.official) continue;
+    const expected = lookup.official;
     const quarantine = evaluateQuarantine({
       filename: manifest.normalizedFilename,
-      collectionValid: expected.collectionId === manifest.collectionId,
+      collectionValid:
+        expected.collectionId === manifest.collectionId ||
+        expected.legacyCollectionIds.includes(manifest.collectionId),
       byteSize: manifest.byteSize,
       sha256: manifest.sha256,
       objectAvailable: true,

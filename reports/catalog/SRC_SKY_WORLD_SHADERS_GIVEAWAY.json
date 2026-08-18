@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "originalFilename": "Giveaway_World Shaders.zip",
+  "sourceId": "SRC_SKY_WORLD_SHADERS_GIVEAWAY",
+  "collection": "world-shaders",
+  "collectionName": "World Shaders",
+  "byteSize": 711398,
+  "sha256RecordedByIntake": "a94ce1909aa77d97674c814f5a6f8a15fcafc67e9cdba7c8e53f52045ea41c7e",
+  "storageVerificationState": "size_verified",
+  "archiveType": "zip",
+  "archiveFileCount": 1,
+  "totalUncompressedSize": 4442856,
+  "directoryStructure": [
+    "Giveaway_World Shaders/"
+  ],
+  "containedExtensions": [
+    ".blend"
+  ],
+  "modelFiles": [
+    "Giveaway_World Shaders/Sky_World.blend"
+  ],
+  "textures": [],
+  "materials": [],
+  "hdriOrSkyImages": [
+    "Giveaway_World Shaders/Sky_World.blend"
+  ],
+  "unityPackages": [],
+  "blenderFiles": [
+    "Giveaway_World Shaders/Sky_World.blend"
+  ],
+  "fbxFiles": [],
+  "glbFiles": [],
+  "objFiles": [],
+  "mtlFiles": [],
+  "documentationAndLicenseFiles": [],
+  "suspiciousOrUnsupported": [],
+  "missingReferencedDependencies": [],
+  "duplicateInternalFilenames": [],
+  "exactDuplicateInternalContent": [],
+  "inspectionReadiness": "inspection_complete",
+  "pipelineState": "inspection_complete",
+  "recommendedNextAction": "Archive listing is complete. Blender-specific metadata stays blocked until an isolated Blender 4.2 worker is available.",
+  "blender": {
+    "available": false,
+    "executed": false,
+    "factoryStartup": false,
+    "autoExecutionDisabled": true,
+    "networkAccess": false,
+    "state": "inspection_blocked",
+    "scenes": null,
+    "collections": null,
+    "objects": null,
+    "meshes": null,
+    "materials": null,
+    "images": null,
+    "cameras": null,
+    "lights": null,
+    "armatures": null,
+    "animations": null,
+    "geometryNodes": null,
+    "linkedOrMissingLibraries": [],
+    "notes": [
+      "Blender 4.2 is not available in this environment. Inspection jobs stay dry-run and realExecution remains not_run.",
+      "Factory startup, disabled auto-execution, no network, bounded temp storage, and a strict timeout would be required.",
+      "Blender results were not invented."
+    ]
+  },
+  "findings": [],
+  "executedEmbeddedScripts": false,
+  "extractedIntoRepository": false,
+  "originalSourceOverwritten": false,
+  "automaticallyApproved": false,
+  "storageRead": true,
+  "notes": [
+    "Archive contents were listed from metadata without extracting into the repository.",
+    "Embedded scripts, installers, and binaries were not executed.",
+    "No refusing archive-safety finding was raised.",
+    "Container inspection completed. Blend-file script execution was not performed."
+  ]
+}

@@ -85,18 +85,18 @@ check('storage invalid when s3 is incomplete', () => {
   if (status.state !== 'invalid') throw new Error(status.state);
 });
 
-check('source inventory is 27 files across 4 collections', () => {
+check('source inventory is 14 files across 4 collections', () => {
   const counts = assertInventoryCounts();
-  if (counts.sourceCount !== 27 || counts.collectionCount !== 4)
+  if (counts.sourceCount !== 14 || counts.collectionCount !== 4)
     throw new Error(JSON.stringify(counts));
 });
 
 check('one-tap review maps four collections and refuses unexpected files individually', () => {
   const review = reviewOneTapPurchasedSelection([
     { filename: 'Village_Textures.zip', byteSize: 128 },
-    { filename: 'HDRI_part_sk1.zip', byteSize: 128 },
-    { filename: 'Stylized_Forest_Textures_2048.zip', byteSize: 128 },
-    { filename: 'Swarm.blend', byteSize: 128 },
+    { filename: 'SkyMachineV2.zip', byteSize: 128 },
+    { filename: 'Stylized_Forest_Nature_Kit.zip', byteSize: 128 },
+    { filename: 'Giveaway_World Shaders.zip', byteSize: 128 },
     { filename: 'readme.txt', byteSize: 64 },
   ]);
   if (review.checkpoint !== ONE_TAP_UPLOAD_CHECKPOINT) throw new Error(review.checkpoint);

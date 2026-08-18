@@ -1,0 +1,17 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "items": [
+    "Village (Blender 4.2.2).zip — hero set dressing and cabin families",
+    "Village (Textures).zip — relink village materials after the Blender package",
+    "Project File.zip — assembled village reference, inspect before reuse",
+    "SkyMachineV2.zip — preferred sky/atmosphere after village lighting is known",
+    "SkyMachineV1.zip — fallback sky package",
+    "Extra Update 1.zip — supplemental skies",
+    "HDRi_JPG_Pack.zip — HDRI and JPG lighting plates",
+    "Giveaway_World Shaders.zip — world-shader look development after lighting exists",
+    "Stylized_Forest_Nature_Kit.zip — surrounding forest after the village is placed",
+    "Stylised EcoKit.zip — scatter, flora, rocks, water, and insects last",
+    "Village (FBX).zip — interchange backup only if Blender sources need a fallback",
+    "Village Unity packages — preservation-only, never a Blender import source"
+  ]
+}

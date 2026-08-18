@@ -91,6 +91,34 @@ export function inventoryArchiveEntries(entries: ArchiveEntry[], executedAgainst
     if (pathFindings.length) suspiciousPaths.push(entry.path);
   }
   const files = entries.filter((entry) => !entry.directory);
+  if (files.length > 20_000) {
+    findings.push({
+      code: 'UNREASONABLE_ENTRY_COUNT',
+      severity: 'error',
+      message: `Archive lists ${files.length} entries, which exceeds the inspection limit.`,
+    });
+  }
+  const uncompressedSize = files.reduce((sum, entry) => sum + entry.uncompressedSize, 0);
+  if (uncompressedSize > 8 * 1024 * 1024 * 1024) {
+    findings.push({
+      code: 'DECOMPRESSED_SIZE_LIMIT',
+      severity: 'error',
+      message: 'Archive total uncompressed size exceeds the inspection limit.',
+    });
+  }
+  for (const entry of files) {
+    if (
+      entry.compressedSize > 0 &&
+      entry.uncompressedSize / entry.compressedSize > 100 &&
+      entry.uncompressedSize > 50 * 1024 * 1024
+    ) {
+      findings.push({
+        code: 'EXTREME_COMPRESSION_RATIO',
+        severity: 'error',
+        message: `Archive entry has an extreme compression ratio: ${entry.path}`,
+      });
+    }
+  }
   const extensions = [...new Set(files.map((entry) => entry.extension).filter(Boolean))].sort();
   const nestedArchives = files.filter((entry) => entry.extension === '.zip' || entry.extension === '.7z' || entry.extension === '.rar').map((entry) => entry.path);
   if (nestedArchives.length) {

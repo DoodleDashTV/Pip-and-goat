@@ -49,10 +49,9 @@ export function buildPublicScenerySnapshot(): PublicScenerySnapshot {
     defaultSeed: DEFAULT_SCENERY_SEED,
     intake: publicIntakeSnapshot(getSceneryIntakeStore().listManifests()),
     missingPrerequisites: [
-      'Purchased Village, Sky, Forest, and Nature files are not in this workspace.',
-      'No SHA-256 inspection has been recorded.',
-      'Normalized purchased assets are unavailable.',
-      'Real Blender inspection and assembly were not run.',
+      'Confirmed 14-file inventory is registered. Internal archive files are not missing downloads.',
+      'Normalized purchased assets are unavailable until a later approved pass.',
+      'Real Blender inspection stays blocked unless an isolated Blender 4.2 worker is available.',
     ],
   };
 }

@@ -174,6 +174,22 @@ export async function createConfiguredMultipartStorage(
         return null;
       }
     },
+    async getObjectRange(key, offset, length) {
+      try {
+        const end = offset + length - 1;
+        const result = await client.send(
+          new GetObjectCommand({
+            Bucket: bucket,
+            Key: key,
+            Range: `bytes=${offset}-${end}`,
+          }),
+        );
+        const bytes = await result.Body?.transformToByteArray();
+        return bytes ? new Uint8Array(bytes) : null;
+      } catch {
+        return null;
+      }
+    },
     async deleteObject(key) {
       await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
     },

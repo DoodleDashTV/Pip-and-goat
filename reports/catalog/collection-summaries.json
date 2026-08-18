@@ -1,0 +1,59 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "items": [
+    {
+      "collectionId": "village",
+      "collectionName": "Village",
+      "expected": 7,
+      "inspected": 7,
+      "preservationOnly": 3,
+      "blenderBlocked": 2,
+      "sourceIds": [
+        "SRC_VILLAGE_BLEND_ZIP",
+        "SRC_VILLAGE_TEXTURES_ZIP",
+        "SRC_VILLAGE_PROJECT_ZIP",
+        "SRC_VILLAGE_FBX_ZIP",
+        "SRC_VILLAGE_UNITY_BUILTIN",
+        "SRC_VILLAGE_UNITY_URP",
+        "SRC_VILLAGE_UNITY_HDRP"
+      ]
+    },
+    {
+      "collectionId": "sky-hdri",
+      "collectionName": "Sky/HDRI",
+      "expected": 4,
+      "inspected": 4,
+      "preservationOnly": 0,
+      "blenderBlocked": 2,
+      "sourceIds": [
+        "SRC_SKY_MACHINE_V1_ZIP",
+        "SRC_SKY_MACHINE_V2_ZIP",
+        "SRC_SKY_EXTRA_UPDATE_ZIP",
+        "SRC_SKY_HDRI_JPG_PACK"
+      ]
+    },
+    {
+      "collectionId": "stylized-forest",
+      "collectionName": "Stylized Forest/EcoKit",
+      "expected": 2,
+      "inspected": 2,
+      "preservationOnly": 0,
+      "blenderBlocked": 2,
+      "sourceIds": [
+        "SRC_FOREST_MODEL_PACKAGE",
+        "SRC_FOREST_STYLISED_ECOKIT"
+      ]
+    },
+    {
+      "collectionId": "world-shaders",
+      "collectionName": "World Shaders",
+      "expected": 1,
+      "inspected": 1,
+      "preservationOnly": 0,
+      "blenderBlocked": 1,
+      "sourceIds": [
+        "SRC_SKY_WORLD_SHADERS_GIVEAWAY"
+      ]
+    }
+  ]
+}

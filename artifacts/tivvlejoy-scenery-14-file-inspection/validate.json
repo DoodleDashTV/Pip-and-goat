@@ -1,0 +1,41 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_14_FILE_INSPECTION_V1",
+  "expectedSourceDownloads": 14,
+  "productionModified": false,
+  "licensed_files_committed": false,
+  "secrets_exposed": false,
+  "passed": 6,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "checkpoint id",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "exactly 14 official downloads",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "all confirmed filenames match",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "archive internals are not missing downloads",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "confirmed manifests report 14/14",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "production and licensed-file safety",
+      "status": "PASS",
+      "detail": "ok"
+    }
+  ]
+}
