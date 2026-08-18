@@ -2,7 +2,11 @@ import {
   AbortMultipartUploadCommand,
   CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
   S3Client,
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
@@ -93,6 +97,46 @@ export async function createConfiguredMultipartStorage(
       } catch {
         return { exists: false, size: null };
       }
+    },
+    async putObject(key, body, contentType) {
+      await client.send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          Body: body,
+          ContentType: contentType ?? 'application/octet-stream',
+        }),
+      );
+    },
+    async getObject(key) {
+      try {
+        const result = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+        const bytes = await result.Body?.transformToByteArray();
+        return bytes ? new Uint8Array(bytes) : null;
+      } catch {
+        return null;
+      }
+    },
+    async deleteObject(key) {
+      await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+    },
+    async listPrefix(prefix) {
+      const items: Array<{ key: string; size: number }> = [];
+      let token: string | undefined;
+      do {
+        const page = await client.send(
+          new ListObjectsV2Command({
+            Bucket: bucket,
+            Prefix: prefix,
+            ContinuationToken: token,
+          }),
+        );
+        for (const object of page.Contents ?? []) {
+          if (object.Key) items.push({ key: object.Key, size: Number(object.Size ?? 0) });
+        }
+        token = page.IsTruncated ? page.NextContinuationToken : undefined;
+      } while (token);
+      return items;
     },
   };
 }

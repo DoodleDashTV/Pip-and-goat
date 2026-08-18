@@ -26,6 +26,14 @@ export const SCENERY_COPY = {
   intakeInstruction:
     'Select the purchased TivvleJoy scenery files and upload them directly to private storage. Upload does not mean asset approval.',
   uploadNotApproval: 'Upload does not mean asset approval.',
+  studioSession: 'Authorized TivvleJoy studio session',
+  studioTokenLabel: 'Studio session token',
+  studioTokenHelp:
+    'Enter the TivvleJoy scenery intake token configured for this Preview. The token stays in this browser session and is never written into storage credentials, bucket controls, or the page snapshot.',
+  unauthorizedMutations:
+    'Unauthorized browsers cannot create, sign, complete, query, resume, or abort upload sessions.',
+  directToStorage:
+    'Large scenery files travel from this browser to signed private-storage URLs. They do not pass through a Vercel request body.',
   softwareFoundation: 'Software foundation',
   realAssetReadiness: 'Real asset readiness',
   storageConfiguration: 'Storage configuration',

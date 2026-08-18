@@ -30,17 +30,21 @@ const COLLECTIONS = [
   { id: 'procedural-nature', name: 'Procedural Nature Library', expected: 9 },
 ] as const;
 
+function intakeHeaders(token: string): HeadersInit {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token.trim()) headers['x-tivvlejoy-scenery-intake-token'] = token.trim();
+  return headers;
+}
+
 export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapshot }) {
   const [rows, setRows] = useState<FileRow[]>([]);
   const [busy, setBusy] = useState(false);
   const [collectionId, setCollectionId] = useState<(typeof COLLECTIONS)[number]['id']>('village');
+  const [studioToken, setStudioToken] = useState('');
 
   const intake = snapshot.intake;
 
-  const checklist = useMemo(
-    () => intake.expectedInventory.filter((item) => item.collectionId === collectionId),
-    [collectionId, intake.expectedInventory],
-  );
+  const checklist = useMemo(() => intake.expectedInventory, [intake.expectedInventory]);
 
   function updateRow(id: string, patch: Partial<FileRow>) {
     setRows((current) => current.map((row) => (row.id === id ? { ...row, ...patch } : row)));
@@ -79,7 +83,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     updateRow(row.id, { sha256: hashed.sha256, hashStatus: 'recorded', progress: 45 });
     const created = await fetch('/api/scenery/intake', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: intakeHeaders(studioToken),
       body: JSON.stringify({
         action: 'create-session',
         collectionId: row.collectionId,
@@ -138,12 +142,16 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     for (const part of session.parts) {
       const signed = await fetch('/api/scenery/intake', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: intakeHeaders(studioToken),
         body: JSON.stringify({ action: 'sign-part', sessionId: session.sessionId, partNumber: part.partNumber }),
       });
       const signedJson = (await signed.json()) as { signedUrl?: string; error?: string };
       if (!signed.ok || !signedJson.signedUrl) {
         updateRow(row.id, { error: signedJson.error ?? 'Part signing failed.', uploadStatus: 'failed' });
+        return;
+      }
+      if (/vercel\.(app|com)/i.test(signedJson.signedUrl)) {
+        updateRow(row.id, { error: 'Signed storage URL must not target Vercel.', uploadStatus: 'failed' });
         return;
       }
       const blob = row.file.slice(part.start, part.end);
@@ -160,7 +168,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     }
     const completed = await fetch('/api/scenery/intake', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: intakeHeaders(studioToken),
       body: JSON.stringify({ action: 'complete', sessionId: session.sessionId, parts: completedParts }),
     });
     const completedJson = (await completed.json()) as {
@@ -195,7 +203,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     if (!row.sessionId) return;
     await fetch('/api/scenery/intake', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: intakeHeaders(studioToken),
       body: JSON.stringify({ action: 'resume', sessionId: row.sessionId }),
     });
     await processRow(row);
@@ -205,7 +213,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     if (!row.sessionId) return;
     await fetch('/api/scenery/intake', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: intakeHeaders(studioToken),
       body: JSON.stringify({ action: 'abort', sessionId: row.sessionId }),
     });
     updateRow(row.id, { uploadStatus: 'aborted' });
@@ -218,6 +226,23 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       <p className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] px-3 py-3 text-sm font-bold">
         {SCENERY_COPY.uploadNotApproval}
       </p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.unauthorizedMutations}</p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.directToStorage}</p>
+      <p className="text-sm leading-6">
+        {SCENERY_COPY.studioSession}: {intake.authorization.tokenConfigured ? 'token configured' : 'token not configured'} ·
+        storage {intake.realAssetReadiness.storageConfiguration}
+      </p>
+      <label className="block text-sm font-bold">
+        {SCENERY_COPY.studioTokenLabel}
+        <input
+          className="field-input mt-1"
+          type="password"
+          autoComplete="off"
+          value={studioToken}
+          onChange={(event) => setStudioToken(event.target.value)}
+        />
+      </label>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.studioTokenHelp}</p>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {COLLECTIONS.map((collection) => (
@@ -238,11 +263,14 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       </div>
 
       <div>
-        <h3 className="font-bold">Expected file checklist</h3>
+        <h3 className="font-bold">Expected 27-file source checklist</h3>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+          {checklist.length} expected production files across {COLLECTIONS.length} collections
+        </p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
           {checklist.map((item) => (
             <li key={item.sourceId}>
-              {item.expectedFilename} · {item.sourceId}
+              {item.collectionName}: {item.expectedFilename} · {item.sourceId}
               {item.unityPreservationOnly ? ' · Unity preservation only' : ''}
             </li>
           ))}

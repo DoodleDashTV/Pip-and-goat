@@ -15,6 +15,7 @@ import {
   planMultipartParts,
   resolveImmutableWrite,
   sanitizeFilename,
+  sceneryInternalObjectKey,
   sceneryObjectKey,
   syntheticExecutableZip,
   syntheticFixtureZip,
@@ -188,6 +189,15 @@ check('inspection readiness stays closed without verified storage', () => {
   });
   if (evaluateInspectionEligibility(manifest).ready) throw new Error('should not be ready');
   assertSingleTextureTierMaterialized(['2048']);
+});
+
+check('internal preview keys stay out of source/', () => {
+  const key = sceneryInternalObjectKey({
+    prefix: 'tivvlejoy-assets',
+    folder: 'preview-tests',
+    filename: 'tivvlejoy-preview-synthetic-validate.txt',
+  });
+  if (!key.includes('/quarantine/preview-tests/') || key.includes('/source/')) throw new Error(key);
 });
 
 check('no licensed binaries or secrets newly tracked', () => {

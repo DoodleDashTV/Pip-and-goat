@@ -7,8 +7,17 @@ export { detectDuplicate, resolveImmutableWrite } from './duplicates';
 export { evaluateQuarantine } from './quarantine';
 export { listZipEntriesWithoutExtracting, inventoryZipBytes, createDryRunArchiveInventory, buildMinimalZip } from './archive';
 export { createUploadSession, MemoryMultipartStorage, ConnectionReadyMultipartStorage } from './multipart';
+export { createConfiguredMultipartStorage } from './r2-multipart';
 export { handleSceneryIntakeAction } from './service';
 export { publicIntakeSnapshot, buildSoftwareFoundationStatus, buildRealAssetReadiness } from './readiness';
+export { SCENERY_INTAKE_TOKEN_HEADER, publicIntakeAuthorizationSnapshot } from './access';
+export { sceneryInternalObjectKey } from './keys';
+export { signedUrlTargetsVercel } from './durable-state';
+export {
+  PREVIEW_SYNTHETIC_SOURCE_ID,
+  previewSyntheticBytes,
+  previewSyntheticFilename,
+} from './fixtures';
 export { SCENERY_INSPECTION_JOBS, evaluateInspectionEligibility, createQueuedInspectionJobs } from './inspection-queue';
 export { BLENDER_INSPECTION_CONTRACT, describeBlenderAvailability } from './blender-contract';
 export { getSceneryIntakeStore, resetSceneryIntakeStore } from './store';

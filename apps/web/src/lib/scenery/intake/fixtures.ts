@@ -3,6 +3,20 @@ import { sha256HexChunked } from './hash';
 
 export const SYNTHETIC_INTAKE_TEXT = 'TivvleJoy synthetic scenery fixture. No commercial geometry.\n';
 
+export const PREVIEW_SYNTHETIC_SOURCE_ID = 'SRC_PREVIEW_SYNTHETIC';
+export const PREVIEW_SYNTHETIC_FILENAME_PREFIX = 'tivvlejoy-preview-synthetic-';
+export const PREVIEW_SYNTHETIC_TEXT =
+  'TivvleJoy preview-only synthetic fixture. No purchased scenery content.\n';
+
+export function previewSyntheticFilename(label = 'intake'): string {
+  const safe = label.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'intake';
+  return `${PREVIEW_SYNTHETIC_FILENAME_PREFIX}${safe}.txt`;
+}
+
+export function previewSyntheticBytes(label = 'intake'): Uint8Array {
+  return new TextEncoder().encode(`${PREVIEW_SYNTHETIC_TEXT}${label}\n`);
+}
+
 export function syntheticFixtureBytes(label = 'village'): Uint8Array {
   return new TextEncoder().encode(`${SYNTHETIC_INTAKE_TEXT}${label}\n`);
 }
