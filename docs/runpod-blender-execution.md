@@ -1,10 +1,12 @@
 # TivvleJoy remote Blender execution foundation
 
-Checkpoint: `TIVVLEJOY_RUNPOD_BLENDER_EXECUTION_FOUNDATION_V1`
+Checkpoint: `TIVVLEJOY_REMOTE_RENDER_WORKER_CONTRACT_ALIGNMENT_V1`
 
 ## CURRENT STATUS
 
 **REMOTE EXECUTION FOUNDATION ONLY**
+
+**WORKER CONTRACT ALIGNMENT COMPLETE** — a TivvleJoy job compiled today is structurally executable by the existing RunPod worker later. Remote GPU execution is still not enabled.
 
 This branch defines the software contract that will eventually send an approved TivvleJoy scene to a guarded RunPod RTX 4090 worker. It does **not** launch a GPU and does **not** run Blender remotely.
 
@@ -18,16 +20,22 @@ A live `render_plan` PASS on RTX 4090 Secure Cloud is evidence that price/availa
 
 ## Intended flow
 
-TivvleJoy approved scene  
-→ render manifest  
-→ preflight  
-→ guarded RunPod approval  
-→ Pod  
-→ asset staging  
+TivvleJoy episode / shot  
+→ `tivvlejoy-remote-render-job-v1` (studio / orchestration contract)  
+→ deterministic compiler `compileTivvleJoyJobToWorkerManifest()`  
+→ `ddp-cloud-job-manifest-v1` (existing RunPod worker execution contract)  
+→ existing single-shot RunPod worker  
+→ R2 asset staging  
 → Blender  
-→ technical output verification  
+→ frame verification  
+→ FFmpeg encode  
+→ ffprobe validation  
+→ R2 upload verification  
+→ COMPLETE only after a verified artifact  
 → cleanup  
 → later visual QC
+
+`tivvlejoy-remote-render-job-v1` is **not** a second worker format. It is only the studio/orchestration schema. The only approved bridge to execution is the compiler. The real worker continues to consume `ddp-cloud-job-manifest-v1` via `renderCore.validateManifest()`.
 
 Visual artistic QC is a later stage. Technical checks here do not claim picture quality.
 
@@ -64,6 +72,26 @@ Local zero-cost gates that remain available:
 
 - `pnpm gates:scene` — `scripts/assets/scene_gates.py`
 - `pnpm gates:local` — CPU EEVEE acceptance, not FINAL_1080P
+
+## Worker contract alignment
+
+| Layer | Schema | Owner |
+| --- | --- | --- |
+| Studio / orchestration | `tivvlejoy-remote-render-job-v1` | TivvleJoy foundation |
+| Compiler / adapter | `compileTivvleJoyJobToWorkerManifest()` | only approved bridge |
+| RunPod execution | `ddp-cloud-job-manifest-v1` | `workers/runpod-blender/src/render-core.js` |
+
+Compiled remote assets are `{ role, r2Key, sha256 }` only. Local `file://` paths may exist in local dry-run preflight, never in the worker manifest.
+
+`outputKey` reuses the existing approved layout from `renderFinalKey`:
+
+`renders/finals/<episode>/<job>/final_1080p.mp4`
+
+TivvleJoy `expected_output_prefix` remains `episode/shot/job` for orchestration identity. Shot identity is also `sceneId`.
+
+Authoritative worker Blender version is read from the worker Dockerfile, FINAL_1080P acceptance pin, and worker manifest default. Those three execution pins must agree. `packages/production` `DEFAULT_BLENDER_VERSION='4.2'` is a requirement prefix, not a silent override.
+
+Cost and runtime reuse the existing worker `limits.maxRuntimeMinutes` / `limits.maxCostUsd` fields (pilot: 20 minutes, $0.25). No second watchdog is added.
 
 ## Pilot pins
 
