@@ -151,3 +151,5 @@ Do not put secret values in source, `.env` files, workflow output, artifacts, lo
 5. `render_launch` is the only paid-capable mode. It requires `confirm_paid_gpu`, the exact phrase `LAUNCH_TIVVLEJOY_GPU`, a configured template secret, and a PASS plan. This Cursor task must not run that mode.
 
 Do not run this on Production settings. Do not expect this workflow to finish a theatrical scene render until the next integration lands a remote worker command.
+
+The stacked remote-command foundation lives in `docs/runpod-blender-execution.md`. It is **REMOTE EXECUTION FOUNDATION ONLY** and does not enable paid GPU or remote Blender execution.
