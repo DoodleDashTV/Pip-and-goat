@@ -146,6 +146,7 @@ database is connected.
 - `pnpm typecheck`
 - `pnpm lint`
 - Production frontend build
+- This Preview pass: `pnpm test` 624/624 (40 files); typecheck pass; lint pass; web build pass; `validate:scenery` 15/15; `validate:scenery-intake` 16 tests + 14/14 script; `validate:scenery-intake-preview` 4 tests + 6/6 script; persist / studio-hardening / steps-9-16-closed / studio-completion 35 checks: pass
 
 ## Protections
 
