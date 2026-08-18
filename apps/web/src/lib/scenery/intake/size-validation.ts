@@ -5,21 +5,21 @@ function extname(filename: string): string {
 }
 
 export const MINIMUM_SOURCE_BYTES_BY_EXTENSION: Readonly<Record<string, number>> = {
-  ".zip": 22,
-  ".unitypackage": 64,
-  ".hdr": 64,
-  ".exr": 64,
-  ".blend": 64,
-  ".fbx": 32,
+  '.zip': 22,
+  '.unitypackage': 64,
+  '.hdr': 64,
+  '.exr': 64,
+  '.blend': 64,
+  '.fbx': 32,
 };
 
 export type SourceSizeIssue =
-  | "zero_byte"
-  | "negative_size"
-  | "declared_mismatch"
-  | "below_format_minimum"
-  | "truncated_transfer"
-  | "stored_size_mismatch";
+  | 'zero_byte'
+  | 'negative_size'
+  | 'declared_mismatch'
+  | 'below_format_minimum'
+  | 'truncated_transfer'
+  | 'stored_size_mismatch';
 
 export type SourceSizeAssessment = {
   declaredBytes: number;
@@ -54,31 +54,31 @@ export function assessSourceSize(input: {
   const minimumBytes = minimumBytesForFilename(input.filename);
 
   if (!Number.isFinite(declaredBytes) || declaredBytes < 0) {
-    issues.push("negative_size");
+    issues.push('negative_size');
   } else if (declaredBytes === 0) {
-    issues.push("zero_byte");
+    issues.push('zero_byte');
   } else if (declaredBytes < minimumBytes) {
-    issues.push("below_format_minimum");
+    issues.push('below_format_minimum');
   }
 
   if (observedBytes !== null) {
     if (observedBytes === 0 && declaredBytes > 0) {
-      issues.push("zero_byte");
+      issues.push('zero_byte');
     }
     if (observedBytes !== declaredBytes) {
-      issues.push("declared_mismatch");
+      issues.push('declared_mismatch');
     }
   }
 
   if (storedBytes !== null) {
     if (storedBytes === 0) {
-      issues.push("zero_byte");
+      issues.push('zero_byte');
     }
     if (declaredBytes > 0 && storedBytes < declaredBytes) {
-      issues.push("truncated_transfer");
+      issues.push('truncated_transfer');
     }
     if (declaredBytes > 0 && storedBytes !== declaredBytes) {
-      issues.push("stored_size_mismatch");
+      issues.push('stored_size_mismatch');
     }
   }
 

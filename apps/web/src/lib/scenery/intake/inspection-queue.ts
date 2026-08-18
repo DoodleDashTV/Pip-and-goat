@@ -1,6 +1,9 @@
 import { createDryRunInspectReport, type IngestionReport } from '../ingestion';
 import { sceneryStorageUri } from '../storage-policy';
-import { createNonExecutingInspectionJob, type NonExecutingInspectionJob } from './inspection-checks';
+import {
+  createNonExecutingInspectionJob,
+  type NonExecutingInspectionJob,
+} from './inspection-checks';
 import type { SourceObjectManifest } from './manifest';
 
 export const SCENERY_INSPECTION_JOBS = [
@@ -81,24 +84,37 @@ export type InspectionEligibility = {
   reasons: string[];
 };
 
-export function evaluateInspectionEligibility(manifest: SourceObjectManifest): InspectionEligibility {
+export function evaluateInspectionEligibility(
+  manifest: SourceObjectManifest,
+): InspectionEligibility {
   const reasons: string[] = [];
-  if (manifest.sourceId === 'SRC_PREVIEW_SYNTHETIC' || manifest.storageObjectKey.includes('/quarantine/preview-tests/')) {
+  if (
+    manifest.sourceId === 'SRC_PREVIEW_SYNTHETIC' ||
+    manifest.storageObjectKey.includes('/quarantine/preview-tests/')
+  ) {
     reasons.push('synthetic preview fixture is not a purchased scenery source');
   }
   if (!manifest.storageObjectKey) reasons.push('storage object key is missing');
   if (manifest.uploadState !== 'completed' && manifest.uploadState !== 'already_present') {
     reasons.push('storage object has not completed upload');
   }
-  if (manifest.verificationState !== 'size_verified' && manifest.verificationState !== 'independently_verified') {
+  if (
+    manifest.verificationState !== 'size_verified' &&
+    manifest.verificationState !== 'independently_verified'
+  ) {
     reasons.push('stored byte size is not verified');
   }
   if (!manifest.sha256) reasons.push('checksum is not recorded');
   if (manifest.quarantineState === 'quarantined') reasons.push('archive validation did not pass');
   if (!manifest.provenanceLicenseRef) reasons.push('provenance placeholder is missing');
   if (!manifest.collectionId) reasons.push('collection mapping is invalid');
-  if (manifest.independentServerSha256 === 'unavailable_in_this_environment' && manifest.verificationState !== 'size_verified') {
-    reasons.push('independent checksum verification is unavailable; record stays awaiting_verification');
+  if (
+    manifest.independentServerSha256 === 'unavailable_in_this_environment' &&
+    manifest.verificationState !== 'size_verified'
+  ) {
+    reasons.push(
+      'independent checksum verification is unavailable; record stays awaiting_verification',
+    );
   }
   return { ready: reasons.length === 0, reasons };
 }
@@ -106,7 +122,8 @@ export function evaluateInspectionEligibility(manifest: SourceObjectManifest): I
 export function markInspectionReady(manifest: SourceObjectManifest): SourceObjectManifest {
   const eligibility = evaluateInspectionEligibility({
     ...manifest,
-    verificationState: manifest.verificationState === 'not_verified' ? 'size_verified' : manifest.verificationState,
+    verificationState:
+      manifest.verificationState === 'not_verified' ? 'size_verified' : manifest.verificationState,
   });
   return {
     ...manifest,
@@ -155,7 +172,8 @@ export function createQueuedInspectionJobs(manifests: SourceObjectManifest[]): A
       dryRunReport: ready
         ? createDryRunInspectReport({
             sourceId: job.sourceId,
-            sourceBlendPath: manifest?.storageObjectKey ?? sceneryStorageUri('source', job.collectionId),
+            sourceBlendPath:
+              manifest?.storageObjectKey ?? sceneryStorageUri('source', job.collectionId),
             reportPath: sceneryStorageUri('inspection', `${job.jobId}.json`),
             normalizeOutputPath: sceneryStorageUri('normalized', job.collectionId),
             dryRun: true,

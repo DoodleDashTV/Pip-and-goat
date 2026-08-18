@@ -101,7 +101,11 @@ export function classifyRecoveredState(input: {
   if (isSessionStale(session)) {
     return 'stale';
   }
-  if (session.state === 'already_present' || input.duplicateStatus === 'already_present' || input.duplicateStatus === 'exact_duplicate') {
+  if (
+    session.state === 'already_present' ||
+    input.duplicateStatus === 'already_present' ||
+    input.duplicateStatus === 'exact_duplicate'
+  ) {
     return 'duplicate';
   }
   if (input.inspectionState === 'inspection_ready') {
@@ -136,7 +140,9 @@ export function partsStillNeeded(input: {
   return missing;
 }
 
-export function sanitizeClientRecoverySnapshot(input: ClientRecoverySnapshot): ClientRecoverySnapshot {
+export function sanitizeClientRecoverySnapshot(
+  input: ClientRecoverySnapshot,
+): ClientRecoverySnapshot {
   return {
     sessionId: input.sessionId,
     sourceId: input.sourceId,

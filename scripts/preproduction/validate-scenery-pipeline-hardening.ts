@@ -51,7 +51,8 @@ check('exact 27-file match', () => {
   const review = reviewOneTapPurchasedSelection(
     listExpectedSourceFiles().map((item) => ({ filename: item.expectedFilename, byteSize: 128 })),
   );
-  if (review.overallTotals.matched !== EXPECTED_SOURCE_COUNT) throw new Error(String(review.overallTotals.matched));
+  if (review.overallTotals.matched !== EXPECTED_SOURCE_COUNT)
+    throw new Error(String(review.overallTotals.matched));
 });
 
 check('world shaders stay outside the purchased 27', () => {
@@ -70,18 +71,28 @@ check('traversal and unicode filenames are refused', () => {
 });
 
 check('prefix escape is refused', () => {
-  if (!isPrefixEscapeAttempt('tivvlejoy-assets/../secret.zip')) throw new Error('prefix escape missed');
+  if (!isPrefixEscapeAttempt('tivvlejoy-assets/../secret.zip'))
+    throw new Error('prefix escape missed');
 });
 
 check('content identity cases', () => {
   const existing = [{ filename: 'Village_Blender_4.2.2.zip', sha256: 'aaa' }];
-  if (classifyContentIdentity({ sha256: 'aaa', filename: 'Village_Blender_4.2.2.zip', existing }) !== 'same_name_same_hash') {
+  if (
+    classifyContentIdentity({ sha256: 'aaa', filename: 'Village_Blender_4.2.2.zip', existing }) !==
+    'same_name_same_hash'
+  ) {
     throw new Error('same name same hash');
   }
-  if (classifyContentIdentity({ sha256: 'bbb', filename: 'Village_Blender_4.2.2.zip', existing }) !== 'same_name_different_hash') {
+  if (
+    classifyContentIdentity({ sha256: 'bbb', filename: 'Village_Blender_4.2.2.zip', existing }) !==
+    'same_name_different_hash'
+  ) {
     throw new Error('same name different hash');
   }
-  if (classifyContentIdentity({ sha256: 'aaa', filename: 'copy.zip', existing }) !== 'different_name_same_hash') {
+  if (
+    classifyContentIdentity({ sha256: 'aaa', filename: 'copy.zip', existing }) !==
+    'different_name_same_hash'
+  ) {
     throw new Error('different name same hash');
   }
 });

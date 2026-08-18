@@ -8,10 +8,24 @@ import {
   removeClientRecoverySnapshot,
   saveClientRecoverySnapshot,
 } from '@/lib/scenery/intake/client-recovery';
-import { runWithBoundedConcurrency, SCENERY_INTAKE_MAX_CONCURRENT_FILES } from '@/lib/scenery/intake/concurrency';
-import { announceIntakeState, INTAKE_LAYOUT, recoveredStateLabel } from '@/lib/scenery/intake/intake-ux';
-import { reviewOneTapPurchasedSelection, type OneTapPurchasedReview } from '@/lib/scenery/intake/one-tap';
-import { classifyRecoveredState, partsStillNeeded, type RecoveredUploadState } from '@/lib/scenery/intake/recovery';
+import {
+  runWithBoundedConcurrency,
+  SCENERY_INTAKE_MAX_CONCURRENT_FILES,
+} from '@/lib/scenery/intake/concurrency';
+import {
+  announceIntakeState,
+  INTAKE_LAYOUT,
+  recoveredStateLabel,
+} from '@/lib/scenery/intake/intake-ux';
+import {
+  reviewOneTapPurchasedSelection,
+  type OneTapPurchasedReview,
+} from '@/lib/scenery/intake/one-tap';
+import {
+  classifyRecoveredState,
+  partsStillNeeded,
+  type RecoveredUploadState,
+} from '@/lib/scenery/intake/recovery';
 import { SCENERY_COPY } from '@/lib/scenery/copy';
 import type { PublicScenerySnapshot } from '@/lib/scenery/public';
 
@@ -93,7 +107,9 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
   const [collectionId, setCollectionId] = useState<(typeof COLLECTIONS)[number]['id']>('village');
   const [studioToken, setStudioToken] = useState('');
   const [review, setReview] = useState<OneTapPurchasedReview | null>(null);
-  const [liveAnnouncement, setLiveAnnouncement] = useState('Ready to select purchased scenery files.');
+  const [liveAnnouncement, setLiveAnnouncement] = useState(
+    'Ready to select purchased scenery files.',
+  );
   const [recoveryNotice, setRecoveryNotice] = useState('');
   const oneTapInputRef = useRef<HTMLInputElement>(null);
   const singleCollectionInputRef = useRef<HTMLInputElement>(null);
@@ -142,7 +158,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         collectionId: matched?.collectionId ?? classified?.collectionId ?? collectionId,
         expectedSourceId: matched?.sourceId ?? snapshotMatch?.sourceId ?? '',
         sha256: snapshotMatch?.sha256 ?? '',
-        uploadStatus: matched ? snapshotMatch?.status ?? 'not_started' : 'refused',
+        uploadStatus: matched ? (snapshotMatch?.status ?? 'not_started') : 'refused',
         recoveredState: snapshotMatch
           ? classifyRecoveredState({
               session: {
@@ -156,7 +172,7 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         uploadedPartNumbers: snapshotMatch?.uploadedPartNumbers ?? [],
         transferredBytes: snapshotMatch?.transferredBytes ?? 0,
         storedBytes: snapshotMatch?.storedBytes ?? 0,
-        error: matched ? null : classified?.reason ?? 'File refused.',
+        error: matched ? null : (classified?.reason ?? 'File refused.'),
         eligible: Boolean(matched),
       });
     });
@@ -210,13 +226,21 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       updateRow(row.id, { uploadStatus: 'paused', recoveredState: 'paused' });
       return;
     }
-    updateRow(row.id, { hashStatus: row.sha256 ? 'recorded' : 'hashing', error: null, recoveredState: 'retryable' });
+    updateRow(row.id, {
+      hashStatus: row.sha256 ? 'recorded' : 'hashing',
+      error: null,
+      recoveredState: 'retryable',
+    });
     const hashed = row.sha256
       ? { sha256: row.sha256, byteSize: row.file.size }
       : await hashFileChunked(row.file, (offset, total) => {
           updateRow(row.id, { progress: Math.round((offset / total) * 40), hashStatus: 'hashing' });
         });
-    updateRow(row.id, { sha256: hashed.sha256, hashStatus: 'recorded', progress: Math.max(row.progress, 45) });
+    updateRow(row.id, {
+      sha256: hashed.sha256,
+      hashStatus: 'recorded',
+      progress: Math.max(row.progress, 45),
+    });
     let sessionId = row.sessionId;
     let parts: Array<{ partNumber: number; start: number; end: number }> = [];
     if (!sessionId) {
@@ -246,7 +270,11 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         };
       };
       if (!created.ok) {
-        updateRow(row.id, { error: createdJson.error ?? 'Session refused.', uploadStatus: 'failed', recoveredState: 'failed' });
+        updateRow(row.id, {
+          error: createdJson.error ?? 'Session refused.',
+          uploadStatus: 'failed',
+          recoveredState: 'failed',
+        });
         announce(announceIntakeState({ filename: row.file.name, state: 'failed' }));
         return;
       }
@@ -269,7 +297,8 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
           storageStatus: 'unavailable',
           progress: 45,
           sessionId: createdJson.session?.sessionId ?? null,
-          error: 'Private storage is not configured in this environment. No file bytes were uploaded.',
+          error:
+            'Private storage is not configured in this environment. No file bytes were uploaded.',
         });
         return;
       }
@@ -293,7 +322,11 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         session?: { parts: Array<{ partNumber: number; start: number; end: number }> };
       };
       if (!queried.ok) {
-        updateRow(row.id, { error: queriedJson.error ?? 'Resume failed.', uploadStatus: 'failed', recoveredState: 'expired' });
+        updateRow(row.id, {
+          error: queriedJson.error ?? 'Resume failed.',
+          uploadStatus: 'failed',
+          recoveredState: 'expired',
+        });
         return;
       }
       parts = queriedJson.session?.parts ?? [];
@@ -307,7 +340,12 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     let transferred = row.transferredBytes;
     for (const part of parts) {
       if (pauseRequested.current.has(row.id)) {
-        const paused = { uploadStatus: 'paused', recoveredState: 'paused' as const, uploadedPartNumbers: uploaded, transferredBytes: transferred };
+        const paused = {
+          uploadStatus: 'paused',
+          recoveredState: 'paused' as const,
+          uploadedPartNumbers: uploaded,
+          transferredBytes: transferred,
+        };
         updateRow(row.id, paused);
         await persistRowRecovery(row, paused);
         announce(announceIntakeState({ filename: row.file.name, state: 'paused' }));
@@ -338,18 +376,29 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         return;
       }
       if (/vercel\.(app|com)/i.test(signedJson.signedUrl)) {
-        updateRow(row.id, { error: 'Signed storage URL must not target Vercel.', uploadStatus: 'failed', recoveredState: 'failed' });
+        updateRow(row.id, {
+          error: 'Signed storage URL must not target Vercel.',
+          uploadStatus: 'failed',
+          recoveredState: 'failed',
+        });
         return;
       }
       const blob = row.file.slice(part.start, part.end);
       const uploadedPart = await fetch(signedJson.signedUrl, { method: 'PUT', body: blob });
       if (!uploadedPart.ok) {
-        const failed = { error: `Part ${part.partNumber} failed.`, uploadStatus: 'failed', recoveredState: 'failed' as const };
+        const failed = {
+          error: `Part ${part.partNumber} failed.`,
+          uploadStatus: 'failed',
+          recoveredState: 'failed' as const,
+        };
         updateRow(row.id, failed);
         await persistRowRecovery(row, failed);
         return;
       }
-      completedParts.push({ partNumber: part.partNumber, etag: uploadedPart.headers.get('ETag') ?? `"part-${part.partNumber}"` });
+      completedParts.push({
+        partNumber: part.partNumber,
+        etag: uploadedPart.headers.get('ETag') ?? `"part-${part.partNumber}"`,
+      });
       uploaded.push(part.partNumber);
       transferred += blob.size;
       const progressPatch = {
@@ -373,10 +422,19 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       error?: string;
       storedSize?: number;
       alreadyCompleted?: boolean;
-      manifest?: { quarantineState: string; inspectionState: string; verificationState: string; notes?: string[] };
+      manifest?: {
+        quarantineState: string;
+        inspectionState: string;
+        verificationState: string;
+        notes?: string[];
+      };
     };
     if (!completed.ok) {
-      updateRow(row.id, { error: completedJson.error ?? 'Complete failed.', uploadStatus: 'failed', recoveredState: 'failed' });
+      updateRow(row.id, {
+        error: completedJson.error ?? 'Complete failed.',
+        uploadStatus: 'failed',
+        recoveredState: 'failed',
+      });
       announce(announceIntakeState({ filename: row.file.name, state: 'failed' }));
       return;
     }
@@ -386,9 +444,15 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       uploadStatus: 'completed',
       storageStatus: completedJson.manifest?.verificationState ?? 'awaiting_verification',
       quarantineStatus: completedJson.manifest?.quarantineState ?? 'not_quarantined',
-      quarantineReason: quarantined ? completedJson.manifest?.notes?.at(-1) ?? 'Quarantined after verification.' : '',
+      quarantineReason: quarantined
+        ? (completedJson.manifest?.notes?.at(-1) ?? 'Quarantined after verification.')
+        : '',
       inspectionStatus: completedJson.manifest?.inspectionState ?? 'not_eligible',
-      recoveredState: (inspectionReady ? 'inspection_ready' : quarantined ? 'quarantined' : 'stored') as RecoveredUploadState,
+      recoveredState: (inspectionReady
+        ? 'inspection_ready'
+        : quarantined
+          ? 'quarantined'
+          : 'stored') as RecoveredUploadState,
       storedBytes: completedJson.storedSize ?? row.file.size,
       progress: 100,
       sessionId,
@@ -396,7 +460,9 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
     updateRow(row.id, done);
     await persistRowRecovery(row, done);
     if (sessionId) removeClientRecoverySnapshot(sessionId);
-    announce(announceIntakeState({ filename: row.file.name, state: done.recoveredState, progress: 100 }));
+    announce(
+      announceIntakeState({ filename: row.file.name, state: done.recoveredState, progress: 100 }),
+    );
   }
 
   async function uploadEligible() {
@@ -406,11 +472,17 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       const eligible = rows.filter(
         (item) =>
           item.eligible &&
-          (item.uploadStatus === 'not_started' || item.uploadStatus === 'failed' || item.uploadStatus === 'paused'),
+          (item.uploadStatus === 'not_started' ||
+            item.uploadStatus === 'failed' ||
+            item.uploadStatus === 'paused'),
       );
-      await runWithBoundedConcurrency(eligible, SCENERY_INTAKE_MAX_CONCURRENT_FILES, async (row) => {
-        await processRow(row, row.uploadStatus === 'failed');
-      });
+      await runWithBoundedConcurrency(
+        eligible,
+        SCENERY_INTAKE_MAX_CONCURRENT_FILES,
+        async (row) => {
+          await processRow(row, row.uploadStatus === 'failed');
+        },
+      );
     } finally {
       setBusy(false);
     }
@@ -460,14 +532,21 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
   return (
     <section className={INTAKE_LAYOUT.section}>
       <h2 className="font-display text-xl font-semibold">{SCENERY_COPY.intakeTitle}</h2>
-      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.intakeInstruction}</p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+        {SCENERY_COPY.intakeInstruction}
+      </p>
       <p className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] px-3 py-3 text-sm font-bold">
         {SCENERY_COPY.uploadNotApproval}
       </p>
-      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.unauthorizedMutations}</p>
-      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.directToStorage}</p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+        {SCENERY_COPY.unauthorizedMutations}
+      </p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+        {SCENERY_COPY.directToStorage}
+      </p>
       <p className="text-sm leading-6">
-        {SCENERY_COPY.studioSession}: {intake.authorization.tokenConfigured ? 'token configured' : 'token not configured'} ·
+        {SCENERY_COPY.studioSession}:{' '}
+        {intake.authorization.tokenConfigured ? 'token configured' : 'token not configured'} ·
         storage {intake.realAssetReadiness.storageConfiguration}
       </p>
       <label className="block text-sm font-bold" htmlFor="tivvlejoy-scenery-intake-token">
@@ -481,11 +560,17 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
           onChange={(event) => setStudioToken(event.target.value)}
         />
       </label>
-      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.studioTokenHelp}</p>
-      <p className="text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.oneTapNoCollectionRequired}</p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+        {SCENERY_COPY.studioTokenHelp}
+      </p>
+      <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+        {SCENERY_COPY.oneTapNoCollectionRequired}
+      </p>
       <div className="rounded-2xl border border-[var(--color-border)] px-3 py-3" role="note">
         <h3 className="font-bold">{SCENERY_COPY.oneTapRecoveryTitle}</h3>
-        <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">{SCENERY_COPY.oneTapRefreshHelp}</p>
+        <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
+          {SCENERY_COPY.oneTapRefreshHelp}
+        </p>
         {recoveryNotice ? <p className="mt-2 text-sm">{recoveryNotice}</p> : null}
       </div>
 
@@ -512,16 +597,18 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
         <div className="space-y-3 rounded-2xl border border-[var(--color-border)] px-3 py-3">
           <h3 className="font-bold">{SCENERY_COPY.oneTapReviewTitle}</h3>
           <p className="text-sm text-[var(--color-text-muted)]">
-            {review.overallTotals.selected} selected · {review.overallTotals.matched} matched · {review.overallTotals.missing}{' '}
-            missing · {review.overallTotals.unexpected} unexpected · {review.overallTotals.duplicates} duplicate ·{' '}
-            {review.overallTotals.incorrect} incorrect · {review.overallTotals.eligible} eligible
+            {review.overallTotals.selected} selected · {review.overallTotals.matched} matched ·{' '}
+            {review.overallTotals.missing} missing · {review.overallTotals.unexpected} unexpected ·{' '}
+            {review.overallTotals.duplicates} duplicate · {review.overallTotals.incorrect} incorrect
+            · {review.overallTotals.eligible} eligible
           </p>
           <div>
             <h4 className="font-bold">{SCENERY_COPY.oneTapMatched}</h4>
             <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
               {review.matched.map((item) => (
                 <li key={`${item.sourceId}-${item.filename}`}>
-                  {item.collectionName}: {item.filename} · {formatBytes(item.byteSize)} · {item.sourceId}
+                  {item.collectionName}: {item.filename} · {formatBytes(item.byteSize)} ·{' '}
+                  {item.sourceId}
                 </li>
               ))}
             </ul>
@@ -564,7 +651,8 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
               {review.incorrect.length === 0 ? <li>None</li> : null}
               {review.incorrect.map((item) => (
                 <li key={`incorrect-${item.filename}`}>
-                  {item.filename} · expected {item.expectedFilename ?? 'exact inventory name'} · refused individually
+                  {item.filename} · expected {item.expectedFilename ?? 'exact inventory name'} ·
+                  refused individually
                 </li>
               ))}
             </ul>
@@ -574,7 +662,8 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
             <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
               {review.collectionTotals.map((item) => (
                 <li key={item.collectionId}>
-                  {item.collectionName}: {item.matched}/{item.expected} matched · {formatBytes(item.bytes)}
+                  {item.collectionName}: {item.matched}/{item.expected} matched ·{' '}
+                  {formatBytes(item.bytes)}
                 </li>
               ))}
               <li>
@@ -641,15 +730,18 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
       {rows.length > 0 ? (
         <div className="space-y-2">
           <p className="text-sm font-bold">
-            {SCENERY_COPY.oneTapOverallProgress}: {overallProgress}% · {completedCount}/{eligibleCount || rows.length} eligible
-            completed
+            {SCENERY_COPY.oneTapOverallProgress}: {overallProgress}% · {completedCount}/
+            {eligibleCount || rows.length} eligible completed
           </p>
           <p className="text-sm">
-            {SCENERY_COPY.oneTapTransferred}: {formatBytes(transferredTotal)} · {SCENERY_COPY.oneTapStored}:{' '}
-            {formatBytes(storedTotal)}
+            {SCENERY_COPY.oneTapTransferred}: {formatBytes(transferredTotal)} ·{' '}
+            {SCENERY_COPY.oneTapStored}: {formatBytes(storedTotal)}
           </p>
           <div className={INTAKE_LAYOUT.progress} aria-hidden="true">
-            <div className="h-2 rounded-full bg-[var(--color-primary)] motion-safe:transition-all" style={{ width: `${overallProgress}%` }} />
+            <div
+              className="h-2 rounded-full bg-[var(--color-primary)] motion-safe:transition-all"
+              style={{ width: `${overallProgress}%` }}
+            />
           </div>
         </div>
       ) : null}
@@ -663,11 +755,12 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
             <p>Upload progress: {row.progress}%</p>
             <p>Multipart progress: {row.multipartProgress}</p>
             <p>
-              {SCENERY_COPY.oneTapTransferred}: {formatBytes(row.transferredBytes)} · {SCENERY_COPY.oneTapStored}:{' '}
-              {formatBytes(row.storedBytes)}
+              {SCENERY_COPY.oneTapTransferred}: {formatBytes(row.transferredBytes)} ·{' '}
+              {SCENERY_COPY.oneTapStored}: {formatBytes(row.storedBytes)}
             </p>
             <p>
-              State: {recoveredStateLabel(row.recoveredState)} ({row.recoveredState.replace(/_/g, ' ')})
+              State: {recoveredStateLabel(row.recoveredState)} (
+              {row.recoveredState.replace(/_/g, ' ')})
             </p>
             <p>
               {SCENERY_COPY.oneTapVerification}: {row.storageStatus}
@@ -678,7 +771,9 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
             <p>
               {SCENERY_COPY.oneTapInspectionReadiness}: {row.inspectionStatus}
             </p>
-            {row.error ? <p className="text-[var(--color-danger-foreground)]">{row.error}</p> : null}
+            {row.error ? (
+              <p className="text-[var(--color-danger-foreground)]">{row.error}</p>
+            ) : null}
             <details className="mt-2">
               <summary className="cursor-pointer font-bold">{SCENERY_COPY.oneTapAdvanced}</summary>
               <p>
@@ -693,16 +788,32 @@ export function SceneryAssetIntake({ snapshot }: { snapshot: PublicScenerySnapsh
             </details>
             {row.eligible ? (
               <div className={INTAKE_LAYOUT.actions}>
-                <button type="button" className="btn-secondary min-h-11 px-3 py-2" onClick={() => resume(row)}>
+                <button
+                  type="button"
+                  className="btn-secondary min-h-11 px-3 py-2"
+                  onClick={() => resume(row)}
+                >
                   {SCENERY_COPY.oneTapResume}
                 </button>
-                <button type="button" className="btn-secondary min-h-11 px-3 py-2" onClick={() => pause(row)}>
+                <button
+                  type="button"
+                  className="btn-secondary min-h-11 px-3 py-2"
+                  onClick={() => pause(row)}
+                >
                   {SCENERY_COPY.oneTapPause}
                 </button>
-                <button type="button" className="btn-secondary min-h-11 px-3 py-2" onClick={() => resume(row)}>
+                <button
+                  type="button"
+                  className="btn-secondary min-h-11 px-3 py-2"
+                  onClick={() => resume(row)}
+                >
                   {SCENERY_COPY.oneTapRetryFailed}
                 </button>
-                <button type="button" className="btn-secondary min-h-11 px-3 py-2" onClick={() => cancel(row)}>
+                <button
+                  type="button"
+                  className="btn-secondary min-h-11 px-3 py-2"
+                  onClick={() => cancel(row)}
+                >
                   {SCENERY_COPY.oneTapCancel}
                 </button>
               </div>

@@ -38,10 +38,16 @@ export function sanitizeFilename(filename: string): string {
 export function assertAllowedExtension(filename: string): string {
   const ext = fileExtension(filename);
   if ((SCENERY_PROHIBITED_EXTENSIONS as readonly string[]).includes(ext)) {
-    throw new SceneryError(`Unsupported executable or script extension: ${ext}`, 'PROHIBITED_EXTENSION');
+    throw new SceneryError(
+      `Unsupported executable or script extension: ${ext}`,
+      'PROHIBITED_EXTENSION',
+    );
   }
   if (!(SCENERY_ALLOWED_EXTENSIONS as readonly string[]).includes(ext)) {
-    throw new SceneryError(`Unsupported scenery file extension: ${ext || '(none)'}`, 'UNSUPPORTED_EXTENSION');
+    throw new SceneryError(
+      `Unsupported scenery file extension: ${ext || '(none)'}`,
+      'UNSUPPORTED_EXTENSION',
+    );
   }
   return ext;
 }
@@ -49,7 +55,10 @@ export function assertAllowedExtension(filename: string): string {
 export function assertSafeRelativeArchivePath(entryPath: string): void {
   const raw = String(entryPath ?? '');
   if (!raw || raw.includes('\0')) {
-    throw new SceneryError('Archive entry path is empty or contains a null byte.', 'ARCHIVE_PATH_TRAVERSAL');
+    throw new SceneryError(
+      'Archive entry path is empty or contains a null byte.',
+      'ARCHIVE_PATH_TRAVERSAL',
+    );
   }
   if (raw.startsWith('/') || raw.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(raw)) {
     throw new SceneryError('Archive entry uses an absolute path.', 'ARCHIVE_ABSOLUTE_PATH');
@@ -107,7 +116,8 @@ export function sceneryObjectKey(input: {
   assertAllowedExtension(filename);
   const ext = fileExtension(filename);
   const stem = filename.slice(0, filename.length - ext.length);
-  const versioned = input.version && input.version > 1 ? `${stem}.v${input.version}${ext}` : filename;
+  const versioned =
+    input.version && input.version > 1 ? `${stem}.v${input.version}${ext}` : filename;
   const parts = [prefix, input.kind, input.collection, versioned].filter(Boolean) as string[];
   const key = parts.join('/');
   if (key.includes('..') || key.startsWith('/') || key.includes('\\') || key.includes('\0')) {
@@ -129,7 +139,10 @@ export function sceneryInternalObjectKey(input: {
   const filename = sanitizeFilename(input.filename);
   const ext = fileExtension(filename);
   if (!(spec.extensions as readonly string[]).includes(ext)) {
-    throw new SceneryError(`Internal scenery object must use ${spec.extensions.join(' or ')}.`, 'UNSAFE_OBJECT_KEY');
+    throw new SceneryError(
+      `Internal scenery object must use ${spec.extensions.join(' or ')}.`,
+      'UNSAFE_OBJECT_KEY',
+    );
   }
   const key = `${prefix}/${spec.kind}/${input.folder}/${filename}`;
   if (key.includes('..') || key.startsWith('/') || key.includes('\\') || key.includes('\0')) {
@@ -141,7 +154,10 @@ export function sceneryInternalObjectKey(input: {
 export function assertObjectKeyWithinPrefix(key: string, prefix: string, kind?: string): void {
   const normalizedPrefix = prefix.replace(/^\/+|\/+$/g, '');
   if (!key.startsWith(`${normalizedPrefix}/`)) {
-    throw new SceneryError('Object key is outside the private TivvleJoy scenery prefix.', 'UNSAFE_OBJECT_KEY');
+    throw new SceneryError(
+      'Object key is outside the private TivvleJoy scenery prefix.',
+      'UNSAFE_OBJECT_KEY',
+    );
   }
   if (key.includes('..') || key.startsWith('/') || key.includes('\\')) {
     throw new SceneryError('Object key is unsafe.', 'UNSAFE_OBJECT_KEY');
@@ -158,12 +174,23 @@ export function assertChunkBoundaries(
 ): void {
   const planned = planMultipartParts(byteSize, partBytes);
   if (parts.length !== planned.length) {
-    throw new SceneryError('Multipart part count does not match the planned chunk boundaries.', 'INCONSISTENT_PART_COUNT');
+    throw new SceneryError(
+      'Multipart part count does not match the planned chunk boundaries.',
+      'INCONSISTENT_PART_COUNT',
+    );
   }
   for (const [index, part] of parts.entries()) {
     const expected = planned[index];
-    if (!expected || part.partNumber !== expected.partNumber || part.start !== expected.start || part.end !== expected.end) {
-      throw new SceneryError('Multipart chunk boundaries do not match the planned part map.', 'INCONSISTENT_PART_COUNT');
+    if (
+      !expected ||
+      part.partNumber !== expected.partNumber ||
+      part.start !== expected.start ||
+      part.end !== expected.end
+    ) {
+      throw new SceneryError(
+        'Multipart chunk boundaries do not match the planned part map.',
+        'INCONSISTENT_PART_COUNT',
+      );
     }
     if (part.end <= part.start || part.start < 0 || part.end > byteSize) {
       throw new SceneryError('Multipart chunk boundary is invalid.', 'INCONSISTENT_PART_COUNT');
@@ -171,7 +198,10 @@ export function assertChunkBoundaries(
   }
 }
 
-export function planMultipartParts(byteSize: number, partBytes: number): Array<{ partNumber: number; start: number; end: number }> {
+export function planMultipartParts(
+  byteSize: number,
+  partBytes: number,
+): Array<{ partNumber: number; start: number; end: number }> {
   if (byteSize <= 0) {
     throw new SceneryError('Cannot plan multipart parts for a zero-byte file.', 'ZERO_BYTE_FILE');
   }

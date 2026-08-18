@@ -13,6 +13,8 @@ export function evaluateProductionSafety(repoRoot: string) {
     credentials_in_html_or_json: false,
     gitSafetyOk: scan.ok,
     gitSafetyViolations: scan.violations,
-    vercelHasDummyDatabaseUrl: vercel.includes('postgresql://preview:preview@127.0.0.1:5432/preview'),
+    vercelHasDummyDatabaseUrl: vercel.includes(
+      'postgresql://preview:preview@127.0.0.1:5432/preview',
+    ),
   };
 }

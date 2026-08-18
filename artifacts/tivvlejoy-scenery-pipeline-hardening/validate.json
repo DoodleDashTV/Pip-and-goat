@@ -1,0 +1,56 @@
+{
+  "checkpoint": "TIVVLEJOY_SCENERY_PIPELINE_HARDENING_V1",
+  "purchasedSourceObjectCount": 0,
+  "purchased_files_uploaded": false,
+  "purchased_files_invented": false,
+  "licensed_files_committed": false,
+  "productionModified": false,
+  "existingPreviewR2Modified": false,
+  "token_printed": false,
+  "credentials_in_html_or_json": false,
+  "synthetic_fixtures_deleted": true,
+  "passed": 8,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "checkpoint id",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "exact 27-file match",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "world shaders stay outside the purchased 27",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "traversal and unicode filenames are refused",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "prefix escape is refused",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "content identity cases",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "hash mismatch stays unverified",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "name": "production and licensed-file safety",
+      "status": "PASS",
+      "detail": "ok"
+    }
+  ]
+}

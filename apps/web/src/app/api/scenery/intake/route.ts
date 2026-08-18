@@ -21,7 +21,8 @@ function fail(error: unknown, token = '') {
     if (error.code === 'TOKEN_LOCATION_REFUSED') {
       return NextResponse.json(publicAuthorizationFailure(error.code), { status: 400 });
     }
-    const status = error.code === 'REQUEST_TOO_LARGE' ? 413 : error.code === 'INTAKE_RATE_LIMIT' ? 429 : 400;
+    const status =
+      error.code === 'REQUEST_TOO_LARGE' ? 413 : error.code === 'INTAKE_RATE_LIMIT' ? 429 : 400;
     return NextResponse.json(
       {
         error: redactSecretsFromText(error.message, [token]),
@@ -32,7 +33,10 @@ function fail(error: unknown, token = '') {
       { status },
     );
   }
-  return NextResponse.json({ error: 'Scenery intake request refused.', uploaded: false, approved: false }, { status: 400 });
+  return NextResponse.json(
+    { error: 'Scenery intake request refused.', uploaded: false, approved: false },
+    { status: 400 },
+  );
 }
 
 export async function GET() {
@@ -56,14 +60,22 @@ export async function POST(request: Request) {
   try {
     const contentLength = Number(request.headers.get('content-length') ?? 0);
     if (Number.isFinite(contentLength) && contentLength > SCENERY_INTAKE_LIMITS.maxJsonBodyBytes) {
-      throw new SceneryError('Intake request is larger than the Preview JSON limit.', 'REQUEST_TOO_LARGE');
+      throw new SceneryError(
+        'Intake request is larger than the Preview JSON limit.',
+        'REQUEST_TOO_LARGE',
+      );
     }
     const raw = await request.text();
     if (raw.length > SCENERY_INTAKE_LIMITS.maxJsonBodyBytes) {
-      throw new SceneryError('Intake request is larger than the Preview JSON limit.', 'REQUEST_TOO_LARGE');
+      throw new SceneryError(
+        'Intake request is larger than the Preview JSON limit.',
+        'REQUEST_TOO_LARGE',
+      );
     }
     const body = JSON.parse(raw || '{}') as Record<string, unknown>;
-    const action = String(body.action ?? 'status') as Parameters<typeof handleSceneryIntakeAction>[0]['action'];
+    const action = String(body.action ?? 'status') as Parameters<
+      typeof handleSceneryIntakeAction
+    >[0]['action'];
     const result = await handleSceneryIntakeAction({
       action,
       body,
@@ -72,7 +84,12 @@ export async function POST(request: Request) {
       studioToken: token,
     });
     const payload = { ...result, approved: false, uploaded: action === 'complete' };
-    return NextResponse.json(JSON.parse(redactSecretsFromText(JSON.stringify(payload), [token])) as Record<string, unknown>);
+    return NextResponse.json(
+      JSON.parse(redactSecretsFromText(JSON.stringify(payload), [token])) as Record<
+        string,
+        unknown
+      >,
+    );
   } catch (error) {
     if (error instanceof SyntaxError) {
       return fail(new SceneryError('Intake request JSON is invalid.', 'INVALID_JSON'), token);

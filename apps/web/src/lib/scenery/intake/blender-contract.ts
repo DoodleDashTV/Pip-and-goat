@@ -44,7 +44,8 @@ export const BLENDER_INSPECTION_CONTRACT = {
   ],
   normalizationBoundary: {
     allowed: false,
-    reason: 'Normalization is refused unless a verified Blender 4.2 worker and actual source bytes are both available.',
+    reason:
+      'Normalization is refused unless a verified Blender 4.2 worker and actual source bytes are both available.',
     outputPrefix: 'tivvlejoy-assets/normalized/',
     neverOverwriteSource: true,
     neverAutoApprove: true,
@@ -61,6 +62,7 @@ export function describeBlenderAvailability(): {
     available: false,
     executed: false,
     gpu: false,
-    message: 'Blender 4.2 is not available in this environment. Inspection jobs stay dry-run and realExecution remains not_run.',
+    message:
+      'Blender 4.2 is not available in this environment. Inspection jobs stay dry-run and realExecution remains not_run.',
   };
 }

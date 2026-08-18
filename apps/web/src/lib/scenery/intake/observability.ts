@@ -1,4 +1,5 @@
-const SECRET_FIELD = /token|secret|authorization|credential|signedurl|uploadid|x-amz|cookie|password/i;
+const SECRET_FIELD =
+  /token|secret|authorization|credential|signedurl|uploadid|x-amz|cookie|password/i;
 const SIGNED_URL = /X-Amz-|Signature=|AWSAccessKeyId=/i;
 
 export type IntakeCountKey =

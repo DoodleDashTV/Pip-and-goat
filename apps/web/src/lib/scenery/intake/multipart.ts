@@ -67,7 +67,12 @@ export type UploadSession = {
 
 export type MultipartStoragePort = {
   createMultipartUpload(input: { key: string; contentType: string }): Promise<{ uploadId: string }>;
-  signPart(input: { key: string; uploadId: string; partNumber: number; ttlSeconds: number }): Promise<{
+  signPart(input: {
+    key: string;
+    uploadId: string;
+    partNumber: number;
+    ttlSeconds: number;
+  }): Promise<{
     url: string;
     expiresAt: string;
   }>;
@@ -131,7 +136,11 @@ export class MemoryMultipartStorage implements MultipartStoragePort {
     return { uploadId };
   }
 
-  async signPart(input: { key: string; uploadId: string; partNumber: number }): Promise<{ url: string; expiresAt: string }> {
+  async signPart(input: {
+    key: string;
+    uploadId: string;
+    partNumber: number;
+  }): Promise<{ url: string; expiresAt: string }> {
     if (!this.uploads.has(input.uploadId)) {
       throw new SceneryError('Unknown multipart upload.', 'UNKNOWN_UPLOAD');
     }
@@ -216,7 +225,11 @@ export function createUploadSession(input: {
   env?: Record<string, string | undefined>;
   now?: string;
   purpose?: IntakePurpose;
-}): { session: UploadSession; expected: ExpectedSourceFile | null; manifest: SourceObjectManifest } {
+}): {
+  session: UploadSession;
+  expected: ExpectedSourceFile | null;
+  manifest: SourceObjectManifest;
+} {
   const env = input.env ?? process.env;
   const limits = resolveIntakeLimits(env);
   const config = describeSceneryStorageConfiguration(env);
@@ -244,7 +257,10 @@ export function createUploadSession(input: {
     throw new SceneryError('Zero-byte files are rejected before upload.', 'ZERO_BYTE_FILE');
   }
   if (input.byteSize > limits.maxUploadBytes) {
-    throw new SceneryError('File exceeds the configured scenery upload size limit.', 'FILE_TOO_LARGE');
+    throw new SceneryError(
+      'File exceeds the configured scenery upload size limit.',
+      'FILE_TOO_LARGE',
+    );
   }
   if (purpose === 'preview-synthetic') {
     if (!normalizedFilename.startsWith('tivvlejoy-preview-synthetic-') || extension !== '.txt') {
@@ -254,7 +270,10 @@ export function createUploadSession(input: {
       );
     }
     if (matchExpectedSourceFile({ collectionId, filename: normalizedFilename })) {
-      throw new SceneryError('Preview synthetic fixtures cannot use a purchased inventory filename.', 'PURCHASED_FILENAME_REFUSED');
+      throw new SceneryError(
+        'Preview synthetic fixtures cannot use a purchased inventory filename.',
+        'PURCHASED_FILENAME_REFUSED',
+      );
     }
     const objectKey = sceneryInternalObjectKey({
       prefix: resolveSceneryAssetPrefix(env),
@@ -315,7 +334,10 @@ export function createUploadSession(input: {
     expectedSourceId: input.expectedSourceId,
   });
   if (!expected) {
-    throw new SceneryError('Filename is not in the expected TivvleJoy scenery inventory for that collection.', 'UNEXPECTED_SOURCE');
+    throw new SceneryError(
+      'Filename is not in the expected TivvleJoy scenery inventory for that collection.',
+      'UNEXPECTED_SOURCE',
+    );
   }
   const duplicate = input.sha256
     ? detectDuplicate({
@@ -381,7 +403,10 @@ export function createUploadSession(input: {
   });
   const planned = planMultipartParts(input.byteSize, limits.multipartPartBytes);
   if (planned.length > limits.maxParts) {
-    throw new SceneryError('File would require more multipart parts than Preview allows.', 'PART_COUNT_LIMIT');
+    throw new SceneryError(
+      'File would require more multipart parts than Preview allows.',
+      'PART_COUNT_LIMIT',
+    );
   }
   assertChunkBoundaries(planned, input.byteSize, limits.multipartPartBytes);
   const parts = planned.map((part) => ({
@@ -452,11 +477,17 @@ export function markPartFailed(session: UploadSession, partNumber: number): Uplo
   return {
     ...session,
     updatedAt: new Date().toISOString(),
-    parts: session.parts.map((item) => (item.partNumber === partNumber ? { ...item, failed: true } : item)),
+    parts: session.parts.map((item) =>
+      item.partNumber === partNumber ? { ...item, failed: true } : item,
+    ),
   };
 }
 
-export function recordPartEtag(session: UploadSession, partNumber: number, etag: string): UploadSession {
+export function recordPartEtag(
+  session: UploadSession,
+  partNumber: number,
+  etag: string,
+): UploadSession {
   return {
     ...session,
     state: 'uploading',
@@ -467,24 +498,36 @@ export function recordPartEtag(session: UploadSession, partNumber: number, etag:
   };
 }
 
-export function assertCompleteParts(session: UploadSession): Array<{ partNumber: number; etag: string }> {
+export function assertCompleteParts(
+  session: UploadSession,
+): Array<{ partNumber: number; etag: string }> {
   const complete = session.parts.map((part) => {
     if (!part.etag) {
-      throw new SceneryError(`Part ${part.partNumber} has no ETag and cannot complete.`, 'INCOMPLETE_MULTIPART');
+      throw new SceneryError(
+        `Part ${part.partNumber} has no ETag and cannot complete.`,
+        'INCOMPLETE_MULTIPART',
+      );
     }
     return { partNumber: part.partNumber, etag: part.etag };
   });
   return complete;
 }
 
-export function resumeSession(session: UploadSession): { nextPart: MultipartPartRecord | null; session: UploadSession } {
+export function resumeSession(session: UploadSession): {
+  nextPart: MultipartPartRecord | null;
+  session: UploadSession;
+} {
   const nextPart = session.parts.find((part) => !part.etag) ?? null;
   return {
     nextPart,
     session: {
       ...session,
-      state: session.state === 'aborted' || session.state === 'completed' ? session.state : 'paused',
-      notes: [...session.notes, 'Resume requested. Completed parts are kept; remaining parts can be re-signed.'],
+      state:
+        session.state === 'aborted' || session.state === 'completed' ? session.state : 'paused',
+      notes: [
+        ...session.notes,
+        'Resume requested. Completed parts are kept; remaining parts can be re-signed.',
+      ],
       updatedAt: new Date().toISOString(),
     },
   };

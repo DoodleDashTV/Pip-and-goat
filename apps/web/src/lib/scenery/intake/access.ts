@@ -8,11 +8,15 @@ const RATE_WINDOW = new Map<string, number[]>();
 export const SCENERY_INTAKE_TOKEN_ENV = 'TIVVLEJOY_SCENERY_INTAKE_TOKEN';
 export const SCENERY_INTAKE_TOKEN_HEADER = 'x-tivvlejoy-scenery-intake-token';
 
-export function isProductionRuntime(env: Record<string, string | undefined> = process.env): boolean {
+export function isProductionRuntime(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
   return String(env.VERCEL_ENV ?? '').trim() === 'production';
 }
 
-export function sceneryIntakeTokenConfigured(env: Record<string, string | undefined> = process.env): boolean {
+export function sceneryIntakeTokenConfigured(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
   return Boolean(String(env[SCENERY_INTAKE_TOKEN_ENV] ?? '').trim());
 }
 
@@ -23,7 +27,9 @@ export function intakeTokensMatch(provided: string, expected: string): boolean {
   return timingSafeEqual(left, right);
 }
 
-export function publicIntakeAuthorizationSnapshot(env: Record<string, string | undefined> = process.env) {
+export function publicIntakeAuthorizationSnapshot(
+  env: Record<string, string | undefined> = process.env,
+) {
   const publicPreview = isPublicWebsitePreview(env);
   const tokenConfigured = sceneryIntakeTokenConfigured(env);
   const productionRefused = isProductionRuntime(env);
@@ -48,7 +54,10 @@ export function assertStudioIntakeAccess(
   providedToken = '',
 ): void {
   if (isProductionRuntime(env)) {
-    throw new SceneryError('Scenery asset intake mutations are refused on Production.', 'PRODUCTION_INTAKE_REFUSED');
+    throw new SceneryError(
+      'Scenery asset intake mutations are refused on Production.',
+      'PRODUCTION_INTAKE_REFUSED',
+    );
   }
   if (!isPublicWebsitePreview(env)) {
     return;
@@ -94,7 +103,9 @@ export function redactSecretsFromText(text: string, secrets: readonly string[]):
   }, text);
 }
 
-export function publicAuthorizationFailure(code: 'INTAKE_UNAUTHORIZED' | 'PRODUCTION_INTAKE_REFUSED' | 'TOKEN_LOCATION_REFUSED') {
+export function publicAuthorizationFailure(
+  code: 'INTAKE_UNAUTHORIZED' | 'PRODUCTION_INTAKE_REFUSED' | 'TOKEN_LOCATION_REFUSED',
+) {
   return {
     error:
       code === 'PRODUCTION_INTAKE_REFUSED'
@@ -111,7 +122,10 @@ export function publicAuthorizationFailure(code: 'INTAKE_UNAUTHORIZED' | 'PRODUC
 export function assertNoTokenReflection(payload: unknown, token: string): void {
   if (!token) return;
   if (JSON.stringify(payload).includes(token)) {
-    throw new SceneryError('Intake responses must not reflect the studio token.', 'TOKEN_REFLECTION_REFUSED');
+    throw new SceneryError(
+      'Intake responses must not reflect the studio token.',
+      'TOKEN_REFLECTION_REFUSED',
+    );
   }
 }
 
@@ -127,15 +141,23 @@ export function assertNoClientStorageCredentials(body: Record<string, unknown>):
   ];
   for (const key of banned) {
     if (key in body) {
-      throw new SceneryError('Client-selected storage credentials or prefixes are refused.', 'CLIENT_CREDENTIALS_REFUSED');
+      throw new SceneryError(
+        'Client-selected storage credentials or prefixes are refused.',
+        'CLIENT_CREDENTIALS_REFUSED',
+      );
     }
   }
 }
 
-export function assertIntakeRateLimit(key: string, env: Record<string, string | undefined> = process.env): void {
+export function assertIntakeRateLimit(
+  key: string,
+  env: Record<string, string | undefined> = process.env,
+): void {
   const limits = resolveIntakeLimits(env);
   const now = Date.now();
-  const recent = (RATE_WINDOW.get(key) ?? []).filter((stamp) => now - stamp < limits.rateLimitWindowMs);
+  const recent = (RATE_WINDOW.get(key) ?? []).filter(
+    (stamp) => now - stamp < limits.rateLimitWindowMs,
+  );
   if (recent.length >= limits.rateLimitMaxRequests) {
     throw new SceneryError('Scenery intake rate limit reached. Retry later.', 'INTAKE_RATE_LIMIT');
   }

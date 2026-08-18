@@ -1,7 +1,4 @@
-import {
-  sanitizeClientRecoverySnapshot,
-  type ClientRecoverySnapshot,
-} from './recovery';
+import { sanitizeClientRecoverySnapshot, type ClientRecoverySnapshot } from './recovery';
 
 export const CLIENT_RECOVERY_STORAGE_KEY = 'tivvlejoy.scenery.intake.recovery.v1';
 
@@ -24,10 +21,16 @@ function memoryFallback(): ClientRecoveryStore {
   };
 }
 
-export function resolveClientRecoveryStore(explicit?: ClientRecoveryStore | null): ClientRecoveryStore {
+export function resolveClientRecoveryStore(
+  explicit?: ClientRecoveryStore | null,
+): ClientRecoveryStore {
   if (explicit) return explicit;
   try {
-    if (typeof globalThis !== 'undefined' && 'localStorage' in globalThis && globalThis.localStorage) {
+    if (
+      typeof globalThis !== 'undefined' &&
+      'localStorage' in globalThis &&
+      globalThis.localStorage
+    ) {
       return globalThis.localStorage;
     }
   } catch {
@@ -36,7 +39,9 @@ export function resolveClientRecoveryStore(explicit?: ClientRecoveryStore | null
   return memoryFallback();
 }
 
-export function loadClientRecoverySnapshots(store?: ClientRecoveryStore | null): ClientRecoverySnapshot[] {
+export function loadClientRecoverySnapshots(
+  store?: ClientRecoveryStore | null,
+): ClientRecoverySnapshot[] {
   const storage = resolveClientRecoveryStore(store);
   const raw = storage.getItem(CLIENT_RECOVERY_STORAGE_KEY);
   if (!raw) return [];
@@ -62,7 +67,10 @@ export function saveClientRecoverySnapshot(
   return next;
 }
 
-export function removeClientRecoverySnapshot(sessionId: string, store?: ClientRecoveryStore | null): void {
+export function removeClientRecoverySnapshot(
+  sessionId: string,
+  store?: ClientRecoveryStore | null,
+): void {
   const storage = resolveClientRecoveryStore(store);
   const next = loadClientRecoverySnapshots(storage).filter((item) => item.sessionId !== sessionId);
   storage.setItem(CLIENT_RECOVERY_STORAGE_KEY, JSON.stringify({ sessions: next }));
@@ -72,7 +80,9 @@ export function matchClientRecoverySnapshot(
   snapshots: readonly ClientRecoverySnapshot[],
   file: { name: string; size: number },
 ): ClientRecoverySnapshot | null {
-  return snapshots.find((item) => item.filename === file.name && item.byteSize === file.size) ?? null;
+  return (
+    snapshots.find((item) => item.filename === file.name && item.byteSize === file.size) ?? null
+  );
 }
 
 export function clientRecoveryContainsSecrets(snapshot: ClientRecoverySnapshot): boolean {

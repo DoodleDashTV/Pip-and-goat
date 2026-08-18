@@ -41,7 +41,12 @@ import type { SourceObjectManifest } from './manifest';
 import { evaluateInspectionEligibility } from './inspection-queue';
 import { assertWriteStaysInApprovedNamespace } from './namespace';
 import { buildIntakeLifecycleEvent, emitIntakeLifecycleEvent } from './observability';
-import { classifyRecoveredState, isSessionExpired, recoveryGuidance, sessionExpiresAt } from './recovery';
+import {
+  classifyRecoveredState,
+  isSessionExpired,
+  recoveryGuidance,
+  sessionExpiresAt,
+} from './recovery';
 import { evaluateStoredVerification } from './verification';
 
 export type IntakeAction =
@@ -57,7 +62,10 @@ export type IntakeAction =
   | 'cleanup-preview-synthetic'
   | 'pause';
 
-async function storageFor(env: Record<string, string | undefined>, override?: MultipartStoragePort) {
+async function storageFor(
+  env: Record<string, string | undefined>,
+  override?: MultipartStoragePort,
+) {
   if (override) return override;
   return createConfiguredMultipartStorage(env);
 }
@@ -101,19 +109,24 @@ async function handleSceneryIntakeActionInner(input: {
   }
 
   if (input.action === 'status') {
-    const sourceCount = config.configured ? await countPurchasedSourceObjects(storage, env) : { count: 0, unavailable: true };
+    const sourceCount = config.configured
+      ? await countPurchasedSourceObjects(storage, env)
+      : { count: 0, unavailable: true };
     return {
       storage: config,
       authorization: publicIntakeAuthorizationSnapshot(env),
       bytesPath: 'client-to-signed-r2',
       purchasedSourceObjectCount: sourceCount.unavailable ? null : sourceCount.count,
       sessions: [...store.sessions.values()].map(publicSession),
-      manifests: store.listManifests().filter((item) => item.sourceId !== PREVIEW_SYNTHETIC_SOURCE_ID),
+      manifests: store
+        .listManifests()
+        .filter((item) => item.sourceId !== PREVIEW_SYNTHETIC_SOURCE_ID),
     };
   }
 
   if (input.action === 'create-session') {
-    const purpose: IntakePurpose = input.body.purpose === 'preview-synthetic' ? 'preview-synthetic' : 'purchased';
+    const purpose: IntakePurpose =
+      input.body.purpose === 'preview-synthetic' ? 'preview-synthetic' : 'purchased';
     const created = createUploadSession({
       collectionId: String(input.body.collectionId ?? ''),
       originalFilename: String(input.body.filename ?? ''),
@@ -121,7 +134,9 @@ async function handleSceneryIntakeActionInner(input: {
       mimeType: input.body.mimeType ? String(input.body.mimeType) : undefined,
       lastModified: input.body.lastModified ? String(input.body.lastModified) : null,
       sha256: input.body.sha256 ? String(input.body.sha256) : null,
-      expectedSourceId: input.body.expectedSourceId ? String(input.body.expectedSourceId) : undefined,
+      expectedSourceId: input.body.expectedSourceId
+        ? String(input.body.expectedSourceId)
+        : undefined,
       existingIndex: store.index(),
       env,
       purpose,
@@ -138,10 +153,16 @@ async function handleSceneryIntakeActionInner(input: {
     if (created.session.state === 'already_present') {
       store.putSession(created.session);
       await persistUploadSession(created.session, storage, env);
-      return { session: publicSession(created.session), manifest: created.manifest, alreadyPresent: true };
+      return {
+        session: publicSession(created.session),
+        manifest: created.manifest,
+        alreadyPresent: true,
+      };
     }
     if (created.session.connectionReadyOnly || storage instanceof ConnectionReadyMultipartStorage) {
-      created.session.notes.push('R2 multipart create was not attempted because storage is not configured.');
+      created.session.notes.push(
+        'R2 multipart create was not attempted because storage is not configured.',
+      );
       store.putSession(created.session);
       await persistUploadSession(created.session, storage, env);
       return {
@@ -173,7 +194,10 @@ async function handleSceneryIntakeActionInner(input: {
   assertSessionObjectKey(session, prefix);
 
   if (input.action === 'query') {
-    return { session: publicSession(session), manifest: store.manifests.get(session.expectedSourceId) ?? null };
+    return {
+      session: publicSession(session),
+      manifest: store.manifests.get(session.expectedSourceId) ?? null,
+    };
   }
 
   if (input.action === 'resume') {
@@ -238,11 +262,20 @@ async function handleSceneryIntakeActionInner(input: {
   }
 
   if (input.action === 'cleanup-preview-synthetic') {
-    if (session.purpose !== 'preview-synthetic' || !session.objectKey.includes('/quarantine/preview-tests/')) {
-      throw new SceneryError('Only preview-synthetic objects under quarantine/preview-tests/ can be deleted by this action.', 'CLEANUP_REFUSED');
+    if (
+      session.purpose !== 'preview-synthetic' ||
+      !session.objectKey.includes('/quarantine/preview-tests/')
+    ) {
+      throw new SceneryError(
+        'Only preview-synthetic objects under quarantine/preview-tests/ can be deleted by this action.',
+        'CLEANUP_REFUSED',
+      );
     }
     if (session.objectKey.includes('/source/')) {
-      throw new SceneryError('Purchased source objects cannot be deleted by preview cleanup.', 'CLEANUP_REFUSED');
+      throw new SceneryError(
+        'Purchased source objects cannot be deleted by preview cleanup.',
+        'CLEANUP_REFUSED',
+      );
     }
     if (storage.deleteObject) {
       await storage.deleteObject(session.objectKey);
@@ -259,12 +292,23 @@ async function handleSceneryIntakeActionInner(input: {
       throw new SceneryError(recoveryGuidance('expired'), 'SESSION_EXPIRED');
     }
     if (!session.uploadId) {
-      throw new SceneryError('Upload session has no multipart id. Storage is connection-ready only.', 'STORAGE_UNAVAILABLE');
+      throw new SceneryError(
+        'Upload session has no multipart id. Storage is connection-ready only.',
+        'STORAGE_UNAVAILABLE',
+      );
     }
     const partNumber = Number(input.body.partNumber);
     const limits = resolveIntakeLimits(env);
-    if (!Number.isInteger(partNumber) || partNumber < 1 || partNumber > session.parts.length || session.parts.length > limits.maxParts) {
-      throw new SceneryError('Part number or part count is outside the Preview intake limits.', 'PART_COUNT_LIMIT');
+    if (
+      !Number.isInteger(partNumber) ||
+      partNumber < 1 ||
+      partNumber > session.parts.length ||
+      session.parts.length > limits.maxParts
+    ) {
+      throw new SceneryError(
+        'Part number or part count is outside the Preview intake limits.',
+        'PART_COUNT_LIMIT',
+      );
     }
     const signed = await storage.signPart({
       key: session.objectKey,
@@ -273,7 +317,10 @@ async function handleSceneryIntakeActionInner(input: {
       ttlSeconds: limits.signedOperationTtlSeconds,
     });
     if (signedUrlTargetsVercel(signed.url)) {
-      throw new SceneryError('Signed part URLs must target private storage, not Vercel.', 'BYTES_PATH_REFUSED');
+      throw new SceneryError(
+        'Signed part URLs must target private storage, not Vercel.',
+        'BYTES_PATH_REFUSED',
+      );
     }
     const next = input.action === 'retry-part' ? markPartFailed(session, partNumber) : session;
     store.putSession(markPartSigned(next, partNumber));
@@ -296,16 +343,22 @@ async function handleSceneryIntakeActionInner(input: {
         manifest: existingManifest ?? null,
         storedSize: head.size,
         alreadyCompleted: true,
-        inspectionReadiness: existingManifest ? evaluateInspectionEligibility(existingManifest) : { ready: false, reasons: ['manifest missing'] },
+        inspectionReadiness: existingManifest
+          ? evaluateInspectionEligibility(existingManifest)
+          : { ready: false, reasons: ['manifest missing'] },
       };
     }
     if (isSessionExpired(session)) {
       throw new SceneryError(recoveryGuidance('expired'), 'SESSION_EXPIRED');
     }
-    const etags = (input.body.parts as Array<{ partNumber: number; etag: string }> | undefined) ?? [];
+    const etags =
+      (input.body.parts as Array<{ partNumber: number; etag: string }> | undefined) ?? [];
     const limits = resolveIntakeLimits(env);
     if (etags.length !== session.parts.length || etags.length > limits.maxParts) {
-      throw new SceneryError('Completed part count does not match the planned multipart map.', 'INCONSISTENT_PART_COUNT');
+      throw new SceneryError(
+        'Completed part count does not match the planned multipart map.',
+        'INCONSISTENT_PART_COUNT',
+      );
     }
     let current = session;
     for (const part of etags) {
@@ -313,7 +366,10 @@ async function handleSceneryIntakeActionInner(input: {
     }
     const parts = assertCompleteParts(current);
     if (!current.uploadId) {
-      throw new SceneryError('Cannot complete a connection-ready session that never reached R2.', 'STORAGE_UNAVAILABLE');
+      throw new SceneryError(
+        'Cannot complete a connection-ready session that never reached R2.',
+        'STORAGE_UNAVAILABLE',
+      );
     }
     let completed: { size: number };
     let ambiguousCompletion = false;
@@ -337,13 +393,18 @@ async function handleSceneryIntakeActionInner(input: {
       }
     }
     if (completed.size !== current.byteSize) {
-      throw new SceneryError('Stored object size does not match the intake record.', 'SIZE_MISMATCH');
+      throw new SceneryError(
+        'Stored object size does not match the intake record.',
+        'SIZE_MISMATCH',
+      );
     }
     current.state = 'completed';
     store.putSession(current);
     await persistUploadSession(current, storage, env);
     const unityPreservationOnly =
-      current.purpose === 'preview-synthetic' ? false : getExpectedSourceFile(current.expectedSourceId).unityPreservationOnly;
+      current.purpose === 'preview-synthetic'
+        ? false
+        : getExpectedSourceFile(current.expectedSourceId).unityPreservationOnly;
     const manifest = applyCompletedVerification(
       store.manifests.get(current.expectedSourceId),
       current,
@@ -377,7 +438,9 @@ async function handleSceneryIntakeActionInner(input: {
   if (input.action === 'verify') {
     const head = await storage.headObject(session.objectKey);
     const unityPreservationOnly =
-      session.purpose === 'preview-synthetic' ? false : getExpectedSourceFile(session.expectedSourceId).unityPreservationOnly;
+      session.purpose === 'preview-synthetic'
+        ? false
+        : getExpectedSourceFile(session.expectedSourceId).unityPreservationOnly;
     const manifest = applyCompletedVerification(
       store.manifests.get(session.expectedSourceId),
       session,
@@ -484,7 +547,10 @@ function assertSessionObjectKey(session: UploadSession, prefix: string): void {
     assertWriteStaysInApprovedNamespace(session.objectKey, prefix, 'quarantine');
     assertObjectKeyWithinPrefix(session.objectKey, prefix, 'quarantine');
     if (!session.objectKey.includes('/quarantine/preview-tests/')) {
-      throw new SceneryError('Preview synthetic objects must stay under quarantine/preview-tests/.', 'UNSAFE_OBJECT_KEY');
+      throw new SceneryError(
+        'Preview synthetic objects must stay under quarantine/preview-tests/.',
+        'UNSAFE_OBJECT_KEY',
+      );
     }
     return;
   }

@@ -96,9 +96,12 @@ export function reviewOneTapPurchasedSelection(
     const sanitizedFilename = sanitizedOrNull(input.filename);
     const safety = assessFilenameSafety(input.filename);
     const size = assessSourceSize({ filename: input.filename, declaredBytes: input.byteSize });
-    const exact = safety.safe && safety.exactPurchasedMatch ? matchExactExpectedFilename(input.filename) : null;
+    const exact =
+      safety.safe && safety.exactPurchasedMatch ? matchExactExpectedFilename(input.filename) : null;
     const aliasOnly = safety.safe ? matchAliasOnlyExpectedFilename(input.filename) : null;
-    const key = exact ? normalizeInventoryFilename(exact.expectedFilename) : normalizeInventoryFilename(input.filename);
+    const key = exact
+      ? normalizeInventoryFilename(exact.expectedFilename)
+      : normalizeInventoryFilename(input.filename);
     const occurrence = (seenExact.get(key) ?? 0) + 1;
     seenExact.set(key, occurrence);
 
@@ -116,10 +119,12 @@ export function reviewOneTapPurchasedSelection(
         reason: `Unsafe filename refused (${safety.issues.join(', ')}). Source files are not renamed.`,
       };
     }
-    if (shouldExcludeWorldShadersGiveaway({
-      filename: input.filename,
-      approvedManifestFilenames: options?.approvedManifestFilenames,
-    })) {
+    if (
+      shouldExcludeWorldShadersGiveaway({
+        filename: input.filename,
+        approvedManifestFilenames: options?.approvedManifestFilenames,
+      })
+    ) {
       return {
         filename: input.filename,
         sanitizedFilename,
@@ -214,19 +219,19 @@ export function reviewOneTapPurchasedSelection(
       expectedFilename: item.expectedFilename,
     }));
 
-  const collectionTotals = (['village', 'sky-hdri', 'stylized-forest', 'procedural-nature'] as const).map(
-    (collectionId) => {
-      const collectionExpected = expected.filter((item) => item.collectionId === collectionId);
-      const collectionMatched = matched.filter((item) => item.collectionId === collectionId);
-      return {
-        collectionId,
-        collectionName: collectionExpected[0]?.collectionName ?? collectionId,
-        expected: collectionExpected.length,
-        matched: collectionMatched.length,
-        bytes: collectionMatched.reduce((sum, item) => sum + item.byteSize, 0),
-      };
-    },
-  );
+  const collectionTotals = (
+    ['village', 'sky-hdri', 'stylized-forest', 'procedural-nature'] as const
+  ).map((collectionId) => {
+    const collectionExpected = expected.filter((item) => item.collectionId === collectionId);
+    const collectionMatched = matched.filter((item) => item.collectionId === collectionId);
+    return {
+      collectionId,
+      collectionName: collectionExpected[0]?.collectionName ?? collectionId,
+      expected: collectionExpected.length,
+      matched: collectionMatched.length,
+      bytes: collectionMatched.reduce((sum, item) => sum + item.byteSize, 0),
+    };
+  });
 
   return {
     checkpoint: ONE_TAP_UPLOAD_CHECKPOINT,

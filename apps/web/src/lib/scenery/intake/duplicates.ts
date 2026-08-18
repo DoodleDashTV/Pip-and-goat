@@ -9,7 +9,8 @@ export type StoredSourceIndexEntry = {
   byteSize: number;
 };
 
-export type DuplicateStatus = 'unique' | 'already_present' | 'exact_duplicate' | 'filename_conflict';
+export type DuplicateStatus =
+  'unique' | 'already_present' | 'exact_duplicate' | 'filename_conflict';
 
 export type DuplicateDecision = {
   status: DuplicateStatus;
@@ -18,10 +19,7 @@ export type DuplicateDecision = {
 };
 
 export type ContentIdentityCase =
-  | 'same_name_same_hash'
-  | 'same_name_different_hash'
-  | 'different_name_same_hash'
-  | 'unique';
+  'same_name_same_hash' | 'same_name_different_hash' | 'different_name_same_hash' | 'unique';
 
 export function classifyContentIdentity(input: {
   sha256: string;
@@ -48,14 +46,16 @@ export function detectDuplicate(input: {
     return {
       status: 'already_present',
       existing: sameCollectionHash,
-      message: 'Identical SHA-256 and filename already exist in this collection. The immutable source was reused.',
+      message:
+        'Identical SHA-256 and filename already exist in this collection. The immutable source was reused.',
     };
   }
   if (sameCollectionHash) {
     return {
       status: 'already_present',
       existing: sameCollectionHash,
-      message: 'Identical SHA-256 already exists in this collection. A second stored copy was not created.',
+      message:
+        'Identical SHA-256 already exists in this collection. A second stored copy was not created.',
     };
   }
   const otherHash = hashMatches[0];
@@ -63,17 +63,22 @@ export function detectDuplicate(input: {
     return {
       status: 'exact_duplicate',
       existing: otherHash,
-      message: 'Identical SHA-256 exists under a different filename. Treated as an exact duplicate.',
+      message:
+        'Identical SHA-256 exists under a different filename. Treated as an exact duplicate.',
     };
   }
   const nameConflict = input.existing.find(
-    (item) => item.collectionId === input.collectionId && item.filename === input.filename && item.sha256 !== input.sha256,
+    (item) =>
+      item.collectionId === input.collectionId &&
+      item.filename === input.filename &&
+      item.sha256 !== input.sha256,
   );
   if (nameConflict) {
     return {
       status: 'filename_conflict',
       existing: nameConflict,
-      message: 'Same filename with a different SHA-256. Versioning or quarantine is required. Silent overwrite is refused.',
+      message:
+        'Same filename with a different SHA-256. Versioning or quarantine is required. Silent overwrite is refused.',
     };
   }
   return { status: 'unique', message: 'No SHA-256 duplicate found.' };
@@ -86,7 +91,10 @@ export function resolveImmutableWrite(input: {
   allowVersion?: boolean;
 }): 'reuse' | 'create' | 'version' | 'reject' {
   if (!input.existing) return 'create';
-  if (input.existing.sha256 === input.incomingSha256 && input.existing.byteSize === input.incomingByteSize) {
+  if (
+    input.existing.sha256 === input.incomingSha256 &&
+    input.existing.byteSize === input.incomingByteSize
+  ) {
     return 'reuse';
   }
   if (input.allowVersion) return 'version';

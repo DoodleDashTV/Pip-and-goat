@@ -42,7 +42,10 @@ import { resetIntakeRateLimit } from './scenery/intake/access';
 import { SCENERY_INTAKE_SCHEMA_VERSION } from './scenery/intake/config';
 import { createEmptyManifestRecord } from './scenery/intake/manifest';
 import { scanTrackedAndStagedFiles } from './scenery/intake/git-safety';
-import { BLENDER_INSPECTION_CONTRACT, describeBlenderAvailability } from './scenery/intake/blender-contract';
+import {
+  BLENDER_INSPECTION_CONTRACT,
+  describeBlenderAvailability,
+} from './scenery/intake/blender-contract';
 import { buildPublicScenerySnapshot } from './scenery/snapshot';
 import { SCENERY_COPY } from './scenery/copy';
 
@@ -170,8 +173,12 @@ describe('one-tap purchased selection review', () => {
       'stylized-forest',
       'procedural-nature',
     ]);
-    expect(review.collectionTotals.find((item) => item.collectionId === 'village')?.matched).toBe(1);
-    expect(review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes).toBe(1152);
+    expect(review.collectionTotals.find((item) => item.collectionId === 'village')?.matched).toBe(
+      1,
+    );
+    expect(
+      review.collectionTotals.find((item) => item.collectionId === 'procedural-nature')?.bytes,
+    ).toBe(1152);
     expect(review.overallTotals.expected).toBe(27);
     expect(review.overallTotals.eligible).toBe(5);
   });
@@ -219,7 +226,12 @@ describe('multipart session workflow', () => {
       env: configuredEnv,
       publicPreview: false,
       storage,
-    })) as { session: { sessionId: string; parts: Array<{ partNumber: number; start: number; end: number }> } };
+    })) as {
+      session: {
+        sessionId: string;
+        parts: Array<{ partNumber: number; start: number; end: number }>;
+      };
+    };
 
     const signed = await handleSceneryIntakeAction({
       action: 'sign-part',
@@ -420,10 +432,24 @@ describe('archive inventory, quarantine, and manifests', () => {
     expect(ok.fileCount).toBe(2);
     expect(ok.executedAgainstStoredBytes).toBe(true);
     expect(ok.jpgFiles.length).toBe(1);
-    expect(() => inventoryZipBytes(syntheticTraversalZip()).findings.some((item) => item.code === 'ARCHIVE_PATH_TRAVERSAL')).not.toThrow();
-    expect(inventoryZipBytes(syntheticTraversalZip()).findings.some((item) => item.code === 'ARCHIVE_PATH_TRAVERSAL')).toBe(true);
-    expect(inventoryZipBytes(syntheticExecutableZip()).findings.some((item) => item.code === 'PROHIBITED_EXTENSION')).toBe(true);
-    const nested = inventoryZipBytes(buildMinimalZip([{ path: 'inner.zip', content: new Uint8Array([1, 2, 3]) }]));
+    expect(() =>
+      inventoryZipBytes(syntheticTraversalZip()).findings.some(
+        (item) => item.code === 'ARCHIVE_PATH_TRAVERSAL',
+      ),
+    ).not.toThrow();
+    expect(
+      inventoryZipBytes(syntheticTraversalZip()).findings.some(
+        (item) => item.code === 'ARCHIVE_PATH_TRAVERSAL',
+      ),
+    ).toBe(true);
+    expect(
+      inventoryZipBytes(syntheticExecutableZip()).findings.some(
+        (item) => item.code === 'PROHIBITED_EXTENSION',
+      ),
+    ).toBe(true);
+    const nested = inventoryZipBytes(
+      buildMinimalZip([{ path: 'inner.zip', content: new Uint8Array([1, 2, 3]) }]),
+    );
     expect(nested.nestedArchives).toEqual(['inner.zip']);
   });
 
@@ -460,7 +486,9 @@ describe('archive inventory, quarantine, and manifests', () => {
     ]);
     expect(jobs).toHaveLength(10);
     expect(jobs.find((job) => job.jobId === 'INSPECT_VILLAGE_BLENDER')?.ready).toBe(true);
-    expect(jobs.find((job) => job.jobId === 'INSPECT_VILLAGE_BLENDER')?.dryRunReport?.realExecution).toBe('not_run');
+    expect(
+      jobs.find((job) => job.jobId === 'INSPECT_VILLAGE_BLENDER')?.dryRunReport?.realExecution,
+    ).toBe('not_run');
     expect(
       evaluateQuarantine({
         filename: 'payload.exe',
@@ -488,7 +516,9 @@ describe('workspace readiness and git safety', () => {
     expect(snapshot.realAssetReadiness.inspectedFiles).toBe(0);
     expect(snapshot.realAssetReadiness.realSceneryProductionReady).toBe(false);
     expect(snapshot.warning).toContain('Upload does not mean asset approval');
-    expect(buildPublicScenerySnapshot().intake.realAssetReadiness.purchasedBytesInspected).toBe(false);
+    expect(buildPublicScenerySnapshot().intake.realAssetReadiness.purchasedBytesInspected).toBe(
+      false,
+    );
     expect(describeBlenderAvailability().available).toBe(false);
     expect(BLENDER_INSPECTION_CONTRACT.paidGpu).toBe(false);
     expect(BLENDER_INSPECTION_CONTRACT.normalizationBoundary.allowed).toBe(false);
@@ -513,7 +543,9 @@ describe('workspace readiness and git safety', () => {
     expect(intake).toContain('SCENERY_COPY.studioSession');
     expect(intake).toContain('x-tivvlejoy-scenery-intake-token');
     expect(intake).toContain('Expected 27-file source checklist');
-    expect(readRepo('apps/web/src/lib/scenery/copy.ts')).toContain('Upload does not mean asset approval');
+    expect(readRepo('apps/web/src/lib/scenery/copy.ts')).toContain(
+      'Upload does not mean asset approval',
+    );
     expect(intake).not.toMatch(/DoodleDash|Doodle Dash|\bDDP\b/);
     expect(scanTrackedAndStagedFiles(repoRoot).ok).toBe(true);
   });

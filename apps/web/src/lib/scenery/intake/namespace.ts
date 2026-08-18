@@ -11,7 +11,10 @@ export function isPrefixEscapeAttempt(key: string, prefix = DEFAULT_SCENERY_ASSE
   if (!decoded.startsWith(`${normalizedPrefix}/`)) {
     return true;
   }
-  if (decoded.startsWith(`${normalizedPrefix}/../`) || decoded.includes(`/${normalizedPrefix}/../`)) {
+  if (
+    decoded.startsWith(`${normalizedPrefix}/../`) ||
+    decoded.includes(`/${normalizedPrefix}/../`)
+  ) {
     return true;
   }
   return false;
@@ -31,7 +34,10 @@ export function assertWriteStaysInApprovedNamespace(
   kind?: 'source' | 'quarantine' | 'catalogs',
 ): void {
   if (isPrefixEscapeAttempt(key, prefix)) {
-    throw new SceneryError('Object key escapes the approved TivvleJoy scenery namespace.', 'UNSAFE_OBJECT_KEY');
+    throw new SceneryError(
+      'Object key escapes the approved TivvleJoy scenery namespace.',
+      'UNSAFE_OBJECT_KEY',
+    );
   }
   assertObjectKeyWithinPrefix(key, prefix, kind);
 }

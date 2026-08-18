@@ -84,10 +84,18 @@ export function envNumber(
 export function resolveIntakeLimits(env: Record<string, string | undefined> = process.env) {
   const multipartPartBytes = Math.max(
     SCENERY_INTAKE_LIMITS.minMultipartPartBytes,
-    envNumber(env, 'TIVVLEJOY_SCENERY_MULTIPART_PART_BYTES', SCENERY_INTAKE_LIMITS.multipartPartBytes),
+    envNumber(
+      env,
+      'TIVVLEJOY_SCENERY_MULTIPART_PART_BYTES',
+      SCENERY_INTAKE_LIMITS.multipartPartBytes,
+    ),
   );
   return {
-    maxUploadBytes: envNumber(env, 'TIVVLEJOY_SCENERY_MAX_UPLOAD_BYTES', SCENERY_INTAKE_LIMITS.maxUploadBytes),
+    maxUploadBytes: envNumber(
+      env,
+      'TIVVLEJOY_SCENERY_MAX_UPLOAD_BYTES',
+      SCENERY_INTAKE_LIMITS.maxUploadBytes,
+    ),
     maxConcurrentParts: envNumber(
       env,
       'TIVVLEJOY_SCENERY_MAX_CONCURRENT_PARTS',
@@ -120,7 +128,11 @@ export function resolveIntakeLimits(env: Record<string, string | undefined> = pr
       'TIVVLEJOY_SCENERY_MAX_MATERIALIZED_BYTES',
       SCENERY_INTAKE_LIMITS.maxMaterializedBytesPerJob,
     ),
-    hashChunkBytes: envNumber(env, 'TIVVLEJOY_SCENERY_HASH_CHUNK_BYTES', SCENERY_INTAKE_LIMITS.hashChunkBytes),
+    hashChunkBytes: envNumber(
+      env,
+      'TIVVLEJOY_SCENERY_HASH_CHUNK_BYTES',
+      SCENERY_INTAKE_LIMITS.hashChunkBytes,
+    ),
     rateLimitWindowMs: SCENERY_INTAKE_LIMITS.rateLimitWindowMs,
     rateLimitMaxRequests: SCENERY_INTAKE_LIMITS.rateLimitMaxRequests,
   };

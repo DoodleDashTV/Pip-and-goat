@@ -173,7 +173,9 @@ describe('pipeline hardening inventory', () => {
   });
 
   it('refuses a zero-byte file', () => {
-    const review = reviewOneTapPurchasedSelection([{ filename: 'Village_Textures.zip', byteSize: 0 }]);
+    const review = reviewOneTapPurchasedSelection([
+      { filename: 'Village_Textures.zip', byteSize: 0 },
+    ]);
     expect(review.incorrect[0]?.reason).toMatch(/zero_byte/);
     expect(review.eligible).toHaveLength(0);
   });
@@ -187,11 +189,16 @@ describe('pipeline hardening inventory', () => {
 
   it('keeps the World Shaders giveaway outside the purchased 27 unless a manifest includes it', () => {
     expect(shouldExcludeWorldShadersGiveaway({ filename: 'World Shaders.zip' })).toBe(true);
-    const review = reviewOneTapPurchasedSelection([{ filename: 'World Shaders.zip', byteSize: 128 }]);
+    const review = reviewOneTapPurchasedSelection([
+      { filename: 'World Shaders.zip', byteSize: 128 },
+    ]);
     expect(review.unexpected[0]?.reason).toMatch(/World Shaders/);
-    const included = reviewOneTapPurchasedSelection([{ filename: 'World Shaders.zip', byteSize: 128 }], {
-      approvedManifestFilenames: ['World Shaders.zip'],
-    });
+    const included = reviewOneTapPurchasedSelection(
+      [{ filename: 'World Shaders.zip', byteSize: 128 }],
+      {
+        approvedManifestFilenames: ['World Shaders.zip'],
+      },
+    );
     expect(included.unexpected[0]?.reason).not.toMatch(/World Shaders giveaway is outside/);
   });
 });
@@ -208,22 +215,35 @@ describe('pipeline hardening duplicates and hashes', () => {
         byteSize: 128,
       },
     ];
-    expect(classifyContentIdentity({ sha256: 'aaa', filename: 'Village_Blender_4.2.2.zip', existing })).toBe(
-      'same_name_same_hash',
+    expect(
+      classifyContentIdentity({ sha256: 'aaa', filename: 'Village_Blender_4.2.2.zip', existing }),
+    ).toBe('same_name_same_hash');
+    expect(
+      classifyContentIdentity({ sha256: 'bbb', filename: 'Village_Blender_4.2.2.zip', existing }),
+    ).toBe('same_name_different_hash');
+    expect(classifyContentIdentity({ sha256: 'aaa', filename: 'copy.zip', existing })).toBe(
+      'different_name_same_hash',
     );
-    expect(classifyContentIdentity({ sha256: 'bbb', filename: 'Village_Blender_4.2.2.zip', existing })).toBe(
-      'same_name_different_hash',
-    );
-    expect(classifyContentIdentity({ sha256: 'aaa', filename: 'copy.zip', existing })).toBe('different_name_same_hash');
-    expect(detectDuplicate({ sha256: 'aaa', filename: 'Village_Blender_4.2.2.zip', collectionId: 'village', existing }).status).toBe(
-      'already_present',
-    );
-    expect(detectDuplicate({ sha256: 'bbb', filename: 'Village_Blender_4.2.2.zip', collectionId: 'village', existing }).status).toBe(
-      'filename_conflict',
-    );
-    expect(detectDuplicate({ sha256: 'aaa', filename: 'copy.zip', collectionId: 'sky-hdri', existing }).status).toBe(
-      'exact_duplicate',
-    );
+    expect(
+      detectDuplicate({
+        sha256: 'aaa',
+        filename: 'Village_Blender_4.2.2.zip',
+        collectionId: 'village',
+        existing,
+      }).status,
+    ).toBe('already_present');
+    expect(
+      detectDuplicate({
+        sha256: 'bbb',
+        filename: 'Village_Blender_4.2.2.zip',
+        collectionId: 'village',
+        existing,
+      }).status,
+    ).toBe('filename_conflict');
+    expect(
+      detectDuplicate({ sha256: 'aaa', filename: 'copy.zip', collectionId: 'sky-hdri', existing })
+        .status,
+    ).toBe('exact_duplicate');
   });
 
   it('treats a hash mismatch as a verification failure', () => {
@@ -307,8 +327,13 @@ describe('pipeline hardening multipart recovery', () => {
     expect(loaded).toHaveLength(1);
     expect(JSON.stringify(loaded)).not.toMatch(/token|secret|X-Amz/i);
     expect(store.getItem(CLIENT_RECOVERY_STORAGE_KEY)).not.toMatch(/token|secret/i);
-    expect(matchClientRecoverySnapshot(loaded, { name: 'Village_Blender_4.2.2.zip', size: 128 })?.sessionId).toBe('session-1');
-    expect(matchClientRecoverySnapshot(loaded, { name: 'Village_Blender_4.2.2.zip', size: 64 })).toBeNull();
+    expect(
+      matchClientRecoverySnapshot(loaded, { name: 'Village_Blender_4.2.2.zip', size: 128 })
+        ?.sessionId,
+    ).toBe('session-1');
+    expect(
+      matchClientRecoverySnapshot(loaded, { name: 'Village_Blender_4.2.2.zip', size: 64 }),
+    ).toBeNull();
   });
 
   it('detects an expired upload session', async () => {
@@ -394,7 +419,9 @@ describe('pipeline hardening multipart recovery', () => {
       publicPreview: false,
       storage,
     })) as { session: { sessionId: string; objectKey: string } };
-    const uploadId = [...storage.uploads.entries()].find(([, upload]) => upload.key === ambiguous.session.objectKey)?.[0];
+    const uploadId = [...storage.uploads.entries()].find(
+      ([, upload]) => upload.key === ambiguous.session.objectKey,
+    )?.[0];
     if (!uploadId) throw new Error('Expected an open multipart upload for the ambiguous session.');
     const etag = await storage.putPart(uploadId, 1, otherBytes);
     await storage.completeMultipartUpload({
@@ -449,7 +476,9 @@ describe('pipeline hardening quarantine and inspection', () => {
     const { completed } = await completeVillageUpload();
     expect(completed.manifest.verificationState).toBe('size_verified');
     expect(['inspection_ready', 'not_eligible']).toContain(completed.manifest.inspectionState);
-    expect(completed.inspectionReadiness.ready).toBe(completed.manifest.inspectionState === 'inspection_ready');
+    expect(completed.inspectionReadiness.ready).toBe(
+      completed.manifest.inspectionState === 'inspection_ready',
+    );
     const blocked = evaluateInspectionEligibility({
       schemaVersion: 'TIVVLEJOY_SCENERY_ASSET_INTAKE_V1',
       sourceId: 'SRC_VILLAGE_BLEND_ZIP',
@@ -466,7 +495,11 @@ describe('pipeline hardening quarantine and inspection', () => {
       quarantineState: 'quarantined',
       inspectionState: 'not_eligible',
       blenderCompatibilityState: 'unknown',
-      uploaderSession: { sessionId: 's', createdAt: '2026-08-18T00:00:00.000Z', publicPreview: true },
+      uploaderSession: {
+        sessionId: 's',
+        createdAt: '2026-08-18T00:00:00.000Z',
+        publicPreview: true,
+      },
       createdAt: '2026-08-18T00:00:00.000Z',
       verifiedAt: null,
       provenanceLicenseRef: 'LICENSE_PENDING — attach the purchased license before approval',
@@ -482,9 +515,13 @@ describe('pipeline hardening quarantine and inspection', () => {
 describe('pipeline hardening security', () => {
   it('refuses namespace escape, traversal, and Unicode-confusable filenames', () => {
     expect(isPrefixEscapeAttempt('tivvlejoy-assets/../secret.zip')).toBe(true);
-    expect(isPrefixEscapeAttempt('other-prefix/source/village/Village_Blender_4.2.2.zip')).toBe(true);
+    expect(isPrefixEscapeAttempt('other-prefix/source/village/Village_Blender_4.2.2.zip')).toBe(
+      true,
+    );
     expect(() =>
-      assertWriteStaysInApprovedNamespace('tivvlejoy-assets/../source/village/Village_Blender_4.2.2.zip'),
+      assertWriteStaysInApprovedNamespace(
+        'tivvlejoy-assets/../source/village/Village_Blender_4.2.2.zip',
+      ),
     ).toThrow(/namespace|unsafe/i);
     expect(assessFilenameSafety('../Village_Blender_4.2.2.zip').issues).toContain('path_traversal');
     expect(assessFilenameSafety('/etc/passwd.zip').issues).toContain('prefix_escape');
@@ -527,7 +564,9 @@ describe('pipeline hardening security', () => {
         storage,
       }),
     ).rejects.toThrow(/authorized TivvleJoy studio/);
-    expect(() => assertTokenOnlyFromApprovedHeader({ token: 'preview-studio-token' })).toThrow(/approved studio header/);
+    expect(() => assertTokenOnlyFromApprovedHeader({ token: 'preview-studio-token' })).toThrow(
+      /approved studio header/,
+    );
     const created = await handleSceneryIntakeAction({
       action: 'create-session',
       body: { collectionId: 'village', filename: 'Village_Blender_4.2.2.zip', byteSize: 128 },
@@ -546,9 +585,14 @@ describe('pipeline hardening security', () => {
       counts: emptyIntakeCounts(),
     });
     const signedMarker = ['X-Amz', 'Signature'].join('-');
-    expect(JSON.stringify(redactStructuredValue({ ...event, signedUrl: `https://example.invalid?${signedMarker}=abc` }))).not.toContain(
-      signedMarker,
-    );
+    expect(
+      JSON.stringify(
+        redactStructuredValue({
+          ...event,
+          signedUrl: `https://example.invalid?${signedMarker}=abc`,
+        }),
+      ),
+    ).not.toContain(signedMarker);
   });
 
   it('leaves Production configuration untouched and does not commit licensed files', () => {
@@ -565,7 +609,10 @@ describe('pipeline hardening security', () => {
 describe('pipeline hardening ux and accessibility', () => {
   it('keeps mobile layout tokens and does not communicate state by color alone', () => {
     const ui = [
-      readFileSync(path.join(repoRoot, 'apps/web/src/components/preview/SceneryAssetIntake.tsx'), 'utf8'),
+      readFileSync(
+        path.join(repoRoot, 'apps/web/src/components/preview/SceneryAssetIntake.tsx'),
+        'utf8',
+      ),
       readFileSync(path.join(repoRoot, 'apps/web/src/lib/scenery/intake/intake-ux.ts'), 'utf8'),
       readFileSync(path.join(repoRoot, 'apps/web/src/lib/scenery/copy.ts'), 'utf8'),
     ].join('\n');
@@ -579,12 +626,18 @@ describe('pipeline hardening ux and accessibility', () => {
     expect(ui).toContain('motion-safe:transition-all');
     expect(ui).not.toMatch(/DoodleDash|Doodle Dash|\bDDP\b/);
     expect(recoveredStateLabel('quarantined')).toBe('Quarantined');
-    expect(announceIntakeState({ filename: 'Village_Blender_4.2.2.zip', state: 'stored' })).toContain(
-      'Upload does not mean asset approval',
-    );
-    expect(classifyRecoveredState({ session: { state: 'paused', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } })).toBe(
-      'paused',
-    );
+    expect(
+      announceIntakeState({ filename: 'Village_Blender_4.2.2.zip', state: 'stored' }),
+    ).toContain('Upload does not mean asset approval');
+    expect(
+      classifyRecoveredState({
+        session: {
+          state: 'paused',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      }),
+    ).toBe('paused');
   });
 
   it('bounds file concurrency so 27 large files are not all in flight', async () => {
