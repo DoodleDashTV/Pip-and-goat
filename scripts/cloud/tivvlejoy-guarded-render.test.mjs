@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 
 import {
   CLEANUP_ATTENTION,
+  GITHUB_JOB_TIMEOUT_MINUTES,
   MAX_COMPUTE_USD,
   MAX_HOURLY_USD,
   MAX_RUNTIME_MINUTES,
@@ -14,21 +15,28 @@ import {
   PINNED_GPU_COUNT,
   PINNED_GPU_TYPE_ID,
   POD_NAME_PREFIX,
+  REMOTE_RENDER_TIMEOUT_CONTRACT,
   REQUIRED_APPROVAL_PHRASE,
   REST_PODS_URL,
   SCENE_EXECUTION_BOUNDARY,
   buildCreatePodPayload,
+  buildRemoteRenderDeadlineWrapper,
   ceilDiv,
   createGuardedPod,
   deleteGuardedPod,
   evaluateApprovals,
   evaluateGpuPlan,
+  evaluateModePaidConfirmation,
+  extractExactNameMatches,
   extractPodId,
   formatUsdFromMicros,
+  intendedPodName,
   parseSecurePricePayload,
   parseUsdToMicros,
+  persistLaunchIntent,
   persistPodId,
   projectedComputeMicros,
+  recoverPodByExactName,
   runCleanup,
   runRenderLaunch,
   runRenderPlan,
@@ -85,9 +93,28 @@ function scriptedFetch(script) {
       throw new Error(`Unexpected fetch ${init.method ?? 'GET'} ${url}`);
     }
     if (next.assert) next.assert({ url, init, calls });
+    if (next.throw) {
+      throw next.throw === true ? new Error('ambiguous transport') : next.throw;
+    }
     return next.response;
   };
   return { fetchFn, calls };
+}
+
+function launchEnv(dir) {
+  return {
+    TIVVLEJOY_POD_ID_FILE: path.join(dir, 'pod-id'),
+    TIVVLEJOY_POD_NAME_FILE: path.join(dir, 'pod-name'),
+    TIVVLEJOY_CREATE_ATTEMPTED_FILE: path.join(dir, 'create-attempted'),
+    GITHUB_ENV: path.join(dir, 'github-env'),
+  };
+}
+
+function authAndPrice() {
+  return [
+    { response: jsonResponse(200, { data: { myself: { id: 'acct' } } }) },
+    { response: jsonResponse(200, priceBody({ price: 0.74 })) },
+  ];
 }
 
 describe('decimal-safe cost math', () => {
@@ -145,6 +172,25 @@ describe('approval and plan gates', () => {
       }).ok,
       true,
     );
+  });
+
+  it('requires confirm_paid_gpu false except for render_launch', () => {
+    for (const mode of ['validate', 'connectivity', 'render_plan']) {
+      assert.equal(evaluateModePaidConfirmation(mode, false).ok, true, mode);
+      assert.equal(evaluateModePaidConfirmation(mode, true).ok, false, mode);
+      assert.equal(
+        evaluateApprovals({
+          mode,
+          confirmPaidGpu: true,
+          paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+          templateId: 'tmpl_test',
+        }).ok,
+        false,
+        mode,
+      );
+    }
+    assert.equal(evaluateModePaidConfirmation('render_launch', true).ok, true);
+    assert.equal(evaluateModePaidConfirmation('render_launch', false).ok, false);
   });
 
   it('refuses unavailable GPUs, failed prices, and prices above cap', () => {
@@ -286,13 +332,9 @@ describe('network modes', () => {
 
   it('creates one Pod only after gates pass and registers cleanup immediately', async () => {
     const dir = tempDir();
-    const env = {
-      TIVVLEJOY_POD_ID_FILE: path.join(dir, 'pod-id'),
-      GITHUB_ENV: path.join(dir, 'github-env'),
-    };
+    const env = launchEnv(dir);
     const { fetchFn, calls } = scriptedFetch([
-      { response: jsonResponse(200, { data: { myself: { id: 'acct' } } }) },
-      { response: jsonResponse(200, priceBody({ price: 0.74 })) },
+      ...authAndPrice(),
       {
         assert: ({ url, init }) => {
           assert.equal(url, REST_PODS_URL);
@@ -322,6 +364,8 @@ describe('network modes', () => {
     assert.equal(result.ok, true);
     assert.equal(result.podId, 'podabc123');
     assert.equal(readFileSync(env.TIVVLEJOY_POD_ID_FILE, 'utf8'), 'podabc123');
+    assert.equal(readFileSync(env.TIVVLEJOY_POD_NAME_FILE, 'utf8'), `${POD_NAME_PREFIX}4242`);
+    assert.equal(readFileSync(env.TIVVLEJOY_CREATE_ATTEMPTED_FILE, 'utf8'), 'true');
     assert.equal(readFileSync(env.GITHUB_ENV, 'utf8').includes('TIVVLEJOY_POD_ID=podabc123'), true);
     assert.equal(calls.filter((call) => call.method === 'POST' && call.url === REST_PODS_URL).length, 1);
     assert.equal(logs.includes('launch PASS'), true);
@@ -374,6 +418,253 @@ describe('network modes', () => {
     });
     assert.equal(created.ok, true);
     assert.equal(created.podId, 'onlyid999');
+  });
+});
+
+describe('ambiguous create recovery', () => {
+  it('A. create succeeds with a valid ID and uses normal cleanup', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: jsonResponse(200, { id: 'podok111', extra: 'nope' }) },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '111',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: () => {},
+      env,
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.podId, 'podok111');
+    assert.equal(calls.some((call) => call.method === 'GET' && call.url === REST_PODS_URL), false);
+    const cleanup = scriptedFetch([{ response: { status: 204, text: async () => '' } }]);
+    const cleaned = await runCleanup({
+      apiKey: 'rpa_fake_test_key',
+      fetchFn: cleanup.fetchFn,
+      log: () => {},
+      env,
+    });
+    assert.equal(cleaned.ok, true);
+    assert.equal(cleanup.calls[0].method, 'DELETE');
+    assert.equal(cleanup.calls[0].url, `${REST_PODS_URL}/podok111`);
+  });
+
+  it('B. HTTP 2xx + malformed JSON recovers the exact name and deletes it', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const logs = [];
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: { status: 200, text: async () => '{not-json' } },
+      { response: jsonResponse(200, [{ id: 'podrec222', name: `${POD_NAME_PREFIX}222` }]) },
+      { response: { status: 204, text: async () => '' } },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '222',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: (line) => logs.push(line),
+      env,
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.recovered, true);
+    assert.equal(result.cleaned, true);
+    assert.equal(result.podId, 'podrec222');
+    assert.equal(calls.filter((call) => call.method === 'GET' && call.url === REST_PODS_URL).length, 1);
+    assert.equal(calls.some((call) => call.method === 'DELETE' && call.url === `${REST_PODS_URL}/podrec222`), true);
+    assert.equal(logs.includes(CLEANUP_ATTENTION), false);
+    assert.equal(logs.some((line) => line.includes('{') || line.includes('not-json')), false);
+  });
+
+  it('C. HTTP 2xx + missing ID recovers the exact name and deletes it', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: jsonResponse(200, { name: `${POD_NAME_PREFIX}333`, account: 'hidden' }) },
+      { response: jsonResponse(200, [{ id: 'podrec333', name: `${POD_NAME_PREFIX}333` }]) },
+      { response: { status: 204, text: async () => '' } },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '333',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: () => {},
+      env,
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.cleaned, true);
+    assert.equal(result.podId, 'podrec333');
+    assert.equal(calls.some((call) => call.method === 'DELETE' && call.url === `${REST_PODS_URL}/podrec333`), true);
+  });
+
+  it('D. ambiguous create transport failure runs the recovery path', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const logs = [];
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { throw: true },
+      { response: jsonResponse(200, [{ id: 'podrec444', name: `${POD_NAME_PREFIX}444` }]) },
+      { response: { status: 204, text: async () => '' } },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '444',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: (line) => logs.push(line),
+      env,
+    });
+    assert.equal(result.recovered, true);
+    assert.equal(result.cleaned, true);
+    assert.equal(readFileSync(env.TIVVLEJOY_CREATE_ATTEMPTED_FILE, 'utf8'), 'true');
+    assert.equal(calls.some((call) => call.method === 'GET' && call.url === REST_PODS_URL), true);
+    assert.equal(logs.some((line) => line.includes('Entering exact-name recovery')), true);
+  });
+
+  it('E. recovery finds zero exact matches and fails safely', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const logs = [];
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: { status: 200, text: async () => '{not-json' } },
+      {
+        response: jsonResponse(200, [
+          { id: 'other999', name: `${POD_NAME_PREFIX}9999` },
+          { id: 'prefix555', name: `${POD_NAME_PREFIX}555-extra` },
+        ]),
+      },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '555',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: (line) => logs.push(line),
+      env,
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.confirmedZero, true);
+    assert.equal(calls.some((call) => call.method === 'DELETE'), false);
+    assert.equal(logs.includes(CLEANUP_ATTENTION), false);
+    assert.equal(logs.some((line) => line.includes('zero exact-name matches')), true);
+  });
+
+  it('F. recovery finds more than one exact match and requires attention', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const logs = [];
+    const { fetchFn, calls } = scriptedFetch([
+      ...authAndPrice(),
+      { response: jsonResponse(200, { name: `${POD_NAME_PREFIX}666` }) },
+      {
+        response: jsonResponse(200, [
+          { id: 'podaaa111', name: `${POD_NAME_PREFIX}666` },
+          { id: 'podbbb222', name: `${POD_NAME_PREFIX}666` },
+        ]),
+      },
+    ]);
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '666',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn,
+      log: (line) => logs.push(line),
+      env,
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.attention, true);
+    assert.equal(calls.some((call) => call.method === 'DELETE'), false);
+    assert.equal(logs.includes(CLEANUP_ATTENTION), true);
+    assert.equal(logs.includes('Matching Pod IDs: podaaa111, podbbb222'), true);
+    assert.equal(logs.some((line) => line.includes('{') || line.includes('account')), false);
+  });
+
+  it('G. recovery API failure requires attention', async () => {
+    const dir = tempDir();
+    const env = launchEnv(dir);
+    const logs = [];
+    const result = await runRenderLaunch({
+      apiKey: 'rpa_fake_test_key',
+      templateId: 'tmpl_test',
+      runId: '777',
+      confirmPaidGpu: true,
+      paidApprovalPhrase: REQUIRED_APPROVAL_PHRASE,
+      fetchFn: scriptedFetch([
+        ...authAndPrice(),
+        { response: { status: 200, text: async () => '{not-json' } },
+        { response: { status: 500, text: async () => '{"error":"no"}' } },
+      ]).fetchFn,
+      log: (line) => logs.push(line),
+      env,
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.attention, true);
+    assert.equal(logs.includes(CLEANUP_ATTENTION), true);
+    assert.equal(logs.some((line) => line.includes('{') || line.includes('error')), false);
+  });
+
+  it('H. recovery never deletes a non-exact name match', async () => {
+    const exact = `${POD_NAME_PREFIX}888`;
+    const extracted = extractExactNameMatches(
+      [
+        { id: 'near1', name: `${exact}-extra` },
+        { id: 'near2', name: `${POD_NAME_PREFIX}88` },
+        { id: 'near3', name: `prefix-${exact}` },
+      ],
+      exact,
+    );
+    assert.equal(extracted.ok, true);
+    assert.deepEqual(extracted.matches, []);
+
+    const listed = await recoverPodByExactName({
+      apiKey: 'rpa_fake_test_key',
+      exactName: exact,
+      fetchFn: async () =>
+        jsonResponse(200, [
+          { id: 'near1', name: `${exact}-extra` },
+          { id: 'near2', name: `${POD_NAME_PREFIX}88` },
+        ]),
+    });
+    assert.equal(listed.kind, 'zero');
+
+    const dir = tempDir();
+    persistLaunchIntent({ podName: exact, env: launchEnv(dir) });
+    const { fetchFn, calls } = scriptedFetch([
+      {
+        response: jsonResponse(200, [
+          { id: 'near1', name: `${exact}-extra` },
+          { id: 'near2', name: `${POD_NAME_PREFIX}88` },
+        ]),
+      },
+    ]);
+    const cleaned = await runCleanup({
+      apiKey: 'rpa_fake_test_key',
+      fetchFn,
+      log: () => {},
+      env: launchEnv(dir),
+    });
+    assert.equal(cleaned.confirmedZero, true);
+    assert.equal(calls.some((call) => call.method === 'DELETE'), false);
   });
 });
 
@@ -449,5 +740,32 @@ describe('workflow contract', () => {
     assert.match(docs, /render_launch/);
     assert.match(docs, /LAUNCH_TIVVLEJOY_GPU/);
     assert.match(docs, /hard refusal/);
+  });
+
+  it('hard-fails wrong-mode paid confirmation and keeps render_plan unpaid', () => {
+    const refuseStep = workflow.slice(
+      workflow.indexOf('name: Refuse paid GPU launch outside render_launch'),
+      workflow.indexOf('name: Validate configuration'),
+    );
+    assert.match(refuseStep, /exit 1/);
+    assert.match(workflow, /inputs\.mode == 'validate' && !inputs\.confirm_paid_gpu/);
+    assert.match(workflow, /inputs\.mode == 'connectivity' && !inputs\.confirm_paid_gpu/);
+    assert.match(workflow, /inputs\.mode == 'render_plan' && !inputs\.confirm_paid_gpu/);
+  });
+
+  it('defines a 20-minute remote execution contract without adding a Blender command', () => {
+    assert.equal(MAX_RUNTIME_MINUTES, 20);
+    assert.equal(GITHUB_JOB_TIMEOUT_MINUTES, 25);
+    assert.equal(REMOTE_RENDER_TIMEOUT_CONTRACT.hardDeadlineMinutes, 20);
+    assert.equal(REMOTE_RENDER_TIMEOUT_CONTRACT.githubOuterTimeoutMinutes, 25);
+    assert.equal(REMOTE_RENDER_TIMEOUT_CONTRACT.githubTimeoutIsOuterEmergencyGuardOnly, true);
+    assert.equal(REMOTE_RENDER_TIMEOUT_CONTRACT.timeoutOrFailureMustFlowIntoPodCleanup, true);
+    assert.equal(REMOTE_RENDER_TIMEOUT_CONTRACT.remoteBlenderCommandPresent, false);
+    assert.equal(intendedPodName('42'), 'tivvlejoy-render-42');
+    assert.equal(buildRemoteRenderDeadlineWrapper([]).ok, false);
+    assert.match(workflow, /own hard MAX_RUNTIME_MINUTES=20 deadline/);
+    assert.match(workflow, /outer emergency guard/);
+    assert.equal(workflow.includes('blender -b'), false);
+    assert.match(docs, /own hard 20-minute deadline/);
   });
 });

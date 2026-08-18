@@ -76,4 +76,26 @@ describe('TivvleJoy guarded RunPod workflow contract', () => {
     expect(docs).toContain('hard refusal thresholds');
     expect(docs).toContain('LAUNCH_TIVVLEJOY_GPU');
   });
+
+  it('hard-fails paid confirmation outside render_launch', () => {
+    const refuseStep = workflow.slice(
+      workflow.indexOf('name: Refuse paid GPU launch outside render_launch'),
+      workflow.indexOf('name: Validate configuration'),
+    );
+    expect(refuseStep).toContain('exit 1');
+    expect(workflow).toContain("inputs.mode == 'validate' && !inputs.confirm_paid_gpu");
+    expect(workflow).toContain("inputs.mode == 'connectivity' && !inputs.confirm_paid_gpu");
+    expect(workflow).toContain("inputs.mode == 'render_plan' && !inputs.confirm_paid_gpu");
+  });
+
+  it('records the 20-minute remote execution contract without adding Blender', () => {
+    expect(helper).toContain('hardDeadlineMinutes: MAX_RUNTIME_MINUTES');
+    expect(helper).toContain('githubTimeoutIsOuterEmergencyGuardOnly: true');
+    expect(helper).toContain('remoteBlenderCommandPresent: false');
+    expect(workflow).toContain('own hard MAX_RUNTIME_MINUTES=20 deadline');
+    expect(workflow).toContain('outer emergency guard');
+    expect(workflow.includes('blender -b')).toBe(false);
+    expect(docs).toContain('own hard 20-minute deadline');
+    expect(docs).toContain('exact name match only');
+  });
 });

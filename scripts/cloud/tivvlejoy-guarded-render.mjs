@@ -23,6 +23,17 @@ export const REST_PODS_URL = 'https://rest.runpod.io/v1/pods';
 export const CLEANUP_ATTENTION = 'RUNPOD CLEANUP REQUIRES ATTENTION';
 export const SCENE_EXECUTION_BOUNDARY =
   'Scene execution is the next TivvleJoy integration boundary. No remote render command is invoked.';
+export const GITHUB_JOB_TIMEOUT_MINUTES = 25;
+export const REMOTE_RENDER_TIMEOUT_CONTRACT = Object.freeze({
+  hardDeadlineMinutes: MAX_RUNTIME_MINUTES,
+  githubOuterTimeoutMinutes: GITHUB_JOB_TIMEOUT_MINUTES,
+  cleanupWindowMinutes: GITHUB_JOB_TIMEOUT_MINUTES - MAX_RUNTIME_MINUTES,
+  githubTimeoutIsOuterEmergencyGuardOnly: true,
+  timeoutOrFailureMustFlowIntoPodCleanup: true,
+  remoteBlenderCommandPresent: false,
+  requirement:
+    'When remote Blender execution is added, it must have its own hard 20-minute deadline. Timeout or failure must flow into Pod cleanup. The GitHub 25-minute job timeout is only an outer emergency guard so cleanup can run before the runner is killed.',
+});
 
 const AVAILABLE_STOCK = new Set(['High', 'Medium', 'Low']);
 const POD_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{2,80}$/;
@@ -83,12 +94,25 @@ export function classifyStock(stockStatus) {
   return { available: false, reason: 'RTX 4090 Secure Cloud stock is unavailable.' };
 }
 
+export function evaluateModePaidConfirmation(mode, confirmPaidGpu) {
+  const paid = isConfirmPaidGpu(confirmPaidGpu);
+  if (mode === 'render_launch') {
+    if (paid) return { ok: true, reason: null };
+    return { ok: false, reason: 'render_launch refused: confirm_paid_gpu must be true.' };
+  }
+  if (paid) {
+    return { ok: false, reason: 'Paid GPU confirmation is not allowed outside render_launch.' };
+  }
+  return { ok: true, reason: null };
+}
+
 export function evaluateApprovals({ mode, confirmPaidGpu, paidApprovalPhrase, templateId }) {
+  const modeGate = evaluateModePaidConfirmation(mode, confirmPaidGpu);
+  if (!modeGate.ok) {
+    return modeGate;
+  }
   if (mode !== 'render_launch') {
     return { ok: true, reason: null };
-  }
-  if (!isConfirmPaidGpu(confirmPaidGpu)) {
-    return { ok: false, reason: 'render_launch refused: confirm_paid_gpu must be true.' };
   }
   if (paidApprovalPhrase !== REQUIRED_APPROVAL_PHRASE) {
     return { ok: false, reason: 'render_launch refused: paid_approval_phrase is not the required phrase.' };
@@ -191,6 +215,86 @@ export function extractPodId(parsed) {
   const id = parsed.id;
   if (typeof id !== 'string' || !POD_ID_PATTERN.test(id)) return null;
   return id;
+}
+
+export function normalizePodList(parsed) {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && typeof parsed === 'object' && Array.isArray(parsed.pods)) return parsed.pods;
+  return null;
+}
+
+export function extractExactNameMatches(items, exactName) {
+  if (!Array.isArray(items)) {
+    return { ok: false, matches: [], reason: 'Pod list response could not be parsed.' };
+  }
+  if (typeof exactName !== 'string' || exactName.length === 0) {
+    return { ok: false, matches: [], reason: 'Intended Pod name is missing.' };
+  }
+  const matches = [];
+  for (const item of items) {
+    if (!item || typeof item !== 'object') {
+      return { ok: false, matches: [], reason: 'Pod list response could not be parsed.' };
+    }
+    if (item.name !== exactName) continue;
+    const id = extractPodId(item);
+    if (!id) {
+      return { ok: false, matches: [], reason: 'Exact-name match had no usable Pod ID.' };
+    }
+    matches.push({ id, name: exactName });
+  }
+  return { ok: true, matches, reason: null };
+}
+
+export function buildRemoteRenderDeadlineWrapper(commandParts) {
+  if (!Array.isArray(commandParts) || commandParts.length === 0) {
+    return {
+      ok: false,
+      reason: 'No remote render command is present yet. Scene execution remains the next integration boundary.',
+      argv: null,
+      hardDeadlineMinutes: MAX_RUNTIME_MINUTES,
+    };
+  }
+  return {
+    ok: true,
+    reason: null,
+    argv: ['timeout', '--kill-after=30s', `${MAX_RUNTIME_MINUTES}m`, ...commandParts],
+    hardDeadlineMinutes: MAX_RUNTIME_MINUTES,
+  };
+}
+
+export function intendedPodName(runId) {
+  if (!runId || !/^[0-9]+$/.test(String(runId))) return null;
+  return `${POD_NAME_PREFIX}${runId}`;
+}
+
+export function persistLaunchIntent({ podName, env = process.env }) {
+  if (typeof podName !== 'string' || !podName.startsWith(POD_NAME_PREFIX) || podName === POD_NAME_PREFIX) {
+    throw new Error('Refusing to persist an invalid intended Pod name.');
+  }
+  if (env.TIVVLEJOY_POD_NAME_FILE) {
+    writeFileSync(env.TIVVLEJOY_POD_NAME_FILE, podName, { encoding: 'utf8', mode: 0o600 });
+  }
+  if (env.TIVVLEJOY_CREATE_ATTEMPTED_FILE) {
+    writeFileSync(env.TIVVLEJOY_CREATE_ATTEMPTED_FILE, 'true', { encoding: 'utf8', mode: 0o600 });
+  }
+  if (env.GITHUB_ENV) {
+    appendFileSync(env.GITHUB_ENV, `TIVVLEJOY_POD_NAME=${podName}\nTIVVLEJOY_CREATE_ATTEMPTED=true\n`);
+  }
+  return { podName, createAttempted: true };
+}
+
+export function readLaunchIntent(env = process.env) {
+  const fromEnvName = typeof env.TIVVLEJOY_POD_NAME === 'string' ? env.TIVVLEJOY_POD_NAME.trim() : '';
+  const nameFile = env.TIVVLEJOY_POD_NAME_FILE;
+  const fromFileName =
+    nameFile && existsSync(nameFile) ? readFileSync(nameFile, 'utf8').trim() : '';
+  const podName = fromEnvName || fromFileName || null;
+  const attemptedEnv = env.TIVVLEJOY_CREATE_ATTEMPTED;
+  const attemptedFile = env.TIVVLEJOY_CREATE_ATTEMPTED_FILE;
+  const attemptedFromFile =
+    attemptedFile && existsSync(attemptedFile) ? readFileSync(attemptedFile, 'utf8').trim() === 'true' : false;
+  const createAttempted = attemptedEnv === 'true' || attemptedFromFile || Boolean(podName);
+  return { podName, createAttempted };
 }
 
 export function persistPodId(podId, env = process.env) {
@@ -373,25 +477,90 @@ export async function runRenderPlan({ apiKey, fetchFn = globalThis.fetch, log = 
   }
 }
 
-export async function createGuardedPod({ apiKey, templateId, runId, fetchFn = globalThis.fetch }) {
-  const payload = buildCreatePodPayload({ templateId, runId });
-  const response = await fetchFn(REST_PODS_URL, {
-    method: 'POST',
-    headers: jsonHeaders(apiKey),
-    body: JSON.stringify(payload),
-  });
+export async function listPodsReadonly(apiKey, fetchFn = globalThis.fetch) {
+  if (!apiKey) {
+    return { ok: false, items: null, reason: 'RUNPOD_API_KEY secret is missing.' };
+  }
+  let response;
+  try {
+    response = await fetchFn(REST_PODS_URL, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+  } catch {
+    return { ok: false, items: null, reason: 'Pod list lookup failed.' };
+  }
   if (response.status < 200 || response.status > 299) {
-    return { ok: false, reason: 'Pod create was refused by the API.' };
+    return { ok: false, items: null, reason: 'Pod list lookup failed.' };
   }
   const { ok, parsed } = await readJsonSilently(response);
   if (!ok) {
-    return { ok: false, reason: 'Pod create response could not be parsed.' };
+    return { ok: false, items: null, reason: 'Pod list response could not be parsed.' };
+  }
+  const items = normalizePodList(parsed);
+  if (items === null) {
+    return { ok: false, items: null, reason: 'Pod list response could not be parsed.' };
+  }
+  return { ok: true, items, reason: null };
+}
+
+export async function recoverPodByExactName({ apiKey, exactName, fetchFn = globalThis.fetch }) {
+  const listed = await listPodsReadonly(apiKey, fetchFn);
+  if (!listed.ok) {
+    return { kind: 'attention', matches: [], reason: listed.reason };
+  }
+  const extracted = extractExactNameMatches(listed.items, exactName);
+  if (!extracted.ok) {
+    return { kind: 'attention', matches: [], reason: extracted.reason };
+  }
+  if (extracted.matches.length === 0) {
+    return { kind: 'zero', matches: [], reason: `Recovery confirmed zero exact-name matches for ${exactName}.` };
+  }
+  if (extracted.matches.length === 1) {
+    return { kind: 'one', matches: extracted.matches, podId: extracted.matches[0].id, reason: null };
+  }
+  return {
+    kind: 'attention',
+    matches: extracted.matches,
+    reason: `Recovery found ${extracted.matches.length} Pods with the exact name ${exactName}.`,
+  };
+}
+
+export async function createGuardedPod({ apiKey, templateId, runId, fetchFn = globalThis.fetch, env = process.env }) {
+  const payload = buildCreatePodPayload({ templateId, runId });
+  persistLaunchIntent({ podName: payload.name, env });
+  let response;
+  try {
+    response = await fetchFn(REST_PODS_URL, {
+      method: 'POST',
+      headers: jsonHeaders(apiKey),
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    return {
+      ok: false,
+      recover: true,
+      reason: 'Pod create transport was ambiguous after the request was sent.',
+      podName: payload.name,
+    };
+  }
+  if (response.status < 200 || response.status > 299) {
+    return { ok: false, recover: false, reason: 'Pod create was refused by the API.', podName: payload.name };
+  }
+  const { ok, parsed } = await readJsonSilently(response);
+  if (!ok) {
+    return { ok: false, recover: true, reason: 'Pod create response could not be parsed.', podName: payload.name };
   }
   const podId = extractPodId(parsed);
   if (!podId) {
-    return { ok: false, reason: 'Pod create response did not include a usable Pod ID.' };
+    return {
+      ok: false,
+      recover: true,
+      reason: 'Pod create response did not include a usable Pod ID.',
+      podName: payload.name,
+    };
   }
-  return { ok: true, podId };
+  return { ok: true, recover: false, podId, podName: payload.name };
 }
 
 export async function deleteGuardedPod({ apiKey, podId, fetchFn = globalThis.fetch }) {
@@ -439,55 +608,124 @@ export async function runRenderLaunch({
 
   let created;
   try {
-    created = await createGuardedPod({ apiKey, templateId, runId, fetchFn });
+    created = await createGuardedPod({ apiKey, templateId, runId, fetchFn, env });
   } catch {
     log('render_launch REFUSE');
-    log('Pod create failed closed before a Pod ID was recorded.');
+    log('Pod create failed closed before a create attempt was recorded.');
     return { ok: false, createdPod: false };
   }
-  if (!created.ok) {
+  if (created.ok) {
+    persistPodId(created.podId, env);
+    log('launch PASS');
+    log(`Pod ID: ${created.podId}`);
+    log(`Selected GPU: ${PINNED_GPU_TYPE_ID}`);
+    log(`Hourly price: ${formatUsdFromMicros(planned.plan.hourlyMicros)}`);
+    log(`Runtime cap: ${MAX_RUNTIME_MINUTES} minutes`);
+    log(`Projected maximum compute cost: ${formatUsdFromMicros(planned.plan.projectedMicros)}`);
+    log(SCENE_EXECUTION_BOUNDARY);
+    return { ok: true, createdPod: true, podId: created.podId };
+  }
+  if (!created.recover) {
     log('render_launch REFUSE');
     log(created.reason);
     return { ok: false, createdPod: false };
   }
-
-  persistPodId(created.podId, env);
-  log('launch PASS');
-  log(`Pod ID: ${created.podId}`);
-  log(`Selected GPU: ${PINNED_GPU_TYPE_ID}`);
-  log(`Hourly price: ${formatUsdFromMicros(planned.plan.hourlyMicros)}`);
-  log(`Runtime cap: ${MAX_RUNTIME_MINUTES} minutes`);
-  log(`Projected maximum compute cost: ${formatUsdFromMicros(planned.plan.projectedMicros)}`);
-  log(SCENE_EXECUTION_BOUNDARY);
-  return { ok: true, createdPod: true, podId: created.podId };
+  return recoverAfterAmbiguousCreate({
+    apiKey,
+    exactName: created.podName ?? intendedPodName(runId),
+    reason: created.reason,
+    fetchFn,
+    log,
+    env,
+  });
 }
 
-export async function runCleanup({ apiKey, fetchFn = globalThis.fetch, log = console.log, env = process.env }) {
-  const podId = readPersistedPodId(env);
-  if (!podId) {
-    log('Cleanup: no Pod was created. Nothing to delete.');
-    return { ok: true, skipped: true };
+function printAttention(log, { podId, podName, matches }) {
+  log(CLEANUP_ATTENTION);
+  if (podId) log(`Pod ID: ${podId}`);
+  if (podName) log(`Exact name: ${podName}`);
+  if (Array.isArray(matches) && matches.length > 0) {
+    log(`Matching Pod IDs: ${matches.map((match) => match.id).join(', ')}`);
   }
+}
+
+async function deletePersistedPod({ apiKey, podId, fetchFn, log }) {
   if (!apiKey) {
-    log(CLEANUP_ATTENTION);
-    log(`Pod ID: ${podId}`);
+    printAttention(log, { podId });
     return { ok: false, skipped: false, podId };
   }
   let deleted;
   try {
     deleted = await deleteGuardedPod({ apiKey, podId, fetchFn });
   } catch {
-    log(CLEANUP_ATTENTION);
-    log(`Pod ID: ${podId}`);
+    printAttention(log, { podId });
     return { ok: false, skipped: false, podId };
   }
   if (!deleted.ok) {
-    log(CLEANUP_ATTENTION);
-    log(`Pod ID: ${podId}`);
+    printAttention(log, { podId });
     return { ok: false, skipped: false, podId };
   }
   log(`Cleanup confirmed for Pod ID: ${podId}`);
   return { ok: true, skipped: false, podId };
+}
+
+async function recoverAfterAmbiguousCreate({ apiKey, exactName, reason, fetchFn, log, env }) {
+  log('Create response was ambiguous. Entering exact-name recovery.');
+  if (reason) log(reason);
+  if (!exactName) {
+    printAttention(log, {});
+    log('Intended Pod name is missing.');
+    return { ok: false, createdPod: false, recovered: false };
+  }
+  const recovered = await recoverPodByExactName({ apiKey, exactName, fetchFn });
+  if (recovered.kind === 'one') {
+    persistPodId(recovered.podId, env);
+    log(`Recovered Pod ID: ${recovered.podId}`);
+    const deleted = await deletePersistedPod({ apiKey, podId: recovered.podId, fetchFn, log });
+    return {
+      ok: false,
+      createdPod: true,
+      recovered: true,
+      cleaned: deleted.ok,
+      podId: recovered.podId,
+    };
+  }
+  if (recovered.kind === 'zero') {
+    log(recovered.reason);
+    return { ok: false, createdPod: false, recovered: true, confirmedZero: true };
+  }
+  printAttention(log, { podName: exactName, matches: recovered.matches });
+  if (recovered.reason) log(recovered.reason);
+  return { ok: false, createdPod: false, recovered: true, attention: true };
+}
+
+export async function runCleanup({ apiKey, fetchFn = globalThis.fetch, log = console.log, env = process.env }) {
+  const podId = readPersistedPodId(env);
+  if (podId) {
+    return deletePersistedPod({ apiKey, podId, fetchFn, log });
+  }
+  const intent = readLaunchIntent(env);
+  if (!intent.createAttempted) {
+    log('Cleanup: no create attempt was recorded. Nothing to delete.');
+    return { ok: true, skipped: true };
+  }
+  if (!intent.podName) {
+    printAttention(log, {});
+    log('A create attempt was recorded but the intended Pod name is missing.');
+    return { ok: false, skipped: false };
+  }
+  const recovered = await recoverPodByExactName({ apiKey, exactName: intent.podName, fetchFn });
+  if (recovered.kind === 'one') {
+    persistPodId(recovered.podId, env);
+    return deletePersistedPod({ apiKey, podId: recovered.podId, fetchFn, log });
+  }
+  if (recovered.kind === 'zero') {
+    log(recovered.reason);
+    return { ok: true, skipped: true, confirmedZero: true };
+  }
+  printAttention(log, { podName: intent.podName, matches: recovered.matches });
+  if (recovered.reason) log(recovered.reason);
+  return { ok: false, skipped: false, attention: true };
 }
 
 async function cli(command, env = process.env, fetchFn = globalThis.fetch) {

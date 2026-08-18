@@ -49,6 +49,7 @@ jobs:
           set -euo pipefail
           echo "Paid GPU execution is not enabled in this mode."
           echo "Use mode render_launch with confirm_paid_gpu and LAUNCH_TIVVLEJOY_GPU to request a guarded launch."
+          exit 1
 
       - name: Validate configuration
         if: ${{ inputs.mode == 'validate' && !inputs.confirm_paid_gpu }}
@@ -95,13 +96,13 @@ jobs:
           esac
 
       - name: Checkout repository
-        if: ${{ inputs.mode == 'render_plan' || inputs.mode == 'render_launch' }}
+        if: ${{ (inputs.mode == 'render_plan' && !inputs.confirm_paid_gpu) || inputs.mode == 'render_launch' }}
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Render plan
-        if: ${{ inputs.mode == 'render_plan' }}
+        if: ${{ inputs.mode == 'render_plan' && !inputs.confirm_paid_gpu }}
         run: |
           set -euo pipefail
           node scripts/cloud/tivvlejoy-guarded-render.mjs render-plan
@@ -112,6 +113,8 @@ jobs:
           CONFIRM_PAID_GPU: ${{ inputs.confirm_paid_gpu }}
           PAID_APPROVAL_PHRASE: ${{ inputs.paid_approval_phrase }}
           TIVVLEJOY_POD_ID_FILE: ${{ runner.temp }}/tivvlejoy-runpod-pod-id
+          TIVVLEJOY_POD_NAME_FILE: ${{ runner.temp }}/tivvlejoy-runpod-pod-name
+          TIVVLEJOY_CREATE_ATTEMPTED_FILE: ${{ runner.temp }}/tivvlejoy-runpod-create-attempted
         run: |
           set -euo pipefail
           cleanup_on_exit() {
@@ -119,7 +122,11 @@ jobs:
           }
           trap cleanup_on_exit EXIT
           node scripts/cloud/tivvlejoy-guarded-render.mjs render-launch
-          # Future remote scene execution would be bounded by MAX_RUNTIME_MINUTES here.
+          # REMOTE RENDER TIMEOUT CONTRACT:
+          # A future remote Blender command must have its own hard MAX_RUNTIME_MINUTES=20 deadline.
+          # Timeout or failure must flow into Pod cleanup.
+          # timeout-minutes: 25 is only an outer emergency guard so cleanup can run
+          # before the GitHub runner is killed. Do not rely on the job timeout alone.
           echo "Scene execution is the next TivvleJoy integration boundary."
           echo "No remote Blender render command is invoked in this workflow."
           echo "The created Pod is stopped and deleted automatically."
@@ -128,15 +135,21 @@ jobs:
         if: ${{ always() && inputs.mode == 'render_launch' }}
         env:
           TIVVLEJOY_POD_ID_FILE: ${{ runner.temp }}/tivvlejoy-runpod-pod-id
+          TIVVLEJOY_POD_NAME_FILE: ${{ runner.temp }}/tivvlejoy-runpod-pod-name
+          TIVVLEJOY_CREATE_ATTEMPTED_FILE: ${{ runner.temp }}/tivvlejoy-runpod-create-attempted
         run: |
           set -euo pipefail
           if [ ! -f scripts/cloud/tivvlejoy-guarded-render.mjs ]; then
-            if [ -n "${TIVVLEJOY_POD_ID:-}" ] || [ -f "${TIVVLEJOY_POD_ID_FILE}" ]; then
+            if [ -n "${TIVVLEJOY_POD_ID:-}" ] || [ -f "${TIVVLEJOY_POD_ID_FILE}" ] || [ -f "${TIVVLEJOY_CREATE_ATTEMPTED_FILE}" ]; then
               echo "RUNPOD CLEANUP REQUIRES ATTENTION"
-              echo "Pod ID: ${TIVVLEJOY_POD_ID:-$(cat "${TIVVLEJOY_POD_ID_FILE}")}"
+              if [ -n "${TIVVLEJOY_POD_ID:-}" ]; then
+                echo "Pod ID: ${TIVVLEJOY_POD_ID}"
+              elif [ -f "${TIVVLEJOY_POD_ID_FILE}" ]; then
+                echo "Pod ID: $(cat "${TIVVLEJOY_POD_ID_FILE}")"
+              fi
               exit 1
             fi
-            echo "Cleanup: no Pod was created. Nothing to delete."
+            echo "Cleanup: no create attempt was recorded. Nothing to delete."
             exit 0
           fi
           if ! node scripts/cloud/tivvlejoy-guarded-render.mjs cleanup; then
