@@ -26,13 +26,42 @@ const TODAY_USER_SUPPLIED_PACKAGE_FILENAMES = [
   'assets-for-v1.6.1-and-below 2.blend.zip',
   'physical-starlight-atmosphere-1.8.3 2.zip',
   'botaniq_full-7.2.0.paq.zip',
+  '3DT_Mountain_Pack_Blender.zip',
+  '3DT_Pack_Mountains_GLB.glb',
+  'FBX and Textures.zip',
+  'UE5_3DT_Pack_Mountains.zip',
+  'LouisBGMountainsV1.zip',
+  'Stylized Tavern Package.fbx',
+  'stylized tavern textures.zip',
+  'Stylized Tavern Interior.blend',
+] as const;
+
+const NEW_SCENERY_FILENAMES = [
+  '3DT_Mountain_Pack_Blender.zip',
+  '3DT_Pack_Mountains_GLB.glb',
+  'FBX and Textures.zip',
+  'UE5_3DT_Pack_Mountains.zip',
+  'LouisBGMountainsV1.zip',
+  'Stylized Tavern Package.fbx',
+  'stylized tavern textures.zip',
+  'Stylized Tavern Interior.blend',
 ] as const;
 
 describe('TivvleJoy iPhone large purchased asset intake', () => {
-  it('accepts every exact purchased package filename supplied by the user today', () => {
-    expect(TODAY_USER_SUPPLIED_PACKAGE_FILENAMES).toHaveLength(19);
+  it('accepts every exact purchased source filename supplied by the user today', () => {
+    expect(TODAY_USER_SUPPLIED_PACKAGE_FILENAMES).toHaveLength(27);
     for (const filename of TODAY_USER_SUPPLIED_PACKAGE_FILENAMES) {
       expect(findPurchasedToolPackageByFilename(filename), filename).not.toBeNull();
+    }
+  });
+
+  it('keeps the eight newly purchased scenery sources STORE_ONLY until inspection', () => {
+    expect(NEW_SCENERY_FILENAMES).toHaveLength(8);
+    for (const filename of NEW_SCENERY_FILENAMES) {
+      const pkg = findPurchasedToolPackageByFilename(filename);
+      expect(pkg, filename).not.toBeNull();
+      expect(pkg?.role, filename).toBe('asset-library');
+      expect(pkg?.activation, filename).toBe('STORE_ONLY');
     }
   });
 
@@ -60,6 +89,39 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
       findPurchasedToolPackageByFilename('botaniq_full_geoscatter_biomes-7.0.0.scatpack.zip')
         ?.activation,
     ).toBe('OPTIONAL_NOT_INTEGRATED');
+  });
+
+  it('accepts the newly purchased direct GLB, FBX and BLEND source formats at plausible sizes', () => {
+    const glb = validatePurchasedToolSelection({
+      filename: '3DT_Pack_Mountains_GLB.glb',
+      byteSize: Math.floor(1.4 * 1024 ** 3),
+    });
+    const fbx = validatePurchasedToolSelection({
+      filename: 'Stylized Tavern Package.fbx',
+      byteSize: 8 * 1024 ** 2,
+    });
+    const blend = validatePurchasedToolSelection({
+      filename: 'Stylized Tavern Interior.blend',
+      byteSize: 9 * 1024 ** 2,
+    });
+    expect(glb.ok).toBe(true);
+    expect(fbx.ok).toBe(true);
+    expect(blend.ok).toBe(true);
+  });
+
+  it('accepts the screenshot-confirmed mountain and tavern size classes', () => {
+    expect(
+      validatePurchasedToolSelection({
+        filename: 'LouisBGMountainsV1.zip',
+        byteSize: Math.floor(5.3 * 1024 ** 2),
+      }).ok,
+    ).toBe(true);
+    expect(
+      validatePurchasedToolSelection({
+        filename: 'stylized tavern textures.zip',
+        byteSize: Math.floor(326.4 * 1024 ** 2),
+      }).ok,
+    ).toBe(true);
   });
 
   it('accepts the legacy Physical Starlight companion bundle at the selected iPhone size class', () => {
@@ -107,7 +169,7 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
     expect(parts.at(-1)?.end).toBe(size);
   });
 
-  it('refuses renamed or unapproved package filenames', () => {
+  it('refuses renamed or locally recompressed scenery filenames', () => {
     expect(
       validatePurchasedToolSelection({ filename: 'botaniq-full-renamed.paq', byteSize: 5 * 1024 ** 3 }).ok,
     ).toBe(false);
@@ -116,6 +178,8 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
     ).toBe(false);
     expect(findPurchasedToolPackageByFilename('Gaffer renamed.zip')).toBeNull();
     expect(findPurchasedToolPackageByFilename('assets-for-v1.6.1-and-below.blend.zip')).toBeNull();
+    expect(findPurchasedToolPackageByFilename('Stylized Tavern Package.zip')).toBeNull();
+    expect(findPurchasedToolPackageByFilename('Stylized Tavern Interior.blend.zip')).toBeNull();
   });
 
   it('uses unique source ids for the two separately named PSA 1.8.3 downloads', () => {
