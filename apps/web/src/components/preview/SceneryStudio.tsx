@@ -8,6 +8,7 @@ import { SYNTHETIC_SCENERY_CATALOG } from '@/lib/scenery/fixtures';
 import type { PublicScenerySnapshot } from '@/lib/scenery/public';
 import { RECIPE_IDS, DEFAULT_SCENERY_SEED } from '@/lib/scenery/types';
 import { syntheticStorybookPlan } from '@/lib/tivvlejoy-storybook-environment';
+import { runStorybookPreviewValidation } from '@/lib/tivvlejoy-storybook-preview-validation';
 import { PreviewPageIntro } from './PreviewEmptyState';
 import { SceneryAssetIntake } from './SceneryAssetIntake';
 
@@ -47,6 +48,7 @@ export function SceneryStudio({
   const [result, setResult] = useState<PlanResponse | null>(null);
   const [busy, setBusy] = useState(false);
   const storybook = useMemo(() => syntheticStorybookPlan(), []);
+  const previewValidation = useMemo(() => runStorybookPreviewValidation(), []);
 
   const localFallback = useMemo(() => {
     if (!result?.plan) return null;
@@ -373,6 +375,80 @@ export function SceneryStudio({
           <div>
             <dt className="text-[var(--color-text-muted)]">Provenance status</dt>
             <dd>{storybook.provenance.status}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="studio-card space-y-3 p-4 sm:p-5">
+        <h2 className="font-display text-xl font-semibold">Storybook Preview Validation</h2>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          Synthetic fixtures only. No commercial scenery was processed and no paid render occurred.
+        </p>
+        <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Fixture world</dt>
+            <dd>{previewValidation.fixtureWorld}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Profile version</dt>
+            <dd>{previewValidation.profileVersion}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Camera / profile</dt>
+            <dd>
+              {previewValidation.cameraProfile} · {previewValidation.qualityTier}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Quality tier</dt>
+            <dd>{previewValidation.qualityTier}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Signage status</dt>
+            <dd>{previewValidation.signageStatus}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Dressing status</dt>
+            <dd>{previewValidation.dressingStatus}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Lighting preset</dt>
+            <dd>{previewValidation.lightingPreset}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Shot score</dt>
+            <dd>
+              {previewValidation.shotScore}/100 · {previewValidation.approvalStatus}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Hard blockers</dt>
+            <dd>
+              {previewValidation.hardBlockers.length === 0 ? 'none' : previewValidation.hardBlockers.join(', ')}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Dependency SHA</dt>
+            <dd className="break-all">{previewValidation.shotDependencySha256.slice(0, 16)}…</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Approval status</dt>
+            <dd>{previewValidation.approvalStatus}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Preview resolution</dt>
+            <dd>{previewValidation.previewResolution}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Synthetic / rendered evidence</dt>
+            <dd>{previewValidation.evidenceStatus}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Complexity estimate</dt>
+            <dd>
+              {previewValidation.complexity.visibleTriangles} tris · {previewValidation.complexity.uniqueMaterials}{' '}
+              materials · planning only
+            </dd>
           </div>
         </dl>
       </section>

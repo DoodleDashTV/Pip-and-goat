@@ -110,3 +110,6 @@ expected by `TIVVLEJOY_SHOT_VISUAL_APPROVAL_V1` (`shotId`,
 A later paid or rendered pass may fill pixel measurements. This PR uses
 synthetic fixture inputs only and does not approve hero scenery from missing
 frames.
+
+See also `docs/TIVVLEJOY_STORYBOOK_PREVIEW_VALIDATION_V1.md` for the stacked
+synthetic preview-validation milestone.
