@@ -1,0 +1,34 @@
+# Zero-GPU render-backend readiness. Never creates a Pod.
+name: TivvleJoy RunPod Backend Readiness
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-runpod-render-backend-readiness-73f1
+
+concurrency:
+  group: tivvlejoy-runpod-backend-readiness-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  readiness:
+    name: Zero-GPU backend readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+          pnpm install --frozen-lockfile
+          pnpm validate:runpod-backend-readiness
+          pnpm --filter @doodle-dash/web exec vitest run src/lib/preview-workspace.test.ts

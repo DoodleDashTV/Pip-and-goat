@@ -206,6 +206,9 @@ describe('Preview assets, voices, workflow, readiness, and render requests', () 
     expect(request.contactedProvider).toBe(false);
     expect(request.outputFile).toBeNull();
     expect(request.progress).toBeNull();
+    expect(request.readinessStatus).toMatch(/^BLOCKED_/);
+    expect(request.readinessCard?.gpuLaunched).toBe(false);
+    expect(request.readinessCard?.paidAuthorization).toBe('REQUIRED');
   });
 });
 

@@ -1,6 +1,16 @@
 import { assertAudienceFacingContent } from '../brand-canon';
 import { isPublicWebsitePreview } from '../public-preview';
 import {
+  evaluateRenderBackendReadiness,
+  fixtureCost,
+  fixtureJob,
+  fixtureShot,
+  fixtureVisualApproval,
+  FIXTURE_ASSETS,
+  hashShotDependency,
+  toPreviewReadinessCard,
+} from '../tivvlejoy-render-backend-readiness';
+import {
   emptyPreviewWorkspace,
   loadPreviewWorkspace,
   resetPreviewWorkspace,
@@ -244,6 +254,16 @@ export function createPreviewRenderRequest(
   const workspace = loadPreviewWorkspace(backend);
   const episode = workspace.episodes.find((item) => item.id === episodeId);
   if (!episode) throw new PreviewWorkspaceError('Create a Preview episode first.', 'EPISODE_MISSING');
+  const shot = fixtureShot();
+  const receipt = evaluateRenderBackendReadiness({
+    jobId: `preview-${episode.id}`,
+    job: { ...fixtureJob(shot), episodeId: episode.id, shotId: 'SH-UNBOUND', assetReceipts: [] },
+    shot,
+    requiredAssets: [],
+    presentAssets: [],
+    visualApproval: null,
+    cost: fixtureCost(),
+  });
   const request: PreviewRenderRequest = {
     id: id('render'),
     episodeId,
@@ -253,6 +273,47 @@ export function createPreviewRenderRequest(
     outputFile: null,
     progress: null,
     createdAt: nowIso(),
+    readinessStatus: receipt.status,
+    readinessCard: toPreviewReadinessCard(receipt, {
+      episodeLabel: `EP${String(episode.episodeNumber).padStart(3, '0')}`,
+      shotLabel: 'SH-UNBOUND',
+    }),
+  };
+  const next = savePreviewWorkspace(
+    { ...workspace, renderRequests: [request, ...workspace.renderRequests] },
+    backend,
+  );
+  return { workspace: next, request };
+}
+
+export function createFixtureAdmissionRequest(
+  episodeId: string,
+  backend: PreviewStoreBackend,
+): { workspace: PreviewWorkspace; request: PreviewRenderRequest } {
+  const workspace = loadPreviewWorkspace(backend);
+  const episode = workspace.episodes.find((item) => item.id === episodeId);
+  if (!episode) throw new PreviewWorkspaceError('Create a Preview episode first.', 'EPISODE_MISSING');
+  const shot = fixtureShot();
+  const receipt = evaluateRenderBackendReadiness({
+    jobId: `fixture-${episode.id}`,
+    job: fixtureJob(shot),
+    shot,
+    requiredAssets: FIXTURE_ASSETS,
+    presentAssets: FIXTURE_ASSETS,
+    visualApproval: fixtureVisualApproval(hashShotDependency(shot)),
+    cost: fixtureCost(),
+  });
+  const request: PreviewRenderRequest = {
+    id: id('render'),
+    episodeId,
+    label: 'Draft request — not rendered',
+    status: 'NOT_RENDERED',
+    contactedProvider: false,
+    outputFile: null,
+    progress: null,
+    createdAt: nowIso(),
+    readinessStatus: receipt.status,
+    readinessCard: toPreviewReadinessCard(receipt, { episodeLabel: 'EP012', shotLabel: 'SH030' }),
   };
   const next = savePreviewWorkspace(
     { ...workspace, renderRequests: [request, ...workspace.renderRequests] },
