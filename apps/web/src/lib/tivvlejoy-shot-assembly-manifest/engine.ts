@@ -359,6 +359,8 @@ export function assembleShot(input: AssemblyShotInput) {
     waitingForAssets: environmentAssets.some((slot) => slot.required && String(slot.sourceReceiptRef) === UNRESOLVED),
     synthetic: true,
   });
+  const planningStatus: AssemblyReadiness = readiness.planning;
+  const realStatus: AssemblyReadiness = readiness.real;
   if (readiness.real === 'READY_FOR_REAL_ASSEMBLY') {
     throw new Error('Synthetic fixtures cannot become READY_FOR_REAL_ASSEMBLY');
   }
@@ -378,7 +380,11 @@ export function assembleShot(input: AssemblyShotInput) {
     locationDeltaSha256: input.locationDeltaSha256,
     cameraTemplateId: input.cameraTemplateId,
     lightingPresetId: input.lightingPresetId,
-    characterSlots: characters,
+    characterSlots: characters.map((slot) => ({
+      characterId: slot.characterId,
+      rigVersion: slot.rigVersion,
+      visible: slot.visibility,
+    })),
     environmentSlots: environmentAssets,
     storyPropIds: input.storyPropRefs,
     renderProfile: input.renderProfile,
@@ -451,8 +457,8 @@ export function assembleShot(input: AssemblyShotInput) {
     },
     collections: collectionPlan(input.shotId),
     names: instanceNames(input.shotId, input.locationPresetId.toUpperCase()),
-    assemblyStatus: readiness.planning,
-    realAssemblyStatus: readiness.real,
+    assemblyStatus: planningStatus,
+    realAssemblyStatus: realStatus,
     unresolvedDependencies: [
       UNRESOLVED_PRODUCTION_RIG,
       ...environmentAssets.filter((slot) => String(slot.dependencyStatus).startsWith('UNRESOLVED')).map((slot) => slot.slotId),
@@ -467,7 +473,7 @@ export function assembleShot(input: AssemblyShotInput) {
       shotDependencySha256: input.shotDependencySha256,
       assemblyDependencySha256,
       renderProfile: input.renderProfile,
-      assemblyReady: readiness.planning === 'READY_FOR_SYNTHETIC_ASSEMBLY' || readiness.planning === 'PLANNING_READY',
+      assemblyReady: planningStatus === 'READY_FOR_SYNTHETIC_ASSEMBLY' || planningStatus === 'PLANNING_READY',
       visualApprovalReady: !input.visualApprovalStale,
       assetReceiptRefs: [UNRESOLVED],
       visualApprovalReceiptRef: input.visualApprovalReceiptRef,

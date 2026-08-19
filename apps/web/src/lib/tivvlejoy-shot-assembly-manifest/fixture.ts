@@ -75,10 +75,8 @@ export function ep012AssemblyInputs(overrides: Partial<AssemblyShotInput> = {}, 
       environmentSlots: bakery ? bakerySlots() : forestSlots(),
       visualApprovalReceiptRef: shot.visualApprovalReceiptRef,
       ...overrides,
-      shotId: shot.shotId,
-      episodeId: plan.episodeId,
     };
-    return input;
+    return { ...input, shotId: shot.shotId, episodeId: plan.episodeId };
   });
 }
 
