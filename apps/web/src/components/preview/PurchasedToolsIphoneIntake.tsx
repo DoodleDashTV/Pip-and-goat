@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { hashFileChunked } from '@/lib/scenery/intake/client-hash';
 import {
@@ -347,6 +348,11 @@ export function PurchasedToolsIphoneIntake() {
         <h1 className="mt-1 font-display text-2xl font-semibold">Purchased Assets — iPhone Upload</h1>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
           Built for the large Botaniq package, selected Blender tools, and purchased scenery sources. Files travel directly from Safari to signed private R2 multipart URLs. They are never committed to GitHub.
+        </p>
+        <p className="mt-2 text-sm">
+          <Link href="/purchased-assets/audit" className="font-bold underline">
+            Open asset library audit
+          </Link>
         </p>
       </div>
 
