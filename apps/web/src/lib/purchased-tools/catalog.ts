@@ -33,7 +33,7 @@ export const PURCHASED_TOOL_PACKAGES: readonly PurchasedToolPackage[] = [
       'Main Botaniq Full asset library. The exact Superhive/iPhone .paq.zip wrapper is the visible approved intake filename; the unwrapped .paq name remains an approved alias. Store privately first; do not install or redistribute raw source bytes.',
   },
 
-  // Gaffer: current candidate plus the exact historical downloads supplied by Justin.
+  // Gaffer: current candidate plus exact historical downloads supplied by the user.
   {
     sourceId: 'SRC_GAFFER_3_2_10',
     displayName: 'Gaffer',
@@ -79,7 +79,7 @@ export const PURCHASED_TOOL_PACKAGES: readonly PurchasedToolPackage[] = [
     notes: 'Historical user-supplied Gaffer download. Approved for private archival intake only; not the active runtime candidate.',
   },
 
-  // Physical Starlight & Atmosphere: current candidate plus all exact historical downloads supplied today.
+  // Physical Starlight & Atmosphere: current candidate plus exact historical downloads supplied today.
   {
     sourceId: 'SRC_PHYSICAL_STARLIGHT_1_9_4',
     displayName: 'Physical Starlight and Atmosphere',
@@ -145,6 +145,17 @@ export const PURCHASED_TOOL_PACKAGES: readonly PurchasedToolPackage[] = [
     minimumReasonableBytes: 64 * 1024,
     activation: 'STORE_ONLY',
     notes: 'Historical user-supplied PSA download. Approved for private archival intake only; not the active runtime candidate.',
+  },
+  {
+    sourceId: 'SRC_PHYSICAL_STARLIGHT_LEGACY_ASSETS_1_6_1_AND_BELOW_2',
+    displayName: 'Physical Starlight legacy assets (historical companion)',
+    expectedFilename: 'assets-for-v1.6.1-and-below 2.blend.zip',
+    role: 'optional-companion',
+    version: '1.6.1-and-below',
+    maxUploadBytes: 512 * MIB,
+    minimumReasonableBytes: 64 * 1024,
+    activation: 'STORE_ONLY',
+    notes: 'Exact legacy companion asset bundle selected on iPhone. Approved for private archival intake only; do not install, execute, or treat it as a current Physical Starlight runtime dependency.',
   },
   {
     sourceId: 'SRC_PHYSICAL_STARLIGHT_1_5_3',
