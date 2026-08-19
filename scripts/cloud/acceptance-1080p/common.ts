@@ -69,6 +69,17 @@ export const WORKER_IMAGE_RENDER_ASSET_SHA256 =
  * record. Superseded: its baked render code is c4afa39c…, this checkout is
  * elsewhere, and the two must agree before a paid launch.
  */
+/**
+ * Immutable image used by paid smoke attempt #1 (Pod 71ttvxy4wbxn46).
+ * Historical provenance only. Do not relabel or overwrite that digest.
+ * PREVIOUS_WORKER_IMAGE below is an older superseded record and must stay
+ * unchanged.
+ */
+export const PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE =
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25'; // pragma: allowlist secret
+export const PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE_SOURCE_COMMIT = '3d5fbf78d2b618a40f10ebbf6e24ed7c97079fd3';
+export const PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID = 'rc8eyeqhn2';
+
 export const PREVIOUS_WORKER_IMAGE =
   'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27'; // pragma: allowlist secret
 export const PREVIOUS_WORKER_IMAGE_SOURCE_COMMIT = 'bb5270372ad558e71673fe789260a12fb51a9c6d';

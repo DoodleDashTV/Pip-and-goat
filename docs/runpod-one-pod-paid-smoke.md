@@ -48,12 +48,16 @@ failure returns `RUNPOD_CLEANUP_REQUIRES_ATTENTION`. No automatic paid retry.
 
 Success after artifact readback and confirmed deletion is `PAID_SMOKE_TEST_PASS`.
 
-The pinned worker keeps `StartupWatchdog` armed until single-shot returns.
-Paid-smoke worker env therefore sets `STARTUP_WATCHDOG_MS` to the 20-minute
-runtime ceiling. The observer also recognizes later worker boot stages
-(`RENDER_STARTED`, Blender preflight, asset-ready) as existing
-`PROCESS_STARTED` / `WORKER_READY` evidence. That does not authorize a second
-paid Pod.
+Paid-smoke worker env sets `STARTUP_WATCHDOG_MS` to a genuine 5-minute
+startup budget (container boot, GPU health, Blender probe). After
+`WORKER_READY` the worker cancels that timer. The single-shot runtime/cost
+guard owns the render. The observer still recognizes later worker boot stages
+as existing `PROCESS_STARTED` / `WORKER_READY` evidence. That does not
+authorize a second paid Pod.
+
+Paid smoke attempt #1 used immutable digest `d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25`
+and template `rc8eyeqhn2`. That template is historical provenance and must
+not be patched or deleted.
 
 ## First authorized paid run
 

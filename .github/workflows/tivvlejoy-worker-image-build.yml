@@ -9,7 +9,7 @@ name: TivvleJoy Worker Image Build
 on:
   push:
     branches:
-      - cursor/tivvlejoy-runpod-worker-image-refresh-73f1
+      - cursor/tivvlejoy-runpod-worker-startup-watchdog-73f1
 
 concurrency:
   group: tivvlejoy-worker-image-${{ github.ref }}
@@ -38,7 +38,7 @@ jobs:
       - name: Refuse any other branch
         run: |
           set -euo pipefail
-          expected='cursor/tivvlejoy-runpod-worker-image-refresh-73f1'
+          expected='cursor/tivvlejoy-runpod-worker-startup-watchdog-73f1'
           if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
             echo "REFUSED: this workflow only runs on ${expected}"
             exit 1

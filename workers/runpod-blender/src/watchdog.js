@@ -1,10 +1,10 @@
 /**
  * Watchdogs for the Runpod GPU worker.
  *
- *  - StartupWatchdog: independent of the render-runtime guard. If the worker
- *    does not reach a meaningful bootstrap milestone (e.g. ASSETS_READY /
- *    RENDER_STARTED) within a configurable startup budget, it fires a
- *    STARTUP_TIMEOUT so a dead container never keeps a PAID GPU waiting.
+ *  - StartupWatchdog: owns BOOT only (PROCESS_STARTED → healthGate →
+ *    WORKER_READY). After WORKER_READY the timer must be cancelled via
+ *    reached(). The single-shot runtime/cost guard owns the actual render
+ *    job. A dead boot fires STARTUP_TIMEOUT so a paid GPU is not left idle.
  *
  *  - computeCostAwareMaxRuntime: sizes the render-runtime budget from the ACTUAL
  *    live GPU hourly rate against a hard USD cap (default $0.25) with a safety
@@ -89,8 +89,8 @@ function clamp(n, lo, hi) {
 
 /**
  * StartupWatchdog — fires onTimeout if `reached()` is not called before the
- * startup budget elapses. Cost-aware: the default budget is small so a dead
- * container is torn down long before it burns the cap.
+ * startup budget elapses. Cancel permanently at WORKER_READY. Do not leave
+ * this timer armed during single-shot download/preflight/render/encode.
  */
 class StartupWatchdog {
   /**

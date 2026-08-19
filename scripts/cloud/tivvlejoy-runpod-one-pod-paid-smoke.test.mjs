@@ -145,8 +145,11 @@ describe('launch receipt binds the real staged identity', () => {
       'LAUNCH_INTENT_MISMATCH',
     );
     assert.equal(MAX_HOURLY_USD, '0.75');
-    assert.equal(SMOKE_STARTUP_WATCHDOG_MS, MAX_RUNTIME_MINUTES * 60_000);
+    assert.equal(SMOKE_STARTUP_WATCHDOG_MS, 300_000);
+    assert.ok(SMOKE_STARTUP_WATCHDOG_MS < MAX_RUNTIME_MINUTES * 60_000);
     assert.equal(moduleSource.includes('STARTUP_WATCHDOG_MS: String(SMOKE_STARTUP_WATCHDOG_MS)'), true);
+    assert.equal(docs.includes('No automatic paid retry'), true);
+    assert.equal(moduleSource.includes('createPodForBenchmark'), false);
   });
 });
 
