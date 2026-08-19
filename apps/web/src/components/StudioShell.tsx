@@ -18,6 +18,7 @@ const PRIMARY_NAV = [
   { href: '/shot-assembly', label: 'Shot Assembly' },
   { href: '/blender-assembly', label: 'Blender Assembly' },
   { href: '/blender-readiness', label: 'Blender Readiness' },
+  { href: '/world-builder', label: 'World Builder' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
   { href: '/render-queue', label: 'Render Queue' },

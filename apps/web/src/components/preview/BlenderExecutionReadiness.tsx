@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { PreviewPageIntro } from './PreviewEmptyState';
-import { evaluateEp012Readiness } from '@/lib/tivvlejoy-blender-execution-readiness';
+import { evaluateEp012Readiness } from '@/lib/tivvlejoy-blender-execution-readiness/fixtures';
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
