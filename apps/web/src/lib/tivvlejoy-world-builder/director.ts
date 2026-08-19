@@ -105,7 +105,7 @@ export function episodeEnvironmentDirector(overrides: Partial<WorldBuilderInput>
 export function scalePlan60() {
   const baseLocations = EXISTING_LOCATIONS.length;
   const locationVariants = baseLocations * SEASONS.length * 6 * 4;
-  const episodes = 60;
+  const episodes = 60; // caller-named 60-episode target helper, not a scenery ceiling
   const uniqueEnvironmentBuilds = baseLocations;
   const reusedEnvironmentBuilds = episodes * 3 - uniqueEnvironmentBuilds;
   return {

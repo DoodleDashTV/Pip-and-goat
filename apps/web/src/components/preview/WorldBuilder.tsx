@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { PreviewPageIntro } from './PreviewEmptyState';
+import { evaluateSceneryLongevity } from '@/lib/tivvlejoy-scenery-longevity';
+import { syntheticRegistry } from '@/lib/tivvlejoy-approved-asset-registry';
 import {
   ARCHETYPE_IDS,
   ENVIRONMENT_RECIPES,
@@ -12,7 +14,6 @@ import {
   assetGapDecision,
   buildEnvironment,
   sceneryCoverageReport,
-  scalePlan60,
   type ArchetypeId,
   type Season,
   type TimeOfDay,
@@ -30,7 +31,16 @@ function Field({ label, value }: { label: string; value: string }) {
 
 export function WorldBuilder() {
   const coverage = useMemo(() => sceneryCoverageReport(), []);
-  const scale = useMemo(() => scalePlan60(), []);
+  const [seasonTarget, setSeasonTarget] = useState(60);
+  const longevity = useMemo(
+    () =>
+      evaluateSceneryLongevity({
+        requestedEpisodeCount: Math.max(1, seasonTarget),
+        approvedAssetRegistry: syntheticRegistry(),
+        evidenceClass: 'SYNTHETIC_PREVIEW',
+      }),
+    [seasonTarget],
+  );
   const [archetypeId, setArchetypeId] = useState<ArchetypeId>('BAKERY_EXTERIOR');
   const [season, setSeason] = useState<Season>('SUMMER');
   const [weather, setWeather] = useState<Weather>('CLEAR');
@@ -78,26 +88,41 @@ export function WorldBuilder() {
           <Link href="/world-builder/assets" className="font-bold underline">
             Approved Asset Registry diagnostics
           </Link>
+          {' · '}
+          <Link href="/world-builder/longevity" className="font-bold underline">
+            Scenery longevity
+          </Link>
         </p>
         {gap.missingSemanticRole ? <p className="text-sm">Missing semantic role: {gap.missingSemanticRole}</p> : null}
       </section>
 
       <section className="studio-card grid gap-3 p-4 sm:p-5 sm:grid-cols-2">
-        <Field label="Library Coverage" value={`${coverage.coveragePercent}%`} />
-        <Field label="Locations" value={`${coverage.estimatedLocationVariantCount} synthetic variants from 7 bases`} />
-        <Field label="Biomes" value="village · forest · river · meadow · snow · coast · cave" />
-        <Field label="Architecture" value={`${coverage.scores.architecture}`} />
-        <Field label="Vegetation" value={`${coverage.scores.vegetation} · native Blender`} />
-        <Field label="Interiors" value={`${coverage.scores.interiors} · modular placeholders`} />
-        <Field label="Terrain" value={`${coverage.scores.terrain}`} />
-        <Field label="Water" value={`${coverage.scores.water}`} />
-        <Field label="Weather" value={`${coverage.scores.weather}`} />
-        <Field label="Seasons" value={`${coverage.scores.seasonal_variants}`} />
-        <Field label="Lighting" value={`${coverage.scores.lighting} · native`} />
+        <p className="sm:col-span-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+          SCENERY LONGEVITY · SYNTHETIC / PLANNING ANALYSIS · NOT LIVE APPROVED-ASSET COVERAGE
+        </p>
+        <Field label="Coverage strength" value={longevity.coverageStrength} />
+        <Field label="Repetition risk" value={longevity.repetitionRisk.overallRisk} />
+        <Field label="Confidence" value={longevity.coverageConfidence} />
+        <label className="text-sm">
+          Target episode count
+          <input
+            className="mt-1 w-full rounded-xl border px-2 py-2"
+            type="number"
+            min={1}
+            value={seasonTarget}
+            onChange={(event) => setSeasonTarget(Number(event.target.value) || 1)}
+          />
+        </label>
+        <Field label="Approved logical assets" value={String(longevity.approvedLogicalAssetCount)} />
+        <Field label="Hero environment diversity" value={String(longevity.heroEnvironmentCount)} />
+        <Field label="Interior diversity" value={String(longevity.approvedInteriorShellCount)} />
+        <Field label="Background diversity" value={String(longevity.backgroundFamilyCount)} />
+        <Field label="High-pressure scenery roles" value={longevity.semanticRoleCoverage.filter((item) => item.pressure === 'BUSY' || item.pressure === 'OVERUSED').map((item) => item.semanticRole).join(', ') || 'none'} />
+        <Field label="Specialty gaps" value={longevity.specialtyGaps.map((gap) => gap.semanticRole).join(', ') || 'none in this plan'} />
+        <Field label="Purchase needed?" value={longevity.purchaseDecision} />
+        <Field label="Library category scores" value={`${coverage.coveragePercent}% planning only`} />
         <Field label="Environment Recipes" value={String(ENVIRONMENT_RECIPES.length)} />
-        <Field label="Reuse" value={`${scale.estimatedReusePercent}% estimated`} />
         <Field label="Performance" value={env.budget.status} />
-        <Field label="Missing Assets" value={coverage.actuallyMissing.join(', ') || 'none required'} />
       </section>
 
       <section className="studio-card space-y-2 p-4 sm:p-5">

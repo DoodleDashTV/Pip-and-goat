@@ -209,6 +209,7 @@ describe('providers, recipes, continuity, and gaps', () => {
     expect(EXISTING_LOCATIONS).toHaveLength(7);
     expect(ARCHETYPE_IDS.length).toBeGreaterThan(20);
     expect(sceneryCoverageReport().purchaseRecommended).toBe(false);
+    expect(sceneryCoverageReport()).not.toHaveProperty('estimatedEpisodeCoverage');
     expect(scalePlan60().baseLocations).toBe(7);
   });
 });
