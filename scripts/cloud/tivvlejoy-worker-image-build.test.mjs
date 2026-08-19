@@ -100,6 +100,7 @@ describe('tivvlejoy worker image build workflow', () => {
     assert.match(common, /b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed/);
     assert.match(common, /WORKER_IMAGE_SOURCE_COMMIT = '1ea2cf58c9cfc015929d0a4ca63446898d59ba79'/);
     assert.match(common, /PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID = 'rc8eyeqhn2'/);
+    assert.match(common, /PAID_SMOKE_ATTEMPT_1_POD_ID = '71ttvxy4wbxn46'/);
     assert.match(common, /e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27/);
     assert.equal(workerSource.includes("startupWatchdog.milestone('WORKER_READY')"), false);
     assert.equal(workerSource.includes("startupWatchdog.reached('WORKER_READY')"), true);
