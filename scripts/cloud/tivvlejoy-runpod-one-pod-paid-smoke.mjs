@@ -184,7 +184,7 @@ export function validatePaidSmokeLaunchReceipt(receipt, { launchIntentSha256, jo
     return fail(`Paid-smoke launch receipt is missing ${missing.join(', ')}.`, 'LAUNCH_INTENT_MISMATCH');
   }
   if (receipt.templateId !== APPROVED_TEMPLATE_ID || (templateId && templateId !== APPROVED_TEMPLATE_ID)) {
-    return fail('Paid-smoke receipt templateId is not rc8eyeqhn2.', 'TEMPLATE_ID_MISMATCH');
+    return fail(`Paid-smoke receipt templateId is not the current approved template ${APPROVED_TEMPLATE_ID}.`, 'TEMPLATE_ID_MISMATCH');
   }
   if (receipt.imageName !== REQUIRED_IMAGE_NAME) {
     return fail('Paid-smoke receipt image is not the pinned digest.', 'IMAGE_MISMATCH');

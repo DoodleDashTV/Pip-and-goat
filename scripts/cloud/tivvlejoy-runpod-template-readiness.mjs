@@ -17,19 +17,21 @@ export const REST_PODS_URL = 'https://rest.runpod.io/v1/pods';
 export const GRAPHQL_URL = 'https://api.runpod.io/graphql';
 
 export const REQUIRED_IMAGE_NAME =
-  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25'; // pragma: allowlist secret
-export const REQUIRED_IMAGE_DIGEST = 'sha256:d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25';
-export const REQUIRED_SOURCE_COMMIT = '3d5fbf78d2b618a40f10ebbf6e24ed7c97079fd3';
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed'; // pragma: allowlist secret
+export const REQUIRED_IMAGE_DIGEST = 'sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed';
+export const REQUIRED_SOURCE_COMMIT = '1ea2cf58c9cfc015929d0a4ca63446898d59ba79';
 export const REQUIRED_RENDER_CODE_SHA256 =
-  '8210e3addd656e5d7c318dc8a66e82fe7b8ba5e1642c3f583fabbaf92a646aed';
+  '52dc742a3aee4cd7c1f141dcdfd45b9c81d6c073b205c3f8eda915adb9505ab5';
 export const REQUIRED_RENDER_ASSET_SHA256 =
   '7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7';
 export const REQUIRED_BLENDER_VERSION = '4.2.3';
 export const REQUIRED_DOCKERFILE_CMD = Object.freeze(['node', './src/worker.js']);
 export const PERSISTENT_VOLUME_REQUIRED = false;
-export const SUGGESTED_TEMPLATE_NAME = 'TivvleJoy Blender Worker - d791981a';
+export const SUGGESTED_TEMPLATE_NAME = 'TivvleJoy Blender Worker - b53fcbf5';
 export const SUGGESTED_CONTAINER_DISK_GB = 50;
 export const SUGGESTED_VOLUME_IN_GB = 0;
+export const HISTORICAL_ATTEMPT_1_IMAGE_DIGEST =
+  'sha256:d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25';
 
 export const FORBIDDEN_TEMPLATE_ENV_KEYS = Object.freeze([
   'RUNPOD_API_KEY',
@@ -194,6 +196,9 @@ export function assessTemplateCompatibility(template) {
     if (looksLikeMutableTag(imageName)) reasons.push('MUTABLE_IMAGE_TAG');
     if (imageName.includes('8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830')) {
       reasons.push('STALE_IMAGE_DIGEST');
+    }
+    if (imageName.includes(HISTORICAL_ATTEMPT_1_IMAGE_DIGEST.replace(/^sha256:/, ''))) {
+      reasons.push('HISTORICAL_IMAGE_DIGEST');
     }
   }
   if (template.category !== 'NVIDIA') reasons.push('CATEGORY_NOT_NVIDIA');
@@ -453,13 +458,13 @@ export async function auditTemplateReadiness({
         reasons: [],
       });
     }
-    say('TEMPLATE LOOKUP: AMBIGUOUS_TEMPLATE_MATCH');
+    say('TEMPLATE LOOKUP: DUPLICATE_TEMPLATE_IDENTITY');
     return emptyResult({
-      code: 'AMBIGUOUS_TEMPLATE_MATCH',
+      code: 'DUPLICATE_TEMPLATE_IDENTITY',
       compatibleCount: compatible.length,
       summaries,
       observations,
-      reasons: ['Multiple compatible templates found. Do not guess.'],
+      reasons: ['Multiple compatible current-generation templates found. Do not guess.'],
     });
   } catch (error) {
     if (error && error.code === 'TEMPLATE_MUTATION_TRIPWIRE') {
@@ -563,6 +568,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
     'TEMPLATE_REQUIRED',
     'TEMPLATE_CANDIDATE_FOUND',
     'AMBIGUOUS_TEMPLATE_MATCH',
+    'DUPLICATE_TEMPLATE_IDENTITY',
   ]);
   return classified.has(result.code) ? 0 : 1;
 }

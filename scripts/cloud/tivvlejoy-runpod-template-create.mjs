@@ -18,15 +18,21 @@ import {
   SUGGESTED_CONTAINER_DISK_GB,
   SUGGESTED_TEMPLATE_NAME,
   SUGGESTED_VOLUME_IN_GB,
+  assessTemplateCompatibility as assessTemplateCompatibilityStrict,
   isAllowedTemplateRead,
   isForbiddenRunpodMutation,
   normalizeTemplateList,
   redactSecrets,
 } from './tivvlejoy-runpod-template-readiness.mjs';
-import { assessTemplateCompatibilityWithProvenance as assessTemplateCompatibility } from './tivvlejoy-runpod-template-normalization.mjs';
+import { assessTemplateCompatibilityWithProvenance } from './tivvlejoy-runpod-template-normalization.mjs';
+import {
+  TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT,
+  buildSanitizedTrustedReceipt,
+} from './tivvlejoy-runpod-template-creation-receipt.mjs';
 
 export const CREATE_MODE = 'create-template';
-export const REQUIRED_CREATE_PHRASE = 'CREATE_TIVVLEJOY_TEMPLATE_D791981A';
+export const HISTORICAL_CREATE_PHRASE = 'CREATE_TIVVLEJOY_TEMPLATE_D791981A';
+export const REQUIRED_CREATE_PHRASE = 'CREATE_TIVVLEJOY_TEMPLATE_B53FCBF5';
 export const TEMPLATE_README =
   'TivvleJoy single-shot Blender 4.2.3 RunPod worker. Immutable worker image. Runtime job/R2 environment is injected only by the guarded launcher.';
 
@@ -47,7 +53,17 @@ export const ALLOWED_CREATE_PAYLOAD_KEYS = Object.freeze([
 ]);
 
 export function evaluateCreateGate({ mode, phrase } = {}) {
-  if (mode !== CREATE_MODE || phrase !== REQUIRED_CREATE_PHRASE) {
+  if (mode !== CREATE_MODE) {
+    return { ok: false, code: 'CREATE_GATE_REFUSED', reason: 'mode and exact create phrase are required.' };
+  }
+  if (phrase === HISTORICAL_CREATE_PHRASE) {
+    return {
+      ok: false,
+      code: 'CREATE_GATE_REFUSED',
+      reason: 'Historical create phrase cannot authorize the current template generation.',
+    };
+  }
+  if (phrase !== REQUIRED_CREATE_PHRASE) {
     return { ok: false, code: 'CREATE_GATE_REFUSED', reason: 'mode and exact create phrase are required.' };
   }
   return { ok: true, code: 'CREATE_GATE_OK', reason: null };
@@ -259,8 +275,16 @@ async function fetchTemplateList(safeFetch, apiKey) {
   return { ok: true, status: response.status, items, code: 'OK' };
 }
 
-function classifyListed(items) {
-  const assessed = items.map((item) => ({ item, ...assessTemplateCompatibility(item) }));
+export function assessCurrentGenerationCompatibility(template, receipt = TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT) {
+  const provenanced = assessTemplateCompatibilityWithProvenance(template, { receipt });
+  if (provenanced.compatible) return provenanced;
+  const strict = assessTemplateCompatibilityStrict(template);
+  if (strict.compatible) return strict;
+  return provenanced.reasons.length ? provenanced : strict;
+}
+
+function classifyListed(items, receipt = TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT) {
+  const assessed = items.map((item) => ({ item, ...assessCurrentGenerationCompatibility(item, receipt) }));
   const compatible = assessed.filter((entry) => entry.compatible);
   return { assessed, compatible };
 }
@@ -272,7 +296,12 @@ export async function recoverTemplateCreation({ fetchFn, apiKey, recorder = { at
     return { code: 'TEMPLATE_CREATE_UNCERTAIN', matches: [], compatible: [], listed };
   }
   const identity = listed.items.filter(intendedIdentityMatches);
-  const compatible = identity.filter((item) => assessTemplateCompatibility(item).compatible);
+  const compatible = identity.filter((item) =>
+    assessCurrentGenerationCompatibility(
+      item,
+      buildSanitizedTrustedReceipt({ templateId: item.id }),
+    ).compatible,
+  );
   if (identity.length > 1) return { code: 'AMBIGUOUS_TEMPLATE_MATCH', matches: identity, compatible, listed };
   if (identity.length === 0) return { code: 'TEMPLATE_CREATE_UNCERTAIN', matches: [], compatible, listed };
   if (compatible.length === 1) return { code: 'RECOVERED_CREATED_TEMPLATE', matches: identity, compatible, listed };
@@ -333,7 +362,7 @@ export async function createTemplateGuarded({
       });
     }
     if (identity.length === 1 && preCount === 0) {
-      const assessed = assessTemplateCompatibility(identity[0]);
+      const assessed = assessCurrentGenerationCompatibility(identity[0]);
       say('PRE-CREATE: CREATED_TEMPLATE_INCOMPATIBLE');
       return emptyResult({
         code: 'CREATED_TEMPLATE_INCOMPATIBLE',
@@ -346,12 +375,12 @@ export async function createTemplateGuarded({
       });
     }
     if (preCount > 1) {
-      say('PRE-CREATE: AMBIGUOUS_TEMPLATE_MATCH');
+      say('PRE-CREATE: DUPLICATE_TEMPLATE_IDENTITY');
       return emptyResult({
-        code: 'AMBIGUOUS_TEMPLATE_MATCH',
+        code: 'DUPLICATE_TEMPLATE_IDENTITY',
         preCreateCompatibleCount: preCount,
         postCreateCompatibleCount: preCount,
-        reasons: ['Multiple compatible templates found. Do not guess.'],
+        reasons: ['Multiple compatible current-generation templates found. Do not guess.'],
         mutationAttempts: attempts(),
       });
     }
@@ -435,6 +464,7 @@ export async function createTemplateGuarded({
       apiKey,
       templateId: createdId,
       say,
+      receipt: buildSanitizedTrustedReceipt({ templateId: createdId }),
     });
     return {
       ...verified,
@@ -470,7 +500,13 @@ export async function createTemplateGuarded({
   }
 }
 
-async function verifyCreatedTemplate({ safeFetch, apiKey, templateId, say }) {
+async function verifyCreatedTemplate({
+  safeFetch,
+  apiKey,
+  templateId,
+  say,
+  receipt = buildSanitizedTrustedReceipt({ templateId }),
+}) {
   const detail = await safeFetch(`${REST_TEMPLATES_URL}/${encodeURIComponent(templateId)}`, {
     method: 'GET',
     headers: authHeaders(apiKey),
@@ -490,7 +526,7 @@ async function verifyCreatedTemplate({ safeFetch, apiKey, templateId, say }) {
       reasons: ['MALFORMED_RESPONSE'],
     });
   }
-  const assessed = assessTemplateCompatibility(parsed);
+  const assessed = assessCurrentGenerationCompatibility(parsed, receipt);
   if (!assessed.compatible) {
     say('POST-CREATE: CREATED_TEMPLATE_INCOMPATIBLE');
     return emptyResult({
@@ -511,12 +547,12 @@ async function verifyCreatedTemplate({ safeFetch, apiKey, templateId, say }) {
       reasons: ['Post-create template list failed.'],
     });
   }
-  const post = classifyListed(listed.items);
+  const post = classifyListed(listed.items, receipt);
   if (post.compatible.length !== 1) {
     say(`POST-CREATE COUNT=${post.compatible.length}`);
     return emptyResult({
       ok: false,
-      code: post.compatible.length > 1 ? 'AMBIGUOUS_TEMPLATE_MATCH' : 'TEMPLATE_CREATE_UNCERTAIN',
+      code: post.compatible.length > 1 ? 'DUPLICATE_TEMPLATE_IDENTITY' : 'TEMPLATE_CREATE_UNCERTAIN',
       templateId,
       summary: assessed.summary,
       postCreateCompatibleCount: post.compatible.length,
@@ -539,7 +575,7 @@ function finalizeRecovery(recovered, extra) {
   const { say: _say, ...rest } = extra;
   if (recovered.code === 'RECOVERED_CREATED_TEMPLATE') {
     const item = recovered.compatible[0];
-    const assessed = assessTemplateCompatibility(item);
+    const assessed = assessCurrentGenerationCompatibility(item);
     return emptyResult({
       ok: true,
       code: 'RECOVERED_CREATED_TEMPLATE',

@@ -3,9 +3,9 @@
  *
  * Missing GET fields are never treated as false globally.
  * They may be filled only when identity, safety, and a sanitized
- * creation receipt all match the guarded POST that created rc8eyeqhn2.
+ * creation receipt all match the guarded POST that created that generation.
  *
- * READ-ONLY. GET /v1/templates and GET /v1/templates/rc8eyeqhn2 only.
+ * READ-ONLY. GET /v1/templates and GET /v1/templates/{id} only.
  * Never POST/PATCH/DELETE a template or Pod. Never prints secrets.
  */
 
@@ -38,10 +38,15 @@ import {
 } from './tivvlejoy-runpod-template-readiness.mjs';
 
 export {
+  TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT,
   TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT,
   TRUSTED_TEMPLATE_ID,
+  PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID,
   receiptIsTrusted,
+  receiptIsTrustedCurrent,
+  receiptIsTrustedHistoricalAttempt1,
   receiptMatchesTemplate,
+  selectReceiptForTemplate,
 } from './tivvlejoy-runpod-template-creation-receipt.mjs';
 
 function fieldAbsent(object, key) {
@@ -61,8 +66,8 @@ export function evaluateNormalizationEligibility(
     return { eligible: false, reasons: ['MALFORMED_TEMPLATE'] };
   }
   if (typeof template.id !== 'string' || template.id.trim().length === 0) reasons.push('TEMPLATE_ID_MISSING');
-  if (template.name !== SUGGESTED_TEMPLATE_NAME) reasons.push('NAME_MISMATCH');
-  if (template.imageName !== REQUIRED_IMAGE_NAME) reasons.push('IMAGE_MISMATCH');
+  if (template.name !== receipt.name) reasons.push('NAME_MISMATCH');
+  if (template.imageName !== receipt.imageName) reasons.push('IMAGE_MISMATCH');
   if (template.category !== 'NVIDIA') reasons.push('CATEGORY_NOT_NVIDIA');
 
   const keys = envKeyNames(template.env);
@@ -303,15 +308,20 @@ export async function auditNormalizedTemplateReadiness({
     assessFn,
   });
 
-  if (!listed.ok && !['TEMPLATE_REQUIRED', 'AMBIGUOUS_TEMPLATE_MATCH', 'INCOMPATIBLE'].includes(listed.code)) {
+  if (
+    !listed.ok &&
+    !['TEMPLATE_REQUIRED', 'AMBIGUOUS_TEMPLATE_MATCH', 'DUPLICATE_TEMPLATE_IDENTITY', 'INCOMPATIBLE'].includes(
+      listed.code,
+    )
+  ) {
     return emptyNormalizedResult({
       ...listed,
       ...countMethods(recorder),
     });
   }
 
-  if (listed.code === 'AMBIGUOUS_TEMPLATE_MATCH') {
-    say('NORMALIZED AUDIT: AMBIGUOUS_TEMPLATE_MATCH');
+  if (listed.code === 'AMBIGUOUS_TEMPLATE_MATCH' || listed.code === 'DUPLICATE_TEMPLATE_IDENTITY') {
+    say(`NORMALIZED AUDIT: ${listed.code}`);
     return emptyNormalizedResult({
       ...listed,
       ...countMethods(recorder),

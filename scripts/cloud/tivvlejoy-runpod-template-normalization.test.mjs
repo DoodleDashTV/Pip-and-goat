@@ -15,12 +15,18 @@ import {
 } from './tivvlejoy-runpod-template-readiness.mjs';
 import {
   FORBIDDEN_RECEIPT_KEYS,
+  HISTORICAL_ATTEMPT_1_IMAGE_NAME,
+  HISTORICAL_ATTEMPT_1_TEMPLATE_ID,
+  HISTORICAL_ATTEMPT_1_TEMPLATE_NAME,
+  TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT,
   TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT,
   TRUSTED_TEMPLATE_ID,
   buildSanitizedExpectedCreatePayload,
   hashSanitizedCreatePayload,
   receiptContainsForbiddenKeys,
   receiptIsTrusted,
+  receiptIsTrustedCurrent,
+  receiptIsTrustedHistoricalAttempt1,
   receiptMatchesTemplate,
 } from './tivvlejoy-runpod-template-creation-receipt.mjs';
 import {
@@ -100,7 +106,7 @@ describe('A. fully populated compatible response', () => {
   });
 });
 
-describe('B. real RunPod-normalized shape for rc8eyeqhn2', () => {
+describe('B. real RunPod-normalized shape for the current trusted template', () => {
   it('passes only with the trusted creation receipt', () => {
     const result = assessTemplateCompatibilityWithProvenance(runpodNormalizedShape());
     assert.equal(result.compatible, true);
@@ -368,7 +374,9 @@ describe('S. mutation tripwire remains intact', () => {
 describe('receipt provenance is sanitized and deterministic', () => {
   it('contains only public create-contract fields', () => {
     assert.equal(receiptIsTrusted(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT), true);
-    assert.equal(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.templateId, 'rc8eyeqhn2');
+    assert.equal(receiptIsTrustedCurrent(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT), true);
+    assert.equal(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.templateId, TRUSTED_TEMPLATE_ID);
+    assert.equal(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.templateId !== 'rc8eyeqhn2', true);
     assert.equal(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.createHttpStatus, 201);
     assert.equal(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.requestedIsPublic, false);
     assert.equal(TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.requestedIsServerless, false);
@@ -385,6 +393,62 @@ describe('receipt provenance is sanitized and deterministic', () => {
     assert.equal(receiptMatchesTemplate(runpodNormalizedShape()), true);
     assert.equal(receiptMatchesTemplate(runpodNormalizedShape({ id: 'nope' })), false);
     assert.equal(receiptIsTrusted({ ...TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT, requestedIsPublic: true }), false);
+  });
+});
+
+describe('generation-isolated receipts', () => {
+  function historicalShape(overrides = {}) {
+    return {
+      category: 'NVIDIA',
+      containerDiskInGb: 50,
+      id: HISTORICAL_ATTEMPT_1_TEMPLATE_ID,
+      imageName: HISTORICAL_ATTEMPT_1_IMAGE_NAME,
+      name: HISTORICAL_ATTEMPT_1_TEMPLATE_NAME,
+      startJupyter: true,
+      startSsh: true,
+      volumeMountPath: '/workspace',
+      ...overrides,
+    };
+  }
+
+  it('keeps the historical attempt #1 receipt valid only for rc8eyeqhn2', () => {
+    assert.equal(receiptIsTrustedHistoricalAttempt1(TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT), true);
+    assert.equal(receiptIsTrusted(TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT), true);
+    assert.equal(receiptIsTrustedCurrent(TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT), false);
+    assert.equal(
+      receiptMatchesTemplate(historicalShape(), TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT),
+      true,
+    );
+    const historical = assessTemplateCompatibilityWithProvenance(historicalShape(), {
+      receipt: TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT,
+    });
+    assert.equal(historical.provenanceMatched, true);
+    assert.equal(historical.compatible, false);
+    assert.equal(historical.reasons.includes('IMAGE_MISMATCH'), true);
+    assert.equal(historical.reasons.includes('HISTORICAL_IMAGE_DIGEST'), true);
+  });
+
+  it('does not let the new receipt validate the old template', () => {
+    assert.equal(receiptMatchesTemplate(historicalShape(), TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT), false);
+    const result = assessTemplateCompatibilityWithProvenance(historicalShape(), {
+      receipt: TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT,
+    });
+    assert.equal(result.compatible, false);
+    assert.equal(result.provenanceMatched, false);
+    assert.equal(result.normalizationApplied, false);
+  });
+
+  it('does not let the old receipt validate the new template', () => {
+    assert.equal(
+      receiptMatchesTemplate(runpodNormalizedShape(), TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT),
+      false,
+    );
+    const result = assessTemplateCompatibilityWithProvenance(runpodNormalizedShape(), {
+      receipt: TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT,
+    });
+    assert.equal(result.compatible, false);
+    assert.equal(result.provenanceMatched, false);
+    assert.equal(result.normalizationApplied, false);
   });
 });
 
@@ -438,6 +502,7 @@ describe('workflow and docs stay read-only', () => {
 
   it('documents the narrow provenance rules', () => {
     assert.match(docs, /rc8eyeqhn2/);
+    assert.match(docs, /b53fcbf5/);
     assert.match(docs, /trusted creation receipt/);
     assert.match(docs, /Do not treat missing booleans as false globally/);
     assert.match(docs, /startSsh/);

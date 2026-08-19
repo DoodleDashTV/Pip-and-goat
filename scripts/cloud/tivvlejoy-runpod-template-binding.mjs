@@ -1,7 +1,7 @@
 /**
  * TivvleJoy approved RunPod template binding and launch dry-run.
  *
- * Binds TEMPLATE_READY template rc8eyeqhn2 to the guarded Pod payload.
+ * Binds the current TEMPLATE_READY worker template to the guarded Pod payload.
  * BUILD AND VALIDATE ONLY. Never POST /v1/pods. Never launches a GPU.
  * Never prints secrets, Authorization headers, or raw worker env values.
  */
@@ -12,6 +12,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID,
+  PAID_SMOKE_ATTEMPT_1_TEMPLATE_NAME,
+  PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE,
+  TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT,
   TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT,
   TRUSTED_TEMPLATE_ID,
   hashSanitizedCreatePayload,
@@ -58,6 +62,18 @@ export const APPROVED_TEMPLATE_BINDING = Object.freeze({
   sanitizedCreatePayloadHash: TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.sanitizedCreatePayloadHash,
   createHttpStatus: TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT.createHttpStatus,
   provenance: APPROVED_TEMPLATE_PROVENANCE,
+});
+
+export const PAID_SMOKE_ATTEMPT_1_TEMPLATE_BINDING = Object.freeze({
+  templateId: PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID,
+  templateName: PAID_SMOKE_ATTEMPT_1_TEMPLATE_NAME,
+  imageName: PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE,
+  imageDigest: TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT.imageName.slice(
+    TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT.imageName.indexOf('sha256:'),
+  ),
+  sanitizedCreatePayloadHash: TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT.sanitizedCreatePayloadHash,
+  createHttpStatus: TIVVLEJOY_HISTORICAL_ATTEMPT_1_TEMPLATE_CREATION_RECEIPT.createHttpStatus,
+  provenance: 'HISTORICAL_PAID_SMOKE_ATTEMPT_1',
 });
 
 function fail(reason, code, extras = {}) {
@@ -141,7 +157,7 @@ export function resolveApprovedTemplateBinding(input = {}) {
 
   const binding = bindings[0];
   if (!binding || binding.templateId !== APPROVED_TEMPLATE_ID || binding.templateName !== APPROVED_TEMPLATE_NAME) {
-    return fail('Approved binding identity does not match rc8eyeqhn2.', 'TEMPLATE_ID_MISMATCH');
+    return fail(`Approved binding identity does not match ${APPROVED_TEMPLATE_ID}.`, 'TEMPLATE_ID_MISMATCH');
   }
 
   const receipt = input.receipt ?? TIVVLEJOY_TRUSTED_TEMPLATE_CREATION_RECEIPT;
