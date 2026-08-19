@@ -22,15 +22,15 @@ export const PURCHASED_TOOL_PACKAGES: readonly PurchasedToolPackage[] = [
   {
     sourceId: 'SRC_BOTANIQ_FULL_7_2_0',
     displayName: 'Botaniq Full',
-    expectedFilename: 'botaniq_full-7.2.0.paq',
-    acceptedFilenameAliases: ['botaniq_full-7.2.0.paq.zip'],
+    expectedFilename: 'botaniq_full-7.2.0.paq.zip',
+    acceptedFilenameAliases: ['botaniq_full-7.2.0.paq'],
     role: 'asset-library',
     version: '7.2.0',
     maxUploadBytes: 8 * GIB,
     minimumReasonableBytes: 1 * GIB,
     activation: 'STORE_ONLY',
     notes:
-      'Main Botaniq Full asset library. The exact Superhive/iPhone .paq.zip wrapper is accepted as an approved alias. Store privately first; do not install or redistribute raw source bytes.',
+      'Main Botaniq Full asset library. The exact Superhive/iPhone .paq.zip wrapper is the visible approved intake filename; the unwrapped .paq name remains an approved alias. Store privately first; do not install or redistribute raw source bytes.',
   },
 
   // Gaffer: current candidate plus the exact historical downloads supplied by Justin.
