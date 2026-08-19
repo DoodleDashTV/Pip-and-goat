@@ -346,12 +346,12 @@ export function PurchasedToolsIphoneIntake() {
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-text-muted)]">Preview only · private R2</p>
         <h1 className="mt-1 font-display text-2xl font-semibold">Purchased Assets — iPhone Upload</h1>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
-          Built for the 5.15 GB Botaniq Full package and the selected Blender tools. Files travel directly from Safari to signed private R2 multipart URLs. They are never committed to GitHub.
+          Built for the large Botaniq package, selected Blender tools, and purchased scenery sources. Files travel directly from Safari to signed private R2 multipart URLs. They are never committed to GitHub.
         </p>
       </div>
 
       <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-3 text-sm leading-6">
-        <strong>For the large Botaniq file:</strong> keep Safari in the foreground and keep the iPhone awake. If iOS interrupts the upload, completed 32 MB chunks remain recorded for up to 72 hours; re-select the exact same file and resume.
+        <strong>For large files:</strong> keep Safari in the foreground and keep the iPhone awake. If iOS interrupts the upload, completed 32 MB chunks remain recorded for up to 72 hours; re-select the exact same file and resume.
       </div>
 
       <label className="block text-sm font-bold">
@@ -370,7 +370,7 @@ export function PurchasedToolsIphoneIntake() {
         <input
           className="field-input mt-1 min-h-11 w-full"
           type="file"
-          accept=".paq,.zip"
+          accept=".paq,.zip,.blend,.fbx,.glb"
           onChange={(event) => selectFile(event.target.files?.[0] ?? null)}
         />
       </label>
@@ -425,7 +425,7 @@ export function PurchasedToolsIphoneIntake() {
       </div>
 
       <p className="text-xs leading-5 text-[var(--color-text-muted)]">
-        Upload does not mean asset approval or plugin activation. Botaniq stays source-immutable; Geo-Scatter remains optional/not integrated; Gaffer and Physical Starlight remain install-later candidates until controlled Blender validation.
+        Upload does not mean asset approval or plugin activation. New mountain and tavern sources remain STORE_ONLY until provenance and controlled inspection complete. Botaniq stays source-immutable; Geo-Scatter remains optional/not integrated; Gaffer and Physical Starlight remain install-later candidates until controlled Blender validation.
       </p>
     </section>
   );
