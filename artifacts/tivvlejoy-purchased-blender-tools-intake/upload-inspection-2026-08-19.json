@@ -1,0 +1,306 @@
+{
+  "checkpoint": "TIVVLEJOY_PURCHASED_BLENDER_TOOLS_UPLOAD_INSPECTION_V1",
+  "inspectedAt": "2026-08-19T13:36:00Z",
+  "policy": {
+    "licensedBytesCommittedToGit": false,
+    "archivesExecuted": false,
+    "archivesExtractedForRuntime": false,
+    "networkUploadPerformed": false,
+    "productionMutation": false
+  },
+  "summary": {
+    "uploadedFileCount": 18,
+    "validZipCount": 17,
+    "invalidDownloadCount": 1,
+    "exactDuplicateGroups": [
+      {
+        "sha256": "35e1998a4e9a812e5b32c49fcd9f2c565c0d2bca8b4d1ee3883cbced60c45c1e",
+        "files": [
+          "physical-starlight-atmosphere-1.8.3.zip",
+          "physical-starlight-atmosphere-1.8.3 2.zip"
+        ]
+      }
+    ]
+  },
+  "activeSelection": {
+    "gaffer": {
+      "filename": "Gaffer 3.2.10 (for b3.4+) - latest.zip",
+      "version": "3.2.10",
+      "blenderMinimum": "3.4.0",
+      "sha256": "a80aa8e593c64059c2f25ed665b6ab4f158cf37e90ebc1456619c78d8f169449"
+    },
+    "physicalStarlightAtmosphere": {
+      "filename": "physical_starlight_atmosphere-1.9.4.zip",
+      "version": "1.9.4",
+      "blenderMinimum": "4.2.0",
+      "sha256": "3b865e63e406f485e9054a8ebaded94a117c3fc4cb25a0d30b1d12cb7d993dd2"
+    },
+    "botaniqGeoScatterBiomes": {
+      "filename": "botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip",
+      "version": "7.1.1",
+      "status": "OPTIONAL_NOT_INTEGRATED",
+      "sha256": "637c316d76c13a1bca59bb7b002e200a1917a12b887097d8b202ce8e62eb8360"
+    },
+    "botaniqFull": {
+      "filename": "botaniq_full-7.2.0.paq.zip",
+      "version": "7.2.0",
+      "status": "REDOWNLOAD_REQUIRED_INVALID_RANGE",
+      "bytes": 135,
+      "sha256": "d85c4e522a1772743361468ed1c4c4e555abb5f7f120a2107e6787f142274e33"
+    }
+  },
+  "files": [
+    {
+      "filename": "physical-starlight-atmosphere-1.5.3.zip",
+      "bytes": 397142,
+      "sha256": "04265685fcc281a19b0a36f8396de5ff44a2c53dd15e332a8077759ac1237a6b",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 14,
+      "uncompressedBytes": 3790979,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "botaniq_full_geoscatter_biomes-7.0.0.scatpack.zip",
+      "bytes": 5598859,
+      "sha256": "aa1e45e772d3a5139ec29085a314a594c8877c3c4d73d141b7408c815b76a8d1",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 503,
+      "uncompressedBytes": 7909476,
+      "family": "BOTANIQ_GEOSCATTER_BIOMES",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "Gaffer 3.1.18 (for b3.2).zip",
+      "bytes": 96117,
+      "sha256": "252778c23bc5c81c234f94e28ca36c15ce0027bcdcaf033905f35b5b5d1ddfcd",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 23,
+      "uncompressedBytes": 408373,
+      "family": "GAFFER",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.1.zip",
+      "bytes": 51409965,
+      "sha256": "25de215d2711d8dccb052620b566f7567f541ad9418ca44eb83eb605a2219b53",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 4,
+      "uncompressedBytes": 52678846,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "Gaffer 3.0.4 (for b2.79).zip",
+      "bytes": 62075,
+      "sha256": "54287bf62ca5de18a47a6d380af8397beaf0f0d5768e8acaad52376ef8e45bfe",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 21,
+      "uncompressedBytes": 248400,
+      "family": "GAFFER",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.7.1.zip",
+      "bytes": 1087978,
+      "sha256": "a9f908e0506c6b64ce2720e28ea646260100a9cce21cdfe9cdd4cd9712f57ddc",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 40,
+      "uncompressedBytes": 10093829,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.3.2.zip",
+      "bytes": 224431,
+      "sha256": "0722fae4bbd6ce905992c998abdd0c8bdfaae37f9d98e38e7b4668fd9ab7c823",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 19,
+      "uncompressedBytes": 1843825,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.8.3.zip",
+      "bytes": 482621,
+      "sha256": "35e1998a4e9a812e5b32c49fcd9f2c565c0d2bca8b4d1ee3883cbced60c45c1e",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 25,
+      "uncompressedBytes": 5147977,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip",
+      "bytes": 5603659,
+      "sha256": "637c316d76c13a1bca59bb7b002e200a1917a12b887097d8b202ce8e62eb8360",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 503,
+      "uncompressedBytes": 7909302,
+      "family": "BOTANIQ_GEOSCATTER_BIOMES",
+      "selection": "active_optional_candidate",
+      "activeCandidate": true,
+      "notes": "Newest uploaded GeoScatter biome pack; optional and not usable without GeoScatter integration.",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.2.3.zip",
+      "bytes": 241130,
+      "sha256": "81a0bdeb33cd7579e225ec82a65a5778458b1845ceb6301daa3e585ae737d1d2",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 12,
+      "uncompressedBytes": 1680095,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical_starlight_atmosphere-1.9.4.zip",
+      "bytes": 33199209,
+      "sha256": "3b865e63e406f485e9054a8ebaded94a117c3fc4cb25a0d30b1d12cb7d993dd2",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 32,
+      "uncompressedBytes": 148115085,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "active_candidate",
+      "activeCandidate": true,
+      "notes": "Latest uploaded PSA; Blender extension manifest version 1.9.4, Blender minimum 4.2.0.",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.4.4beta.zip",
+      "bytes": 389256,
+      "sha256": "479f1db46d5cd7a93782fcb22fbcdf8123c04cb82fa8cfa379d304dcb7744998",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 18,
+      "uncompressedBytes": 3763038,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "Gaffer 3.2.10 (for b3.4+) - latest.zip",
+      "bytes": 214512,
+      "sha256": "a80aa8e593c64059c2f25ed665b6ab4f158cf37e90ebc1456619c78d8f169449",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 35,
+      "uncompressedBytes": 542745,
+      "family": "GAFFER",
+      "selection": "active_candidate",
+      "activeCandidate": true,
+      "notes": "Latest uploaded Gaffer; package metadata version 3.2.10, Blender minimum 3.4.0.",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "Gaffer 3.1.5 (for b2.8).zip",
+      "bytes": 93361,
+      "sha256": "e6d6982bdeb435f744cc391451fff5c760cc68eb1a6bb54e1a2558d06c2e0459",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 23,
+      "uncompressedBytes": 381910,
+      "family": "GAFFER",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.9.2.zip",
+      "bytes": 33507421,
+      "sha256": "af636b7d99d36419ec7a692b4c592b733f76a46cb26e9d0ad0a61bf8418e3ad5",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 34,
+      "uncompressedBytes": 148114629,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.6.1.zip",
+      "bytes": 399678,
+      "sha256": "6f15cc4e33e35c1768211600fa7956996ee94848ee3bb3847ea3445f43e1c73d",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 14,
+      "uncompressedBytes": 3927022,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "legacy_version",
+      "activeCandidate": false,
+      "notes": "",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "physical-starlight-atmosphere-1.8.3 2.zip",
+      "bytes": 482621,
+      "sha256": "35e1998a4e9a812e5b32c49fcd9f2c565c0d2bca8b4d1ee3883cbced60c45c1e",
+      "archiveStatus": "VALID_ARCHIVE",
+      "entryCount": 25,
+      "uncompressedBytes": 5147977,
+      "family": "PHYSICAL_STARLIGHT_ATMOSPHERE",
+      "selection": "duplicate_version",
+      "activeCandidate": false,
+      "notes": "Byte-identical duplicate of physical-starlight-atmosphere-1.8.3.zip.",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    },
+    {
+      "filename": "botaniq_full-7.2.0.paq.zip",
+      "bytes": 135,
+      "sha256": "d85c4e522a1772743361468ed1c4c4e555abb5f7f120a2107e6787f142274e33",
+      "archiveStatus": "INVALID_DOWNLOAD",
+      "entryCount": null,
+      "uncompressedBytes": null,
+      "family": "BOTANIQ_FULL",
+      "selection": "required_main_asset_pack",
+      "activeCandidate": true,
+      "notes": "135-byte XML error payload, not a ZIP/PAQ asset package; server returned InvalidRange.",
+      "archivePathTraversalFindings": 0,
+      "archiveSymlinkFindings": 0
+    }
+  ]
+}
