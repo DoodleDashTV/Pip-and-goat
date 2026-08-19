@@ -140,6 +140,33 @@ describe('dependency graph and blockers', () => {
     ).toBe('VERSION_MISMATCH');
   });
 
+  it('reports missing environment version and hash without pretending the source is missing', () => {
+    expect(
+      resolveAssetSlot({
+        slotId: 'ver',
+        semanticRole: 'PATH',
+        qualityTier: 'SUPPORTING',
+        required: true,
+        visibilityClass: 'SUPPORTING',
+        sourceReceiptRef: 'r',
+        sourceSha256: 'aa'.repeat(32),
+        approvalStatus: 'approved',
+      }).blocker,
+    ).toBe('MISSING_ENVIRONMENT_VERSION');
+    expect(
+      resolveAssetSlot({
+        slotId: 'hash',
+        semanticRole: 'PATH',
+        qualityTier: 'SUPPORTING',
+        required: true,
+        visibilityClass: 'SUPPORTING',
+        sourceReceiptRef: 'r',
+        sourceVersion: 'v',
+        approvalStatus: 'approved',
+      }).blocker,
+    ).toBe('MISSING_ENVIRONMENT_HASH');
+  });
+
   it('blocks a hash mismatch', () => {
     expect(
       resolveAssetSlot({

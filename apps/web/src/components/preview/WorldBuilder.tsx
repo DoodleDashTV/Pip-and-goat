@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { PreviewPageIntro } from './PreviewEmptyState';
 import {
@@ -73,6 +74,11 @@ export function WorldBuilder() {
           PLANNING ONLY / NO BLENDER EXECUTION / BOTANIQ NOT ACTIVATED / PURCHASE DEFAULT = NO
         </p>
         <p className="text-2xl font-bold">SCENERY PURCHASE REQUIRED: {gap.purchaseRequired}</p>
+        <p className="text-sm">
+          <Link href="/world-builder/assets" className="font-bold underline">
+            Approved Asset Registry diagnostics
+          </Link>
+        </p>
         {gap.missingSemanticRole ? <p className="text-sm">Missing semantic role: {gap.missingSemanticRole}</p> : null}
       </section>
 
