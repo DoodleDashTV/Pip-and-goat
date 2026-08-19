@@ -42,6 +42,7 @@
     "validate:world-builder": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-world-builder.test.ts src/lib/tivvlejoy-blender-execution-readiness.test.ts src/lib/tivvlejoy-blender-assembly-driver.test.ts src/lib/tivvlejoy-shot-assembly-manifest.test.ts src/lib/tivvlejoy-episode-scene-planner.test.ts src/lib/tivvlejoy-storybook-preview-validation.test.ts src/lib/tivvlejoy-storybook-environment.test.ts",
     "validate:approved-asset-registry": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-approved-asset-registry.test.ts",
     "validate:approved-asset-bridge": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-approved-asset-registry.test.ts src/lib/tivvlejoy-world-builder.test.ts src/lib/tivvlejoy-shot-assembly-manifest.test.ts",
+    "validate:scenery-longevity": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-scenery-longevity.test.ts src/lib/tivvlejoy-world-builder.test.ts src/lib/tivvlejoy-approved-asset-registry.test.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
