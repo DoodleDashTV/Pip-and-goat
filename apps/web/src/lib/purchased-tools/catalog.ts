@@ -1,6 +1,7 @@
 export const PURCHASED_TOOL_UPLOAD_VERSION = 'TIVVLEJOY_IPHONE_LARGE_PURCHASED_ASSETS_UPLOAD_V1';
 
 export type PurchasedToolRole = 'asset-library' | 'addon' | 'optional-companion';
+export type PurchasedToolActivation = 'STORE_ONLY' | 'INSTALL_LATER' | 'OPTIONAL_NOT_INTEGRATED';
 
 export type PurchasedToolPackage = {
   sourceId: string;
@@ -11,7 +12,7 @@ export type PurchasedToolPackage = {
   version: string;
   maxUploadBytes: number;
   minimumReasonableBytes: number;
-  activation: 'STORE_ONLY' | 'INSTALL_LATER' | 'OPTIONAL_NOT_INTEGRATED';
+  activation: PurchasedToolActivation;
   notes: string;
 };
 

@@ -132,6 +132,15 @@ export function PreviewDashboard({ snapshot }: { snapshot: SafePersistenceSnapsh
           Open Scenery
         </Link>
       </section>
+      <section className="studio-card p-4 sm:p-5">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Asset Library Audit</h2>
+        <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
+          Read-only catalog and receipt reconciliation. Uploaded is not usable.
+        </p>
+        <Link href="/purchased-assets/audit" className="btn-primary mt-4 w-full px-4 text-sm sm:w-auto">
+          Open Asset Audit
+        </Link>
+      </section>
     </div>
   );
 }
