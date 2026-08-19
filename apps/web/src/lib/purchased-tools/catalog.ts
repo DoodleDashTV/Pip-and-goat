@@ -6,6 +6,7 @@ export type PurchasedToolPackage = {
   sourceId: string;
   displayName: string;
   expectedFilename: string;
+  acceptedFilenameAliases?: readonly string[];
   role: PurchasedToolRole;
   version: string;
   maxUploadBytes: number;
@@ -22,12 +23,14 @@ export const PURCHASED_TOOL_PACKAGES: readonly PurchasedToolPackage[] = [
     sourceId: 'SRC_BOTANIQ_FULL_7_2_0',
     displayName: 'Botaniq Full',
     expectedFilename: 'botaniq_full-7.2.0.paq',
+    acceptedFilenameAliases: ['botaniq_full-7.2.0.paq.zip'],
     role: 'asset-library',
     version: '7.2.0',
     maxUploadBytes: 8 * GIB,
     minimumReasonableBytes: 1 * GIB,
     activation: 'STORE_ONLY',
-    notes: 'Main Botaniq Full asset library. Store privately first; do not install or redistribute raw source bytes.',
+    notes:
+      'Main Botaniq Full asset library. The exact Superhive/iPhone .paq.zip wrapper is accepted as an approved alias. Store privately first; do not install or redistribute raw source bytes.',
   },
   {
     sourceId: 'SRC_GAFFER_3_2_10',
@@ -65,7 +68,13 @@ export const PURCHASED_TOOL_PACKAGES: readonly PurchasedToolPackage[] = [
 ] as const;
 
 export function findPurchasedToolPackageByFilename(filename: string): PurchasedToolPackage | null {
-  return PURCHASED_TOOL_PACKAGES.find((item) => item.expectedFilename === filename) ?? null;
+  return (
+    PURCHASED_TOOL_PACKAGES.find(
+      (item) =>
+        item.expectedFilename === filename ||
+        (item.acceptedFilenameAliases ?? []).includes(filename),
+    ) ?? null
+  );
 }
 
 export function getPurchasedToolPackage(sourceId: string): PurchasedToolPackage {
