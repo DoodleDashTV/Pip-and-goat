@@ -1,7 +1,12 @@
 import { sha256Canonical } from '@/lib/tivvlejoy-storybook-environment';
+import type { ApprovedAssetRegistry } from '@/lib/tivvlejoy-approved-asset-registry/types';
+import { resolveWorldBuilderEnvironmentAssets } from '@/lib/tivvlejoy-approved-asset-registry/bridge';
 import type { BuiltEnvironment } from './engine';
 
-export function shotAssemblyEnvironmentAdapter(env: BuiltEnvironment) {
+export function shotAssemblyEnvironmentAdapter(
+  env: BuiltEnvironment,
+  context?: { registry?: ApprovedAssetRegistry; resolverVersion?: string },
+) {
   const slots = env.vegetation.roles.map((role, index) => ({
     slotId: `${env.input.archetypeId}_${role}`,
     semanticRole: role,
@@ -32,6 +37,9 @@ export function shotAssemblyEnvironmentAdapter(env: BuiltEnvironment) {
       weather: env.weather.weather,
     }),
     materialized: false,
+    approvedResolution: context?.registry
+      ? resolveWorldBuilderEnvironmentAssets(env, context.registry)
+      : null,
   };
 }
 
