@@ -1,7 +1,7 @@
 import { sha256Canonical } from './hash';
 import { EXISTING_LOCATIONS } from '@/lib/tivvlejoy-world-builder/types';
-import { hashContinuityFact, type ContinuityFact } from './continuity';
-import { SEASON_SIMULATION_SCHEMA, type VoiceReceipt } from './types';
+import { hashContinuityFact } from './continuity';
+import { SEASON_SIMULATION_SCHEMA, type ContinuityFact, type VoiceReceipt } from './types';
 
 const LOCATIONS = [...EXISTING_LOCATIONS, 'new_meadow', 'new_overlook'] as const;
 const SEASONS = ['SPRING', 'SUMMER', 'AUTUMN', 'WINTER'] as const;

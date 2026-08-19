@@ -2,7 +2,8 @@ import { sampleEpisodeWithKnownHashes } from '@/lib/tivvlejoy-episode-scene-plan
 import { assembleShot } from '@/lib/tivvlejoy-shot-assembly-manifest';
 import { ep012AssemblyInputs } from '@/lib/tivvlejoy-shot-assembly-manifest/fixture';
 import { compileEpisodeProductionPacket } from './packet';
-import { hashContinuityFact, type ContinuityFact } from './continuity';
+import { hashContinuityFact } from './continuity';
+import type { ContinuityFact } from './types';
 import type { VoiceReceipt } from './types';
 
 export function ep012VoiceReceipts(): VoiceReceipt[] {
@@ -26,7 +27,7 @@ export function ep012ContinuityFacts(): ContinuityFact[] {
     { continuityFactId: 'FACT_WEATHER_BAKERY', continuityVersion: '1', topic: 'WEATHER', subjectId: 'bakery', state: 'CLEAR', effectiveEpisode: 'EP012', effectiveShot: 'SH001', source: 'world-builder' },
     { continuityFactId: 'FACT_ENTRY', continuityVersion: '1', topic: 'SCREEN_DIRECTION', subjectId: 'GOAT', state: 'ENTER_RIGHT', effectiveEpisode: 'EP012', effectiveShot: 'SH002', source: 'planner' },
   ];
-  return drafts.map((fact) => ({ ...fact, dependencySha256: hashContinuityFact({ ...fact, dependencySha256: '' }) }));
+  return drafts.map((fact) => ({ ...fact, dependencySha256: hashContinuityFact(fact) }));
 }
 
 export function compileEp012ProductionPacket() {

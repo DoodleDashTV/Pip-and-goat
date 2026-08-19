@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { evaluateEpisodeQc } from './tivvlejoy-production-studio/qc';
+import { evaluateEpisodeQc, type EpisodeQcInput } from './tivvlejoy-production-studio/qc';
 import { QC_PROFILES } from './tivvlejoy-production-studio/types';
 
-function complete(overrides: Parameters<typeof evaluateEpisodeQc>[0] = { episodeId: 'EP012' }) {
-  return evaluateEpisodeQc({
+function complete(overrides: Partial<EpisodeQcInput> = {}) {
+  const base: EpisodeQcInput = {
     episodeId: 'EP012',
     profileId: 'SHORT_60',
     width: 1080,
@@ -30,8 +30,8 @@ function complete(overrides: Parameters<typeof evaluateEpisodeQc>[0] = { episode
     characterRigVersion: 'PIP_V1',
     renderManifestMatch: true,
     deliveryManifestMatch: true,
-    ...overrides,
-  });
+  };
+  return evaluateEpisodeQc({ ...base, ...overrides });
 }
 
 describe('episode QC', () => {

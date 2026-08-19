@@ -41,6 +41,8 @@ export function factKey(topic: string, subjectId: string): string {
   return `${topic}::${subjectId}`;
 }
 
+export type { ContinuityFact };
+
 export function hashContinuityFact(input: Omit<ContinuityFact, 'dependencySha256'>): string {
   return sha256Canonical({
     id: input.continuityFactId,

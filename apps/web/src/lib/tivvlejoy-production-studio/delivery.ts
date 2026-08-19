@@ -83,7 +83,9 @@ export function compileDeliveryPackage(input: DeliveryPackageInput): DeliveryPac
     episodeNumber: input.episodeNumber,
     seasonNumber: input.seasonNumber,
     thumbnailRequirement: '1080x1920 cover still with title-safe margin',
-    futurePlatformSlots: ['YOUTUBE_SHORTS', 'TIKTOK', 'INSTAGRAM_REELS'] as const,
+    futurePlatformSlots: ['YOUTUBE_SHORTS', 'TIKTOK', 'INSTAGRAM_REELS'] as Array<
+      'YOUTUBE_SHORTS' | 'TIKTOK' | 'INSTAGRAM_REELS'
+    >,
     deliveryFiles: ['video.mp4', 'audio.wav', 'captions.vtt', 'thumbnail.jpg', 'delivery-manifest.json'],
     readiness,
     autoPublished: false as const,

@@ -5,9 +5,9 @@ import {
   evaluateContinuity,
   hashContinuityFact,
   latestFact,
-  type ContinuityFact,
 } from './tivvlejoy-production-studio/continuity';
 import { ep012ContinuityFacts } from './tivvlejoy-production-studio/fixtures';
+import type { ContinuityFact } from './tivvlejoy-production-studio/types';
 
 function fact(partial: Omit<ContinuityFact, 'dependencySha256'> & { dependencySha256?: string }): ContinuityFact {
   return { ...partial, dependencySha256: partial.dependencySha256 || hashContinuityFact(partial) };
