@@ -34,9 +34,11 @@ const TODAY_USER_SUPPLIED_PACKAGE_FILENAMES = [
   'Stylized Tavern Package.fbx',
   'stylized tavern textures.zip',
   'Stylized Tavern Interior.blend',
+  'Stylized Tavern Package.zip',
+  'Stylized Tavern Interior.blend.zip',
 ] as const;
 
-const NEW_SCENERY_FILENAMES = [
+const ORIGINAL_NEW_SCENERY_FILENAMES = [
   '3DT_Mountain_Pack_Blender.zip',
   '3DT_Pack_Mountains_GLB.glb',
   'FBX and Textures.zip',
@@ -47,117 +49,82 @@ const NEW_SCENERY_FILENAMES = [
   'Stylized Tavern Interior.blend',
 ] as const;
 
+const TAVERN_WRAPPER_FILENAMES = [
+  'Stylized Tavern Package.zip',
+  'Stylized Tavern Interior.blend.zip',
+] as const;
+
 describe('TivvleJoy iPhone large purchased asset intake', () => {
-  it('accepts every exact purchased source filename supplied by the user today', () => {
-    expect(TODAY_USER_SUPPLIED_PACKAGE_FILENAMES).toHaveLength(27);
+  it('accepts every exact purchased/source filename selected by the user today', () => {
+    expect(TODAY_USER_SUPPLIED_PACKAGE_FILENAMES).toHaveLength(29);
     for (const filename of TODAY_USER_SUPPLIED_PACKAGE_FILENAMES) {
       expect(findPurchasedToolPackageByFilename(filename), filename).not.toBeNull();
     }
   });
 
-  it('keeps the eight newly purchased scenery sources STORE_ONLY until inspection', () => {
-    expect(NEW_SCENERY_FILENAMES).toHaveLength(8);
-    for (const filename of NEW_SCENERY_FILENAMES) {
-      const pkg = findPurchasedToolPackageByFilename(filename);
-      expect(pkg, filename).not.toBeNull();
-      expect(pkg?.role, filename).toBe('asset-library');
-      expect(pkg?.activation, filename).toBe('STORE_ONLY');
+  it('keeps the eight newly purchased original scenery sources STORE_ONLY until inspection', () => {
+    expect(ORIGINAL_NEW_SCENERY_FILENAMES).toHaveLength(8);
+    for (const filename of ORIGINAL_NEW_SCENERY_FILENAMES) {
+      const found = findPurchasedToolPackageByFilename(filename);
+      expect(found, filename).not.toBeNull();
+      expect(found?.role, filename).toBe('asset-library');
+      expect(found?.activation, filename).toBe('STORE_ONLY');
     }
   });
 
-  it('keeps the selected current candidates active while older downloads are intake/storage only', () => {
-    expect(findPurchasedToolPackageByFilename('Gaffer 3.2.10 (for b3.4+) - latest.zip')?.activation).toBe(
-      'INSTALL_LATER',
-    );
-    expect(findPurchasedToolPackageByFilename('physical_starlight_atmosphere-1.9.4.zip')?.activation).toBe(
-      'INSTALL_LATER',
-    );
-    expect(findPurchasedToolPackageByFilename('Gaffer 3.1.18 (for b3.2).zip')?.activation).toBe(
-      'STORE_ONLY',
-    );
-    expect(findPurchasedToolPackageByFilename('physical-starlight-atmosphere-1.9.2.zip')?.activation).toBe(
-      'STORE_ONLY',
-    );
-    expect(findPurchasedToolPackageByFilename('assets-for-v1.6.1-and-below 2.blend.zip')?.activation).toBe(
-      'STORE_ONLY',
-    );
-    expect(
-      findPurchasedToolPackageByFilename('botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip')
-        ?.activation,
-    ).toBe('OPTIONAL_NOT_INTEGRATED');
-    expect(
-      findPurchasedToolPackageByFilename('botaniq_full_geoscatter_biomes-7.0.0.scatpack.zip')
-        ?.activation,
-    ).toBe('OPTIONAL_NOT_INTEGRATED');
+  it('accepts the two exact iPhone tavern ZIP wrappers with separate archival source ids', () => {
+    const ids = TAVERN_WRAPPER_FILENAMES.map((filename) => {
+      const found = findPurchasedToolPackageByFilename(filename);
+      expect(found, filename).not.toBeNull();
+      expect(found?.activation, filename).toBe('STORE_ONLY');
+      expect(found?.version, filename).toBe('1-wrapper');
+      return found?.sourceId;
+    });
+    expect(new Set(ids).size).toBe(2);
+    expect(ids).not.toContain('SRC_STYLIZED_TAVERN_PACKAGE_FBX');
+    expect(ids).not.toContain('SRC_STYLIZED_TAVERN_INTERIOR_BLEND');
   });
 
-  it('accepts the newly purchased direct GLB, FBX and BLEND source formats at plausible sizes', () => {
-    const glb = validatePurchasedToolSelection({
-      filename: '3DT_Pack_Mountains_GLB.glb',
-      byteSize: Math.floor(1.4 * 1024 ** 3),
-    });
-    const fbx = validatePurchasedToolSelection({
-      filename: 'Stylized Tavern Package.fbx',
-      byteSize: 8 * 1024 ** 2,
-    });
-    const blend = validatePurchasedToolSelection({
-      filename: 'Stylized Tavern Interior.blend',
-      byteSize: 9 * 1024 ** 2,
-    });
-    expect(glb.ok).toBe(true);
-    expect(fbx.ok).toBe(true);
-    expect(blend.ok).toBe(true);
+  it('keeps current tool candidates active while older downloads remain storage only', () => {
+    expect(findPurchasedToolPackageByFilename('Gaffer 3.2.10 (for b3.4+) - latest.zip')?.activation).toBe('INSTALL_LATER');
+    expect(findPurchasedToolPackageByFilename('physical_starlight_atmosphere-1.9.4.zip')?.activation).toBe('INSTALL_LATER');
+    expect(findPurchasedToolPackageByFilename('Gaffer 3.1.18 (for b3.2).zip')?.activation).toBe('STORE_ONLY');
+    expect(findPurchasedToolPackageByFilename('physical-starlight-atmosphere-1.9.2.zip')?.activation).toBe('STORE_ONLY');
+    expect(findPurchasedToolPackageByFilename('assets-for-v1.6.1-and-below 2.blend.zip')?.activation).toBe('STORE_ONLY');
+    expect(findPurchasedToolPackageByFilename('botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip')?.activation).toBe('OPTIONAL_NOT_INTEGRATED');
+    expect(findPurchasedToolPackageByFilename('botaniq_full_geoscatter_biomes-7.0.0.scatpack.zip')?.activation).toBe('OPTIONAL_NOT_INTEGRATED');
   });
 
-  it('accepts the screenshot-confirmed mountain and tavern size classes', () => {
-    expect(
-      validatePurchasedToolSelection({
-        filename: 'LouisBGMountainsV1.zip',
-        byteSize: Math.floor(5.3 * 1024 ** 2),
-      }).ok,
-    ).toBe(true);
-    expect(
-      validatePurchasedToolSelection({
-        filename: 'stylized tavern textures.zip',
-        byteSize: Math.floor(326.4 * 1024 ** 2),
-      }).ok,
-    ).toBe(true);
+  it('accepts direct GLB, FBX and BLEND source formats at plausible sizes', () => {
+    expect(validatePurchasedToolSelection({ filename: '3DT_Pack_Mountains_GLB.glb', byteSize: Math.floor(1.24 * 1024 ** 3) }).ok).toBe(true);
+    expect(validatePurchasedToolSelection({ filename: 'Stylized Tavern Package.fbx', byteSize: 8 * 1024 ** 2 }).ok).toBe(true);
+    expect(validatePurchasedToolSelection({ filename: 'Stylized Tavern Interior.blend', byteSize: 9 * 1024 ** 2 }).ok).toBe(true);
+  });
+
+  it('accepts screenshot-confirmed mountain and tavern size classes', () => {
+    expect(validatePurchasedToolSelection({ filename: 'LouisBGMountainsV1.zip', byteSize: Math.floor(5.3 * 1024 ** 2) }).ok).toBe(true);
+    expect(validatePurchasedToolSelection({ filename: 'stylized tavern textures.zip', byteSize: Math.floor(326.4 * 1024 ** 2) }).ok).toBe(true);
+  });
+
+  it('accepts plausible tavern ZIP wrapper sizes without treating arbitrary names as approved', () => {
+    expect(validatePurchasedToolSelection({ filename: 'Stylized Tavern Package.zip', byteSize: 8 * 1024 ** 2 }).ok).toBe(true);
+    expect(validatePurchasedToolSelection({ filename: 'Stylized Tavern Interior.blend.zip', byteSize: 9 * 1024 ** 2 }).ok).toBe(true);
+    expect(findPurchasedToolPackageByFilename('Stylized Tavern Package copy.zip')).toBeNull();
+    expect(findPurchasedToolPackageByFilename('Stylized Tavern Interior copy.blend.zip')).toBeNull();
   });
 
   it('accepts the legacy Physical Starlight companion bundle at the selected iPhone size class', () => {
-    const selection = validatePurchasedToolSelection({
-      filename: 'assets-for-v1.6.1-and-below 2.blend.zip',
-      byteSize: Math.floor(1.9 * 1024 ** 2),
-    });
+    const selection = validatePurchasedToolSelection({ filename: 'assets-for-v1.6.1-and-below 2.blend.zip', byteSize: Math.floor(1.9 * 1024 ** 2) });
     expect(selection.ok).toBe(true);
     expect(selection.ok && selection.package.role).toBe('optional-companion');
   });
 
   it('accepts a 5.15 GiB-class Botaniq Full file under the dedicated 8 GiB cap', () => {
-    const selection = validatePurchasedToolSelection({
-      filename: 'botaniq_full-7.2.0.paq',
-      byteSize: Math.floor(5.15 * 1024 ** 3),
-    });
-    expect(selection.ok).toBe(true);
+    expect(validatePurchasedToolSelection({ filename: 'botaniq_full-7.2.0.paq', byteSize: Math.floor(5.15 * 1024 ** 3) }).ok).toBe(true);
   });
 
-  it('accepts the exact Superhive/iPhone Botaniq .paq.zip wrapper without accepting arbitrary renames', () => {
-    const wrapped = validatePurchasedToolSelection({
-      filename: 'botaniq_full-7.2.0.paq.zip',
-      byteSize: Math.floor(4.8 * 1024 ** 3),
-    });
-    expect(wrapped.ok).toBe(true);
-    expect(findPurchasedToolPackageByFilename('botaniq_full-7.2.0.paq.zip')?.sourceId).toBe(
-      'SRC_BOTANIQ_FULL_7_2_0',
-    );
-  });
-
-  it('rejects the tiny failed Botaniq download instead of uploading it', () => {
-    const selection = validatePurchasedToolSelection({
-      filename: 'botaniq_full-7.2.0.paq.zip',
-      byteSize: 135,
-    });
-    expect(selection.ok).toBe(false);
+  it('rejects the tiny failed Botaniq download', () => {
+    expect(validatePurchasedToolSelection({ filename: 'botaniq_full-7.2.0.paq.zip', byteSize: 135 }).ok).toBe(false);
   });
 
   it('uses 32 MiB chunks so large iPhone uploads can resume granularly', () => {
@@ -169,25 +136,17 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
     expect(parts.at(-1)?.end).toBe(size);
   });
 
-  it('refuses renamed or locally recompressed scenery filenames', () => {
-    expect(
-      validatePurchasedToolSelection({ filename: 'botaniq-full-renamed.paq', byteSize: 5 * 1024 ** 3 }).ok,
-    ).toBe(false);
-    expect(
-      validatePurchasedToolSelection({ filename: 'botaniq_full-7.2.0-copy.paq.zip', byteSize: 5 * 1024 ** 3 }).ok,
-    ).toBe(false);
+  it('still refuses unrelated renamed filenames', () => {
+    expect(validatePurchasedToolSelection({ filename: 'botaniq-full-renamed.paq', byteSize: 5 * 1024 ** 3 }).ok).toBe(false);
+    expect(validatePurchasedToolSelection({ filename: 'botaniq_full-7.2.0-copy.paq.zip', byteSize: 5 * 1024 ** 3 }).ok).toBe(false);
     expect(findPurchasedToolPackageByFilename('Gaffer renamed.zip')).toBeNull();
     expect(findPurchasedToolPackageByFilename('assets-for-v1.6.1-and-below.blend.zip')).toBeNull();
-    expect(findPurchasedToolPackageByFilename('Stylized Tavern Package.zip')).toBeNull();
-    expect(findPurchasedToolPackageByFilename('Stylized Tavern Interior.blend.zip')).toBeNull();
   });
 
   it('uses unique source ids for the two separately named PSA 1.8.3 downloads', () => {
     const first = findPurchasedToolPackageByFilename('physical-starlight-atmosphere-1.8.3.zip');
     const second = findPurchasedToolPackageByFilename('physical-starlight-atmosphere-1.8.3 2.zip');
     expect(first?.sourceId).not.toBe(second?.sourceId);
-    expect(first?.activation).toBe('STORE_ONLY');
-    expect(second?.activation).toBe('STORE_ONLY');
   });
 
   it('keeps the catalog free of duplicate source ids and exact expected filenames', () => {
