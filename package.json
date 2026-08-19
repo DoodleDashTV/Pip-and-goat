@@ -33,6 +33,7 @@
     "validate:scenery-pipeline-hardening": "pnpm --filter @doodle-dash/web exec vitest run src/lib/scenery-pipeline-hardening.test.ts && pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/validate-scenery-pipeline-hardening.ts",
     "validate:scenery-14-file-inspection": "pnpm --filter @doodle-dash/web exec vitest run src/lib/scenery-file-inspection.test.ts src/lib/scenery-intake.test.ts src/lib/scenery-pipeline-hardening.test.ts src/lib/scenery-intake-preview.test.ts src/lib/scenery.test.ts && pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/validate-scenery-14-file-inspection.ts",
     "validate:scenery-blender-inspection": "pnpm --filter @doodle-dash/web exec vitest run src/lib/scenery-blender-inspection.test.ts src/lib/scenery-file-inspection.test.ts",
+    "validate:storybook-environment": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-storybook-environment.test.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
