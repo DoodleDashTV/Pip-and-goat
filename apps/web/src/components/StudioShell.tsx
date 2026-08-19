@@ -21,6 +21,7 @@ const PRIMARY_NAV = [
   { href: '/world-builder', label: 'World Builder' },
   { href: '/world-builder/assets', label: 'Approved Assets' },
   { href: '/world-builder/longevity', label: 'Scenery Longevity' },
+  { href: '/production-control', label: 'Production Control' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
   { href: '/render-queue', label: 'Render Queue' },

@@ -36,6 +36,10 @@ export function SceneryLongevityPreview() {
           <Link href="/world-builder/assets" className="font-bold underline">
             Approved assets
           </Link>
+          {' · '}
+          <Link href="/production-control" className="font-bold underline">
+            Production control
+          </Link>
         </p>
       </div>
 

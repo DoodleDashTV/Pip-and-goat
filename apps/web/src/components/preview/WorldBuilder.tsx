@@ -92,6 +92,10 @@ export function WorldBuilder() {
           <Link href="/world-builder/longevity" className="font-bold underline">
             Scenery longevity
           </Link>
+          {' · '}
+          <Link href="/production-control" className="font-bold underline">
+            Production control
+          </Link>
         </p>
         {gap.missingSemanticRole ? <p className="text-sm">Missing semantic role: {gap.missingSemanticRole}</p> : null}
       </section>
