@@ -16,6 +16,7 @@ const PRIMARY_NAV = [
   { href: '/scenery', label: 'Scenery' },
   { href: '/episode-planner', label: 'Episode Planner' },
   { href: '/shot-assembly', label: 'Shot Assembly' },
+  { href: '/blender-assembly', label: 'Blender Assembly' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
   { href: '/render-queue', label: 'Render Queue' },
