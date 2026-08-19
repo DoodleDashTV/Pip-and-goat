@@ -1,4 +1,5 @@
-import { ARCHETYPE_IDS, COVERAGE_CATEGORIES, EXISTING_LOCATIONS, type CoverageCategory, type GapDecision, type WorldBuilderInput } from './types';
+import { evaluateSceneryLongevity } from '@/lib/tivvlejoy-scenery-longevity/evaluate';
+import { ARCHETYPE_IDS, COVERAGE_CATEGORIES, type CoverageCategory, type GapDecision, type WorldBuilderInput } from './types';
 import { ARCHETYPES } from './archetypes';
 import type { BuiltEnvironment } from './engine';
 import { ASSET_GAP_DECISION_SCHEMA, SCENERY_COVERAGE_SCHEMA } from './types';
@@ -19,23 +20,35 @@ const CATEGORY_SCORE: Record<CoverageCategory, number> = {
   hero_locations: 88,
 };
 
-export function sceneryCoverageReport() {
+export function sceneryCoverageReport(options?: { requestedEpisodeCount?: number }) {
   const productionReady = COVERAGE_CATEGORIES.filter((item) => CATEGORY_SCORE[item] >= 85);
   const partial = COVERAGE_CATEGORIES.filter((item) => CATEGORY_SCORE[item] >= 70 && CATEGORY_SCORE[item] < 85);
   const missing = COVERAGE_CATEGORIES.filter((item) => CATEGORY_SCORE[item] < 70);
   const coveragePercent = Math.round(
     COVERAGE_CATEGORIES.reduce((sum, item) => sum + CATEGORY_SCORE[item], 0) / COVERAGE_CATEGORIES.length,
   );
+  const longevity =
+    options?.requestedEpisodeCount && Number.isInteger(options.requestedEpisodeCount) && options.requestedEpisodeCount > 0
+      ? evaluateSceneryLongevity({
+          requestedEpisodeCount: options.requestedEpisodeCount,
+          evidenceClass: 'SYNTHETIC_PREVIEW',
+        })
+      : null;
   return {
     schemaVersion: SCENERY_COVERAGE_SCHEMA,
     scores: CATEGORY_SCORE,
     coveragePercent,
+    coverageStrength: longevity?.coverageStrength ?? null,
+    repetitionRisk: longevity?.repetitionRisk.overallRisk ?? null,
+    longevityConfidence: longevity?.coverageConfidence ?? 'LOW',
+    seasonTargetEvaluation: longevity?.seasonTargetSummary ?? null,
     productionReadyCategories: productionReady,
     partialCategories: partial,
     missingCategories: missing,
-    estimatedEpisodeCoverage: 48,
-    estimatedLocationVariantCount: EXISTING_LOCATIONS.length * 4 * 6 * 4,
-    purchaseRecommended: false,
+    purchaseRecommended: longevity?.purchaseDecision === 'PURCHASE_MAY_BE_JUSTIFIED',
+    specialtyGaps: longevity?.specialtyGaps.map((gap) => gap.semanticRole) ?? [],
+    highPressureCategories: longevity?.semanticRoleCoverage.filter((item) => item.pressure === 'BUSY' || item.pressure === 'OVERUSED').map((item) => item.semanticRole) ?? [],
+    episodeCapacityInvented: false,
     alreadyHave: ['7 library locations', 'native lighting', 'procedural terrain', 'native vegetation'],
     canBuildNatively: ARCHETYPE_IDS.filter((id) => ARCHETYPES[id].nativeProcedural),
     optional: ['Botaniq vegetation', 'Gaffer', 'Physical Starlight'],
