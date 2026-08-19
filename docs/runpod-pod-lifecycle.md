@@ -17,9 +17,11 @@ Trigger: `push` to `cursor/tivvlejoy-runpod-pod-lifecycle-73f1` only.
 
 ## Approved identity
 
-- template ID `rc8eyeqhn2`
-- immutable worker image from PR #56
-- launch intent `71b73dd63e9432c68f2ea24a9232936f628cfd5cf5f1492ec6da1cddff1d29fc`
+- current approved template ID (b53fcbf5 generation)
+- historical attempt #1 template `rc8eyeqhn2` remains provenance only
+- immutable worker image `b53fcbf5…`
+- current launch intent `92b252b4c725cdf127bdbc19210c398f6220b6cef14f6080ea06b5e79826367f`
+- historical attempt #1 dry-run launch intent `71b73dd63e9432c68f2ea24a9232936f628cfd5cf5f1492ec6da1cddff1d29fc` remains provenance only
 - `ALLOW_WORKER_SELF_TERMINATE=false`
 
 ## States

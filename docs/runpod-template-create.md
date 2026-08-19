@@ -15,18 +15,21 @@ Trigger: `push` to `cursor/tivvlejoy-runpod-template-create-73f1` only.
 Creation requires both:
 
 - mode `create-template`
-- exact phrase `CREATE_TIVVLEJOY_TEMPLATE_D791981A`
+- exact phrase `CREATE_TIVVLEJOY_TEMPLATE_B53FCBF5`
 
 The phrase is not a secret. Wrong or missing phrase refuses the request and does not POST.
 
+The historical phrase `CREATE_TIVVLEJOY_TEMPLATE_D791981A` remains documented as paid-smoke attempt #1 provenance. It cannot authorize a current-generation create.
+
 ## Idempotency
 
-Before POST, the helper `GET /v1/templates` and runs the compatibility rules, including the provenance-backed normalization for `rc8eyeqhn2`.
+Before POST, the helper `GET /v1/templates` and runs the current-generation compatibility rules. Historical template `rc8eyeqhn2` (digest `d791981a`) is attempt #1 provenance and does not count as a current-generation match.
 
-- 0 compatible and no intended name+image match → one `POST /v1/templates`
-- 1 compatible → `ALREADY_READY`, zero POST
+- 0 current-compatible and no intended name+image match → one `POST /v1/templates`
+- 1 current-compatible → `ALREADY_READY`, zero POST
 - intended name+image already exists but is not compatible → `CREATED_TEMPLATE_INCOMPATIBLE`, zero POST
-- >1 compatible or >1 intended identity → `AMBIGUOUS_TEMPLATE_MATCH`, zero POST
+- >1 current-compatible → `DUPLICATE_TEMPLATE_IDENTITY`, zero POST
+- >1 intended identity → `AMBIGUOUS_TEMPLATE_MATCH`, zero POST
 
 A second run must not create a duplicate.
 

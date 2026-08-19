@@ -8,8 +8,9 @@ const helper = readFileSync(path.join(repoRoot, 'scripts/cloud/tivvlejoy-runpod-
 const payload = readFileSync(path.join(repoRoot, 'scripts/cloud/tivvlejoy-guarded-pod-payload.mjs'), 'utf8');
 
 describe('TivvleJoy RunPod template binding contract', () => {
-  it('binds rc8eyeqhn2 in dry-run only', () => {
+  it('binds the current approved template in dry-run only', () => {
     expect(docs).toContain('rc8eyeqhn2');
+    expect(docs).toContain('b53fcbf5');
     expect(docs).toContain('TEMPLATE_BOUND');
     expect(docs).toContain('DRY_RUN_ONLY');
     expect(docs).toContain('Do not POST /v1/pods');

@@ -13,6 +13,7 @@ import {
 import {
   CREATE_GRAPHQL_URL,
   CREATE_MODE,
+  HISTORICAL_CREATE_PHRASE,
   REQUIRED_CREATE_PHRASE,
   TEMPLATE_README,
   buildCreateTemplatePayload,
@@ -26,6 +27,11 @@ import {
   validateCreateTemplatePayload,
 } from './tivvlejoy-runpod-template-create.mjs';
 import { redactSecrets } from './tivvlejoy-runpod-template-readiness.mjs';
+import {
+  HISTORICAL_ATTEMPT_1_IMAGE_NAME,
+  HISTORICAL_ATTEMPT_1_TEMPLATE_NAME,
+  PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID,
+} from './tivvlejoy-runpod-template-creation-receipt.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const workflow = readFileSync(path.join(repoRoot, '.github/workflows/tivvlejoy-runpod-template-create.yml'), 'utf8');
@@ -74,6 +80,23 @@ function gated(input = {}) {
 describe('create gate', () => {
   it('accepts the exact mode and phrase', () => {
     assert.equal(evaluateCreateGate({ mode: CREATE_MODE, phrase: REQUIRED_CREATE_PHRASE }).ok, true);
+  });
+
+  it('refuses the historical create phrase without posting', async () => {
+    const recorder = { attempts: [] };
+    const result = await createTemplateGuarded({
+      mode: CREATE_MODE,
+      phrase: HISTORICAL_CREATE_PHRASE,
+      env: { RUNPOD_API_KEY: FAKE_KEY },
+      mutationRecorder: recorder,
+      fetchFn: async () => jsonResponse(201, compatibleTemplate()),
+    });
+    assert.equal(evaluateCreateGate({ mode: CREATE_MODE, phrase: HISTORICAL_CREATE_PHRASE }).ok, false);
+    assert.equal(REQUIRED_CREATE_PHRASE, 'CREATE_TIVVLEJOY_TEMPLATE_B53FCBF5');
+    assert.equal(HISTORICAL_CREATE_PHRASE, 'CREATE_TIVVLEJOY_TEMPLATE_D791981A');
+    assert.equal(result.code, 'CREATE_GATE_REFUSED');
+    assert.equal(result.postCount, 0);
+    assert.equal(recorder.attempts.length, 0);
   });
 
   it('refuses a wrong or missing phrase without posting', async () => {
@@ -184,8 +207,42 @@ describe('idempotent pre-create decisions', () => {
       ...gated(),
       fetchFn: async () => jsonResponse(200, [compatibleTemplate({ id: 'a' }), compatibleTemplate({ id: 'b', name: 'other' })]),
     });
-    assert.equal(result.code, 'AMBIGUOUS_TEMPLATE_MATCH');
+    assert.equal(result.code, 'DUPLICATE_TEMPLATE_IDENTITY');
     assert.equal(result.postCount, 0);
+  });
+
+  it('does not treat historical rc8eyeqhn2 as a current-generation duplicate', async () => {
+    const historical = {
+      id: PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID,
+      name: HISTORICAL_ATTEMPT_1_TEMPLATE_NAME,
+      imageName: HISTORICAL_ATTEMPT_1_IMAGE_NAME,
+      category: 'NVIDIA',
+      containerDiskInGb: 50,
+      volumeMountPath: '/workspace',
+      startSsh: true,
+      startJupyter: true,
+    };
+    const created = compatibleTemplate();
+    let posts = 0;
+    const result = await createTemplateGuarded({
+      ...gated(),
+      fetchFn: async (url, opts = {}) => {
+        const method = String(opts.method || 'GET').toUpperCase();
+        if (method === 'GET' && String(url).endsWith('/templates')) {
+          return jsonResponse(200, posts === 0 ? [historical] : [historical, created]);
+        }
+        if (method === 'POST') {
+          posts += 1;
+          return jsonResponse(201, created);
+        }
+        if (String(url).includes(created.id)) return jsonResponse(200, created);
+        return jsonResponse(404, {});
+      },
+    });
+    assert.equal(result.code, 'CREATED');
+    assert.equal(result.postCount, 1);
+    assert.equal(posts, 1);
+    assert.equal(result.templateId, 'tplnew001');
   });
 });
 
@@ -343,7 +400,7 @@ describe('HTTP and recovery', () => {
         return jsonResponse(200, [created, compatibleTemplate({ id: 'dup', name: 'other-compatible-name' })]);
       },
     });
-    assert.equal(duplicate.code, 'AMBIGUOUS_TEMPLATE_MATCH');
+    assert.equal(duplicate.code, 'DUPLICATE_TEMPLATE_IDENTITY');
     assert.equal(duplicate.postCreateCompatibleCount, 2);
   });
 
@@ -408,9 +465,12 @@ describe('workflow and docs', () => {
     assert.equal(workflow.includes('/v1/pods'), false);
     assert.equal(workflow.includes('echo "${RUNPOD_API_KEY}"'), false);
     assert.equal(common.includes('d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25'), true);
+    assert.equal(common.includes('b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed'), true);
+    assert.equal(REQUIRED_CREATE_PHRASE, 'CREATE_TIVVLEJOY_TEMPLATE_B53FCBF5');
   });
 
   it('documents the single allowed mutation and volume fail-closed rule', () => {
+    assert.match(docs, /CREATE_TIVVLEJOY_TEMPLATE_B53FCBF5/);
     assert.match(docs, /CREATE_TIVVLEJOY_TEMPLATE_D791981A/);
     assert.match(docs, /POST \/v1\/templates/);
     assert.match(docs, /TEMPLATE_VOLUME_CONFIGURATION_REJECTED/);

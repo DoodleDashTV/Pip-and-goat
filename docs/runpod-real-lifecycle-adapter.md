@@ -31,7 +31,7 @@ Future real execution must require all of:
 - `mode=paid-smoke-test`
 - `CONFIRM_PAID_GPU=true`
 - the required paid approval phrase
-- approved template `rc8eyeqhn2`
+- the current approved template (b53fcbf5 generation; historical `rc8eyeqhn2` is not selectable)
 - the pinned immutable worker image
 - fresh render-plan PASS
 - Secure RTX 4090, GPU count 1

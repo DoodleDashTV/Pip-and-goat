@@ -1,0 +1,100 @@
+# TivvleJoy RunPod worker template rollover — zero-cost validation only.
+# Never creates a Pod or GPU. Never prints secrets.
+# Template create is idempotent and already completed for 34a9iknfuc.
+name: TivvleJoy RunPod Worker Template Rollover
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-runpod-worker-template-rollover-73f1
+
+concurrency:
+  group: tivvlejoy-worker-template-rollover-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  worker-template-rollover:
+    name: Current template rollover zero-cost validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      RUNPOD_RENDER_TEMPLATE_ID: 34a9iknfuc
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - name: Print safe checkout identity
+        run: |
+          set -euo pipefail
+          echo "github.sha=${GITHUB_SHA}"
+          echo "github.ref_name=${GITHUB_REF_NAME}"
+
+      - name: Refuse any other branch
+        run: |
+          set -euo pipefail
+          expected='cursor/tivvlejoy-runpod-worker-template-rollover-73f1'
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "REFUSED: this workflow only runs on ${expected}"
+            exit 1
+          fi
+
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack pnpm
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+
+      - name: Install locked dependencies
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+
+      - name: Zero-cost contract tests
+        run: |
+          set -euo pipefail
+          pnpm validate:runpod-template-rollover
+          pnpm validate:runpod-template-create
+          pnpm validate:runpod-template-readiness
+          pnpm validate:runpod-template-normalization
+          pnpm validate:runpod-template-binding
+          pnpm validate:runpod-worker-image
+          pnpm validate:runpod-pod-payload
+          pnpm validate:runpod-blender-foundation
+          pnpm validate:runpod-guarded
+          pnpm validate:runpod-lifecycle
+          pnpm validate:runpod-real-lifecycle
+          pnpm validate:runpod-one-pod-paid-smoke
+          pnpm --filter @doodle-dash/web lint
+
+      - name: Verify pinned worker image
+        run: |
+          set -euo pipefail
+          pnpm cloud:fingerprints
+          pnpm cloud:verify-image
+          pnpm cloud:preflight-offline
+
+      - name: Current template readiness GET
+        run: node scripts/cloud/tivvlejoy-runpod-template-readiness.mjs audit
+
+      - name: Guarded template create remains idempotent
+        run: node scripts/cloud/tivvlejoy-runpod-template-create.mjs create-template CREATE_TIVVLEJOY_TEMPLATE_B53FCBF5
+
+      - name: Zero-cost dry-runs and paid-smoke preflight
+        run: |
+          set -euo pipefail
+          pnpm cloud:runpod-launch-dry-run
+          pnpm cloud:runpod-lifecycle-dry-run
+          pnpm cloud:runpod-real-lifecycle-preflight
+          pnpm cloud:runpod-one-pod-paid-smoke

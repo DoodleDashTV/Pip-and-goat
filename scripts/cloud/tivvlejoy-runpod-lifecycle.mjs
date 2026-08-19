@@ -52,6 +52,8 @@ import {
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 export const APPROVED_LAUNCH_INTENT_SHA256 =
+  '92b252b4c725cdf127bdbc19210c398f6220b6cef14f6080ea06b5e79826367f';
+export const PAID_SMOKE_ATTEMPT_1_LAUNCH_INTENT_SHA256 =
   '71b73dd63e9432c68f2ea24a9232936f628cfd5cf5f1492ec6da1cddff1d29fc';
 
 export const LIFECYCLE_STATES = Object.freeze([

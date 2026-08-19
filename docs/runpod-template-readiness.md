@@ -41,7 +41,7 @@ If the ID is missing, GET the caller's templates and count compatible candidates
 
 - 0 → `TEMPLATE_REQUIRED`
 - 1 → `TEMPLATE_CANDIDATE_FOUND`
-- >1 → `AMBIGUOUS_TEMPLATE_MATCH` (stop; do not guess)
+- >1 → `DUPLICATE_TEMPLATE_IDENTITY` (stop; do not guess)
 
 ## Compatible template
 
@@ -62,7 +62,7 @@ Runtime worker credentials belong on the guarded Pod-create payload, not on a re
 
 If no compatible template exists, the helper prints a **non-mutating** plan:
 
-- name: `TivvleJoy Blender Worker - d791981a`
+- name: `TivvleJoy Blender Worker - b53fcbf5`
 - private NVIDIA Pod template
 - empty env, ports, entrypoint, and start command
 - `containerDiskInGb: 50`

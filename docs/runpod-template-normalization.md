@@ -2,7 +2,10 @@
 
 Checkpoint: `TIVVLEJOY_RUNPOD_TEMPLATE_NORMALIZATION_V1`
 
-This path classifies the already-created template `rc8eyeqhn2` using a **narrow semantic-normalization and provenance layer**.
+This path classifies a trusted TivvleJoy template using a **narrow semantic-normalization and provenance layer**.
+
+Current generation uses the `b53fcbf5` worker image and its matching receipt.
+Historical paid-smoke attempt #1 (`rc8eyeqhn2` / `d791981a`) keeps its own receipt and must not prove current-generation fields.
 
 It does **not** create another template.  
 Do not POST /v1/templates.  
@@ -38,11 +41,11 @@ Do not treat missing booleans as false globally.
 
 ## Provenance
 
-The trusted creation receipt is sanitized and safe to commit. It contains only:
+Receipts are sanitized and safe to commit. Each receipt contains only:
 
-- template ID `rc8eyeqhn2`
-- expected template name
-- immutable image digest
+- that generation's template ID (`rc8eyeqhn2` historically; the current `b53fcbf5` template after create/recovery)
+- that generation's expected template name
+- that generation's immutable image digest
 - create HTTP status `201`
 - requested `isPublic=false`
 - requested `isServerless=false`
@@ -59,8 +62,8 @@ It never contains `RUNPOD_API_KEY`, Authorization headers, R2 credentials, GitHu
 A missing or defaulted GET field may be normalized only when **all** of the following are true:
 
 - template ID is present
-- name exactly matches `TivvleJoy Blender Worker - d791981a`
-- `imageName` exactly matches the immutable required digest
+- name exactly matches the receipt for that same generation
+- `imageName` exactly matches that receipt's immutable digest
 - `category` is `NVIDIA`
 - no unexpected environment keys exist
 - no unexpected exposed ports exist

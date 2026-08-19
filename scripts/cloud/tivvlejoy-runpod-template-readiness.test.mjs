@@ -44,7 +44,7 @@ const FAKE_API_KEY = 'FAKE_RUNPOD_KEY_value_do_not_log';
 function compatibleTemplate(overrides = {}) {
   return {
     id: 'tplcompat01',
-    name: 'TivvleJoy Blender Worker - d791981a',
+    name: 'TivvleJoy Blender Worker - b53fcbf5',
     imageName: REQUIRED_IMAGE_NAME,
     category: 'NVIDIA',
     isServerless: false,
@@ -208,7 +208,7 @@ describe('audit paths and HTTP classification', () => {
       fetchFn: async () =>
         jsonResponse(200, [compatibleTemplate({ id: 'a' }), compatibleTemplate({ id: 'b', name: 'other' })]),
     });
-    assert.equal(result.code, 'AMBIGUOUS_TEMPLATE_MATCH');
+    assert.equal(result.code, 'DUPLICATE_TEMPLATE_IDENTITY');
     assert.equal(result.compatibleCount, 2);
   });
 
@@ -317,7 +317,7 @@ describe('workflow and docs stay read-only', () => {
     assert.match(docs, /GET \/v1\/templates/);
     assert.match(docs, /Do \*\*NOT\*\* create/);
     assert.match(docs, /TEMPLATE_REQUIRED/);
-    assert.match(docs, /TivvleJoy Blender Worker - d791981a/);
+    assert.match(docs, /TivvleJoy Blender Worker - b53fcbf5/);
     assert.match(docs, /PERSISTENT_VOLUME_REQUIRED = false/);
     assert.equal(docs.includes('POST /v1/templates'), true);
     assert.match(docs, /must not POST/);

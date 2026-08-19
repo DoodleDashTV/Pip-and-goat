@@ -31,8 +31,9 @@ Real mutation requires all of:
 - `mode=paid-smoke-test`
 - `CONFIRM_PAID_GPU=true`
 - the required paid approval phrase
-- template `rc8eyeqhn2`
+- the current approved template (b53fcbf5 generation)
 - the pinned immutable worker image
+- historical attempt #1 template `rc8eyeqhn2` is not selectable
 - fresh live render-plan PASS
 - Secure RTX 4090, GPU count 1
 - hourly `<= $0.75`, runtime `<= 20` minutes, projected compute `<= $0.25`

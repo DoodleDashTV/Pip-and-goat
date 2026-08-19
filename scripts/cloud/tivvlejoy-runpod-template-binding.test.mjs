@@ -131,14 +131,15 @@ function boundInputs(roots, extra = {}) {
 }
 
 describe('1. correct template ID', () => {
-  it('binds rc8eyeqhn2 and reuses PR #59 provenance', () => {
+  it('binds the current approved template and reuses PR #59 provenance', () => {
     const result = resolveApprovedTemplateBinding({
       templateId: APPROVED_TEMPLATE_ID,
       env: { RUNPOD_RENDER_TEMPLATE_ID: APPROVED_TEMPLATE_ID },
     });
     assert.equal(result.ok, true);
     assert.equal(result.code, 'TEMPLATE_BOUND');
-    assert.equal(result.templateId, 'rc8eyeqhn2');
+    assert.equal(result.templateId, APPROVED_TEMPLATE_ID);
+    assert.equal(result.templateId !== 'rc8eyeqhn2', true);
     assert.equal(result.provenance, 'TEMPLATE_READY');
     assert.equal(result.assessed.compatible, true);
     assert.equal(result.assessed.provenanceMatched, true);
@@ -159,6 +160,13 @@ describe('3. wrong template ID', () => {
     const result = resolveApprovedTemplateBinding({ templateId: 'other-template' });
     assert.equal(result.ok, false);
     assert.equal(result.code, 'TEMPLATE_ID_MISMATCH');
+  });
+
+  it('refuses historical attempt #1 template rc8eyeqhn2 for current launch', () => {
+    const result = resolveApprovedTemplateBinding({ templateId: 'rc8eyeqhn2' });
+    assert.equal(result.ok, false);
+    assert.equal(result.code, 'TEMPLATE_ID_MISMATCH');
+    assert.equal(APPROVED_TEMPLATE_ID !== 'rc8eyeqhn2', true);
   });
 });
 
@@ -216,7 +224,8 @@ describe('8-14. bound payload isolation and identity', () => {
     );
     assert.equal(built.ok, true);
     assert.equal(built.code, 'POD_PAYLOAD_READY');
-    assert.equal(built.privateExecutionPayload.templateId, 'rc8eyeqhn2');
+    assert.equal(built.privateExecutionPayload.templateId, APPROVED_TEMPLATE_ID);
+    assert.equal(built.privateExecutionPayload.templateId !== 'rc8eyeqhn2', true);
     assert.equal('RUNPOD_RENDER_TEMPLATE_ID' in built.privateExecutionPayload.env, false);
     assert.equal('RUNPOD_API_KEY' in built.privateExecutionPayload.env, false);
     assert.equal('RUNPOD_POD_ID' in built.privateExecutionPayload.env, false);
@@ -297,8 +306,8 @@ describe('18. dry-run performs zero paid operations', () => {
     });
     assert.equal(result.ok, true);
     assert.equal(result.code, 'DRY_RUN_PASS');
-    assert.equal(result.templateId, 'rc8eyeqhn2');
-    assert.equal(result.privateExecutionPayload.templateId, 'rc8eyeqhn2');
+    assert.equal(result.templateId, APPROVED_TEMPLATE_ID);
+    assert.equal(result.privateExecutionPayload.templateId, APPROVED_TEMPLATE_ID);
     assert.equal(result.postPodsCount, 0);
     assert.equal(result.deletePodsCount, 0);
     assert.equal(result.templatePostCount, 0);
@@ -362,6 +371,7 @@ describe('workflow and docs stay dry-run only', () => {
     assert.equal(workflow.includes('LAUNCH_TIVVLEJOY_GPU'), false);
     assert.equal(workflow.includes('echo "${RUNPOD_API_KEY}"'), false);
     assert.equal(workflow.includes('RUNPOD_RENDER_TEMPLATE_ID: rc8eyeqhn2'), true);
+    assert.equal(APPROVED_TEMPLATE_ID !== 'rc8eyeqhn2', true);
     assert.equal(moduleSource.includes("method: 'POST'"), false);
     assert.equal(moduleSource.includes('createGuardedPod'), false);
   });
