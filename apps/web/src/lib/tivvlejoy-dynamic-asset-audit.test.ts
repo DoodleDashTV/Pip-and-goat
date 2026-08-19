@@ -75,6 +75,11 @@ describe('TIVVLEJOY_DYNAMIC_ASSET_AUDIT_V1', () => {
     expect(audit.counts.catalogAssetCount).toBe(audit.sources.length);
     expect(audit.counts.catalogAssetCount).toBeGreaterThan(0);
     expect(audit.hardCodedAssetTotal).toBe(false);
+    const packageVersionDups = audit.sources.filter((item) => item.duplicateState === 'DUPLICATE_PACKAGE_VERSION');
+    expect(packageVersionDups.map((item) => item.sourceId).sort()).toEqual([
+      'SRC_PHYSICAL_STARLIGHT_1_8_3',
+      'SRC_PHYSICAL_STARLIGHT_1_8_3_DUPLICATE_2',
+    ]);
   });
 
   it('increases the total when a future catalog entry is added', () => {

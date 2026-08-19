@@ -166,6 +166,17 @@ function familyKey(displayName: string): string {
     .toLowerCase();
 }
 
+function filenameStem(filename: string): string {
+  return filename
+    .toLowerCase()
+    .replace(/\s+\d+(\.[a-z0-9]+)$/i, '$1')
+    .replace(/\s+copy(\.[a-z0-9]+)$/i, '$1');
+}
+
+function packageVersionKey(pkg: Pick<PurchasedToolPackage, 'displayName' | 'version' | 'role' | 'expectedFilename'>): string {
+  return `${familyKey(pkg.displayName)}::${pkg.version}::${pkg.role}::${filenameStem(pkg.expectedFilename)}`;
+}
+
 export function detectSourceFormat(filename: string): SourceFormat {
   const lower = filename.toLowerCase();
   if (lower.endsWith('.scatpack.zip')) return 'scatpack.zip';
@@ -283,7 +294,7 @@ function buildReport(
   const shaMissing = stored && !clientSha256Present;
   const shaInvalid = stored && clientSha256Present && !validSha;
   const shaDup = Boolean(validSha && (shaOwners.get(sha256!)?.length ?? 0) > 1);
-  const packageVersionDup = catalogPresent && duplicatePackageVersions.has(`${familyKey(pkg.displayName)}::${pkg.version}`);
+  const packageVersionDup = catalogPresent && duplicatePackageVersions.has(packageVersionKey(pkg));
   const inspectionState = !stored
     ? 'NOT_APPLICABLE'
     : inspection?.state ?? 'AWAITING_INSPECTION';
@@ -417,7 +428,7 @@ export function auditPurchasedAssets(input: DynamicAuditInput = {}): DynamicAsse
   const versionGroups = new Map<string, string[]>();
   for (const pkg of catalog) {
     if (isWrapperPackage(pkg)) continue;
-    const key = `${familyKey(pkg.displayName)}::${pkg.version}`;
+    const key = packageVersionKey(pkg);
     const group = versionGroups.get(key) ?? [];
     group.push(pkg.sourceId);
     versionGroups.set(key, group);
@@ -457,7 +468,9 @@ export function auditPurchasedAssets(input: DynamicAuditInput = {}): DynamicAsse
     usableCount: catalogReports.filter((item) => item.productionUsable).length,
     archivalCount: catalogReports.filter((item) => item.auditState === 'ARCHIVAL_ONLY' || item.historical).length,
     duplicateCount: catalogReports.filter((item) => item.duplicateState !== 'NONE').length,
-    blockedCount: [...catalogReports, ...unknownReceipts].filter((item) => item.auditState === 'BLOCKED' || item.blockers.length > 0 && (item.auditState === 'BLOCKED' || !item.catalogPresent)).length,
+    blockedCount: [...catalogReports, ...unknownReceipts].filter(
+      (item) => item.auditState === 'BLOCKED' || !item.catalogPresent,
+    ).length,
     missingCount: catalogReports.filter((item) => !item.stored && item.auditState !== 'UPLOAD_INCOMPLETE').length,
   };
   const machine = {
