@@ -5,7 +5,7 @@
 #
 set -euo pipefail
 
-EXPECTED_BRANCH="cursor/tivvlejoy-runpod-worker-startup-watchdog-73f1"
+EXPECTED_BRANCH="cursor/tivvlejoy-runpod-worker-image-refresh-73f1"
 
 die() { echo "PREFLIGHT_ABORT: $*" >&2; exit 1; }
 

@@ -33,10 +33,10 @@ const FORBIDDEN_WORKFLOW = [
 ];
 
 describe('tivvlejoy worker image build workflow', () => {
-  it('is a tightly scoped push trigger for the startup-watchdog branch only', () => {
+  it('is a tightly scoped push trigger for the refresh branch only', () => {
     assert.match(
       workflow,
-      /^on:\n  push:\n    branches:\n      - cursor\/tivvlejoy-runpod-worker-startup-watchdog-73f1\n/m,
+      /^on:\n  push:\n    branches:\n      - cursor\/tivvlejoy-runpod-worker-image-refresh-73f1\n/m,
     );
     for (const forbidden of ['workflow_dispatch', 'pull_request:', 'schedule:', 'workflow_run:', 'repository_dispatch:']) {
       assert.equal(workflow.includes(forbidden), false, forbidden);
@@ -44,10 +44,10 @@ describe('tivvlejoy worker image build workflow', () => {
   });
 
   it('refuses any other branch and keeps one in-flight build', () => {
-    assert.match(workflow, /cursor\/tivvlejoy-runpod-worker-startup-watchdog-73f1/);
+    assert.match(workflow, /cursor\/tivvlejoy-runpod-worker-image-refresh-73f1/);
     assert.match(workflow, /group: tivvlejoy-worker-image-\$\{\{ github\.ref \}\}/);
     assert.match(workflow, /cancel-in-progress: false/);
-    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-runpod-worker-startup-watchdog-73f1"/);
+    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-runpod-worker-image-refresh-73f1"/);
   });
 
   it('uses least-privilege permissions and Actions GHCR login', () => {
@@ -97,6 +97,8 @@ describe('tivvlejoy worker image build workflow', () => {
   it('records paid-smoke attempt #1 digest without rewriting PREVIOUS_WORKER_IMAGE', () => {
     assert.match(common, /PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE/);
     assert.match(common, /d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25/);
+    assert.match(common, /b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed/);
+    assert.match(common, /WORKER_IMAGE_SOURCE_COMMIT = '1ea2cf58c9cfc015929d0a4ca63446898d59ba79'/);
     assert.match(common, /PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID = 'rc8eyeqhn2'/);
     assert.match(common, /e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27/);
     assert.equal(workerSource.includes("startupWatchdog.milestone('WORKER_READY')"), false);
