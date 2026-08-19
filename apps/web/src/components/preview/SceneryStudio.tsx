@@ -7,6 +7,7 @@ import { planSceneryScene } from '@/lib/scenery/planner';
 import { SYNTHETIC_SCENERY_CATALOG } from '@/lib/scenery/fixtures';
 import type { PublicScenerySnapshot } from '@/lib/scenery/public';
 import { RECIPE_IDS, DEFAULT_SCENERY_SEED } from '@/lib/scenery/types';
+import { syntheticStorybookPlan } from '@/lib/tivvlejoy-storybook-environment';
 import { PreviewPageIntro } from './PreviewEmptyState';
 import { SceneryAssetIntake } from './SceneryAssetIntake';
 
@@ -45,6 +46,7 @@ export function SceneryStudio({
   const [storyPurpose, setStoryPurpose] = useState('Pip and Goat follow a path toward a cabin');
   const [result, setResult] = useState<PlanResponse | null>(null);
   const [busy, setBusy] = useState(false);
+  const storybook = useMemo(() => syntheticStorybookPlan(), []);
 
   const localFallback = useMemo(() => {
     if (!result?.plan) return null;
@@ -308,6 +310,71 @@ export function SceneryStudio({
             <li key={item}>{item}</li>
           ))}
         </ul>
+      </section>
+
+      <section className="studio-card space-y-3 p-4 sm:p-5">
+        <h2 className="font-display text-xl font-semibold">Storybook environment foundation</h2>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          Preview-only synthetic plan. No commercial scenery was converted and nothing was rendered.
+        </p>
+        <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Storybook profile</dt>
+            <dd>{storybook.profile.schemaVersion}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Material classification status</dt>
+            <dd>
+              {storybook.materials.requiresManualReview ? 'manual review required' : 'classified'} ·{' '}
+              {storybook.stylizationReport.classificationConfidence}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Quality tiers</dt>
+            <dd>
+              {storybook.qualityTier} · texture {storybook.textureTarget}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Dressing plan</dt>
+            <dd>
+              {storybook.dressing.clusterTarget.min}-{storybook.dressing.clusterTarget.max} clusters · seed{' '}
+              {storybook.dressing.seed}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Lighting preset</dt>
+            <dd>{storybook.lighting.id}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Shot visual score</dt>
+            <dd>
+              {storybook.visual.receipt.score}/100 · {storybook.visual.receipt.result}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Hard blockers</dt>
+            <dd>{storybook.visual.receipt.hardBlockers.length === 0 ? 'none' : storybook.visual.receipt.hardBlockers.join(', ')}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Stylization approval state</dt>
+            <dd>{storybook.stylizationReport.approvalStatus}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Performance estimate</dt>
+            <dd>
+              {storybook.complexity.estimatedRenderSeconds}s planning only
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Cache identity</dt>
+            <dd className="break-all">{storybook.cacheIdentity.slice(0, 16)}…</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-muted)]">Provenance status</dt>
+            <dd>{storybook.provenance.status}</dd>
+          </div>
+        </dl>
       </section>
 
       <section className="studio-card space-y-3 p-4 sm:p-5">
