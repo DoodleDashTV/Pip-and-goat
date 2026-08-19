@@ -9,6 +9,8 @@ const workflow = readFileSync(path.join(repoRoot, '.github/workflows/tivvlejoy-w
 const buildScript = readFileSync(path.join(repoRoot, 'scripts/cloud/build-worker-image.sh'), 'utf8');
 const preflight = readFileSync(path.join(repoRoot, 'scripts/cloud/gha-worker-image-preflight.sh'), 'utf8');
 const dockerfile = readFileSync(path.join(repoRoot, 'workers/runpod-blender/Dockerfile'), 'utf8');
+const common = readFileSync(path.join(repoRoot, 'scripts/cloud/acceptance-1080p/common.ts'), 'utf8');
+const workerSource = readFileSync(path.join(repoRoot, 'workers/runpod-blender/src/worker.js'), 'utf8');
 
 const FORBIDDEN_WORKFLOW = [
   'workflow_dispatch',
@@ -90,6 +92,17 @@ describe('tivvlejoy worker image build workflow', () => {
     assert.equal(buildScript.includes('rest.runpod.io'), false);
     assert.match(preflight, /RENDER_CODE_MISMATCH/);
     assert.match(buildScript, /GHCR_PACKAGE_WRITE_REFUSED/);
+  });
+
+  it('records paid-smoke attempt #1 digest without rewriting PREVIOUS_WORKER_IMAGE', () => {
+    assert.match(common, /PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE/);
+    assert.match(common, /d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25/);
+    assert.match(common, /b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed/);
+    assert.match(common, /WORKER_IMAGE_SOURCE_COMMIT = '1ea2cf58c9cfc015929d0a4ca63446898d59ba79'/);
+    assert.match(common, /PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID = 'rc8eyeqhn2'/);
+    assert.match(common, /e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27/);
+    assert.equal(workerSource.includes("startupWatchdog.milestone('WORKER_READY')"), false);
+    assert.equal(workerSource.includes("startupWatchdog.reached('WORKER_READY')"), true);
   });
 
   it('verifies worker files, assemble_scene, blender, and architecture before push', () => {

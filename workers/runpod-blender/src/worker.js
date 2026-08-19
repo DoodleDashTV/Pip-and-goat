@@ -108,6 +108,55 @@ async function terminateSelf(reason = 'done', env = process.env) {
   }
 }
 
+/**
+ * Startup watchdog owns BOOT only: PROCESS_STARTED → healthGate → WORKER_READY.
+ * Call start() before healthGate. Cancel permanently with reached('WORKER_READY').
+ */
+function createAndStartStartupWatchdog({
+  env = process.env,
+  persist,
+  logFn = log,
+  StartupWatchdogImpl = StartupWatchdog,
+  terminate = terminateSelf,
+  exitFn = (code) => process.exit(code),
+} = {}) {
+  const startupTimeoutMs = Number(env.STARTUP_WATCHDOG_MS || 180_000);
+  return new StartupWatchdogImpl({
+    startupTimeoutMs,
+    onTimeout: async (info) => {
+      logFn('startup_watchdog_timeout', { ...info, startupTimeoutMs });
+      try {
+        if (typeof persist === 'function') {
+          await persist(EXIT_CLASS.TIMEOUT, { kind: 'STARTUP_TIMEOUT', ...info });
+        }
+      } finally {
+        await terminate(`startup_timeout:${info.lastMilestone || 'none'}`, env);
+        exitFn(exitCodeFor(EXIT_CLASS.TIMEOUT));
+      }
+    },
+  }).start();
+}
+
+function applyHealthGateToStartupWatchdog(startupWatchdog, health) {
+  if (!health || health.ok !== true) {
+    startupWatchdog.reached('HEALTH_GATE_FAILED');
+    return {
+      ok: false,
+      ready: false,
+      cancelled: startupWatchdog.cleared === true,
+      lastMilestone: startupWatchdog.lastMilestone,
+    };
+  }
+  // Authoritative successful startup transition: cancel the boot watchdog.
+  startupWatchdog.reached('WORKER_READY');
+  return {
+    ok: true,
+    ready: true,
+    cancelled: startupWatchdog.cleared === true && startupWatchdog.timer == null,
+    lastMilestone: startupWatchdog.lastMilestone,
+  };
+}
+
 function healthGate() {
   const requireGpu = String(process.env.REQUIRE_GPU_HEALTH || 'true').toLowerCase() !== 'false';
   const allowCpuFallback =
@@ -276,36 +325,22 @@ async function main() {
     log('early_startup_status_failed', { error: redactMessage(e && e.message) });
   }
 
-  // Startup watchdog: independent of the render-runtime guard. If boot does not
-  // reach a meaningful milestone within the (cost-aware) startup budget, tear the
-  // container down so a dead worker never keeps a paid GPU waiting.
-  const startupTimeoutMs = Number(env.STARTUP_WATCHDOG_MS || 180_000);
-  const startupWatchdog = new StartupWatchdog({
-    startupTimeoutMs,
-    onTimeout: async (info) => {
-      log('startup_watchdog_timeout', { ...info, startupTimeoutMs });
-      try {
-        await persist(EXIT_CLASS.TIMEOUT, { kind: 'STARTUP_TIMEOUT', ...info });
-      } finally {
-        await terminateSelf(`startup_timeout:${info.lastMilestone || 'none'}`);
-        process.exit(exitCodeFor(EXIT_CLASS.TIMEOUT));
-      }
-    },
-  }).start();
+  // Startup watchdog owns BOOT only. Arm it before healthGate. Cancel it at
+  // WORKER_READY. The single-shot runtime/cost guard owns the render job.
+  const startupWatchdog = createAndStartStartupWatchdog({ env, persist });
 
   // healthGate() is synchronous (spawnSync Blender). Yield once so the watchdog
   // timer and the early R2 write above can settle before we block the event loop.
   await new Promise((r) => setImmediate(r));
 
   const health = healthGate();
-  if (!health.ok) {
-    startupWatchdog.reached('HEALTH_GATE_FAILED');
+  const startup = applyHealthGateToStartupWatchdog(startupWatchdog, health);
+  if (!startup.ok) {
     log('worker_unhealthy_abort', { classification: health.classification });
     await persist(health.classification, { kind: 'HEALTH_GATE_FAILED' });
     process.exitCode = exitCodeFor(health.classification);
     return;
   }
-  startupWatchdog.milestone('WORKER_READY');
   log('WORKER_READY');
   try {
     await persist('BOOTING', { kind: 'WORKER_READY', bootStage: 'WORKER_READY' });
@@ -317,13 +352,9 @@ async function main() {
   const apiUrl = strip(env.RENDER_API_URL);
 
   // Single-shot mode takes precedence and requires no ingress.
+  // The startup watchdog is already cancelled. Do not re-arm it here.
   if (jobId) {
-    let result;
-    try {
-      result = await runSingleShot({ env, log });
-    } finally {
-      startupWatchdog.reached('SINGLE_SHOT_RETURNED');
-    }
+    const result = await runSingleShot({ env, log });
     const classification = result.ok ? EXIT_CLASS.OK : result.classification || classifyCode(result.code);
     log('single_shot_result', { ok: result.ok, code: result.code || null, classification, artifactKey: result.artifactKey || null });
     process.exitCode = result.ok ? 0 : exitCodeFor(classification);
@@ -377,4 +408,12 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main, processApiJob, downloadUriAsset, terminateSelf, canWorkerSelfTerminate };
+module.exports = {
+  main,
+  processApiJob,
+  downloadUriAsset,
+  terminateSelf,
+  canWorkerSelfTerminate,
+  createAndStartStartupWatchdog,
+  applyHealthGateToStartupWatchdog,
+};

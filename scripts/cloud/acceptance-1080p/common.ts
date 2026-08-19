@@ -40,7 +40,7 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * rebuilt.
  *
  * Verified worker image produced by GitHub Actions on
- * 3d5fbf78d2b618a40f10ebbf6e24ed7c97079fd3. The immutable digest below was
+ * 1ea2cf58c9cfc015929d0a4ca63446898d59ba79. The immutable digest below was
  * anonymously registry-verified: linux/amd64, source-commit label, baked
  * render-code fingerprint, and approved render-asset fingerprint all agree
  * with this checkout. Blender in the image is 4.2.3. No RunPod render has
@@ -49,10 +49,10 @@ export const STATE_FILE = path.join(STATE_DIR, 'run-state.json');
  * after another verified image build.
  */
 export const WORKER_IMAGE =
-  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25'; // pragma: allowlist secret
-export const WORKER_IMAGE_SOURCE_COMMIT = '3d5fbf78d2b618a40f10ebbf6e24ed7c97079fd3';
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed'; // pragma: allowlist secret
+export const WORKER_IMAGE_SOURCE_COMMIT = '1ea2cf58c9cfc015929d0a4ca63446898d59ba79';
 export const WORKER_IMAGE_RENDER_CODE_SHA256 =
-  '8210e3addd656e5d7c318dc8a66e82fe7b8ba5e1642c3f583fabbaf92a646aed';
+  '52dc742a3aee4cd7c1f141dcdfd45b9c81d6c073b205c3f8eda915adb9505ab5';
 
 /**
  * Fingerprint of the approved `.blend` assets this checkout would render, from
@@ -65,9 +65,18 @@ export const WORKER_IMAGE_RENDER_ASSET_SHA256 =
   '7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7';
 
 /**
- * The image the cloud re-acceptance render actually ran, kept for the provenance
- * record. Superseded: its baked render code is c4afa39c…, this checkout is
- * elsewhere, and the two must agree before a paid launch.
+ * Immutable image used by paid smoke attempt #1 (Pod 71ttvxy4wbxn46).
+ * Historical provenance only. Do not relabel or overwrite that digest.
+ */
+export const PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE =
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25'; // pragma: allowlist secret
+export const PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE_SOURCE_COMMIT = '3d5fbf78d2b618a40f10ebbf6e24ed7c97079fd3';
+export const PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE_RENDER_CODE_SHA256 =
+  '8210e3addd656e5d7c318dc8a66e82fe7b8ba5e1642c3f583fabbaf92a646aed';
+export const PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID = 'rc8eyeqhn2';
+
+/**
+ * Older superseded image record. Do not rewrite this historical pin.
  */
 export const PREVIOUS_WORKER_IMAGE =
   'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:e80cf523b7cb6d6c3a7c8dedda22e90ca0b8664f65be4c55eb82323083b31c27'; // pragma: allowlist secret
