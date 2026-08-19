@@ -6,6 +6,7 @@ import {
   advancePreviewEpisode,
   createPreviewEpisode,
   createPreviewRenderRequest,
+  createFixtureAdmissionRequest,
   PreviewWorkspaceError,
   registerPreviewAsset,
   resetPreviewStudio,
@@ -78,6 +79,11 @@ export function usePreviewWorkspace() {
       run(
         () => createPreviewRenderRequest(episodeId, backend),
         'Draft request recorded. Nothing was rendered.',
+      ),
+    requestFixtureAdmission: (episodeId: string) =>
+      run(
+        () => createFixtureAdmissionRequest(episodeId, backend),
+        'Zero-GPU fixture admission recorded. No GPU was launched.',
       ),
     reset: () => run(() => resetPreviewStudio(backend), 'Preview workspace reset. Production data was not touched.'),
     exportBackup: () => {

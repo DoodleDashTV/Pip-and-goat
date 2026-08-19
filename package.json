@@ -47,6 +47,7 @@
     "cloud:runpod-real-lifecycle-preflight": "RUNPOD_RENDER_TEMPLATE_ID=34a9iknfuc node scripts/cloud/tivvlejoy-runpod-real-lifecycle-adapter.mjs real-lifecycle-preflight",
     "validate:runpod-one-pod-paid-smoke": "node --test scripts/cloud/tivvlejoy-runpod-one-pod-paid-smoke.test.mjs && pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-runpod-one-pod-paid-smoke.test.ts",
     "cloud:runpod-one-pod-paid-smoke": "RUNPOD_RENDER_TEMPLATE_ID=34a9iknfuc node scripts/cloud/tivvlejoy-runpod-one-pod-paid-smoke.mjs preflight",
+    "validate:runpod-backend-readiness": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-render-backend-readiness.test.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",

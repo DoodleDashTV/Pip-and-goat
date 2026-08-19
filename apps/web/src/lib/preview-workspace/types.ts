@@ -76,6 +76,26 @@ export type PreviewRenderRequest = {
   outputFile: null;
   progress: null;
   createdAt: string;
+  readinessStatus?: string;
+  readinessCard?: {
+    episodeLabel: string;
+    shotLabel: string;
+    status: string;
+    backendProven: boolean;
+    hashesVerified: boolean;
+    assetsApprovedLabel: string;
+    shotApprovalLabel: string;
+    cacheLabel: string;
+    estimatedRuntimeLabel: string;
+    gpuLabel: string;
+    hourlyQuoteLabel: string;
+    estimatedComputeLabel: string;
+    maximumCostLabel: string;
+    providerContacted: false;
+    gpuLaunched: false;
+    paidAuthorization: 'REQUIRED';
+    blockingReason: string | null;
+  };
 };
 
 export type PreviewWorkspace = {
