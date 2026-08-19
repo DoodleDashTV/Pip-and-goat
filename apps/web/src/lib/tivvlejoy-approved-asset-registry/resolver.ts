@@ -44,7 +44,7 @@ function fail(
     requestSha256: request.requestSha256,
     registrySnapshotSha256: request.registrySnapshotSha256,
     resolutionState: state,
-    selectedAssetId: null as const,
+    selectedAssetId: null,
     reason,
     filenameUsedForSelection: false as const,
     mutableLatestUsed: false as const,
