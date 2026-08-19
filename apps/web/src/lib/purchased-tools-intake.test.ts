@@ -28,6 +28,17 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
     expect(selection.ok).toBe(true);
   });
 
+  it('accepts the exact Superhive/iPhone Botaniq .paq.zip wrapper without accepting arbitrary renames', () => {
+    const wrapped = validatePurchasedToolSelection({
+      filename: 'botaniq_full-7.2.0.paq.zip',
+      byteSize: Math.floor(4.8 * 1024 ** 3),
+    });
+    expect(wrapped.ok).toBe(true);
+    expect(findPurchasedToolPackageByFilename('botaniq_full-7.2.0.paq.zip')?.sourceId).toBe(
+      'SRC_BOTANIQ_FULL_7_2_0',
+    );
+  });
+
   it('rejects the tiny failed Botaniq download instead of uploading it', () => {
     const selection = validatePurchasedToolSelection({
       filename: 'botaniq_full-7.2.0.paq',
@@ -48,6 +59,9 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
   it('refuses renamed or unapproved package filenames', () => {
     expect(
       validatePurchasedToolSelection({ filename: 'botaniq-full-renamed.paq', byteSize: 5 * 1024 ** 3 }).ok,
+    ).toBe(false);
+    expect(
+      validatePurchasedToolSelection({ filename: 'botaniq_full-7.2.0-copy.paq.zip', byteSize: 5 * 1024 ** 3 }).ok,
     ).toBe(false);
   });
 });
