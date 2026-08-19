@@ -159,6 +159,15 @@ export function PreviewDashboard({ snapshot }: { snapshot: SafePersistenceSnapsh
           Open Blender Assembly
         </Link>
       </section>
+      <section className="studio-card p-4 sm:p-5">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Blender Execution Readiness</h2>
+        <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
+          No Blender execution. No commercial asset read. No GPU. Authorization not issued.
+        </p>
+        <Link href="/blender-readiness" className="btn-primary mt-4 w-full px-4 text-sm sm:w-auto">
+          Open Blender Readiness
+        </Link>
+      </section>
     </div>
   );
 }
