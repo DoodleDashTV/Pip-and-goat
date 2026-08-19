@@ -23,13 +23,14 @@ const TODAY_USER_SUPPLIED_PACKAGE_FILENAMES = [
   'Gaffer 3.1.5 (for b2.8).zip',
   'physical-starlight-atmosphere-1.9.2.zip',
   'physical-starlight-atmosphere-1.6.1.zip',
+  'assets-for-v1.6.1-and-below 2.blend.zip',
   'physical-starlight-atmosphere-1.8.3 2.zip',
   'botaniq_full-7.2.0.paq.zip',
 ] as const;
 
 describe('TivvleJoy iPhone large purchased asset intake', () => {
   it('accepts every exact purchased package filename supplied by the user today', () => {
-    expect(TODAY_USER_SUPPLIED_PACKAGE_FILENAMES).toHaveLength(18);
+    expect(TODAY_USER_SUPPLIED_PACKAGE_FILENAMES).toHaveLength(19);
     for (const filename of TODAY_USER_SUPPLIED_PACKAGE_FILENAMES) {
       expect(findPurchasedToolPackageByFilename(filename), filename).not.toBeNull();
     }
@@ -48,6 +49,9 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
     expect(findPurchasedToolPackageByFilename('physical-starlight-atmosphere-1.9.2.zip')?.activation).toBe(
       'STORE_ONLY',
     );
+    expect(findPurchasedToolPackageByFilename('assets-for-v1.6.1-and-below 2.blend.zip')?.activation).toBe(
+      'STORE_ONLY',
+    );
     expect(
       findPurchasedToolPackageByFilename('botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip')
         ?.activation,
@@ -56,6 +60,15 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
       findPurchasedToolPackageByFilename('botaniq_full_geoscatter_biomes-7.0.0.scatpack.zip')
         ?.activation,
     ).toBe('OPTIONAL_NOT_INTEGRATED');
+  });
+
+  it('accepts the legacy Physical Starlight companion bundle at the selected iPhone size class', () => {
+    const selection = validatePurchasedToolSelection({
+      filename: 'assets-for-v1.6.1-and-below 2.blend.zip',
+      byteSize: Math.floor(1.9 * 1024 ** 2),
+    });
+    expect(selection.ok).toBe(true);
+    expect(selection.ok && selection.package.role).toBe('optional-companion');
   });
 
   it('accepts a 5.15 GiB-class Botaniq Full file under the dedicated 8 GiB cap', () => {
@@ -102,6 +115,7 @@ describe('TivvleJoy iPhone large purchased asset intake', () => {
       validatePurchasedToolSelection({ filename: 'botaniq_full-7.2.0-copy.paq.zip', byteSize: 5 * 1024 ** 3 }).ok,
     ).toBe(false);
     expect(findPurchasedToolPackageByFilename('Gaffer renamed.zip')).toBeNull();
+    expect(findPurchasedToolPackageByFilename('assets-for-v1.6.1-and-below.blend.zip')).toBeNull();
   });
 
   it('uses unique source ids for the two separately named PSA 1.8.3 downloads', () => {
