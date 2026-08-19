@@ -92,7 +92,9 @@ export function evaluateEpisodeQc(input: EpisodeQcInput): EpisodeQcReport {
   ];
   const hardBlockers = checks.filter((item) => item.hardBlocker && item.state === 'FAIL').map((item) => item.category);
   const warnings = checks.filter((item) => item.state === 'WARNING' || item.state === 'NOT_EVALUATED').map((item) => item.category);
-  const passed = hardBlockers.length === 0 && checks.every((item) => item.state !== 'FAIL');
+  const passed =
+    hardBlockers.length === 0 &&
+    checks.every((item) => item.state !== 'FAIL' && !(item.hardBlocker && item.state === 'NOT_EVALUATED'));
   const body = {
     schemaVersion: EPISODE_QC_SCHEMA,
     episodeId: input.episodeId,
