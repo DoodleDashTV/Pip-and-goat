@@ -62,3 +62,18 @@ render. Do not reuse the 20-minute startup-watchdog workaround.
 
 Exactly one `POST /v1/pods`. No automatic paid retry. Delete once. Confirm
 absence. Remaining Pod count must be 0.
+
+## Attempt #2 result
+
+`PAID_SMOKE_TEST_PASS`
+
+- Pod `iqgio6a31mpf5z`
+- job `tjsmo20260819105505`
+- template `34a9iknfuc` / digest `b53fcbf5`
+- WORKER_READY observed, render COMPLETE, artifact QC 1080x1920
+- POST `/v1/pods` = 1, DELETE = 1, remaining Pods = 0
+- hourly `$0.74`, actual runtime ~9m12s, estimated compute ~`$0.113`
+- no paid retry
+
+Sanitized receipt and execute result live under
+`artifacts/tivvlejoy-paid-smoke/attempt-2/`. The mp4 is not committed.

@@ -271,5 +271,22 @@ describe('attempt #1 provenance and attempt #2 isolation', () => {
     assert.equal(JSON.stringify(receipt).includes('RUNPOD_API_KEY'), false);
     assert.match(moduleSource, /STARTUP_WATCHDOG_MS: String\(SMOKE_STARTUP_WATCHDOG_MS\)/);
     assert.equal(moduleSource.includes('STARTUP_WATCHDOG_MS: String(20'), false);
+
+    const attempt2Receipt = JSON.parse(
+      readFileSync(path.join(PAID_SMOKE_ATTEMPT_2_ARTIFACT_DIR, 'paid-smoke-launch-receipt.json'), 'utf8'),
+    );
+    const attempt2Result = JSON.parse(
+      readFileSync(path.join(PAID_SMOKE_ATTEMPT_2_ARTIFACT_DIR, 'execute-result.json'), 'utf8'),
+    );
+    assert.equal(attempt2Receipt.templateId, '34a9iknfuc');
+    assert.equal(attempt2Receipt.jobId, 'tjsmo20260819105505');
+    assert.equal(attempt2Result.code, 'PAID_SMOKE_TEST_PASS');
+    assert.equal(attempt2Result.podId, 'iqgio6a31mpf5z');
+    assert.equal(attempt2Result.realPostPods, 1);
+    assert.equal(attempt2Result.realDeletePods, 1);
+    assert.equal(attempt2Result.remainingPodCount, 0);
+    assert.equal(attempt2Result.history.includes('WORKER_READY'), true);
+    assert.equal(JSON.stringify(attempt2Result).includes('RUNPOD_API_KEY'), false);
+    assert.equal(attempt2Receipt.templateId !== receipt.templateId, true);
   });
 });
