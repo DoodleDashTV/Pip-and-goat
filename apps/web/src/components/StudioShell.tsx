@@ -19,6 +19,7 @@ const PRIMARY_NAV = [
   { href: '/blender-assembly', label: 'Blender Assembly' },
   { href: '/blender-readiness', label: 'Blender Readiness' },
   { href: '/world-builder', label: 'World Builder' },
+  { href: '/world-builder/assets', label: 'Approved Assets' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
   { href: '/render-queue', label: 'Render Queue' },

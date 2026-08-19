@@ -59,6 +59,20 @@ export type EnvironmentSlotInput = {
   approvalStatus?: 'approved' | 'unapproved' | 'quarantined' | 'missing';
   expectedVersion?: string;
   providerPreference?: 'NATIVE_BLENDER' | 'BOTANIQ_IF_APPROVED';
+  approvedAssetId?: string;
+  approvedAssetVersion?: string;
+  sourceId?: string;
+  inspectionReceiptRef?: string;
+  inspectionSha256?: string;
+  approvalReceiptRef?: string;
+  approvalSha256?: string;
+  assetDependencySha256?: string;
+  resolutionReceiptRef?: string;
+  resolutionReceiptSha256?: string;
+  registrySnapshotSha256?: string;
+  resolutionState?: string;
+  filenameSubstitution?: boolean;
+  latestUsed?: boolean;
 };
 
 export type StoryPropContinuityInput = {
@@ -77,6 +91,36 @@ export function resolveAssetSlot(slot: EnvironmentSlotInput): {
   if (slot.providerPreference === 'BOTANIQ_IF_APPROVED') {
     return { dependencyStatus: 'UNRESOLVED_SOURCE', blocker: null };
   }
+  if (slot.resolutionState === 'UNRESOLVED_NO_ELIGIBLE_ASSET') {
+    return { dependencyStatus: 'UNRESOLVED_SOURCE', blocker: slot.required ? 'MISSING_ENVIRONMENT_SOURCE' : null };
+  }
+  if (slot.resolutionState === 'BLOCKED_UNAPPROVED') {
+    return { dependencyStatus: 'BLOCKED_UNAPPROVED', blocker: 'UNAPPROVED_ASSET' };
+  }
+  if (slot.resolutionState === 'BLOCKED_QUARANTINED') {
+    return { dependencyStatus: 'BLOCKED_QUARANTINED', blocker: 'QUARANTINED_ASSET' };
+  }
+  if (slot.resolutionState === 'BLOCKED_HASH_MISMATCH') {
+    return { dependencyStatus: 'BLOCKED_HASH_MISMATCH', blocker: 'HASH_MISMATCH' };
+  }
+  if (slot.resolutionState === 'UNRESOLVED_PROVENANCE') {
+    return { dependencyStatus: 'UNRESOLVED_PROVENANCE', blocker: 'PROVENANCE_UNKNOWN' };
+  }
+  if (slot.resolutionState === 'BLOCKED_CANONICAL_CONFLICT') {
+    return { dependencyStatus: 'BLOCKED_CANONICAL_CONFLICT', blocker: 'CANONICAL_CONFLICT' };
+  }
+  if (slot.resolutionState === 'BLOCKED_CONTINUITY_PIN_INVALID') {
+    return { dependencyStatus: 'BLOCKED_CONTINUITY_PIN_INVALID', blocker: 'CONTINUITY_PIN_INVALID' };
+  }
+  if (slot.resolutionState === 'BLOCKED_LICENSE') {
+    return { dependencyStatus: 'BLOCKED_LICENSE', blocker: 'LICENSE_BLOCKED' };
+  }
+  if (slot.resolutionState === 'BLOCKED_STYLE_INCOMPATIBLE') {
+    return { dependencyStatus: 'BLOCKED_STYLE_INCOMPATIBLE', blocker: 'STYLE_INCOMPATIBLE' };
+  }
+  if (slot.resolutionState === 'BLOCKED_TECHNICAL_INCOMPATIBLE') {
+    return { dependencyStatus: 'BLOCKED_TECHNICAL_INCOMPATIBLE', blocker: 'TECHNICAL_INCOMPATIBLE' };
+  }
   if (slot.approvalStatus === 'missing' || !slot.sourceReceiptRef) {
     return { dependencyStatus: 'UNRESOLVED_SOURCE', blocker: slot.required ? 'MISSING_ENVIRONMENT_SOURCE' : null };
   }
@@ -87,10 +131,10 @@ export function resolveAssetSlot(slot: EnvironmentSlotInput): {
     return { dependencyStatus: 'BLOCKED_UNAPPROVED', blocker: 'UNAPPROVED_ASSET' };
   }
   if (!slot.sourceVersion) {
-    return { dependencyStatus: 'UNRESOLVED_VERSION', blocker: slot.required ? 'MISSING_LOCATION_VERSION' : null };
+    return { dependencyStatus: 'UNRESOLVED_VERSION', blocker: slot.required ? 'MISSING_ENVIRONMENT_VERSION' : null };
   }
   if (!slot.sourceSha256) {
-    return { dependencyStatus: 'UNRESOLVED_HASH', blocker: slot.required ? 'MISSING_ENVIRONMENT_SOURCE' : null };
+    return { dependencyStatus: 'UNRESOLVED_HASH', blocker: slot.required ? 'MISSING_ENVIRONMENT_HASH' : null };
   }
   if (slot.expectedVersion && slot.sourceVersion && slot.expectedVersion !== slot.sourceVersion) {
     return { dependencyStatus: 'BLOCKED_VERSION_MISMATCH', blocker: 'VERSION_MISMATCH' };
@@ -147,8 +191,19 @@ export function environmentSlot(input: EnvironmentSlotInput) {
     botaniqBound: false,
     geoScatterIntegrated: false,
     blocker: resolved.blocker,
-    latestUsed: false,
-    filenameSubstitution: false,
+    latestUsed: input.latestUsed ?? false,
+    filenameSubstitution: input.filenameSubstitution ?? false,
+    approvedAssetId: input.approvedAssetId ?? null,
+    approvedAssetVersion: input.approvedAssetVersion ?? null,
+    sourceId: input.sourceId ?? null,
+    inspectionReceiptRef: input.inspectionReceiptRef ?? null,
+    inspectionSha256: input.inspectionSha256 ?? null,
+    approvalReceiptRef: input.approvalReceiptRef ?? null,
+    approvalSha256: input.approvalSha256 ?? null,
+    assetDependencySha256: input.assetDependencySha256 ?? null,
+    resolutionReceiptRef: input.resolutionReceiptRef ?? null,
+    resolutionReceiptSha256: input.resolutionReceiptSha256 ?? null,
+    registrySnapshotSha256: input.registrySnapshotSha256 ?? null,
   };
 }
 
@@ -162,7 +217,16 @@ export function hashAssemblyManifest(input: {
   cameraTemplateId: string;
   lightingPresetId: string;
   characterSlots: Array<{ characterId: string; rigVersion: string; visible: boolean }>;
-  environmentSlots: Array<{ slotId: string; sourceVersion: string; sourceSha256: string }>;
+  environmentSlots: Array<{
+    slotId: string;
+    sourceVersion: string;
+    sourceSha256: string;
+    approvedAssetId?: string | null;
+    approvedAssetVersion?: string | null;
+    assetDependencySha256?: string | null;
+    resolutionReceiptSha256?: string | null;
+    registrySnapshotSha256?: string | null;
+  }>;
   storyPropIds: string[];
   renderProfile: RenderProfile;
 }) {
@@ -180,8 +244,16 @@ export function hashAssemblyManifest(input: {
       .map((slot) => ({ id: slot.characterId, rig: slot.rigVersion, visible: slot.visible }))
       .sort((a, b) => a.id.localeCompare(b.id)),
     environment: input.environmentSlots
-      .map((slot) => ({ id: slot.slotId, version: slot.sourceVersion, sha: slot.sourceSha256 }))
-      .sort((a, b) => a.id.localeCompare(b.id)),
+      .map((slot) => ({
+        slotId: slot.slotId,
+        approvedAssetId: slot.approvedAssetId ?? null,
+        approvedAssetVersion: slot.approvedAssetVersion ?? null,
+        sourceSha256: slot.sourceSha256,
+        assetDependencySha256: slot.assetDependencySha256 ?? null,
+        resolutionReceiptSha256: slot.resolutionReceiptSha256 ?? null,
+        registrySnapshotSha256: slot.registrySnapshotSha256 ?? null,
+      }))
+      .sort((a, b) => a.slotId.localeCompare(b.slotId)),
     storyProps: [...input.storyPropIds].sort(),
     renderProfile: input.renderProfile,
   });
@@ -202,7 +274,14 @@ export function classifyReadiness(input: {
           'HASH_MISMATCH',
           'VERSION_MISMATCH',
           'MISSING_ENVIRONMENT_SOURCE',
+          'MISSING_ENVIRONMENT_VERSION',
+          'MISSING_ENVIRONMENT_HASH',
           'MISSING_STORY_PROP',
+          'CANONICAL_CONFLICT',
+          'CONTINUITY_PIN_INVALID',
+          'LICENSE_BLOCKED',
+          'TECHNICAL_INCOMPATIBLE',
+          'STYLE_INCOMPATIBLE',
         ] as AssemblyBlocker[]
       ).includes(item),
     )
@@ -226,11 +305,18 @@ export function stoppedStage(blockers: AssemblyBlocker[]): AssemblyStage {
   if (blockers.includes('MISSING_LOCATION_VERSION')) return '02_RESOLVE_LOCATION';
   if (
     blockers.includes('MISSING_ENVIRONMENT_SOURCE') ||
+    blockers.includes('MISSING_ENVIRONMENT_VERSION') ||
+    blockers.includes('MISSING_ENVIRONMENT_HASH') ||
     blockers.includes('MISSING_DERIVATIVE') ||
     blockers.includes('UNAPPROVED_ASSET') ||
     blockers.includes('QUARANTINED_ASSET') ||
     blockers.includes('HASH_MISMATCH') ||
-    blockers.includes('VERSION_MISMATCH')
+    blockers.includes('VERSION_MISMATCH') ||
+    blockers.includes('CANONICAL_CONFLICT') ||
+    blockers.includes('CONTINUITY_PIN_INVALID') ||
+    blockers.includes('LICENSE_BLOCKED') ||
+    blockers.includes('TECHNICAL_INCOMPATIBLE') ||
+    blockers.includes('STYLE_INCOMPATIBLE')
   ) {
     return '03_RESOLVE_ASSET_RECEIPTS';
   }
