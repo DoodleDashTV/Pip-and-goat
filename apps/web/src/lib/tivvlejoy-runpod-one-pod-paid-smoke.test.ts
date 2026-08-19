@@ -12,6 +12,8 @@ describe('TivvleJoy one-Pod paid smoke contract', () => {
     expect(docs).toContain('PAID_SMOKE_PREFLIGHT_PASS');
     expect(docs).toContain('Do not POST /v1/pods unless execute');
     expect(docs).toContain('rc8eyeqhn2');
+    expect(docs).toContain('71ttvxy4wbxn46');
+    expect(docs).toContain('34a9iknfuc');
     expect(helper).toContain("export const PAID_GPU_ENABLED = false");
     expect(helper).toContain("export const POD_CREATION_ENABLED = false");
     expect(helper).toContain('runPodLifecycle');

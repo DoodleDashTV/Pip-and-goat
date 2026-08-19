@@ -33,6 +33,10 @@ import {
 } from './tivvlejoy-runpod-real-lifecycle-adapter.mjs';
 import {
   PAID_GPU_ENABLED,
+  PAID_SMOKE_ATTEMPT_1_POD_ID,
+  PAID_SMOKE_ATTEMPT_1_RECEIPT_FILE,
+  PAID_SMOKE_ATTEMPT_1_RESULT,
+  PAID_SMOKE_ATTEMPT_2_ARTIFACT_DIR,
   PAID_SMOKE_STATUS,
   POD_CREATION_ENABLED,
   REAL_NETWORK_MUTATION_ENABLED as SMOKE_REAL_NETWORK,
@@ -249,5 +253,23 @@ describe('lifecycle still works after async R2 reads', () => {
     assert.equal(moduleSource.includes('createPodForBenchmark'), false);
     assert.equal(adapterSource.includes('allowRealNetwork === true'), true);
     assert.equal(typeof runPodLifecycle, 'function');
+  });
+});
+
+describe('attempt #1 provenance and attempt #2 isolation', () => {
+  it('preserves attempt #1 and writes attempt #2 beside it', () => {
+    const receipt = JSON.parse(readFileSync(PAID_SMOKE_ATTEMPT_1_RECEIPT_FILE, 'utf8'));
+    assert.equal(PAID_SMOKE_ATTEMPT_1_POD_ID, '71ttvxy4wbxn46');
+    assert.equal(PAID_SMOKE_ATTEMPT_1_RESULT, 'RENDER_FAILED / TIMEOUT');
+    assert.equal(receipt.templateId, 'rc8eyeqhn2');
+    assert.equal(receipt.imageName.includes('d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25'), true);
+    assert.equal(receipt.templateId !== APPROVED_TEMPLATE_ID, true);
+    assert.equal(APPROVED_TEMPLATE_ID, '34a9iknfuc');
+    assert.equal(SMOKE_STARTUP_WATCHDOG_MS, 300_000);
+    assert.equal(PAID_SMOKE_ATTEMPT_2_ARTIFACT_DIR.endsWith('attempt-2'), true);
+    assert.equal(PAID_SMOKE_ATTEMPT_1_RECEIPT_FILE.includes('attempt-1'), true);
+    assert.equal(JSON.stringify(receipt).includes('RUNPOD_API_KEY'), false);
+    assert.match(moduleSource, /STARTUP_WATCHDOG_MS: String\(SMOKE_STARTUP_WATCHDOG_MS\)/);
+    assert.equal(moduleSource.includes('STARTUP_WATCHDOG_MS: String(20'), false);
   });
 });

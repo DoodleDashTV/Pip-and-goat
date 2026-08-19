@@ -75,6 +75,8 @@ export const PAID_SMOKE_ATTEMPT_1_WORKER_IMAGE_RENDER_CODE_SHA256 =
   '8210e3addd656e5d7c318dc8a66e82fe7b8ba5e1642c3f583fabbaf92a646aed';
 export const PAID_SMOKE_ATTEMPT_1_TEMPLATE_ID = 'rc8eyeqhn2';
 export const PAID_SMOKE_ATTEMPT_1_TEMPLATE_NAME = 'TivvleJoy Blender Worker - d791981a';
+export const PAID_SMOKE_ATTEMPT_1_POD_ID = '71ttvxy4wbxn46';
+export const PAID_SMOKE_ATTEMPT_1_RESULT = 'RENDER_FAILED / TIMEOUT';
 
 /**
  * Older superseded image record. Do not rewrite this historical pin.

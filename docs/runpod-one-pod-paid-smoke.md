@@ -58,7 +58,12 @@ authorize a second paid Pod.
 
 Paid smoke attempt #1 used immutable digest `d791981a4ed530214dcf96cb76593ad6e849c9e408672df36db102a52cdc1b25`
 and template `rc8eyeqhn2`. That template is historical provenance and must
-not be patched or deleted.
+not be patched or deleted. Pod `71ttvxy4wbxn46` ended `RENDER_FAILED / TIMEOUT`.
+
+Justin later authorized paid smoke attempt #2 on Draft PR #65 for the current
+`34a9iknfuc` / `b53fcbf5` generation. That authorization permits exactly one
+Pod and is consumed by the first `POST /v1/pods`. See
+`docs/runpod-paid-smoke-attempt-2.md`.
 
 ## First authorized paid run
 

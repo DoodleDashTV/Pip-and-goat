@@ -85,6 +85,21 @@ export const SMOKE_FRAME_END = 8;
 export const SMOKE_STARTUP_WATCHDOG_MS = 300_000;
 export const SMOKE_EPISODE_ID = 'meadow-map-mystery';
 export const SMOKE_SHOT_ID = 'meadow-map-smoke';
+export const PAID_SMOKE_ATTEMPT_1_POD_ID = '71ttvxy4wbxn46';
+export const PAID_SMOKE_ATTEMPT_1_RESULT = 'RENDER_FAILED / TIMEOUT';
+export const PAID_SMOKE_ATTEMPT_2_ARTIFACT_DIR = path.join(
+  REPO_ROOT,
+  'artifacts',
+  'tivvlejoy-paid-smoke',
+  'attempt-2',
+);
+export const PAID_SMOKE_ATTEMPT_1_RECEIPT_FILE = path.join(
+  REPO_ROOT,
+  'artifacts',
+  'tivvlejoy-paid-smoke',
+  'attempt-1',
+  'paid-smoke-launch-receipt.json',
+);
 
 const FOUNDING_ASSETS = Object.freeze([
   {
@@ -531,7 +546,7 @@ export async function runPaidSmokeExecute(options = {}) {
   const fetchFn = options.fetchFn || globalThis.fetch;
   const now = options.now ?? Date.now();
   const ids = options.ids || makeSmokeIds(now);
-  const artifactDir = options.artifactDir || path.join(REPO_ROOT, 'artifacts', 'tivvlejoy-paid-smoke');
+  const artifactDir = options.artifactDir || PAID_SMOKE_ATTEMPT_2_ARTIFACT_DIR;
   mkdirSync(artifactDir, { recursive: true });
 
   if (!apiKey) return fail('RUNPOD_API_KEY is missing.', 'PAID_EXECUTION_NOT_AUTHORIZED');
