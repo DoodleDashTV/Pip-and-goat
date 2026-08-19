@@ -141,6 +141,15 @@ export function PreviewDashboard({ snapshot }: { snapshot: SafePersistenceSnapsh
           Open Episode Planner
         </Link>
       </section>
+      <section className="studio-card p-4 sm:p-5">
+        <h2 className="font-display text-xl font-semibold text-[var(--color-text)]">Shot Assembly Planner</h2>
+        <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
+          Planning only. No Blender execution. No Botaniq processing. No paid GPU.
+        </p>
+        <Link href="/shot-assembly" className="btn-primary mt-4 w-full px-4 text-sm sm:w-auto">
+          Open Shot Assembly
+        </Link>
+      </section>
     </div>
   );
 }

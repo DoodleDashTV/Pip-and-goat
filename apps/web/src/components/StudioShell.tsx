@@ -15,6 +15,7 @@ const PRIMARY_NAV = [
   { href: '/voice-production', label: 'Voice Production' },
   { href: '/scenery', label: 'Scenery' },
   { href: '/episode-planner', label: 'Episode Planner' },
+  { href: '/shot-assembly', label: 'Shot Assembly' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
   { href: '/render-queue', label: 'Render Queue' },
