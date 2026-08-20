@@ -36,6 +36,7 @@ function exactInput(segmentId: string) {
     segmentId: request.segmentId,
     speaker: request.speaker,
     canonicalText: request.canonicalText,
+    characterCount: request.characterCount,
     textSha256: request.textSha256,
     segmentSha256: request.segmentSha256,
     dialogueSha256: request.dialogueSha256,
@@ -77,9 +78,20 @@ describe('TIVVLEJOY_EP012_VOICE_AUTHORIZATION_V1', () => {
       expect(segment).toBeDefined();
       expect(request.speaker).toBe(segment?.speaker);
       expect(request.canonicalText).toBe(segment?.canonicalText);
+      expect(request.characterCount).toBe(Array.from(segment?.canonicalText ?? '').length);
       expect(request.textSha256).toBe(segment?.textSha256);
       expect(request.segmentSha256).toBe(segment?.segmentSha256);
     }
+  });
+
+  it('pins the exact authorized character budget from the locked text', () => {
+    expect(EP012_VOICE_AUTHORIZATION.pipCharacterCount).toBe(289);
+    expect(EP012_VOICE_AUTHORIZATION.goatCharacterCount).toBe(171);
+    expect(EP012_VOICE_AUTHORIZATION.totalCharacterCount).toBe(460);
+    expect(EP012_VOICE_AUTHORIZATION.maxPaidCharacters).toBe(460);
+    expect(
+      EP012_VOICE_AUTHORIZATION.authorizedRequests.reduce((sum, request) => sum + request.characterCount, 0),
+    ).toBe(460);
   });
 
   it('uses one deterministic request id per speaker segment', () => {
@@ -92,6 +104,11 @@ describe('TIVVLEJOY_EP012_VOICE_AUTHORIZATION_V1', () => {
   it('forbids automatic retry so a provider request cannot be silently billed twice', () => {
     expect(EP012_VOICE_AUTHORIZATION.automaticRetryAllowed).toBe(false);
     expect(EP012_VOICE_AUTHORIZATION.authorizedRequests.every((request) => !request.automaticRetryAllowed)).toBe(true);
+  });
+
+  it('authorizes provider contact only inside this exact scope', () => {
+    expect(EP012_VOICE_AUTHORIZATION.providerContactAuthorizedWithinScope).toBe(true);
+    expect(EP012_VOICE_AUTHORIZATION.scope).toBe('EP012_CANONICAL_SUBSEGMENTS_ONLY');
   });
 
   it('does not weaken the durable-ledger or server-gate requirements', () => {
@@ -162,6 +179,13 @@ describe('TIVVLEJOY_EP012_VOICE_AUTHORIZATION_V1', () => {
   it('rejects a speaker swap', () => {
     const input = exactInput('DL_HOOK_01__PIP');
     expect(() => assertEp012VoiceRequestAuthorized({ ...input, speaker: 'GOAT' })).toThrow(/REQUEST_MISMATCH/);
+  });
+
+  it('rejects a character-count change', () => {
+    const input = exactInput('DL_HOOK_01__PIP');
+    expect(() => assertEp012VoiceRequestAuthorized({ ...input, characterCount: input.characterCount + 1 })).toThrow(
+      /REQUEST_MISMATCH/,
+    );
   });
 
   it('rejects a text hash change', () => {
