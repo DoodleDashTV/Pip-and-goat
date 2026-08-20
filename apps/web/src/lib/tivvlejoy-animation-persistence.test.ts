@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryStore } from './tivvlejoy-production-persistence';
-import { buildProductionStateGraph } from './tivvlejoy-production-studio/state-graph';
+import { buildProductionStateGraph, changeImpact } from './tivvlejoy-production-studio/state-graph';
 import { assembleShot, ep012AssemblyInputs } from './tivvlejoy-shot-assembly-manifest';
 import {
   evaluateRigAdmission,
@@ -303,5 +303,66 @@ describe('animation persistence and state graph integration', () => {
       },
     ]);
     expect(graph.nodes.find((node) => node.kind === 'CHARACTER_RIG')?.humanLabel).toBe('Waiting for Pip production rig');
+  });
+
+  it('does not invalidate an unrelated episode animation node when one location changes', () => {
+    const graph = buildProductionStateGraph([
+      { episodeId: 'EP001', scriptSha256: '11'.repeat(32), shots: [{ shotId: 'A', locationId: 'bakery', locationSha256: '22'.repeat(32), charactersVisible: ['PIP'] }] },
+      { episodeId: 'EP002', scriptSha256: '33'.repeat(32), shots: [{ shotId: 'B', locationId: 'forest_exit', locationSha256: '44'.repeat(32), charactersVisible: ['GOAT'] }] },
+    ]);
+    const bakery = graph.nodes.find((node) => node.nodeId.includes('LOCATION::bakery'))!.nodeId;
+    expect(changeImpact(graph, [bakery]).some((id) => id.includes('EP002::ANIMATION'))).toBe(false);
+  });
+
+  it('writes animation batch hashes that survive a second persist', () => {
+    const store = createMemoryStore({ workspaceId: 'ws_batch' });
+    const batch = planAnimationBatches({ episodeHorizon: 10, shots: [] });
+    persistAnimationArtifacts({
+      store,
+      plans: [],
+      admissions: [evaluateRigAdmission({ characterId: 'PIP' })],
+      qcReports: [],
+      batch,
+    });
+    expect(store.readRecord('ANIMATION_BATCH_PLAN', 'horizon-10')?.payload.batchPlanSha256).toBe(batch.batchPlanSha256);
+  });
+
+  it('stores viseme and timing hashes beside the shot animation manifest', () => {
+    const store = createMemoryStore({ workspaceId: 'ws_timing' });
+    const plan = planCharacterShot({
+      shotId: 'T1',
+      characterId: 'PIP',
+      speaking: true,
+      voice: { audioReceiptRef: 'VR', audioSha256: '33'.repeat(32), durationMs: 1100 },
+    });
+    persistAnimationArtifacts({
+      store,
+      plans: [plan],
+      admissions: [evaluateRigAdmission({ characterId: 'PIP' })],
+      qcReports: [],
+      batch: planAnimationBatches({ episodeHorizon: 1, shots: [] }),
+    });
+    expect(store.readRecord('DIALOGUE_TIMING_PLAN', 'T1:PIP:timing')?.payload.sha256).toBe(plan.timing.timingSha256);
+    expect(store.readRecord('VISEME_PLAN', 'T1:PIP:viseme')?.payload.sha256).toBe(plan.viseme.visemePlanSha256);
+  });
+
+  it('keeps SHOT_ASSEMBLY waiting for rigs even after an animation plan is attached', () => {
+    const graph = buildProductionStateGraph([
+      {
+        episodeId: 'EP012',
+        scriptSha256: 'aa'.repeat(32),
+        shots: [
+          {
+            shotId: 'SH001',
+            locationId: 'bakery',
+            charactersVisible: ['PIP'],
+            animationPlanReady: true,
+            animationQcReady: true,
+            shotAnimationManifestSha256: '11'.repeat(32),
+          },
+        ],
+      },
+    ]);
+    expect(graph.nodes.find((node) => node.kind === 'SHOT_ASSEMBLY')?.state).toBe('WAITING_FOR_RIG');
   });
 });

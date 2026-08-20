@@ -212,4 +212,19 @@ describe('60-episode animation simulation and stress tests', () => {
     expect(bakery.manifest.shotAnimationDependencySha256).not.toBe(forest.manifest.shotAnimationDependencySha256);
     expect(JSON.stringify(bakery.manifest.rig)).not.toMatch(/bakery\.blend|forest\.blend/);
   });
+
+  it('plans a map pickup walk transfer and put-down without admitting synthetic rigs', () => {
+    const pickup = planCharacterShot({ shotId: 'M1', characterId: 'PIP', prop: 'PICK_UP', locomotion: 'walk', partner: 'GOAT' });
+    const handoff = planCharacterShot({ shotId: 'M2', characterId: 'PIP', prop: 'HAND_OVER', partner: 'GOAT' });
+    const receive = planCharacterShot({ shotId: 'M3', characterId: 'GOAT', prop: 'RECEIVE', partner: 'PIP' });
+    expect(pickup.usesProp).toBe(true);
+    expect(handoff.props.events[0]?.state).toBe('TRANSFERRING');
+    expect(receive.characterId).toBe('GOAT');
+    expect(pickup.admitted).toBe(false);
+  });
+
+  it('keeps season hashes filename-free', () => {
+    expect(season.simulationSha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(JSON.stringify(season)).not.toMatch(/pip_production\.blend|goat_production\.blend/);
+  });
 });

@@ -204,4 +204,41 @@ describe('animation continuity and props', () => {
     expect(issue?.fromShotId).toBe('A1');
     expect(issue?.toShotId).toBe('B2');
   });
+
+  it('treats a released map as free for the next carrier only after RELEASED', () => {
+    expect(
+      detectPropTeleport([
+        { shotId: 'A', propId: 'STORY_MAP', fromCarrier: 'PIP', toCarrier: null, state: 'RELEASED' },
+        { shotId: 'B', propId: 'STORY_MAP', fromCarrier: null, toCarrier: 'GOAT', state: 'ATTACHED' },
+      ]),
+    ).toBe(false);
+  });
+
+  it('flags Goat suddenly holding a map Pip still owned', () => {
+    expect(
+      detectPropTeleport([
+        { shotId: 'A', propId: 'STORY_MAP', fromCarrier: null, toCarrier: 'PIP', state: 'HELD' },
+        { shotId: 'B', propId: 'STORY_MAP', fromCarrier: 'GOAT', toCarrier: 'GOAT', state: 'HELD' },
+      ]),
+    ).toBe(true);
+  });
+
+  it('allows a stored identity accessory to stay off the transfer ledger', () => {
+    expect(
+      detectPropTeleport([
+        { shotId: 'A', propId: 'SCARF', fromCarrier: 'PIP', toCarrier: 'PIP', state: 'STORED' },
+        { shotId: 'B', propId: 'SCARF', fromCarrier: 'PIP', toCarrier: 'PIP', state: 'HELD' },
+      ]),
+    ).toBe(false);
+  });
+
+  it('keeps a reaching state from jumping carriers', () => {
+    expect(
+      detectPropTeleport([
+        { shotId: 'A', propId: 'STORY_MAP', fromCarrier: null, toCarrier: 'PIP', state: 'APPROACHING' },
+        { shotId: 'B', propId: 'STORY_MAP', fromCarrier: 'PIP', toCarrier: 'PIP', state: 'REACHING' },
+        { shotId: 'C', propId: 'STORY_MAP', fromCarrier: 'PIP', toCarrier: 'PIP', state: 'ATTACHED' },
+      ]),
+    ).toBe(false);
+  });
 });

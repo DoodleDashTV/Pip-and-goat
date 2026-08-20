@@ -253,4 +253,47 @@ describe('dialogue timing viseme blink and gaze', () => {
     expect(timing.speechEnd).toBeNull();
     expect(timing.audioReceiptRef).toBeNull();
   });
+
+  const seeds = [1, 7, 19, 41, 99];
+  for (const seed of seeds) {
+    it(`keeps blink planning deterministic for seed ${seed}`, () => {
+      const input = {
+        shotId: 'SEED',
+        characterId: 'GOAT' as const,
+        durationMs: 3600,
+        emotion: 'warm',
+        speaking: true,
+        attentionShifts: [500, 1800],
+        seed,
+      };
+      expect(buildBlinkPlan(input).blinkPlanSha256).toBe(buildBlinkPlan(input).blinkPlanSha256);
+    });
+  }
+
+  it('does not emit a blink after the shot ends', () => {
+    const plan = buildBlinkPlan({
+      shotId: 'END',
+      characterId: 'PIP',
+      durationMs: 900,
+      emotion: 'curious',
+      speaking: false,
+      attentionShifts: [2000],
+      seed: 8,
+    });
+    expect(plan.events.every((event) => event.atMs < 900)).toBe(true);
+  });
+
+  it('uses a rhythmic six-key viseme plan for line-level timing', () => {
+    const viseme = buildVisemePlan(
+      buildDialogueTiming({
+        lineId: 'RHYTHM',
+        characterId: 'PIP',
+        audioReceiptRef: 'VR',
+        audioSha256: '22'.repeat(32),
+        durationMs: 1800,
+      }),
+    );
+    expect(viseme.keys).toHaveLength(6);
+    expect(viseme.keys.at(-1)?.bucket).toBe('REST');
+  });
 });

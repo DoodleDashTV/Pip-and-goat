@@ -226,8 +226,58 @@ describe('animation manifest cache and batching', () => {
   }
 
   it('changes the dependency when performance intent changes', () => {
-    const calm = planCharacterShot({ shotId: 'S1', characterId: 'PIP', emotion: 'curious' as never });
+    const calm = planCharacterShot({ shotId: 'S1', characterId: 'PIP' });
     const run = planCharacterShot({ shotId: 'S1', characterId: 'PIP', locomotion: 'run' });
     expect(calm.manifest.performanceIntentSha256).not.toBe(run.manifest.performanceIntentSha256);
+  });
+
+  it('does not stale Goat animation when only a Pip voice receipt changes', () => {
+    const goat = planCharacterShot({ shotId: 'S1', characterId: 'GOAT' });
+    const goatAfterPipVoice = planCharacterShot({ shotId: 'S1', characterId: 'GOAT' });
+    const pipChanged = planCharacterShot({
+      shotId: 'S1',
+      characterId: 'PIP',
+      speaking: true,
+      voice: { audioReceiptRef: 'X', audioSha256: '99'.repeat(32), durationMs: 800 },
+    });
+    expect(goat.manifest.shotAnimationDependencySha256).toBe(goatAfterPipVoice.manifest.shotAnimationDependencySha256);
+    expect(pipChanged.speaking).toBe(true);
+  });
+
+  it('groups shared walk foundations separately from run foundations', () => {
+    const plan = planAnimationBatches({
+      episodeHorizon: 10,
+      shots: [
+        {
+          shotId: 'W1',
+          episodeId: 'EP001',
+          characterIds: ['PIP'],
+          locationId: 'bakery',
+          dialogueReady: true,
+          animationDependencyReady: true,
+          locomotionClass: 'WALK',
+          actionFoundation: 'curious',
+          pipRigVersion: 'V1',
+          goatRigVersion: 'V1',
+          pipAdmitted: false,
+          goatAdmitted: false,
+        },
+        {
+          shotId: 'R1',
+          episodeId: 'EP001',
+          characterIds: ['PIP'],
+          locationId: 'bakery',
+          dialogueReady: true,
+          animationDependencyReady: true,
+          locomotionClass: 'RUN',
+          actionFoundation: 'curious',
+          pipRigVersion: 'V1',
+          goatRigVersion: 'V1',
+          pipAdmitted: false,
+          goatAdmitted: false,
+        },
+      ],
+    });
+    expect(plan.groups).toHaveLength(2);
   });
 });

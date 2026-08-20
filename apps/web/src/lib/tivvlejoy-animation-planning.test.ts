@@ -128,4 +128,20 @@ describe('body acting locomotion and contact', () => {
       'ZERO_UNEXPLAINED_SLIDE',
     );
   });
+
+  const energies = ['curious', 'happy', 'confused', 'surprised', 'concerned'] as const;
+  for (const emotion of energies) {
+    it(`builds a ${emotion} body plan for both characters`, () => {
+      const pip = buildBodyActingPlan(intentFromBeat({ shotId: emotion, characterId: 'PIP', emotion }));
+      const goat = buildBodyActingPlan(intentFromBeat({ shotId: emotion, characterId: 'GOAT', emotion }));
+      expect(pip.characterId).toBe('PIP');
+      expect(goat.characterId).toBe('GOAT');
+      expect(pip.bodyActingPlanSha256).not.toBe(goat.bodyActingPlanSha256);
+    });
+  }
+
+  it('keeps contact hashes stable for identical locomotion', () => {
+    const loco = buildLocomotionPlan({ shotId: 'C1', characterId: 'GOAT', speedClass: 'RUN', durationMs: 1400 });
+    expect(buildContactPlan(loco).contactPlanSha256).toBe(buildContactPlan(loco).contactPlanSha256);
+  });
 });
