@@ -7,6 +7,7 @@ export * from './blender-bootstrap';
 export * from './blender-acceptance';
 export * from './commercial-gate';
 export * from './ep012-canonical-dialogue';
+export * from './ep012-voice-authorization';
 export * from './voice-plan';
 export * from './voice-cost';
 export * from './voice-timing';
