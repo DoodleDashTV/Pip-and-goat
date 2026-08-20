@@ -145,7 +145,7 @@ export function planMusicCue(input: {
     endFrame: input.endFrame,
     energy: input.role === 'TENSION' || input.role === 'ADVENTURE' ? 0.7 : input.role === 'ENDING_BUTTON' || input.role === 'HEARTWARMING' ? 0.35 : 0.5,
     duckUnderDialogue: duck,
-    transition: input.role === 'ENDING_BUTTON' ? 'CROSSFADE' : 'HOLD',
+    transition: (input.role === 'ENDING_BUTTON' ? 'CROSSFADE' : 'HOLD') as MusicCue['transition'],
     storyBeatRefs: input.storyBeatRefs,
     copyrightedAudioIncluded: false as const,
   };

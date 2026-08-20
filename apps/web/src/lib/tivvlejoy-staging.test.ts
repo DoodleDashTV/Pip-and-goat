@@ -82,6 +82,15 @@ describe('staging and screen direction', () => {
     expect(ledger.facts[0]?.state).toBe('INVALID_SCREEN_DIRECTION');
   });
 
+  it('does not randomly flip screen sides on a still conversation', () => {
+    const a = planCharacterStaging({ shotId: 'STILL_A', mode: 'PIP_SPEAKING' });
+    const b = planCharacterStaging({ shotId: 'STILL_B', mode: 'GOAT_SPEAKING' });
+    expect(a.screenDirection).toBe('NEUTRAL');
+    expect(b.screenDirection).toBe('NEUTRAL');
+    expect(a.pipZone.x).toBeLessThan(a.goatZone.x);
+    expect(b.pipZone.x).toBeLessThan(b.goatZone.x);
+  });
+
   it('chooses conversation modes from story situation', () => {
     expect(conversationModeFor({ map: true })).toBe('MAP_READING');
     expect(conversationModeFor({ speaker: 'GOAT' })).toBe('GOAT_SPEAKING');

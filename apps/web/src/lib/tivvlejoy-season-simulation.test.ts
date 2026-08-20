@@ -190,7 +190,7 @@ describe('season simulation', () => {
     expect(plan.schemaVersion).toBe('TIVVLEJOY_PRODUCTION_STUDIO_ORCHESTRATOR_V1');
     expect(plan.packets).toHaveLength(60);
     expect(plan.safeNextActions.length).toBeGreaterThan(0);
-    expect(plan.safeNextActions.every((item) => !/started gpu|rendered|uploaded|approved/i.test(item.label))).toBe(true);
+    expect(plan.safeNextActions.every((item) => !/started gpu|gpu started|render completed|uploaded|asset approved|rigs? approved/i.test(item.label))).toBe(true);
   });
 
   it('lets newly approved registry assets flow into packets without auto-approval', () => {

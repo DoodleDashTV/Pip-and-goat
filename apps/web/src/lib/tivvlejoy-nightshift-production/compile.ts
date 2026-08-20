@@ -11,7 +11,7 @@ import { planCameraMotion } from './camera-motion';
 import { buildDirectorPerformanceNote } from './performance-notes';
 import { lightingIntentFor, planLightingDirection } from './lighting';
 import { vfxForShot } from './vfx';
-import { buildEditorialTimeline, durationForShot, evaluateEditRhythm } from './editorial';
+import { buildEditorialTimeline, durationForShot, evaluateEditRhythm, type ShotTiming } from './editorial';
 import { buildVoiceTimingReceipt, planDialogueEdit, type DialogueEdit } from './dialogue';
 import { ambienceForLocation, musicRoleForBeat, planMusicCue, planSfxEvent, sfxFromContacts, type AmbienceEvent, type MusicCue, type SfxEvent } from './sound';
 import { captionsFromDialogue, evaluateCaptionQc } from './captions';
@@ -19,6 +19,8 @@ import { planJlCut } from './jl-cuts';
 import { addDailiesNote, emptyApprovalMatrix } from './dailies';
 import { bindDirectorPackageToPacket, compileDirectorPackage, compileFinalShotSpec, type EpisodeDirectorPackage, type FinalShotSpec } from './specs';
 import type { CameraMotion, ShotIntent } from './types';
+import type { DirectorPerformanceNote } from './performance-notes';
+import type { LightingDirection } from './lighting';
 
 export type CompiledShot = {
   shotId: string;
@@ -59,14 +61,14 @@ export function compileDirectedEpisode(episode: SimulatedEpisode, options: { fps
   });
   const beats = buildStoryBeats({ intent, shotCount: episode.shots.length, locations, heroProp: 'map' });
   const compiledShots: CompiledShot[] = [];
-  const timings = [];
+  const timings: ShotTiming[] = [];
   const videoShots: Array<{ shotId: string; durationFrames: number; intent: ShotIntent; locationId: string; dialogueRef?: string | null }> = [];
   const dialogue: DialogueEdit[] = [];
   const sfx: SfxEvent[] = [];
   const ambience: AmbienceEvent[] = [];
   const music: MusicCue[] = [];
-  const performanceNotes = [];
-  const lightingPlans = [];
+  const performanceNotes: DirectorPerformanceNote[] = [];
+  const lightingPlans: LightingDirection[] = [];
   let cursor = 0;
   let movingStreak = 0;
   let previousMotion: CameraMotion | undefined;

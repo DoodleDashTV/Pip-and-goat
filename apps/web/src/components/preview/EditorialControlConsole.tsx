@@ -23,15 +23,15 @@ export function EditorialControlConsole({ model }: { model: NightshiftConsoleMod
           Timeline, dialogue, SFX, music, ambience, and caption lanes are planning metadata. This page does not claim a
           final mix or a finished episode.
         </p>
-        <p className="text-sm">
-          <Link href="/director-control" className="font-bold underline">
+        <nav aria-label="Editorial workspace" className="text-sm">
+          <Link href="/director-control" className="inline-flex min-h-11 items-center font-bold underline">
             Director control
           </Link>
           {' · '}
-          <Link href="/dailies" className="font-bold underline">
+          <Link href="/dailies" className="inline-flex min-h-11 items-center font-bold underline">
             Dailies
           </Link>
-        </p>
+        </nav>
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Stat label="Shots" value={model.editorial.shots} />

@@ -40,4 +40,26 @@ describe('caption system', () => {
   it('only formats whitespace, never rewrites dialogue', () => {
     expect(formatCaptionText('  I   see   it.  ')).toBe('I see it.');
   });
+
+  for (const speaker of ['PIP', 'GOAT'] as const) {
+    it(`keeps ${speaker} captions inside a covering shot`, () => {
+      const cue = planCaptionCue({ captionId: speaker, speaker, text: 'Look.', startFrame: 10, endFrame: 40 });
+      const qc = evaluateCaptionQc({
+        captions: [cue],
+        shotRanges: [{ shotId: 'SH01', inFrame: 0, outFrame: 48 }],
+      });
+      expect(qc.passed).toBe(true);
+    });
+  }
+
+  it('flags a speaker change that collides with the previous cue', () => {
+    const qc = evaluateCaptionQc({
+      captions: [
+        planCaptionCue({ captionId: 'A', speaker: 'PIP', text: 'Hello there friend', startFrame: 0, endFrame: 40 }),
+        planCaptionCue({ captionId: 'B', speaker: 'GOAT', text: 'Hi', startFrame: 40, endFrame: 70 }),
+      ],
+      shotRanges: [{ shotId: 'SH01', inFrame: 0, outFrame: 80 }],
+    });
+    expect(qc.findings.some((item) => item.code === 'SPEAKER_CHANGE')).toBe(true);
+  });
 });

@@ -39,7 +39,8 @@ export function planVfxDirection(input: {
   type: VfxIntent;
   qualityTier?: VfxDirection['qualityTier'];
 }): VfxDirection {
-  const layer = input.type === 'LIGHT_RAYS' || input.type === 'FOG' || input.type === 'FIREFLY' ? 'BACKGROUND' : 'FOREGROUND';
+  const layer: VfxDirection['layer'] =
+    input.type === 'LIGHT_RAYS' || input.type === 'FOG' || input.type === 'FIREFLY' ? 'BACKGROUND' : 'FOREGROUND';
   const body = {
     schemaVersion: VFX_DIRECTION_SCHEMA,
     vfxId: `${input.shotId}_${input.type}`,
@@ -49,10 +50,10 @@ export function planVfxDirection(input: {
     qualityTier: input.qualityTier ?? 'SUPPORTING',
     layer,
     duration: input.type === 'MAGIC_SPARKLE' || input.type === 'CONFETTI' ? 36 : 90,
-    density: input.type === 'RAIN' || input.type === 'SNOW' ? 'MEDIUM' : 'SPARSE',
-    characterInteraction: input.type === 'DUST_PUFF' || input.type === 'SPLASH' ? 'CONTACT' : 'NONE',
+    density: (input.type === 'RAIN' || input.type === 'SNOW' ? 'MEDIUM' : 'SPARSE') as VfxDirection['density'],
+    characterInteraction: (input.type === 'DUST_PUFF' || input.type === 'SPLASH' ? 'CONTACT' : 'NONE') as VfxDirection['characterInteraction'],
     safety: 'CHILD_SAFE_CARTOON' as const,
-    renderCostClass: input.type === 'RAIN' || input.type === 'SNOW' || input.type === 'FOG' ? 'MEDIUM' : 'LOW',
+    renderCostClass: (input.type === 'RAIN' || input.type === 'SNOW' || input.type === 'FOG' ? 'MEDIUM' : 'LOW') as VfxDirection['renderCostClass'],
     executed: false as const,
   };
   return { ...body, vfxDependencySha256: sha256Canonical(body) };

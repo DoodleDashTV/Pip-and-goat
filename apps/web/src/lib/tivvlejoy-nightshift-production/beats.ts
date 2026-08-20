@@ -62,7 +62,7 @@ export function buildStoryBeats(input: {
       beatId: `${input.intent.episodeId}_BEAT_${String(index + 1).padStart(2, '0')}`,
       beatType,
       purpose: purposeFor(beatType, input.intent),
-      characters: (beatType === 'INSERT' ? ['PIP'] : ['PIP', 'GOAT']) as Array<'PIP' | 'GOAT'>,
+      characters: (['PIP', 'GOAT'] as const).slice() as Array<'PIP' | 'GOAT'>,
       location,
       prop: beatType === 'DISCOVERY' || beatType === 'REVEAL' ? input.heroProp ?? 'map' : null,
       dialogueRefs: dialogue,
@@ -71,7 +71,11 @@ export function buildStoryBeats(input: {
       requiredAudienceKnowledge: knowledgeFor(beatType, input.intent),
       energy: energyFor(beatType, input.intent.energyProfile),
       durationTarget: durationFor(beatType, input.intent.paceProfile),
-      cutPriority: beatType === 'BUTTON' || beatType === 'REVEAL' || beatType === 'HOOK' ? 'MUST_HOLD' : beatType === 'TRANSITION' ? 'CUTTABLE' : 'FLEXIBLE',
+      cutPriority: (beatType === 'BUTTON' || beatType === 'REVEAL' || beatType === 'HOOK'
+        ? 'MUST_HOLD'
+        : beatType === 'TRANSITION'
+          ? 'CUTTABLE'
+          : 'FLEXIBLE') as StoryBeat['cutPriority'],
       continuityRequirements: [`location:${location}`, `axis:${input.intent.episodeId}`],
       directorNotes: `${beatType} should serve ${input.intent.episodeGoal} without inventing a final script.`,
     };

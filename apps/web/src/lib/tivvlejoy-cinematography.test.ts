@@ -80,6 +80,14 @@ describe('cinematography and vertical composition', () => {
     expect(composition.checks.FACE_SAFE).toBe(true);
   });
 
+  it('keeps caption-safe default subjects out of the platform overlay bands', () => {
+    const plan = planCinematography({ shotId: 'SH_SAFE', intent: 'MEDIUM_TWO_SHOT' });
+    const subjects = defaultSubjectsFor(plan);
+    const composition = evaluateVerticalComposition({ subjects, captionsEnabled: true });
+    expect(composition.checks.CAPTION_SAFE).toBe(true);
+    expect(composition.checks.HEADROOM_SAFE).toBe(true);
+  });
+
   it('refuses random motion and applies fatigue after a moving streak', () => {
     const intent = buildEpisodeCreativeIntent({ episodeId: 'EP006', episodeNumber: 6 });
     const beats = buildStoryBeats({ intent, shotCount: 4 });

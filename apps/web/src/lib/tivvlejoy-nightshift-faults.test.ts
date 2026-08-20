@@ -43,7 +43,6 @@ describe('nightshift fault matrix', () => {
         softwareLayers: fault === 'missing edit' || fault === 'missing camera' ? ['ASSET'] : ['DIRECTING', 'EDITORIAL', 'ANIMATION', 'ASSET'],
       });
       expect(readiness.state).not.toBe('PRODUCTION_READY');
-      expect(readiness.state === 'PRODUCTION_READY' ? 1 : 0).toBe(0);
     });
   }
 

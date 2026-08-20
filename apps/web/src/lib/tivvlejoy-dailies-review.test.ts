@@ -63,6 +63,25 @@ describe('dailies, revisions, and approvals', () => {
     expect(reviewCategories()).toHaveLength(13);
   });
 
+  for (const category of reviewCategories()) {
+    it(`keeps a ${category} note from auto-approving`, () => {
+      const note = addDailiesNote({
+        reviewId: `N_${category}`,
+        shotId: 'SH09',
+        shotDependencySha256: 'cc'.repeat(32),
+        reviewerClass: 'SYNTHETIC_OPERATOR',
+        reviewCategory: category,
+        note: `${category} check`,
+        severity: 'NOTE',
+        frameRange: { start: 0, end: 8 },
+        createdAt: '1970-01-01T00:00:00.000Z',
+        resolvedByRevision: null,
+      });
+      expect(note.autoApproved).toBe(false);
+      expect(note.reviewSha256).toMatch(/^[a-f0-9]{64}$/);
+    });
+  }
+
   it('maps change kinds to minimal invalidation', () => {
     expect(evaluateChangeImpact('CAMERA').preserves).toContain('voice receipt');
     expect(evaluateChangeImpact('LIGHTING').preserves).toContain('voice receipt');

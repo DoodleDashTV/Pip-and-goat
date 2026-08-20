@@ -37,6 +37,16 @@ describe('dialogue editor and voice timing', () => {
     expect(edit.comedyBeat).toBe(8);
   });
 
+  for (const speaker of ['PIP', 'GOAT'] as const) {
+    it(`plans a ${speaker} line with breath space and no synthesis`, () => {
+      const receipt = buildVoiceTimingReceipt({ dialogueRef: `${speaker}_L`, speaker, lineDurationFrames: 36, words: ['I', 'see'] });
+      const edit = planDialogueEdit({ lineId: `${speaker}_L`, speaker, shotId: 'SHX', pictureIn: 30, receipt });
+      expect(edit.breathSpace).toBeGreaterThan(0);
+      expect(edit.synthesized).toBe(false);
+      expect(edit.confidence).toBe('WORD_LEVEL');
+    });
+  }
+
   it('plans J and L cuts without duplicating dialogue', () => {
     const receipt = buildVoiceTimingReceipt({ dialogueRef: 'DL4', speaker: 'PIP', lineDurationFrames: 30 });
     const outgoing = planDialogueEdit({ lineId: 'DL4', speaker: 'PIP', shotId: 'A', pictureIn: 0, receipt });

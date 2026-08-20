@@ -184,6 +184,13 @@ describe('cost, proxy, graph, and safety', () => {
     expect(graph.nodes.some((node) => node.state === 'WAITING_FOR_RIG' || node.blockerClass === 'RIG' || node.humanLabel.includes('rig'))).toBe(true);
   });
 
+  it('scales graph and hash work beyond 60 episodes without claiming readiness', () => {
+    const sim = simulateNightshiftSeason({ episodeCount: 8, shotsPerEpisode: 12 });
+    expect(sim.shots).toBe(96);
+    expect(sim.readinessState).not.toBe('PRODUCTION_READY');
+    expect(JSON.stringify(sim.compiled[0]?.directorPackage)).not.toMatch(/DATABASE_URL|R2_SECRET|RUNPOD|ELEVENLABS|sk-/);
+  });
+
   it('keeps the nightshift safety report closed', () => {
     const safety = nightshiftSafetyReport();
     expect(safety.productionMutation).toBe(false);

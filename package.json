@@ -103,7 +103,7 @@
     "validate:shot-approval": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-dailies-review.test.ts",
     "validate:director-package": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-director-package.test.ts",
     "validate:master-production-readiness": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-director-package.test.ts",
-    "validate:production-nightshift-simulation": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-director-package.test.ts src/lib/tivvlejoy-nightshift-faults.test.ts",
+    "validate:production-nightshift-simulation": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-director-package.test.ts src/lib/tivvlejoy-nightshift-faults.test.ts src/lib/tivvlejoy-nightshift-depth.test.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",

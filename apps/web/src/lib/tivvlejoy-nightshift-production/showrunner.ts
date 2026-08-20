@@ -57,7 +57,12 @@ export function buildEpisodeCreativeIntent(input: {
   const seasonId = input.seasonId ?? 'S01';
   const goal = GOALS[(input.episodeNumber - 1) % GOALS.length]!;
   const paceProfile = paceForEpisode(input.episodeNumber);
-  const energyProfile = paceProfile === 'CALM_DISCOVERY' || paceProfile === 'EMOTIONAL_HOLD' ? 'LOW' : paceProfile === 'FAST_COMEDY' || paceProfile === 'ACTION_BURST' ? 'HIGH' : 'MEDIUM';
+  const energyProfile: EpisodeCreativeIntent['energyProfile'] =
+    paceProfile === 'CALM_DISCOVERY' || paceProfile === 'EMOTIONAL_HOLD'
+      ? 'LOW'
+      : paceProfile === 'FAST_COMEDY' || paceProfile === 'ACTION_BURST'
+        ? 'HIGH'
+        : 'MEDIUM';
   const body = {
     schemaVersion: SHOWRUNNER_SCHEMA,
     episodeId: input.episodeId,
@@ -85,8 +90,8 @@ export function buildEpisodeCreativeIntent(input: {
     callback: input.episodeNumber > 1 ? `A quiet nod to EP${String(input.episodeNumber - 1).padStart(3, '0')}.` : null,
     paceProfile,
     energyProfile,
-    dialogueDensityTarget: energyProfile === 'HIGH' ? 'DENSE' : energyProfile === 'LOW' ? 'SPARSE' : 'BALANCED',
-    visualNoveltyTarget: input.episodeNumber % 5 === 0 ? 'NOVEL' : input.episodeNumber % 3 === 0 ? 'MIXED' : 'FAMILIAR',
+    dialogueDensityTarget: (energyProfile === 'HIGH' ? 'DENSE' : energyProfile === 'LOW' ? 'SPARSE' : 'BALANCED') as EpisodeCreativeIntent['dialogueDensityTarget'],
+    visualNoveltyTarget: (input.episodeNumber % 5 === 0 ? 'NOVEL' : input.episodeNumber % 3 === 0 ? 'MIXED' : 'FAMILIAR') as EpisodeCreativeIntent['visualNoveltyTarget'],
     synthetic: true as const,
   };
   return { ...body, episodeCreativeIntentSha256: sha256Canonical(body) };

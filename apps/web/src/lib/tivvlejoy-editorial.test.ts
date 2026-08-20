@@ -99,4 +99,43 @@ describe('editorial timeline and pacing', () => {
     expect(paceProfiles()).toEqual([...PACE_PROFILES]);
     expect(transitionTypes()).toEqual([...TRANSITIONS]);
   });
+
+  for (const [fromIntent, toIntent] of [
+    ['ESTABLISHING', 'MEDIUM_TWO_SHOT'],
+    ['CLOSE_UP', 'REACTION'],
+    ['FOLLOW', 'LOCATION_TRANSITION'],
+    ['PROP_INSERT', 'REACTION'],
+    ['STATIC_COMEDY', 'MEDIUM_SINGLE'],
+    ['WIDE_TWO_SHOT', 'PUSH_IN'],
+    ['OVER_SHOULDER', 'CLOSE_UP'],
+    ['PAN_REVEAL', 'REACTION'],
+    ['TRACKING', 'ESTABLISHING'],
+    ['ENVIRONMENT_HERO', 'WIDE_TWO_SHOT'],
+  ] as const) {
+    it(`gives ${fromIntent} -> ${toIntent} a written transition reason`, () => {
+      const transition = chooseTransition({ fromIntent, toIntent, locationChanged: fromIntent === 'FOLLOW' });
+      expect(transition.reason.length).toBeGreaterThan(8);
+      expect(TRANSITIONS).toContain(transition.type);
+    });
+  }
+
+  it('keeps J-cut style picture order when dialogue is absent on the outgoing shot', () => {
+    const timeline = buildEditorialTimeline({
+      episodeId: 'EP020',
+      shots: [
+        { shotId: 'A', durationFrames: 60, intent: 'ESTABLISHING', locationId: 'village' },
+        { shotId: 'B', durationFrames: 90, intent: 'MEDIUM_TWO_SHOT', locationId: 'village', dialogueRef: 'DLX' },
+        { shotId: 'C', durationFrames: 70, intent: 'REACTION', locationId: 'forest' },
+      ],
+    });
+    expect(timeline.markers).toHaveLength(3);
+    expect(timeline.transitions[0]?.atFrame).toBe(60);
+    expect(timeline.transitions[1]?.type).toBe('REACTION_CUT');
+  });
+
+  it('does not force every 60-second episode onto one cut rate', () => {
+    const calm = DEFAULT_PACE_THRESHOLDS.CALM_DISCOVERY.minCut;
+    const burst = DEFAULT_PACE_THRESHOLDS.ACTION_BURST.minCut;
+    expect(calm).toBeGreaterThan(burst);
+  });
 });

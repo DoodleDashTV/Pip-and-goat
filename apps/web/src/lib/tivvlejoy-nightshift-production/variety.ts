@@ -111,8 +111,10 @@ export function evaluateVariety(packages: EpisodeDirectorPackage[]): VarietyRepo
     }
   }
   const uniqueCameras = new Set(packages.flatMap((pack) => pack.finalShotSpecs.map((spec) => spec.cameraSha256))).size;
-  const locationRepetitionRisk = locationRuns.filter((row, index, all) => all.indexOf(row) !== index).length > 2 ? 'HIGH' : uniqueCameras < packages.length ? 'MEDIUM' : 'LOW';
-  const storyStructureRepetitionRisk = similarPairs.length > 4 ? 'HIGH' : similarPairs.length > 0 ? 'MEDIUM' : 'LOW';
+  const locationRepetitionRisk: VarietyReport['locationRepetitionRisk'] =
+    locationRuns.filter((row, index, all) => all.indexOf(row) !== index).length > 2 ? 'HIGH' : uniqueCameras < packages.length ? 'MEDIUM' : 'LOW';
+  const storyStructureRepetitionRisk: VarietyReport['storyStructureRepetitionRisk'] =
+    similarPairs.length > 4 ? 'HIGH' : similarPairs.length > 0 ? 'MEDIUM' : 'LOW';
   const audioDensity = packages.reduce((sum, pack) => sum + pack.sfx.length + pack.music.length, 0) / Math.max(1, packages.length);
   const body = {
     schemaVersion: EPISODE_VARIETY_SCHEMA,

@@ -23,19 +23,19 @@ export function DirectorControlConsole({ model }: { model: NightshiftConsoleMode
           Episode intent, beats, cameras, staging, lighting, VFX, and review notes are planned here. Nothing is a final
           render and no synthetic fixture is a human-approved shot.
         </p>
-        <p className="text-sm">
-          <Link href="/production-control" className="font-bold underline">
+        <nav aria-label="Director workspace" className="text-sm">
+          <Link href="/production-control" className="inline-flex min-h-11 items-center font-bold underline">
             Production control
           </Link>
           {' · '}
-          <Link href="/editorial-control" className="font-bold underline">
+          <Link href="/editorial-control" className="inline-flex min-h-11 items-center font-bold underline">
             Editorial
           </Link>
           {' · '}
-          <Link href="/dailies" className="font-bold underline">
+          <Link href="/dailies" className="inline-flex min-h-11 items-center font-bold underline">
             Dailies
           </Link>
-        </p>
+        </nav>
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Stat label="Intent-ready episodes" value={model.directing.ready} />

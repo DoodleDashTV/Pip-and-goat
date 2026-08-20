@@ -41,7 +41,7 @@ export function planCinematography(input: {
   cameraMotion?: CameraMotion;
 }): CinematographyPlan {
   const language = shotLanguage(input.intent);
-  const shotSize =
+  const shotSize: CinematographyPlan['shotSize'] =
     input.intent === 'ESTABLISHING' || input.intent === 'ENVIRONMENT_HERO' || input.intent === 'LOCATION_TRANSITION'
       ? 'ESTABLISHING'
       : input.intent === 'WIDE_TWO_SHOT' || input.intent === 'SILHOUETTE'
@@ -51,10 +51,25 @@ export function planCinematography(input: {
           : input.intent === 'INSERT' || input.intent === 'PROP_INSERT' || input.intent === 'POV'
             ? 'INSERT'
             : 'MEDIUM';
-  const subjectPriority =
-    language.characterPriority === 'BOTH' ? 'BOTH' : language.characterPriority === 'NONE' ? (language.propPriority === 'STORY' ? 'PROP' : 'LOCATION') : language.characterPriority;
-  const eyeLine = input.speaker === 'PIP' ? 'RIGHT' : input.speaker === 'GOAT' ? 'LEFT' : shotSize === 'ESTABLISHING' ? 'CENTER' : 'RIGHT';
-  const cameraMotion = input.cameraMotion ?? (language.cameraMotionClass === 'static' ? 'STATIC' : language.cameraMotionClass === 'walk-follow' ? 'FOLLOW' : language.cameraMotionClass === 'reveal-push' ? 'REVEAL' : 'PAN');
+  const subjectPriority: CinematographyPlan['subjectPriority'] =
+    language.characterPriority === 'BOTH'
+      ? 'BOTH'
+      : language.characterPriority === 'NONE'
+        ? language.propPriority === 'STORY'
+          ? 'PROP'
+          : 'LOCATION'
+        : language.characterPriority;
+  const eyeLine: CinematographyPlan['eyeLine'] =
+    input.speaker === 'PIP' ? 'RIGHT' : input.speaker === 'GOAT' ? 'LEFT' : shotSize === 'ESTABLISHING' ? 'CENTER' : 'RIGHT';
+  const cameraMotion: CameraMotion =
+    input.cameraMotion ??
+    (language.cameraMotionClass === 'static'
+      ? 'STATIC'
+      : language.cameraMotionClass === 'walk-follow'
+        ? 'FOLLOW'
+        : language.cameraMotionClass === 'reveal-push'
+          ? 'REVEAL'
+          : 'PAN');
   const body = {
     schemaVersion: CINEMATOGRAPHY_SCHEMA,
     shotId: input.shotId,
@@ -69,17 +84,27 @@ export function planCinematography(input: {
     foregroundLayer: shotSize === 'INSERT' ? 'story-prop' : 'near-set-dressing',
     midgroundLayer: subjectPriority === 'LOCATION' ? 'architecture' : 'characters',
     backgroundLayer: 'environment-depth',
-    depthReadability: input.intent === 'OVER_SHOULDER' ? 'DEEP' : shotSize === 'CLOSE' ? 'FLAT_RISK' : 'READABLE',
-    motionDirection: cameraMotion === 'STATIC' ? 'NONE' : cameraMotion === 'SLOW_PULL' || cameraMotion === 'PULL_OUT' ? 'OUT' : cameraMotion === 'SLOW_PUSH' || cameraMotion === 'FAST_PUSH' ? 'IN' : input.travel === 'LEFT' ? 'LEFT' : input.travel === 'RIGHT' ? 'RIGHT' : 'IN',
-    screenDirection: input.travel === 'LEFT' ? 'LEFT' : input.travel === 'RIGHT' ? 'RIGHT' : 'NEUTRAL',
-    cameraHeightClass: shotSize === 'ESTABLISHING' ? 'HIGH' : shotSize === 'INSERT' ? 'LOW' : 'EYE',
-    lensClass: shotSize === 'CLOSE' ? 'CLOSE' : shotSize === 'ESTABLISHING' || shotSize === 'WIDE' ? 'WIDE' : 'NORMAL',
+    depthReadability: (input.intent === 'OVER_SHOULDER' ? 'DEEP' : shotSize === 'CLOSE' ? 'FLAT_RISK' : 'READABLE') as CinematographyPlan['depthReadability'],
+    motionDirection: (cameraMotion === 'STATIC'
+      ? 'NONE'
+      : cameraMotion === 'SLOW_PULL'
+        ? 'OUT'
+        : cameraMotion === 'SLOW_PUSH' || cameraMotion === 'FAST_PUSH'
+          ? 'IN'
+          : input.travel === 'LEFT'
+            ? 'LEFT'
+            : input.travel === 'RIGHT'
+              ? 'RIGHT'
+              : 'IN') as CinematographyPlan['motionDirection'],
+    screenDirection: (input.travel === 'LEFT' ? 'LEFT' : input.travel === 'RIGHT' ? 'RIGHT' : 'NEUTRAL') as CinematographyPlan['screenDirection'],
+    cameraHeightClass: (shotSize === 'ESTABLISHING' ? 'HIGH' : shotSize === 'INSERT' ? 'LOW' : 'EYE') as CinematographyPlan['cameraHeightClass'],
+    lensClass: (shotSize === 'CLOSE' ? 'CLOSE' : shotSize === 'ESTABLISHING' || shotSize === 'WIDE' ? 'WIDE' : 'NORMAL') as CinematographyPlan['lensClass'],
     cameraMotion,
     focusTarget: subjectPriority === 'PROP' ? input.prop ?? 'story-prop' : subjectPriority === 'GOAT' ? 'GOAT' : subjectPriority === 'PIP' ? 'PIP' : subjectPriority === 'BOTH' ? 'PIP_AND_GOAT' : 'ENVIRONMENT',
     secondaryFocusTarget: subjectPriority === 'BOTH' ? 'environment-depth' : input.speaker && subjectPriority !== input.speaker ? input.speaker : null,
-    storyPropVisibility: input.prop ? (shotSize === 'INSERT' ? 'HERO' : 'PRESENT') : 'HIDDEN',
-    facialReadability: shotSize === 'INSERT' || shotSize === 'ESTABLISHING' ? 'OPTIONAL' : 'REQUIRED',
-    gestureReadability: input.intent === 'FOLLOW' || input.intent === 'TRACKING' || input.intent === 'STATIC_COMEDY' ? 'REQUIRED' : 'OPTIONAL',
+    storyPropVisibility: (input.prop ? (shotSize === 'INSERT' ? 'HERO' : 'PRESENT') : 'HIDDEN') as CinematographyPlan['storyPropVisibility'],
+    facialReadability: (shotSize === 'INSERT' || shotSize === 'ESTABLISHING' ? 'OPTIONAL' : 'REQUIRED') as CinematographyPlan['facialReadability'],
+    gestureReadability: (input.intent === 'FOLLOW' || input.intent === 'TRACKING' || input.intent === 'STATIC_COMEDY' ? 'REQUIRED' : 'OPTIONAL') as CinematographyPlan['gestureReadability'],
     cameraTemplateId: language.cameraTemplateId,
     exactCameraTransforms: 'UNRESOLVED' as const,
   };

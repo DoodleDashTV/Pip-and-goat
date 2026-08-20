@@ -34,7 +34,11 @@ export function forecastRenderCost(input: {
     estimatedRenderMinutes: Number(minutes.toFixed(2)),
     estimatedComputeHours: Number(hours.toFixed(3)),
     estimatedCost: Number((hours * rate).toFixed(2)),
-    confidence: input.usdPerGpuHour == null ? 'LOW_CONFIDENCE' : input.framesPerMinute ? 'MEDIUM_CONFIDENCE' : 'LOW_CONFIDENCE',
+    confidence: (input.usdPerGpuHour == null
+      ? 'LOW_CONFIDENCE'
+      : input.framesPerMinute
+        ? 'MEDIUM_CONFIDENCE'
+        : 'LOW_CONFIDENCE') as RenderCostForecast['confidence'],
     assumptions: [
       `quality=${input.qualityTier}`,
       `fps=${fps}`,

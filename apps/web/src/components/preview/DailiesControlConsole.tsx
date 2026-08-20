@@ -26,10 +26,13 @@ export function DailiesControlConsole({ model }: { model: NightshiftConsoleModel
           </Link>
         </p>
       </div>
-      <label className="studio-card block space-y-2 p-4 sm:p-5">
-        <span className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">Filter episode</span>
+      <label className="studio-card block space-y-2 p-4 sm:p-5" htmlFor="dailies-filter">
+        <span className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">Filter episode, shot, or note</span>
         <input
-          className="w-full rounded-xl border border-[var(--color-border)] bg-transparent px-3 py-2 text-base"
+          id="dailies-filter"
+          name="dailies-filter"
+          aria-label="Filter dailies by episode, shot, or note"
+          className="min-h-11 w-full rounded-xl border border-[var(--color-border)] bg-transparent px-3 py-2 text-base"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Episode ID"

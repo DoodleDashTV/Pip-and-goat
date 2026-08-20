@@ -26,6 +26,7 @@ export * from './readiness';
 export * from './variety';
 export * from './season';
 export * from './cost';
+export * from './planning';
 export * from './graph';
 export * from './proxy';
 export * from './console-model';
