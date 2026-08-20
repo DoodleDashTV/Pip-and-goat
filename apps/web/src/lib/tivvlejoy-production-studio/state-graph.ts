@@ -27,9 +27,16 @@ export type EpisodeGraphInput = {
     renderPreflightReady?: boolean;
     qcComplete?: boolean;
     deliveryReady?: boolean;
+    animationPlanReady?: boolean;
+    animationQcReady?: boolean;
+    continuityReady?: boolean;
+    voiceTimingReady?: boolean;
+    rigApprovalReady?: boolean;
+    shotAnimationManifestSha256?: string | null;
   }>;
   voiceReceipts?: VoiceReceipt[];
   characterRigsResolved?: boolean;
+  characterRigsApproved?: boolean;
   pipRigVersion?: string;
   goatRigVersion?: string;
 };
@@ -274,18 +281,50 @@ export function buildProductionStateGraph(episodes: EpisodeGraphInput[]): Produc
       addEdge({ from: preflightId, to: renderId, reason: 'no render without preflight' });
 
       const animationId = `${episode.episodeId}::ANIMATION::${shot.shotId}`;
+      const animationState = (() => {
+        if (assemblyBlocked) return 'WAITING_FOR_RIG' as const;
+        if (shot.rigApprovalReady === false || episode.characterRigsApproved === false) return 'WAITING_FOR_RIG_APPROVAL' as const;
+        if (missingVoices.length && shot.voiceTimingReady === false) return 'WAITING_FOR_VOICE_TIMING' as const;
+        if (shot.continuityReady === false) return 'WAITING_FOR_CONTINUITY' as const;
+        if (shot.animationPlanReady !== true) return 'WAITING_FOR_ANIMATION_PLAN' as const;
+        if (shot.animationQcReady !== true) return 'WAITING_FOR_ANIMATION_QC' as const;
+        return 'READY_FOR_CHARACTER_ANIMATION_ASSEMBLY' as const;
+      })();
+      const animationLabel =
+        animationState === 'WAITING_FOR_RIG'
+          ? 'Waiting for approved production rigs before character animation'
+          : animationState === 'WAITING_FOR_RIG_APPROVAL'
+            ? 'Animation waiting for human rig approval'
+            : animationState === 'WAITING_FOR_VOICE_TIMING'
+              ? 'Waiting for voice timing before exact mouth/beak animation'
+              : animationState === 'WAITING_FOR_CONTINUITY'
+                ? 'Waiting for continuity before animation assembly'
+                : animationState === 'WAITING_FOR_ANIMATION_PLAN'
+                  ? 'Character animation plan still needed'
+                  : animationState === 'WAITING_FOR_ANIMATION_QC'
+                    ? 'Animation plan waiting for QC'
+                    : 'Ready for character animation assembly';
       addNode({
         nodeId: animationId,
         kind: 'ANIMATION',
         episodeId: episode.episodeId,
         shotId: shot.shotId,
-        state: assemblyBlocked ? 'WAITING_FOR_RIG' : 'PLANNED',
-        blockerClass: assemblyBlocked ? 'RIG' : null,
-        blockerCode: assemblyBlocked ? 'UNRESOLVED_PRODUCTION_RIG' : null,
-        humanLabel: 'Animation planning',
-        waitingOn: [rigId],
-        dependencySha256: null,
-        humanAuthorizationRequired: false,
+        state: animationState,
+        blockerClass: animationState === 'WAITING_FOR_RIG' || animationState === 'WAITING_FOR_RIG_APPROVAL' ? 'RIG' : animationState === 'WAITING_FOR_VOICE_TIMING' ? 'VOICE' : animationState === 'READY_FOR_CHARACTER_ANIMATION_ASSEMBLY' ? null : 'TECHNICAL',
+        blockerCode:
+          animationState === 'WAITING_FOR_RIG'
+            ? 'UNRESOLVED_PRODUCTION_RIG'
+            : animationState === 'WAITING_FOR_RIG_APPROVAL'
+              ? 'RIG_HUMAN_APPROVAL_REQUIRED'
+              : animationState === 'WAITING_FOR_VOICE_TIMING'
+                ? 'VOICE_TIMING_REQUIRED'
+                : animationState === 'READY_FOR_CHARACTER_ANIMATION_ASSEMBLY'
+                  ? null
+                  : animationState,
+        humanLabel: animationLabel,
+        waitingOn: [rigId, voiceId],
+        dependencySha256: shot.shotAnimationManifestSha256 ?? null,
+        humanAuthorizationRequired: animationState === 'WAITING_FOR_RIG_APPROVAL',
       });
       addEdge({ from: rigId, to: animationId, reason: 'animation needs rigs' });
       addEdge({ from: animationId, to: assemblyId, reason: 'assembly consumes animation plan' });

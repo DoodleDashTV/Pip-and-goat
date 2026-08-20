@@ -184,6 +184,9 @@ export function persistSeasonToStore(
         locationId: shot.locationId,
         environmentDependencySha256: shot.environmentDependencySha256,
         assemblyDependencySha256: shot.assemblyDependencySha256,
+        shotAnimationManifestSha256: null,
+        characterRigDependencySha256: 'UNRESOLVED_PRODUCTION_RIG',
+        animationQcRequirement: 'REQUIRED',
       });
     }
     if (persistEveryJob) {
@@ -244,6 +247,26 @@ export function persistSeasonToStore(
   add(refs, 'AUDIT_EVENT', 'audit_season_persist', {
     studioReadiness: plan.studioReadiness,
     synthetic: true,
+  });
+  add(refs, 'RIG_ADMISSION_REPORT', 'PIP', {
+    characterId: 'PIP',
+    state: 'RIG_NOT_PRESENT',
+    approvedForAnimation: false,
+    syntheticCannotApprove: true,
+    reportSha256: sha256Canonical({ characterId: 'PIP', state: 'RIG_NOT_PRESENT' }),
+  });
+  add(refs, 'RIG_ADMISSION_REPORT', 'GOAT', {
+    characterId: 'GOAT',
+    state: 'RIG_NOT_PRESENT',
+    approvedForAnimation: false,
+    syntheticCannotApprove: true,
+    reportSha256: sha256Canonical({ characterId: 'GOAT', state: 'RIG_NOT_PRESENT' }),
+  });
+  add(refs, 'RIG_VERSION_IDENTITY', 'PIP', { rigVersion: 'UNRESOLVED_PRODUCTION_RIG' });
+  add(refs, 'RIG_VERSION_IDENTITY', 'GOAT', { rigVersion: 'UNRESOLVED_PRODUCTION_RIG' });
+  add(refs, 'ANIMATION_BATCH_PLAN', 'horizon-60', {
+    blockedRealRigWork: season.shotCount,
+    batchPlanSha256: plan.batchPlan.batchPlanSha256,
   });
   commit(refs, 'WORKSPACE_SAVED', 'persist references and graph');
   receipts.push(store.writeStateGraphSnapshot());

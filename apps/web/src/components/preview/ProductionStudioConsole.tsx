@@ -146,6 +146,10 @@ export function ProductionStudioConsole({
           <Link href="/shot-assembly" className="font-bold underline">
             Shot Assembly
           </Link>
+          {' · '}
+          <Link href="/animation-control" className="font-bold underline">
+            Animation Control
+          </Link>
         </p>
       </div>
 
