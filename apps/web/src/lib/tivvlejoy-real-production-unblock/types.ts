@@ -179,7 +179,7 @@ export type BlenderBootstrap = {
   persistent: boolean;
   installationCostsMoney: false;
   installedNow: boolean;
-  trustedPinPresent: false;
+  trustedPinPresent: boolean;
   reasonNotInstalled: string | null;
   laterAuthorizationPlaybook: string[];
 };
