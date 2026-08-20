@@ -6,6 +6,7 @@ export * from './inspection-order';
 export * from './blender-bootstrap';
 export * from './blender-acceptance';
 export * from './commercial-gate';
+export * from './ep012-canonical-dialogue';
 export * from './voice-plan';
 export * from './voice-cost';
 export * from './voice-timing';
