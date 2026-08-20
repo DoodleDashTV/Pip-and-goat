@@ -56,7 +56,7 @@ describe('production orchestrator', () => {
       evidenceClass: 'SYNTHETIC_PREVIEW',
     });
     expect(plan.schemaVersion).toBe('TIVVLEJOY_PRODUCTION_STUDIO_ORCHESTRATOR_V1');
-    expect(plan.safeNextActions.some((item) => item.label.includes('Inspect or approve required scenery source'))).toBe(true);
+    expect(plan.safeNextActions.some((item) => item.label.includes('Review the mountain hero candidate'))).toBe(true);
   });
 
   it('never returns PRODUCTION_READY for synthetic evidence', () => {
@@ -103,9 +103,9 @@ describe('production orchestrator', () => {
         }),
       ],
     });
-    expect(actions.some((item) => item.label === 'Wait for production Pip/Goat rig')).toBe(true);
-    expect(actions.some((item) => item.label === 'Generate/review confirmed voice line')).toBe(true);
-    expect(actions.some((item) => item.label === 'Review shot preview')).toBe(true);
+    expect(actions.some((item) => item.label === 'Receive and inspect the approved Pip production rig.')).toBe(true);
+    expect(actions.some((item) => item.label === 'Confirm the episode dialogue receipt.')).toBe(true);
+    expect(actions.some((item) => item.label === 'Review Shot 08 camera and performance.')).toBe(true);
     expect(actions.some((item) => item.label === 'Paid render authorization required')).toBe(true);
     expect(actions.every((item) => item.neverClaimsExecution)).toBe(true);
   });

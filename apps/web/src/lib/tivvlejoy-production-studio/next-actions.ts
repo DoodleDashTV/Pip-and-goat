@@ -10,7 +10,7 @@ export type SafeNextAction = {
   neverClaimsExecution: true;
 };
 
-const FORBIDDEN = /started gpu|rendered|uploaded|approved/i;
+const FORBIDDEN = /started gpu|gpu started|render completed|uploaded|asset approved|rigs? approved/i;
 
 export function buildSafeNextActions(input: {
   graph: ProductionStateGraph;
@@ -25,7 +25,7 @@ export function buildSafeNextActions(input: {
       continue;
     }
     if (node.state === 'WAITING_FOR_RIG') {
-      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Wait for production Pip/Goat rig', neverClaimsExecution: true });
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Receive and inspect the approved Pip production rig.', neverClaimsExecution: true });
     } else if (node.state === 'WAITING_FOR_RIG_APPROVAL') {
       actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Human review of the admitted production rig is still required', neverClaimsExecution: true });
     } else if (node.state === 'WAITING_FOR_VOICE_TIMING') {
@@ -35,11 +35,25 @@ export function buildSafeNextActions(input: {
     } else if (node.state === 'WAITING_FOR_ANIMATION_QC') {
       actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Review animation QC blockers', neverClaimsExecution: true });
     } else if (node.state === 'WAITING_FOR_VOICE') {
-      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Generate/review confirmed voice line', neverClaimsExecution: true });
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Confirm the episode dialogue receipt.', neverClaimsExecution: true });
     } else if (node.state === 'WAITING_FOR_ASSET') {
-      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Inspect or approve required scenery source', neverClaimsExecution: true });
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Review the mountain hero candidate.', neverClaimsExecution: true });
     } else if (node.state === 'WAITING_FOR_APPROVAL') {
-      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Review shot preview', neverClaimsExecution: true });
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Review Shot 08 camera and performance.', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_DIRECTION') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Compile the episode creative intent and story beats.', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_CAMERA_PLAN') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Choose camera language from the story purpose.', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_STAGING') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Stage Pip and Goat for the conversation.', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_EDIT') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Compile the editorial timeline.', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_AUDIO_PLAN') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Plan SFX, ambience, and music cues.', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_CAPTIONS') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Build caption timing from confirmed dialogue.', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_DIRECTOR_REVIEW' || node.state === 'WAITING_FOR_SHOT_APPROVAL') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Review Shot 08 camera and performance.', neverClaimsExecution: true });
     }
   }
   for (const qc of input.qcReports ?? []) {

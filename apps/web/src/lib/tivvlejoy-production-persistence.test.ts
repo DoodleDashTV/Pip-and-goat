@@ -65,7 +65,8 @@ describe('durable production persistence model', () => {
     expect(ENTITY_TYPES).toContain('RIG_ADMISSION_REPORT');
     expect(ENTITY_TYPES).toContain('SHOT_ANIMATION_MANIFEST');
     expect(ENTITY_TYPES).toContain('SCENERY_INSPECTION_RECEIPT');
-    expect(ENTITY_TYPES).toHaveLength(39);
+    expect(ENTITY_TYPES).toContain('DIRECTOR_PACKAGE');
+    expect(ENTITY_TYPES).toHaveLength(53);
   });
 
   it('enumerates optimistic write results', () => {

@@ -154,8 +154,35 @@ export function ProductionStudioConsole({
           <Link href="/scenery-inspection" className="font-bold underline">
             Scenery inspection
           </Link>
+          {' · '}
+          <Link href="/director-control" className="font-bold underline">
+            Director control
+          </Link>
+          {' · '}
+          <Link href="/editorial-control" className="font-bold underline">
+            Editorial
+          </Link>
+          {' · '}
+          <Link href="/dailies" className="font-bold underline">
+            Dailies
+          </Link>
         </p>
       </div>
+
+      <section className="studio-card space-y-3 p-4 sm:p-5">
+        <h2 className="font-display text-xl font-semibold">Studio departments</h2>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <Stat label="Directing" value="planned / waiting human" />
+          <Stat label="Animation" value="waiting rigs" />
+          <Stat label="Scenery" value="waiting approval" />
+          <Stat label="Editorial" value="software ready" />
+          <Stat label="Audio" value="metadata only" />
+          <Stat label="Review" value="no auto approval" />
+          <Stat label="Render" value="authorization required" />
+          <Stat label="QC" value="planning only" />
+          <Stat label="Delivery" value="blocked" />
+        </div>
+      </section>
 
       <section className="studio-card space-y-3 p-4 sm:p-5">
         <h2 className="font-display text-xl font-semibold">Season health</h2>
