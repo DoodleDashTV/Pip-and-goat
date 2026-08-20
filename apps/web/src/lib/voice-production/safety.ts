@@ -1,3 +1,4 @@
+import { LEGACY_DRAFT_AUDIO_VOICE_AUTHORIZE_PAID_VALUE, readVoiceAuthorizePaidRaw } from './paid-authorization-convention';
 import {
   DEFAULT_MAX_CHARS_PER_EPISODE,
   DEFAULT_MAX_CHARS_PER_REQUEST,
@@ -38,7 +39,10 @@ export function isPaidVoiceGenerationEnabled(env: VoiceEnv = process.env): boole
 }
 
 export function isPaidVoiceGenerationAuthorized(env: VoiceEnv = process.env): boolean {
-  return isPaidVoiceGenerationEnabled(env) && read(env, 'TIVVLEJOY_VOICE_AUTHORIZE_PAID') === '1';
+  return (
+    isPaidVoiceGenerationEnabled(env) &&
+    readVoiceAuthorizePaidRaw(env) === LEGACY_DRAFT_AUDIO_VOICE_AUTHORIZE_PAID_VALUE
+  );
 }
 
 export function hasElevenLabsApiKey(env: VoiceEnv = process.env): boolean {
