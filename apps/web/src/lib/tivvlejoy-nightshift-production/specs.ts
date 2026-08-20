@@ -33,6 +33,9 @@ export type FinalShotSpec = {
   shotAssemblySha256: string | null;
   compositionQcSha256: string;
   qcRequirements: string[];
+  shotSize: CinematographyPlan['shotSize'];
+  cameraMotion: CinematographyPlan['cameraMotion'];
+  cameraIntent: CinematographyPlan['cameraIntent'];
   mediaExecuted: false;
   finalShotSpecSha256: string;
 };
@@ -73,6 +76,9 @@ export function compileFinalShotSpec(input: {
     shotAssemblySha256: input.shotAssemblySha256 ?? null,
     compositionQcSha256: input.compositionQc.qcSha256,
     qcRequirements: ['FACE_SAFE', 'CAPTION_SAFE', 'NO_AUTO_APPROVAL'],
+    shotSize: input.camera.shotSize,
+    cameraMotion: input.camera.cameraMotion,
+    cameraIntent: input.camera.cameraIntent,
     mediaExecuted: false as const,
   };
   return { ...body, finalShotSpecSha256: sha256Canonical(body) };

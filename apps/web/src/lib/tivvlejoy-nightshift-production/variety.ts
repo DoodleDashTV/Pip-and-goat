@@ -97,10 +97,9 @@ export function evaluateVariety(packages: EpisodeDirectorPackage[]): VarietyRepo
   for (const pack of packages) {
     locationRuns.push(pack.beats.map((beat) => beat.location).join('>'));
     for (const spec of pack.finalShotSpecs) {
-      const size = spec.qcRequirements[0] ?? 'UNKNOWN';
-      shotSizeDistribution[size] = (shotSizeDistribution[size] ?? 0) + 1;
+      shotSizeDistribution[spec.shotSize] = (shotSizeDistribution[spec.shotSize] ?? 0) + 1;
+      cameraMotionDistribution[spec.cameraMotion] = (cameraMotionDistribution[spec.cameraMotion] ?? 0) + 1;
     }
-    cameraMotionDistribution[pack.intent.paceProfile] = (cameraMotionDistribution[pack.intent.paceProfile] ?? 0) + 1;
   }
   const fingerprints = packages.map((pack) => episodeFingerprint(pack));
   const similarPairs: VarietyReport['similarPairs'] = [];
