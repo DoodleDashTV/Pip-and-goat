@@ -95,7 +95,7 @@ describe('scenery inspection persistence, recovery and concurrency', () => {
         store,
         evidence: {
           ...first.evidence,
-          warnings: ['https://example.com/?X-Amz-Signature=abc'],
+          warnings: ['https://evil.example/?X-Amz-Signature=abc'],
         },
         children: [first.child],
       }),
