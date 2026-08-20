@@ -217,7 +217,7 @@ export function ProductionStudioConsole({
       </section>
 
       <section className="studio-card space-y-3 p-4 sm:p-5" data-testid="first-real-episode">
-        <h2 className="font-display text-xl font-semibold">{episodeUnblock.title}</h2>
+        <h2 className="font-display text-xl font-semibold">FIRST REAL EPISODE</h2>
         <p className="text-sm font-bold">#1 blocker: {episodeUnblock.numberOneBlocker}</p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <Stat label="Rig status" value={episodeUnblock.rigStatus} />
@@ -233,7 +233,8 @@ export function ProductionStudioConsole({
             <li key={action}>{action}</li>
           ))}
         </ol>
-        <p className="text-sm font-bold">{episodeUnblock.spendBanner}</p>
+        <p className="text-sm font-bold">DO NOT SPEND MONEY YET / AUTHORIZATION REQUIRED</p>
+        <p className="text-sm">{episodeUnblock.spendBanner}</p>
       </section>
 
       <section className="studio-card space-y-3 p-4 sm:p-5">

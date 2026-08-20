@@ -595,7 +595,7 @@ describe('do-not-rebuild matrix', () => {
   });
 
   it('has a checked-in operator matrix document', () => {
-    const doc = readFileSync(path.resolve(__dirname, '../../../docs/TIVVLEJOY_DO_NOT_REBUILD_MATRIX_V1.md'), 'utf8');
+    const doc = readFileSync(path.resolve(__dirname, '../../../../docs/TIVVLEJOY_DO_NOT_REBUILD_MATRIX_V1.md'), 'utf8');
     expect(doc).toContain('TIVVLEJOY_DO_NOT_REBUILD_MATRIX_V1');
     expect(doc).toContain('persistence');
     expect(doc).toContain('scenery audit');
