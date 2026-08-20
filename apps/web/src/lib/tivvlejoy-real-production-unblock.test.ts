@@ -106,6 +106,18 @@ describe('TIVVLEJOY_FIRST_REAL_SOURCE_READ_PLAN_V1', () => {
     expect(fixturePlan().selected.every((item) => item.size < 900_000_000)).toBe(true);
   });
 
+  it('skips an oversized direct GLB instead of treating size as proof of usefulness', () => {
+    const plan = compileFirstRealSourceReadPlan(
+      inventoryFrom([
+        { key: 'tivvlejoy-assets/source/mountain/huge.glb', size: 1_548_419_288, etag: 'huge-glb' },
+        { key: 'tivvlejoy-assets/source/village/small.zip', size: 2_148_090, etag: 'village' },
+      ]),
+    );
+    expect(plan.selected.some((item) => item.family === 'direct_glb')).toBe(false);
+    expect(plan.selected.some((item) => item.family === 'village')).toBe(true);
+    expect(plan.avoided.some((item) => item.reason.includes('Huge package'))).toBe(true);
+  });
+
   it('does not select receipt JSON as scenery', () => {
     expect(fixturePlan().selected.every((item) => item.format !== 'json')).toBe(true);
   });
