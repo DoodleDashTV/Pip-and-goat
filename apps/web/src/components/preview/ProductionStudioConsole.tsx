@@ -18,6 +18,8 @@ import {
   type SaveStatus,
 } from '@/lib/tivvlejoy-production-persistence';
 import type { ProductionConsoleModel } from '@/lib/tivvlejoy-production-studio/console-model';
+import type { FirstEpisodeOperatorModel } from '@/lib/tivvlejoy-real-production-unblock/console-model';
+import { fallbackFirstEpisodeOperatorModel } from '@/lib/tivvlejoy-real-production-unblock/console-model';
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
@@ -31,10 +33,13 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 export function ProductionStudioConsole({
   model,
   persistence,
+  firstEpisode,
 }: {
   model: ProductionConsoleModel;
   persistence?: PersistenceConsoleModel;
+  firstEpisode?: FirstEpisodeOperatorModel;
 }) {
+  const episodeUnblock = firstEpisode ?? fallbackFirstEpisodeOperatorModel();
   const [episodeId, setEpisodeId] = useState(model.episodes[0]?.episodeId ?? '');
   const [showTechnical, setShowTechnical] = useState(false);
   const [realityMode, setRealityMode] = useState<'REAL_PROJECT_STATUS' | 'SYNTHETIC_SIMULATION'>('REAL_PROJECT_STATUS');
@@ -209,6 +214,26 @@ export function ProductionStudioConsole({
             Season cards below are synthetic planning. They do not satisfy real preflight.
           </p>
         )}
+      </section>
+
+      <section className="studio-card space-y-3 p-4 sm:p-5" data-testid="first-real-episode">
+        <h2 className="font-display text-xl font-semibold">{episodeUnblock.title}</h2>
+        <p className="text-sm font-bold">#1 blocker: {episodeUnblock.numberOneBlocker}</p>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <Stat label="Rig status" value={episodeUnblock.rigStatus} />
+          <Stat label="Voice receipt status" value={episodeUnblock.voiceReceiptStatus} />
+          <Stat label="Scenery real-inspection status" value={episodeUnblock.sceneryRealInspectionStatus} />
+          <Stat label="Blender status" value={episodeUnblock.blenderStatus} />
+          <Stat label="Human review status" value={episodeUnblock.humanReviewStatus} />
+          <Stat label="Paid-render status" value={episodeUnblock.paidRenderStatus} />
+        </div>
+        <h3 className="font-display text-lg font-semibold">NEXT 5 ACTIONS</h3>
+        <ol className="list-decimal space-y-1 pl-5 text-sm">
+          {episodeUnblock.next5Actions.map((action) => (
+            <li key={action}>{action}</li>
+          ))}
+        </ol>
+        <p className="text-sm font-bold">{episodeUnblock.spendBanner}</p>
       </section>
 
       <section className="studio-card space-y-3 p-4 sm:p-5">
