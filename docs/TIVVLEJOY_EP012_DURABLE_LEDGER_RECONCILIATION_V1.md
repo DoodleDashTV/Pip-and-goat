@@ -78,3 +78,7 @@ Every response reports:
 Secrets, database URLs, admin tokens, API keys, provider Voice IDs, and raw database errors are never returned.
 
 Keep the stacked PR OPEN / DRAFT / UNMERGED / NOT READY until the real Preview ledger is configured and the subsequent no-provider EP012 preflight proves authoritative readiness.
+
+## Preview deployment checkpoint — 2026-08-20
+
+Operator reported the dedicated Preview PostgreSQL migration completed and the two Preview ledger environment variables configured in Vercel. This note intentionally contains no secrets. Live preflight verification remains required before treating the ledger as configured or available.
