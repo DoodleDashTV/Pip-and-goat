@@ -31,6 +31,18 @@ export function eventTypeFor(entityType: EntityType): JournalEventType {
       return 'STATE_GRAPH_SNAPSHOTTED';
     case 'BATCH_PLAN':
       return 'BATCH_PLAN_WRITTEN';
+    case 'RIG_ADMISSION_REPORT':
+    case 'RIG_VERSION_IDENTITY':
+      return 'RIG_ADMISSION_RECORDED';
+    case 'PERFORMANCE_INTENT':
+    case 'DIALOGUE_TIMING_PLAN':
+    case 'VISEME_PLAN':
+    case 'SHOT_ANIMATION_MANIFEST':
+    case 'ANIMATION_CACHE_IDENTITY':
+    case 'ANIMATION_BATCH_PLAN':
+      return 'ANIMATION_PLAN_WRITTEN';
+    case 'ANIMATION_QC_RECEIPT':
+      return 'ANIMATION_QC_RECORDED';
     default:
       return 'WORKSPACE_SAVED';
   }

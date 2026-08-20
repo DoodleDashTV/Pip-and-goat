@@ -26,6 +26,14 @@ export function buildSafeNextActions(input: {
     }
     if (node.state === 'WAITING_FOR_RIG') {
       actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Wait for production Pip/Goat rig', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_RIG_APPROVAL') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Human review of the admitted production rig is still required', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_VOICE_TIMING') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Attach confirmed voice timing before exact mouth or beak animation', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_ANIMATION_PLAN') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Finish the semantic character animation plan', neverClaimsExecution: true });
+    } else if (node.state === 'WAITING_FOR_ANIMATION_QC') {
+      actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Review animation QC blockers', neverClaimsExecution: true });
     } else if (node.state === 'WAITING_FOR_VOICE') {
       actions.push({ actionId: `${node.nodeId}::NEXT`, episodeId: node.episodeId, shotId: node.shotId, label: 'Generate/review confirmed voice line', neverClaimsExecution: true });
     } else if (node.state === 'WAITING_FOR_ASSET') {

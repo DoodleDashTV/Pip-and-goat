@@ -417,6 +417,10 @@ export type AssemblyShotInput = {
   environmentSlots: EnvironmentSlotInput[];
   visualApprovalReceiptRef: unknown;
   visualApprovalStale?: boolean;
+  shotAnimationManifestSha256?: string | null;
+  characterRigDependencySha256?: string | null;
+  animationQcRequirement?: 'REQUIRED' | 'NOT_REQUIRED';
+  animationManifestFresh?: boolean;
 };
 
 export function assembleShot(input: AssemblyShotInput) {
@@ -434,6 +438,15 @@ export function assembleShot(input: AssemblyShotInput) {
     .filter((item): item is AssemblyBlocker => Boolean(item));
   if (input.charactersVisible.includes('PIP') || input.charactersVisible.includes('GOAT')) {
     requiredBlockers.push('MISSING_CHARACTER_RIG');
+    if (input.animationQcRequirement === 'REQUIRED' && !input.shotAnimationManifestSha256) {
+      requiredBlockers.push('MISSING_ANIMATION_MANIFEST');
+    }
+    if (input.shotAnimationManifestSha256 && input.animationManifestFresh === false) {
+      requiredBlockers.push('STALE_ANIMATION_MANIFEST');
+    }
+    if (input.animationQcRequirement === 'REQUIRED') {
+      requiredBlockers.push('ANIMATION_QC_REQUIRED');
+    }
   }
   requiredBlockers.push('CAMERA_RIG_MEASUREMENT_UNRESOLVED');
   if (input.visualApprovalStale) requiredBlockers.push('VISUAL_APPROVAL_STALE');
@@ -550,6 +563,9 @@ export function assembleShot(input: AssemblyShotInput) {
       ...environmentAssets.filter((slot) => String(slot.dependencyStatus).startsWith('UNRESOLVED')).map((slot) => slot.slotId),
     ],
     hardBlockers: uniqueBlockers,
+    shotAnimationManifestSha256: input.shotAnimationManifestSha256 ?? null,
+    characterRigDependencySha256: input.characterRigDependencySha256 ?? null,
+    animationQcRequirement: input.animationQcRequirement ?? 'REQUIRED',
     assemblyDependencySha256,
     stoppedAt: readiness.planning === 'ASSEMBLY_BLOCKED' ? stoppedStage(uniqueBlockers) : '14_BUILD_DEPENDENCY_HASH',
     stages: ASSEMBLY_STAGES,
