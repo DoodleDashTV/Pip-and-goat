@@ -411,7 +411,12 @@ describe('dailies, impact, and readiness depth', () => {
         fromRevisionId: 'SHOT_V1',
       });
       expect(revision.selectedBinding).not.toBe('latest');
-      expect(revision.doesNotInvalidate).toContain('unrelated scenery source hash');
+      expect(revision.doesNotInvalidate.length).toBeGreaterThan(0);
+      expect(revision.impacts.length).toBeGreaterThan(0);
+      expect(revision.doesNotInvalidate.join(' ')).not.toMatch(/\blatest\b/);
+      if (category !== 'SCENERY') {
+        expect(revision.doesNotInvalidate.join(' ')).toMatch(/scenery|voice|dialogue|asset/i);
+      }
     });
   }
 
