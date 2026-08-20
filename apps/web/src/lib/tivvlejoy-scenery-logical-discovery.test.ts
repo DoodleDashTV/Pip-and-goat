@@ -131,3 +131,58 @@ describe('semantic role coverage', () => {
     });
   }
 });
+
+describe('logical identity and inventory', () => {
+  it('keeps tavern shell and furniture as distinct children of one source', () => {
+    const children = discoverLogicalAssets({
+      sourceId: 'SRC_TAVERN_PACK',
+      sourceSha256: '11'.repeat(32),
+      hints: [
+        { internalStableRef: 'interior_shell:tavern', assetKind: 'interior_shell' },
+        { internalStableRef: 'furniture:table', assetKind: 'table' },
+      ],
+    });
+    expect(children[0]?.assetCandidateId).not.toBe(children[1]?.assetCandidateId);
+    expect(children[0]?.sourceSha256).toBe(children[1]?.sourceSha256);
+    expect(children.every((item) => item.selectableApprovedAsset === false)).toBe(true);
+  });
+
+  it('infers terrain, water, signage, HDRI and material-library kinds', () => {
+    expect(inferAssetKind({ name: 'CliffTerrain' })).toBe('terrain_piece');
+    expect(inferAssetKind({ name: 'RiverWater' })).toBe('water');
+    expect(inferAssetKind({ name: 'VillageSignboard' })).toBe('signage');
+    expect(inferAssetKind({ name: 'sunset.hdr' })).toBe('hdri');
+    expect(inferAssetKind({ name: 'World Shader Pack' })).toBe('material_library');
+  });
+
+  it('falls back to a package-root candidate when inventory is empty', () => {
+    const children = discoverLogicalAssetsFromInventory({
+      sourceId: 'SRC_EMPTY',
+      sourceSha256: '22'.repeat(32),
+      descriptions: ['unknown scenery pack'],
+    });
+    expect(children).toHaveLength(1);
+    expect(children[0]?.internalStableRef).toBe('package-root');
+    expect(children[0]?.discoveryIsNotApproval).toBe(true);
+  });
+
+  it('records explicit child evidence refs without filename production IDs', () => {
+    const child = discoverLogicalAssets({
+      sourceId: 'SRC_EV',
+      sourceSha256: '33'.repeat(32),
+      hints: [
+        {
+          internalStableRef: 'rock:01',
+          assetKind: 'rock',
+          geometryEvidenceRef: 'geom:rock',
+          materialEvidenceRef: 'mat:rock',
+          textureEvidenceRef: 'tex:rock',
+        },
+      ],
+    })[0]!;
+    expect(child.geometryEvidenceRef).toBe('geom:rock');
+    expect(child.materialEvidenceRef).toBe('mat:rock');
+    expect(child.textureEvidenceRef).toBe('tex:rock');
+    expect(child.assetCandidateId.startsWith('cand:')).toBe(true);
+  });
+});

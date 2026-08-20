@@ -147,6 +147,97 @@ describe('TIVVLEJOY_SAFE_ARCHIVE_INSPECTION_V1', () => {
     expect(report.state).toBe('ARCHIVE_TOO_LARGE');
     expect(report.extracted).toBe(false);
   });
+
+  it('rejects unix symlink mode without extracting the target', () => {
+    const report = inspectZipArchive(buildStoredZip([{ name: 'escape.blend', data: '/tmp/secret', unixMode: 0o120000 }]));
+    expect(report.state).toBe('ARCHIVE_UNSAFE_PATH');
+    expect(report.extracted).toBe(false);
+    expect(report.notes.join(' ')).toMatch(/symlink/i);
+  });
+
+  it('rejects hardlink-like zero-size data-descriptor entries', () => {
+    const report = inspectZipArchive(
+      buildStoredZip([{ name: 'hardlink-mesh.fbx', data: '', flags: 0x0008, declaredUncompressed: 0 }]),
+    );
+    expect(report.state).toBe('ARCHIVE_UNSAFE_PATH');
+    expect(report.notes.join(' ')).toMatch(/hardlink/i);
+  });
+
+  it('rejects an extreme declared compression ratio as ARCHIVE_BOMB_RISK', () => {
+    const report = inspectZipArchive(buildStoredZip([{ name: 'tiny.bin', data: 'x', declaredUncompressed: 9 * 1024 * 1024 }]), {
+      maxEntries: 8,
+      maxUncompressedBytes: 2 * 1024 * 1024 * 1024,
+      maxEntryUncompressedBytes: 512 * 1024 * 1024,
+      maxCompressionRatio: 4,
+      maxNestedDepth: 1,
+      maxNestedArchives: 1,
+    });
+    expect(report.state).toBe('ARCHIVE_BOMB_RISK');
+    expect(report.extracted).toBe(false);
+  });
+
+  it('stops nested archive explosion at the configured child-archive limit', () => {
+    const child = buildStoredZip([{ name: 'inner.fbx', data: 'fbx' }]);
+    const parent = inspectZipArchive(
+      buildStoredZip([
+        { name: 'a.zip', data: child },
+        { name: 'b.zip', data: child },
+      ]),
+      {
+        maxEntries: 20,
+        maxUncompressedBytes: 10_000_000,
+        maxEntryUncompressedBytes: 10_000_000,
+        maxCompressionRatio: 80,
+        maxNestedDepth: 2,
+        maxNestedArchives: 1,
+      },
+    );
+    expect(parent.nested.some((item) => item.stoppedReason === 'NESTED_ARCHIVE_LIMIT')).toBe(true);
+  });
+
+  it('inventories directories, JSON, XML and material files without executing them', () => {
+    const report = zip([
+      { name: 'props/', data: '' },
+      { name: 'meta.json', data: '{}' },
+      { name: 'scene.xml', data: '<scene/>' },
+      { name: 'wood.mtl', data: 'newmtl wood' },
+    ]);
+    expect(report.state).toBe('ARCHIVE_SAFE');
+    expect(report.entries.some((item) => item.directory)).toBe(true);
+    expect(report.entries.find((item) => item.relativePath === 'meta.json')?.probableAssetCategory).toBe('other');
+    expect(report.materialPaths).toEqual(['wood.mtl']);
+    expect(report.executedEmbeddedScripts).toBe(false);
+  });
+
+  it('categorizes remaining scenery and risk extensions', () => {
+    expect(categorizeArchivePath('a.tiff')).toBe('texture');
+    expect(categorizeArchivePath('a.bmp')).toBe('texture');
+    expect(categorizeArchivePath('pack.scatpack')).toBe('archive');
+    expect(categorizeArchivePath('lib.paq')).toBe('archive');
+    expect(categorizeArchivePath('addon.pyc')).toBe('addon_script');
+    expect(categorizeArchivePath('helper.dll')).toBe('executable');
+    expect(categorizeArchivePath('notes.pdf')).toBe('documentation');
+  });
+
+  it('records child archive hash and entry count when nested inventory is allowed', () => {
+    const child = buildStoredZip([{ name: 'inner.glb', data: 'glb' }]);
+    const parent = inspectZipArchive(buildStoredZip([{ name: 'wrap/child.zip', data: child }]), {
+      maxEntries: 20,
+      maxUncompressedBytes: 10_000_000,
+      maxEntryUncompressedBytes: 10_000_000,
+      maxCompressionRatio: 80,
+      maxNestedDepth: 1,
+      maxNestedArchives: 2,
+    });
+    expect(parent.nested[0]?.childArchiveHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(parent.nested[0]?.childEntryCount).toBe(1);
+    expect(parent.nested[0]?.stoppedReason).toBeNull();
+  });
+
+  it('does not extract when the ZIP central directory is truncated', () => {
+    const zipBytes = buildStoredZip([{ name: 'ok.fbx', data: 'fbx' }]);
+    expect(inspectZipArchive(zipBytes.subarray(0, 12)).state).toBe('ARCHIVE_CORRUPT');
+  });
 });
 
 describe('archive inventory coverage', () => {

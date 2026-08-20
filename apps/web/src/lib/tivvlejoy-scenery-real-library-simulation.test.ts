@@ -105,3 +105,94 @@ describe('scale children', () => {
     });
   }
 });
+
+describe('coverage and private-source extras', () => {
+  it('indexes 500+ catalog sources and thousands of logical children', () => {
+    const discovery = discoverInspectionCatalog(makeCatalog(640));
+    expect(discovery.counts.catalog).toBe(640);
+    expect(discovery.hardcodedAssetTotal).toBe(false);
+    const library = buildProductionLibrary(
+      Array.from({ length: 1200 }, (_, index) => ({
+        assetId: `AA_CHILD_${index}`,
+        assetVersion: 'v1',
+        category: categoryFor({ approved: true, blocked: false, archival: false, quality: ['BACKGROUND'], roles: ['BACKGROUND_FILL'] }),
+        semanticRoles: ['BACKGROUND_FILL'],
+        archetypes: ['village'],
+        quality: ['BACKGROUND'] as Array<'BACKGROUND'>,
+        sourceId: `SRC_${index}`,
+        inspectionSha256: '55'.repeat(32),
+        approvalSha256: '66'.repeat(32),
+        worldBuilderEligible: true,
+      })),
+    );
+    expect(library.indexes.byAssetId.size).toBe(1200);
+  });
+
+  it('keeps 60-episode unresolved slots honest when the library is unapproved', () => {
+    const coverage = simulateApprovedLibraryCoverage({ library: buildProductionLibrary([]), episodeCount: 60 });
+    expect(coverage.environmentSlotsRequested).toBe(720);
+    expect(coverage.approvedSlotsResolved).toBe(0);
+    expect(coverage.unresolvedSlots + coverage.nativeProceduralSlots).toBe(720);
+    expect(coverage.syntheticFixtureResultsAreNotRealLibraryCoverage).toBe(true);
+  });
+
+  it('does not treat mountain or tavern convergence as approval', () => {
+    expect(convergeMountain(true).inspected).toBe(true);
+    expect(convergeMountain(true).activated).toBe(false);
+    expect(convergeTavern(true).notes.join(' ')).toMatch(/not approved without human visual review/i);
+    expect(convergeTavern(true).candidateRoles).toEqual(
+      expect.arrayContaining(['INTERIOR_SHELL', 'INTERIOR_PROP', 'BUILDING_HERO']),
+    );
+  });
+
+  it('probes a private catalog without printing keys or downloading bytes', async () => {
+    const probe = await (await import('./tivvlejoy-real-scenery-inspection')).probePrivateSourceCatalog({
+      env: {
+        R2_BUCKET: 'bucket',
+        R2_ENDPOINT: 'https://example.invalid',
+        R2_ACCESS_KEY_ID: 'id',
+        R2_SECRET_ACCESS_KEY: 'secret',
+      },
+      listPrefix: async () => [
+        { key: 'tivvlejoy-assets/source/tavern.zip', size: 12 },
+        { key: 'tivvlejoy-assets/source/mountain.blend', size: 44 },
+      ],
+    });
+    expect(probe.realPrivateSourceAccessAvailable).toBe(true);
+    expect(probe.objectCount).toBe(2);
+    expect(probe.commercialBytesDownloaded).toBe(0);
+    expect(probe.r2Mutated).toBe(false);
+    expect(probe.credentialsPrinted).toBe(false);
+    expect(JSON.stringify(probe)).not.toContain('tivvlejoy-assets/source/tavern.zip');
+    expect(JSON.stringify(probe)).not.toContain('secret');
+    expect(probe.hashedObjectIdentities[0]).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it('records an exact listing blocker without leaking secrets', async () => {
+    const probe = await (await import('./tivvlejoy-real-scenery-inspection')).probePrivateSourceCatalog({
+      env: {
+        R2_BUCKET: 'bucket',
+        R2_ENDPOINT: 'https://example.invalid',
+        R2_ACCESS_KEY_ID: 'id',
+        R2_SECRET_ACCESS_KEY: 'super-secret',
+      },
+      listPrefix: async () => {
+        throw new Error('denied X-Amz-Signature=abc https://evil.example/key.zip');
+      },
+    });
+    expect(probe.realPrivateSourceAccessAvailable).toBe(false);
+    expect(probe.blocker).toMatch(/PRIVATE_SOURCE_LISTING_FAILED/);
+    expect(probe.blocker).not.toMatch(/super-secret|X-Amz-Signature=abc|evil\.example/);
+  });
+
+  it('builds a control room over a 29-style fixture without exposing credentials', () => {
+    const model = buildSceneryInspectionControlRoom({
+      discovery: discoverInspectionCatalog(make29StyleFixture()),
+      evidenceClass: 'PLANNING_ONLY',
+    });
+    expect(model.catalogSources).toBe(29);
+    expect(model.approved).toBe(0);
+    expect(model.exposedCredentials).toBe(false);
+    expect(model.sources.every((row) => row.sourceId.startsWith('SRC_STYLE_'))).toBe(true);
+  });
+});

@@ -251,3 +251,112 @@ describe('approval refusal matrix', () => {
     });
   }
 });
+
+describe('approval and visual contract extras', () => {
+  it('moves to VISUAL_REVIEW_REQUIRED only after visual evidence exists', () => {
+    expect(evaluateTechnicalApprovalState({ blockers: [], visualRequired: true, visualSatisfied: true })).toBe(
+      'VISUAL_REVIEW_REQUIRED',
+    );
+  });
+
+  it('refuses promotion when the candidate dependency hash does not match', () => {
+    const discovered = child();
+    const approval = issueHumanApproval({
+      actorClass: 'HUMAN',
+      decision: 'APPROVED',
+      assetCandidateId: discovered.assetCandidateId,
+      sourceId: discovered.sourceId,
+      inspectionSha256: inspectionSha,
+      candidateDependencySha256: discovered.candidateDependencySha256,
+      visualRequired: false,
+      semanticRoles: ['PATH'],
+      licenseState: 'LICENSE_INTERNAL_PRODUCTION_APPROVED',
+      provenanceState: 'PROVENANCE_RESOLVED',
+      canonicalState: 'PRIMARY',
+      confirm: true,
+    });
+    expect(
+      promoteApprovedChild({
+        child: { ...discovered, candidateDependencySha256: '55'.repeat(32) },
+        approval,
+        inspectionSha256: inspectionSha,
+        sourceReceiptRef: 'r',
+        roles: ['PATH'],
+        archetypes: [],
+        quality: ['SUPPORTING'],
+        depth: ['MIDGROUND'],
+        canonical: recommendCanonical({ receipt: makeReceipt({ sourceId: 'SRC_TAVERN' }), child: discovered }),
+      }),
+    ).toBeNull();
+  });
+
+  it('populates registry bridge fields only after a valid human approval', () => {
+    const discovered = child();
+    const approval = issueHumanApproval({
+      actorClass: 'HUMAN',
+      decision: 'APPROVED',
+      assetCandidateId: discovered.assetCandidateId,
+      sourceId: discovered.sourceId,
+      inspectionSha256: inspectionSha,
+      candidateDependencySha256: discovered.candidateDependencySha256,
+      visualRequired: true,
+      visualEvidenceSha256: visualSha,
+      semanticRoles: ['INTERIOR_SHELL'],
+      licenseState: 'LICENSE_INTERNAL_PRODUCTION_APPROVED',
+      provenanceState: 'PROVENANCE_RESOLVED',
+      canonicalState: 'PRIMARY',
+      confirm: true,
+    });
+    const promoted = promoteApprovedChild({
+      child: discovered,
+      approval,
+      inspectionSha256: inspectionSha,
+      sourceReceiptRef: 'receipt:SRC_TAVERN',
+      roles: ['INTERIOR_SHELL'],
+      archetypes: ['tavern'],
+      quality: ['HERO'],
+      depth: ['MIDGROUND'],
+      canonical: recommendCanonical({ receipt: makeReceipt({ sourceId: 'SRC_TAVERN', formatHint: 'BLEND' }), child: discovered }),
+    });
+    expect(promoted?.assetId.startsWith('env:')).toBe(true);
+    expect(promoted?.sourceReceiptRef).toBe('receipt:SRC_TAVERN');
+    expect(promoted?.inspectionSha256).toBe(inspectionSha);
+    expect(promoted?.approvalSha256).toBe(approval.approvalSha256);
+    expect(promoted?.shotAssemblyEligible).toBe(true);
+    expect(promoted?.storeOnlyMutated).toBe(false);
+  });
+
+  it('queues standard hero shots plus interior shots for shells', () => {
+    const hero = queueVisualEvidence({ assetCandidateId: 'cand:hero', roles: ['BUILDING_HERO'], quality: ['HERO'] });
+    expect(hero.requiredShots).toEqual(
+      expect.arrayContaining(['front', 'rear', 'side', 'three-quarter', 'close material view', 'story-camera view', 'scale reference view']),
+    );
+    expect(hero.finalRender).toBe(false);
+    expect(hero.paidCompute).toBe(false);
+  });
+
+  it('labels synthetic preview approval and refuses system approval of archival decisions', () => {
+    const synthetic = issueHumanApproval({
+      actorClass: 'SYNTHETIC',
+      decision: 'ARCHIVAL_ONLY',
+      assetCandidateId: child().assetCandidateId,
+      sourceId: 'SRC_TAVERN',
+      inspectionSha256: inspectionSha,
+      candidateDependencySha256: child().candidateDependencySha256,
+      visualRequired: false,
+      semanticRoles: ['PATH'],
+      licenseState: 'LICENSE_INTERNAL_PRODUCTION_APPROVED',
+      provenanceState: 'PROVENANCE_RESOLVED',
+      canonicalState: 'ARCHIVAL',
+      confirm: true,
+    });
+    expect(synthetic.issued).toBe(false);
+    expect(synthetic.syntheticLabeled).toBe(true);
+  });
+
+  it('reviews unknown provenance as review-required without inferring redistribution', () => {
+    const review = reviewProvenanceAndLicense(makeReceipt({ sourceId: 'SRC_UNK', provenanceState: 'PROVENANCE_UNKNOWN' }));
+    expect(review.provenanceState === 'PROVENANCE_UNKNOWN' || review.provenanceState === 'PROVENANCE_REVIEW_REQUIRED').toBe(true);
+    expect(review.rawRedistributionAllowed).toBe(false);
+  });
+});

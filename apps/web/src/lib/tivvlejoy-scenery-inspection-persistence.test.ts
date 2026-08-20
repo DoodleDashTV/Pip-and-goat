@@ -180,3 +180,77 @@ describe('recovery matrix', () => {
     });
   }
 });
+
+describe('inspection journal and reuse extras', () => {
+  it('journals ARCHIVE_INSPECTED when a container state is present', () => {
+    const store = createMemoryStore({ workspaceId: 'ws_archive_event' });
+    const first = evidence('SRC_AR');
+    persistInspectionArtifacts({
+      store,
+      evidence: { ...first.evidence, containerState: 'ARCHIVE_SAFE' },
+      children: [first.child],
+    });
+    expect(store.listEvents().map((event) => event.eventType)).toContain('ARCHIVE_INSPECTED');
+  });
+
+  it('journals VISUAL_REVIEW_REQUESTED for hero-quality evidence', () => {
+    const store = createMemoryStore({ workspaceId: 'ws_visual_event' });
+    const first = evidence('SRC_HE');
+    persistInspectionArtifacts({
+      store,
+      evidence: {
+        ...first.evidence,
+        quality: { ...first.evidence.quality, tiers: ['HERO', 'SUPPORTING', 'BACKGROUND'] },
+      },
+      children: [first.child],
+    });
+    expect(store.listEvents().map((event) => event.eventType)).toContain('VISUAL_REVIEW_REQUESTED');
+  });
+
+  it('restores children and quarantines after a second store instance reads the same memory', () => {
+    const store = createMemoryStore({ workspaceId: 'ws_restore_kids' });
+    const first = evidence('SRC_RS');
+    persistInspectionArtifacts({
+      store,
+      evidence: first.evidence,
+      children: [first.child],
+      quarantine: { sourceId: 'SRC_RS', state: 'QUARANTINED', reasons: ['CORRUPT_ARCHIVE'], storedSourceDeleted: false },
+    });
+    const restored = restoreInspectionState(store);
+    expect(restored.children[0]?.assetCandidateId).toBe(first.child.assetCandidateId);
+    expect(restored.quarantines[0]?.reasons).toEqual(['CORRUPT_ARCHIVE']);
+    expect(reuseInspectionReceipt(store, 'SRC_RS', '77'.repeat(32))).toBeTruthy();
+  });
+
+  it('does not persist commercial binary fields on logical children', () => {
+    const store = createMemoryStore({ workspaceId: 'ws_no_bin' });
+    const first = evidence('SRC_NB');
+    persistInspectionArtifacts({ store, evidence: first.evidence, children: [first.child] });
+    const blob = JSON.stringify(store.listRecords());
+    expect(blob).not.toMatch(/\.blend|\.fbx|\.glb|\.scatpack/);
+  });
+
+  it('rejects a stale expected revision on a later review write', () => {
+    const store = createMemoryStore({ workspaceId: 'ws_stale_rev' });
+    const first = evidence('SRC_ST');
+    persistInspectionArtifacts({ store, evidence: first.evidence, children: [first.child] });
+    const revision = store.getRevision();
+    store.writeRecord({
+      entityType: 'SCENERY_REVIEW_DECISION',
+      entityId: first.child.assetCandidateId,
+      payload: { decision: 'APPROVED' },
+      expectedRevision: revision,
+      eventType: 'REGISTRY_UPDATED',
+      reason: 'first',
+    });
+    const stale = store.writeRecord({
+      entityType: 'SCENERY_REVIEW_DECISION',
+      entityId: first.child.assetCandidateId,
+      payload: { decision: 'REJECTED' },
+      expectedRevision: revision,
+      eventType: 'REGISTRY_UPDATED',
+      reason: 'stale',
+    });
+    expect(stale.result).toBe('WRITE_CONFLICT');
+  });
+});

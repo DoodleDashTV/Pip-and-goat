@@ -62,6 +62,14 @@ export function persistInspectionArtifacts(input: {
       }, 'SOURCE_HASH_VERIFIED'),
     );
   }
+  if (input.evidence.containerState && input.evidence.containerState !== 'NOT_AN_ARCHIVE') {
+    receipts.push(
+      write(input.store, 'SCENERY_INSPECTION_RECEIPT', `${input.evidence.inspectionSha256}:archive`, {
+        containerState: input.evidence.containerState,
+        inspectionSha256: input.evidence.inspectionSha256,
+      }, 'ARCHIVE_INSPECTED'),
+    );
+  }
   receipts.push(
     write(input.store, 'SCENERY_INSPECTION_RECEIPT', input.evidence.inspectionSha256, {
       inspectionSha256: input.evidence.inspectionSha256,
@@ -70,6 +78,14 @@ export function persistInspectionArtifacts(input: {
       containerState: input.evidence.containerState,
     }, input.evidence.deepInspection.state === 'DEEP_BLENDER_INSPECTED' ? 'DEEP_INSPECTION_COMPLETED' : 'STATIC_FORMAT_INSPECTED'),
   );
+  if (input.evidence.quality.tiers.includes('HERO')) {
+    receipts.push(
+      write(input.store, 'SCENERY_VISUAL_EVIDENCE', `${input.evidence.inspectionSha256}:visual`, {
+        inspectionSha256: input.evidence.inspectionSha256,
+        visualApprovalAutomatic: false,
+      }, 'VISUAL_REVIEW_REQUESTED'),
+    );
+  }
   for (const child of input.children) {
     receipts.push(
       write(input.store, 'SCENERY_LOGICAL_ASSET', child.assetCandidateId, {

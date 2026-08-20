@@ -149,4 +149,171 @@ describe('named attacks', () => {
     });
     expect(kids[0]?.assetCandidateId).not.toBe(kids[1]?.assetCandidateId);
   });
+
+  it('hash mismatch', () => {
+    const glb = buildMinimalGlb({ meshes: [] });
+    const copy = new Uint8Array(glb);
+    copy[20] = (copy[20] ?? 0) ^ 0xff;
+    expect(inspectGlb(copy).malformed).toBe(true);
+  });
+
+  it('size mismatch', () => {
+    const glb = buildMinimalGlb({ meshes: [] });
+    const declared = new Uint8Array(glb);
+    declared[8] = 99;
+    expect(inspectGlb(declared).malformed).toBe(true);
+  });
+
+  it('stale receipt revision', () => {
+    const child = discoverLogicalAssets({
+      sourceId: 'SRC_STALE',
+      sourceSha256: 'dd'.repeat(32),
+      hints: [{ internalStableRef: 'path:1', assetKind: 'path' }],
+    })[0]!;
+    const stale = issueHumanApproval({
+      actorClass: 'HUMAN',
+      decision: 'APPROVED',
+      assetCandidateId: child.assetCandidateId,
+      sourceId: child.sourceId,
+      inspectionSha256: 'ee'.repeat(32),
+      candidateDependencySha256: child.candidateDependencySha256,
+      visualRequired: false,
+      semanticRoles: ['PATH'],
+      licenseState: 'LICENSE_INTERNAL_PRODUCTION_APPROVED',
+      provenanceState: 'PROVENANCE_RESOLVED',
+      canonicalState: 'PRIMARY',
+      confirm: true,
+      expectedRevision: 2,
+      currentRevision: 9,
+    });
+    expect(stale.issued).toBe(false);
+    expect(stale.reason).toContain('WRITE_CONFLICT');
+  });
+
+  it('unsafe signed URL is not a valid visual evidence hash', () => {
+    const child = discoverLogicalAssets({
+      sourceId: 'SRC_URL',
+      sourceSha256: 'ee'.repeat(32),
+      hints: [{ internalStableRef: 'sky:1', assetKind: 'sky' }],
+    })[0]!;
+    const denied = issueHumanApproval({
+      actorClass: 'HUMAN',
+      decision: 'APPROVED',
+      assetCandidateId: child.assetCandidateId,
+      sourceId: child.sourceId,
+      inspectionSha256: 'ff'.repeat(32),
+      candidateDependencySha256: child.candidateDependencySha256,
+      visualRequired: true,
+      visualEvidenceSha256: 'https://evil.example/?X-Amz-Signature=abc',
+      semanticRoles: ['SKY'],
+      licenseState: 'LICENSE_INTERNAL_PRODUCTION_APPROVED',
+      provenanceState: 'PROVENANCE_RESOLVED',
+      canonicalState: 'PRIMARY',
+      confirm: true,
+    });
+    expect(denied.issued).toBe(false);
+  });
+
+  it('secret leak strings stay out of the safety report', () => {
+    expect(JSON.stringify(safetyReport())).not.toMatch(/R2_SECRET_ACCESS_KEY|OBJECT_STORAGE_SECRET|signedUrl/);
+  });
+
+  it('approval replay against a different candidate is rejected', () => {
+    const first = discoverLogicalAssets({
+      sourceId: 'SRC_REP',
+      sourceSha256: '11'.repeat(32),
+      hints: [{ internalStableRef: 'rock:1', assetKind: 'rock' }],
+    })[0]!;
+    const second = discoverLogicalAssets({
+      sourceId: 'SRC_REP',
+      sourceSha256: '11'.repeat(32),
+      hints: [{ internalStableRef: 'tree:1', assetKind: 'tree' }],
+    })[0]!;
+    const approval = issueHumanApproval({
+      actorClass: 'HUMAN',
+      decision: 'APPROVED',
+      assetCandidateId: first.assetCandidateId,
+      sourceId: first.sourceId,
+      inspectionSha256: '22'.repeat(32),
+      candidateDependencySha256: first.candidateDependencySha256,
+      visualRequired: false,
+      semanticRoles: ['ROCK'],
+      licenseState: 'LICENSE_INTERNAL_PRODUCTION_APPROVED',
+      provenanceState: 'PROVENANCE_RESOLVED',
+      canonicalState: 'PRIMARY',
+      confirm: true,
+    });
+    expect(
+      promoteApprovedChild({
+        child: second,
+        approval,
+        inspectionSha256: '22'.repeat(32),
+        sourceReceiptRef: 'r',
+        roles: ['TREE_SUPPORT'],
+        archetypes: [],
+        quality: ['BACKGROUND'],
+        depth: ['BACKGROUND'],
+        canonical: recommendCanonical({ receipt: makeReceipt({ sourceId: 'SRC_REP' }), child: second }),
+      }),
+    ).toBeNull();
+  });
+
+  it('stale approval hash cannot promote', () => {
+    const child = discoverLogicalAssets({
+      sourceId: 'SRC_OLD',
+      sourceSha256: '33'.repeat(32),
+      hints: [{ internalStableRef: 'barrel:1', assetKind: 'barrel' }],
+    })[0]!;
+    const approval = issueHumanApproval({
+      actorClass: 'HUMAN',
+      decision: 'APPROVED',
+      assetCandidateId: child.assetCandidateId,
+      sourceId: child.sourceId,
+      inspectionSha256: '44'.repeat(32),
+      candidateDependencySha256: child.candidateDependencySha256,
+      visualRequired: false,
+      semanticRoles: ['INTERIOR_PROP'],
+      licenseState: 'LICENSE_INTERNAL_PRODUCTION_APPROVED',
+      provenanceState: 'PROVENANCE_RESOLVED',
+      canonicalState: 'PRIMARY',
+      confirm: true,
+    });
+    expect(
+      promoteApprovedChild({
+        child,
+        approval: { ...approval, issued: true, inspectionSha256: '99'.repeat(32) },
+        inspectionSha256: '44'.repeat(32),
+        sourceReceiptRef: 'r',
+        roles: ['INTERIOR_PROP'],
+        archetypes: [],
+        quality: ['SUPPORTING'],
+        depth: ['MIDGROUND'],
+        canonical: recommendCanonical({ receipt: makeReceipt({ sourceId: 'SRC_OLD' }), child }),
+      }),
+    ).toBeNull();
+  });
+
+  it('commercial extensions are flagged for tracked source paths only', () => {
+    expect(isCommercialExtension('village.blend')).toBe(true);
+    expect(isCommercialExtension('pack.fbx')).toBe(true);
+    expect(isCommercialExtension('env.glb')).toBe(true);
+    expect(isCommercialExtension('notes.md')).toBe(false);
+    expect(assertNoCommercialBytesInTrackedSources(['apps/web/src/lib/ok.ts', 'apps/web/secret.blend'])).toEqual([
+      'apps/web/secret.blend',
+    ]);
+  });
+
+  it('declared archive bomb and symlink attacks stay unextracted', () => {
+    expect(
+      inspectZipArchive(buildStoredZip([{ name: 'bomb.bin', data: 'z', declaredUncompressed: 9 * 1024 * 1024 }]), {
+        maxEntries: 8,
+        maxUncompressedBytes: 2 * 1024 * 1024 * 1024,
+        maxEntryUncompressedBytes: 512 * 1024 * 1024,
+        maxCompressionRatio: 2,
+        maxNestedDepth: 1,
+        maxNestedArchives: 1,
+      }).extracted,
+    ).toBe(false);
+    expect(inspectZipArchive(buildStoredZip([{ name: 'link.fbx', data: 'x', unixMode: 0o120000 }])).extracted).toBe(false);
+  });
 });

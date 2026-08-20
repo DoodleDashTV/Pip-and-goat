@@ -36,6 +36,7 @@ export type GltfInspection = {
   imageCount: number;
   animationCount: number;
   skinCount: number;
+  cameraCount: number;
   bufferCount: number;
   extensionsUsed: string[];
   externalDependencyRefs: string[];
@@ -230,6 +231,7 @@ export function inspectGltfJson(text: string): GltfInspection {
     imageCount: 0,
     animationCount: 0,
     skinCount: 0,
+    cameraCount: 0,
     bufferCount: 0,
     extensionsUsed: [] as string[],
     externalDependencyRefs: [] as string[],
@@ -244,7 +246,9 @@ export function inspectGltfJson(text: string): GltfInspection {
     return { ...base, notes: ['GLTF JSON is invalid.'] };
   }
   const external = collectExternalRefs(json);
-  const network = external.filter((uri) => /^https?:\/\//i.test(uri) || uri.startsWith('//'));
+  const network = external.filter(
+    (uri) => /^https?:\/\//i.test(uri) || /^ftp:\/\//i.test(uri) || uri.startsWith('//'),
+  );
   return {
     ...base,
     validJson: true,
@@ -256,6 +260,7 @@ export function inspectGltfJson(text: string): GltfInspection {
     imageCount: Array.isArray(json.images) ? json.images.length : 0,
     animationCount: Array.isArray(json.animations) ? json.animations.length : 0,
     skinCount: Array.isArray(json.skins) ? json.skins.length : 0,
+    cameraCount: Array.isArray(json.cameras) ? json.cameras.length : 0,
     bufferCount: Array.isArray(json.buffers) ? json.buffers.length : 0,
     extensionsUsed: Array.isArray(json.extensionsUsed) ? json.extensionsUsed.map(String) : [],
     externalDependencyRefs: external,

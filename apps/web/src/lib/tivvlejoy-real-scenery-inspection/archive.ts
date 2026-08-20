@@ -321,10 +321,21 @@ function tryExtractZipEntry(bytes: Uint8Array, wanted: string): Uint8Array | nul
   return null;
 }
 
-export function buildStoredZip(entries: Array<{ name: string; data: Uint8Array | string }>): Uint8Array {
+export function buildStoredZip(
+  entries: Array<{
+    name: string;
+    data: Uint8Array | string;
+    unixMode?: number;
+    declaredUncompressed?: number;
+    flags?: number;
+  }>,
+): Uint8Array {
   const files = entries.map((entry) => ({
     name: entry.name,
     data: typeof entry.data === 'string' ? new TextEncoder().encode(entry.data) : entry.data,
+    unixMode: entry.unixMode ?? 0,
+    declaredUncompressed: entry.declaredUncompressed,
+    flags: entry.flags ?? 0,
   }));
   const encoder = new TextEncoder();
   const chunks: Uint8Array[] = [];
@@ -336,11 +347,11 @@ export function buildStoredZip(entries: Array<{ name: string; data: Uint8Array |
     const local = new Uint8Array(30 + name.byteLength + file.data.byteLength);
     writeU32(local, 0, 0x04034b50);
     writeU16(local, 4, 20);
-    writeU16(local, 8, 0);
+    writeU16(local, 8, file.flags);
     writeU16(local, 10, 0);
     writeU32(local, 14, crc);
     writeU32(local, 18, file.data.byteLength);
-    writeU32(local, 22, file.data.byteLength);
+    writeU32(local, 22, file.declaredUncompressed ?? file.data.byteLength);
     writeU16(local, 26, name.byteLength);
     local.set(name, 30);
     local.set(file.data, 30 + name.byteLength);
@@ -349,10 +360,12 @@ export function buildStoredZip(entries: Array<{ name: string; data: Uint8Array |
     writeU32(central, 0, 0x02014b50);
     writeU16(central, 4, 20);
     writeU16(central, 6, 20);
+    writeU16(central, 8, file.flags);
     writeU32(central, 16, crc);
     writeU32(central, 20, file.data.byteLength);
-    writeU32(central, 24, file.data.byteLength);
+    writeU32(central, 24, file.declaredUncompressed ?? file.data.byteLength);
     writeU16(central, 28, name.byteLength);
+    writeU32(central, 38, (file.unixMode & 0xffff) << 16);
     writeU32(central, 42, offset);
     central.set(name, 46);
     centrals.push(central);

@@ -338,4 +338,134 @@ describe('TIVVLEJOY_SOURCE_MATERIALIZATION_V1', () => {
     expect(identity).not.toContain('popular.zip');
     expect(new Set(identity).size).toBe(8);
   });
+
+  it('adapts receipt aliases without promoting filename into identity', () => {
+    const receipt = adaptPurchasedAssetReceipt({
+      id: 'SRC_ALIAS',
+      receiptRef: 'receipt:alias',
+      byteSize: 12,
+      sha256: matchingBytes('alias').sha256,
+      stored: true,
+      filename: 'Pretty Name.zip',
+      licenseState: 'APPROVED_INTERNAL',
+      provenanceState: 'RESOLVED',
+    });
+    const identity = productionIdentityOf(receipt);
+    expect(identity.sourceId).toBe('SRC_ALIAS');
+    expect(identity.sourceReceiptRef).toBe('receipt:alias');
+    expect(identity.licenseState).toBe('LICENSE_INTERNAL_PRODUCTION_APPROVED');
+    expect(identity.provenanceState).toBe('PROVENANCE_RESOLVED');
+    expect(identity.filenameUsedForIdentity).toBe(false);
+    expect(receipt.originalFilename).toBe('Pretty Name.zip');
+  });
+
+  it('keeps SOURCE_HASH_MISSING after writing an isolated copy that still cleans up', async () => {
+    const { bytes, size } = matchingBytes('hash-missing-copy');
+    const result = await materializeSource({
+      receipt: adaptPurchasedAssetReceipt({
+        sourceId: 'SRC_HASH_MISSING_COPY',
+        sourceReceiptRef: 'r',
+        stored: true,
+        storedByteSize: size,
+      }),
+      bytes,
+    });
+    expect(result.state).toBe('SOURCE_HASH_MISSING');
+    expect(result.observedSha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.workspace && existsSync(result.workspace.root)).toBe(true);
+    cleanupMaterialization(result);
+    expect(result.workspace && existsSync(result.workspace.root)).toBe(false);
+  });
+
+  it('reports hash-verified sources separately from inspection candidates', () => {
+    const catalog = adaptPurchasedAssetCatalog([
+      { sourceId: 'HASHED', sourceReceiptRef: 'r', stored: true, storedByteSize: 4, sourceSha256: matchingBytes('h').sha256, provenanceState: 'RESOLVED' },
+      { sourceId: 'NOHASH', sourceReceiptRef: 'r', stored: true, storedByteSize: 4, provenanceState: 'RESOLVED' },
+    ]);
+    const report = discoverInspectionCatalog(catalog);
+    expect(report.hashVerifiedSources.map((item) => item.sourceId)).toEqual(['HASHED']);
+    expect(report.inspectionCandidates.map((item) => item.sourceId)).toEqual(['HASHED', 'NOHASH']);
+  });
+
+  it('indexes duplicate hashes without collapsing source identities', () => {
+    const sha = matchingBytes('dup').sha256;
+    const catalog = adaptPurchasedAssetCatalog([
+      { sourceId: 'ONE', sourceReceiptRef: 'r1', stored: true, storedByteSize: 3, sourceSha256: sha },
+      { sourceId: 'TWO', sourceReceiptRef: 'r2', stored: true, storedByteSize: 3, sourceSha256: sha },
+    ]);
+    const byHash = indexSourcesByHash(catalog);
+    expect(byHash.get(sha)?.map((item) => item.sourceId)).toEqual(['ONE', 'TWO']);
+    expect(indexSourcesById(catalog).size).toBe(2);
+  });
+
+  it('blocks unknown stored size before treating a source as an inspection candidate', () => {
+    const report = discoverInspectionCatalog([
+      adaptPurchasedAssetReceipt({ sourceId: 'NOSIZE', sourceReceiptRef: 'r', stored: true }),
+    ]);
+    expect(report.inspectionBlockedSources[0]?.blocker).toBe('SOURCE_SIZE_UNKNOWN');
+  });
+
+  it('never mutates R2 on materialization failure paths', async () => {
+    const failed = await materializeSource({
+      receipt: adaptPurchasedAssetReceipt({ sourceId: 'FAIL', sourceReceiptRef: 'r', stored: true, storedByteSize: 1 }),
+      bytes: null,
+    });
+    expect(failed.r2Mutated).toBe(false);
+    expect(failed.deleted).toBe(false);
+    expect(failed.renamed).toBe(false);
+    expect(failed.overwritten).toBe(false);
+  });
+
+  it('enumerates 512 sources without a hardcoded total in the discovery report', () => {
+    const report = discoverInspectionCatalog(makeCatalog(512));
+    expect(report.counts.catalog).toBe(512);
+    expect(report.hardcodedAssetTotal).toBe(false);
+    expect(indexSourcesById(makeCatalog(512)).size).toBe(512);
+  });
+
+  it('treats review-required license as inspectable provenance, not identity', () => {
+    const receipt = adaptPurchasedAssetReceipt({
+      sourceId: 'SRC_REVIEW_LIC',
+      sourceReceiptRef: 'r',
+      stored: true,
+      storedByteSize: 8,
+      licenseState: 'LICENSE_REVIEW_REQUIRED',
+      provenanceState: 'RESOLVED',
+    });
+    expect(productionIdentityOf(receipt).licenseState).toBe('LICENSE_REVIEW_REQUIRED');
+    expect(discoverInspectionCatalog([receipt]).inspectionCandidates).toHaveLength(1);
+  });
+
+  it('keeps wrapper identity separate from the wrapped sourceId', () => {
+    const catalog = adaptPurchasedAssetCatalog([
+      { sourceId: 'SRC_ORIG', sourceReceiptRef: 'r', stored: true, storedByteSize: 2, canonicalCandidate: true },
+      { sourceId: 'SRC_IPHONE_WRAP', sourceReceiptRef: 'r', stored: true, storedByteSize: 2, wrapperOfSourceId: 'SRC_ORIG' },
+    ]);
+    const report = discoverInspectionCatalog(catalog);
+    expect(report.archiveWrappers[0]?.sourceId).toBe('SRC_IPHONE_WRAP');
+    expect(report.archiveWrappers[0]?.sourceId).not.toBe('SRC_ORIG');
+  });
+
+  it('materialization identity never includes originalFilename fields', async () => {
+    const { bytes, sha256, size } = matchingBytes('identity-fields');
+    const receipt = adaptPurchasedAssetReceipt({
+      sourceId: 'SRC_FIELDS',
+      sourceReceiptRef: 'receipt:fields',
+      stored: true,
+      storedByteSize: size,
+      sourceSha256: sha256,
+      filename: 'VillageHeroPack.zip',
+    });
+    const result = await materializeSource({ receipt, bytes });
+    expect(JSON.stringify(productionIdentityOf(receipt))).not.toContain('VillageHeroPack');
+    expect(result.sourceId).toBe('SRC_FIELDS');
+    cleanupMaterialization(result);
+  });
+
+  it('cleans a leftover workspace even when destroy is called twice', () => {
+    const leftover = createIsolatedWorkspace();
+    destroyIsolatedWorkspace(leftover);
+    destroyIsolatedWorkspace(leftover);
+    expect(existsSync(leftover.root)).toBe(false);
+  });
 });

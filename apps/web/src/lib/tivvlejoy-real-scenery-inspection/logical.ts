@@ -42,11 +42,11 @@ const KIND_HINTS: Array<{ kind: AssetKind; pattern: RegExp }> = [
   { kind: 'terrain_piece', pattern: /terrain|ground|cliff|slope/i },
   { kind: 'hdri', pattern: /\.hdr$|\.exr$|hdri/i },
   { kind: 'sky', pattern: /sky|horizon/i },
-  { kind: 'street_prop', pattern: /sign|lantern|cart|fence|prop/i },
+  { kind: 'signage', pattern: /signage|signboard|poster/i },
+  { kind: 'street_prop', pattern: /lantern|cart|fence|street.?prop/i },
   { kind: 'furniture', pattern: /furniture|shelf|cabinet/i },
   { kind: 'water', pattern: /water|river|lake|pond/i },
   { kind: 'path', pattern: /path|road|street|cobble/i },
-  { kind: 'signage', pattern: /signage|signboard|poster/i },
   { kind: 'material_library', pattern: /shader|material.?pack|world.?shader/i },
   { kind: 'procedural_material_source', pattern: /procedural.?material|node.?group/i },
 ];

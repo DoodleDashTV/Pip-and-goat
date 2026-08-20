@@ -148,4 +148,77 @@ describe('static format matrix', () => {
     const report = inspectGltfJson(JSON.stringify({ images: [{ uri: 'data:image/png;base64,xx' }] }));
     expect(report.blockedExternalNetwork).toBe(false);
   });
+
+  it('rejects unsupported GLB versions and truncated headers', () => {
+    const version1 = buildMinimalGlb({ scenes: [] });
+    version1[4] = 1;
+    expect(inspectGlb(version1).malformed).toBe(true);
+    expect(inspectGlb(version1).notes.join(' ')).toMatch(/Unsupported GLB version/);
+    const short = new Uint8Array([0x67, 0x6c, 0x54, 0x46, 2, 0, 0, 0, 12, 0, 0, 0]);
+    expect(inspectGlb(short).malformed).toBe(true);
+  });
+
+  it('rejects a GLB whose first chunk is not JSON', () => {
+    const glb = buildMinimalGlb({ scenes: [] });
+    glb[16] = 0x42;
+    glb[17] = 0x49;
+    glb[18] = 0x4e;
+    glb[19] = 0x00;
+    expect(inspectGlb(glb).malformed).toBe(true);
+    expect(inspectGlb(glb).notes.join(' ')).toMatch(/not JSON/);
+  });
+
+  it('inspects a GLB BIN chunk without executing buffers', () => {
+    const glb = buildMinimalGlb({ meshes: [{ primitives: [{}] }], buffers: [{ byteLength: 4 }] }, new Uint8Array([1, 2, 3, 4]));
+    const report = inspectGlb(glb);
+    expect(report.valid).toBe(true);
+    expect(report.meshCount).toBe(1);
+  });
+
+  it('blocks FTP GLTF dependencies without fetching them', () => {
+    const report = inspectGltfJson(JSON.stringify({ buffers: [{ uri: 'ftp://files.example/a.bin' }] }));
+    expect(report.blockedExternalNetwork).toBe(true);
+    expect(report.blocker).toBe('BLOCKED_EXTERNAL_NETWORK_DEPENDENCY');
+  });
+
+  it('counts GLTF skins, cameras and textures independently', () => {
+    const report = inspectGltfJson(
+      JSON.stringify({
+        skins: [{}, {}],
+        cameras: [{}],
+        textures: [{}, {}, {}],
+        images: [{ uri: 'local.png' }, { uri: 'other.png' }],
+      }),
+    );
+    expect(report.skinCount).toBe(2);
+    expect(report.cameraCount).toBe(1);
+    expect(report.textureCount).toBe(3);
+    expect(report.imageCount).toBe(2);
+    expect(report.blockedExternalNetwork).toBe(false);
+  });
+
+  it('reads 32-bit and big-endian Blender headers without deep inspection', () => {
+    const thirtyTwo = inspectBlendHeader(new TextEncoder().encode('BLENDER_v280TEST'));
+    expect(thirtyTwo.pointerSize).toBe(4);
+    expect(thirtyTwo.endianness).toBe('little');
+    expect(thirtyTwo.deepSceneInspected).toBe(false);
+    const big = inspectBlendHeader(new TextEncoder().encode('BLENDER-V402TEST'));
+    expect(big.endianness).toBe('big');
+    expect(big.state).toBe('BLEND_VERSION_DETECTED');
+    expect(inspectBlendHeader(new TextEncoder().encode('BLENDER-x999TEST')).state).toBe('BLEND_HEADER_INVALID');
+  });
+
+  it('keeps binary FBX confidence conservative when names are sparse', () => {
+    const header = fbxBinaryHeader(7400);
+    expect(inspectFbx(header).confidence).not.toBe('HIGH');
+    expect(inspectFbx(header).notes.join(' ')).toMatch(/not validated/i);
+  });
+
+  it('does not claim deep Blender inspection even when a source path is supplied', () => {
+    const deep = inspectWithIsolatedBlender({ sourcePath: '/tmp/not-a-real-source.blend' });
+    expect(deep.state).toBe('DEEP_BLENDER_INSPECTION_PENDING');
+    expect(deep.sourceSaved).toBe(false);
+    expect(deep.addonsActivated).toBe(false);
+    expect(deep.autoExecutionDisabled).toBe(true);
+  });
 });

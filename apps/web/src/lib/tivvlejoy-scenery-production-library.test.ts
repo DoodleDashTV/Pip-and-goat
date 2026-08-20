@@ -133,4 +133,70 @@ describe('library category and search matrix', () => {
     expect(categoryFor({ approved: false, blocked: false, archival: false, quality: [], roles: [] })).toBe('AWAITING_REVIEW');
     expect(categoryFor({ approved: true, blocked: false, archival: false, quality: ['BACKGROUND'], roles: ['BACKGROUND_FILL'] })).toBe('APPROVED_BACKGROUND');
   });
+
+  it('categorizes hero, supporting, interior, vegetation, prop and sky families', () => {
+    expect(categoryFor({ approved: true, blocked: false, archival: false, quality: ['HERO'], roles: ['BUILDING_HERO'] })).toBe('APPROVED_HERO');
+    expect(categoryFor({ approved: true, blocked: false, archival: false, quality: ['SUPPORTING'], roles: ['BUILDING_SUPPORT'] })).toBe('APPROVED_SUPPORTING');
+    expect(categoryFor({ approved: true, blocked: false, archival: false, quality: ['HERO'], roles: ['INTERIOR_PROP'] })).toBe('APPROVED_INTERIOR');
+    expect(categoryFor({ approved: true, blocked: false, archival: false, quality: ['BACKGROUND'], roles: ['VINES'] })).toBe('APPROVED_VEGETATION');
+    expect(categoryFor({ approved: true, blocked: false, archival: false, quality: ['SUPPORTING'], roles: ['SIGNAGE'] })).toBe('APPROVED_PROP');
+    expect(categoryFor({ approved: true, blocked: false, archival: false, quality: ['BACKGROUND'], roles: ['SKY'] })).toBe('APPROVED_SKY');
+  });
+
+  it('refreshes hero, background and prop capacities from approved records only', () => {
+    const library = buildProductionLibrary([
+      approved('INTERIOR_SHELL'),
+      approved('TREE_HERO'),
+      approved('MOUNTAIN_BACKGROUND', { quality: ['BACKGROUND'] }),
+      {
+        ...approved('SKY'),
+        semanticRoles: ['STREET_PROP'],
+        category: 'APPROVED_PROP',
+        approvalSha256: '66'.repeat(32),
+      },
+    ]);
+    const refresh = refreshWorldBuilderFromLibrary(library);
+    expect(refresh.heroLocationAvailability).toBeGreaterThan(0);
+    expect(refresh.backgroundCapacity).toBeGreaterThan(0);
+    expect(refresh.propCapacity).toBeGreaterThan(0);
+    expect(refresh.resolverSourceChanged).toBe(false);
+  });
+
+  it('does not recommend specialty purchases from a missing filename', () => {
+    const library = buildProductionLibrary([approved('TREE_HERO')]);
+    expect(genuineSemanticGaps({ plannedStoryRoles: ['SuperVillage.zip', 'CASTLE_RUIN_HERO'], library })).toEqual([
+      'CASTLE_RUIN_HERO',
+    ]);
+  });
+
+  it('keeps specialty story roles closed unless planned demand exists', () => {
+    const library = buildProductionLibrary([approved('TREE_HERO')]);
+    expect(
+      genuineSemanticGaps({
+        plannedStoryRoles: ['CAVE_HERO', 'COASTAL_HERO', 'UNDERWATER_HERO', 'DESERT_HERO', 'SWAMP_HERO'],
+        library,
+      }),
+    ).toEqual(['CAVE_HERO', 'COASTAL_HERO', 'UNDERWATER_HERO', 'DESERT_HERO', 'SWAMP_HERO']);
+  });
+
+  it('filters approved search by quality and refuses unapproved SKY', () => {
+    const library = buildProductionLibrary([
+      approved('INTERIOR_SHELL', { quality: ['HERO', 'SUPPORTING'] }),
+      { ...approved('SKY'), approvalSha256: null, worldBuilderEligible: false, category: 'AWAITING_REVIEW' },
+    ]);
+    expect(findApprovedAssets(library, { role: 'INTERIOR_SHELL', quality: 'HERO' })).toHaveLength(1);
+    expect(findApprovedAssets(library, { role: 'SKY' })).toHaveLength(0);
+  });
+
+  it('indexes 200 library records without filename selection', () => {
+    const records = Array.from({ length: 200 }, (_, index) => ({
+      ...approved('TREE_HERO'),
+      assetId: `AA_SCALE_${index}`,
+      sourceId: `SRC_SCALE_${index}`,
+    }));
+    const library = buildProductionLibrary(records);
+    expect(library.indexes.byAssetId.size).toBe(200);
+    expect(findApprovedAssets(library, { role: 'TREE_HERO' }).length).toBe(200);
+    expect(() => findByFilename(library, 'x.zip')).toThrow(/not a production resolver/);
+  });
 });

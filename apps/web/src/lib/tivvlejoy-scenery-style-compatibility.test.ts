@@ -150,3 +150,89 @@ describe('quality and depth matrix', () => {
     });
   }
 });
+
+describe('canonical, scale and budget extras', () => {
+  it('does not generate a recipe for incompatible or exact styles', () => {
+    expect(buildHarmonizationRecipe(assessStyleCompatibility({ realismLevel: 'REALISTIC', materialComplexity: 'HIGH', textureStyle: 'PBR_REALISTIC' }))).toBeNull();
+    expect(buildHarmonizationRecipe(assessStyleCompatibility({ realismLevel: 'STORYBOOK', textureStyle: 'PAINTED' }))).toBeNull();
+  });
+
+  it('keeps recipe steps as plans only', () => {
+    const recipe = buildHarmonizationRecipe(assessStyleCompatibility({ realismLevel: 'STYLIZED' }));
+    expect(recipe?.steps).toEqual(
+      expect.arrayContaining(['material simplification', 'storybook lighting treatment', 'vegetation density adjustment']),
+    );
+    expect(recipe?.recipeExecuted).toBe(false);
+  });
+
+  it('classifies prop, building and terrain scale categories without rescaling', () => {
+    expect(analyzeScale({ dimensions: { x: 0.4, y: 0.4, z: 0.4 } }).probableScaleCategory).toBe('PROP');
+    expect(analyzeScale({ dimensions: { x: 12, y: 8, z: 10 } }).probableScaleCategory).toBe('BUILDING');
+    expect(analyzeScale({ dimensions: { x: 80, y: 40, z: 80 } }).probableScaleCategory).toBe('TERRAIN');
+    expect(analyzeScale({ dimensions: { x: 12, y: 8, z: 10 } }).rescaled).toBe(false);
+  });
+
+  it('records origin offset and rotation without altering the source', () => {
+    const transform = analyzeTransform({
+      origin: { x: 4, y: 0, z: -2 },
+      rotation: { x: 0, y: 90, z: 0 },
+      boundingBoxOffset: { x: 1, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+    });
+    expect(transform.origin).toEqual({ x: 4, y: 0, z: -2 });
+    expect(transform.rotation).toEqual({ x: 0, y: 90, z: 0 });
+    expect(transform.unappliedScale).toBe(false);
+    expect(transform.sourceAltered).toBe(false);
+  });
+
+  it('assigns VERY_HEAVY without claiming GPU performance', () => {
+    const budget = analyzeBudget({ triangleEstimate: 400_000, textureBytes: 90 * 1024 * 1024, quality: 'HERO' });
+    expect(budget.band).toBe('VERY_HEAVY');
+    expect(budget.gpuPerformanceClaimed).toBe(false);
+    expect(budget.textureMemoryEstimateBytes).toBe(90 * 1024 * 1024);
+  });
+
+  it('detects exact child geometry and texture hashes without collapsing kinds', () => {
+    const report = detectDuplicates({
+      sources: [makeReceipt({ sourceId: 'A' })],
+      children: discoverLogicalAssets({
+        sourceId: 'A',
+        sourceSha256: 'aa'.repeat(32),
+        hints: [
+          { internalStableRef: 'table:1', assetKind: 'table' },
+          { internalStableRef: 'chair:1', assetKind: 'chair' },
+        ],
+      }),
+      geometryHashes: [
+        { candidateId: 'c1', hash: 'gg'.repeat(32) },
+        { candidateId: 'c2', hash: 'gg'.repeat(32) },
+      ],
+      textureHashes: [
+        { ref: 'wood.png', sha256: 'tt'.repeat(32) },
+        { ref: 'wood-copy.png', sha256: 'tt'.repeat(32) },
+      ],
+    });
+    expect(report.exactChildGeometryGroups[0]?.candidateIds).toHaveLength(2);
+    expect(report.exactTextureGroups[0]?.refs).toHaveLength(2);
+    expect(report.logicalCanonicalGroups).toHaveLength(2);
+  });
+
+  it('keeps Gaffer, Starlight and Botaniq versions separately identifiable', () => {
+    expect(versionIdentity(makeReceipt({ sourceId: 'G1', packageFamily: 'Gaffer', packageVersion: '3.1' }))).toBe('Gaffer::3.1');
+    expect(versionIdentity(makeReceipt({ sourceId: 'G2', packageFamily: 'Gaffer', packageVersion: '4.0' }))).toBe('Gaffer::4.0');
+    expect(versionIdentity(makeReceipt({ sourceId: 'S1', packageFamily: 'Physical Starlight', packageVersion: '2' }))).not.toBe(
+      versionIdentity(makeReceipt({ sourceId: 'S2', packageFamily: 'Physical Starlight', packageVersion: '3' })),
+    );
+  });
+
+  it('marks receipt-level duplicates as DUPLICATE, not primary', () => {
+    const child = discoverLogicalAssets({
+      sourceId: 'SRC_DUP',
+      sourceSha256: 'ab'.repeat(32),
+      hints: [{ internalStableRef: 'rock:1', assetKind: 'rock' }],
+    })[0]!;
+    expect(recommendCanonical({ receipt: makeReceipt({ sourceId: 'SRC_DUP', canonicalSourceRelation: 'DUPLICATE' }), child }).state).toBe(
+      'DUPLICATE',
+    );
+  });
+});

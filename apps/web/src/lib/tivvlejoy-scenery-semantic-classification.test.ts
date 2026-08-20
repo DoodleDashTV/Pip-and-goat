@@ -26,4 +26,64 @@ describe('TIVVLEJOY_SCENERY_SEMANTIC_CLASSIFICATION_V1', () => {
       }).archetypes.some((item) => item.id === 'mountain'),
     ).toBe(true);
   });
+
+  it('maps vines, reeds, understory and foreground frames from object metadata', () => {
+    expect(
+      classifySemanticRoles({
+        kind: 'vegetation',
+        evidence: { geometryObjectNames: ['IvyVines'] },
+      }).roles,
+    ).toContain('VINES');
+    expect(
+      classifySemanticRoles({
+        kind: 'vegetation',
+        evidence: { geometryObjectNames: ['RiverReeds'] },
+      }).roles,
+    ).toContain('REEDS');
+    expect(
+      classifySemanticRoles({
+        kind: 'vegetation',
+        evidence: { geometryObjectNames: ['FernUnderstory'] },
+      }).roles,
+    ).toContain('FOREST_UNDERSTORY');
+    expect(
+      classifySemanticRoles({
+        kind: 'unknown',
+        evidence: { geometryObjectNames: ['ForegroundFrameLeaves'] },
+      }).roles,
+    ).toContain('FOREGROUND_FRAME');
+  });
+
+  it('maps snow, river and interior archetypes from evidence, not filenames', () => {
+    expect(
+      classifyArchetypes({
+        kind: 'terrain_piece',
+        roles: ['TERRAIN_SURFACE'],
+        evidence: { sourceDescriptions: ['snow ridge'] },
+      }).archetypes.some((item) => item.id === 'snow'),
+    ).toBe(true);
+    expect(
+      classifyArchetypes({
+        kind: 'water',
+        roles: ['WATER'],
+        evidence: { sourceDescriptions: ['river bend'] },
+      }).archetypes.some((item) => item.id === 'river'),
+    ).toBe(true);
+    expect(
+      classifyArchetypes({
+        kind: 'interior_shell',
+        roles: ['INTERIOR_SHELL'],
+        evidence: { sourceDescriptions: ['room'] },
+      }).archetypes.some((item) => item.id === 'interior'),
+    ).toBe(true);
+  });
+
+  it('records dimension evidence without using filename as identity', () => {
+    const result = classifySemanticRoles({
+      kind: 'building',
+      evidence: { geometryObjectNames: ['BakeryHero'], dimensions: { x: 8, y: 6, z: 10 } },
+    });
+    expect(result.filenameOnly).toBe(false);
+    expect(result.evidence.some((item) => item.startsWith('dimensions:'))).toBe(true);
+  });
 });

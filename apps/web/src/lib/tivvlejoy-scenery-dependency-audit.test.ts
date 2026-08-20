@@ -122,3 +122,76 @@ describe('map and material matrix', () => {
     });
   }
 });
+
+describe('texture and material completeness', () => {
+  it('separates embedded and external texture counts', () => {
+    const audit = auditTextures({
+      refs: [
+        { ref: 'embed.png', bytes: pngFixture(8, 8), embedded: true },
+        { ref: 'disk.png', embedded: false, format: '.png' },
+      ],
+    });
+    expect(audit.embeddedCount).toBe(1);
+    expect(audit.externalCount).toBe(1);
+    expect(audit.formats).toEqual(['.png']);
+  });
+
+  it('records color-space metadata when provided and leaves unknown maps unknown', () => {
+    const audit = auditTextures({
+      refs: [{ ref: 'hero.png', bytes: pngFixture(32, 16), colorSpace: 'sRGB', format: '.png' }],
+    });
+    expect(audit.textures[0]?.colorSpace).toBe('sRGB');
+    expect(audit.textures[0]?.mapKind).toBe('UNKNOWN');
+    expect(audit.textures[0]?.mapConfidence).toBe('LOW');
+  });
+
+  it('classifies emission, transparency and harmonization without modifying materials', () => {
+    const audit = auditMaterials({
+      materials: [
+        { name: 'Glow', pbr: true, emission: true, nodeCount: 3 },
+        { name: 'Glass', pbr: true, transparency: true, nodeCount: 6 },
+        { name: 'Paint', pbr: false, nodeCount: 2 },
+      ],
+    });
+    expect(audit.materials[0]?.classification).toBe('HARMONIZATION_REQUIRED');
+    expect(audit.materials[1]?.transparency).toBe(true);
+    expect(audit.materials[2]?.classification).toBe('HARMONIZATION_REQUIRED');
+    expect(audit.materials.every((item) => item.modified === false)).toBe(true);
+  });
+
+  it('keeps Botaniq and Geo-Scatter inactive even when required or optional', () => {
+    const both = inspectAddonDependencies(['Botaniq Full 7.2.0', 'Geo-Scatter 5 companion']);
+    expect(both.botaniq).toBe('NOT_ACTIVATED');
+    expect(both.geoScatter).toBe('NOT_INTEGRATED');
+    expect(both.activated).toBe(false);
+  });
+
+  it('classifies driver expressions as review-required and never executed', () => {
+    const report = inspectScriptEvidence(['#frame * 2', 'noise.random()']);
+    expect(report.state).toBe('SCRIPT_REVIEW_REQUIRED');
+    expect(report.executed).toBe(false);
+    expect(report.driverExpressions.length).toBeGreaterThan(0);
+  });
+
+  it('classifies shell-like references as unsafe without running them', () => {
+    const report = inspectScriptEvidence(['/bin/sh -c echo']);
+    expect(report.state).toBe('UNSAFE_EXECUTION_DEPENDENCY');
+    expect(report.shellLikeReferences).toHaveLength(1);
+    expect(report.executed).toBe(false);
+  });
+
+  it('reads PNG color types for RGB and grayscale headers', () => {
+    const rgb = pngFixture(4, 4);
+    rgb[25] = 2;
+    expect(inspectPngHeader(rgb)?.channels).toBe(3);
+    const gray = pngFixture(4, 4);
+    gray[25] = 0;
+    expect(inspectPngHeader(gray)?.channels).toBe(1);
+  });
+
+  it('does not invent texture identity from a popular filename', () => {
+    const hint = classifyTextureMapHint('SuperPopularVillagePack_basecolor.png');
+    expect(hint.kind).toBe('BASE_COLOR');
+    expect(hint.confidence).toBe('LOW');
+  });
+});
