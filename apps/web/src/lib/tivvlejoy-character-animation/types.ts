@@ -1,0 +1,264 @@
+export const ANIMATION_SYSTEM_SCHEMA = 'TIVVLEJOY_CHARACTER_ANIMATION_SYSTEM_V1' as const;
+export const RIG_CONTRACT_SCHEMA = 'TIVVLEJOY_CHARACTER_RIG_CONTRACT_V1' as const;
+export const RIG_ADMISSION_SCHEMA = 'TIVVLEJOY_RIG_ADMISSION_GATE_V1' as const;
+export const RIG_INSPECTION_SCHEMA = 'TIVVLEJOY_RIG_INSPECTION_REPORT_V1' as const;
+export const PERFORMANCE_INTENT_SCHEMA = 'TIVVLEJOY_PERFORMANCE_INTENT_V1' as const;
+export const ACTION_VOCABULARY_SCHEMA = 'TIVVLEJOY_ACTION_VOCABULARY_V1' as const;
+export const DIALOGUE_TIMING_SCHEMA = 'TIVVLEJOY_DIALOGUE_TIMING_V1' as const;
+export const VISEME_PLAN_SCHEMA = 'TIVVLEJOY_VISEME_PLAN_V1' as const;
+export const GAZE_SCHEMA = 'TIVVLEJOY_GAZE_AND_ATTENTION_V1' as const;
+export const LOCOMOTION_SCHEMA = 'TIVVLEJOY_LOCOMOTION_PLAN_V1' as const;
+export const CONTACT_SCHEMA = 'TIVVLEJOY_CONTACT_AND_FOOT_PLANT_V1' as const;
+export const BODY_ACTING_SCHEMA = 'TIVVLEJOY_BODY_ACTING_PLAN_V1' as const;
+export const CLIP_PLAN_SCHEMA = 'TIVVLEJOY_ANIMATION_CLIP_PLAN_V1' as const;
+export const SHOT_MANIFEST_SCHEMA = 'TIVVLEJOY_SHOT_ANIMATION_MANIFEST_V1' as const;
+export const ANIMATION_CONTINUITY_SCHEMA = 'TIVVLEJOY_ANIMATION_CONTINUITY_V1' as const;
+export const ANIMATION_QC_SCHEMA = 'TIVVLEJOY_ANIMATION_QC_V1' as const;
+export const ANIMATION_CACHE_SCHEMA = 'TIVVLEJOY_ANIMATION_CACHE_V1' as const;
+export const ANIMATION_BATCH_SCHEMA = 'TIVVLEJOY_ANIMATION_BATCH_SCHEDULER_V1' as const;
+export const ANIMATION_CONSOLE_SCHEMA = 'TIVVLEJOY_ANIMATION_OPERATOR_CONSOLE_V1' as const;
+export const ANIMATION_SEASON_SCHEMA = 'TIVVLEJOY_ANIMATION_SEASON_SIMULATION_V1' as const;
+
+export const CAPABILITY_FAMILIES = [
+  'ROOT_MOTION',
+  'BODY_CENTER',
+  'CHEST',
+  'NECK',
+  'HEAD',
+  'EYE_LEFT',
+  'EYE_RIGHT',
+  'EYE_AIM',
+  'EYELID_LEFT',
+  'EYELID_RIGHT',
+  'MOUTH_OR_BEAK_UPPER',
+  'MOUTH_OR_BEAK_LOWER',
+  'FACE_EXPRESSION',
+  'ARM_OR_WING_LEFT',
+  'ARM_OR_WING_RIGHT',
+  'LEG_LEFT',
+  'LEG_RIGHT',
+  'FOOT_LEFT',
+  'FOOT_RIGHT',
+  'TOE_OR_DIGIT_CONTROLS',
+  'ACCESSORY_CONTROLS',
+  'PROP_ATTACHMENT_POINTS',
+] as const;
+export type CapabilityFamily = (typeof CAPABILITY_FAMILIES)[number];
+
+export const CAPABILITY_REQUIREMENTS = ['REQUIRED', 'OPTIONAL', 'DESIRABLE'] as const;
+export type CapabilityRequirement = (typeof CAPABILITY_REQUIREMENTS)[number];
+
+export const ADMISSION_STATES = [
+  'RIG_NOT_PRESENT',
+  'RIG_DISCOVERED',
+  'RIG_INSPECTION_REQUIRED',
+  'RIG_CAPABILITY_CHECK_PENDING',
+  'RIG_CAPABILITY_INCOMPLETE',
+  'RIG_HASH_MISMATCH',
+  'RIG_VERSION_MISMATCH',
+  'RIG_VISUAL_TEST_REQUIRED',
+  'RIG_HUMAN_APPROVAL_REQUIRED',
+  'RIG_APPROVED_FOR_ANIMATION',
+  'RIG_BLOCKED',
+] as const;
+export type AdmissionState = (typeof ADMISSION_STATES)[number];
+
+export const POSE_RESULTS = ['PASS', 'WARNING', 'FAIL', 'NOT_TESTED'] as const;
+export type PoseResult = (typeof POSE_RESULTS)[number];
+
+export const ACTION_IDS = [
+  'IDLE_NEUTRAL',
+  'IDLE_CURIOUS',
+  'IDLE_HAPPY',
+  'LOOK_LEFT',
+  'LOOK_RIGHT',
+  'LOOK_UP',
+  'LOOK_DOWN',
+  'LOOK_AT_CHARACTER',
+  'LOOK_AT_PROP',
+  'BLINK_SINGLE',
+  'BLINK_DOUBLE',
+  'HEAD_NOD',
+  'HEAD_SHAKE',
+  'HEAD_TILT',
+  'WALK_FORWARD',
+  'WALK_SLOW',
+  'WALK_EXCITED',
+  'RUN',
+  'STOP',
+  'TURN_LEFT',
+  'TURN_RIGHT',
+  'JUMP',
+  'LAND',
+  'POINT',
+  'WAVE',
+  'REACH',
+  'PICK_UP',
+  'PUT_DOWN',
+  'HOLD_PROP',
+  'HAND_PROP_OVER',
+  'RECEIVE_PROP',
+  'PIP_WING_GESTURE_SMALL',
+  'PIP_WING_GESTURE_BIG',
+  'PIP_WING_FLUTTER',
+  'GOAT_HEAD_BOB',
+  'GOAT_EAR_REACTION',
+  'BEAK_OR_MOUTH_OPEN',
+  'BEAK_OR_MOUTH_CLOSE',
+  'SURPRISE_RECOIL',
+  'HAPPY_BOUNCE',
+  'THINKING_POSE',
+  'CONFUSED_REACTION',
+] as const;
+export type ActionId = (typeof ACTION_IDS)[number];
+
+export const ACTION_SUPPORT = [
+  'SUPPORTED_DIRECTLY',
+  'SUPPORTED_COMPOSITE',
+  'SUPPORTED_WITH_LIMITATION',
+  'UNSUPPORTED',
+  'RIG_NOT_ADMITTED',
+] as const;
+export type ActionSupport = (typeof ACTION_SUPPORT)[number];
+
+export const TIMING_SOURCES = ['TIMING_EXACT', 'TIMING_WORD_LEVEL', 'TIMING_LINE_LEVEL', 'TIMING_UNAVAILABLE'] as const;
+export type TimingSource = (typeof TIMING_SOURCES)[number];
+
+export const VISEME_BUCKETS = ['REST', 'CLOSED', 'SMALL_OPEN', 'MEDIUM_OPEN', 'WIDE_OPEN', 'ROUND', 'EMPHASIS'] as const;
+export type VisemeBucket = (typeof VISEME_BUCKETS)[number];
+
+export const GAZE_TARGETS = [
+  'OTHER_CHARACTER',
+  'STORY_PROP',
+  'CAMERA_NEAR',
+  'CAMERA_OFF_AXIS',
+  'DESTINATION',
+  'ENVIRONMENT_FEATURE',
+  'SELF_ACTION',
+] as const;
+export type GazeTarget = (typeof GAZE_TARGETS)[number];
+
+export const LOCOMOTION_CLASSES = [
+  'STATIONARY',
+  'WALK',
+  'FAST_WALK',
+  'RUN',
+  'JUMP',
+  'LAND',
+  'TURN',
+  'APPROACH',
+  'DEPART',
+] as const;
+export type LocomotionClass = (typeof LOCOMOTION_CLASSES)[number];
+
+export const PROP_STATES = ['FREE', 'APPROACHING', 'REACHING', 'ATTACHED', 'HELD', 'TRANSFERRING', 'RELEASED', 'STORED'] as const;
+export type PropState = (typeof PROP_STATES)[number];
+
+export const CACHE_STATUSES = [
+  'CACHE_MISS',
+  'CACHE_REUSABLE',
+  'CACHE_STALE',
+  'CACHE_CONTEXT_MISMATCH',
+  'CACHE_RIG_VERSION_MISMATCH',
+] as const;
+export type CacheStatus = (typeof CACHE_STATUSES)[number];
+
+export const CONTINUITY_ISSUES = [
+  'POSITION_JUMP',
+  'FACING_FLIP',
+  'PROP_TELEPORT',
+  'GAZE_DISCONTINUITY',
+  'MOTION_DISCONTINUITY',
+  'CONTACT_DISCONTINUITY',
+] as const;
+export type ContinuityIssueKind = (typeof CONTINUITY_ISSUES)[number];
+
+export const QC_STATES = ['PASS', 'WARNING', 'FAIL', 'NOT_EVALUATED'] as const;
+export type QcState = (typeof QC_STATES)[number];
+
+export const QC_CHECK_IDS = [
+  'RIG_ADMITTED',
+  'RIG_VERSION_MATCH',
+  'CHARACTER_IDENTITY_MATCH',
+  'DIALOGUE_TIMING_AVAILABLE',
+  'VISEME_CONFIDENCE',
+  'BLINK_VALID',
+  'GAZE_VALID',
+  'POSE_CONTINUITY',
+  'PROP_CONTINUITY',
+  'FOOT_CONTACT',
+  'FOOT_SLIDE',
+  'GROUND_CONTACT',
+  'MOVEMENT_SPEED',
+  'TURN_CONTINUITY',
+  'GESTURE_READABILITY',
+  'FACE_READABILITY',
+  'ACCESSORY_PRESENT',
+  'CAMERA_PERFORMANCE_VISIBILITY',
+  'ANIMATION_DEPENDENCY_FRESH',
+] as const;
+export type QcCheckId = (typeof QC_CHECK_IDS)[number];
+
+export const BLENDER_ANIMATION_OPS = [
+  'LOAD_APPROVED_RIG',
+  'VALIDATE_RIG_HASH',
+  'BIND_CHARACTER_TO_SHOT',
+  'SET_ROOT_TRANSFORM',
+  'APPLY_ACTION_LAYER',
+  'APPLY_GAZE_LAYER',
+  'APPLY_BLINK_LAYER',
+  'APPLY_VISEME_LAYER',
+  'APPLY_BODY_ACTING_LAYER',
+  'APPLY_LOCOMOTION_LAYER',
+  'APPLY_PROP_ATTACHMENT',
+  'VALIDATE_CONTACT',
+  'BAKE_ANIMATION',
+  'WRITE_DERIVATIVE',
+] as const;
+export type BlenderAnimationOp = (typeof BLENDER_ANIMATION_OPS)[number];
+
+export const RIG_ARRIVAL_STEPS = [
+  'RECEIVE',
+  'HASH',
+  'REGISTER_IMMUTABLE_SOURCE',
+  'INSPECT',
+  'CAPABILITY_REPORT',
+  'TEST_POSE_REPORT',
+  'IDENTITY_COMPATIBILITY',
+  'DEFORMATION_EVIDENCE',
+  'HUMAN_VISUAL_REVIEW',
+  'APPROVAL_RECEIPT',
+  'REGISTER_PRODUCTION_RIG_VERSION',
+] as const;
+export type RigArrivalStep = (typeof RIG_ARRIVAL_STEPS)[number];
+
+export const ANIMATION_GRAPH_STATES = [
+  'WAITING_FOR_RIG',
+  'WAITING_FOR_RIG_APPROVAL',
+  'WAITING_FOR_VOICE_TIMING',
+  'WAITING_FOR_CONTINUITY',
+  'WAITING_FOR_ANIMATION_PLAN',
+  'WAITING_FOR_ANIMATION_QC',
+  'READY_FOR_CHARACTER_ANIMATION_ASSEMBLY',
+] as const;
+export type AnimationGraphState = (typeof ANIMATION_GRAPH_STATES)[number];
+
+export type CapabilitySpec = {
+  family: CapabilityFamily;
+  controlId: string;
+  requirement: CapabilityRequirement;
+  semanticPurpose: string;
+};
+
+export type RigIdentity = {
+  characterId: 'PIP' | 'GOAT';
+  rigId: string;
+  rigVersion: string;
+  rigDependencySha256: string;
+  sourceReceiptRef: string | null;
+  sourceSha256: string | null;
+  rigApprovalReceiptRef: string | null;
+  rigApprovalSha256: string | null;
+  blenderVersionCompatibility: string;
+  evidenceClass: 'SYNTHETIC_PREVIEW' | 'PRODUCTION_CANDIDATE';
+};
