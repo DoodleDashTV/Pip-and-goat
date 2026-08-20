@@ -114,6 +114,6 @@ export function unsafeScriptFixture(kind: 'subprocess' | 'os.system' | 'network'
   if (kind === 'os.system') return 'import os\nos.system("blender")\n';
   if (kind === 'network') return 'import requests\nrequests.get("https://example.invalid/network")\n';
   if (kind === 'overwrite') return 'bpy.ops.wm.save_mainfile()\noverwrite source\n';
-  if (kind === 'signed-url') return 'url = "https://bucket.amazonaws.com/file?X-Amz-Signature=abc"\n';
+  if (kind === 'signed-url') return 'url = "https://bucket.amazonaws.com/file?X-Amz-Signature=abc-placeholder"\n';
   return 'token = "sk_live_dummyexampletoken"\n';
 }
