@@ -17,6 +17,7 @@ export type Ep012AuthorizedVoiceRequest = {
   segmentId: string;
   speaker: Ep012CanonicalSegmentSpeaker;
   canonicalText: string;
+  characterCount: number;
   textSha256: string;
   segmentSha256: string;
   dialogueSha256: typeof EP012_VOICE_AUTHORIZATION_DIALOGUE_SHA256;
@@ -28,6 +29,10 @@ function requestIdFor(segmentSha256: string): string {
   return `ep012_voice_${segmentSha256.slice(0, 24)}`;
 }
 
+function countCharacters(text: string): number {
+  return Array.from(text).length;
+}
+
 function buildAuthorizedRequests(): readonly Ep012AuthorizedVoiceRequest[] {
   return EP012_CANONICAL_DIALOGUE_LOCK.lines.flatMap((line) =>
     line.subsegments.map((segment) => ({
@@ -37,6 +42,7 @@ function buildAuthorizedRequests(): readonly Ep012AuthorizedVoiceRequest[] {
       segmentId: segment.segmentId,
       speaker: segment.speaker,
       canonicalText: segment.canonicalText,
+      characterCount: countCharacters(segment.canonicalText),
       textSha256: segment.textSha256,
       segmentSha256: segment.segmentSha256,
       dialogueSha256: EP012_VOICE_AUTHORIZATION_DIALOGUE_SHA256,
@@ -47,6 +53,13 @@ function buildAuthorizedRequests(): readonly Ep012AuthorizedVoiceRequest[] {
 }
 
 const authorizedRequests = buildAuthorizedRequests();
+const pipCharacterCount = authorizedRequests
+  .filter((request) => request.speaker === 'PIP')
+  .reduce((sum, request) => sum + request.characterCount, 0);
+const goatCharacterCount = authorizedRequests
+  .filter((request) => request.speaker === 'GOAT')
+  .reduce((sum, request) => sum + request.characterCount, 0);
+const totalCharacterCount = pipCharacterCount + goatCharacterCount;
 
 const authorizationCore = {
   schemaVersion: EP012_VOICE_AUTHORIZATION_SCHEMA,
@@ -58,7 +71,12 @@ const authorizationCore = {
   canonicalLineCount: 7 as const,
   authorizedSegmentCount: 11 as const,
   maxProviderRequests: 11 as const,
+  pipCharacterCount,
+  goatCharacterCount,
+  totalCharacterCount,
+  maxPaidCharacters: totalCharacterCount,
   oneRequestPerSpeaker: true as const,
+  providerContactAuthorizedWithinScope: true as const,
   automaticRetryAllowed: false as const,
   durableLedgerRequired: true as const,
   existingServerGatesRequired: true as const,
@@ -84,6 +102,7 @@ export type Ep012VoiceAuthorizationRequestInput = {
   segmentId: string;
   speaker: string;
   canonicalText: string;
+  characterCount: number;
   textSha256: string;
   segmentSha256: string;
   dialogueSha256: string;
@@ -108,6 +127,9 @@ export function verifyEp012VoiceAuthorization(): true {
   if (authorizedRequests.length !== 11 || EP012_CANONICAL_DIALOGUE_LOCK.utteranceSegmentCount !== 11) {
     throw new Error('EP012_VOICE_AUTH_SEGMENT_COUNT_MISMATCH');
   }
+  if (totalCharacterCount !== authorizedRequests.reduce((sum, request) => sum + countCharacters(request.canonicalText), 0)) {
+    throw new Error('EP012_VOICE_AUTH_CHARACTER_COUNT_MISMATCH');
+  }
 
   const segmentIds = new Set<string>();
   const requestIds = new Set<string>();
@@ -127,6 +149,9 @@ export function verifyEp012VoiceAuthorization(): true {
     }
     if (locked.segment.canonicalText !== request.canonicalText) {
       throw new Error(`EP012_VOICE_AUTH_TEXT_MISMATCH:${request.segmentId}`);
+    }
+    if (countCharacters(locked.segment.canonicalText) !== request.characterCount) {
+      throw new Error(`EP012_VOICE_AUTH_CHARACTER_COUNT_MISMATCH:${request.segmentId}`);
     }
     if (locked.segment.textSha256 !== request.textSha256) {
       throw new Error(`EP012_VOICE_AUTH_TEXT_HASH_MISMATCH:${request.segmentId}`);
@@ -161,6 +186,7 @@ export function assertEp012VoiceRequestAuthorized(input: Ep012VoiceAuthorization
     input.dialogueRef === authorized.dialogueRef &&
     input.speaker === authorized.speaker &&
     input.canonicalText === authorized.canonicalText &&
+    input.characterCount === authorized.characterCount &&
     input.textSha256 === authorized.textSha256 &&
     input.segmentSha256 === authorized.segmentSha256;
   if (!exact) throw new Error(`EP012_VOICE_AUTH_REQUEST_MISMATCH:${input.segmentId}`);
