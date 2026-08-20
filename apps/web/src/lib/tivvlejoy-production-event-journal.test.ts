@@ -190,7 +190,7 @@ describe('production event journal and snapshots', () => {
       nextRevision: 1,
       dependencySha256: 'c'.repeat(64),
       reason: 'save',
-      payload: { url: 'https://r2.example/obj?X-Amz-Signature=zzzz' },
+      payload: { url: 'https://r2.example/obj?X-Amz-Signature=preview-placeholder' },
     });
     expect(event.payload.url).toBe('[REDACTED]');
   });

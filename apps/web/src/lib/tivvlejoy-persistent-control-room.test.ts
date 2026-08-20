@@ -28,7 +28,7 @@ const SECRET_SAMPLES = {
   RUNPOD_API_KEY: 'preview-runpod-placeholder',
   ELEVENLABS_API_KEY: 'preview-elevenlabs-placeholder',
   authorization: 'Bearer preview-authorization-placeholder',
-  signedUrl: 'https://example.test/obj?X-Amz-Signature=preview',
+  signedUrl: 'https://example.test/obj?X-Amz-Signature=preview-placeholder',
   cookie: 'preview-cookie-placeholder',
   token: 'preview-token-placeholder',
 };

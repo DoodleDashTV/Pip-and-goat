@@ -321,7 +321,7 @@ describe('durable production persistence model', () => {
   it('redacts signed URL values before they are stored', () => {
     const store = createMemoryStore();
     const receipt = store.writeWorkspace({
-      note: 'https://bucket.example/obj?X-Amz-Signature=abc123secret',
+      note: 'https://bucket.example/obj?X-Amz-Signature=preview-placeholder',
     });
     expect(receipt.result).toBe('WRITE_ACCEPTED');
     expect(store.readWorkspace()?.payload.note).toBe('[REDACTED]');
