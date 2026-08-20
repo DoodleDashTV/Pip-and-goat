@@ -43,6 +43,21 @@ export function eventTypeFor(entityType: EntityType): JournalEventType {
       return 'ANIMATION_PLAN_WRITTEN';
     case 'ANIMATION_QC_RECEIPT':
       return 'ANIMATION_QC_RECORDED';
+    case 'SCENERY_SOURCE_RECEIPT':
+      return 'SOURCE_MATERIALIZED';
+    case 'SCENERY_INSPECTION_RECEIPT':
+      return 'STATIC_FORMAT_INSPECTED';
+    case 'SCENERY_LOGICAL_ASSET':
+      return 'LOGICAL_ASSET_DISCOVERED';
+    case 'SCENERY_APPROVAL_RECEIPT':
+      return 'ASSET_APPROVED';
+    case 'SCENERY_VISUAL_EVIDENCE':
+      return 'VISUAL_REVIEW_REQUESTED';
+    case 'SCENERY_QUARANTINE':
+      return 'ASSET_ARCHIVED';
+    case 'SCENERY_PRODUCTION_LIBRARY':
+    case 'SCENERY_REVIEW_DECISION':
+      return 'REGISTRY_UPDATED';
     default:
       return 'WORKSPACE_SAVED';
   }
