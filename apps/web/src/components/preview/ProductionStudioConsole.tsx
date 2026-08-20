@@ -150,6 +150,10 @@ export function ProductionStudioConsole({
           <Link href="/animation-control" className="font-bold underline">
             Animation Control
           </Link>
+          {' · '}
+          <Link href="/scenery-inspection" className="font-bold underline">
+            Scenery inspection
+          </Link>
         </p>
       </div>
 
