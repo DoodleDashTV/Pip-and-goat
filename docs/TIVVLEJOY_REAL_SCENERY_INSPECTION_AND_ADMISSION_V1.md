@@ -42,3 +42,11 @@ Filename is provenance metadata only. It is never a production identity.
 Commercial bytes stay out of Git. Embedded scripts are inventoried, never
 run. Botaniq, Geo-Scatter, Gaffer, and Physical Starlight are not activated.
 No GPU, RunPod, or paid compute is launched. Production is not mutated.
+
+A read-only catalog probe (`pnpm probe:private-scenery-catalog`) may list
+hashed object identities when durable R2 credentials resolve to a real
+client. The connection-ready stub is never treated as real private access.
+Listing is not a byte read. Listing is not inspection. Inspection is not
+approval. Observed catalog listings in this marathon did not download
+commercial bytes, so they cannot be counted as statically inspected or
+deep-inspected sources.

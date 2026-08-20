@@ -168,6 +168,24 @@ describe('coverage and private-source extras', () => {
     expect(probe.hashedObjectIdentities[0]).toMatch(/^[a-f0-9]{64}$/);
   });
 
+  it('does not treat the connection-ready stub as real private source access', async () => {
+    const { ConnectionReadyMultipartStorage } = await import('./scenery/intake/multipart');
+    const probe = await (await import('./tivvlejoy-real-scenery-inspection')).probePrivateSourceCatalog({
+      env: {
+        R2_BUCKET: 'bucket',
+        R2_ENDPOINT: 'https://example.invalid',
+        R2_ACCESS_KEY_ID: 'id',
+        R2_SECRET_ACCESS_KEY: 'secret',
+      },
+      storage: new ConnectionReadyMultipartStorage(),
+    });
+    expect(probe.realPrivateSourceAccessAvailable).toBe(false);
+    expect(probe.listingExecuted).toBe(false);
+    expect(probe.commercialBytesDownloaded).toBe(0);
+    expect(probe.blocker).toMatch(/CONNECTION_READY_STUB/);
+    expect(JSON.stringify(probe)).not.toContain('secret');
+  });
+
   it('records an exact listing blocker without leaking secrets', async () => {
     const probe = await (await import('./tivvlejoy-real-scenery-inspection')).probePrivateSourceCatalog({
       env: {

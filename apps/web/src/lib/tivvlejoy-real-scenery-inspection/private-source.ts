@@ -1,4 +1,5 @@
 import { createConfiguredMultipartStorage } from '@/lib/scenery/intake/r2-multipart';
+import { ConnectionReadyMultipartStorage } from '@/lib/scenery/intake/multipart';
 import { describeSceneryStorageConfiguration, resolveSceneryAssetPrefix } from '@/lib/scenery/intake/config';
 import { sha256Text } from './hash';
 
@@ -69,6 +70,7 @@ export function describePrivateSourceAccess(
 export async function probePrivateSourceCatalog(input?: {
   env?: Record<string, string | undefined>;
   listPrefix?: (prefix: string) => Promise<Array<{ key: string; size: number }>>;
+  storage?: { listPrefix?: (prefix: string) => Promise<Array<{ key: string; size: number }>> };
 }): Promise<PrivateSourceProbe> {
   const env = input?.env ?? process.env;
   const baseline = describePrivateSourceAccess(env);
@@ -92,7 +94,12 @@ export async function probePrivateSourceCatalog(input?: {
   }
   try {
     const prefix = resolveSceneryAssetPrefix(env);
-    const storage = input?.listPrefix ? null : await createConfiguredMultipartStorage(env);
+    const storage = input?.storage ?? (input?.listPrefix ? null : await createConfiguredMultipartStorage(env));
+    if (storage instanceof ConnectionReadyMultipartStorage) {
+      return empty(
+        'PRIVATE_SOURCE_LIST_USED_CONNECTION_READY_STUB: credentials may be present, but this process did not obtain a durable R2 client. Commercial bytes were not listed or read.',
+      );
+    }
     const listPrefix = input?.listPrefix ?? storage?.listPrefix?.bind(storage);
     if (!listPrefix) {
       return empty('PRIVATE_SOURCE_LIST_UNSUPPORTED: storage port has no read-only listPrefix.');

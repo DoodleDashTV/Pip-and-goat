@@ -81,6 +81,7 @@
     "validate:scenery-inspection-persistence": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-scenery-inspection-persistence.test.ts",
     "validate:scenery-inspection-security": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-scenery-inspection-security.test.ts",
     "validate:scenery-real-library-simulation": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-scenery-real-library-simulation.test.ts",
+    "probe:private-scenery-catalog": "pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/probe-private-scenery-catalog.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
