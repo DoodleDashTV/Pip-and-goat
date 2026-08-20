@@ -22,6 +22,8 @@ const PRIMARY_NAV = [
   { href: '/world-builder/assets', label: 'Approved Assets' },
   { href: '/world-builder/longevity', label: 'Scenery Longevity' },
   { href: '/production-control', label: 'Production Control' },
+  { href: '/episode-preflight', label: 'Episode Preflight' },
+  { href: '/rig-arrival', label: 'Rig Arrival' },
   { href: '/animation-control', label: 'Animation Control' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
