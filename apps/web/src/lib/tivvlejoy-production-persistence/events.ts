@@ -58,6 +58,31 @@ export function eventTypeFor(entityType: EntityType): JournalEventType {
     case 'SCENERY_PRODUCTION_LIBRARY':
     case 'SCENERY_REVIEW_DECISION':
       return 'REGISTRY_UPDATED';
+    case 'DIRECTOR_INTENT':
+    case 'STORY_BEAT_PLAN':
+      return 'DIRECTOR_INTENT_CREATED';
+    case 'CAMERA_PLAN':
+      return 'CAMERA_PLAN_CREATED';
+    case 'STAGING_PLAN':
+      return 'STAGING_PLAN_CREATED';
+    case 'EDITORIAL_TIMELINE':
+      return 'EDIT_TIMELINE_CREATED';
+    case 'SFX_PLAN':
+      return 'SFX_PLAN_CREATED';
+    case 'MUSIC_CUE_PLAN':
+      return 'MUSIC_PLAN_CREATED';
+    case 'CAPTION_PLAN':
+      return 'CAPTION_PLAN_CREATED';
+    case 'DAILIES_REVIEW':
+      return 'REVIEW_NOTE_ADDED';
+    case 'REVISION_REQUEST':
+      return 'REVISION_REQUESTED';
+    case 'FINAL_SHOT_SPEC':
+    case 'LIGHTING_DIRECTION':
+    case 'VFX_DIRECTION':
+      return 'SHOT_APPROVAL_RECORDED';
+    case 'DIRECTOR_PACKAGE':
+      return 'DIRECTOR_PACKAGE_COMPILED';
     default:
       return 'WORKSPACE_SAVED';
   }

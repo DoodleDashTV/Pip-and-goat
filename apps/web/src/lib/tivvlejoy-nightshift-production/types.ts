@@ -1,0 +1,328 @@
+export const SHOWRUNNER_SCHEMA = 'TIVVLEJOY_SHOWRUNNER_SYSTEM_V1' as const;
+export const STORY_BEAT_SCHEMA = 'TIVVLEJOY_STORY_BEAT_DIRECTOR_V1' as const;
+export const SHOT_LANGUAGE_SCHEMA = 'TIVVLEJOY_DIRECTORIAL_SHOT_LANGUAGE_V1' as const;
+export const CINEMATOGRAPHY_SCHEMA = 'TIVVLEJOY_CINEMATOGRAPHY_SYSTEM_V1' as const;
+export const VERTICAL_COMPOSITION_SCHEMA = 'TIVVLEJOY_VERTICAL_COMPOSITION_V1' as const;
+export const SHOT_COMPOSITION_QC_SCHEMA = 'TIVVLEJOY_SHOT_COMPOSITION_QC_V1' as const;
+export const CHARACTER_STAGING_SCHEMA = 'TIVVLEJOY_CHARACTER_STAGING_V1' as const;
+export const SCREEN_DIRECTION_SCHEMA = 'TIVVLEJOY_SCREEN_DIRECTION_CONTINUITY_V1' as const;
+export const LIGHTING_DIRECTION_SCHEMA = 'TIVVLEJOY_LIGHTING_DIRECTION_V1' as const;
+export const VFX_DIRECTION_SCHEMA = 'TIVVLEJOY_VFX_DIRECTION_V1' as const;
+export const EDITORIAL_SCHEMA = 'TIVVLEJOY_EDITORIAL_SYSTEM_V1' as const;
+export const EDIT_RHYTHM_SCHEMA = 'TIVVLEJOY_EDIT_RHYTHM_QC_V1' as const;
+export const DIALOGUE_EDITOR_SCHEMA = 'TIVVLEJOY_DIALOGUE_EDITOR_V1' as const;
+export const SOUND_DESIGN_SCHEMA = 'TIVVLEJOY_SOUND_DESIGN_V1' as const;
+export const MUSIC_CUE_SCHEMA = 'TIVVLEJOY_MUSIC_CUE_PLAN_V1' as const;
+export const CAPTION_SCHEMA = 'TIVVLEJOY_CAPTION_SYSTEM_V1' as const;
+export const MASTER_TIMELINE_SCHEMA = 'TIVVLEJOY_EPISODE_MASTER_TIMELINE_V1' as const;
+export const DAILIES_SCHEMA = 'TIVVLEJOY_DAILIES_REVIEW_V1' as const;
+export const REVISION_SCHEMA = 'TIVVLEJOY_REVISION_REQUEST_V1' as const;
+export const FINAL_SHOT_SPEC_SCHEMA = 'TIVVLEJOY_FINAL_SHOT_SPEC_V1' as const;
+export const DIRECTOR_PACKAGE_SCHEMA = 'TIVVLEJOY_EPISODE_DIRECTOR_PACKAGE_V1' as const;
+export const MASTER_READINESS_SCHEMA = 'TIVVLEJOY_MASTER_PRODUCTION_READINESS_V1' as const;
+export const SEASON_BIBLE_SCHEMA = 'TIVVLEJOY_SEASON_BIBLE_V1' as const;
+export const EPISODE_VARIETY_SCHEMA = 'TIVVLEJOY_EPISODE_VARIETY_V1' as const;
+export const RENDER_COST_SCHEMA = 'TIVVLEJOY_RENDER_COST_FORECAST_V1' as const;
+export const SEASON_SCHEDULE_SCHEMA = 'TIVVLEJOY_SEASON_PRODUCTION_SCHEDULE_V1' as const;
+export const DAILY_QUEUE_SCHEMA = 'TIVVLEJOY_DAILY_PRODUCTION_QUEUE_V1' as const;
+export const BUDGET_PLAN_SCHEMA = 'TIVVLEJOY_PRODUCTION_BUDGET_PLAN_V1' as const;
+export const DIRECTOR_TO_RENDER_SCHEMA = 'TIVVLEJOY_DIRECTOR_TO_RENDER_PACKAGE_V1' as const;
+
+export const BEAT_TYPES = [
+  'HOOK',
+  'SETUP',
+  'DISCOVERY',
+  'QUESTION',
+  'REACTION',
+  'DECISION',
+  'MOVEMENT',
+  'REVEAL',
+  'COMEDY',
+  'TENSION',
+  'PAYOFF',
+  'TRANSITION',
+  'BUTTON',
+] as const;
+export type BeatType = (typeof BEAT_TYPES)[number];
+
+export const SHOT_INTENTS = [
+  'ESTABLISHING',
+  'WIDE_TWO_SHOT',
+  'MEDIUM_TWO_SHOT',
+  'MEDIUM_SINGLE',
+  'CLOSE_UP',
+  'EXTREME_CLOSE_UP',
+  'REACTION',
+  'INSERT',
+  'PROP_INSERT',
+  'OVER_SHOULDER',
+  'POV',
+  'FOLLOW',
+  'PUSH_IN',
+  'PULL_OUT',
+  'PAN_REVEAL',
+  'TILT_REVEAL',
+  'TRACKING',
+  'STATIC_COMEDY',
+  'SILHOUETTE',
+  'ENVIRONMENT_HERO',
+  'LOCATION_TRANSITION',
+] as const;
+export type ShotIntent = (typeof SHOT_INTENTS)[number];
+
+export const CAMERA_MOTIONS = [
+  'STATIC',
+  'SLOW_PUSH',
+  'FAST_PUSH',
+  'SLOW_PULL',
+  'PAN',
+  'TILT',
+  'TRACK',
+  'FOLLOW',
+  'ARC',
+  'REVEAL',
+] as const;
+export type CameraMotion = (typeof CAMERA_MOTIONS)[number];
+
+export const PACE_PROFILES = [
+  'CALM_DISCOVERY',
+  'NORMAL_ADVENTURE',
+  'FAST_COMEDY',
+  'TENSION_BUILD',
+  'MAGICAL_WONDER',
+  'ACTION_BURST',
+  'EMOTIONAL_HOLD',
+] as const;
+export type PaceProfile = (typeof PACE_PROFILES)[number];
+
+export const LIGHTING_INTENTS = [
+  'WARM_INVITING',
+  'BRIGHT_ADVENTURE',
+  'SOFT_MYSTERY',
+  'RAINY_COZY',
+  'GOLDEN_DISCOVERY',
+  'EVENING_FESTIVAL',
+  'MAGICAL_NIGHT',
+  'TENSION_COOL',
+  'REVEAL_ACCENT',
+] as const;
+export type LightingIntent = (typeof LIGHTING_INTENTS)[number];
+
+export const VFX_INTENTS = [
+  'DUST_PUFF',
+  'LEAF_FALL',
+  'LIGHT_RAYS',
+  'RAIN',
+  'SNOW',
+  'SPLASH',
+  'MAGIC_SPARKLE',
+  'FOG',
+  'STEAM',
+  'SMOKE_SAFE_CARTOON',
+  'CONFETTI',
+  'FIREFLY',
+  'WATER_RIPPLE',
+] as const;
+export type VfxIntent = (typeof VFX_INTENTS)[number];
+
+export const TRANSITIONS = [
+  'HARD_CUT',
+  'MATCH_CUT',
+  'REACTION_CUT',
+  'ACTION_CUT',
+  'LOCATION_CUT',
+  'DISSOLVE',
+  'FADE_IN',
+  'FADE_OUT',
+] as const;
+export type TransitionType = (typeof TRANSITIONS)[number];
+
+export const SFX_TYPES = [
+  'FOOTSTEP_SOFT',
+  'FOOTSTEP_DIRT',
+  'FOOTSTEP_WOOD',
+  'HOOF_SOFT',
+  'HOOF_WOOD',
+  'WING_FLUTTER',
+  'BACKPACK_RUSTLE',
+  'SCARF_RUSTLE',
+  'MAP_UNFOLD',
+  'MAP_FOLD',
+  'PAPER_RUSTLE',
+  'DOOR_OPEN',
+  'DOOR_CLOSE',
+  'WOOD_CREAK',
+  'BELL',
+  'CART_ROLL',
+  'WATER_SPLASH',
+  'RIVER',
+  'WIND_LIGHT',
+  'FOREST_AMBIENCE',
+  'BIRDS',
+  'RAIN',
+  'THUNDER_SOFT',
+  'MAGIC_SPARKLE',
+  'OBJECT_PICKUP',
+  'OBJECT_SETDOWN',
+  'COMEDY_BUMP',
+] as const;
+export type SfxType = (typeof SFX_TYPES)[number];
+
+export const AMBIENCE_LAYERS = [
+  'VILLAGE_DAY',
+  'VILLAGE_NIGHT',
+  'FOREST_DAY',
+  'FOREST_RAIN',
+  'RIVER',
+  'TAVERN_INTERIOR',
+  'MOUNTAIN_WIND',
+  'FESTIVAL',
+  'SNOW_SOFT',
+  'MAGICAL_NIGHT',
+] as const;
+export type AmbienceLayer = (typeof AMBIENCE_LAYERS)[number];
+
+export const MUSIC_ROLES = [
+  'OPENING_HOOK',
+  'ADVENTURE',
+  'CURIOUS',
+  'COMEDY',
+  'MYSTERY',
+  'TENSION',
+  'DISCOVERY',
+  'WONDER',
+  'HEARTWARMING',
+  'PAYOFF',
+  'ENDING_BUTTON',
+] as const;
+export type MusicRole = (typeof MUSIC_ROLES)[number];
+
+export const DUCK_STATES = ['NO_DUCK', 'LIGHT_DUCK', 'MEDIUM_DUCK', 'STRONG_DUCK'] as const;
+export type DuckState = (typeof DUCK_STATES)[number];
+
+export const REVIEW_STATUSES = ['OPEN', 'ACKNOWLEDGED', 'FIX_PLANNED', 'RESOLVED', 'WONT_FIX_WITH_REASON'] as const;
+export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
+
+export const REVIEW_CATEGORIES = [
+  'PERFORMANCE',
+  'CAMERA',
+  'STAGING',
+  'LIGHTING',
+  'SCENERY',
+  'CONTINUITY',
+  'DIALOGUE',
+  'SFX',
+  'MUSIC',
+  'CAPTIONS',
+  'EDIT',
+  'TECHNICAL',
+  'QC',
+] as const;
+export type ReviewCategory = (typeof REVIEW_CATEGORIES)[number];
+
+export const APPROVAL_AREAS = [
+  'STORY_APPROVED',
+  'CAMERA_APPROVED',
+  'PERFORMANCE_APPROVED',
+  'SCENERY_APPROVED',
+  'CONTINUITY_APPROVED',
+  'AUDIO_APPROVED',
+  'EDITORIAL_APPROVED',
+  'TECHNICAL_APPROVED',
+] as const;
+export type ApprovalArea = (typeof APPROVAL_AREAS)[number];
+
+export const COMPOSITION_CHECKS = [
+  'FACE_SAFE',
+  'PROP_SAFE',
+  'CAPTION_SAFE',
+  'GESTURE_SAFE',
+  'ACTION_SAFE',
+  'HEADROOM_SAFE',
+  'FOOTROOM_SAFE',
+  'SIGNAGE_SAFE',
+] as const;
+export type CompositionCheck = (typeof COMPOSITION_CHECKS)[number];
+
+export const COMPOSITION_DEFECTS = [
+  'FACE_TOO_SMALL',
+  'FACE_OUT_OF_SAFE_REGION',
+  'PROP_NOT_READABLE',
+  'GESTURE_OUT_OF_FRAME',
+  'TOO_MUCH_EMPTY_SPACE',
+  'SCREEN_DIRECTION_AMBIGUOUS',
+  'SUBJECT_OVERLAP',
+  'BACKGROUND_COMPETES_WITH_FACE',
+  'SIGNAGE_OCCLUDED',
+  'ACTION_EXIT_NOT_VISIBLE',
+  'CAPTION_COLLISION',
+  'DEPTH_FLATTENED',
+] as const;
+export type CompositionDefect = (typeof COMPOSITION_DEFECTS)[number];
+
+export const SCREEN_DIRECTION_STATES = [
+  'VALID',
+  'INTENTIONAL_AXIS_BREAK',
+  'AXIS_BREAK_REQUIRES_ESTABLISHING_SHOT',
+  'INVALID_SCREEN_DIRECTION',
+] as const;
+export type ScreenDirectionState = (typeof SCREEN_DIRECTION_STATES)[number];
+
+export const CONVERSATION_MODES = [
+  'PIP_SPEAKING',
+  'GOAT_LISTENING',
+  'GOAT_SPEAKING',
+  'PIP_LISTENING',
+  'SHARED_DISCOVERY',
+  'ARGUMENT_CONFUSION',
+  'JOINT_REACTION',
+  'MAP_READING',
+  'WALKING_CONVERSATION',
+  'SIDE_BY_SIDE_TRAVEL',
+  'ONE_LEADING',
+  'ONE_FOLLOWING',
+] as const;
+export type ConversationMode = (typeof CONVERSATION_MODES)[number];
+
+export const EDITORIAL_TRACKS = ['VIDEO', 'DIALOGUE', 'SFX', 'MUSIC', 'AMBIENCE', 'CAPTIONS', 'MARKERS'] as const;
+export type EditorialTrackKind = (typeof EDITORIAL_TRACKS)[number];
+
+export const TIMING_CONFIDENCE = ['LINE_LEVEL', 'WORD_LEVEL', 'PHONEME_LEVEL', 'EXACT'] as const;
+export type TimingConfidence = (typeof TIMING_CONFIDENCE)[number];
+
+export const MASTER_READINESS_STATES = [
+  'FOUNDATION_ONLY',
+  'PLANNING_OPERATIONAL',
+  'DIRECTING_OPERATIONAL',
+  'ASSET_PIPELINE_OPERATIONAL',
+  'ANIMATION_PIPELINE_OPERATIONAL',
+  'EDITORIAL_PIPELINE_OPERATIONAL',
+  'CONTROLLED_PRODUCTION_VALIDATION_READY',
+  'WAITING_FOR_EXTERNAL_ASSETS',
+  'WAITING_FOR_RIGS',
+  'WAITING_FOR_HUMAN_APPROVAL',
+  'WAITING_FOR_PAID_RENDER_AUTHORIZATION',
+  'PRODUCTION_READY',
+] as const;
+export type MasterReadinessState = (typeof MASTER_READINESS_STATES)[number];
+
+export const PREVIEW_LADDER = [
+  'PLANNING',
+  'BLOCKING_PREVIEW',
+  'ANIMATION_PREVIEW',
+  'LIGHTING_PREVIEW',
+  'DIRECTOR_PREVIEW',
+  'FINAL_PREFLIGHT',
+  'FINAL',
+] as const;
+export type PreviewLadderLevel = (typeof PREVIEW_LADDER)[number];
+
+export const QUALITY_TARGETS = [
+  'HERO_SHOT',
+  'STANDARD_SHOT',
+  'TRANSITION_SHOT',
+  'BACKGROUND_HEAVY',
+  'DIALOGUE_CLOSEUP',
+  'ACTION_SHOT',
+] as const;
+export type QualityTarget = (typeof QUALITY_TARGETS)[number];
