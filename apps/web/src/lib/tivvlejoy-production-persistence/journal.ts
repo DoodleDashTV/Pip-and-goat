@@ -21,7 +21,7 @@ export function createJournalEvent(input: {
   reason: string;
   timestamp?: string;
 }): JournalEvent {
-  const payload = sanitizeForPersistence(input.payload ?? {});
+  const payload = sanitizeForPersistence((input.payload ?? {}) as Record<string, unknown>);
   assertNoSecrets(payload, 'journal payload');
   assertNoSecrets(input.reason, 'journal reason');
   const event: JournalEvent = {

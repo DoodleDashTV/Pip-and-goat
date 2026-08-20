@@ -14,6 +14,8 @@ import {
   readViewFromDisposableTables,
   sha256Canonical,
   writeViewToDisposableTables,
+  type JournalEvent,
+  type WorkspaceBackup,
 } from './tivvlejoy-production-persistence';
 
 describe('production backup and schema migration', { timeout: 120_000 }, () => {
@@ -160,7 +162,7 @@ describe('production backup and schema migration', { timeout: 120_000 }, () => {
       commercialBytesExcluded: true as const,
       backupSha256: '',
     };
-    const hashed = { ...backup, backupSha256: sha256Canonical({ ...backup, backupSha256: undefined }) };
+    const hashed: WorkspaceBackup = { ...backup, events: [] as JournalEvent[], backupSha256: sha256Canonical({ ...backup, backupSha256: undefined }) };
     hashed.events = [
       {
         eventId: 'e1',
@@ -176,7 +178,7 @@ describe('production backup and schema migration', { timeout: 120_000 }, () => {
         timestamp: '1970-01-01T00:00:00.000Z',
         actorClass: 'TEST',
         reason: 'x',
-      },
+      } satisfies JournalEvent,
     ];
     const { backupSha256: _ignored, ...rest } = hashed;
     const withHash = { ...hashed, backupSha256: sha256Canonical(rest) };
