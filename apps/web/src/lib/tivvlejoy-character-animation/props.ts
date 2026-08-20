@@ -37,8 +37,8 @@ export function detectPropTeleport(events: PropEvent[]): boolean {
       carrier = event.toCarrier;
       continue;
     }
-    if (event.toCarrier && carrier && event.toCarrier !== carrier && event.state !== 'RECEIVING' as never) {
-      if (event.state !== 'TRANSFERRING' && event.fromCarrier !== carrier) return true;
+    if (event.toCarrier && carrier && event.toCarrier !== carrier && event.fromCarrier !== carrier) {
+      return true;
     }
     if (event.toCarrier) carrier = event.toCarrier;
     if (event.state === 'RELEASED' || event.state === 'FREE' || event.state === 'STORED') carrier = null;

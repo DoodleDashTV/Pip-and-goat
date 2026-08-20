@@ -29,12 +29,14 @@ export function buildGazePlan(input: {
   else if (input.speaking && input.partnerVisible) primary = 'OTHER_CHARACTER';
   else if (!input.speaking && input.partnerVisible) primary = 'OTHER_CHARACTER';
   else if (input.moving) primary = 'DESTINATION';
-  const body = {
+  const secondary: GazeTarget | null =
+    input.propId && primary !== 'STORY_PROP' ? 'STORY_PROP' : input.speaking ? 'CAMERA_OFF_AXIS' : null;
+  const body: Omit<GazePlan, 'gazePlanSha256'> = {
     schemaVersion: GAZE_SCHEMA,
     shotId: input.shotId,
     characterId: input.characterId,
     primary,
-    secondary: input.propId && primary !== 'STORY_PROP' ? 'STORY_PROP' : input.speaking ? 'CAMERA_OFF_AXIS' : null,
+    secondary,
     gazeTransition: primary === 'STORY_PROP' ? 'hold-on-object' : 'ease-to-partner',
     headFollow: true,
     eyeLeadMs: 70,

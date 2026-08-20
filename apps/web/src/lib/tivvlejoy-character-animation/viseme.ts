@@ -31,7 +31,7 @@ const PHONEME_MAP: Record<string, VisemeBucket> = {
 };
 
 export function buildVisemePlan(timing: DialogueTimingPlan): VisemePlan {
-  const adapter = timing.characterId === 'PIP' ? 'PIP_BEAK' : 'GOAT_JAW';
+  const adapter: VisemePlan['adapter'] = timing.characterId === 'PIP' ? 'PIP_BEAK' : 'GOAT_JAW';
   let keys: VisemeKey[] = [{ atMs: 0, bucket: 'REST' }];
   let confidence: VisemePlan['confidence'] = 'LOW';
   if (timing.phonemeTimings?.length) {
