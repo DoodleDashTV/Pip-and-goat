@@ -13,7 +13,7 @@ import {
 describe('real evidence security', () => {
   it('rejects secret-bearing payloads', () => {
     expect(() => assertNoSecrets({ DATABASE_URL: 'postgres://user:pass@host/db' })).toThrow(/Secret-bearing/);
-    expect(() => assertNoSecrets({ url: 'https://x?X-Amz-Signature=abc' })).toThrow(/Secret-bearing/);
+    expect(() => assertNoSecrets({ url: 'https://x?X-Amz-Signature=preview-placeholder' })).toThrow(/Secret-bearing/);
     expect(() => assertNoSecrets({ note: 'safe' })).not.toThrow();
   });
 
