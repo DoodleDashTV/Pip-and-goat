@@ -37,6 +37,7 @@ export function ProductionStudioConsole({
 }) {
   const [episodeId, setEpisodeId] = useState(model.episodes[0]?.episodeId ?? '');
   const [showTechnical, setShowTechnical] = useState(false);
+  const [realityMode, setRealityMode] = useState<'REAL_PROJECT_STATUS' | 'SYNTHETIC_SIMULATION'>('REAL_PROJECT_STATUS');
   const [persistenceView, setPersistenceView] = useState<PersistenceConsoleModel | undefined>(persistence);
   const [dirty, setDirty] = useState(createDirtyPersistenceState());
   const [importText, setImportText] = useState('');
@@ -166,8 +167,49 @@ export function ProductionStudioConsole({
           <Link href="/dailies" className="font-bold underline">
             Dailies
           </Link>
+          {' · '}
+          <Link href="/episode-preflight" className="font-bold underline">
+            Episode preflight
+          </Link>
+          {' · '}
+          <Link href="/rig-arrival" className="font-bold underline">
+            Rig arrival
+          </Link>
         </p>
       </div>
+
+      <section className="studio-card space-y-3 p-4 sm:p-5">
+        <h2 className="font-display text-xl font-semibold">Reality mode</h2>
+        <p className="text-sm font-bold">
+          {realityMode === 'REAL_PROJECT_STATUS'
+            ? 'REAL PROJECT STATUS — not a synthetic simulation'
+            : 'SYNTHETIC SIMULATION — not real production evidence'}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn-secondary min-h-11 px-4 text-sm" onClick={() => setRealityMode('REAL_PROJECT_STATUS')}>
+            Real project status
+          </button>
+          <button type="button" className="btn-secondary min-h-11 px-4 text-sm" onClick={() => setRealityMode('SYNTHETIC_SIMULATION')}>
+            Synthetic simulation
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-[0.12em]">
+          <span className="rounded-full bg-[var(--color-background)] px-3 py-1">REAL</span>
+          <span className="rounded-full bg-[var(--color-background)] px-3 py-1">SYNTHETIC</span>
+          <span className="rounded-full bg-[var(--color-background)] px-3 py-1">PENDING</span>
+          <span className="rounded-full bg-[var(--color-background)] px-3 py-1">HUMAN APPROVAL</span>
+          <span className="rounded-full bg-[var(--color-background)] px-3 py-1">PAID AUTH</span>
+        </div>
+        {realityMode === 'REAL_PROJECT_STATUS' ? (
+          <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+            Fixture-only evidence cannot show a green ready badge. Open Episode preflight for the honest EP012 matrix.
+          </p>
+        ) : (
+          <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+            Season cards below are synthetic planning. They do not satisfy real preflight.
+          </p>
+        )}
+      </section>
 
       <section className="studio-card space-y-3 p-4 sm:p-5">
         <h2 className="font-display text-xl font-semibold">Studio departments</h2>

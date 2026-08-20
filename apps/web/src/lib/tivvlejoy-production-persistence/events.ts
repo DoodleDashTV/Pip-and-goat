@@ -83,6 +83,14 @@ export function eventTypeFor(entityType: EntityType): JournalEventType {
       return 'SHOT_APPROVAL_RECORDED';
     case 'DIRECTOR_PACKAGE':
       return 'DIRECTOR_PACKAGE_COMPILED';
+    case 'REAL_SOURCE_INVENTORY':
+      return 'REAL_SOURCE_LISTED';
+    case 'REAL_VOICE_BINDING':
+      return 'REAL_VOICE_RECEIPT_BOUND';
+    case 'FIRST_EPISODE_PREFLIGHT':
+      return 'FIRST_EPISODE_PREFLIGHT_COMPILED';
+    case 'REAL_PRODUCTION_GAP':
+      return 'WORKSPACE_SAVED';
     default:
       return 'WORKSPACE_SAVED';
   }
