@@ -2571,3 +2571,77 @@ model TivvleJoyPreviewVoiceLedgerEntry {
 
   @@map("tivvlejoy_preview_voice_ledger_entries")
 }
+
+model TivvleJoyDurableWorkspace {
+  id               String   @id
+  workspaceId      String   @unique @map("workspace_id")
+  schemaVersion    String   @map("schema_version")
+  entityVersion    String   @map("entity_version")
+  dependencySha256 String   @map("dependency_sha256")
+  revision         Int
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  payload          Json
+
+  records   TivvleJoyDurableRecord[]
+  events    TivvleJoyDurableEvent[]
+  snapshots TivvleJoyDurableSnapshot[]
+
+  @@map("tivvlejoy_durable_workspaces")
+}
+
+model TivvleJoyDurableRecord {
+  id               String   @id
+  workspaceId      String   @map("workspace_id")
+  schemaVersion    String   @map("schema_version")
+  entityType       String   @map("entity_type")
+  entityId         String   @map("entity_id")
+  entityVersion    String   @map("entity_version")
+  dependencySha256 String   @map("dependency_sha256")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  revision         Int
+  payload          Json
+
+  workspace TivvleJoyDurableWorkspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Cascade)
+
+  @@unique([workspaceId, entityType, entityId])
+  @@index([workspaceId, entityType])
+  @@map("tivvlejoy_durable_records")
+}
+
+model TivvleJoyDurableEvent {
+  id               String   @id
+  workspaceId      String   @map("workspace_id")
+  entityType       String   @map("entity_type")
+  entityId         String   @map("entity_id")
+  eventType        String   @map("event_type")
+  previousRevision Int      @map("previous_revision")
+  nextRevision     Int      @map("next_revision")
+  dependencySha256 String   @map("dependency_sha256")
+  payloadSha256    String   @map("payload_sha256")
+  timestamp        DateTime
+  actorClass       String   @map("actor_class")
+  reason           String
+
+  workspace TivvleJoyDurableWorkspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Cascade)
+
+  @@index([workspaceId, nextRevision])
+  @@map("tivvlejoy_durable_events")
+}
+
+model TivvleJoyDurableSnapshot {
+  id               String   @id
+  workspaceId      String   @map("workspace_id")
+  schemaVersion    String   @map("schema_version")
+  journalPosition  Int      @map("journal_position")
+  revision         Int
+  snapshotSha256   String   @map("snapshot_sha256")
+  createdAt        DateTime @default(now()) @map("created_at")
+  records          Json
+
+  workspace TivvleJoyDurableWorkspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Cascade)
+
+  @@index([workspaceId, revision])
+  @@map("tivvlejoy_durable_snapshots")
+}
