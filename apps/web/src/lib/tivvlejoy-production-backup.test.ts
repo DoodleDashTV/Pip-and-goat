@@ -132,7 +132,7 @@ describe('production backup and schema migration', { timeout: 120_000 }, () => {
           ...backup.snapshot.records,
           {
             ...backup.snapshot.records[0]!,
-            payload: { DATABASE_URL: 'postgresql://secret' },
+            payload: { DATABASE_URL: 'postgresql://preview:preview@127.0.0.1:5432/preview-only' },
           },
         ],
       },
@@ -172,7 +172,7 @@ describe('production backup and schema migration', { timeout: 120_000 }, () => {
         nextRevision: 1,
         dependencySha256: 'a'.repeat(64),
         payloadSha256: 'b'.repeat(64),
-        payload: { token: 'secret-token-value' },
+        payload: { token: 'preview-token-placeholder' },
         timestamp: '1970-01-01T00:00:00.000Z',
         actorClass: 'TEST',
         reason: 'x',
@@ -218,9 +218,9 @@ describe('production backup and schema migration', { timeout: 120_000 }, () => {
 
   it('redacts secrets during export', () => {
     const store = createMemoryStore();
-    store.writeWorkspace({ label: 'ok', AWS_SECRET_ACCESS_KEY: 'wJalrXUtnFEMI' });
+    store.writeWorkspace({ label: 'ok', AWS_SECRET_ACCESS_KEY: 'preview-aws-placeholder' });
     const backup = exportWorkspaceBackup(store);
-    expect(JSON.stringify(backup)).not.toContain('wJalrXUtnFEMI');
+    expect(JSON.stringify(backup)).not.toContain('preview-aws-placeholder');
   });
 
   it('aborts backup creation on MID_BACKUP without changing records', () => {
