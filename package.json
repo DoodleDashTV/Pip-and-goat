@@ -112,6 +112,7 @@
     "validate:first-episode-preflight": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-first-episode-preflight.test.ts",
     "validate:real-gap-ledger": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-real-gap-ledger.test.ts",
     "validate:real-evidence-security": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-real-evidence-security.test.ts",
+    "validate:real-production-unblock": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-real-production-unblock.test.ts",
     "cloud:r2-test": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/r2-connection-test.ts",
     "cloud:runpod-auth": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/runpod-auth-test.ts",
     "cloud:preflight": "pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/preflight-report.ts",
