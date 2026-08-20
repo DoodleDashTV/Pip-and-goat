@@ -20,11 +20,11 @@ export function DailiesControlConsole({ model }: { model: NightshiftConsoleModel
           Notes can request revisions. They cannot auto-approve a shot or mark TivvleJoy production-ready.
         </p>
         <p className="text-sm">Open notes: {model.review.open}. Human finals: {model.review.approved}.</p>
-        <p className="text-sm">
-          <Link href="/director-control" className="font-bold underline">
+        <nav aria-label="Dailies workspace" className="text-sm">
+          <Link href="/director-control" className="inline-flex min-h-11 items-center font-bold underline">
             Director control
           </Link>
-        </p>
+        </nav>
       </div>
       <label className="studio-card block space-y-2 p-4 sm:p-5" htmlFor="dailies-filter">
         <span className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">Filter episode, shot, or note</span>

@@ -82,6 +82,7 @@
     "validate:scenery-inspection-security": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-scenery-inspection-security.test.ts",
     "validate:scenery-real-library-simulation": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-scenery-real-library-simulation.test.ts",
     "probe:private-scenery-catalog": "pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/probe-private-scenery-catalog.ts",
+    "report:nightshift-season": "pnpm --filter @doodle-dash/web exec tsx ../../scripts/preproduction/report-nightshift-season.ts",
     "validate:showrunner": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-showrunner.test.ts",
     "validate:story-beat-director": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-showrunner.test.ts",
     "validate:cinematography": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-cinematography.test.ts",
