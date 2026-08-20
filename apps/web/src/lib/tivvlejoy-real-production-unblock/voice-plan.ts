@@ -26,7 +26,7 @@ export function compileEp012RealVoiceGenerationPlan(): VoiceGenerationPlan {
     return {
       dialogueRef,
       speaker: speakerFor(dialogueRef),
-      textSource: 'NO_CANONICAL_SPOKEN_TEXT_IN_EPISODE_PLAN',
+      textSource: 'TIVVLEJOY_EP012_CANONICAL_DIALOGUE_V1_LOCKED_NOT_GENERATED',
       textHash: null,
       characterCount: null,
       voiceIdentityBound: true,
