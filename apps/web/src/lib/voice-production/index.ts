@@ -18,6 +18,12 @@ export {
   publicVoiceIdentitySnapshot,
 } from './approved-voice-settings';
 export { publicLiveTestSnapshot, serverGatesOpen, isProductionVoiceRuntime } from './candidate-gates';
+export {
+  CANONICAL_PREVIEW_VOICE_AUTHORIZE_PAID_VALUE,
+  isCanonicalPaidVoiceAuthorization,
+  isPaidVoiceAuthorizationConventionMismatch,
+  paidAuthorizationConventionSnapshot,
+} from './paid-authorization-convention';
 export { publicVoiceDirectory, isRegisteredCharacterId, assertNoClientVoiceId } from './registry';
 export {
   SCRIPT_TO_VOICE_COPY,

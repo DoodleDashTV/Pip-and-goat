@@ -6,6 +6,7 @@ import {
   publicApprovedSamples,
 } from './candidates';
 import { publicVoiceIdentitySnapshot } from './approved-voice-settings';
+import { isCanonicalPaidVoiceAuthorization } from './paid-authorization-convention';
 import { hasElevenLabsApiKey, isPaidVoiceGenerationEnabled, type VoiceEnv } from './safety';
 import { VoiceProductionError } from './types';
 
@@ -14,7 +15,7 @@ function read(env: VoiceEnv, name: string): string {
 }
 
 export function isVoiceAuthorizePaidTrue(env: VoiceEnv = process.env): boolean {
-  return read(env, 'TIVVLEJOY_VOICE_AUTHORIZE_PAID') === 'true';
+  return isCanonicalPaidVoiceAuthorization(env);
 }
 
 export function isProductionVoiceRuntime(env: VoiceEnv = process.env): boolean {

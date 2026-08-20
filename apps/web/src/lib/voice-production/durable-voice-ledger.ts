@@ -77,6 +77,12 @@ export type DurableVoiceLedgerStore = {
     evidence: string;
   }): Promise<{ imported: boolean; record: DurableLedgerRecord }>;
   seedPaidUsage?(input: { requestId: string; character: DurableSpeaker; characterCount: number }): DurableLedgerRecord;
+  seedEntry?(input: {
+    requestId: string;
+    character: DurableSpeaker;
+    characterCount: number;
+    status: DurableEntryStatus;
+  }): DurableLedgerRecord;
 };
 
 const UNAVAILABLE_RECORD: DurableLedgerRecord = {
@@ -405,6 +411,34 @@ export function createSharedDurableLedgerStore(seed: DurableLedgerRecord = empty
         reconciliationStatus: 'imported',
         paidRequests: record.paidRequests + 1,
         paidCharactersUsed: record.paidCharactersUsed + input.characterCount,
+      };
+      return cloneRecord(record);
+    },
+    seedEntry(input) {
+      const now = new Date().toISOString();
+      entries.set(input.requestId, {
+        idempotencyKey: input.requestId,
+        requestId: input.requestId,
+        character: input.character,
+        characterCount: input.characterCount,
+        status: input.status,
+        receiptRef: input.status === 'succeeded' ? input.requestId : null,
+        createdAt: now,
+        updatedAt: now,
+        deploymentId: 'test',
+      });
+      record = {
+        ...record,
+        reconciled: input.status === 'succeeded' ? true : record.reconciled,
+        reconciliationStatus: input.status === 'succeeded' ? 'imported' : record.reconciliationStatus,
+        paidRequests: input.status === 'succeeded' ? record.paidRequests + 1 : record.paidRequests,
+        paidCharactersUsed:
+          input.status === 'succeeded' ? record.paidCharactersUsed + input.characterCount : record.paidCharactersUsed,
+        reservedRequests: input.status === 'reserved' ? record.reservedRequests + 1 : record.reservedRequests,
+        reservedCharacters:
+          input.status === 'reserved' ? record.reservedCharacters + input.characterCount : record.reservedCharacters,
+        unfinalizedCount: input.status === 'unfinalized' ? record.unfinalizedCount + 1 : record.unfinalizedCount,
+        failedAttempts: input.status === 'failed' ? record.failedAttempts + 1 : record.failedAttempts,
       };
       return cloneRecord(record);
     },

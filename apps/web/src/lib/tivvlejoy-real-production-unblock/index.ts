@@ -8,6 +8,8 @@ export * from './blender-acceptance';
 export * from './commercial-gate';
 export * from './ep012-canonical-dialogue';
 export * from './ep012-voice-authorization';
+export * from './ep012-no-provider-preflight';
+export * from './ep012-generate-guard';
 export * from './voice-plan';
 export * from './voice-cost';
 export * from './voice-timing';
