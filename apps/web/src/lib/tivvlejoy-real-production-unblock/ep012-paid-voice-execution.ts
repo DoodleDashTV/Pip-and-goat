@@ -7,7 +7,6 @@ import {
   EP012_BLOCKER_CODES,
   createEp012SideEffectTracker,
   type Ep012BlockerCode,
-  type Ep012SideEffectTracker,
 } from './ep012-no-provider-preflight';
 import {
   EP012_FINAL_GLOBAL_CHARACTER_CEILING,
@@ -65,7 +64,7 @@ export type Ep012PaidVoiceExecutionResult = {
   productionEnabled: false;
 };
 
-export type Ep012PaidVoiceExecutionInput = Ep012GenerateGuardInput & {
+export type Ep012PaidVoiceExecutionInput = Omit<Ep012GenerateGuardInput, 'providerTransport'> & {
   providerTransport?: Ep012ProviderTransport;
   storage?: Ep012AudioStorage;
 };
@@ -139,23 +138,22 @@ function executionResult(input: {
 
 function mapExecutionBlocker(error: unknown): Ep012BlockerCode {
   if (error instanceof VoiceProductionError) {
-    const code = error.code as Ep012BlockerCode;
-    if ((Object.values(EP012_BLOCKER_CODES) as string[]).includes(code)) return code;
+    const code = error.code;
+    if ((Object.values(EP012_BLOCKER_CODES) as string[]).includes(code)) {
+      return code as Ep012BlockerCode;
+    }
     if (code === 'DUPLICATE_REQUEST') return EP012_BLOCKER_CODES.EP012_REQUEST_ALREADY_RESERVED;
     if (code === 'PRIOR_USAGE_RECONCILIATION') return EP012_BLOCKER_CODES.EP012_LEDGER_RECONCILIATION_REQUIRED;
     if (code === 'DURABLE_LEDGER_UNAVAILABLE') return EP012_BLOCKER_CODES.EP012_LEDGER_UNAVAILABLE;
-    if (code === 'EP012_GLOBAL_REQUEST_CEILING') return EP012_BLOCKER_CODES.EP012_GLOBAL_REQUEST_CEILING;
-    if (code === 'EP012_GLOBAL_CHARACTER_CEILING') return EP012_BLOCKER_CODES.EP012_GLOBAL_CHARACTER_CEILING;
-    if (code === 'EP012_EPISODE_REQUEST_CEILING') return EP012_BLOCKER_CODES.EP012_EPISODE_REQUEST_CEILING;
-    if (code === 'EP012_EPISODE_CHARACTER_CEILING') return EP012_BLOCKER_CODES.EP012_EPISODE_CHARACTER_CEILING;
-    if (code === 'EP012_RECOVERY_REQUIRED') return EP012_BLOCKER_CODES.EP012_RECOVERY_REQUIRED;
-    if (code === 'EP012_STORAGE_VERIFICATION_FAILED') return EP012_BLOCKER_CODES.EP012_STORAGE_VERIFICATION_FAILED;
-    if (code === 'EP012_STORAGE_NOT_CONFIGURED') return EP012_BLOCKER_CODES.EP012_STORAGE_NOT_CONFIGURED;
-    if (code === 'EP012_PROVIDER_RESPONSE_INVALID') return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
-    if (code === 'EP012_PROVIDER_TIMEOUT') return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
-    if (code === 'EP012_PROVIDER_AUTHORIZATION') return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
-    if (code === 'EP012_PROVIDER_QUOTA') return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
-    if (code === 'EP012_PROVIDER_REDIRECT_REFUSED') return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
+    if (
+      code === 'EP012_PROVIDER_TIMEOUT' ||
+      code === 'EP012_PROVIDER_AUTHORIZATION' ||
+      code === 'EP012_PROVIDER_QUOTA' ||
+      code === 'EP012_PROVIDER_REDIRECT_REFUSED' ||
+      code === 'EP012_PROVIDER_RETRY_REFUSED'
+    ) {
+      return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
+    }
   }
   return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
 }
@@ -164,7 +162,8 @@ export async function runEp012PaidVoiceExecution(input: Ep012PaidVoiceExecutionI
   const env = input.env ?? process.env;
   const tracker = input.tracker ?? createEp012SideEffectTracker();
   const store = input.store ?? resolvePreviewVoiceLedgerStore(env);
-  const guard = await runEp012GenerateGuard({ ...input, env, store, tracker });
+  const { providerTransport: _ignoredTransport, storage: _ignoredStorage, ...guardInput } = input;
+  const guard = await runEp012GenerateGuard({ ...guardInput, env, store, tracker });
 
   if (!isPreviewOnlyVoiceRuntime(env) && !guard.blockers.includes(EP012_BLOCKER_CODES.EP012_PREVIEW_RUNTIME_REQUIRED)) {
     return executionResult({
