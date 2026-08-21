@@ -61,10 +61,12 @@ function storageErrorCode(error: unknown): string {
     name?: unknown;
     Code?: unknown;
     code?: unknown;
+    message?: unknown;
     $metadata?: { httpStatusCode?: unknown };
   };
   const name = String(details.name ?? "");
   const code = String(details.Code ?? details.code ?? name).toUpperCase();
+  const message = String(details.message ?? "").toLowerCase();
   const status = Number(details.$metadata?.httpStatusCode);
 
   if (code === "INVALIDACCESSKEYID") return "R2_INVALID_ACCESS_KEY_ID";
@@ -72,6 +74,14 @@ function storageErrorCode(error: unknown): string {
   if (code === "ACCESSDENIED") return "R2_ACCESS_DENIED";
   if (code === "NOSUCHBUCKET") return "R2_BUCKET_NOT_FOUND";
   if (code === "INVALIDBUCKETNAME") return "R2_BUCKET_NAME_INVALID";
+  if (code === "INVALIDARGUMENT" && message.includes("access key"))
+    return "R2_ACCESS_KEY_ID_INVALID";
+  if (code === "INVALIDARGUMENT" && message.includes("credential"))
+    return "R2_CREDENTIAL_INVALID";
+  if (code === "INVALIDARGUMENT" && message.includes("bucket"))
+    return "R2_BUCKET_ARGUMENT_INVALID";
+  if (code === "INVALIDARGUMENT" && message.includes("region"))
+    return "R2_REGION_INVALID";
   if (code === "INVALIDARGUMENT") return "R2_INVALID_ARGUMENT";
   if (code === "AUTHORIZATIONHEADERMALFORMED")
     return "R2_AUTHORIZATION_HEADER_MALFORMED";
@@ -138,8 +148,20 @@ function assertStorageConfigShape(env: NodeJS.ProcessEnv): void {
   ) {
     fail("R2_BUCKET_NAME_INVALID");
   }
+  if (
+    accessKeyId === "R2_ACCESS_KEY_ID" ||
+    accessKeyId === "TIVVLEJOY_EP012_AUDIO_ACCESS_KEY_ID"
+  ) {
+    fail("R2_ACCESS_KEY_ID_PLACEHOLDER");
+  }
   if (accessKeyId.length < 16 || accessKeyId.length > 128) {
     fail("R2_ACCESS_KEY_ID_FORMAT_INVALID");
+  }
+  if (
+    secretAccessKey === "R2_SECRET_ACCESS_KEY" ||
+    secretAccessKey === "TIVVLEJOY_EP012_AUDIO_SECRET_ACCESS_KEY"
+  ) {
+    fail("R2_SECRET_ACCESS_KEY_PLACEHOLDER");
   }
   if (secretAccessKey.length < 32 || secretAccessKey.length > 256) {
     fail("R2_SECRET_ACCESS_KEY_FORMAT_INVALID");
