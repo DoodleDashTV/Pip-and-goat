@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { spawnSync } from 'node:child_process';
 
 export const REQUIRED_BRANCH = 'cursor/tivvlejoy-ep012-preview-ledger-migration-73f1';
 export const REQUIRED_ORG_ID = 'team_SKbKndUqqNWtp29jHlMG5Otl';
@@ -12,6 +12,31 @@ export const REQUIRED_MIGRATION_SHA256 =
   '3432791735d5c561eda9e96dfb96b73b24d8cf832a4409765e02e418429f192c';
 
 const SECRET_NAME = 'TIVVLEJOY_VOICE_LEDGER_DATABASE_URL';
+const TARGET_TABLE = 'tivvlejoy_ep012_voice_executions';
+const STATE_TABLE = 'tivvlejoy_preview_voice_ledger_state';
+const ENTRY_TABLE = 'tivvlejoy_preview_voice_ledger_entries';
+const EXPECTED_COLUMNS = [
+  'alignment_present',
+  'audio_bytes',
+  'audio_object_key',
+  'audio_sha256',
+  'character',
+  'character_count',
+  'created_at',
+  'deployment_id',
+  'provider_attempted_at',
+  'receipt_object_key',
+  'receipt_ref',
+  'request_id',
+  'segment_id',
+  'status',
+  'storage_verified',
+  'updated_at',
+].sort();
+const EXPECTED_INDEXES = [
+  'tivvlejoy_ep012_voice_executions_pkey',
+  'tivvlejoy_ep012_voice_executions_segment_id_key',
+].sort();
 
 function fail(code) {
   const error = new Error(code);
@@ -62,6 +87,10 @@ export function planPreviewMigration(env) {
   return { action: 'migrate', databaseUrl };
 }
 
+function migrationPath(repoRoot) {
+  return join(repoRoot, 'packages/database/prisma/migrations', REQUIRED_MIGRATION, 'migration.sql');
+}
+
 export function verifyMigrationPayload(repoRoot) {
   const migrationsRoot = join(repoRoot, 'packages/database/prisma/migrations');
   const migrations = readdirSync(migrationsRoot, { withFileTypes: true })
@@ -73,50 +102,144 @@ export function verifyMigrationPayload(repoRoot) {
     fail('EP012_MIGRATION_NOT_LATEST');
   }
 
-  const migrationPath = join(migrationsRoot, REQUIRED_MIGRATION, 'migration.sql');
-  const digest = createHash('sha256').update(readFileSync(migrationPath)).digest('hex');
+  const digest = createHash('sha256')
+    .update(readFileSync(migrationPath(repoRoot)))
+    .digest('hex');
   if (digest !== REQUIRED_MIGRATION_SHA256) {
     fail('EP012_MIGRATION_DIGEST_MISMATCH');
   }
 }
 
-function classifyPrismaFailure(result) {
-  const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
-  for (const code of ['P1000', 'P1001', 'P1002', 'P1010', 'P3005', 'P3009', 'P3018']) {
-    if (output.includes(code)) return code;
+function exactMigrationStatements(repoRoot) {
+  const statements = readFileSync(migrationPath(repoRoot), 'utf8')
+    .split(';')
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+
+  if (
+    statements.length !== 2 ||
+    !statements[0].includes(`CREATE TABLE "${TARGET_TABLE}"`) ||
+    !statements[1].includes('CREATE UNIQUE INDEX')
+  ) {
+    fail('EP012_MIGRATION_STATEMENT_SET_UNEXPECTED');
   }
-  return 'UNKNOWN';
+
+  return statements;
 }
 
-function prismaCommand(spawn, root, env, args) {
-  return spawn(
-    'pnpm',
-    [
-      '--filter',
-      '@doodle-dash/database',
-      'exec',
-      'prisma',
-      'migrate',
-      ...args,
-      '--schema',
-      'prisma/schema.prisma',
-    ],
-    {
-      cwd: root,
-      env,
-      encoding: 'utf8',
-      maxBuffer: 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    },
+function normalizeCount(value) {
+  if (typeof value === 'bigint') return Number(value);
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string' && /^\d+$/.test(value)) return Number(value);
+  fail('EP012_LEDGER_COUNT_UNREADABLE');
+}
+
+function equalSorted(actual, expected) {
+  const normalized = [...actual].sort();
+  return (
+    normalized.length === expected.length &&
+    normalized.every((value, index) => value === expected[index])
   );
 }
 
-function pendingMigrations(result) {
-  const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
-  return [...new Set(output.match(/\b\d{14}_[a-z0-9_]+\b/g) ?? [])];
+async function tableNames(client) {
+  const rows = await client.$queryRawUnsafe(`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = current_schema()
+      AND table_name IN ('${STATE_TABLE}', '${ENTRY_TABLE}', '${TARGET_TABLE}')
+  `);
+  return rows.map((row) => String(row.table_name));
 }
 
-export function runPreviewMigration({ env = process.env, repoRoot, spawn = spawnSync } = {}) {
+async function assertMonthlyLedgerIdentity(client) {
+  const rows = await client.$queryRawUnsafe(`
+    SELECT paid_requests, paid_characters_used, failed_attempts,
+           reserved_requests, reserved_characters, unfinalized_count, reconciled
+    FROM "${STATE_TABLE}"
+    WHERE id = 'preview-voice-ledger'
+  `);
+
+  if (rows.length !== 1) fail('PREVIEW_LEDGER_STATE_IDENTITY_MISMATCH');
+  const row = rows[0];
+  if (
+    normalizeCount(row.paid_requests) !== 4 ||
+    normalizeCount(row.paid_characters_used) !== 235 ||
+    normalizeCount(row.failed_attempts) !== 0 ||
+    normalizeCount(row.reserved_requests) !== 0 ||
+    normalizeCount(row.reserved_characters) !== 0 ||
+    normalizeCount(row.unfinalized_count) !== 0 ||
+    row.reconciled !== true
+  ) {
+    fail('PREVIEW_LEDGER_STATE_IDENTITY_MISMATCH');
+  }
+}
+
+async function assertTargetTable(client) {
+  const countRows = await client.$queryRawUnsafe(`SELECT COUNT(*) AS count FROM "${TARGET_TABLE}"`);
+  if (countRows.length !== 1 || normalizeCount(countRows[0].count) !== 0) {
+    fail('EP012_EXECUTION_LEDGER_NOT_EMPTY');
+  }
+
+  const columnRows = await client.$queryRawUnsafe(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = current_schema() AND table_name = '${TARGET_TABLE}'
+  `);
+  if (
+    !equalSorted(
+      columnRows.map((row) => String(row.column_name)),
+      EXPECTED_COLUMNS,
+    )
+  ) {
+    fail('EP012_EXECUTION_LEDGER_COLUMN_MISMATCH');
+  }
+
+  const indexRows = await client.$queryRawUnsafe(`
+    SELECT indexname
+    FROM pg_indexes
+    WHERE schemaname = current_schema() AND tablename = '${TARGET_TABLE}'
+  `);
+  if (
+    !equalSorted(
+      indexRows.map((row) => String(row.indexname)),
+      EXPECTED_INDEXES,
+    )
+  ) {
+    fail('EP012_EXECUTION_LEDGER_INDEX_MISMATCH');
+  }
+}
+
+async function probeSchema(client) {
+  const names = await tableNames(client);
+  if (!names.includes(STATE_TABLE) || !names.includes(ENTRY_TABLE)) {
+    fail('PREVIEW_LEDGER_SCHEMA_IDENTITY_MISMATCH');
+  }
+  await assertMonthlyLedgerIdentity(client);
+
+  if (names.includes(TARGET_TABLE)) {
+    await assertTargetTable(client);
+    return 'ALREADY_PRESENT';
+  }
+  return 'ABSENT';
+}
+
+function defaultClientFactory(repoRoot, databaseUrl) {
+  const require = createRequire(join(repoRoot, 'packages/database/package.json'));
+  const { PrismaClient } = require('@prisma/client');
+  return new PrismaClient({ datasources: { db: { url: databaseUrl } }, log: [] });
+}
+
+function sanitizedPrismaCode(error) {
+  const code = String(error?.code ?? '');
+  return /^P\d{4}$/.test(code) ? code : 'UNKNOWN';
+}
+
+export async function runPreviewMigration({
+  env = process.env,
+  repoRoot,
+  clientFactory = defaultClientFactory,
+} = {}) {
   const plan = planPreviewMigration(env);
   if (plan.action === 'skip') {
     return { status: 'SKIPPED', reason: plan.reason };
@@ -124,38 +247,41 @@ export function runPreviewMigration({ env = process.env, repoRoot, spawn = spawn
 
   const root = resolve(repoRoot ?? join(dirname(fileURLToPath(import.meta.url)), '../..'));
   verifyMigrationPayload(root);
+  const statements = exactMigrationStatements(root);
+  const client = clientFactory(root, plan.databaseUrl);
 
-  const childEnv = { ...env, DATABASE_URL: plan.databaseUrl };
-  const before = prismaCommand(spawn, root, childEnv, ['status']);
-  if (before.error) {
-    fail(`EP012_PREVIEW_MIGRATION_STATUS_FAILED_${classifyPrismaFailure(before)}`);
-  }
-
-  if (before.status === 0) {
-    return { status: 'ALREADY_PRESENT', migration: REQUIRED_MIGRATION };
-  }
-
-  const pending = pendingMigrations(before);
-  if (before.status !== 1 || pending.length !== 1 || pending[0] !== REQUIRED_MIGRATION) {
-    const failure = classifyPrismaFailure(before);
-    if (failure !== 'UNKNOWN') {
-      fail(`EP012_PREVIEW_MIGRATION_STATUS_FAILED_${failure}`);
+  try {
+    const before = await probeSchema(client);
+    if (before === 'ALREADY_PRESENT') {
+      return { status: 'ALREADY_PRESENT', migration: REQUIRED_MIGRATION };
     }
-    fail('EP012_PREVIEW_MIGRATION_UNEXPECTED_PENDING_SET');
+
+    await client.$transaction(async (transaction) => {
+      await transaction.$queryRawUnsafe(
+        `SELECT pg_advisory_xact_lock(hashtext('tivvlejoy'), hashtext('ep012_execution_ledger'))`,
+      );
+      const names = await tableNames(transaction);
+      if (names.includes(TARGET_TABLE)) return;
+      if (!names.includes(STATE_TABLE) || !names.includes(ENTRY_TABLE)) {
+        fail('PREVIEW_LEDGER_SCHEMA_IDENTITY_MISMATCH');
+      }
+      await assertMonthlyLedgerIdentity(transaction);
+      for (const statement of statements) {
+        await transaction.$executeRawUnsafe(statement);
+      }
+    });
+
+    if ((await probeSchema(client)) !== 'ALREADY_PRESENT') {
+      fail('EP012_EXECUTION_LEDGER_POSTCHECK_FAILED');
+    }
+    return { status: 'APPLIED', migration: REQUIRED_MIGRATION };
+  } catch (error) {
+    if (typeof error?.code === 'string' && error.code.startsWith('EP012_')) throw error;
+    if (typeof error?.code === 'string' && error.code.startsWith('PREVIEW_')) throw error;
+    fail(`EP012_PREVIEW_MIGRATION_FAILED_${sanitizedPrismaCode(error)}`);
+  } finally {
+    await client.$disconnect();
   }
-
-  const result = prismaCommand(spawn, root, childEnv, ['deploy']);
-
-  if (result.error || result.status !== 0) {
-    fail(`EP012_PREVIEW_MIGRATION_FAILED_${classifyPrismaFailure(result)}`);
-  }
-
-  const after = prismaCommand(spawn, root, childEnv, ['status']);
-  if (after.error || after.status !== 0) {
-    fail(`EP012_PREVIEW_MIGRATION_POSTCHECK_FAILED_${classifyPrismaFailure(after)}`);
-  }
-
-  return { status: 'APPLIED', migration: REQUIRED_MIGRATION };
 }
 
 function sanitizedMessage(result) {
@@ -167,7 +293,7 @@ function sanitizedMessage(result) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
-    console.log(sanitizedMessage(runPreviewMigration()));
+    console.log(sanitizedMessage(await runPreviewMigration()));
   } catch (error) {
     const code = typeof error?.code === 'string' ? error.code : 'UNKNOWN';
     console.error(`TIVVLEJOY_EP012_PREVIEW_LEDGER_MIGRATION BLOCKED ${code}`);
