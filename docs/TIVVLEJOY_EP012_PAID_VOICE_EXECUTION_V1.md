@@ -32,3 +32,6 @@ Local, Development, and Production runtimes fail closed. Preview requires the ex
 8. Finalize the ledger only after verification
 
 Unfinalized or reserved entries block all later generation. Finalized success may replay with zero provider contact.
+
+The dedicated table `tivvlejoy_ep012_voice_executions` is probed separately from the monthly/global durable ledger. A failed probe returns `EP012_EXECUTION_LEDGER_UNAVAILABLE` and cannot report READY. A readable empty table is not that blocker. Generate and audio map that failure to HTTP 400 JSON, never a platform 500.
+

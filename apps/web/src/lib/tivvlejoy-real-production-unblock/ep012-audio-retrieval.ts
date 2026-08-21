@@ -68,6 +68,19 @@ export function readEp012VoiceTestTokenFromHeaders(headers: Headers): string {
   return String(headers.get(EP012_VOICE_TEST_TOKEN_HEADER) ?? '').trim();
 }
 
+function blockedRetrieval(blockers: string[]): Extract<Ep012AudioRetrievalResult, { ok: false }> {
+  return {
+    ok: false,
+    schemaVersion: EP012_AUDIO_RETRIEVAL_SCHEMA,
+    status: 'BLOCKED',
+    blockers,
+    providerContacted: false,
+    providerRequestsMade: 0,
+    sceneryAccessed: false,
+    productionEnabled: false,
+  };
+}
+
 export async function retrieveEp012AuthorizedAudio(input: Ep012AudioRetrievalInput): Promise<Ep012AudioRetrievalResult> {
   const env = input.env ?? process.env;
   const tracker = createEp012SideEffectTracker();
@@ -97,16 +110,7 @@ export async function retrieveEp012AuthorizedAudio(input: Ep012AudioRetrievalInp
     blockers.push(EP012_BLOCKER_CODES.EP012_SEGMENT_NOT_AUTHORIZED);
   }
   if (blockers.length > 0) {
-    return {
-      ok: false,
-      schemaVersion: EP012_AUDIO_RETRIEVAL_SCHEMA,
-      status: 'BLOCKED',
-      blockers,
-      providerContacted: false,
-      providerRequestsMade: 0,
-      sceneryAccessed: false,
-      productionEnabled: false,
-    };
+    return blockedRetrieval(blockers);
   }
 
   let derived;
@@ -114,31 +118,18 @@ export async function retrieveEp012AuthorizedAudio(input: Ep012AudioRetrievalInp
     derived = deriveEp012AuthorizedRequest(String(input.segmentId));
     deriveEp012ObjectKeys(derived.segmentId);
   } catch {
-    return {
-      ok: false,
-      schemaVersion: EP012_AUDIO_RETRIEVAL_SCHEMA,
-      status: 'BLOCKED',
-      blockers: [EP012_BLOCKER_CODES.EP012_SEGMENT_NOT_AUTHORIZED],
-      providerContacted: false,
-      providerRequestsMade: 0,
-      sceneryAccessed: false,
-      productionEnabled: false,
-    };
+    return blockedRetrieval([EP012_BLOCKER_CODES.EP012_SEGMENT_NOT_AUTHORIZED]);
   }
 
   const store = input.store ?? resolvePreviewVoiceLedgerStore(env);
-  const execution = await store.getEp012ExecutionBySegment(derived.segmentId);
+  let execution;
+  try {
+    execution = await store.getEp012ExecutionBySegment(derived.segmentId);
+  } catch {
+    return blockedRetrieval([EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE]);
+  }
   if (!execution || execution.status !== 'succeeded' || !execution.storageVerified) {
-    return {
-      ok: false,
-      schemaVersion: EP012_AUDIO_RETRIEVAL_SCHEMA,
-      status: 'BLOCKED',
-      blockers: [EP012_BLOCKER_CODES.EP012_ARTIFACT_NOT_FINALIZED],
-      providerContacted: false,
-      providerRequestsMade: 0,
-      sceneryAccessed: false,
-      productionEnabled: false,
-    };
+    return blockedRetrieval([EP012_BLOCKER_CODES.EP012_ARTIFACT_NOT_FINALIZED]);
   }
 
   const storage = input.storage ?? installedRetrievalStorage ?? createR2Ep012AudioStorage(env);
@@ -162,26 +153,8 @@ export async function retrieveEp012AuthorizedAudio(input: Ep012AudioRetrievalInp
     };
   } catch (error) {
     if (error instanceof VoiceProductionError) {
-      return {
-        ok: false,
-        schemaVersion: EP012_AUDIO_RETRIEVAL_SCHEMA,
-        status: 'BLOCKED',
-        blockers: [error.code],
-        providerContacted: false,
-        providerRequestsMade: 0,
-        sceneryAccessed: false,
-        productionEnabled: false,
-      };
+      return blockedRetrieval([error.code]);
     }
-    return {
-      ok: false,
-      schemaVersion: EP012_AUDIO_RETRIEVAL_SCHEMA,
-      status: 'BLOCKED',
-      blockers: [EP012_BLOCKER_CODES.EP012_ARTIFACT_NOT_FINALIZED],
-      providerContacted: false,
-      providerRequestsMade: 0,
-      sceneryAccessed: false,
-      productionEnabled: false,
-    };
+    return blockedRetrieval([EP012_BLOCKER_CODES.EP012_ARTIFACT_NOT_FINALIZED]);
   }
 }
