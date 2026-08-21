@@ -42,6 +42,14 @@ function value(env: NodeJS.ProcessEnv, name: string): string {
   return String(env[name] ?? "").trim();
 }
 
+function storageValue(
+  env: NodeJS.ProcessEnv,
+  ep012Name: string,
+  legacyName: string,
+): string {
+  return value(env, ep012Name) || value(env, legacyName);
+}
+
 function planProbe(env: NodeJS.ProcessEnv): ProbePlan {
   if (value(env, "VERCEL_GIT_COMMIT_REF") !== REQUIRED_BRANCH) {
     return { action: "skip", reason: "BRANCH_NOT_AUTHORIZED" };
@@ -67,6 +75,28 @@ function planProbe(env: NodeJS.ProcessEnv): ProbePlan {
     fail("VERCEL_PREVIEW_HOST_INVALID");
   const token = value(env, "TIVVLEJOY_VOICE_TEST_TOKEN");
   if (!token) fail("VOICE_TEST_TOKEN_MISSING");
+  if (!storageValue(env, "TIVVLEJOY_EP012_AUDIO_BUCKET", "R2_BUCKET"))
+    fail("R2_BUCKET_MISSING");
+  if (!storageValue(env, "TIVVLEJOY_EP012_AUDIO_ENDPOINT", "R2_ENDPOINT"))
+    fail("R2_ENDPOINT_MISSING");
+  if (
+    !storageValue(
+      env,
+      "TIVVLEJOY_EP012_AUDIO_ACCESS_KEY_ID",
+      "R2_ACCESS_KEY_ID",
+    )
+  ) {
+    fail("R2_ACCESS_KEY_ID_MISSING");
+  }
+  if (
+    !storageValue(
+      env,
+      "TIVVLEJOY_EP012_AUDIO_SECRET_ACCESS_KEY",
+      "R2_SECRET_ACCESS_KEY",
+    )
+  ) {
+    fail("R2_SECRET_ACCESS_KEY_MISSING");
+  }
   return { action: "execute", host, token };
 }
 
@@ -181,7 +211,15 @@ async function runStorageProbe(
     response,
     "STORAGE_PROBE_JSON_INVALID",
   );
-  if (response.status !== 200) fail(`STORAGE_PROBE_HTTP_${response.status}`);
+  if (response.status !== 200) {
+    const blocker =
+      result.blockers.length === 1 ? String(result.blockers[0] ?? "") : "";
+    fail(
+      /^[A-Z0-9_]+$/.test(blocker)
+        ? blocker
+        : `STORAGE_PROBE_HTTP_${response.status}`,
+    );
+  }
   assertStorageProbe(result);
 
   const after = await preflight("AFTER");
