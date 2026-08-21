@@ -518,7 +518,12 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
     requestChecks.push(check);
   }
 
-  const executions = await store.listEp012Executions();
+  let executions: Awaited<ReturnType<DurableVoiceLedgerStore['listEp012Executions']>> = [];
+  try {
+    executions = await store.listEp012Executions();
+  } catch {
+    executions = [];
+  }
   const storageVerifiedCount = executions.filter((item) => item.storageVerified && item.status === 'succeeded').length;
   const providerRequestsMade = executions.filter((item) => Boolean(item.providerAttemptedAt) || item.status === 'succeeded').length;
   const recoveryRequired = executions.filter(
