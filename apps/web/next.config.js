@@ -14,6 +14,8 @@ const nextConfig = {
     '/api/voice-production/ep012/preflight': prismaRuntimeFiles,
     '/api/voice-production/ep012/generate': prismaRuntimeFiles,
     '/api/voice-production/ep012/ledger/reconcile': prismaRuntimeFiles,
+    '/api/voice-production/ep012/audio': prismaRuntimeFiles,
+    '/api/voice-production/ep012/storage-probe': prismaRuntimeFiles,
   },
   transpilePackages: [
     '@doodle-dash/database',

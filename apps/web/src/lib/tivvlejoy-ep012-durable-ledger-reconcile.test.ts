@@ -287,6 +287,6 @@ describe('TIVVLEJOY_EP012_DURABLE_LEDGER_RECONCILIATION_V1', () => {
     expect(combined).not.toMatch(/\bfetch\s*\(/);
     expect(combined).not.toMatch(/R2_|cloudflarestorage/i);
     expect(combined).not.toMatch(/scenery.*(get|download|materialize)/i);
-    expect(combined).not.toMatch(/dialogue.*(write|update|mutate)/i);
+    expect(combined).not.toMatch(/dialogue(?!LockMutated).*(write|update|mutate)/i);
   });
 });

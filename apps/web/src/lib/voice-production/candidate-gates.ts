@@ -22,6 +22,10 @@ export function isProductionVoiceRuntime(env: VoiceEnv = process.env): boolean {
   return read(env, 'VERCEL_ENV') === 'production';
 }
 
+export function isPreviewOnlyVoiceRuntime(env: VoiceEnv = process.env): boolean {
+  return read(env, 'VERCEL_ENV') === 'preview';
+}
+
 export function readVoiceTestMaxCharacters(env: VoiceEnv = process.env): number {
   const raw = Number(read(env, 'TIVVLEJOY_VOICE_TEST_MAX_CHARACTERS'));
   return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : DEFAULT_VOICE_TEST_MAX_CHARACTERS;
