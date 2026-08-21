@@ -5,7 +5,6 @@ import { passingEp012Blueprint } from './fixtures';
 import { attachAudienceEngagementAdvisory } from './pipeline';
 import { APPROVED_PILOT_EXPERIMENTS } from './pilots';
 import {
-  FORBIDDEN_VIRALITY_LANGUAGE,
   KIDS_ENGAGEMENT_SCHEMA,
   STUDIO_ENGAGEMENT_PIPELINE,
   type AudienceEngagementReport,
@@ -20,7 +19,6 @@ export const VIRALITY_HONESTY_NOTICE =
 export type AudienceEngagementConsoleModel = {
   framework: typeof KIDS_ENGAGEMENT_SCHEMA;
   notice: typeof VIRALITY_HONESTY_NOTICE;
-  forbiddenLanguage: typeof FORBIDDEN_VIRALITY_LANGUAGE;
   pipeline: typeof STUDIO_ENGAGEMENT_PIPELINE;
   episode: {
     episodeId: string;
@@ -50,7 +48,6 @@ export function buildAudienceEngagementConsoleModel(): AudienceEngagementConsole
   return {
     framework: KIDS_ENGAGEMENT_SCHEMA,
     notice: VIRALITY_HONESTY_NOTICE,
-    forbiddenLanguage: FORBIDDEN_VIRALITY_LANGUAGE,
     pipeline: STUDIO_ENGAGEMENT_PIPELINE,
     episode: {
       episodeId: advisory.episodeId,

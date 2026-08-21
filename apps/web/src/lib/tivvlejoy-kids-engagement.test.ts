@@ -304,5 +304,9 @@ describe('TIVVLEJOY_RESEARCH_INFORMED_KIDS_ENGAGEMENT_V1', () => {
     expect(docs).toContain('Forbidden language includes');
     expect(ui).not.toMatch(/DoodleDash/i);
     expect(planner).not.toMatch(/DoodleDash/i);
+    const payload = JSON.stringify(buildAudienceEngagementConsoleModel());
+    for (const phrase of FORBIDDEN_VIRALITY_LANGUAGE) {
+      expect(payload).not.toContain(phrase);
+    }
   });
 });
