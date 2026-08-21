@@ -302,11 +302,14 @@ export async function runPreviewMigration({
     }
 
     await client.$transaction(async (transaction) => {
-      await safeQuery(
+      const lockRows = await safeQuery(
         transaction,
         'LOCK',
-        `SELECT pg_advisory_xact_lock(hashtext('tivvlejoy'), hashtext('ep012_execution_ledger'))`,
+        `SELECT id FROM "${STATE_TABLE}" WHERE id = 'preview-voice-ledger' FOR UPDATE`,
       );
+      if (lockRows.length !== 1 || lockRows[0].id !== 'preview-voice-ledger') {
+        fail('PREVIEW_LEDGER_LOCK_IDENTITY_MISMATCH');
+      }
       const names = await tableNames(transaction, 'LOCKED_TABLES');
       if (names.includes(TARGET_TABLE)) return;
       if (!names.includes(STATE_TABLE) || !names.includes(ENTRY_TABLE)) {

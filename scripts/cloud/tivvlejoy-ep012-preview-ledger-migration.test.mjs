@@ -49,7 +49,7 @@ function fakeClient({
     disconnected: false,
     async $queryRawUnsafe(sql) {
       if (failWith) throw failWith;
-      if (sql.includes('pg_advisory_xact_lock')) return [];
+      if (sql.includes('FOR UPDATE')) return [{ id: 'preview-voice-ledger' }];
       if (sql.includes('information_schema.tables')) {
         return [
           { table_name: 'tivvlejoy_preview_voice_ledger_state' },
