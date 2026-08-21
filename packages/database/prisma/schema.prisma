@@ -2572,6 +2572,27 @@ model TivvleJoyPreviewVoiceLedgerEntry {
   @@map("tivvlejoy_preview_voice_ledger_entries")
 }
 
+model TivvleJoyEp012VoiceExecution {
+  requestId           String    @id @map("request_id")
+  segmentId           String    @unique @map("segment_id")
+  character           String
+  characterCount      Int       @map("character_count")
+  status              String
+  providerAttemptedAt DateTime? @map("provider_attempted_at")
+  audioSha256         String?   @map("audio_sha256")
+  audioBytes          Int?      @map("audio_bytes")
+  storageVerified     Boolean   @default(false) @map("storage_verified")
+  audioObjectKey      String?   @map("audio_object_key")
+  receiptObjectKey    String?   @map("receipt_object_key")
+  receiptRef          String?   @map("receipt_ref")
+  alignmentPresent    Boolean   @default(false) @map("alignment_present")
+  deploymentId        String    @map("deployment_id")
+  createdAt           DateTime  @map("created_at")
+  updatedAt           DateTime  @map("updated_at")
+
+  @@map("tivvlejoy_ep012_voice_executions")
+}
+
 model TivvleJoyDurableWorkspace {
   id               String   @id
   workspaceId      String   @unique @map("workspace_id")
