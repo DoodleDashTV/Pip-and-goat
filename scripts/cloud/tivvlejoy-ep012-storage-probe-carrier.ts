@@ -1,5 +1,11 @@
 import { GET as getEp012Preflight } from "../../apps/web/src/app/api/voice-production/ep012/preflight/route";
 import { POST as postEp012StorageProbe } from "../../apps/web/src/app/api/voice-production/ep012/storage-probe/route";
+import {
+  assertSafeEp012ObjectKey,
+  createR2Ep012AudioStorage,
+  sha256Bytes,
+  storageProbeMarkerBytes,
+} from "../../apps/web/src/lib/tivvlejoy-real-production-unblock/ep012-audio-storage";
 import type { Ep012NoProviderPreflight } from "../../apps/web/src/lib/tivvlejoy-real-production-unblock/ep012-no-provider-preflight";
 import type { Ep012StorageProbeResult } from "../../apps/web/src/lib/tivvlejoy-real-production-unblock/ep012-storage-probe";
 
@@ -48,6 +54,51 @@ function storageValue(
   legacyName: string,
 ): string {
   return value(env, ep012Name) || value(env, legacyName);
+}
+
+function storageErrorCode(error: unknown): string {
+  const details = (error && typeof error === "object" ? error : {}) as {
+    name?: unknown;
+    code?: unknown;
+    $metadata?: { httpStatusCode?: unknown };
+  };
+  const name = String(details.name ?? "");
+  const code = String(details.code ?? "").toUpperCase();
+  const status = Number(details.$metadata?.httpStatusCode);
+
+  if (name === "InvalidAccessKeyId") return "R2_INVALID_ACCESS_KEY_ID";
+  if (name === "SignatureDoesNotMatch") return "R2_SIGNATURE_MISMATCH";
+  if (name === "AccessDenied") return "R2_ACCESS_DENIED";
+  if (name === "NoSuchBucket") return "R2_BUCKET_NOT_FOUND";
+  if (code === "ENOTFOUND") return "R2_ENDPOINT_DNS_FAILED";
+  if (code === "ECONNREFUSED") return "R2_ENDPOINT_CONNECTION_REFUSED";
+  if (code === "ETIMEDOUT") return "R2_ENDPOINT_TIMEOUT";
+  if (code === "ERR_INVALID_URL") return "R2_ENDPOINT_INVALID";
+  if ([400, 401, 403, 404, 409, 429, 500, 502, 503, 504].includes(status)) {
+    return `R2_HTTP_${status}`;
+  }
+  return "R2_STORAGE_TRANSPORT_FAILED";
+}
+
+async function directStorageDiagnostic(env: NodeJS.ProcessEnv): Promise<void> {
+  const storage = createR2Ep012AudioStorage(env);
+  if (storage.kind !== "r2") fail("R2_STORAGE_UNAVAILABLE");
+  const key = assertSafeEp012ObjectKey(EXPECTED_MARKER_KEY);
+  const marker = storageProbeMarkerBytes();
+  try {
+    await storage.putObject(key, marker, "application/json");
+    const readBack = await storage.getObject(key);
+    if (
+      readBack.byteLength !== marker.byteLength ||
+      sha256Bytes(readBack) !== sha256Bytes(marker)
+    ) {
+      fail("R2_READBACK_MISMATCH");
+    }
+  } catch (error) {
+    if (error instanceof Error && /^[A-Z0-9_]+$/.test(error.message))
+      throw error;
+    fail(storageErrorCode(error));
+  }
 }
 
 function planProbe(env: NodeJS.ProcessEnv): ProbePlan {
@@ -192,6 +243,7 @@ async function runStorageProbe(
   if (plan.action === "skip") return plan;
 
   await preflight("BEFORE");
+  await directStorageDiagnostic(env);
 
   const request = new Request(
     `https://${plan.host}/api/voice-production/ep012/storage-probe`,
