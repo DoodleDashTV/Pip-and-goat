@@ -202,6 +202,7 @@ test('refuses a ledger whose reconciled counters do not match the checkpoint', a
 test('sanitizes database failures', async () => {
   const hidden = new Error('hidden connection details');
   hidden.code = 'P1001';
+  hidden.meta = { code: '08001' };
   await assert.rejects(
     runPreviewMigration({
       env: authorizedEnv,
@@ -210,6 +211,6 @@ test('sanitizes database failures', async () => {
         return fakeClient({ failWith: hidden });
       },
     }),
-    { message: 'EP012_PREVIEW_MIGRATION_FAILED_P1001' },
+    { message: 'EP012_PREVIEW_MIGRATION_PRECHECK_TABLES_FAILED_P1001_08001' },
   );
 });

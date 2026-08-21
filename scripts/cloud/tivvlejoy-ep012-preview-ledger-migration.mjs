@@ -142,23 +142,61 @@ function equalSorted(actual, expected) {
   );
 }
 
-async function tableNames(client) {
-  const rows = await client.$queryRawUnsafe(`
+function sanitizedPrismaCode(error) {
+  const code = String(error?.code ?? '');
+  return /^P\d{4}$/.test(code) ? code : 'UNKNOWN';
+}
+
+function sanitizedSqlState(error) {
+  const code = String(error?.meta?.code ?? '');
+  return /^[0-9A-Z]{5}$/.test(code) ? code : 'UNKNOWN';
+}
+
+async function safeQuery(client, stage, sql) {
+  try {
+    return await client.$queryRawUnsafe(sql);
+  } catch (error) {
+    fail(
+      `EP012_PREVIEW_MIGRATION_${stage}_FAILED_${sanitizedPrismaCode(error)}_${sanitizedSqlState(error)}`,
+    );
+  }
+}
+
+async function safeExecute(client, stage, sql) {
+  try {
+    return await client.$executeRawUnsafe(sql);
+  } catch (error) {
+    fail(
+      `EP012_PREVIEW_MIGRATION_${stage}_FAILED_${sanitizedPrismaCode(error)}_${sanitizedSqlState(error)}`,
+    );
+  }
+}
+
+async function tableNames(client, stage) {
+  const rows = await safeQuery(
+    client,
+    stage,
+    `
     SELECT table_name
     FROM information_schema.tables
     WHERE table_schema = current_schema()
       AND table_name IN ('${STATE_TABLE}', '${ENTRY_TABLE}', '${TARGET_TABLE}')
-  `);
+  `,
+  );
   return rows.map((row) => String(row.table_name));
 }
 
-async function assertMonthlyLedgerIdentity(client) {
-  const rows = await client.$queryRawUnsafe(`
+async function assertMonthlyLedgerIdentity(client, stage) {
+  const rows = await safeQuery(
+    client,
+    stage,
+    `
     SELECT paid_requests, paid_characters_used, failed_attempts,
            reserved_requests, reserved_characters, unfinalized_count, reconciled
     FROM "${STATE_TABLE}"
     WHERE id = 'preview-voice-ledger'
-  `);
+  `,
+  );
 
   if (rows.length !== 1) fail('PREVIEW_LEDGER_STATE_IDENTITY_MISMATCH');
   const row = rows[0];
@@ -175,17 +213,25 @@ async function assertMonthlyLedgerIdentity(client) {
   }
 }
 
-async function assertTargetTable(client) {
-  const countRows = await client.$queryRawUnsafe(`SELECT COUNT(*) AS count FROM "${TARGET_TABLE}"`);
+async function assertTargetTable(client, stagePrefix) {
+  const countRows = await safeQuery(
+    client,
+    `${stagePrefix}_COUNT`,
+    `SELECT COUNT(*) AS count FROM "${TARGET_TABLE}"`,
+  );
   if (countRows.length !== 1 || normalizeCount(countRows[0].count) !== 0) {
     fail('EP012_EXECUTION_LEDGER_NOT_EMPTY');
   }
 
-  const columnRows = await client.$queryRawUnsafe(`
+  const columnRows = await safeQuery(
+    client,
+    `${stagePrefix}_COLUMNS`,
+    `
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = current_schema() AND table_name = '${TARGET_TABLE}'
-  `);
+  `,
+  );
   if (
     !equalSorted(
       columnRows.map((row) => String(row.column_name)),
@@ -195,11 +241,15 @@ async function assertTargetTable(client) {
     fail('EP012_EXECUTION_LEDGER_COLUMN_MISMATCH');
   }
 
-  const indexRows = await client.$queryRawUnsafe(`
+  const indexRows = await safeQuery(
+    client,
+    `${stagePrefix}_INDEXES`,
+    `
     SELECT indexname
     FROM pg_indexes
     WHERE schemaname = current_schema() AND tablename = '${TARGET_TABLE}'
-  `);
+  `,
+  );
   if (
     !equalSorted(
       indexRows.map((row) => String(row.indexname)),
@@ -210,15 +260,15 @@ async function assertTargetTable(client) {
   }
 }
 
-async function probeSchema(client) {
-  const names = await tableNames(client);
+async function probeSchema(client, stagePrefix) {
+  const names = await tableNames(client, `${stagePrefix}_TABLES`);
   if (!names.includes(STATE_TABLE) || !names.includes(ENTRY_TABLE)) {
     fail('PREVIEW_LEDGER_SCHEMA_IDENTITY_MISMATCH');
   }
-  await assertMonthlyLedgerIdentity(client);
+  await assertMonthlyLedgerIdentity(client, `${stagePrefix}_STATE`);
 
   if (names.includes(TARGET_TABLE)) {
-    await assertTargetTable(client);
+    await assertTargetTable(client, `${stagePrefix}_TARGET`);
     return 'ALREADY_PRESENT';
   }
   return 'ABSENT';
@@ -228,11 +278,6 @@ function defaultClientFactory(repoRoot, databaseUrl) {
   const require = createRequire(join(repoRoot, 'packages/database/package.json'));
   const { PrismaClient } = require('@prisma/client');
   return new PrismaClient({ datasources: { db: { url: databaseUrl } }, log: [] });
-}
-
-function sanitizedPrismaCode(error) {
-  const code = String(error?.code ?? '');
-  return /^P\d{4}$/.test(code) ? code : 'UNKNOWN';
 }
 
 export async function runPreviewMigration({
@@ -251,34 +296,38 @@ export async function runPreviewMigration({
   const client = clientFactory(root, plan.databaseUrl);
 
   try {
-    const before = await probeSchema(client);
+    const before = await probeSchema(client, 'PRECHECK');
     if (before === 'ALREADY_PRESENT') {
       return { status: 'ALREADY_PRESENT', migration: REQUIRED_MIGRATION };
     }
 
     await client.$transaction(async (transaction) => {
-      await transaction.$queryRawUnsafe(
+      await safeQuery(
+        transaction,
+        'LOCK',
         `SELECT pg_advisory_xact_lock(hashtext('tivvlejoy'), hashtext('ep012_execution_ledger'))`,
       );
-      const names = await tableNames(transaction);
+      const names = await tableNames(transaction, 'LOCKED_TABLES');
       if (names.includes(TARGET_TABLE)) return;
       if (!names.includes(STATE_TABLE) || !names.includes(ENTRY_TABLE)) {
         fail('PREVIEW_LEDGER_SCHEMA_IDENTITY_MISMATCH');
       }
-      await assertMonthlyLedgerIdentity(transaction);
-      for (const statement of statements) {
-        await transaction.$executeRawUnsafe(statement);
+      await assertMonthlyLedgerIdentity(transaction, 'LOCKED_STATE');
+      for (const [index, statement] of statements.entries()) {
+        await safeExecute(transaction, index === 0 ? 'DDL_TABLE' : 'DDL_INDEX', statement);
       }
     });
 
-    if ((await probeSchema(client)) !== 'ALREADY_PRESENT') {
+    if ((await probeSchema(client, 'POSTCHECK')) !== 'ALREADY_PRESENT') {
       fail('EP012_EXECUTION_LEDGER_POSTCHECK_FAILED');
     }
     return { status: 'APPLIED', migration: REQUIRED_MIGRATION };
   } catch (error) {
     if (typeof error?.code === 'string' && error.code.startsWith('EP012_')) throw error;
     if (typeof error?.code === 'string' && error.code.startsWith('PREVIEW_')) throw error;
-    fail(`EP012_PREVIEW_MIGRATION_FAILED_${sanitizedPrismaCode(error)}`);
+    fail(
+      `EP012_PREVIEW_MIGRATION_FAILED_${sanitizedPrismaCode(error)}_${sanitizedSqlState(error)}`,
+    );
   } finally {
     await client.$disconnect();
   }
