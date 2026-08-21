@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && DATABASE_URL=postgresql://preview:preview@127.0.0.1:5432/preview pnpm db:generate && TIVVLEJOY_EP012_CANARY_AUTHORIZATION=DL_HOOK_01__PIP_ONE_PAID_ATTEMPT_NO_RETRY TSX_TSCONFIG_PATH=tsconfig.json pnpm --filter @doodle-dash/web exec node --import tsx ../../scripts/cloud/tivvlejoy-ep012-single-paid-canary.ts && pnpm --filter @doodle-dash/web build"
+  "buildCommand": "cd ../.. && DATABASE_URL=postgresql://preview:preview@127.0.0.1:5432/preview pnpm db:generate && pnpm canary:ep012 && pnpm --filter @doodle-dash/web build"
 }
