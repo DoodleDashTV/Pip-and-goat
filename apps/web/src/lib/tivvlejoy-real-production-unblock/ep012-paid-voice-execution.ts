@@ -145,6 +145,7 @@ function mapExecutionBlocker(error: unknown): Ep012BlockerCode {
     if (code === 'DUPLICATE_REQUEST') return EP012_BLOCKER_CODES.EP012_REQUEST_ALREADY_RESERVED;
     if (code === 'PRIOR_USAGE_RECONCILIATION') return EP012_BLOCKER_CODES.EP012_LEDGER_RECONCILIATION_REQUIRED;
     if (code === 'DURABLE_LEDGER_UNAVAILABLE') return EP012_BLOCKER_CODES.EP012_LEDGER_UNAVAILABLE;
+    if (code === 'EP012_EXECUTION_LEDGER_UNAVAILABLE') return EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE;
     if (
       code === 'EP012_PROVIDER_TIMEOUT' ||
       code === 'EP012_PROVIDER_AUTHORIZATION' ||
@@ -158,12 +159,71 @@ function mapExecutionBlocker(error: unknown): Ep012BlockerCode {
   return EP012_BLOCKER_CODES.EP012_PROVIDER_RESPONSE_INVALID;
 }
 
+export function createEp012GenerateFailClosedResult(blockers: Ep012BlockerCode[]): {
+  schemaVersion: typeof EP012_PAID_VOICE_EXECUTION_SCHEMA;
+  ok: false;
+  status: 'BLOCKED';
+  episodeId: 'EP012';
+  title: 'The Bakery Map';
+  blockers: Ep012BlockerCode[];
+  readyForProviderContact: false;
+  providerContacted: false;
+  providerRequestsMade: 0;
+  sceneryAccessed: false;
+  sceneryRequestsMade: 0;
+  commercialBytesDownloaded: 0;
+  dialogueLockMutated: false;
+  productionEnabled: false;
+} {
+  return {
+    schemaVersion: EP012_PAID_VOICE_EXECUTION_SCHEMA,
+    ok: false,
+    status: 'BLOCKED',
+    episodeId: 'EP012',
+    title: 'The Bakery Map',
+    blockers: [...new Set(blockers)],
+    readyForProviderContact: false,
+    providerContacted: false,
+    providerRequestsMade: 0,
+    sceneryAccessed: false,
+    sceneryRequestsMade: 0,
+    commercialBytesDownloaded: 0,
+    dialogueLockMutated: false,
+    productionEnabled: false,
+  };
+}
+
 export async function runEp012PaidVoiceExecution(input: Ep012PaidVoiceExecutionInput): Promise<Ep012PaidVoiceExecutionResult> {
   const env = input.env ?? process.env;
   const tracker = input.tracker ?? createEp012SideEffectTracker();
   const store = input.store ?? resolvePreviewVoiceLedgerStore(env);
   const { providerTransport: _ignoredTransport, storage: _ignoredStorage, ...guardInput } = input;
   const guard = await runEp012GenerateGuard({ ...guardInput, env, store, tracker });
+
+  try {
+    return await continueEp012PaidVoiceExecution({ input, env, store, guard, tracker });
+  } catch (error) {
+    if (error instanceof VoiceProductionError) {
+      return executionResult({
+        status: 'BLOCKED',
+        guard,
+        blockers: [...guard.blockers, mapExecutionBlocker(error)],
+        providerContacted: false,
+        providerRequestsMade: 0,
+      });
+    }
+    throw error;
+  }
+}
+
+async function continueEp012PaidVoiceExecution(args: {
+  input: Ep012PaidVoiceExecutionInput;
+  env: VoiceEnv;
+  store: ReturnType<typeof resolvePreviewVoiceLedgerStore>;
+  guard: Ep012GenerateGuardResult;
+  tracker: ReturnType<typeof createEp012SideEffectTracker>;
+}): Promise<Ep012PaidVoiceExecutionResult> {
+  const { input, env, store, guard, tracker } = args;
 
   if (!isPreviewOnlyVoiceRuntime(env) && !guard.blockers.includes(EP012_BLOCKER_CODES.EP012_PREVIEW_RUNTIME_REQUIRED)) {
     return executionResult({
@@ -186,7 +246,18 @@ export async function runEp012PaidVoiceExecution(input: Ep012PaidVoiceExecutionI
     });
   }
 
-  const existingExecution = await store.getEp012Execution(derived.requestId);
+  let existingExecution;
+  try {
+    existingExecution = await store.getEp012Execution(derived.requestId);
+  } catch {
+    return executionResult({
+      status: 'BLOCKED',
+      guard,
+      blockers: [...guard.blockers, EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE],
+      providerContacted: false,
+      providerRequestsMade: 0,
+    });
+  }
   if (existingExecution?.status === 'succeeded' && existingExecution.storageVerified) {
     return executionResult({
       status: 'ALREADY_SUCCEEDED',

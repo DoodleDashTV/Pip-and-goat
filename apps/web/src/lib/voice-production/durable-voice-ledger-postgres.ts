@@ -30,6 +30,7 @@ import {
 } from './script-line';
 import { currentUsageMonth, type VoiceEnv } from './safety';
 import { VoiceProductionError } from './types';
+import { wrapEp012ExecutionLedgerQuery } from '@/lib/tivvlejoy-real-production-unblock/ep012-execution-ledger-errors';
 
 const STATE_ID = 'preview-voice-ledger';
 
@@ -734,28 +735,22 @@ export function createPostgresDurableLedgerStore(env: VoiceEnv = process.env): D
       }
     },
     async getEp012Execution(requestId) {
-      try {
+      return wrapEp012ExecutionLedgerQuery(async () => {
         const row = await db.tivvleJoyEp012VoiceExecution.findUnique({ where: { requestId } });
         return row ? toExecution(row) : null;
-      } catch {
-        throw new VoiceProductionError(DURABLE_LEDGER_COPY.unavailable, 'DURABLE_LEDGER_UNAVAILABLE');
-      }
+      });
     },
     async getEp012ExecutionBySegment(segmentId) {
-      try {
+      return wrapEp012ExecutionLedgerQuery(async () => {
         const row = await db.tivvleJoyEp012VoiceExecution.findUnique({ where: { segmentId } });
         return row ? toExecution(row) : null;
-      } catch {
-        throw new VoiceProductionError(DURABLE_LEDGER_COPY.unavailable, 'DURABLE_LEDGER_UNAVAILABLE');
-      }
+      });
     },
     async listEp012Executions() {
-      try {
+      return wrapEp012ExecutionLedgerQuery(async () => {
         const rows = await db.tivvleJoyEp012VoiceExecution.findMany();
         return rows.map(toExecution);
-      } catch {
-        throw new VoiceProductionError(DURABLE_LEDGER_COPY.unavailable, 'DURABLE_LEDGER_UNAVAILABLE');
-      }
+      });
     },
   };
 }
