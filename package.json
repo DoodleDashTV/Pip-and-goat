@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "pnpm --filter @doodle-dash/web dev",
     "build": "pnpm db:generate && pnpm --filter @doodle-dash/web build",
-    "canary:ep012": "TIVVLEJOY_EP012_CANARY_AUTHORIZATION=DL_HOOK_01__PIP_ONE_PAID_ATTEMPT_NO_RETRY TSX_TSCONFIG_PATH=tsconfig.json pnpm --filter @doodle-dash/web exec node --import tsx ../../scripts/cloud/tivvlejoy-ep012-single-paid-canary.ts",
     "lint": "pnpm --filter @doodle-dash/web lint",
     "typecheck": "pnpm db:generate && pnpm --filter @doodle-dash/domain typecheck && pnpm --filter @doodle-dash/shared typecheck && pnpm --filter @doodle-dash/universe typecheck && pnpm --filter @doodle-dash/characters typecheck && pnpm --filter @doodle-dash/story typecheck && pnpm --filter @doodle-dash/direction typecheck && pnpm --filter @doodle-dash/preproduction typecheck && pnpm --filter @doodle-dash/production typecheck && pnpm --filter @doodle-dash/rendering typecheck && pnpm --filter @doodle-dash/audio typecheck && pnpm --filter @doodle-dash/providers typecheck && pnpm --filter @doodle-dash/web typecheck",
     "test": "pnpm db:generate && pnpm --filter @doodle-dash/web test",
