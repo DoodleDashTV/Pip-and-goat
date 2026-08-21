@@ -138,3 +138,59 @@ The active build hook was disarmed immediately after the successful result. The 
 - Final cleanup deployment: `dpl_2RFVrRMD9pkkvKXVTEipafsNvo38` / `READY`
 
 No additional EP012 segment may contact the provider without another fresh, explicit authorization.
+
+## Fresh authorized Goat hook canary
+
+After the successful Pip hook canary had been finalized and its carrier removed, Justin provided fresh authorization to continue with exactly one next paid Preview segment: `DL_HOOK_01__GOAT`, with no retry.
+
+### Precheck
+
+Immediately before arming the Goat carrier:
+
+- HTTP 200 / `status: READY`
+- `DL_HOOK_01__PIP`: `SUCCEEDED` / `ALREADY_SUCCEEDED`
+- `DL_HOOK_01__GOAT`: `ABSENT` / `ELIGIBLE`
+- global ledger: `5` requests / `286` characters
+- EP012 succeeded: `1` request / `51` characters
+- provider requests made: `1`
+- storage-verified executions: `1`
+- failed attempts, reservations, unfinalized entries, and recovery-required entries: all `0`
+- Production runtime: false
+
+### Executed result
+
+- Armed commit: `833a758c3a2027bbd9e381c556da32f58b07a297`
+- Preview deployment: `dpl_6BXsLY6h979kBshBtM9WD67oHt5S`
+- Deployment target/state: Preview / `READY`
+- Result: `SUCCEEDED`
+- Segment: `DL_HOOK_01__GOAT`
+- Character count: `34`
+- Generate invocations: `1`
+- ElevenLabs/provider requests for this canary: `1`
+- Automatic retries: `0`
+- Storage verified: true
+- MP3 bytes: `27629`
+- MP3 SHA-256: `210c54fb3ef8468d3115943cb0bb7c6c7a510e0e778b59c890bb96ce2c9a6ca8`
+- Receipt and MP3 read-back contracts: verified
+- Scenery access: none
+- Production enabled: false
+
+### Durable postcheck and cleanup
+
+- `DL_HOOK_01__PIP`: `SUCCEEDED` / `ALREADY_SUCCEEDED`
+- `DL_HOOK_01__GOAT`: `SUCCEEDED` / `ALREADY_SUCCEEDED`
+- global ledger: `6` requests / `320` characters
+- EP012 succeeded: `2` requests / `85` characters
+- EP012 remaining: `9` requests / `375` characters
+- provider requests made: `2`
+- storage-verified executions: `2`
+- failed attempts, reservations, unfinalized entries, and recovery-required entries: all `0`
+
+The active hook was disarmed and the temporary command and carrier were removed.
+
+- Disarm commit: `c0cbd3e30afdf702c078740c757532a1b5c45afc`
+- Command cleanup commit: `f13cde0e8273c71f6a602cc759ab028955890d85`
+- Carrier cleanup commit: `4e3d85807bb10c45d56974ecce0dfc2fed08d849`
+- Final cleanup deployment: `dpl_CctY2XdRPZhzSGeNC1D3uqCah5TM` / `READY`
+
+No additional EP012 segment may contact the provider without another fresh, explicit authorization.
