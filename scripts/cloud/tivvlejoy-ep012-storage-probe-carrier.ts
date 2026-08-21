@@ -59,17 +59,26 @@ function storageValue(
 function storageErrorCode(error: unknown): string {
   const details = (error && typeof error === "object" ? error : {}) as {
     name?: unknown;
+    Code?: unknown;
     code?: unknown;
     $metadata?: { httpStatusCode?: unknown };
   };
   const name = String(details.name ?? "");
-  const code = String(details.code ?? "").toUpperCase();
+  const code = String(details.Code ?? details.code ?? name).toUpperCase();
   const status = Number(details.$metadata?.httpStatusCode);
 
-  if (name === "InvalidAccessKeyId") return "R2_INVALID_ACCESS_KEY_ID";
-  if (name === "SignatureDoesNotMatch") return "R2_SIGNATURE_MISMATCH";
-  if (name === "AccessDenied") return "R2_ACCESS_DENIED";
-  if (name === "NoSuchBucket") return "R2_BUCKET_NOT_FOUND";
+  if (code === "INVALIDACCESSKEYID") return "R2_INVALID_ACCESS_KEY_ID";
+  if (code === "SIGNATUREDOESNOTMATCH") return "R2_SIGNATURE_MISMATCH";
+  if (code === "ACCESSDENIED") return "R2_ACCESS_DENIED";
+  if (code === "NOSUCHBUCKET") return "R2_BUCKET_NOT_FOUND";
+  if (code === "INVALIDBUCKETNAME") return "R2_BUCKET_NAME_INVALID";
+  if (code === "INVALIDARGUMENT") return "R2_INVALID_ARGUMENT";
+  if (code === "AUTHORIZATIONHEADERMALFORMED")
+    return "R2_AUTHORIZATION_HEADER_MALFORMED";
+  if (code === "INVALIDREQUEST") return "R2_INVALID_REQUEST";
+  if (code === "REQUESTTIMETOOSKEWED") return "R2_REQUEST_TIME_SKEWED";
+  if (code === "PERMANENTREDIRECT") return "R2_ENDPOINT_REDIRECT";
+  if (code === "METHODNOTALLOWED") return "R2_METHOD_NOT_ALLOWED";
   if (code === "ENOTFOUND") return "R2_ENDPOINT_DNS_FAILED";
   if (code === "ECONNREFUSED") return "R2_ENDPOINT_CONNECTION_REFUSED";
   if (code === "ETIMEDOUT") return "R2_ENDPOINT_TIMEOUT";
@@ -80,7 +89,65 @@ function storageErrorCode(error: unknown): string {
   return "R2_STORAGE_TRANSPORT_FAILED";
 }
 
+function assertStorageConfigShape(env: NodeJS.ProcessEnv): void {
+  const endpoint = storageValue(
+    env,
+    "TIVVLEJOY_EP012_AUDIO_ENDPOINT",
+    "R2_ENDPOINT",
+  );
+  const bucket = storageValue(
+    env,
+    "TIVVLEJOY_EP012_AUDIO_BUCKET",
+    "R2_BUCKET",
+  );
+  const accessKeyId = storageValue(
+    env,
+    "TIVVLEJOY_EP012_AUDIO_ACCESS_KEY_ID",
+    "R2_ACCESS_KEY_ID",
+  );
+  const secretAccessKey = storageValue(
+    env,
+    "TIVVLEJOY_EP012_AUDIO_SECRET_ACCESS_KEY",
+    "R2_SECRET_ACCESS_KEY",
+  );
+
+  let parsed: URL;
+  try {
+    parsed = new URL(endpoint);
+  } catch {
+    fail("R2_ENDPOINT_INVALID");
+  }
+  if (
+    parsed.protocol !== "https:" ||
+    !parsed.hostname ||
+    parsed.username ||
+    parsed.password ||
+    parsed.search ||
+    parsed.hash
+  ) {
+    fail("R2_ENDPOINT_INVALID");
+  }
+  if (parsed.pathname !== "/" && parsed.pathname !== "") {
+    fail("R2_ENDPOINT_PATH_UNEXPECTED");
+  }
+  if (
+    !/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(bucket) ||
+    bucket.includes("..") ||
+    bucket.includes(".-") ||
+    bucket.includes("-.")
+  ) {
+    fail("R2_BUCKET_NAME_INVALID");
+  }
+  if (accessKeyId.length < 16 || accessKeyId.length > 128) {
+    fail("R2_ACCESS_KEY_ID_FORMAT_INVALID");
+  }
+  if (secretAccessKey.length < 32 || secretAccessKey.length > 256) {
+    fail("R2_SECRET_ACCESS_KEY_FORMAT_INVALID");
+  }
+}
+
 async function directStorageDiagnostic(env: NodeJS.ProcessEnv): Promise<void> {
+  assertStorageConfigShape(env);
   const storage = createR2Ep012AudioStorage(env);
   if (storage.kind !== "r2") fail("R2_STORAGE_UNAVAILABLE");
   const key = assertSafeEp012ObjectKey(EXPECTED_MARKER_KEY);
