@@ -172,25 +172,30 @@ const defaultFrame: NineSixteenReadability = {
   focalReadable: true,
 };
 
+export type AudienceEngagementBlueprintOverrides = {
+  episodeId?: string;
+  title?: string;
+  dialogueRefs?: readonly string[];
+  positiveArousalHook?: Partial<PositiveArousalHook>;
+  visibleGoal?: Partial<VisibleGoal>;
+  causalStoryChain?: Partial<CausalStoryChain>;
+  characterConsistency?: Partial<Omit<CharacterConsistency, 'problemRoles'>> & {
+    problemRoles?: Partial<CharacterConsistency['problemRoles']>;
+  };
+  participationCue?: Partial<ParticipationCue>;
+  safeHumor?: Partial<SafeHumor>;
+  focalMotionPlan?: Partial<FocalMotionPlan>;
+  relevantAudioPlan?: Partial<RelevantAudioPlan>;
+  pacingAndProcessing?: Partial<PacingAndProcessing>;
+  prosocialPayoff?: Partial<ProsocialPayoff>;
+  replayDesign?: Partial<ReplayDesign>;
+  productionReusePlan?: Partial<ProductionReusePlan>;
+  nineSixteenReadability?: Partial<NineSixteenReadability>;
+  ageBandLayers?: readonly AgeBandLayer[];
+};
+
 export function buildAudienceEngagementBlueprint(
-  overrides: Partial<AudienceEngagementBlueprint> & {
-    positiveArousalHook?: Partial<PositiveArousalHook>;
-    visibleGoal?: Partial<VisibleGoal>;
-    causalStoryChain?: Partial<CausalStoryChain>;
-    characterConsistency?: Partial<CharacterConsistency> & {
-      problemRoles?: Partial<CharacterConsistency['problemRoles']>;
-    };
-    participationCue?: Partial<ParticipationCue>;
-    safeHumor?: Partial<SafeHumor>;
-    focalMotionPlan?: Partial<FocalMotionPlan>;
-    relevantAudioPlan?: Partial<RelevantAudioPlan>;
-    pacingAndProcessing?: Partial<PacingAndProcessing>;
-    prosocialPayoff?: Partial<ProsocialPayoff>;
-    replayDesign?: Partial<ReplayDesign>;
-    productionReusePlan?: Partial<ProductionReusePlan>;
-    nineSixteenReadability?: Partial<NineSixteenReadability>;
-    ageBandLayers?: readonly AgeBandLayer[];
-  } = {},
+  overrides: AudienceEngagementBlueprintOverrides = {},
 ): AudienceEngagementBlueprint {
   return {
     schemaVersion: AUDIENCE_ENGAGEMENT_BLUEPRINT_SCHEMA,
