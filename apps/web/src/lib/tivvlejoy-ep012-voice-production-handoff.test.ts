@@ -21,6 +21,11 @@ import {
   runEp012VoiceProductionHandoff,
   type Ep012VoiceHandoffCompileInput,
 } from "./tivvlejoy-real-production-unblock/ep012-voice-production-handoff";
+import {
+  fallbackFirstEpisodeOperatorModel,
+  projectEp012VoiceHandoffForProductionControl,
+  reconcileFirstEpisodeVoiceHandoff,
+} from "./tivvlejoy-real-production-unblock/console-model";
 import { sha256Canonical } from "./tivvlejoy-production-studio/hash";
 
 const checkedAt = new Date("2026-08-22T00:45:00.000Z");
@@ -379,5 +384,76 @@ describe("TIVVLEJOY_EP012_VOICE_PRODUCTION_HANDOFF_V1", () => {
       /database details|postgresql:\/\//,
     );
     expect(result.providerRequestsMadeDuringHandoff).toBe(0);
+  });
+
+  it("projects the exact completed handoff as real Preview ledger evidence", () => {
+    const handoff = compileEp012VoiceProductionHandoff(completeInput());
+    const control = projectEp012VoiceHandoffForProductionControl(handoff);
+    expect(control.evidenceClass).toBe("REAL_LEDGER");
+    expect(control.status).toBe("HANDOFF_COMPLETE");
+    expect(control.segmentCount).toBe(11);
+    expect(control.dialogueReceiptCount).toBe(7);
+    expect(control.characterCount).toBe(460);
+    expect(control.packetReadiness).toBe("PLANNING_COMPLETE");
+    expect(control.studioReadiness).toBe("WAITING_FOR_CHARACTER_RIGS");
+    expect(control.renderStatus).toBe("NOT_STARTED");
+    expect(control.providerRequestsMadeDuringHandoff).toBe(0);
+    expect(control.storageObjectsReadDuringHandoff).toBe(0);
+    expect(control.productionEnabled).toBe(false);
+  });
+
+  it("fails the control projection closed when a completed contract is inconsistent", () => {
+    const handoff = compileEp012VoiceProductionHandoff(completeInput());
+    const control = projectEp012VoiceHandoffForProductionControl({
+      ...handoff,
+      segmentCount: 10,
+    });
+    expect(control.evidenceClass).toBe("BLOCKED");
+    expect(control.status).toBe("BLOCKED");
+    expect(control.blockers).toContain("EP012_CONTROL_HANDOFF_MISMATCH");
+    expect(control.handoffSha256).toBeNull();
+    expect(control.productionEnabled).toBe(false);
+  });
+
+  it("reconciles the operator card without retaining stale voice actions", () => {
+    const handoff = compileEp012VoiceProductionHandoff(completeInput());
+    const original = fallbackFirstEpisodeOperatorModel();
+    const result = reconcileFirstEpisodeVoiceHandoff(original, handoff);
+    expect(result.firstEpisode.voiceReceiptStatus).toBe(
+      "11/11 verified segments · 7/7 dialogue receipts · 460/460 characters.",
+    );
+    expect(result.firstEpisode.next5Actions.join(" ")).not.toMatch(
+      /write or confirm|generate voices/i,
+    );
+    expect(result.firstEpisode.next5Actions.join(" ")).toMatch(
+      /verified EP012 voice dependency/i,
+    );
+    expect(result.firstEpisode.next5Actions).toHaveLength(5);
+  });
+
+  it("leaves the original operator card unchanged when the handoff is blocked", () => {
+    const blocked = compileEp012VoiceProductionHandoff(
+      completeInput({ previewOnlyRuntime: false, productionRuntime: true }),
+    );
+    const original = fallbackFirstEpisodeOperatorModel();
+    const result = reconcileFirstEpisodeVoiceHandoff(original, blocked);
+    expect(result.firstEpisode).toEqual(original);
+    expect(result.voiceHandoff.status).toBe("BLOCKED");
+    expect(result.voiceHandoff.productionEnabled).toBe(false);
+  });
+
+  it("keeps request IDs, artifact hashes, and object references out of the control projection", () => {
+    const handoff = compileEp012VoiceProductionHandoff(completeInput());
+    const control = projectEp012VoiceHandoffForProductionControl(handoff);
+    const serialized = JSON.stringify(control);
+    for (const authorized of EP012_VOICE_AUTHORIZATION.authorizedRequests) {
+      expect(serialized).not.toContain(authorized.requestId);
+    }
+    for (const execution of completeExecutions()) {
+      expect(serialized).not.toContain(execution.audioSha256);
+      expect(serialized).not.toContain(execution.audioObjectKey);
+      expect(serialized).not.toContain(execution.receiptObjectKey);
+      expect(serialized).not.toContain(execution.receiptRef);
+    }
   });
 });

@@ -18,7 +18,10 @@ import {
   type SaveStatus,
 } from '@/lib/tivvlejoy-production-persistence';
 import type { ProductionConsoleModel } from '@/lib/tivvlejoy-production-studio/console-model';
-import type { FirstEpisodeOperatorModel } from '@/lib/tivvlejoy-real-production-unblock/console-model';
+import type {
+  FirstEpisodeOperatorModel,
+  FirstEpisodeVoiceHandoffModel,
+} from '@/lib/tivvlejoy-real-production-unblock/console-model';
 import { fallbackFirstEpisodeOperatorModel } from '@/lib/tivvlejoy-real-production-unblock/console-model';
 
 function Stat({ label, value }: { label: string; value: string | number }) {
@@ -34,10 +37,12 @@ export function ProductionStudioConsole({
   model,
   persistence,
   firstEpisode,
+  voiceHandoff,
 }: {
   model: ProductionConsoleModel;
   persistence?: PersistenceConsoleModel;
   firstEpisode?: FirstEpisodeOperatorModel;
+  voiceHandoff: FirstEpisodeVoiceHandoffModel;
 }) {
   const episodeUnblock = firstEpisode ?? fallbackFirstEpisodeOperatorModel();
   const [episodeId, setEpisodeId] = useState(model.episodes[0]?.episodeId ?? '');
@@ -214,6 +219,63 @@ export function ProductionStudioConsole({
             Season cards below are synthetic planning. They do not satisfy real preflight.
           </p>
         )}
+      </section>
+
+      <section className="studio-card space-y-3 p-4 sm:p-5" data-testid="ep012-real-voice-handoff">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-display text-xl font-semibold">EP012 voice handoff</h2>
+          <span className="rounded-full bg-[var(--color-background)] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em]">
+            {voiceHandoff.evidenceClass === 'REAL_LEDGER' ? 'Real ledger evidence' : 'Blocked'}
+          </span>
+        </div>
+        <p className="text-sm font-bold">{voiceHandoff.status}</p>
+        <p className="text-sm leading-6">{voiceHandoff.statusLabel}</p>
+        <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+          Only this EP012 voice panel is backed by the Preview durable ledgers. The season planning console remains
+          synthetic, and this evidence does not authorize Production or a paid render.
+        </p>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <Stat label="Verified segments" value={`${voiceHandoff.segmentCount}/11`} />
+          <Stat label="Dialogue receipts" value={`${voiceHandoff.dialogueReceiptCount}/7`} />
+          <Stat label="Characters" value={`${voiceHandoff.characterCount}/460`} />
+          <Stat label="Storage verified" value={`${voiceHandoff.storageVerifiedCount}/11`} />
+          <Stat label="Exact timing" value={`${voiceHandoff.exactTimingSegmentCount}/11`} />
+          <Stat label="Historical provider requests" value={voiceHandoff.historicalProviderRequests} />
+          <Stat label="Packet" value={voiceHandoff.packetReadiness} />
+          <Stat label="Studio" value={voiceHandoff.studioReadiness} />
+          <Stat label="Render" value={voiceHandoff.renderStatus} />
+        </div>
+        {voiceHandoff.blockers.length ? (
+          <div className="space-y-1">
+            <p className="text-sm font-bold">Voice handoff blockers</p>
+            {voiceHandoff.blockers.map((blocker) => (
+              <p key={blocker} className="break-all text-sm">
+                {blocker}
+              </p>
+            ))}
+          </div>
+        ) : null}
+        <div className="space-y-1">
+          <p className="text-sm font-bold">Remaining real-production blockers</p>
+          {voiceHandoff.remainingBlockers.map((blocker) => (
+            <p key={blocker} className="text-sm">
+              {blocker}
+            </p>
+          ))}
+        </div>
+        <p className="text-sm">
+          This read-only handoff made {voiceHandoff.providerRequestsMadeDuringHandoff} provider requests and read{' '}
+          {voiceHandoff.storageObjectsReadDuringHandoff} storage objects. Production enabled:{' '}
+          {voiceHandoff.productionEnabled ? 'YES' : 'NO'}.
+        </p>
+        <details className="rounded-2xl bg-[var(--color-background)]/60 p-3">
+          <summary className="min-h-touch cursor-pointer font-bold">Voice dependency hashes</summary>
+          <div className="mt-2 space-y-2 break-all text-xs">
+            <p>Handoff: {voiceHandoff.handoffSha256 ?? 'unavailable'}</p>
+            <p>Voice dependency: {voiceHandoff.voiceDependencySha256 ?? 'unavailable'}</p>
+            <p>Production packet: {voiceHandoff.productionPacketSha256 ?? 'unavailable'}</p>
+          </div>
+        </details>
       </section>
 
       <section className="studio-card space-y-3 p-4 sm:p-5" data-testid="first-real-episode">
