@@ -1,7 +1,13 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { buildRealInputConsoleModel } from '@/lib/tivvlejoy-real-input-convergence/console-model';
+import {
+  fallbackFirstEpisodeVoiceHandoffModel,
+  isFirstEpisodeVoiceHandoffModel,
+  type FirstEpisodeVoiceHandoffModel,
+} from '@/lib/tivvlejoy-real-production-unblock/console-model';
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
@@ -17,6 +23,87 @@ export function EpisodePreflightConsole({
 }: {
   model: ReturnType<typeof buildRealInputConsoleModel>;
 }) {
+  const [voiceHandoff, setVoiceHandoff] = useState<FirstEpisodeVoiceHandoffModel>(() =>
+    fallbackFirstEpisodeVoiceHandoffModel(),
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch('/api/voice-production/ep012/control-handoff', {
+      cache: 'no-store',
+      headers: { accept: 'application/json' },
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('EP012_CONTROL_HANDOFF_UNAVAILABLE');
+        return response.json() as Promise<unknown>;
+      })
+      .then((candidate) => {
+        if (isFirstEpisodeVoiceHandoffModel(candidate)) setVoiceHandoff(candidate);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
+
+  const voiceComplete = voiceHandoff.evidenceClass === 'REAL_LEDGER' && voiceHandoff.status === 'HANDOFF_COMPLETE';
+
+  const shots = useMemo(
+    () =>
+      voiceComplete
+        ? model.shots.map((shot) => ({
+            ...shot,
+            columns: { ...shot.columns, voice: 'REAL_READY' as const },
+          }))
+        : model.shots,
+    [model.shots, voiceComplete],
+  );
+
+  const subsystems = useMemo(
+    () =>
+      voiceComplete
+        ? model.subsystems.map((item) => {
+            if (item.subsystem === 'VOICE') {
+              return {
+                ...item,
+                state: 'REAL_READY' as const,
+                evidenceBadge: 'REAL' as const,
+                blocker: '11/11 verified EP012 voice segments are bound to 7/7 dialogue receipts with exact timing.',
+              };
+            }
+            if (item.subsystem === 'ANIMATION') {
+              return {
+                ...item,
+                blocker: 'Verified real voice timing is available; animation remains blocked on admitted Pip and Goat production rigs.',
+              };
+            }
+            if (item.subsystem === 'CAPTIONS') {
+              return {
+                ...item,
+                blocker: 'Verified real voice timing is available; caption output still requires real episode assembly and review.',
+              };
+            }
+            return item;
+          })
+        : model.subsystems,
+    [model.subsystems, voiceComplete],
+  );
+
+  const criticalPath = useMemo(
+    () =>
+      voiceComplete
+        ? model.criticalPath.filter((item) => !item.startsWith('Real ElevenLabs-or-recorded receipts'))
+        : model.criticalPath,
+    [model.criticalPath, voiceComplete],
+  );
+
+  const nextActions = useMemo(
+    () =>
+      voiceComplete
+        ? model.nextActions.filter((item) => !/voice|synthesi[sz]e/i.test(item))
+        : model.nextActions,
+    [model.nextActions, voiceComplete],
+  );
+
   return (
     <section className="space-y-4">
       <div className="studio-card space-y-2 p-4 sm:p-5">
@@ -36,6 +123,26 @@ export function EpisodePreflightConsole({
           </Link>
         </p>
       </div>
+
+      <section className="studio-card space-y-3 p-4 sm:p-5" data-testid="ep012-preflight-voice-handoff">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-display text-xl font-semibold">EP012 real voice evidence</h2>
+          <span className="rounded-full bg-[var(--color-background)] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em]">
+            {voiceComplete ? 'REAL LEDGER' : 'BLOCKED'}
+          </span>
+        </div>
+        <p className="text-sm font-bold">{voiceHandoff.status}</p>
+        <p className="text-sm leading-6">{voiceHandoff.statusLabel}</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <Stat label="Verified segments" value={`${voiceHandoff.segmentCount}/11`} />
+          <Stat label="Dialogue receipts" value={`${voiceHandoff.dialogueReceiptCount}/7`} />
+          <Stat label="Exact timing" value={`${voiceHandoff.exactTimingSegmentCount}/11`} />
+        </div>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          This panel consumes the same sanitized, read-only durable-ledger handoff as Production Control. It makes no provider request,
+          reads no storage object during handoff, and does not enable Production.
+        </p>
+      </section>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Stat label="Listed objects" value={model.listedObjects} />
@@ -76,7 +183,7 @@ export function EpisodePreflightConsole({
             </tr>
           </thead>
           <tbody>
-            {model.shots.map((shot) => (
+            {shots.map((shot) => (
               <tr key={shot.shotId} className="border-t border-[var(--color-border)]">
                 <td className="py-2 font-bold">{shot.shotId}</td>
                 <td>{shot.columns.voice}</td>
@@ -91,7 +198,7 @@ export function EpisodePreflightConsole({
 
       <div className="studio-card space-y-2 p-4 sm:p-5">
         <h2 className="font-display text-xl font-semibold">Subsystems</h2>
-        {model.subsystems.map((item) => (
+        {subsystems.map((item) => (
           <p key={item.subsystem} className="text-sm">
             <span className="font-bold">{item.subsystem}</span> · {item.state} · {item.evidenceBadge}
           </p>
@@ -101,7 +208,7 @@ export function EpisodePreflightConsole({
       <div className="studio-card space-y-2 p-4 sm:p-5">
         <h2 className="font-display text-xl font-semibold">Critical path</h2>
         <ol className="list-decimal space-y-1 pl-5 text-sm">
-          {model.criticalPath.map((item) => (
+          {criticalPath.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ol>
@@ -115,7 +222,7 @@ export function EpisodePreflightConsole({
         <p className="text-sm text-[var(--color-text-muted)]">{model.morningBrief.whatNeedsMichaelOrRigger.join(' ')}</p>
         <p className="text-sm font-bold">Next safe actions</p>
         <ol className="list-decimal space-y-1 pl-5 text-sm">
-          {model.nextActions.map((item) => (
+          {nextActions.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ol>
