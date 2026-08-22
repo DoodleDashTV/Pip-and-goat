@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo } from 'react';
 import { PreviewPageIntro } from './PreviewEmptyState';
 import { sampleBatchPlan, sampleEpisodeWithKnownHashes } from '@/lib/tivvlejoy-episode-scene-planner';
@@ -15,6 +16,21 @@ export function EpisodeScenePlanner() {
         title="TivvleJoy episode scene planner"
         instruction="Planning only. No Blender render. No paid GPU. No commercial assets processed."
       />
+
+      <section className="studio-card space-y-2 p-4 sm:p-5">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+          Audience Engagement Blueprint
+        </p>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          Research-informed Story Clarity and Replay Design sit after episode concept and before shot planning.
+          This is not a guarantee of virality.
+        </p>
+        <p className="text-sm">
+          <Link href="/audience-engagement" className="font-bold underline">
+            Open Audience Engagement
+          </Link>
+        </p>
+      </section>
 
       <section className="studio-card space-y-2 p-4 sm:p-5">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-primary)]">
