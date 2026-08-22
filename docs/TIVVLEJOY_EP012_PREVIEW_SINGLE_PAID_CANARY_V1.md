@@ -256,3 +256,80 @@ The active build hook was disarmed immediately after the successful carrier resu
 - Final cleanup deployment: `dpl_ByoDo8q1jDE2r924eVU5wA6xRWf7` / `READY`
 
 No additional EP012 segment may contact the provider without another fresh, explicit authorization.
+
+## Authorized remaining eight-segment completion batch
+
+Justin authorized hands-off completion of the eight remaining paid Preview segments, with exactly one provider request per segment, no automatic retries, and an immediate stop on any mismatch. Production, scenery, dialogue-lock mutation, PR readiness, retargeting, merging, and unrelated storage remained out of scope.
+
+### No-contact validation
+
+The staged carrier required the exact branch, team, project, Preview runtime, authorization marker, starting ledger identity, eligible segment set, cumulative counters after every segment, and final ledger ceilings. Before arming it, a validation deployment overrode the branch identity to an unauthorized value. The carrier compiled and loaded, then exited at its first branch gate before any API, ledger, storage, or provider call.
+
+- Carrier staging commit: `6e281f8e062cd27d3e9da1f9b1edff51153b02cb`
+- Command staging commit: `26b1c24901b53f806b0fb00012f875ab7d1d601a`
+- No-contact validation commit: `7bab8e37b3e342e2a627ecf8c37bb46856fbe314`
+- No-contact validation deployment: `dpl_4JC7UGNXbG6PjsXJdb9iREZWPsuJ` / `READY`
+- Validation result: `SKIPPED BRANCH_NOT_AUTHORIZED`
+- Precheck: HTTP 200 / `status: READY`
+- Starting global ledger: `7` requests / `400` characters
+- Starting EP012 ledger: `3` requests / `165` characters
+- Remaining authorized work: `8` requests / `295` characters
+- All eight target segments: `ABSENT` / `ELIGIBLE`
+- Failed attempts, reservations, unfinalized entries, and recovery-required entries: all `0`
+- Production runtime: false
+
+### Executed result
+
+Exactly one Preview deployment was created for the armed commit. The carrier made eight explicit sequential Generate calls, one for each remaining segment, with no retry loop. After every success it checked the exact cumulative ledger counters and verified the receipt and MP3 read-back contract before proceeding.
+
+- Armed commit: `87afa844c0cd10a2a75a40c9b180bab1a47f60d6`
+- Preview deployment: `dpl_Gs8qEvitr4zUx5yQzRGX3i1AMavQ` / `READY`
+- Deployment target: Preview (`target: null`)
+- Result: `SUCCEEDED`
+- Generate invocations: `8`
+- ElevenLabs/provider requests: `8`
+- Automatic retries: `0`
+- Storage verified for all eight artifacts: true
+- Scenery access: none
+- Production enabled: false
+
+| Segment | Characters | MP3 bytes | MP3 SHA-256 |
+|---|---:|---:|---|
+| `DL_DECISION_01__GOAT` | 56 | 45601 | `6cb94e856d510bcdba8e3254a3c5b34401feb9c67a4835cf746a966cd913ed9b` |
+| `DL_ACTION_01__PIP` | 23 | 20524 | `4bf5172b65887660274823eb1c05c0b21e7704a17373495d60e0b1a0719276db` |
+| `DL_ACTION_01__GOAT` | 30 | 25539 | `4265afd7e082658ef5d95d0202d5eeaa71d1bb923a64e1f0113b9c163dbe0f8f` |
+| `DL_COMPLICATION_01__GOAT` | 26 | 24285 | `7fcce6989523c1d571ee4c15bb924fe712597a76eae832d10ce9637ba7c0fbde` |
+| `DL_COMPLICATION_01__PIP` | 37 | 37660 | `3e6d78f8ba7658c4efa3cadd5a7711f2f95d04f566f4d06d0bd0a9ff7b10fd14` |
+| `DL_PAYOFF_01__PIP` | 66 | 56886 | `46234f9a04f22ace55fa75b5a80b53f89032bcfc9fde41f16817b288176637f4` |
+| `DL_BUTTON_01__GOAT` | 25 | 26375 | `d58793390af203748e5ac6509d84264aa54d33af06eb291be20e7d0377794f4b` |
+| `DL_BUTTON_01__PIP` | 32 | 35152 | `10727aef3e6fdfb394f604fa18a883d17e8150167a602207cdd5c447472da212` |
+
+### Durable completion postcheck
+
+From the final clean Preview deployment, read-only preflight returned:
+
+- HTTP 200 / `status: COMPLETE`
+- All `11 / 11` request checks: `SUCCEEDED` / `ALREADY_SUCCEEDED`
+- Global ledger: `15` requests / `695` characters
+- EP012 succeeded: `11` requests / `460` characters
+- EP012 remaining: `0` requests / `0` characters
+- Provider requests made: `11`
+- Storage-verified executions: `11`
+- All artifacts storage verified: true
+- Next provider contact permitted: false
+- Failed attempts, reserved requests/characters, unfinalized entries, and recovery-required entries: all `0`
+- Preview-only runtime: true
+- Production runtime: false
+- Scenery requests: `0`
+- Dialogue lock mutated: false
+
+### Cleanup
+
+The armed build hook was disarmed immediately after the batch result. The temporary package command and carrier were removed, and the normal Preview build was restored.
+
+- Disarm commit: `60333e6244202eadcbb5310eb6efb49529c23b17`
+- Command cleanup commit: `2c58eebc166a57cc883ea23c4ce1d906c012023c`
+- Carrier cleanup commit: `30e78aacd249e43fdbb36087882b28a46cf6ab3b`
+- Final clean deployment: `dpl_8WRKYKpHF98r1MiudREmdWPKAUzs` / `READY`
+
+EP012 paid voice generation is complete. The ledger now rejects further provider contact for this authorization.
