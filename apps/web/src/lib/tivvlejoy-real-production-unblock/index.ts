@@ -16,6 +16,7 @@ export * from './ep012-elevenlabs-transport';
 export * from './ep012-audio-storage';
 export * from './ep012-paid-voice-execution';
 export * from './ep012-audio-retrieval';
+export * from './ep012-voice-production-handoff';
 export * from './ep012-storage-probe';
 export * from './voice-plan';
 export * from './voice-cost';
