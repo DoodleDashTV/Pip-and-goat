@@ -194,3 +194,65 @@ The active hook was disarmed and the temporary command and carrier were removed.
 - Final cleanup deployment: `dpl_CctY2XdRPZhzSGeNC1D3uqCah5TM` / `READY`
 
 No additional EP012 segment may contact the provider without another fresh, explicit authorization.
+
+## Fresh authorized Discovery Pip canary
+
+After the two hook segments were finalized and their temporary carrier was removed, Justin provided fresh authorization to continue with exactly one next paid Preview segment: `DL_DISCOVERY_01__PIP`, with a maximum of one provider request and no retry.
+
+### Precheck
+
+Immediately before arming the single-use carrier:
+
+- HTTP 200 / `status: READY`
+- `DL_HOOK_01__PIP`: `SUCCEEDED` / `ALREADY_SUCCEEDED`
+- `DL_HOOK_01__GOAT`: `SUCCEEDED` / `ALREADY_SUCCEEDED`
+- `DL_DISCOVERY_01__PIP`: `ABSENT` / `ELIGIBLE`
+- global ledger: `6` requests / `320` characters
+- EP012 succeeded: `2` requests / `85` characters
+- provider requests made: `2`
+- storage-verified executions: `2`
+- failed attempts, reservations, unfinalized entries, and recovery-required entries: all `0`
+- Preview runtime: true
+- Production runtime: false
+
+### Executed result
+
+The carrier contained exactly one Generate invocation and no retry loop.
+
+- Carrier staging commit: `d725b7e5117a68f264a0edc40c72d0635af57024`
+- Command staging commit: `a28569436f00be5d29b10b719fed29ac38ec25cb`
+- Armed commit: `1dbcc1c8836e620183fb0dde0e0a6e3ec40a168b`
+- Preview deployment: `dpl_4ipQPzmSq912CdYFv9zFYrqQ8wVM`
+- Deployment target/state: Preview / `READY`
+- Result: `SUCCEEDED`
+- Segment: `DL_DISCOVERY_01__PIP`
+- Character count: `80`
+- Generate invocations: `1`
+- ElevenLabs/provider requests for this canary: `1`
+- Automatic retries: `0`
+- Storage verified: true
+- MP3 bytes: `76948`
+- MP3 SHA-256: `99f3a5e9d1e3d7d30982127f1a9fd3f295f985e7e1066d0a452f140c1cff76e8`
+- Receipt and MP3 read-back contracts: verified
+- Scenery access: none
+- Production enabled: false
+
+### Durable postcheck and cleanup
+
+- global ledger: `7` requests / `400` characters
+- EP012 succeeded: `3` requests / `165` characters
+- EP012 remaining: `8` requests / `295` characters
+- provider requests made: `3`
+- storage-verified executions: `3`
+- `DL_DISCOVERY_01__PIP`: `SUCCEEDED` / `ALREADY_SUCCEEDED`
+- failed attempts, reserved requests/characters, unfinalized entries, and recovery-required entries: all `0`
+- Production runtime: false
+
+The active build hook was disarmed immediately after the successful carrier result. The temporary command and carrier were removed.
+
+- Disarm commit: `f684c336e2776b6210157299a53f8794286ec83f`
+- Command cleanup commit: `11f46ab3b5804d069072b04957941b4b3eb6daa1`
+- Carrier cleanup commit: `6d4503e56a4a26ebdeb40d0fd9eac2400bf18561`
+- Final cleanup deployment: `dpl_ByoDo8q1jDE2r924eVU5wA6xRWf7` / `READY`
+
+No additional EP012 segment may contact the provider without another fresh, explicit authorization.
