@@ -10,6 +10,15 @@ readiness, or QC. It never promises that a video will go viral.
 
 Operator UI: `/audience-engagement`
 
+Content library (planning bibles, not a second software stack):
+
+- `docs/content/TIVVLEJOY_CHARACTER_BIBLE_V1.md`
+- `docs/content/TIVVLEJOY_WORLD_BIBLE_V1.md`
+- `docs/content/TIVVLEJOY_VIRAL_HOOK_LIBRARY_V1.md`
+- `docs/content/TIVVLEJOY_PRODUCTION_PLAYBOOK_V1.md`
+- `docs/content/TIVVLEJOY_EPISODE_VAULT_V1.md`
+- `docs/content/TIVVLEJOY_RECURRING_CHARACTERS_V1.md`
+
 ## Honesty
 
 Direct virality evidence is different from child-attention evidence.
