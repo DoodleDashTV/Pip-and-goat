@@ -30,7 +30,9 @@ export function ep012ContinuityFacts(): ContinuityFact[] {
   return drafts.map((fact) => ({ ...fact, dependencySha256: hashContinuityFact(fact) }));
 }
 
-export function compileEp012ProductionPacket() {
+export function compileEp012ProductionPacket(
+  voiceReceipts: VoiceReceipt[] = ep012VoiceReceipts(),
+) {
   const plan = sampleEpisodeWithKnownHashes();
   const inputs = ep012AssemblyInputs();
   const manifests = inputs.map((input) => assembleShot(input));
@@ -38,7 +40,7 @@ export function compileEp012ProductionPacket() {
     episodeId: plan.episodeId,
     episodeVersion: plan.episodeVersion,
     scriptSha256: plan.dependencyHash,
-    voiceReceipts: ep012VoiceReceipts(),
+    voiceReceipts,
     shots: manifests.map((manifest, index) => ({
       shotId: manifest.shotId,
       locationId: inputs[index]!.locationPresetId,
