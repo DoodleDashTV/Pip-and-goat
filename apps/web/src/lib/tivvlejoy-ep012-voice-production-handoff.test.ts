@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { GET as getEp012ControlHandoff } from "@/app/api/voice-production/ep012/control-handoff/route";
+import { installPreviewVoiceLedgerStore } from "./voice-production/durable-voice-ledger";
 import type {
   DurableLedgerEntry,
   DurableLedgerRecord,
@@ -22,7 +24,9 @@ import {
   type Ep012VoiceHandoffCompileInput,
 } from "./tivvlejoy-real-production-unblock/ep012-voice-production-handoff";
 import {
+  fallbackFirstEpisodeVoiceHandoffModel,
   fallbackFirstEpisodeOperatorModel,
+  isFirstEpisodeVoiceHandoffModel,
   projectEp012VoiceHandoffForProductionControl,
   reconcileFirstEpisodeVoiceHandoff,
 } from "./tivvlejoy-real-production-unblock/console-model";
@@ -454,6 +458,64 @@ describe("TIVVLEJOY_EP012_VOICE_PRODUCTION_HANDOFF_V1", () => {
       expect(serialized).not.toContain(execution.audioObjectKey);
       expect(serialized).not.toContain(execution.receiptObjectKey);
       expect(serialized).not.toContain(execution.receiptRef);
+    }
+  });
+
+  it("accepts only complete or fail-closed control summaries at the client boundary", () => {
+    const complete = projectEp012VoiceHandoffForProductionControl(
+      compileEp012VoiceProductionHandoff(completeInput()),
+    );
+    const fallback = fallbackFirstEpisodeVoiceHandoffModel();
+    expect(isFirstEpisodeVoiceHandoffModel(complete)).toBe(true);
+    expect(isFirstEpisodeVoiceHandoffModel(fallback)).toBe(true);
+    expect(
+      isFirstEpisodeVoiceHandoffModel({ ...complete, productionEnabled: true }),
+    ).toBe(false);
+    expect(
+      isFirstEpisodeVoiceHandoffModel({
+        ...complete,
+        remainingBlockers: [],
+      }),
+    ).toBe(false);
+    expect(
+      isFirstEpisodeVoiceHandoffModel({ ...fallback, segmentCount: -1 }),
+    ).toBe(false);
+  });
+
+  it("serves only the sanitized control summary from the same-origin endpoint", async () => {
+    const priorEnv = {
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      TIVVLEJOY_VOICE_LEDGER_DURABLE:
+        process.env.TIVVLEJOY_VOICE_LEDGER_DURABLE,
+      TIVVLEJOY_VOICE_LEDGER_DATABASE_URL:
+        process.env.TIVVLEJOY_VOICE_LEDGER_DATABASE_URL,
+    };
+    process.env.VERCEL_ENV = "preview";
+    process.env.TIVVLEJOY_VOICE_LEDGER_DURABLE = "true";
+    process.env.TIVVLEJOY_VOICE_LEDGER_DATABASE_URL =
+      "postgresql://test-ledger/unused";
+    installPreviewVoiceLedgerStore(readOnlyStore());
+    try {
+      const response = await getEp012ControlHandoff();
+      const result = (await response.json()) as Record<string, unknown>;
+      expect(response.status).toBe(200);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(result.status).toBe("HANDOFF_COMPLETE");
+      expect(result.evidenceClass).toBe("REAL_LEDGER");
+      expect(result.segmentCount).toBe(11);
+      expect(result.dialogueReceiptCount).toBe(7);
+      expect(result.characterCount).toBe(460);
+      expect(result).not.toHaveProperty("segmentChecks");
+      expect(result).not.toHaveProperty("dialogueReceipts");
+      expect(JSON.stringify(result)).not.toMatch(
+        /ep012_voice_|audio\/EP012\/|\.receipt\.json|private-receipt-/,
+      );
+    } finally {
+      installPreviewVoiceLedgerStore(null);
+      for (const [key, value] of Object.entries(priorEnv)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
     }
   });
 });

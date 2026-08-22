@@ -53,6 +53,96 @@ function isSha256(value: string | null): value is string {
   return Boolean(value && /^[a-f0-9]{64}$/.test(value));
 }
 
+function isNonnegativeInteger(value: unknown): value is number {
+  return Number.isInteger(value) && Number(value) >= 0;
+}
+
+export function fallbackFirstEpisodeVoiceHandoffModel(): FirstEpisodeVoiceHandoffModel {
+  return {
+    evidenceClass: 'BLOCKED',
+    status: 'BLOCKED',
+    statusLabel: 'Voice handoff unavailable or inconsistent. Production remains blocked.',
+    segmentCount: 0,
+    dialogueReceiptCount: 0,
+    characterCount: 0,
+    storageVerifiedCount: 0,
+    exactTimingSegmentCount: 0,
+    handoffSha256: null,
+    voiceDependencySha256: null,
+    productionPacketSha256: null,
+    packetReadiness: 'BLOCKED',
+    studioReadiness: 'WAITING_FOR_CHARACTER_RIGS',
+    renderStatus: 'NOT_STARTED',
+    remainingBlockers: ['Verified EP012 voice handoff', 'Pip and Goat production rigs', 'paid render authorization', 'real media QC'],
+    blockers: ['EP012_HANDOFF_UNAVAILABLE', CONTROL_HANDOFF_MISMATCH],
+    historicalProviderRequests: 0,
+    providerRequestsMadeDuringHandoff: 0,
+    storageObjectsReadDuringHandoff: 0,
+    productionEnabled: false,
+  };
+}
+
+export function isFirstEpisodeVoiceHandoffModel(value: unknown): value is FirstEpisodeVoiceHandoffModel {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<FirstEpisodeVoiceHandoffModel>;
+  if (
+    !Array.isArray(candidate.remainingBlockers) ||
+    !candidate.remainingBlockers.every((item) => typeof item === 'string') ||
+    !Array.isArray(candidate.blockers) ||
+    !candidate.blockers.every((item) => typeof item === 'string')
+  ) {
+    return false;
+  }
+  const remainingBlockers = candidate.remainingBlockers;
+  const blockers = candidate.blockers;
+  const commonValid =
+    candidate.studioReadiness === 'WAITING_FOR_CHARACTER_RIGS' &&
+    candidate.renderStatus === 'NOT_STARTED' &&
+    candidate.providerRequestsMadeDuringHandoff === 0 &&
+    candidate.storageObjectsReadDuringHandoff === 0 &&
+    candidate.productionEnabled === false &&
+    typeof candidate.statusLabel === 'string' &&
+    candidate.statusLabel.length > 0 &&
+    isNonnegativeInteger(candidate.segmentCount) &&
+    isNonnegativeInteger(candidate.dialogueReceiptCount) &&
+    isNonnegativeInteger(candidate.characterCount) &&
+    isNonnegativeInteger(candidate.storageVerifiedCount) &&
+    isNonnegativeInteger(candidate.exactTimingSegmentCount) &&
+    isNonnegativeInteger(candidate.historicalProviderRequests);
+  if (!commonValid) return false;
+
+  if (candidate.evidenceClass === 'REAL_LEDGER' && candidate.status === 'HANDOFF_COMPLETE') {
+    return (
+      candidate.segmentCount === EP012_AUTHORIZED_REQUEST_COUNT &&
+      candidate.dialogueReceiptCount === EP012_CANONICAL_DIALOGUE_LOCK.lines.length &&
+      candidate.characterCount === EP012_AUTHORIZED_CHARACTER_COUNT &&
+      candidate.storageVerifiedCount === EP012_AUTHORIZED_REQUEST_COUNT &&
+      candidate.exactTimingSegmentCount === EP012_AUTHORIZED_REQUEST_COUNT &&
+      candidate.historicalProviderRequests === EP012_AUTHORIZED_REQUEST_COUNT &&
+      candidate.packetReadiness === 'PLANNING_COMPLETE' &&
+      blockers.length === 0 &&
+      remainingBlockers.length === 3 &&
+      remainingBlockers.includes('Pip and Goat production rigs') &&
+      remainingBlockers.includes('paid render authorization') &&
+      remainingBlockers.includes('real media QC') &&
+      isSha256(candidate.handoffSha256 ?? null) &&
+      isSha256(candidate.voiceDependencySha256 ?? null) &&
+      isSha256(candidate.productionPacketSha256 ?? null)
+    );
+  }
+
+  return (
+    candidate.evidenceClass === 'BLOCKED' &&
+    candidate.status === 'BLOCKED' &&
+    candidate.packetReadiness === 'BLOCKED' &&
+    candidate.handoffSha256 === null &&
+    candidate.voiceDependencySha256 === null &&
+    candidate.productionPacketSha256 === null &&
+    remainingBlockers.length > 0 &&
+    blockers.length > 0
+  );
+}
+
 export function projectEp012VoiceHandoffForProductionControl(
   handoff: Ep012VoiceProductionHandoff,
 ): FirstEpisodeVoiceHandoffModel {
@@ -156,7 +246,17 @@ export function reconcileFirstEpisodeVoiceHandoff(
   handoff: Ep012VoiceProductionHandoff,
 ): { firstEpisode: FirstEpisodeOperatorModel; voiceHandoff: FirstEpisodeVoiceHandoffModel } {
   const voiceHandoff = projectEp012VoiceHandoffForProductionControl(handoff);
-  if (voiceHandoff.status !== 'HANDOFF_COMPLETE') return { firstEpisode: model, voiceHandoff };
+  return {
+    firstEpisode: reconcileFirstEpisodeVoiceControlModel(model, voiceHandoff),
+    voiceHandoff,
+  };
+}
+
+export function reconcileFirstEpisodeVoiceControlModel(
+  model: FirstEpisodeOperatorModel,
+  voiceHandoff: FirstEpisodeVoiceHandoffModel,
+): FirstEpisodeOperatorModel {
+  if (!isFirstEpisodeVoiceHandoffModel(voiceHandoff) || voiceHandoff.status !== 'HANDOFF_COMPLETE') return model;
 
   const nonVoiceActions = model.next5Actions.filter((action) => !/voice|spoken lines?/i.test(action));
   const next5Actions = [
@@ -166,12 +266,9 @@ export function reconcileFirstEpisodeVoiceHandoff(
   ].filter((action, index, values) => values.indexOf(action) === index).slice(0, 5);
 
   return {
-    firstEpisode: {
-      ...model,
-      voiceReceiptStatus: '11/11 verified segments · 7/7 dialogue receipts · 460/460 characters.',
-      next5Actions,
-    },
-    voiceHandoff,
+    ...model,
+    voiceReceiptStatus: '11/11 verified segments · 7/7 dialogue receipts · 460/460 characters.',
+    next5Actions,
   };
 }
 
