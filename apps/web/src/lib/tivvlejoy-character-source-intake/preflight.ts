@@ -1,5 +1,19 @@
-import { GOAT_SOURCE_SHA256, GOAT_SOURCE_SIZE_BYTES } from './goat-spec';
-import { validateGoatFilename } from './keys';
+import { GOAT_SOURCE_FILENAME, GOAT_SOURCE_SHA256, GOAT_SOURCE_SIZE_BYTES } from './goat-spec';
+
+export function validateGoatFilename(filename: string): { ok: true } | { ok: false; code: string; reason: string } {
+  const basename = filename.replace(/\\/g, '/').split('/').pop() ?? filename;
+  if (!basename || filename.includes('..') || filename.includes('\0') || filename.startsWith('/') || /[\\]/.test(filename)) {
+    return { ok: false, code: 'UNSAFE_FILENAME', reason: `Filename is unsafe: ${filename || '(empty)'}.` };
+  }
+  if (basename !== GOAT_SOURCE_FILENAME) {
+    return {
+      ok: false,
+      code: 'WRONG_FILENAME',
+      reason: `Expected ${GOAT_SOURCE_FILENAME}. Received ${basename}.`,
+    };
+  }
+  return { ok: true };
+}
 
 export function verifyGoatSourceHash(observed: string | null | undefined): {
   ok: boolean;

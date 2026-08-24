@@ -1,7 +1,5 @@
-import { DEFAULT_SCENERY_ASSET_PREFIX } from '@/lib/scenery/intake/config';
-import { assessFilenameSafety } from '@/lib/scenery/intake/filename-safety';
 import { GOAT_SOURCE_OBJECT_KEY, GOAT_SOURCE_PREFIX, GOAT_SOURCE_RECEIPT_OBJECT_KEY } from './types';
-import { GOAT_SOURCE_FILENAME } from './goat-spec';
+import { validateGoatFilename } from './preflight';
 
 export class CharacterSourceError extends Error {
   constructor(
@@ -27,7 +25,7 @@ export function assertCharacterSourceKey(key: string): void {
   if (key.includes('..') || key.startsWith('/') || key.includes('\\') || key.includes('\0')) {
     throw new CharacterSourceError('Object key is unsafe.', 'UNSAFE_OBJECT_KEY');
   }
-  if (!key.startsWith(`${DEFAULT_SCENERY_ASSET_PREFIX}/characters/`)) {
+  if (!key.startsWith('tivvlejoy-assets/characters/')) {
     throw new CharacterSourceError('Object key left the private TivvleJoy asset prefix.', 'UNSAFE_OBJECT_KEY');
   }
   if (!key.startsWith(`${GOAT_SOURCE_PREFIX}/`)) {
@@ -53,17 +51,4 @@ export function assertGoatMetadataKey(key: string): void {
   }
 }
 
-export function validateGoatFilename(filename: string): { ok: true } | { ok: false; code: string; reason: string } {
-  const safety = assessFilenameSafety(filename);
-  if (!safety.safe) {
-    return { ok: false, code: 'UNSAFE_FILENAME', reason: `Filename is unsafe: ${safety.issues.join(', ')}.` };
-  }
-  if (safety.basename !== GOAT_SOURCE_FILENAME) {
-    return {
-      ok: false,
-      code: 'WRONG_FILENAME',
-      reason: `Expected ${GOAT_SOURCE_FILENAME}. Received ${safety.basename}.`,
-    };
-  }
-  return { ok: true };
-}
+export { validateGoatFilename };
