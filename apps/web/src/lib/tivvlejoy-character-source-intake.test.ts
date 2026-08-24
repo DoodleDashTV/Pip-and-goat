@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, beforeEach } from 'vitest';
 import type { MultipartStoragePort } from './scenery/intake/multipart';
@@ -18,9 +19,18 @@ import {
   compileGoatPaidExecutionFinalReport,
   compileGoatPostUploadPreflight,
   dryRunGoatSourceMaterialization,
+  consumeGoatV3Authorization,
   evaluateGoatPaidExecutionAuthorization,
+  evaluateGoatV3PaidExecutionAuthorization,
   GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3,
   GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA,
+  GOAT_V3_HARD_COST_USD,
+  GOAT_V3_REQUIRED_DIGEST,
+  GOAT_V3_REQUIRED_SOURCE_COMMIT,
+  GoatV3PaidMutationTripwire,
+  provePinnedImageCannotInvokeRealDownload,
+  readGoatV3ConsumptionLedger,
+  resolvePinnedV3ImageRef,
   INVALID_GOAT_PAID_AUTHORIZATIONS,
   KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST,
   READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
@@ -749,5 +759,132 @@ describe('Goat character source intake bridge', () => {
     expect(preflightScript).not.toMatch(/ALLOW_PAID_GPU_LAUNCH\s*=\s*['"]true['"]/);
     expect(preflightScript).not.toMatch(/createPodForBenchmark/);
     expect(preflightScript).toContain('Creates no Pod');
+  });
+
+  it('binds V3 to the exact 1e29b0ba digest and refuses CREATE while the image cannot download Goat', () => {
+    const pin = resolvePinnedV3ImageRef();
+    expect(pin.ok).toBe(true);
+    expect(pin.containsLiteralOrgPlaceholder).toBe(false);
+    expect(pin.digest).toBe(GOAT_V3_REQUIRED_DIGEST);
+    expect(pin.sourceCommit).toBe(GOAT_V3_REQUIRED_SOURCE_COMMIT);
+    expect(pin.ref.endsWith(`ddp-runpod-blender@${GOAT_V3_REQUIRED_DIGEST}`)).toBe(true);
+    expect(pin.forbidden).toBe(false);
+
+    const downloadProof = provePinnedImageCannotInvokeRealDownload();
+    expect(downloadProof.ok).toBe(false);
+    expect(downloadProof.code).toBe('AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD');
+    expect(downloadProof.downloadFunctionBaked).toBe(true);
+    expect(downloadProof.characterMasterInvokesDownload).toBe(false);
+    expect(downloadProof.materializeAlwaysForbidsNetwork).toBe(true);
+
+    const live = {
+      sourceLocked: true,
+      objectExists: true,
+      storedSize: GOAT_SOURCE_SIZE_BYTES,
+      storedSha256: GOAT_SOURCE_SHA256,
+      hashVerified: true,
+      zipOk: true,
+      incompleteMultipartCount: 0,
+      secure4090PriceUsdPerHr: 0.74,
+      secure4090StockStatus: 'High',
+      existingBillablePodCount: 0,
+      priorAuthorizedLaunchCount: 0,
+      requestedGpu: 'NVIDIA GeForce RTX 4090',
+      requestedCloudType: 'SECURE' as const,
+      capabilitySchema: REQUIRED_LIVE_CAPABILITY_SCHEMA,
+      liveCharacterDepartmentCapable: true,
+      mandatoryDryRun: false,
+      authorizationName: GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3,
+      knownCurrentImageJobKind: 'CHARACTER_MASTER_BUILD CHARACTER_SOURCE_MATERIALIZE CHARACTER_BUILD',
+      knownCurrentImageHasCharacterDepartment: true,
+      knownCurrentImageHasGoatMaterialize: true,
+    };
+    const decision = evaluateGoatV3PaidExecutionAuthorization({
+      env: { RUNPOD_WORKER_IMAGE: '', ALLOW_PAID_GPU_LAUNCH: 'false', CLOUD_RENDER_ENABLED: 'false' },
+      live,
+    });
+    expect(decision.schema).toBe(GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3);
+    expect(decision.status).toBe('FAIL_CLOSED_DO_NOT_LAUNCH');
+    expect(decision.launch.allowed).toBe(false);
+    expect(decision.launch.createRequestCount).toBe(0);
+    expect(decision.consumed).toBe(false);
+    expect(decision.goatProductionReady).toBe(false);
+    expect(decision.bindings.digest).toBe(GOAT_V3_REQUIRED_DIGEST);
+    expect(decision.bindings.sourceCommit).toBe(GOAT_V3_REQUIRED_SOURCE_COMMIT);
+    expect(decision.bindings.hardCostUsd).toBe(GOAT_V3_HARD_COST_USD);
+    expect(decision.bindings.characterId).toBe('CHAR_GOAT_001');
+    expect(decision.bindings.sourceKey).toBe(GOAT_SOURCE_OBJECT_KEY);
+    expect(decision.bindings.expectedSha256).toBe(GOAT_SOURCE_SHA256);
+    expect(decision.bindings.expectedSizeBytes).toBe(GOAT_SOURCE_SIZE_BYTES);
+    expect(decision.bindings.maxCreateRequests).toBe(1);
+    expect(decision.quote.withinAuthorization).toBe(true);
+    expect(decision.remainingBlockers).toEqual(['AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD']);
+
+    const overBudget = evaluateGoatV3PaidExecutionAuthorization({
+      env: { RUNPOD_WORKER_IMAGE: '' },
+      live: { ...live, secure4090PriceUsdPerHr: 2 },
+    });
+    expect(overBudget.remainingBlockers).toContain('PREDICTED_COST_EXCEEDS_AUTHORIZATION');
+    expect(overBudget.quote.predictedTotalUsd).toBeGreaterThan(GOAT_V3_HARD_COST_USD);
+
+    const v1 = evaluateGoatV3PaidExecutionAuthorization({
+      env: { RUNPOD_WORKER_IMAGE: '' },
+      live: { ...live, authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1' },
+    });
+    expect(v1.launch.allowed).toBe(false);
+    expect(v1.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
+    expect(v1.remainingBlockers).toContain('LIVE_AUTHORIZATION_V3_REQUIRED');
+    const v2 = evaluateGoatV3PaidExecutionAuthorization({
+      env: { RUNPOD_WORKER_IMAGE: '' },
+      live: { ...live, authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2' },
+    });
+    expect(v2.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
+    expect(v2.consumed).toBe(false);
+
+    const tripwire = new GoatV3PaidMutationTripwire();
+    expect(() => tripwire.authorizeSingleCreate({ launchAllowed: false, consumed: false })).toThrow(
+      'CREATE_REFUSED_PREFLIGHT',
+    );
+    expect(() => tripwire.authorizeSingleCreate({ launchAllowed: true, consumed: false })).toThrow(
+      'CREATE_REFUSED_UNCONSUMED',
+    );
+    expect(tripwire.createRequestCount).toBe(0);
+    tripwire.authorizeSingleCreate({ launchAllowed: true, consumed: true });
+    expect(tripwire.createRequestCount).toBe(1);
+    expect(() => tripwire.authorizeSingleCreate({ launchAllowed: true, consumed: true })).toThrow(
+      'CREATE_RETRY_FORBIDDEN',
+    );
+
+    const ledger = readGoatV3ConsumptionLedger();
+    expect(ledger.consumed).toBe(false);
+    expect(ledger.createAttempted).toBe(false);
+    const tmp = mkdtempSync(path.join(os.tmpdir(), 'goat-v3-ledger-'));
+    const first = consumeGoatV3Authorization(tmp);
+    expect(first.ok).toBe(true);
+    const second = consumeGoatV3Authorization(tmp);
+    expect(second.ok).toBe(false);
+    expect(second.code).toBe('V3_ALREADY_CONSUMED');
+  });
+
+  it('keeps V3 preflight and launch scripts read-only until CREATE is authorized', () => {
+    const preflight = readFileSync(
+      path.resolve(__dirname, '../../../scripts/cloud/goat-paid-execution-v3/preflight.ts'),
+      'utf8',
+    );
+    const launch = readFileSync(
+      path.resolve(__dirname, '../../../scripts/cloud/goat-paid-execution-v3/launch.ts'),
+      'utf8',
+    );
+    expect(preflight).toContain('Creates no Pod');
+    expect(preflight).toContain('Never downloads Goat_FINN.zip');
+    expect(preflight).toContain('HeadObjectCommand');
+    expect(preflight).toContain('Range:');
+    expect(preflight).not.toContain('createHash');
+    expect(preflight).not.toMatch(/ALLOW_PAID_GPU_LAUNCH\s*=\s*['"]true['"]/);
+    expect(preflight).toContain("ALLOW_PAID_GPU_LAUNCH: 'false'");
+    expect(launch).toContain('CREATE is not entered');
+    expect(launch).not.toMatch(/ALLOW_PAID_GPU_LAUNCH\s*=\s*['"]true['"]/);
+    expect(launch).not.toMatch(/createPodForBenchmark\(/);
+    expect(launch).not.toMatch(/PAID_EXECUTION_AUTHORIZED\s*=\s*['"]true['"]/);
   });
 });
