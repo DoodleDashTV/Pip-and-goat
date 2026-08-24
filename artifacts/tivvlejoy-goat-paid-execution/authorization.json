@@ -1,0 +1,295 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1",
+  "status": "FAIL_CLOSED_DO_NOT_LAUNCH",
+  "authorizationPresent": true,
+  "limits": {
+    "characterId": "CHAR_GOAT_001",
+    "sourceObjectKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip",
+    "expectedSha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+    "expectedSizeBytes": 269512136,
+    "gpuTypeId": "NVIDIA GeForce RTX 4090",
+    "cloudType": "SECURE",
+    "maxRuntimeMinutes": 180,
+    "maxTotalCostUsd": 3,
+    "maxLaunches": 1,
+    "reuploadForbidden": true,
+    "secondLaunchForbidden": true,
+    "productionUntouched": true,
+    "pr99MustRemainDraft": true,
+    "pr100MustRemainDraft": true,
+    "elevenLabsContactForbidden": true,
+    "theatricalGateForbidden": true,
+    "qualityGatesMustNotBeLowered": true
+  },
+  "protections": {
+    "singleLaunch": true,
+    "startupWatchdogRequired": true,
+    "cleanupDeleteGuaranteed": true,
+    "paidMutationTripwire": true,
+    "allowPaidGpuLaunchEnv": false,
+    "cloudRenderEnabledEnv": false,
+    "inProcessFlagLiftOnlyIfLaunchAllowed": true
+  },
+  "worker": {
+    "envConfigured": false,
+    "envValidation": {
+      "ref": "",
+      "registry": null,
+      "repository": null,
+      "digest": null,
+      "ok": false,
+      "code": "WORKER_IMAGE_MISSING",
+      "reason": "RUNPOD_WORKER_IMAGE is not configured. Set the immutable @sha256 worker image digest."
+    },
+    "checkoutStaleDigest": "sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830",
+    "checkoutStalePinUsable": false,
+    "knownCurrentTivvleJoyDigest": "sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed",
+    "knownCurrentSourceCommit": "1ea2cf58c9cfc015929d0a4ca63446898d59ba79",
+    "knownCurrentReachable": true,
+    "knownCurrentJobKind": "FINAL_1080P_RENDER",
+    "knownCurrentHasCharacterDepartment": false,
+    "knownCurrentHasGoatMaterialize": false,
+    "requiredJobKinds": [
+      "CHARACTER_SOURCE_MATERIALIZE",
+      "CHARACTER_BUILD"
+    ],
+    "positivelyResolved": false,
+    "digestUsed": null,
+    "reason": "RUNPOD_WORKER_IMAGE is not a positively resolved immutable ghcr.io @sha256 pin in this environment. The checkout 1080p pin is stale and must not be substituted. Do not launch."
+  },
+  "quote": {
+    "gpuTypeId": "NVIDIA GeForce RTX 4090",
+    "cloudType": "SECURE",
+    "uninterruptablePriceUsdPerHr": 0.74,
+    "stockStatus": "Low",
+    "predictedRuntimeMinutes": 180,
+    "predictedTotalUsd": 2.22,
+    "studioHourlyCapUsd": 0.8,
+    "authorizationCeilingUsd": 3,
+    "withinAuthorization": true
+  },
+  "source": {
+    "objectKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip",
+    "locked": true,
+    "hashVerified": true,
+    "storedSize": 269512136,
+    "storedSha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+    "zipOk": true,
+    "zipMembers": [
+      "Goat_FINN.blend",
+      "FBX_TEX/Goat_Body/Goat_Body_Alpha.png",
+      "FBX_TEX/Goat_Body/Goat_Body_BaseColor.png",
+      "FBX_TEX/Goat_Body/Goat_Body_Displacement.png",
+      "FBX_TEX/Goat_Body/Goat_Body_Emission.png",
+      "FBX_TEX/Goat_Body/Goat_Body_Metallic.png",
+      "FBX_TEX/Goat_Body/Goat_Body_Normal.png",
+      "FBX_TEX/Goat_Body/Goat_Body_Roughness.png",
+      "FBX_TEX/Goat_Horns_Mouth/Goat_Horn_Mouth_Alpha.png",
+      "FBX_TEX/Goat_Horns_Mouth/Goat_Horn_Mouth_BaseColor.png",
+      "FBX_TEX/Goat_Horns_Mouth/Goat_Horn_Mouth_Displacement.png",
+      "FBX_TEX/Goat_Horns_Mouth/Goat_Horn_Mouth_Emission.png",
+      "FBX_TEX/Goat_Horns_Mouth/Goat_Horn_Mouth_Metallic.png",
+      "FBX_TEX/Goat_Horns_Mouth/Goat_Horn_Mouth_Normal.png",
+      "FBX_TEX/Goat_Horns_Mouth/Goat_Horn_Mouth_Roughness.png",
+      "FBX_TEX/Goat_Props/Goat_Props_Alpha.png",
+      "FBX_TEX/Goat_Props/Goat_Props_BaseColor.png",
+      "FBX_TEX/Goat_Props/Goat_Props_Displacement.png",
+      "FBX_TEX/Goat_Props/Goat_Props_Emission.png",
+      "FBX_TEX/Goat_Props/Goat_Props_Metallic.png",
+      "FBX_TEX/Goat_Props/Goat_Props_Normal.png",
+      "FBX_TEX/Goat_Props/Goat_Props_Roughness.png",
+      "FBX_TEX/Goat_FINN.fbx",
+      "ReadMe.md"
+    ],
+    "incompleteMultipartCount": 0
+  },
+  "blender": {
+    "authoredHint": "4.3",
+    "studioPin": "4.2.2",
+    "conversionClaimed": false,
+    "safeOpenValidated": false,
+    "status": "UNTESTED_NO_WORKER"
+  },
+  "department": {
+    "schema": "TIVVLEJOY_CHARACTER_RIGGING_ANIMATION_DEPARTMENT_V1",
+    "stageCount": 26,
+    "duplicatePipelineCreated": false,
+    "stages": [
+      {
+        "stage": "SOURCE_INTAKE",
+        "disposition": "REUSED",
+        "status": "PLANNED"
+      },
+      {
+        "stage": "SOURCE_HASH_LOCK",
+        "disposition": "REUSED",
+        "status": "PLANNED"
+      },
+      {
+        "stage": "BLENDER_VERSION_CHECK",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "OBJECT_INVENTORY",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "MATERIAL_INVENTORY",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "TEXTURE_INVENTORY",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "UV_VALIDATION",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "TOPOLOGY_AUDIT",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "SCALE_ORIENTATION_NORMALIZATION",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "CHARACTER_SEMANTIC_MAPPING",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "RIG_GUIDE_GENERATION",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "SKELETON_BUILD",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "CONTROL_RIG_BUILD",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "INITIAL_SKIN_BIND",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "WEIGHT_REFINEMENT",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "FACIAL_SYSTEM_BUILD",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "VISEME_SYSTEM_BUILD",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "SECONDARY_CONTROLS",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "CORRECTIVE_DEFORMATION_BUILD",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "ACCESSORY_BINDING",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "DEFORMATION_TESTS",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "ANIMATION_TESTS",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "PERFORMANCE_PROFILE",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "RENDER_QA",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "EXPORT_QA",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      },
+      {
+        "stage": "CHARACTER_MASTER_GATE",
+        "disposition": "BLOCKED",
+        "status": "BLOCKED"
+      }
+    ]
+  },
+  "launch": {
+    "allowed": false,
+    "launched": false,
+    "paid": false,
+    "launchCount": 0,
+    "gpuLaunched": false,
+    "podId": null,
+    "existingBillablePodCount": 0
+  },
+  "remainingBlockers": [
+    "WORKER_IMAGE_MISSING",
+    "WORKER_IMAGE_WRONG_JOB_KIND",
+    "WORKER_IMAGE_CHARACTER_DEPARTMENT_NOT_BAKED"
+  ],
+  "goatProductionReady": false,
+  "productionMutationCount": 0,
+  "nextStep": "Do not launch. Rebuild and digest-pin a TivvleJoy worker that bakes Goat materialize plus the existing 26-stage department, then issue a new explicit authorization.",
+  "paidGpuLaunched": false,
+  "runpodContacted": false,
+  "productionMutated": false,
+  "theatricalGateOpened": false,
+  "elevenLabsContacted": false,
+  "canonicalAssetOverwritten": false,
+  "sourceOverwritten": false,
+  "gitBinaryCommitted": false,
+  "proposedGpu": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "secureGpuPolicy": "SECURE_GPU_PRESERVED",
+  "hourlyCapUsd": 0.8,
+  "historicalSecureHourlyUsd": 0.74,
+  "estimatedDurationMinutes": {
+    "likely": 90,
+    "conservativeMax": 180
+  },
+  "conservativeMaxCostUsd": 2.4,
+  "recommendedAuthorizationCeilingUsd": 3,
+  "defaultStudioSingleJobCapUsd": 2,
+  "defaultStudioMaxRuntimeMinutes": 180,
+  "authorizationMustLiftSingleJobCap": true,
+  "singleLaunch": true,
+  "startupWatchdogRequired": true,
+  "cleanupDeleteGuaranteed": true,
+  "paidMutationTripwire": true,
+  "launched": false,
+  "paid": false
+}

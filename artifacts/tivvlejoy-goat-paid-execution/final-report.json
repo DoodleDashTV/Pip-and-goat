@@ -1,0 +1,73 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1",
+  "startingBranch": "cursor/tivvlejoy-goat-character-source-intake-73f1",
+  "startingSha": "e837122d5a1c4028a998ea073c867ce57ff00948",
+  "workerImageDigestUsed": null,
+  "workerImageResolution": {
+    "envConfigured": false,
+    "envValidation": {
+      "ref": "",
+      "registry": null,
+      "repository": null,
+      "digest": null,
+      "ok": false,
+      "code": "WORKER_IMAGE_MISSING",
+      "reason": "RUNPOD_WORKER_IMAGE is not configured. Set the immutable @sha256 worker image digest."
+    },
+    "checkoutStaleDigest": "sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830",
+    "checkoutStalePinUsable": false,
+    "knownCurrentTivvleJoyDigest": "sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed",
+    "knownCurrentSourceCommit": "1ea2cf58c9cfc015929d0a4ca63446898d59ba79",
+    "knownCurrentReachable": true,
+    "knownCurrentJobKind": "FINAL_1080P_RENDER",
+    "knownCurrentHasCharacterDepartment": false,
+    "knownCurrentHasGoatMaterialize": false,
+    "requiredJobKinds": [
+      "CHARACTER_SOURCE_MATERIALIZE",
+      "CHARACTER_BUILD"
+    ],
+    "positivelyResolved": false,
+    "digestUsed": null,
+    "reason": "RUNPOD_WORKER_IMAGE is not a positively resolved immutable ghcr.io @sha256 pin in this environment. The checkout 1080p pin is stale and must not be substituted. Do not launch."
+  },
+  "gpuActuallyUsed": null,
+  "secureStatus": "NOT_LAUNCHED",
+  "exactLaunchCount": 0,
+  "materializationResult": "NOT_STARTED",
+  "postDownloadShaResult": "R2_PREFLIGHT_HASH_MATCH",
+  "zipValidationResult": "ZIP_SAFE",
+  "blenderCompatibilityResult": "UNTESTED_NO_WORKER",
+  "workingCopyResult": "NOT_CREATED",
+  "sourceTopologyUvMaterialAudit": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "skeletonResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "controlRigResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "ikFkResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "skinningResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "weightRefinementResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "facialRigResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "visemeResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "secondaryControlResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "correctiveDeformationResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "deformationTestResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "animationValidationResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "performanceResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "renderQaResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "exportQaResult": "NOT_EXECUTED — paid launch refused by fail-closed preflight",
+  "characterMasterGateResult": "BLOCKED",
+  "goatProductionReady": false,
+  "visualArtifactsProduced": [],
+  "actualRuntimeMinutes": 0,
+  "actualCostUsd": 0,
+  "podCleanupVerification": {
+    "launched": false,
+    "podsRemaining": 0,
+    "orphanPod": false
+  },
+  "remainingDefects": [
+    "WORKER_IMAGE_MISSING",
+    "WORKER_IMAGE_WRONG_JOB_KIND",
+    "WORKER_IMAGE_CHARACTER_DEPARTMENT_NOT_BAKED"
+  ],
+  "exactNextStep": "Do not launch. Rebuild and digest-pin a TivvleJoy worker that bakes Goat materialize plus the existing 26-stage department, then issue a new explicit authorization.",
+  "authorizationStatus": "FAIL_CLOSED_DO_NOT_LAUNCH"
+}

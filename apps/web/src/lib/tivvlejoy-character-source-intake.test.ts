@@ -15,8 +15,12 @@ import {
   buildGoatSourceReceipt,
   connectReceiptToCharacterPipeline,
   createGoatUploadSession,
+  compileGoatPaidExecutionFinalReport,
   compileGoatPostUploadPreflight,
   dryRunGoatSourceMaterialization,
+  evaluateGoatPaidExecutionAuthorization,
+  GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA,
+  KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST,
   READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
   emptyGoatSourceReceipt,
   handleCharacterSourceAction,
@@ -290,6 +294,120 @@ describe('Goat character source intake bridge', () => {
     expect(preflight.nextAuthorizationAction).not.toContain('Upload Goat Source');
   });
 
+  it('refuses TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1 when the digest-pinned worker cannot be resolved', () => {
+    const locked = {
+      sourceLocked: true,
+      objectExists: true,
+      storedSize: GOAT_SOURCE_SIZE_BYTES,
+      storedSha256: GOAT_SOURCE_SHA256,
+      hashVerified: true,
+      zipOk: true,
+      incompleteMultipartCount: 0,
+      secure4090PriceUsdPerHr: 0.74,
+      secure4090StockStatus: 'High',
+      existingBillablePodCount: 0,
+      priorAuthorizedLaunchCount: 0,
+      requestedGpu: 'NVIDIA GeForce RTX 4090',
+      requestedCloudType: 'SECURE' as const,
+      knownCurrentDigestReachable: true,
+      knownCurrentImageJobKind: 'FINAL_1080P_RENDER',
+      knownCurrentImageHasCharacterDepartment: false,
+      knownCurrentImageHasGoatMaterialize: false,
+    };
+    const decision = evaluateGoatPaidExecutionAuthorization({
+      authorizationPresent: true,
+      env: {
+        RUNPOD_WORKER_IMAGE: '',
+        ALLOW_PAID_GPU_LAUNCH: 'false',
+        CLOUD_RENDER_ENABLED: 'false',
+      },
+      live: locked,
+    });
+    expect(decision.schema).toBe(GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA);
+    expect(decision.status).toBe('FAIL_CLOSED_DO_NOT_LAUNCH');
+    expect(decision.launch.allowed).toBe(false);
+    expect(decision.launch.launchCount).toBe(0);
+    expect(decision.worker.positivelyResolved).toBe(false);
+    expect(decision.worker.checkoutStalePinUsable).toBe(false);
+    expect(decision.worker.knownCurrentTivvleJoyDigest).toBe(KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST);
+    expect(decision.remainingBlockers).toContain('WORKER_IMAGE_MISSING');
+    expect(decision.remainingBlockers).toContain('WORKER_IMAGE_WRONG_JOB_KIND');
+    expect(decision.remainingBlockers).toContain('WORKER_IMAGE_CHARACTER_DEPARTMENT_NOT_BAKED');
+    expect(decision.goatProductionReady).toBe(false);
+    expect(decision.paidGpuLaunched).toBe(false);
+    expect(decision.quote.withinAuthorization).toBe(true);
+    const report = compileGoatPaidExecutionFinalReport({
+      startingBranch: 'cursor/tivvlejoy-goat-character-source-intake-73f1',
+      startingSha: 'e837122d5a1c4028a998ea073c867ce57ff00948',
+      authorization: decision,
+      live: { ...locked, actualRuntimeMinutes: 0, actualCostUsd: 0, podsRemaining: 0 },
+    });
+    expect(report.exactLaunchCount).toBe(0);
+    expect(report.characterMasterGateResult).toBe('BLOCKED');
+    expect(report.goatProductionReady).toBe(false);
+    expect(report.actualCostUsd).toBe(0);
+  });
+
+  it('still refuses a digest-pinned render worker even when RUNPOD_WORKER_IMAGE is set', () => {
+    const digest = KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST;
+    const decision = evaluateGoatPaidExecutionAuthorization({
+      authorizationPresent: true,
+      env: {
+        RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${digest}`,
+        ALLOW_PAID_GPU_LAUNCH: 'true',
+        CLOUD_RENDER_ENABLED: 'true',
+      },
+      live: {
+        sourceLocked: true,
+        objectExists: true,
+        storedSize: GOAT_SOURCE_SIZE_BYTES,
+        storedSha256: GOAT_SOURCE_SHA256,
+        hashVerified: true,
+        zipOk: true,
+        incompleteMultipartCount: 0,
+        secure4090PriceUsdPerHr: 0.74,
+        knownCurrentDigestReachable: true,
+        knownCurrentImageJobKind: 'FINAL_1080P_RENDER',
+        knownCurrentImageHasCharacterDepartment: false,
+        knownCurrentImageHasGoatMaterialize: false,
+        requestedGpu: 'NVIDIA GeForce RTX 4090',
+        requestedCloudType: 'SECURE',
+      },
+    });
+    expect(decision.launch.allowed).toBe(false);
+    expect(decision.remainingBlockers).toContain('WORKER_IMAGE_WRONG_JOB_KIND');
+    expect(decision.worker.digestUsed).toBeNull();
+  });
+
+  it('refuses community cloud, a second launch, and a quote above $3', () => {
+    const overBudget = evaluateGoatPaidExecutionAuthorization({
+      authorizationPresent: true,
+      env: { RUNPOD_WORKER_IMAGE: '' },
+      live: {
+        requestedCloudType: 'COMMUNITY',
+        requestedGpu: 'NVIDIA GeForce RTX 5090',
+        priorAuthorizedLaunchCount: 1,
+        secure4090PriceUsdPerHr: 1.2,
+        sourceLocked: true,
+        objectExists: true,
+        storedSize: GOAT_SOURCE_SIZE_BYTES,
+        storedSha256: GOAT_SOURCE_SHA256,
+        hashVerified: true,
+        zipOk: true,
+      },
+    });
+    expect(overBudget.remainingBlockers).toEqual(
+      expect.arrayContaining([
+        'COMMUNITY_CLOUD_REFUSED',
+        'WRONG_GPU',
+        'PRIOR_LAUNCH_ALREADY_CONSUMED',
+        'HOURLY_RATE_EXCEEDS_STUDIO_CAP',
+        'PREDICTED_COST_EXCEEDS_AUTHORIZATION',
+      ]),
+    );
+    expect(overBudget.launch.allowed).toBe(false);
+  });
+
   it('stays connection-ready without R2 and refuses Production mutations', async () => {
     const ready = await handleCharacterSourceAction({
       action: 'create-session',
@@ -481,6 +599,15 @@ describe('Goat character source intake bridge', () => {
     );
     expect(doc).toContain(GOAT_SOURCE_OBJECT_KEY);
     expect(doc).toContain(GOAT_SOURCE_RECEIPT_OBJECT_KEY);
+    expect(doc).toContain(GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA);
+    expect(doc).toContain('FAIL_CLOSED');
     expect(doc).not.toMatch(/R2_SECRET_ACCESS_KEY=|sk_live_/);
+    const preflightScript = readFileSync(
+      path.resolve(__dirname, '../../scripts/goat-paid-execution-authorization-preflight.ts'),
+      'utf8',
+    );
+    expect(preflightScript).not.toMatch(/ALLOW_PAID_GPU_LAUNCH\s*=\s*['"]true['"]/);
+    expect(preflightScript).not.toMatch(/createPodForBenchmark/);
+    expect(preflightScript).toContain('Creates no Pod');
   });
 });

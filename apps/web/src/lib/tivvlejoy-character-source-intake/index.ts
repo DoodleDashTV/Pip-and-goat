@@ -9,6 +9,7 @@ export * from './durable';
 export * from './materialization';
 export * from './pipeline-bridge';
 export * from './post-upload-preflight';
+export * from './paid-execution-authorization';
 export * from './states';
 export * from './store';
 export * from './service';

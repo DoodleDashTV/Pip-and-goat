@@ -81,7 +81,21 @@ Blender 4.3 → 4.2.2 is **not claimed**. If 4.2.2 cannot safely open the 4.3 so
 
 ## Paid execution
 
-This increment is dry-run only. RunPod is not launched. Future paid materialization still requires the existing paid-execution authorization gate, SECURE GPU, cost estimation, cleanup, single-launch protection, and watchdogs.
+Checkpoint: `TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1`
+
+Explicit one-launch authorization was received and evaluated `FAIL_CLOSED_DO_NOT_LAUNCH`. Launch count remains 0. Cost remains $0. `goatProductionReady` remains false.
+
+Do not launch unless every condition is true:
+
+- `RUNPOD_WORKER_IMAGE` is a positively resolved immutable `ghcr.io` `@sha256` pin
+- that image bakes `CHARACTER_SOURCE_MATERIALIZE` plus the existing 26-stage department
+- GPU is SECURE `NVIDIA GeForce RTX 4090`
+- predicted 180-minute cost is at or under $3.00
+- single-launch, startup watchdog, cleanup/delete, and paid-mutation tripwire stay intact
+
+The checkout 1080p pin (`sha256:8204d4bf…`) is stale and must not be substituted. The current TivvleJoy render pin (`sha256:b53fcbf5…` from `1ea2cf58`) is a FINAL_1080P worker, not a Goat department worker.
+
+Live preflight (no Pod created): locked R2 Goat hash matched, ZIP_SAFE, SECURE RTX 4090 quoted $0.74/hr, zero billable pods. Evidence: `artifacts/tivvlejoy-goat-paid-execution/`.
 
 ## Git
 
