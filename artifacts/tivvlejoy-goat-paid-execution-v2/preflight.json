@@ -1,0 +1,106 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_V2",
+  "status": "FAIL_CLOSED_DO_NOT_LAUNCH",
+  "authorization": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2",
+  "requiredHeadSha": "f3194bc59939d794943618329f65d326672123e8",
+  "requiredDigest": "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+  "image": {
+    "resolved": true,
+    "containsLiteralOrg": false,
+    "digest": "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+    "sourceCommit": "fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3",
+    "validation": {
+      "ok": true,
+      "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+      "code": "OK",
+      "reason": "Worker image pinned by immutable @sha256 digest on ghcr.io.",
+      "registry": "ghcr.io",
+      "repository": "<org>/ddp-runpod-blender",
+      "digest": "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e"
+    },
+    "forbidden": false,
+    "resolvedRefRedacted": "ghcr.io/<org>/ddp-runpod-blender@sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e"
+  },
+  "registry": {
+    "ok": true,
+    "amd64": true,
+    "digest": "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+    "detail": "config blob read; linux/amd64=true",
+    "sourceCommit": "fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3",
+    "blender": "4.2.2",
+    "characterMaster": "true",
+    "jobKind": "CHARACTER_MASTER_BUILD",
+    "stageCount": "26",
+    "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V1",
+    "entrypoint": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V1"
+  },
+  "baked": {
+    "realGoatDownloadHardForbidden": true,
+    "departmentAlwaysDryRun": true,
+    "credentialsBaked": false,
+    "realGoatSourceBaked": false
+  },
+  "creds": {
+    "runpodApiKeyPresent": true,
+    "r2BucketPresent": true,
+    "r2EndpointPresent": true,
+    "r2AccessKeyPresent": true,
+    "r2SecretPresent": true
+  },
+  "source": {
+    "objectExists": true,
+    "storedSize": 269512136,
+    "sizeMatches": true,
+    "downloaded": false,
+    "receiptPresent": true,
+    "receiptLocked": true,
+    "receiptShaMatches": true,
+    "hashVerified": true,
+    "zipIntegrityVerified": true,
+    "zipState": "ZIP_SAFE",
+    "memberCount": null,
+    "incompleteMultipartCount": 0,
+    "sourceLocked": true
+  },
+  "quote": {
+    "ok": true,
+    "myselfIdPresent": true,
+    "gpu4090Present": true,
+    "secureUsdPerHr": 0.74,
+    "stockStatus": "Low",
+    "predicted180MinUsd": 2.22,
+    "withinThreeDollars": true,
+    "stockAvailable": true
+  },
+  "pods": {
+    "billable": 0,
+    "exactPlannedNameCount": 0,
+    "names": []
+  },
+  "guards": {
+    "startupWatchdogMinutes": 20,
+    "stopNewStagesAtMinutes": 165,
+    "hardDeleteAtMinutes": 180,
+    "singleLaunchCounter": 0,
+    "paidMutationTripwireArmed": true,
+    "allowPaidGpuLaunch": false
+  },
+  "launch": {
+    "allowed": false,
+    "podCreateRequestCount": 0,
+    "confirmedPodCount": 0,
+    "podId": null,
+    "reason": "Authorized image cannot perform real Goat download or live 26-stage execution. Worker rebuild would invalidate this authorization."
+  },
+  "remainingBlockers": [
+    "AUTHORIZED_IMAGE_CANNOT_DOWNLOAD_REAL_GOAT",
+    "AUTHORIZED_IMAGE_DEPARTMENT_IS_DRY_RUN_ONLY",
+    "WORKER_REBUILD_REQUIRED_AUTHORIZATION_INVALID"
+  ],
+  "goatProductionReady": false,
+  "characterMasterGate": "BLOCKED_REAL_EXECUTION_REQUIRED",
+  "realCompatibility": "UNTESTED_REAL_SOURCE",
+  "actualRuntimeMinutes": 0,
+  "actualCostUsd": 0,
+  "billablePodsRemaining": 0
+}
