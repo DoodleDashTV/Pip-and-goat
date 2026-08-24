@@ -25,6 +25,7 @@ const PRIMARY_NAV = [
   { href: '/episode-preflight', label: 'Episode Preflight' },
   { href: '/rig-arrival', label: 'Rig Arrival' },
   { href: '/animation-control', label: 'Animation Control' },
+  { href: '/character-rigging', label: 'Character Rigging' },
   { href: '/workflow', label: 'Episode Workflow' },
   { href: '/readiness', label: 'Readiness' },
   { href: '/render-queue', label: 'Render Queue' },

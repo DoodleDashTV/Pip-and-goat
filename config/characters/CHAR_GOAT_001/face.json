@@ -1,0 +1,29 @@
+{
+  "version": "goat.face.v1",
+  "controls": [
+    "eye_aim_master",
+    "eye_left",
+    "eye_right",
+    "blink",
+    "eyelid_upper",
+    "eyelid_lower",
+    "jaw",
+    "mouth_open",
+    "mouth_width",
+    "smile",
+    "frown",
+    "corners"
+  ],
+  "expressions": [
+    "happy",
+    "excited",
+    "curious",
+    "surprised",
+    "worried",
+    "confused",
+    "sad",
+    "determined",
+    "mischievous",
+    "laughing"
+  ]
+}

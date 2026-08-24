@@ -1,0 +1,24 @@
+{
+  "version": "goat.skeleton.v1",
+  "required": [
+    "CTRL.MASTER",
+    "CTRL.WORLD",
+    "CTRL.ROOT",
+    "CTRL.COG",
+    "DEF.PELVIS",
+    "DEF.SPINE_01",
+    "DEF.CHEST",
+    "DEF.NECK",
+    "DEF.HEAD",
+    "DEF.JAW",
+    "DEF.THIGH.L",
+    "DEF.THIGH.R",
+    "DEF.SHIN.L",
+    "DEF.SHIN.R",
+    "DEF.FOOT.L",
+    "DEF.FOOT.R",
+    "CTRL.IK.FOOT.L",
+    "CTRL.IK.FOOT.R"
+  ],
+  "anatomyDependent": ["DEF.UPPER_CHEST", "DEF.CLAVICLE.L", "DEF.CLAVICLE.R", "DEF.HAND.L", "DEF.HAND.R"]
+}
