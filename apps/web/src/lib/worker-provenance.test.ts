@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   LABEL_BUILD_TIME,
+  LABEL_RENDER_ASSET_SHA256,
   LABEL_RENDER_CODE_SHA256,
   LABEL_SOURCE_COMMIT,
   computeRenderAssetFingerprint,
@@ -30,6 +31,7 @@ function registry(overrides: Partial<RegistryImageFacts> = {}): RegistryImageFac
     labels: {
       [LABEL_SOURCE_COMMIT]: COMMIT,
       [LABEL_RENDER_CODE_SHA256]: RENDER_CODE,
+      [LABEL_RENDER_ASSET_SHA256]: RENDER_ASSETS,
       [LABEL_BUILD_TIME]: '2026-08-12T22:00:00Z',
     },
     env: {},
@@ -248,6 +250,24 @@ describe('changing a character model invalidates preflight', () => {
     });
     expect(result.ok).toBe(true);
     expect(result.facts.localRenderAssetSha256).toBe(RENDER_ASSETS);
+    expect(result.facts.imageRenderAssetSha256).toBe(RENDER_ASSETS);
+  });
+
+  it('fails closed when the pinned asset fingerprint is absent from the published OCI labels', () => {
+    const result = verify({
+      expectedRenderAssetSha256: RENDER_ASSETS,
+      localRenderAssetSha256: RENDER_ASSETS,
+      registry: registry({
+        labels: {
+          [LABEL_SOURCE_COMMIT]: COMMIT,
+          [LABEL_RENDER_CODE_SHA256]: RENDER_CODE,
+          [LABEL_BUILD_TIME]: '2026-08-12T22:00:00Z',
+        },
+      }),
+    });
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe('RENDER_ASSET_MISMATCH');
+    expect(result.reasons.join(' ')).toContain('absent');
   });
 
   it('reports the real fingerprint of Pip’s current model, and a different one after an edit', () => {

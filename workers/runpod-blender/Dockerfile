@@ -84,10 +84,12 @@ COPY scripts/blender ./blender
 ARG DDP_SOURCE_COMMIT=unknown
 ARG DDP_WORKER_BUILD_TIME=unknown
 ARG DDP_RENDER_CODE_SHA256=unknown
+ARG DDP_RENDER_ASSET_SHA256=unknown
 
 ENV DDP_SOURCE_COMMIT=${DDP_SOURCE_COMMIT} \
     DDP_WORKER_BUILD_TIME=${DDP_WORKER_BUILD_TIME} \
     DDP_RENDER_CODE_SHA256=${DDP_RENDER_CODE_SHA256} \
+    DDP_RENDER_ASSET_SHA256=${DDP_RENDER_ASSET_SHA256} \
     DDP_PROVENANCE_FILE=/opt/ddp-worker/provenance.json
 
 RUN node ./src/provenance.js --write "$DDP_PROVENANCE_FILE" --expect "$DDP_RENDER_CODE_SHA256" && \
@@ -100,6 +102,7 @@ LABEL org.opencontainers.image.title="ddp-runpod-blender" \
       ddp.source.commit="${DDP_SOURCE_COMMIT}" \
       ddp.worker.build.time="${DDP_WORKER_BUILD_TIME}" \
       ddp.render.code.sha256="${DDP_RENDER_CODE_SHA256}" \
+      ddp.render.asset.sha256="${DDP_RENDER_ASSET_SHA256}" \
       ddp.character.master="true" \
       ddp.character.job.kind="CHARACTER_MASTER_BUILD" \
       ddp.character.stage.count="26" \

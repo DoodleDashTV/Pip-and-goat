@@ -29,6 +29,12 @@ test -f scripts/blender/characters/build_character.py || die "build_character.py
 test -f scripts/blender/characters/common/stages.py || die "department stages missing"
 grep -q 'CHARACTER_MASTER_BUILD' workers/runpod-blender/src/character-job-kinds.js \
   || die "CHARACTER_MASTER_BUILD constant missing"
+grep -q 'ARG DDP_RENDER_ASSET_SHA256=unknown' workers/runpod-blender/Dockerfile \
+  || die "render-asset build argument missing"
+grep -q 'ddp.render.asset.sha256="${DDP_RENDER_ASSET_SHA256}"' workers/runpod-blender/Dockerfile \
+  || die "render-asset OCI label missing"
+grep -q -- '--build-arg "DDP_RENDER_ASSET_SHA256=$RENDER_ASSET_SHA256"' scripts/cloud/build-worker-image.sh \
+  || die "render-asset fingerprint is not passed into docker build"
 
 # Scan only the character runtime and this workflow. Do not scan this
 # preflight script itself — the needle strings live here as the tripwire.
