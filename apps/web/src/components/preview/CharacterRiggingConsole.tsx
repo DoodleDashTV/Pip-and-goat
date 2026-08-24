@@ -1,7 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import type { CharacterRiggingConsoleModel } from '@/lib/tivvlejoy-character-rigging-department/console-model';
+import { GoatSourceIntake } from '@/components/preview/GoatSourceIntake';
+import type { buildGoatSourceIntakeConsoleModel } from '@/lib/tivvlejoy-character-source-intake/console-model';
+
+type Model = ReturnType<typeof buildGoatSourceIntakeConsoleModel>;
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
@@ -12,7 +15,7 @@ function Stat({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-export function CharacterRiggingConsole({ model }: { model: CharacterRiggingConsoleModel }) {
+export function CharacterRiggingConsole({ model }: { model: Model }) {
   return (
     <section className="space-y-4">
       <div className="studio-card space-y-2 p-4 sm:p-5">
@@ -25,7 +28,7 @@ export function CharacterRiggingConsole({ model }: { model: CharacterRiggingCons
           Status: {model.status} · {model.verdict}
         </p>
         <p className="text-sm">Real asset: {model.realAssetStatus}</p>
-        <p className="text-sm">Next input: {model.nextInputRequired}</p>
+        <p className="text-sm">Next input: {model.intake.nextUserAction}</p>
         <p className="text-sm">
           <Link href="/animation-control" className="font-bold underline">
             Animation control
@@ -36,6 +39,14 @@ export function CharacterRiggingConsole({ model }: { model: CharacterRiggingCons
           </Link>
         </p>
       </div>
+
+      <GoatSourceIntake
+        initial={{
+          state: model.intake.state,
+          nextUserAction: model.intake.nextUserAction,
+          checklist: model.intake.checklist,
+        }}
+      />
 
       <section className="studio-card space-y-3 p-4 sm:p-5">
         <h2 className="font-display text-xl font-semibold">Goat CHAR_GOAT_001</h2>
