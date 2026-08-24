@@ -285,8 +285,8 @@ test('source-storage write methods cannot be invoked by the authorized download 
   const capability = compileCharacterCapability({ root: repoRoot });
   assert.equal(capability.authorizedRealSourceDownloadCapable, true);
   assert.equal(capability.sourceWritesForbidden, true);
-  assert.equal(capability.entrypointVersion, 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V4');
+  assert.equal(capability.entrypointVersion, 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5');
   assert.equal(capability.durableArtifactPersistenceCapable, true);
-  assert.equal(capability.requiredLiveAuthorizationName, 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4');
+  assert.equal(capability.requiredLiveAuthorizationName, 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5');
   assert.equal(process.env.ALLOW_PAID_GPU_LAUNCH === 'true', false);
 });

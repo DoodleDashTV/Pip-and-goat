@@ -52,8 +52,8 @@ async function main(): Promise<number> {
   if (labels['ddp.character.capability.schema'] !== 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2') return 8;
   if (labels['ddp.character.live.capable'] !== 'true') return 9;
   if (labels['ddp.character.mandatory.dry.run'] !== 'false') return 10;
-  if (labels['ddp.character.entrypoint'] !== 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V4') return 11;
-  if (labels['ddp.character.live.authorization'] !== 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4') return 12;
+  if (labels['ddp.character.entrypoint'] !== 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5') return 11;
+  if (labels['ddp.character.live.authorization'] !== 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5') return 12;
   if (labels['ddp.character.output.persistence'] !== 'true') return 13;
   if (pin.sourceCommit && report.sourceCommit && report.sourceCommit !== pin.sourceCommit) return 7;
   return 0;

@@ -34,8 +34,8 @@ describe('character worker image workflow', () => {
     assert.match(dockerfile, /ddp.character.master="true"/);
     assert.match(master, /CHARACTER_MASTER_BUILD/);
     assert.match(master, /FINAL_1080P_CANNOT_IMPERSONATE_CHARACTER/);
-    assert.match(dockerfile, /TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V4/);
-    assert.match(dockerfile, /TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4/);
+    assert.match(dockerfile, /TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5/);
+    assert.match(dockerfile, /TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5/);
     assert.match(dockerfile, /ddp.character.output.persistence="true"/);
     assert.match(dockerfile, /ARG DDP_RENDER_ASSET_SHA256=unknown/);
     assert.match(dockerfile, /ddp.render.asset.sha256="\$\{DDP_RENDER_ASSET_SHA256\}"/);

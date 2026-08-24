@@ -86,6 +86,7 @@ test('each missing authorization condition is independently forbidden', () => {
     ['invalid V1', completeInput({ authorizationReceipt: receipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1' }) }), completeEnv()],
     ['invalid V2', completeInput({ authorizationReceipt: receipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2' }) }), completeEnv()],
     ['invalid V3', completeInput({ authorizationReceipt: receipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3' }) }), completeEnv()],
+    ['invalid V4', completeInput({ authorizationReceipt: receipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4' }) }), completeEnv()],
     ['locked destination', completeInput({ outputDestination: 'tivvlejoy-assets/characters/CHAR_GOAT_001/source' }), completeEnv()],
     ['malformed receipt', { executionMode: 'live', authorizationReceiptJson: '{not-json', outputDestination: '/tmp/tivvlejoy-character-out', authorizedImageDigest: DIGEST, imageRef: `ghcr.io/example/ddp-runpod-blender@${DIGEST}`, executionId: 'exec-test-0001' }, completeEnv()],
   ];
