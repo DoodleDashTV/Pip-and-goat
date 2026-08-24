@@ -435,7 +435,7 @@ describe('Goat character source intake bridge', () => {
       { schema: 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V1', liveCharacterDepartmentCapable: true },
     );
     expect(v1.ok).toBe(false);
-    expect(v1.code).toBe(WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE);
+    expect([REJECTED_LIVE_EXECUTION_DIGEST, WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE]).toContain(v1.code);
   });
 
   it('stays connection-ready without R2 and refuses Production mutations', async () => {

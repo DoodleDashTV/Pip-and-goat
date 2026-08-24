@@ -98,6 +98,16 @@ export function resolveLiveCharacterWorkerImage(
   env: Record<string, string | undefined> = process.env,
   capability?: { schema?: string; liveCharacterDepartmentCapable?: boolean; mandatoryDryRun?: boolean },
 ) {
+  if (capability && capability.schema === REJECTED_LIVE_CAPABILITY_SCHEMA) {
+    return {
+      ok: false as const,
+      code: WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE,
+      reason: 'Capability V1 is not live-execution capable. Live character execution requires Capability V2.',
+      digest: null,
+      ref: '',
+      source: 'capability' as const,
+    };
+  }
   const resolved = resolveAuthorizedCharacterWorkerImage(env);
   if (!resolved.ok) return resolved;
   if (

@@ -18,6 +18,8 @@ def sha256(path: Path) -> str:
 def build_fixture(out_dir: Path) -> dict:
     import bpy  # type: ignore
 
+    if "tivvlejoy-assets/characters/CHAR_GOAT_001/source" in out_dir.resolve().as_posix():
+        raise RuntimeError("LOCKED_SOURCE_WRITE_FORBIDDEN")
     out_dir.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=1.0)

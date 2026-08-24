@@ -278,7 +278,15 @@ describe('TivvleJoy character rigging department', () => {
     expect(joined).not.toMatch(/\bsubprocess\b/);
     expect(joined).not.toMatch(/os\.system|os\.popen/);
     expect(joined).not.toMatch(/\brequests\b|\bsocket\b|urllib/);
-    expect(joined).not.toMatch(/save_as_mainfile|overwrite source/i);
+    const planning = files.filter(
+      (item) =>
+        !String(item).endsWith('execute.py') && !String(item).endsWith('create_synthetic_goat_fixture.py'),
+    );
+    const planningJoined = planning.map((item) => readFileSync(path.join(dir, String(item)), 'utf8')).join('\n');
+    expect(planningJoined).not.toMatch(/save_as_mainfile|overwrite source/i);
+    expect(joined).toMatch(/save_as_mainfile/);
+    expect(joined).toMatch(/LOCKED_SOURCE_WRITE_FORBIDDEN|_refuse_locked_write/);
+    expect(joined).not.toMatch(/overwrite source/i);
     expect(joined).not.toMatch(/sk_live_|RUNPOD_API/i);
     expect(joined).toMatch(/elevenLabsContacted.: False/);
     expect(joined).not.toMatch(/DoodleDash/i);
