@@ -868,11 +868,11 @@ describe('Goat character source intake bridge', () => {
 
   it('keeps V3 preflight and launch scripts read-only until CREATE is authorized', () => {
     const preflight = readFileSync(
-      path.resolve(__dirname, '../../../scripts/cloud/goat-paid-execution-v3/preflight.ts'),
+      path.resolve(__dirname, '../../../../scripts/cloud/goat-paid-execution-v3/preflight.ts'),
       'utf8',
     );
     const launch = readFileSync(
-      path.resolve(__dirname, '../../../scripts/cloud/goat-paid-execution-v3/launch.ts'),
+      path.resolve(__dirname, '../../../../scripts/cloud/goat-paid-execution-v3/launch.ts'),
       'utf8',
     );
     expect(preflight).toContain('Creates no Pod');
