@@ -106,7 +106,14 @@ LABEL org.opencontainers.image.title="ddp-runpod-blender" \
       ddp.character.blender="${BLENDER_VERSION}" \
       ddp.character.capability.schema="TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2" \
       ddp.character.live.capable="true" \
-      ddp.character.mandatory.dry.run="false"
+      ddp.character.mandatory.dry.run="false" \
+      ddp.character.entrypoint="TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V4" \
+      ddp.character.authorized.download.capable="true" \
+      ddp.character.requires.paid.authorization="true" \
+      ddp.character.live.authorization="TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4" \
+      ddp.character.source.writes.forbidden="true" \
+      ddp.character.output.persistence="true" \
+      ddp.character.synthetic.live.verified="true"
 
 # Health endpoint / check.
 # Force REQUIRE_GPU_HEALTH=false for the Docker HEALTHCHECK: the pod sets

@@ -11,6 +11,7 @@ const {
   GOAT_CHARACTER_ID,
   DEPARTMENT_STAGE_COUNT,
   STUDIO_BLENDER,
+  REQUIRED_LIVE_AUTHORIZATION_NAME,
 } = require('./character-job-kinds');
 
 function readDepartmentStageCount(repoHint) {
@@ -51,6 +52,10 @@ function filesPresent(root) {
     path.join(root, 'src/character-source-materialize.js'),
     path.join(root, 'workers/runpod-blender/src/character-source-materialize.js'),
   ]);
+  const characterArtifacts = firstExisting([
+    path.join(root, 'src/character-artifacts.js'),
+    path.join(root, 'workers/runpod-blender/src/character-artifacts.js'),
+  ]);
   const downloadGate = firstExisting([
     path.join(root, 'src/character-download-gate.js'),
     path.join(root, 'workers/runpod-blender/src/character-download-gate.js'),
@@ -78,6 +83,7 @@ function filesPresent(root) {
   return {
     characterMaster,
     characterMaterializer,
+    characterArtifacts,
     downloadGate,
     streamHash,
     characterBuilder,
@@ -135,7 +141,8 @@ function compileCharacterCapability(input = {}) {
     live.executeFlag &&
     live.executeImpl &&
     live.wired &&
-    !live.alwaysDryRun;
+    !live.alwaysDryRun &&
+    Boolean(baked.characterArtifacts);
   const realDownloadCodeBaked = Boolean(baked.characterMaterializer && baked.streamHash && baked.downloadGate);
   const authorizedDownloadCapable =
     realDownloadCodeBaked && live.gateComplete && !live.unconditionalForbid && live.masterInvokesAuthorizedDownload;
@@ -158,6 +165,8 @@ function compileCharacterCapability(input = {}) {
     liveCharacterDepartmentCapable: liveCapable,
     realSourceDownloadCodeBaked: realDownloadCodeBaked,
     authorizedRealSourceDownloadCapable: authorizedDownloadCapable,
+    durableArtifactPersistenceCapable: Boolean(baked.characterArtifacts),
+    requiredLiveAuthorizationName: REQUIRED_LIVE_AUTHORIZATION_NAME,
     defaultExecutionMode: 'dry-run',
     mandatoryDryRun: live.alwaysDryRun,
     requiresPaidAuthorization: true,
@@ -198,6 +207,13 @@ function rejectCapabilityV1ForLive(capability) {
       ok: false,
       code: 'WORKER_NOT_AUTHORIZATION_GATED',
       reason: 'Pinned worker cannot perform authorization-gated real source download.',
+    };
+  }
+  if (capability.durableArtifactPersistenceCapable !== true) {
+    return {
+      ok: false,
+      code: 'WORKER_ARTIFACT_PERSISTENCE_REQUIRED',
+      reason: 'Pinned worker cannot durably persist character outputs before Pod cleanup.',
     };
   }
   return { ok: true, code: 'OK' };

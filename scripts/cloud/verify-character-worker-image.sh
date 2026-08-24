@@ -16,6 +16,7 @@ prove() {
 
 prove /opt/ddp-worker/src/character-master.js
 prove /opt/ddp-worker/src/character-source-materialize.js
+prove /opt/ddp-worker/src/character-artifacts.js
 prove /opt/ddp-worker/src/character-capability.js
 prove /opt/ddp-worker/src/character-download-gate.js
 prove /opt/ddp-worker/src/character-stream-hash.js
@@ -37,6 +38,9 @@ echo "$CAPABILITY" | grep -q '"characterDepartmentBaked": true' || die "departme
 echo "$CAPABILITY" | grep -q '"liveCharacterDepartmentCapable": true' || die "live department not capable"
 echo "$CAPABILITY" | grep -q '"realSourceDownloadCodeBaked": true' || die "real download code not baked"
 echo "$CAPABILITY" | grep -q '"authorizedRealSourceDownloadCapable": true' || die "authorized download not capable"
+echo "$CAPABILITY" | grep -q '"durableArtifactPersistenceCapable": true' || die "durable artifact persistence not capable"
+echo "$CAPABILITY" | grep -q 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4' || die "V4 authorization binding missing"
+echo "$CAPABILITY" | grep -q 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V4' || die "V4 entrypoint missing"
 echo "$CAPABILITY" | grep -q '"defaultExecutionMode": "dry-run"' || die "default mode is not dry-run"
 echo "$CAPABILITY" | grep -q '"mandatoryDryRun": false' || die "mandatoryDryRun must be false"
 echo "$CAPABILITY" | grep -q '"requiresPaidAuthorization": true' || die "paid authorization requirement missing"

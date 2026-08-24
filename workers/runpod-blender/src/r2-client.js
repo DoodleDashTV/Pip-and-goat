@@ -10,7 +10,7 @@ const {
   HeadObjectCommand,
 } = require('@aws-sdk/client-s3');
 const { createHash } = require('node:crypto');
-const { createWriteStream, promises: fs } = require('node:fs');
+const { createReadStream, createWriteStream, promises: fs } = require('node:fs');
 const { pipeline } = require('node:stream/promises');
 
 function strip(v) {
@@ -79,6 +79,29 @@ async function uploadBuffer({ client, bucket }, key, body, contentType) {
   return `s3://${bucket}/${key}`;
 }
 
+async function uploadFile({ client, bucket }, key, filePath, contentType) {
+  const stat = await fs.stat(filePath);
+  if (!stat.isFile()) throw new Error(`Artifact is not a file: ${filePath}`);
+  await client.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: createReadStream(filePath),
+      ContentLength: stat.size,
+      ContentType: contentType,
+    }),
+  );
+  return { uri: `s3://${bucket}/${key}`, byteSize: stat.size };
+}
+
+async function headObject({ client, bucket }, key) {
+  const result = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+  return {
+    byteSize: Number(result.ContentLength ?? 0),
+    contentType: result.ContentType || null,
+  };
+}
+
 async function downloadToFile({ client, bucket }, key, destPath, expectedChecksum) {
   const res = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
   await pipeline(res.Body, createWriteStream(destPath));
@@ -108,6 +131,8 @@ async function deleteKey({ client, bucket }, key) {
 module.exports = {
   createR2Client,
   uploadBuffer,
+  uploadFile,
+  headObject,
   downloadToFile,
   exists,
   deleteKey,

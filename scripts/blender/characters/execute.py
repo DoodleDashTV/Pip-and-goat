@@ -20,6 +20,8 @@ from visemes import PRODUCTION_VISEMES
 
 STUDIO_BLENDER = (4, 2, 2)
 LOCKED_SOURCE_PREFIX = Path("tivvlejoy-assets") / "characters" / "CHAR_GOAT_001" / "source"
+LOCKED_SOURCE_SHA256 = "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5"
+LOCKED_SOURCE_SIZE = 269512136
 
 
 def _sha256(path: Path) -> str:
@@ -120,6 +122,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
     failed: list[str] = []
     inject = str(getattr(args, "inject_stage_failure", "") or "")
     source_zip = Path(args.source_zip) if args.source_zip else None
+    real_asset_verified = bool(getattr(args, "real_asset_verified", False))
     before_objects = {obj.name for obj in bpy.data.objects}
     before_keys = {obj.name: [key.name for key in (obj.data.shape_keys.key_blocks if obj.type == "MESH" and obj.data.shape_keys else [])] for obj in bpy.data.objects}
 
@@ -147,8 +150,23 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             "byteSize": source_zip.stat().st_size,
             "path": str(source_zip),
             "lockedSourceUntouched": True,
+            "realAssetVerified": real_asset_verified,
         }
-        record(executed_stage("SOURCE_INTAKE", "Hashed supplied source bytes.", **intake), intake)
+        identity_mismatch = real_asset_verified and (
+            intake["sha256"] != LOCKED_SOURCE_SHA256 or intake["byteSize"] != LOCKED_SOURCE_SIZE
+        )
+        if identity_mismatch:
+            record(
+                failed_stage(
+                    "SOURCE_INTAKE",
+                    "Launcher claimed a real asset, but the local source hash or size was not the locked Goat identity.",
+                    expectedSha256=LOCKED_SOURCE_SHA256,
+                    expectedSize=LOCKED_SOURCE_SIZE,
+                ),
+                {**intake, "identityMismatch": True},
+            )
+        else:
+            record(executed_stage("SOURCE_INTAKE", "Hashed supplied source bytes.", **intake), intake)
     else:
         intake = {"present": True, "sha256": _sha256(working), "byteSize": working.stat().st_size, "workingOnly": True}
         record(executed_stage("SOURCE_INTAKE", "Hashed WORKING blend bytes; no locked archive was read.", **intake), intake)
@@ -527,21 +545,61 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             bpy.context.collection.objects.link(camera)
         scene.camera = camera
         scene.render.engine = "BLENDER_WORKBENCH"
-        scene.render.resolution_x = 16
-        scene.render.resolution_y = 16
+        scene.render.resolution_x = 512
+        scene.render.resolution_y = 512
         scene.render.resolution_percentage = 100
-        render_path = artifact_dir / "render_qa.png"
-        _refuse_locked_write(render_path)
-        scene.render.filepath = str(render_path)
-        with _with_object(bpy, camera):
-            bpy.ops.render.render(write_still=True)
+        scene.render.image_settings.file_format = "PNG"
+        scene.display.shading.light = "STUDIO"
+        scene.display.shading.color_type = "TEXTURE"
+        mesh_objects = [obj for obj in bpy.data.objects if obj.type == "MESH" and obj.visible_get()]
+        world_points = [obj.matrix_world @ corner for obj in mesh_objects for corner in obj.bound_box]
+        if world_points:
+            center = sum(world_points, world_points[0] * 0.0) / len(world_points)
+            extent = max(
+                max(point.x for point in world_points) - min(point.x for point in world_points),
+                max(point.y for point in world_points) - min(point.y for point in world_points),
+                max(point.z for point in world_points) - min(point.z for point in world_points),
+                0.5,
+            )
+        else:
+            from mathutils import Vector
+
+            center = Vector((0.0, 0.0, 1.0))
+            extent = 2.0
+        views = {
+            "render_qa.png": (center.x, center.y - extent * 2.8, center.z),
+            "render_qa_three_quarter.png": (
+                center.x + extent * 1.9,
+                center.y - extent * 1.9,
+                center.z + extent * 0.15,
+            ),
+            "render_qa_side.png": (center.x + extent * 2.8, center.y, center.z),
+        }
+        rendered = []
+        for filename, location in views.items():
+            camera.location = location
+            camera.rotation_euler = (center - camera.location).to_track_quat("-Z", "Y").to_euler()
+            camera.data.lens = 55
+            render_path = artifact_dir / filename
+            _refuse_locked_write(render_path)
+            scene.render.filepath = str(render_path)
+            with _with_object(bpy, camera):
+                bpy.ops.render.render(write_still=True)
+            rendered.append(
+                {
+                    "path": str(render_path),
+                    "wrote": render_path.is_file(),
+                    "bytes": render_path.stat().st_size if render_path.is_file() else 0,
+                }
+            )
         evidence = {
             "engine": scene.render.engine,
-            "resolution": [16, 16],
-            "wrote": render_path.is_file(),
-            "bytes": render_path.stat().st_size if render_path.is_file() else 0,
+            "resolution": [512, 512],
+            "renders": rendered,
+            "wrote": all(item["wrote"] for item in rendered),
+            "bytes": sum(item["bytes"] for item in rendered),
         }
-        if not render_path.is_file():
+        if not evidence["wrote"]:
             record(failed_stage("RENDER_QA", "Workbench still was not written.", **evidence), evidence)
         else:
             record(executed_stage("RENDER_QA", "Rendered a live workbench still.", **evidence), evidence)
@@ -576,7 +634,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
 
     # 26 CHARACTER_MASTER_GATE
     gate = evaluate_master_gate(
-        real_asset_present=False,
+        real_asset_present=real_asset_verified,
         bpy_available=True,
         executed=not failed,
         failed_stages=failed,
@@ -613,7 +671,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         "dryRun": False,
         "blenderExecuted": True,
         "goatProductionReady": False,
-        "realGoatSourceTested": False,
+        "realGoatSourceTested": real_asset_verified,
     }
 
 

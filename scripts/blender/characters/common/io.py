@@ -22,6 +22,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--artifact-dir", default="artifacts/character-rigging/CHAR_GOAT_001")
     parser.add_argument("--working-blend", default="")
     parser.add_argument("--source-zip", default="")
+    parser.add_argument("--real-asset-verified", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--character-id", default="CHAR_GOAT_001")

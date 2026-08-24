@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-EXPECTED_BRANCH="cursor/tivvlejoy-goat-real-download-entrypoint-repair-73f1"
+EXPECTED_BRANCH="cursor/tivvlejoy-goat-v4-live-output-repair-73f1"
 
 die() { echo "PREFLIGHT_ABORT: $*" >&2; exit 1; }
 
