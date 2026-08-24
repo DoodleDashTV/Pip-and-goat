@@ -293,16 +293,45 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         for bone in list(arm.edit_bones):
             arm.edit_bones.remove(bone)
         created = []
-        parent = None
+        parent_by_name = {
+            "CTRL.WORLD": "CTRL.MASTER",
+            "CTRL.ROOT": "CTRL.WORLD",
+            "CTRL.COG": "CTRL.ROOT",
+            "DEF.PELVIS": "CTRL.COG",
+            "DEF.SPINE_01": "DEF.PELVIS",
+            "DEF.SPINE_02": "DEF.SPINE_01",
+            "DEF.CHEST": "DEF.SPINE_02",
+            "DEF.UPPER_CHEST": "DEF.CHEST",
+            "DEF.NECK": "DEF.UPPER_CHEST",
+            "DEF.HEAD": "DEF.NECK",
+            "CTRL.HEAD_ISOLATE": "CTRL.COG",
+            "DEF.JAW": "DEF.HEAD",
+            "DEF.EYE.L": "DEF.HEAD",
+            "DEF.EYE.R": "DEF.HEAD",
+            "DEF.THIGH.L": "DEF.PELVIS",
+            "DEF.THIGH.R": "DEF.PELVIS",
+            "DEF.SHIN.L": "DEF.THIGH.L",
+            "DEF.SHIN.R": "DEF.THIGH.R",
+            "DEF.ANKLE.L": "DEF.SHIN.L",
+            "DEF.ANKLE.R": "DEF.SHIN.R",
+            "DEF.FOOT.L": "DEF.ANKLE.L",
+            "DEF.FOOT.R": "DEF.ANKLE.R",
+            # IK targets and pole controls must not descend from the chains
+            # they solve; doing so creates a dependency cycle in Blender.
+            "CTRL.IK.FOOT.L": "CTRL.ROOT",
+            "CTRL.IK.FOOT.R": "CTRL.ROOT",
+            "CTRL.POLE.KNEE.L": "CTRL.ROOT",
+            "CTRL.POLE.KNEE.R": "CTRL.ROOT",
+        }
         height = 0.0
         for name, role, deform, _required in GENERIC_SKELETON:
             bone = arm.edit_bones.new(name)
             bone.head = (0.0, 0.0, height)
             bone.tail = (0.0, 0.15 if "FOOT" in name or "IK" in name else 0.0, height + 0.18)
             bone.use_deform = deform
-            if parent is not None and (name.startswith("DEF.") or name.startswith("CTRL.IK") or name.startswith("CTRL.POLE") or name.startswith("CTRL.HEAD")):
-                bone.parent = parent
-            parent = bone if name.startswith("DEF.") or name in {"CTRL.MASTER", "CTRL.WORLD", "CTRL.ROOT", "CTRL.COG"} else parent
+            parent_name = parent_by_name.get(name)
+            if parent_name and arm.edit_bones.get(parent_name):
+                bone.parent = arm.edit_bones[parent_name]
             height += 0.16
             created.append({"name": name, "role": role, "deform": deform})
         _set_mode(bpy, arm_obj, "OBJECT")
@@ -535,6 +564,8 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
 
     # 24 RENDER_QA
     if not prior_blocked("RENDER_QA"):
+        from mathutils import Vector
+
         scene = bpy.context.scene
         camera = bpy.data.objects.get("CHAR_GOAT_001_QA_Camera")
         if camera is None or camera.type != "CAMERA":
@@ -552,7 +583,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         scene.display.shading.light = "STUDIO"
         scene.display.shading.color_type = "TEXTURE"
         mesh_objects = [obj for obj in bpy.data.objects if obj.type == "MESH" and obj.visible_get()]
-        world_points = [obj.matrix_world @ corner for obj in mesh_objects for corner in obj.bound_box]
+        world_points = [obj.matrix_world @ Vector(corner) for obj in mesh_objects for corner in obj.bound_box]
         if world_points:
             center = sum(world_points, world_points[0] * 0.0) / len(world_points)
             extent = max(
@@ -562,8 +593,6 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
                 0.5,
             )
         else:
-            from mathutils import Vector
-
             center = Vector((0.0, 0.0, 1.0))
             extent = 2.0
         views = {
