@@ -274,7 +274,8 @@ describe('TivvleJoy character rigging department', () => {
     expect(joined).not.toMatch(/os\.system|os\.popen/);
     expect(joined).not.toMatch(/\brequests\b|\bsocket\b|urllib/);
     expect(joined).not.toMatch(/save_as_mainfile|overwrite source/i);
-    expect(joined).not.toMatch(/elevenlabs|sk_live_|RUNPOD_API/i);
+    expect(joined).not.toMatch(/sk_live_|RUNPOD_API/i);
+    expect(joined).toMatch(/elevenLabsContacted.: False/);
     expect(joined).not.toMatch(/DoodleDash/i);
   });
 

@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 ROLE_HINTS = {
-    "BODY": ("body", "mesh", "goat", "pip"),
-    "HEAD": ("head",),
-    "EYES": ("eye",),
-    "MOUTH": ("mouth", "jaw", "beak"),
+    "WINGS": ("wing",),
+    "CREST": ("crest", "feather"),
+    "BACKPACK": ("backpack",),
+    "STRAP": ("strap",),
+    "ACCESSORY": ("spiral", "copper"),
     "HORNS": ("horn",),
     "EARS": ("ear",),
     "COLLAR": ("collar",),
     "TAG": ("tag", "nameplate"),
     "SCARF": ("scarf",),
-    "WINGS": ("wing",),
-    "CREST": ("crest", "feather"),
-    "BACKPACK": ("backpack", "pack"),
-    "STRAP": ("strap",),
-    "ACCESSORY": ("spiral", "copper"),
+    "EYES": ("eye",),
+    "MOUTH": ("mouth", "jaw", "beak"),
+    "HEAD": ("head",),
+    "BODY": ("body", "mesh"),
 }
 
 

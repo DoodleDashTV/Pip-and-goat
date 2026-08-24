@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common.bpy_guard import detect_bpy
+from common.bpy_guard import detect_bpy
 
 
 def inventory_scene() -> dict[str, Any]:
