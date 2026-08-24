@@ -64,6 +64,8 @@ jobs:
           node --test scripts/cloud/tivvlejoy-character-worker-image-build.test.mjs
           pnpm --filter @doodle-dash/runpod-blender-worker test
           pnpm --filter @doodle-dash/runpod-blender-worker check
+          pnpm db:generate
+          pnpm --filter @doodle-dash/web typecheck
           pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-character-source-intake.test.ts src/lib/tivvlejoy-character-rigging-department.test.ts src/lib/runpod-worker-image.test.ts
 
       - name: Pre-build safety

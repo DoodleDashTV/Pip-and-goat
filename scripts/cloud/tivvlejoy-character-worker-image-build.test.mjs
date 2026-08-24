@@ -18,6 +18,8 @@ describe('character worker image workflow', () => {
     assert.equal(workflow.includes('api.runpod.io'), false);
     assert.equal(workflow.includes('RUNPOD_API_KEY'), false);
     assert.equal(workflow.includes('contents: write'), false);
+    assert.match(workflow, /pnpm db:generate/);
+    assert.match(workflow, /pnpm --filter @doodle-dash\/web typecheck/);
   });
 
   it('pins Blender 4.2.2 and bakes the character-master dispatcher', () => {

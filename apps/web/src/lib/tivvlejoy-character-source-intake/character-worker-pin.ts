@@ -26,7 +26,10 @@ export function resolveAuthorizedCharacterWorkerImage(
         source: 'env' as const,
       };
     }
-    if (validation.digest && FORBIDDEN_STALE_WORKER_DIGESTS.includes(validation.digest)) {
+    if (
+      validation.digest &&
+      (FORBIDDEN_STALE_WORKER_DIGESTS as readonly string[]).includes(validation.digest)
+    ) {
       return {
         ok: false as const,
         code: RUNPOD_WORKER_IMAGE_PIN_BLOCKED,
