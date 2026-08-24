@@ -62,10 +62,14 @@ export const REQUIRED_GOAT_WORKER_JOB_KINDS = [
 export const INVALID_GOAT_PAID_AUTHORIZATIONS = [
   'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1',
   'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2',
+  'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3',
 ] as const;
 
 export const GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3 =
   'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3' as const;
+
+export const GOAT_CURRENT_LIVE_PAID_EXECUTION_AUTHORIZATION =
+  'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4' as const;
 
 export const REJECTED_GOAT_LIVE_WORKER_DIGEST =
   'sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e' as const;
@@ -91,7 +95,7 @@ export type GoatPaidExecutionBlocker =
   | 'WORKER_NOT_LIVE_CHARACTER_CAPABLE'
   | 'REJECTED_LIVE_EXECUTION_DIGEST'
   | 'INVALID_SUPERSEDED_AUTHORIZATION'
-  | 'LIVE_AUTHORIZATION_V3_REQUIRED';
+  | 'LIVE_AUTHORIZATION_V4_REQUIRED';
 
 export type GoatWorkerImageResolution = {
   envConfigured: boolean;
@@ -291,8 +295,8 @@ export function evaluateGoatPaidExecutionAuthorization(input?: {
   if ((INVALID_GOAT_PAID_AUTHORIZATIONS as readonly string[]).includes(authorizationName)) {
     blockers.push('INVALID_SUPERSEDED_AUTHORIZATION');
   }
-  if (authorizationName !== GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3) {
-    blockers.push('LIVE_AUTHORIZATION_V3_REQUIRED');
+  if (authorizationName !== GOAT_CURRENT_LIVE_PAID_EXECUTION_AUTHORIZATION) {
+    blockers.push('LIVE_AUTHORIZATION_V4_REQUIRED');
   }
   void resolveLiveCharacterWorkerImage(env, {
     schema: capabilitySchema,
@@ -364,7 +368,7 @@ export function evaluateGoatPaidExecutionAuthorization(input?: {
     productionMutationCount: 0,
     nextStep: launchAllowed
       ? 'Launch exactly one SECURE RTX 4090 pod on the positively resolved character-capable worker.'
-      : 'Do not launch. Rebuild and digest-pin a TivvleJoy worker that bakes Goat materialize plus the existing 26-stage department, then issue a new explicit authorization.',
+      : 'Do not launch. Use the digest-pinned V4 worker with durable output persistence and a fresh unconsumed V4 authorization.',
     ...ZERO_INTAKE_SIDE_EFFECTS,
     ...GOAT_FIRST_PAID_EXECUTION,
     launched: false,
