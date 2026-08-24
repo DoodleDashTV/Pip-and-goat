@@ -30,10 +30,13 @@ test -f scripts/blender/characters/common/stages.py || die "department stages mi
 grep -q 'CHARACTER_MASTER_BUILD' workers/runpod-blender/src/character-job-kinds.js \
   || die "CHARACTER_MASTER_BUILD constant missing"
 
-if grep -R -n "createPodForBenchmark\|podFindAndDeployOnDemand\|ALLOW_PAID_GPU_LAUNCH=true" \
+# Scan only the character runtime and this workflow. Do not scan this
+# preflight script itself — the needle strings live here as the tripwire.
+if grep -n "createPodForBenchmark\|podFindAndDeployOnDemand\|ALLOW_PAID_GPU_LAUNCH=true" \
   workers/runpod-blender/src/character-master.js \
   workers/runpod-blender/src/character-source-materialize.js \
-  scripts/cloud/gha-character-worker-image-preflight.sh \
+  workers/runpod-blender/src/character-job-kinds.js \
+  workers/runpod-blender/src/worker.js \
   .github/workflows/tivvlejoy-worker-image-build.yml; then
   die "paid-mutation tripwire tripped"
 fi
