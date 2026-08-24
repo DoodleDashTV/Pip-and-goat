@@ -14,8 +14,6 @@ on:
       - 'scripts/cloud/gha-character-worker-image-preflight.sh'
       - 'scripts/cloud/prove-synthetic-live-path.sh'
       - 'scripts/cloud/prove-authorized-download-entrypoint.sh'
-      - 'apps/web/src/lib/tivvlejoy-character-source-intake/**'
-      - 'apps/web/src/lib/tivvlejoy-character-source-intake.test.ts'
       - '.github/workflows/tivvlejoy-worker-image-build.yml'
 
 concurrency:

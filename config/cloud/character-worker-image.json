@@ -1,9 +1,9 @@
 {
   "schema": "TIVVLEJOY_GOAT_CHARACTER_WORKER_IMAGE_PIN_V1",
   "repository": "ddp-runpod-blender",
-  "digest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
-  "ref": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
-  "sourceCommit": "08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4",
+  "digest": "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
+  "ref": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
+  "sourceCommit": "4b57856d69b8e5d698e58dcca136ffa86872bc0b",
   "architecture": "linux/amd64",
   "blenderVersion": "4.2.2",
   "characterMasterCapable": true,
@@ -19,12 +19,17 @@
   "forbiddenDigests": [
     "sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830",
     "sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed",
-    "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e"
+    "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
   ],
-  "renderCodeSha256": "541aa82ab6dbd929be28b99e2e99b7914370b3c7cfde3b748452365cf22845a9",
+  "supersededForRealExecution": [
+    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+  ],
+  "supersededReason": "Production CHARACTER_MASTER_BUILD called materializeGoatSource and never invoked downloadAuthorizedGoatSource.",
+  "renderCodeSha256": "17cd757b4dff85ddbb30d8c2586f40260883a234b0e5321a0eed4e6280242a03",
   "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
-  "buildTimestamp": "2026-08-24T20:30:35Z",
-  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V2",
+  "buildTimestamp": "2026-08-24T21:32:50Z",
+  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V3",
   "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
   "liveCharacterDepartmentCapable": true,
   "realSourceDownloadCodeBaked": true,
@@ -34,6 +39,7 @@
   "requiresPaidAuthorization": true,
   "sourceWritesForbidden": true,
   "syntheticLivePathVerified": true,
+  "authorizedDownloadEntrypointVerified": true,
   "realGoatSourceTested": false,
   "realGoatSourceBaked": false,
   "credentialsBaked": false,
@@ -43,6 +49,6 @@
   "goatProductionReady": false,
   "runpodLaunchCount": 0,
   "runpodCostUsd": 0,
-  "provenWorkflowRunId": "32771856179",
-  "provenImageDigest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+  "provenWorkflowRunId": "32779944874",
+  "provenImageDigest": "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd"
 }

@@ -1,0 +1,34 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_DOWNLOAD_ENTRYPOINT_REPAIR_BUILD_AND_PIN_V1",
+  "imageRef": "ghcr.io/<org>/ddp-runpod-blender@sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
+  "digest": "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
+  "sourceCommit": "4b57856d69b8e5d698e58dcca136ffa86872bc0b",
+  "architecture": "linux/amd64",
+  "blenderVersion": "4.2.2",
+  "renderCodeSha256": "17cd757b4dff85ddbb30d8c2586f40260883a234b0e5321a0eed4e6280242a03",
+  "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V3",
+  "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
+  "liveCharacterDepartmentCapable": true,
+  "authorizedRealSourceDownloadCapable": true,
+  "requiresPaidAuthorization": true,
+  "sourceWritesForbidden": true,
+  "characterDepartmentStageCount": 26,
+  "authorizedDownloadInvoked": 1,
+  "syntheticAuthorizedEntrypointVerified": true,
+  "mandatoryDryRun": false,
+  "goatProductionReady": false,
+  "realGoatDownloadCount": 0,
+  "runpodCreateRequestCount": 0,
+  "runpodPodCount": 0,
+  "runpodCostUsd": 0,
+  "supersededForRealExecution": [
+    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+  ],
+  "forbiddenDigests": [
+    "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+  ],
+  "workflowRunId": "32779944874",
+  "workflowUrl": "https://github.com/<org>/Pip-and-goat/actions/runs/32779944874"
+}
