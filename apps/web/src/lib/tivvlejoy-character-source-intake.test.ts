@@ -777,6 +777,7 @@ describe('Goat character source intake bridge', () => {
     expect(downloadProof.characterMasterInvokesDownload).toBe(false);
     expect(downloadProof.workingTreeInvokesDownload).toBe(true);
     expect(downloadProof.materializeAlwaysForbidsNetwork).toBe(true);
+    expect(downloadProof.workingTreeMaterializeAlwaysForbidsNetwork).toBe(true);
 
     const live = {
       sourceLocked: true,
