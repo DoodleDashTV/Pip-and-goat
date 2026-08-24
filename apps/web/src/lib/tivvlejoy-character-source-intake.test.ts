@@ -19,12 +19,18 @@ import {
   compileGoatPostUploadPreflight,
   dryRunGoatSourceMaterialization,
   evaluateGoatPaidExecutionAuthorization,
+  GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3,
   GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA,
+  INVALID_GOAT_PAID_AUTHORIZATIONS,
   KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST,
   READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
+  REJECTED_GOAT_LIVE_WORKER_DIGEST,
+  REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS,
+  REQUIRED_LIVE_CAPABILITY_SCHEMA,
   RUNPOD_WORKER_IMAGE_PIN_BLOCKED,
   REJECTED_LIVE_EXECUTION_DIGEST,
   WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE,
+  readCharacterWorkerPin,
   resolveAuthorizedCharacterWorkerImage,
   resolveLiveCharacterWorkerImage,
   emptyGoatSourceReceipt,
@@ -417,11 +423,15 @@ describe('Goat character source intake bridge', () => {
   });
 
   it('resolves RUNPOD_WORKER_IMAGE from the authoritative character pin and rejects stale digests', () => {
+    const pin = readCharacterWorkerPin();
+    const provenDigest = 'sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9';
+    expect(pin.digest).toBe(provenDigest);
+    expect(pin.sourceCommit).toBe('08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4');
     const resolved = resolveAuthorizedCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
     expect(resolved.ok).toBe(true);
     expect(resolved.source).toBe('authoritative-pin');
-    expect(resolved.digest).toBe('sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e');
-    expect(resolved.ref).toContain('@sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e');
+    expect(resolved.digest).toBe(provenDigest);
+    expect(resolved.ref).toContain(`@${provenDigest}`);
     const stale = resolveAuthorizedCharacterWorkerImage({
       RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST}`,
     });
@@ -436,6 +446,93 @@ describe('Goat character source intake bridge', () => {
     );
     expect(v1.ok).toBe(false);
     expect([REJECTED_LIVE_EXECUTION_DIGEST, WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE]).toContain(v1.code);
+  });
+
+  it('accepts the proven Capability V2 digest for a future V3 and rejects V1, f732, tags, and V1/V2 auths', () => {
+    const provenDigest = 'sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9';
+    const v2 = {
+      schema: REQUIRED_LIVE_CAPABILITY_SCHEMA,
+      liveCharacterDepartmentCapable: true,
+      mandatoryDryRun: false,
+    };
+    const live = resolveLiveCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' }, v2);
+    expect(live.ok).toBe(true);
+    expect(live.digest).toBe(provenDigest);
+    expect(live.ref).toMatch(/@sha256:[0-9a-f]{64}$/);
+    expect(live.ref).not.toMatch(/:(latest|08d6fa5)\b/);
+
+    const capabilityV1 = resolveLiveCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' }, {
+      schema: 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V1',
+      liveCharacterDepartmentCapable: true,
+      mandatoryDryRun: false,
+    });
+    expect(capabilityV1.ok).toBe(false);
+    expect(capabilityV1.code).toBe(WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE);
+
+    expect(REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS).toContain(REJECTED_GOAT_LIVE_WORKER_DIGEST);
+    const oldLive = resolveLiveCharacterWorkerImage(
+      { RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${REJECTED_GOAT_LIVE_WORKER_DIGEST}` },
+      v2,
+    );
+    expect(oldLive.ok).toBe(false);
+    expect([REJECTED_LIVE_EXECUTION_DIGEST, RUNPOD_WORKER_IMAGE_PIN_BLOCKED]).toContain(oldLive.code);
+
+    const mutable = resolveAuthorizedCharacterWorkerImage({
+      RUNPOD_WORKER_IMAGE: 'ghcr.io/example-org/ddp-runpod-blender:latest',
+    });
+    expect(mutable.ok).toBe(false);
+    expect(mutable.code).toBe(RUNPOD_WORKER_IMAGE_PIN_BLOCKED);
+
+    const pinJson = JSON.parse(
+      readFileSync(path.resolve(process.cwd(), 'config/cloud/character-worker-image.json'), 'utf8'),
+    ) as { defaultExecutionMode?: string; goatProductionReady?: boolean };
+    expect(pinJson.defaultExecutionMode).toBe('dry-run');
+    expect(pinJson.goatProductionReady).toBe(false);
+    expect(INVALID_GOAT_PAID_AUTHORIZATIONS).toEqual([
+      'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1',
+      'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2',
+    ]);
+    const v1Auth = evaluateGoatPaidExecutionAuthorization({
+      authorizationPresent: true,
+      env: { RUNPOD_WORKER_IMAGE: '', ALLOW_PAID_GPU_LAUNCH: 'false' },
+      live: {
+        sourceLocked: true,
+        objectExists: true,
+        storedSize: GOAT_SOURCE_SIZE_BYTES,
+        storedSha256: GOAT_SOURCE_SHA256,
+        hashVerified: true,
+        zipOk: true,
+        capabilitySchema: REQUIRED_LIVE_CAPABILITY_SCHEMA,
+        liveCharacterDepartmentCapable: true,
+        mandatoryDryRun: false,
+        authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1',
+      },
+    });
+    expect(v1Auth.launch.allowed).toBe(false);
+    expect(v1Auth.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
+    expect(v1Auth.remainingBlockers).toContain('LIVE_AUTHORIZATION_V3_REQUIRED');
+    const v2Auth = evaluateGoatPaidExecutionAuthorization({
+      authorizationPresent: true,
+      env: { RUNPOD_WORKER_IMAGE: '', ALLOW_PAID_GPU_LAUNCH: 'false' },
+      live: {
+        sourceLocked: true,
+        objectExists: true,
+        storedSize: GOAT_SOURCE_SIZE_BYTES,
+        storedSha256: GOAT_SOURCE_SHA256,
+        hashVerified: true,
+        zipOk: true,
+        capabilitySchema: REQUIRED_LIVE_CAPABILITY_SCHEMA,
+        liveCharacterDepartmentCapable: true,
+        mandatoryDryRun: false,
+        authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2',
+      },
+    });
+    expect(v2Auth.launch.allowed).toBe(false);
+    expect(v2Auth.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
+    expect(v2Auth.remainingBlockers).toContain('LIVE_AUTHORIZATION_V3_REQUIRED');
+    expect(GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3).toBe(
+      'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3',
+    );
   });
 
   it('stays connection-ready without R2 and refuses Production mutations', async () => {
