@@ -36,6 +36,7 @@ function sourceFiles() {
     'src/character-source-materialize.js',
     'src/character-download-gate.js',
     'src/character-job-kinds.js',
+    'src/character-worker-entry.js',
     'src/worker.js',
   ].map((rel) => fs.readFileSync(path.join(workerRoot, rel), 'utf8'));
 }

@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('node:fs');
+const path = require('node:path');
 const { inflateRawSync } = require('node:zlib');
 
 const PROHIBITED_EXTENSIONS = new Set([
@@ -165,4 +167,169 @@ function extractZipSafely(bytes, destDir, fsImpl) {
   return { ...inspected, written };
 }
 
-module.exports = { listZipEntries, inspectZipSafety, extractZipSafely, PROHIBITED_EXTENSIONS };
+function readFileRange(fd, offset, length) {
+  const buf = Buffer.alloc(length);
+  const read = fs.readSync(fd, buf, 0, length, offset);
+  return buf.subarray(0, read);
+}
+
+function listZipEntriesFromCentral(central, count) {
+  const entries = [];
+  let cursor = 0;
+  for (let i = 0; i < count; i += 1) {
+    if (readU32(central, cursor) !== 0x02014b50) {
+      const err = new Error('ZIP_CORRUPT');
+      err.code = 'ZIP_CORRUPT';
+      throw err;
+    }
+    const method = readU16(central, cursor + 10);
+    const compressedSize = readU32(central, cursor + 20);
+    const uncompressedSize = readU32(central, cursor + 24);
+    const nameLen = readU16(central, cursor + 28);
+    const extraLen = readU16(central, cursor + 30);
+    const commentLen = readU16(central, cursor + 32);
+    const localOffset = readU32(central, cursor + 42);
+    const name = central.subarray(cursor + 46, cursor + 46 + nameLen).toString('utf8');
+    entries.push({
+      path: name,
+      method,
+      compressedSize,
+      uncompressedSize,
+      localOffset,
+      directory: name.endsWith('/'),
+    });
+    cursor += 46 + nameLen + extraLen + commentLen;
+  }
+  return entries;
+}
+
+function listZipEntriesFromFile(filePath) {
+  const stat = fs.statSync(filePath);
+  if (stat.size < 22) {
+    const err = new Error('ZIP_CORRUPT');
+    err.code = 'ZIP_CORRUPT';
+    throw err;
+  }
+  const fd = fs.openSync(filePath, 'r');
+  try {
+    const tailLen = Math.min(stat.size, 65557);
+    const tail = readFileRange(fd, stat.size - tailLen, tailLen);
+    let eocd = -1;
+    for (let i = tail.length - 22; i >= 0; i -= 1) {
+      if (readU32(tail, i) === 0x06054b50) {
+        eocd = i;
+        break;
+      }
+    }
+    if (eocd < 0) {
+      const err = new Error('ZIP_CORRUPT');
+      err.code = 'ZIP_CORRUPT';
+      throw err;
+    }
+    const count = readU16(tail, eocd + 10);
+    const cdSize = readU32(tail, eocd + 12);
+    const cdOffset = readU32(tail, eocd + 16);
+    if (cdOffset + cdSize > stat.size) {
+      const err = new Error('ZIP_CORRUPT');
+      err.code = 'ZIP_CORRUPT';
+      throw err;
+    }
+    const central = readFileRange(fd, cdOffset, cdSize);
+    return listZipEntriesFromCentral(central, count);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+function inspectZipSafetyFromFile(filePath, required) {
+  const entries = listZipEntriesFromFile(filePath);
+  const names = entries.map((entry) => ({ path: entry.path, directory: entry.directory }));
+  const members = names.filter((item) => !item.directory).map((item) => item.path);
+  const findings = [];
+  const seen = new Set();
+  for (const entry of names) {
+    const normalized = entry.path.replace(/\\/g, '/');
+    if (normalized.includes('..') || normalized.startsWith('/') || normalized.includes('\0')) {
+      findings.push('ZIP_TRAVERSAL');
+    }
+    if (seen.has(normalized)) findings.push('ZIP_DUPLICATE');
+    seen.add(normalized);
+    const ext = normalized.includes('.') ? `.${normalized.split('.').pop().toLowerCase()}` : '';
+    if (PROHIBITED_EXTENSIONS.has(ext)) findings.push('ZIP_PROHIBITED_PAYLOAD');
+    if (normalized.endsWith('.lnk') || normalized.endsWith('.symlink')) findings.push('ZIP_LINK');
+  }
+  const need = required || { blend: 'Goat_FINN.blend', fbx: 'Goat_FINN.fbx' };
+  const hasBlend = members.some((member) => member.replace(/\\/g, '/').endsWith(need.blend));
+  const hasFbx = members.some((member) => member.replace(/\\/g, '/').endsWith(need.fbx));
+  if (!hasBlend || !hasFbx) findings.push('MISSING_REQUIRED_FILE');
+  const unique = [...new Set(findings)];
+  const code = unique.includes('ZIP_TRAVERSAL')
+    ? 'ZIP_TRAVERSAL'
+    : unique.includes('ZIP_PROHIBITED_PAYLOAD')
+      ? 'ZIP_PROHIBITED_PAYLOAD'
+      : unique.includes('ZIP_LINK')
+        ? 'ZIP_LINK'
+        : unique.includes('ZIP_DUPLICATE')
+          ? 'ZIP_DUPLICATE'
+          : unique.includes('MISSING_REQUIRED_FILE')
+            ? 'MISSING_REQUIRED_FILE'
+            : 'ZIP_SAFE';
+  return { ok: code === 'ZIP_SAFE', code, members, count: members.length, findings: unique };
+}
+
+function extractZipSafelyFromFile(filePath, destDir) {
+  const inspected = inspectZipSafetyFromFile(filePath);
+  if (!inspected.ok) {
+    const err = new Error(inspected.code);
+    err.code = inspected.code;
+    throw err;
+  }
+  const entries = listZipEntriesFromFile(filePath);
+  const fd = fs.openSync(filePath, 'r');
+  const written = [];
+  try {
+    for (const entry of entries) {
+      if (entry.directory) continue;
+      const normalized = entry.path.replace(/\\/g, '/');
+      const target = path.resolve(destDir, normalized);
+      if (!target.startsWith(path.resolve(destDir))) {
+        const err = new Error('ZIP_TRAVERSAL');
+        err.code = 'ZIP_TRAVERSAL';
+        throw err;
+      }
+      const local = readFileRange(fd, entry.localOffset, 30);
+      if (local.length < 30 || readU32(local, 0) !== 0x04034b50) {
+        const err = new Error('ZIP_CORRUPT');
+        err.code = 'ZIP_CORRUPT';
+        throw err;
+      }
+      const nameLen = readU16(local, 26);
+      const extraLen = readU16(local, 28);
+      const dataStart = entry.localOffset + 30 + nameLen + extraLen;
+      const compressed = readFileRange(fd, dataStart, entry.compressedSize);
+      const data =
+        entry.method === 0 ? compressed : entry.method === 8 ? inflateRawSync(compressed) : null;
+      if (!data) {
+        const err = new Error('ZIP_CORRUPT');
+        err.code = 'ZIP_CORRUPT';
+        throw err;
+      }
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, data);
+      written.push(target);
+    }
+  } finally {
+    fs.closeSync(fd);
+  }
+  return { ...inspected, written };
+}
+
+module.exports = {
+  listZipEntries,
+  inspectZipSafety,
+  extractZipSafely,
+  listZipEntriesFromFile,
+  inspectZipSafetyFromFile,
+  extractZipSafelyFromFile,
+  PROHIBITED_EXTENSIONS,
+};

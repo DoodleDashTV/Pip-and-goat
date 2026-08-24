@@ -36,6 +36,7 @@ import {
   READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
   REJECTED_GOAT_LIVE_WORKER_DIGEST,
   REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS,
+  SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST,
   REQUIRED_LIVE_CAPABILITY_SCHEMA,
   RUNPOD_WORKER_IMAGE_PIN_BLOCKED,
   REJECTED_LIVE_EXECUTION_DIGEST,
@@ -434,9 +435,9 @@ describe('Goat character source intake bridge', () => {
 
   it('resolves RUNPOD_WORKER_IMAGE from the authoritative character pin and rejects stale digests', () => {
     const pin = readCharacterWorkerPin();
-    const provenDigest = 'sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9';
+    const provenDigest = 'sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd';
     expect(pin.digest).toBe(provenDigest);
-    expect(pin.sourceCommit).toBe('08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4');
+    expect(pin.sourceCommit).toBe('4b57856d69b8e5d698e58dcca136ffa86872bc0b');
     const resolved = resolveAuthorizedCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
     expect(resolved.ok).toBe(true);
     expect(resolved.source).toBe('authoritative-pin');
@@ -459,7 +460,7 @@ describe('Goat character source intake bridge', () => {
   });
 
   it('accepts the proven Capability V2 digest for a future V3 and rejects V1, f732, tags, and V1/V2 auths', () => {
-    const provenDigest = 'sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9';
+    const provenDigest = 'sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd';
     const v2 = {
       schema: REQUIRED_LIVE_CAPABILITY_SCHEMA,
       liveCharacterDepartmentCapable: true,
@@ -480,6 +481,13 @@ describe('Goat character source intake bridge', () => {
     expect(capabilityV1.code).toBe(WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE);
 
     expect(REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS).toContain(REJECTED_GOAT_LIVE_WORKER_DIGEST);
+    expect(REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS).toContain(SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST);
+    const superseded = resolveLiveCharacterWorkerImage(
+      { RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST}` },
+      v2,
+    );
+    expect(superseded.ok).toBe(false);
+    expect([REJECTED_LIVE_EXECUTION_DIGEST, RUNPOD_WORKER_IMAGE_PIN_BLOCKED]).toContain(superseded.code);
     const oldLive = resolveLiveCharacterWorkerImage(
       { RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${REJECTED_GOAT_LIVE_WORKER_DIGEST}` },
       v2,
@@ -763,11 +771,14 @@ describe('Goat character source intake bridge', () => {
 
   it('binds V3 to the exact 1e29b0ba digest and refuses CREATE while the image cannot download Goat', () => {
     const pin = resolvePinnedV3ImageRef();
-    expect(pin.ok).toBe(true);
+    expect(pin.ok).toBe(false);
     expect(pin.containsLiteralOrgPlaceholder).toBe(false);
-    expect(pin.digest).toBe(GOAT_V3_REQUIRED_DIGEST);
-    expect(pin.sourceCommit).toBe(GOAT_V3_REQUIRED_SOURCE_COMMIT);
-    expect(pin.ref.endsWith(`ddp-runpod-blender@${GOAT_V3_REQUIRED_DIGEST}`)).toBe(true);
+    expect(pin.digest).toBe('sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd');
+    expect(pin.sourceCommit).toBe('4b57856d69b8e5d698e58dcca136ffa86872bc0b');
+    expect(pin.digest).not.toBe(GOAT_V3_REQUIRED_DIGEST);
+    expect(pin.sourceCommit).not.toBe(GOAT_V3_REQUIRED_SOURCE_COMMIT);
+    expect(GOAT_V3_REQUIRED_DIGEST).toBe(SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST);
+    expect(GOAT_V3_REQUIRED_SOURCE_COMMIT).toBe('08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4');
     expect(pin.forbidden).toBe(false);
 
     const downloadProof = provePinnedImageCannotInvokeRealDownload();
@@ -775,7 +786,9 @@ describe('Goat character source intake bridge', () => {
     expect(downloadProof.code).toBe('AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD');
     expect(downloadProof.downloadFunctionBaked).toBe(true);
     expect(downloadProof.characterMasterInvokesDownload).toBe(false);
+    expect(downloadProof.workingTreeInvokesDownload).toBe(true);
     expect(downloadProof.materializeAlwaysForbidsNetwork).toBe(true);
+    expect(downloadProof.workingTreeMaterializeAlwaysForbidsNetwork).toBe(true);
 
     const live = {
       sourceLocked: true,
@@ -818,7 +831,15 @@ describe('Goat character source intake bridge', () => {
     expect(decision.bindings.expectedSizeBytes).toBe(GOAT_SOURCE_SIZE_BYTES);
     expect(decision.bindings.maxCreateRequests).toBe(1);
     expect(decision.quote.withinAuthorization).toBe(true);
-    expect(decision.remainingBlockers).toEqual(['AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD']);
+    expect(decision.remainingBlockers).toEqual(
+      expect.arrayContaining([
+        'V3_PIN_MISSING',
+        'V3_DIGEST_MISMATCH',
+        'V3_SOURCE_COMMIT_MISMATCH',
+        'AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD',
+      ]),
+    );
+    expect(decision.remainingBlockers).not.toContain('REJECTED_LIVE_EXECUTION_DIGEST');
 
     const overBudget = evaluateGoatV3PaidExecutionAuthorization({
       env: { RUNPOD_WORKER_IMAGE: '' },

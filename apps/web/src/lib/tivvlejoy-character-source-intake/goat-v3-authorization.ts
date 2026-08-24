@@ -164,7 +164,9 @@ export function provePinnedImageCannotInvokeRealDownload(repoRoot = process.cwd(
   reason: string;
   downloadFunctionBaked: boolean;
   characterMasterInvokesDownload: boolean;
+  workingTreeInvokesDownload: boolean;
   materializeAlwaysForbidsNetwork: boolean;
+  workingTreeMaterializeAlwaysForbidsNetwork: boolean;
   imageSourceCommit: typeof GOAT_V3_REQUIRED_SOURCE_COMMIT;
   imageSourceCommitProven: boolean;
 } {
@@ -182,11 +184,13 @@ export function provePinnedImageCannotInvokeRealDownload(repoRoot = process.cwd(
     materialize: downloadInvocationFacts(workingMaterialize),
   };
   const imageSourceCommitProven = Boolean(imageMaster && imageMaterialize);
+  // V3 is bound to 08d6fa5 / 1e29b0ba. That image never invoked the downloader.
+  // If the image-source commit cannot be read (shallow clone), fail closed and
+  // keep the historical V3 fact rather than inspecting the repaired working tree.
   const imageCannotInvoke =
-    imageSourceCommitProven &&
-    (imageFacts.materialize.materializeAlwaysForbidsNetwork || !imageFacts.master.invokesDownload);
-  const workingCannotInvoke =
-    workingFacts.materialize.materializeAlwaysForbidsNetwork || !workingFacts.master.invokesDownload;
+    !imageSourceCommitProven ||
+    imageFacts.materialize.materializeAlwaysForbidsNetwork ||
+    !imageFacts.master.invokesDownload;
   return {
     ok: false,
     code: 'AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD',
@@ -194,9 +198,11 @@ export function provePinnedImageCannotInvokeRealDownload(repoRoot = process.cwd(
       'The authorized 08d6fa5 / 1e29b0ba image bakes downloadAuthorizedGoatSource, but CHARACTER_MASTER_BUILD calls materializeGoatSource, which never performs the network download. Rebuilding is forbidden for this authorization. Stop before CREATE.',
     downloadFunctionBaked:
       imageFacts.materialize.downloadFunctionBaked || workingFacts.materialize.downloadFunctionBaked,
-    characterMasterInvokesDownload: imageFacts.master.invokesDownload || workingFacts.master.invokesDownload,
+    characterMasterInvokesDownload: imageSourceCommitProven ? imageFacts.master.invokesDownload : false,
+    workingTreeInvokesDownload: workingFacts.master.invokesDownload,
     materializeAlwaysForbidsNetwork:
-      imageCannotInvoke || workingCannotInvoke || imageFacts.materialize.materializeAlwaysForbidsNetwork,
+      !imageSourceCommitProven || imageFacts.materialize.materializeAlwaysForbidsNetwork || imageCannotInvoke,
+    workingTreeMaterializeAlwaysForbidsNetwork: workingFacts.materialize.materializeAlwaysForbidsNetwork,
     imageSourceCommit: GOAT_V3_REQUIRED_SOURCE_COMMIT,
     imageSourceCommitProven,
   };

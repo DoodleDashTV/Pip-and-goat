@@ -19,6 +19,8 @@ prove /opt/ddp-worker/src/character-source-materialize.js
 prove /opt/ddp-worker/src/character-capability.js
 prove /opt/ddp-worker/src/character-download-gate.js
 prove /opt/ddp-worker/src/character-stream-hash.js
+prove /opt/ddp-worker/src/character-worker-entry.js
+prove /opt/ddp-worker/src/prove-authorized-download-entrypoint.js
 prove /opt/ddp-worker/blender/characters/build_character.py
 prove /opt/ddp-worker/blender/characters/execute.py
 prove /opt/ddp-worker/blender/characters/common/stages.py
@@ -51,5 +53,7 @@ echo "$BLENDER_OUT" | grep -q '4.2.2' || die "container Blender is not 4.2.2"
 ARCH="$(docker image inspect "$BUILD_TAG" --format '{{.Architecture}}')"
 echo "architecture=$ARCH" | tee "$EVIDENCE/architecture.txt"
 [ "$ARCH" = "amd64" ] || die "image architecture is $ARCH, expected amd64"
+
+bash scripts/cloud/prove-authorized-download-entrypoint.sh "$BUILD_TAG" "$EVIDENCE/authorized-download-entrypoint"
 
 echo "CHARACTER_WORKER_IMAGE_VERIFIED"

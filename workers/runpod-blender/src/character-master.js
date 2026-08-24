@@ -19,8 +19,13 @@ const {
   isCharacterJobKind,
   isFinal1080p,
 } = require('./character-job-kinds');
-const { materializeGoatSource, planCharacterSourceMaterialize } = require('./character-source-materialize');
-const { compileCharacterCapability } = require('./character-capability');
+const {
+  materializeGoatSource,
+  planCharacterSourceMaterialize,
+  downloadAuthorizedGoatSource,
+  evaluateRealDownloadRequest,
+} = require('./character-source-materialize');
+const { compileCharacterCapability, rejectCapabilityV1ForLive } = require('./character-capability');
 
 function fail(code, reason, extra = {}) {
   return {
@@ -204,8 +209,18 @@ async function runCharacterMaster(input = {}) {
     expectedSha256: input.expectedSha256,
     workspaceDir: input.workspaceDir,
     outputDestination: input.workspaceDir,
-    runBlenderProbe: input.runBlenderProbe === true || mode.mode === EXECUTION_MODE_LIVE,
-    createWorkingCopy: input.createWorkingCopy === true || mode.mode === EXECUTION_MODE_LIVE,
+    runBlenderProbe:
+      input.runBlenderProbe === true ||
+      (mode.mode === EXECUTION_MODE_LIVE &&
+        input.runBlenderProbe !== false &&
+        input.authorizedTestTransport !== true &&
+        typeof input.sourceTransport !== 'function'),
+    createWorkingCopy:
+      input.createWorkingCopy === true ||
+      (mode.mode === EXECUTION_MODE_LIVE &&
+        input.createWorkingCopy !== false &&
+        input.authorizedTestTransport !== true &&
+        typeof input.sourceTransport !== 'function'),
     allowRealGoatDownload: env.GOAT_ALLOW_REAL_DOWNLOAD === 'true',
     paidExecutionAuthorized: env.PAID_EXECUTION_AUTHORIZED === 'true',
     requestRealDownload: input.requestRealDownload === true,
@@ -219,12 +234,39 @@ async function runCharacterMaster(input = {}) {
     maxBytes: input.maxBytes,
   };
 
-  const materialize =
-    resolved.kind === CHARACTER_BUILD && input.skipMaterialize === true
-      ? planCharacterSourceMaterialize({ dryRun: mode.mode !== EXECUTION_MODE_LIVE })
-      : mode.mode !== EXECUTION_MODE_LIVE && !input.syntheticBytes && !input.syntheticPath
-        ? planCharacterSourceMaterialize({ dryRun: true })
-        : materializeGoatSource(materializeInput);
+  const real = evaluateRealDownloadRequest(materializeInput);
+  let materialize;
+  let authorizedDownloadInvoked = 0;
+  if (mode.mode === EXECUTION_MODE_LIVE && real.wanted) {
+    const capabilityGate = rejectCapabilityV1ForLive(capability);
+    if (!capabilityGate.ok) {
+      return fail(capabilityGate.code, capabilityGate.reason, { capability });
+    }
+    if (!real.gate.ok) {
+      return fail(real.gate.code, real.gate.reason, {
+        failedConditions: real.gate.failedConditions,
+        authorizationReceipt: real.gate.authorizationReceipt,
+        authorizedDownloadInvoked: 0,
+        networkDownloadInvoked: false,
+      });
+    }
+    authorizedDownloadInvoked = 1;
+    materialize = await downloadAuthorizedGoatSource({
+      ...materializeInput,
+      performNetworkDownload: true,
+      sourceTransport: input.sourceTransport,
+      authorizedTestTransport: input.authorizedTestTransport === true,
+      testExpectedSize: input.testExpectedSize,
+      testExpectedSha256: input.testExpectedSha256,
+    });
+  } else {
+    materialize =
+      resolved.kind === CHARACTER_BUILD && input.skipMaterialize === true
+        ? planCharacterSourceMaterialize({ dryRun: mode.mode !== EXECUTION_MODE_LIVE })
+        : mode.mode !== EXECUTION_MODE_LIVE && !input.syntheticBytes && !input.syntheticPath
+          ? planCharacterSourceMaterialize({ dryRun: true })
+          : materializeGoatSource(materializeInput);
+  }
 
   if (resolved.kind === CHARACTER_SOURCE_MATERIALIZE) {
     return {
@@ -279,6 +321,8 @@ async function runCharacterMaster(input = {}) {
     department,
     capability,
     characterMasterGate: department.characterMasterGate,
+    authorizedDownloadInvoked: materialize.authorizedDownloadInvoked || authorizedDownloadInvoked,
+    networkDownloadInvoked: materialize.networkDownloadInvoked === true,
     executionMode: mode.mode,
     sanitizedArgv: department.sanitizedArgv,
     blenderFlag: department.blenderFlag,
