@@ -10,6 +10,7 @@ export * from './materialization';
 export * from './pipeline-bridge';
 export * from './post-upload-preflight';
 export * from './paid-execution-authorization';
+export * from './goat-v3-authorization';
 export * from './character-worker-pin-record';
 export * from './character-worker-pin';
 export * from './states';

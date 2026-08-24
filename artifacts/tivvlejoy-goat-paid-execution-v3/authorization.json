@@ -1,0 +1,139 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3",
+  "status": "FAIL_CLOSED_DO_NOT_LAUNCH",
+  "bindings": {
+    "authorizationName": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3",
+    "characterId": "CHAR_GOAT_001",
+    "sourceKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip",
+    "expectedSha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+    "expectedSizeBytes": 269512136,
+    "digest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "sourceCommit": "08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4",
+    "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
+    "renderCodeSha256": "541aa82ab6dbd929be28b99e2e99b7914370b3c7cfde3b748452365cf22845a9",
+    "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+    "maxCreateRequests": 1,
+    "maxPods": 1,
+    "hardCostUsd": 5,
+    "cloudType": "SECURE",
+    "plannedPodName": "tivvlejoy-goat-v3-1e29b0ba",
+    "noRetry": true,
+    "mandatoryCleanup": true,
+    "humanVisualApprovalRequired": true,
+    "productionPromotionForbidden": true
+  },
+  "limits": {
+    "characterId": "CHAR_GOAT_001",
+    "sourceObjectKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip",
+    "expectedSha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+    "expectedSizeBytes": 269512136,
+    "gpuTypeId": "NVIDIA GeForce RTX 4090",
+    "cloudType": "SECURE",
+    "maxRuntimeMinutes": 180,
+    "maxTotalCostUsd": 5,
+    "maxLaunches": 1,
+    "reuploadForbidden": true,
+    "secondLaunchForbidden": true,
+    "productionUntouched": true,
+    "pr99MustRemainDraft": true,
+    "pr100MustRemainDraft": true,
+    "elevenLabsContactForbidden": true,
+    "theatricalGateForbidden": true,
+    "qualityGatesMustNotBeLowered": true,
+    "authorizationName": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3",
+    "requiredDigest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "requiredSourceCommit": "08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4",
+    "requiredCapabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
+    "humanVisualApprovalRequired": true,
+    "productionPromotionForbidden": true,
+    "noCreateRetry": true,
+    "mandatoryCleanup": true,
+    "secureCloudOnly": true
+  },
+  "pin": {
+    "ok": true,
+    "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "digest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "sourceCommit": "08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4",
+    "containsLiteralOrgPlaceholder": false,
+    "validation": {
+      "ok": true,
+      "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+      "code": "OK",
+      "reason": "Worker image pinned by immutable @sha256 digest on ghcr.io.",
+      "registry": "ghcr.io",
+      "repository": "<org>/ddp-runpod-blender",
+      "digest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+    },
+    "forbidden": false,
+    "refRedacted": "ghcr.io/<org>/ddp-runpod-blender@sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+  },
+  "worker": {
+    "envConfigured": true,
+    "envValidation": {
+      "ok": true,
+      "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+      "code": "OK",
+      "reason": "Worker image pinned by immutable @sha256 digest on ghcr.io.",
+      "registry": "ghcr.io",
+      "repository": "<org>/ddp-runpod-blender",
+      "digest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+    },
+    "checkoutStaleDigest": "sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830",
+    "checkoutStalePinUsable": false,
+    "knownCurrentTivvleJoyDigest": "sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed",
+    "knownCurrentSourceCommit": "1ea2cf58c9cfc015929d0a4ca63446898d59ba79",
+    "knownCurrentReachable": null,
+    "knownCurrentJobKind": "CHARACTER_MASTER_BUILD CHARACTER_SOURCE_MATERIALIZE CHARACTER_BUILD",
+    "knownCurrentHasCharacterDepartment": true,
+    "knownCurrentHasGoatMaterialize": true,
+    "requiredJobKinds": [
+      "CHARACTER_MASTER_BUILD",
+      "CHARACTER_SOURCE_MATERIALIZE",
+      "CHARACTER_BUILD"
+    ],
+    "positivelyResolved": true,
+    "digestUsed": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "reason": "Worker image pinned by immutable @sha256 digest on ghcr.io."
+  },
+  "liveResolved": {
+    "ok": true,
+    "code": "OK",
+    "reason": "RUNPOD_WORKER_IMAGE matches the immutable character-worker digest.",
+    "digest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "source": "env"
+  },
+  "quote": {
+    "gpuTypeId": "NVIDIA GeForce RTX 4090",
+    "cloudType": "SECURE",
+    "uninterruptablePriceUsdPerHr": 0.74,
+    "stockStatus": "Low",
+    "predictedRuntimeMinutes": 180,
+    "predictedTotalUsd": 2.22,
+    "studioHourlyCapUsd": 0.8,
+    "authorizationCeilingUsd": 5,
+    "withinAuthorization": true
+  },
+  "downloadProof": {
+    "ok": false,
+    "code": "AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD",
+    "reason": "The authorized 08d6fa5 / 1e29b0ba image bakes downloadAuthorizedGoatSource, but CHARACTER_MASTER_BUILD calls materializeGoatSource, which never performs the network download. Rebuilding is forbidden for this authorization. Stop before CREATE.",
+    "downloadFunctionBaked": true,
+    "characterMasterInvokesDownload": false,
+    "materializeAlwaysForbidsNetwork": true,
+    "imageSourceCommit": "08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4",
+    "imageSourceCommitProven": true
+  },
+  "launch": {
+    "allowed": false,
+    "launched": false,
+    "createRequestCount": 0,
+    "podCount": 0
+  },
+  "remainingBlockers": [
+    "AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD"
+  ],
+  "goatProductionReady": false,
+  "consumed": false
+}
