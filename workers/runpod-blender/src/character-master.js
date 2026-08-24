@@ -13,6 +13,8 @@ const {
   ENTRYPOINT_VERSION,
   GOAT_CHARACTER_ID,
   DEPARTMENT_STAGE_COUNT,
+  LOCKED_SOURCE_SHA256,
+  LOCKED_SOURCE_SIZE,
   EXECUTION_MODE_LIVE,
   resolveDeclaredJobKind,
   resolveExecutionMode,
@@ -84,6 +86,22 @@ function sanitizeArgv(args) {
   });
 }
 
+function resolveDepartmentTimeoutMs(input = {}, env = process.env) {
+  const explicit = Number(input.timeoutMs);
+  if (Number.isFinite(explicit) && explicit > 0) return Math.floor(explicit);
+
+  const maxRuntimeMinutes = Number(env.MAX_JOB_RUNTIME_MINUTES || 180);
+  const stopNewStagesAtMinutes = Number(env.CHARACTER_STOP_NEW_STAGES_MINUTES || 165);
+  const boundedMinutes = Math.max(
+    1,
+    Math.min(
+      Number.isFinite(maxRuntimeMinutes) && maxRuntimeMinutes > 0 ? maxRuntimeMinutes : 180,
+      Number.isFinite(stopNewStagesAtMinutes) && stopNewStagesAtMinutes > 0 ? stopNewStagesAtMinutes : 165,
+    ),
+  );
+  return Math.floor(boundedMinutes * 60_000);
+}
+
 function runDepartment(input = {}) {
   const root = input.root || process.cwd();
   const script = departmentScriptPath(root);
@@ -128,6 +146,9 @@ function runDepartment(input = {}) {
   if (input.sourceZip) {
     args.push('--source-zip', input.sourceZip);
   }
+  if (input.realAssetVerified === true) {
+    args.push('--real-asset-verified');
+  }
   if (input.injectStageFailure) {
     args.push('--inject-stage-failure', input.injectStageFailure);
   }
@@ -135,7 +156,7 @@ function runDepartment(input = {}) {
   const sanitizedArgv = sanitizeArgv([bin, ...args]);
   const result = spawnSync(bin, args, {
     encoding: 'utf8',
-    timeout: input.timeoutMs || 180_000,
+    timeout: resolveDepartmentTimeoutMs(input, input.env || process.env),
     env: {
       ...process.env,
       ...(input.env || {}),
@@ -301,6 +322,10 @@ async function runCharacterMaster(input = {}) {
     artifactDir: input.artifactDir,
     workingBlend: materialize.working?.department,
     sourceZip: input.sourceZip || materialize.stagedZip,
+    realAssetVerified:
+      materialize.realGoatDownloaded === true &&
+      materialize.observedSha256 === LOCKED_SOURCE_SHA256 &&
+      materialize.observedSize === LOCKED_SOURCE_SIZE,
     executionModeResolved: mode,
     injectStageFailure: input.injectStageFailure,
     timeoutMs: input.timeoutMs,
@@ -341,5 +366,6 @@ module.exports = {
   resolveJobKind,
   runCharacterMaster,
   runDepartment,
+  resolveDepartmentTimeoutMs,
   CHARACTER_JOB_KINDS,
 };

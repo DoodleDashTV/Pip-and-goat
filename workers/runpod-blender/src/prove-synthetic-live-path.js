@@ -107,9 +107,10 @@ function runGateMatrix() {
   assertForbidden('expired', { ...base, authorizationReceipt: completeReceipt({ expiresAt: '2020-01-01T00:00:00.000Z' }) }, env);
   assertForbidden('consumed', { ...base, authorizationReceipt: completeReceipt({ consumed: true }) }, env);
   assertForbidden('v2 invalid', { ...base, authorizationReceipt: completeReceipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2' }) }, env);
+  assertForbidden('v4 invalid', { ...base, authorizationReceipt: completeReceipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4' }) }, env);
   const opened = evaluateRealDownloadAuthorization(base, env);
   if (!opened.ok) die(`complete gate unexpectedly failed: ${JSON.stringify(opened.failedConditions)}`);
-  return { negatives: 13, completeGateOpens: true };
+  return { negatives: 14, completeGateOpens: true };
 }
 
 async function main() {

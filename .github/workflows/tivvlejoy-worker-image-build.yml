@@ -5,7 +5,7 @@ name: TivvleJoy Character Worker Image Build
 on:
   push:
     branches:
-      - cursor/tivvlejoy-goat-real-download-entrypoint-repair-73f1
+      - cursor/tivvlejoy-goat-v4-live-output-repair-73f1
     paths:
       - 'workers/runpod-blender/**'
       - 'scripts/blender/**'
@@ -41,7 +41,7 @@ jobs:
       - name: Refuse any other branch
         run: |
           set -euo pipefail
-          expected='cursor/tivvlejoy-goat-real-download-entrypoint-repair-73f1'
+          expected='cursor/tivvlejoy-goat-v4-live-output-repair-73f1'
           if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
             echo "REFUSED: this workflow only runs on ${expected}"
             exit 1

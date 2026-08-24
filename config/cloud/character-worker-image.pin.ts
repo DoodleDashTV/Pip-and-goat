@@ -3,6 +3,6 @@
  * equals GHCR_USER / R2_BUCKET, so the secret scanner may flag the line.
  */
 export const CHARACTER_WORKER_IMAGE =
-  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd'; // pragma: allowlist secret
-export const CHARACTER_WORKER_IMAGE_DIGEST = 'sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd';
-export const CHARACTER_WORKER_IMAGE_SOURCE_COMMIT = '4b57856d69b8e5d698e58dcca136ffa86872bc0b';
+  'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0'; // pragma: allowlist secret
+export const CHARACTER_WORKER_IMAGE_DIGEST = 'sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0';
+export const CHARACTER_WORKER_IMAGE_SOURCE_COMMIT = 'ec84229db8e4c14ecfcb9e3660f49830547cc833';

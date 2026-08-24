@@ -15,6 +15,7 @@ import path from 'node:path';
 
 import {
   LABEL_BUILD_TIME,
+  LABEL_RENDER_ASSET_SHA256,
   LABEL_RENDER_CODE_SHA256,
   LABEL_SOURCE_COMMIT,
   computeRenderAssetFingerprint,
@@ -51,7 +52,12 @@ async function main(): Promise<number> {
   console.log('');
   console.log(`registry read:    ok=${registry.ok} amd64=${registry.amd64} — ${registry.detail}`);
   if (registry.ok) {
-    for (const label of [LABEL_SOURCE_COMMIT, LABEL_BUILD_TIME, LABEL_RENDER_CODE_SHA256]) {
+    for (const label of [
+      LABEL_SOURCE_COMMIT,
+      LABEL_BUILD_TIME,
+      LABEL_RENDER_CODE_SHA256,
+      LABEL_RENDER_ASSET_SHA256,
+    ]) {
       console.log(`  ${label} = ${registry.labels[label] ?? '(absent)'}`);
     }
     for (const label of ['org.opencontainers.image.revision', 'org.opencontainers.image.created']) {

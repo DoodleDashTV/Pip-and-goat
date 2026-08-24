@@ -1,0 +1,43 @@
+{
+  "schema": "TIVVLEJOY_GOAT_V5_OCI_PROVENANCE_WORKER_PIN_RECEIPT_V1",
+  "status": "VERIFIED_IMAGE_BUILT_AND_PINNED",
+  "image": {
+    "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0",
+    "digest": "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0",
+    "architecture": "linux/amd64",
+    "blenderVersion": "4.2.2",
+    "sourceCommit": "ec84229db8e4c14ecfcb9e3660f49830547cc833",
+    "renderCodeSha256": "602d843f0efb358b51257d9075f91a7638d32eb815e03a23ace85051cf4b78cc",
+    "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+    "publishedRenderAssetLabel": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+    "entrypoint": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5",
+    "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
+    "requiredLiveAuthorization": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5"
+  },
+  "proof": {
+    "workflowRunId": "32787711415",
+    "workflowUrl": "https://github.com/DoodleDashTV/Pip-and-goat/actions/runs/32787711415",
+    "workflowConclusion": "success",
+    "registryVerify": "PASS",
+    "independentRegistryVerify": "PASS",
+    "authorizedDownloadInvoked": 1,
+    "durableArtifactPersistenceCapable": true,
+    "sourceWritesForbidden": true,
+    "realGoatDownloadCount": 0,
+    "runpodCreateRequestCount": 0,
+    "costUsd": 0
+  },
+  "supersededV4": {
+    "digest": "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3",
+    "reason": "Published OCI config omitted ddp.render.asset.sha256.",
+    "authorizationConsumed": false,
+    "createRequestCount": 0
+  },
+  "gates": {
+    "goatProductionReady": false,
+    "humanVisualApprovalRequired": true,
+    "productionUntouched": true,
+    "prReady": false,
+    "prMerged": false
+  }
+}

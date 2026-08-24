@@ -15,9 +15,9 @@ const authorizedProof = readFileSync(
 );
 
 describe('character worker image workflow', () => {
-  it('is scoped to the download-entrypoint-repair branch, path-filtered, and never talks to RunPod', () => {
-    assert.match(workflow, /cursor\/tivvlejoy-goat-real-download-entrypoint-repair-73f1/);
-    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-goat-real-download-entrypoint-repair-73f1"/);
+  it('is scoped to the V4 live-output-repair branch, path-filtered, and never talks to RunPod', () => {
+    assert.match(workflow, /cursor\/tivvlejoy-goat-v4-live-output-repair-73f1/);
+    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-goat-v4-live-output-repair-73f1"/);
     assert.match(workflow, /workers\/runpod-blender\/\*\*/);
     assert.equal(workflow.includes('config/cloud/character-worker-image.json'), false);
     assert.equal(workflow.includes('workflow_dispatch'), false);
@@ -34,6 +34,11 @@ describe('character worker image workflow', () => {
     assert.match(dockerfile, /ddp.character.master="true"/);
     assert.match(master, /CHARACTER_MASTER_BUILD/);
     assert.match(master, /FINAL_1080P_CANNOT_IMPERSONATE_CHARACTER/);
+    assert.match(dockerfile, /TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5/);
+    assert.match(dockerfile, /TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5/);
+    assert.match(dockerfile, /ddp.character.output.persistence="true"/);
+    assert.match(dockerfile, /ARG DDP_RENDER_ASSET_SHA256=unknown/);
+    assert.match(dockerfile, /ddp.render.asset.sha256="\$\{DDP_RENDER_ASSET_SHA256\}"/);
     assert.match(authorizedProof, /authorizedDownloadInvoked.:\[\[:space:\]\]\*1/);
   });
 });

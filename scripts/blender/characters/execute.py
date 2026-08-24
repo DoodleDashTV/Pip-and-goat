@@ -20,6 +20,8 @@ from visemes import PRODUCTION_VISEMES
 
 STUDIO_BLENDER = (4, 2, 2)
 LOCKED_SOURCE_PREFIX = Path("tivvlejoy-assets") / "characters" / "CHAR_GOAT_001" / "source"
+LOCKED_SOURCE_SHA256 = "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5"
+LOCKED_SOURCE_SIZE = 269512136
 
 
 def _sha256(path: Path) -> str:
@@ -120,6 +122,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
     failed: list[str] = []
     inject = str(getattr(args, "inject_stage_failure", "") or "")
     source_zip = Path(args.source_zip) if args.source_zip else None
+    real_asset_verified = bool(getattr(args, "real_asset_verified", False))
     before_objects = {obj.name for obj in bpy.data.objects}
     before_keys = {obj.name: [key.name for key in (obj.data.shape_keys.key_blocks if obj.type == "MESH" and obj.data.shape_keys else [])] for obj in bpy.data.objects}
 
@@ -147,8 +150,23 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             "byteSize": source_zip.stat().st_size,
             "path": str(source_zip),
             "lockedSourceUntouched": True,
+            "realAssetVerified": real_asset_verified,
         }
-        record(executed_stage("SOURCE_INTAKE", "Hashed supplied source bytes.", **intake), intake)
+        identity_mismatch = real_asset_verified and (
+            intake["sha256"] != LOCKED_SOURCE_SHA256 or intake["byteSize"] != LOCKED_SOURCE_SIZE
+        )
+        if identity_mismatch:
+            record(
+                failed_stage(
+                    "SOURCE_INTAKE",
+                    "Launcher claimed a real asset, but the local source hash or size was not the locked Goat identity.",
+                    expectedSha256=LOCKED_SOURCE_SHA256,
+                    expectedSize=LOCKED_SOURCE_SIZE,
+                ),
+                {**intake, "identityMismatch": True},
+            )
+        else:
+            record(executed_stage("SOURCE_INTAKE", "Hashed supplied source bytes.", **intake), intake)
     else:
         intake = {"present": True, "sha256": _sha256(working), "byteSize": working.stat().st_size, "workingOnly": True}
         record(executed_stage("SOURCE_INTAKE", "Hashed WORKING blend bytes; no locked archive was read.", **intake), intake)
@@ -275,16 +293,45 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         for bone in list(arm.edit_bones):
             arm.edit_bones.remove(bone)
         created = []
-        parent = None
+        parent_by_name = {
+            "CTRL.WORLD": "CTRL.MASTER",
+            "CTRL.ROOT": "CTRL.WORLD",
+            "CTRL.COG": "CTRL.ROOT",
+            "DEF.PELVIS": "CTRL.COG",
+            "DEF.SPINE_01": "DEF.PELVIS",
+            "DEF.SPINE_02": "DEF.SPINE_01",
+            "DEF.CHEST": "DEF.SPINE_02",
+            "DEF.UPPER_CHEST": "DEF.CHEST",
+            "DEF.NECK": "DEF.UPPER_CHEST",
+            "DEF.HEAD": "DEF.NECK",
+            "CTRL.HEAD_ISOLATE": "CTRL.COG",
+            "DEF.JAW": "DEF.HEAD",
+            "DEF.EYE.L": "DEF.HEAD",
+            "DEF.EYE.R": "DEF.HEAD",
+            "DEF.THIGH.L": "DEF.PELVIS",
+            "DEF.THIGH.R": "DEF.PELVIS",
+            "DEF.SHIN.L": "DEF.THIGH.L",
+            "DEF.SHIN.R": "DEF.THIGH.R",
+            "DEF.ANKLE.L": "DEF.SHIN.L",
+            "DEF.ANKLE.R": "DEF.SHIN.R",
+            "DEF.FOOT.L": "DEF.ANKLE.L",
+            "DEF.FOOT.R": "DEF.ANKLE.R",
+            # IK targets and pole controls must not descend from the chains
+            # they solve; doing so creates a dependency cycle in Blender.
+            "CTRL.IK.FOOT.L": "CTRL.ROOT",
+            "CTRL.IK.FOOT.R": "CTRL.ROOT",
+            "CTRL.POLE.KNEE.L": "CTRL.ROOT",
+            "CTRL.POLE.KNEE.R": "CTRL.ROOT",
+        }
         height = 0.0
         for name, role, deform, _required in GENERIC_SKELETON:
             bone = arm.edit_bones.new(name)
             bone.head = (0.0, 0.0, height)
             bone.tail = (0.0, 0.15 if "FOOT" in name or "IK" in name else 0.0, height + 0.18)
             bone.use_deform = deform
-            if parent is not None and (name.startswith("DEF.") or name.startswith("CTRL.IK") or name.startswith("CTRL.POLE") or name.startswith("CTRL.HEAD")):
-                bone.parent = parent
-            parent = bone if name.startswith("DEF.") or name in {"CTRL.MASTER", "CTRL.WORLD", "CTRL.ROOT", "CTRL.COG"} else parent
+            parent_name = parent_by_name.get(name)
+            if parent_name and arm.edit_bones.get(parent_name):
+                bone.parent = arm.edit_bones[parent_name]
             height += 0.16
             created.append({"name": name, "role": role, "deform": deform})
         _set_mode(bpy, arm_obj, "OBJECT")
@@ -517,6 +564,8 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
 
     # 24 RENDER_QA
     if not prior_blocked("RENDER_QA"):
+        from mathutils import Vector
+
         scene = bpy.context.scene
         camera = bpy.data.objects.get("CHAR_GOAT_001_QA_Camera")
         if camera is None or camera.type != "CAMERA":
@@ -527,21 +576,59 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             bpy.context.collection.objects.link(camera)
         scene.camera = camera
         scene.render.engine = "BLENDER_WORKBENCH"
-        scene.render.resolution_x = 16
-        scene.render.resolution_y = 16
+        scene.render.resolution_x = 512
+        scene.render.resolution_y = 512
         scene.render.resolution_percentage = 100
-        render_path = artifact_dir / "render_qa.png"
-        _refuse_locked_write(render_path)
-        scene.render.filepath = str(render_path)
-        with _with_object(bpy, camera):
-            bpy.ops.render.render(write_still=True)
+        scene.render.image_settings.file_format = "PNG"
+        scene.display.shading.light = "STUDIO"
+        scene.display.shading.color_type = "TEXTURE"
+        mesh_objects = [obj for obj in bpy.data.objects if obj.type == "MESH" and obj.visible_get()]
+        world_points = [obj.matrix_world @ Vector(corner) for obj in mesh_objects for corner in obj.bound_box]
+        if world_points:
+            center = sum(world_points, world_points[0] * 0.0) / len(world_points)
+            extent = max(
+                max(point.x for point in world_points) - min(point.x for point in world_points),
+                max(point.y for point in world_points) - min(point.y for point in world_points),
+                max(point.z for point in world_points) - min(point.z for point in world_points),
+                0.5,
+            )
+        else:
+            center = Vector((0.0, 0.0, 1.0))
+            extent = 2.0
+        views = {
+            "render_qa.png": (center.x, center.y - extent * 2.8, center.z),
+            "render_qa_three_quarter.png": (
+                center.x + extent * 1.9,
+                center.y - extent * 1.9,
+                center.z + extent * 0.15,
+            ),
+            "render_qa_side.png": (center.x + extent * 2.8, center.y, center.z),
+        }
+        rendered = []
+        for filename, location in views.items():
+            camera.location = location
+            camera.rotation_euler = (center - camera.location).to_track_quat("-Z", "Y").to_euler()
+            camera.data.lens = 55
+            render_path = artifact_dir / filename
+            _refuse_locked_write(render_path)
+            scene.render.filepath = str(render_path)
+            with _with_object(bpy, camera):
+                bpy.ops.render.render(write_still=True)
+            rendered.append(
+                {
+                    "path": str(render_path),
+                    "wrote": render_path.is_file(),
+                    "bytes": render_path.stat().st_size if render_path.is_file() else 0,
+                }
+            )
         evidence = {
             "engine": scene.render.engine,
-            "resolution": [16, 16],
-            "wrote": render_path.is_file(),
-            "bytes": render_path.stat().st_size if render_path.is_file() else 0,
+            "resolution": [512, 512],
+            "renders": rendered,
+            "wrote": all(item["wrote"] for item in rendered),
+            "bytes": sum(item["bytes"] for item in rendered),
         }
-        if not render_path.is_file():
+        if not evidence["wrote"]:
             record(failed_stage("RENDER_QA", "Workbench still was not written.", **evidence), evidence)
         else:
             record(executed_stage("RENDER_QA", "Rendered a live workbench still.", **evidence), evidence)
@@ -576,7 +663,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
 
     # 26 CHARACTER_MASTER_GATE
     gate = evaluate_master_gate(
-        real_asset_present=False,
+        real_asset_present=real_asset_verified,
         bpy_available=True,
         executed=not failed,
         failed_stages=failed,
@@ -613,7 +700,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         "dryRun": False,
         "blenderExecuted": True,
         "goatProductionReady": False,
-        "realGoatSourceTested": False,
+        "realGoatSourceTested": real_asset_verified,
     }
 
 

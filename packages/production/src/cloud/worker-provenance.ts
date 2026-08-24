@@ -51,6 +51,7 @@ export const RENDER_ASSET_EXTENSIONS: ReadonlyArray<string> = ['.blend'];
 
 export const LABEL_SOURCE_COMMIT = 'ddp.source.commit';
 export const LABEL_RENDER_CODE_SHA256 = 'ddp.render.code.sha256';
+export const LABEL_RENDER_ASSET_SHA256 = 'ddp.render.asset.sha256';
 export const LABEL_BUILD_TIME = 'ddp.worker.build.time';
 
 export type RegistryImageFacts = {
@@ -83,6 +84,7 @@ export type ProvenanceVerification = {
     imageDigest: string | null;
     imageSourceCommit: string | null;
     imageRenderCodeSha256: string | null;
+    imageRenderAssetSha256: string | null;
     imageBuildTime: string | null;
     expectedSourceCommit: string;
     expectedRenderCodeSha256: string;
@@ -251,6 +253,7 @@ export function verifyWorkerProvenance(input: {
     null;
   const imageRenderCodeSha256 =
     registry.labels[LABEL_RENDER_CODE_SHA256] || registry.env.DDP_RENDER_CODE_SHA256 || null;
+  const imageRenderAssetSha256 = registry.labels[LABEL_RENDER_ASSET_SHA256] || null;
   const imageBuildTime =
     registry.labels[LABEL_BUILD_TIME] ||
     registry.env.DDP_WORKER_BUILD_TIME ||
@@ -261,6 +264,7 @@ export function verifyWorkerProvenance(input: {
     imageDigest: registry.digest,
     imageSourceCommit,
     imageRenderCodeSha256,
+    imageRenderAssetSha256,
     imageBuildTime,
     expectedSourceCommit,
     expectedRenderCodeSha256,
@@ -311,6 +315,12 @@ export function verifyWorkerProvenance(input: {
     );
   }
   if (expectedRenderAssetSha256) {
+    if (imageRenderAssetSha256 !== expectedRenderAssetSha256) {
+      return fail(
+        'RENDER_ASSET_MISMATCH',
+        `image render assets ${imageRenderAssetSha256 ?? 'absent'} != pinned assets ${expectedRenderAssetSha256}`,
+      );
+    }
     if (!localRenderAssetSha256) {
       return fail(
         'RENDER_ASSET_MISMATCH',

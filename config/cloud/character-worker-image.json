@@ -1,9 +1,9 @@
 {
   "schema": "TIVVLEJOY_GOAT_CHARACTER_WORKER_IMAGE_PIN_V1",
   "repository": "ddp-runpod-blender",
-  "digest": "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
-  "ref": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
-  "sourceCommit": "4b57856d69b8e5d698e58dcca136ffa86872bc0b",
+  "digest": "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0",
+  "ref": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0",
+  "sourceCommit": "ec84229db8e4c14ecfcb9e3660f49830547cc833",
   "architecture": "linux/amd64",
   "blenderVersion": "4.2.2",
   "characterMasterCapable": true,
@@ -20,20 +20,26 @@
     "sha256:8204d4bffdc2d28dee6c313fc571e6fb5e3831a3d8ff241a29a536963ec1f830",
     "sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed",
     "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
-    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
+    "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3"
   ],
   "supersededForRealExecution": [
-    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9"
+    "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
+    "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3"
   ],
-  "supersededReason": "Production CHARACTER_MASTER_BUILD called materializeGoatSource and never invoked downloadAuthorizedGoatSource.",
-  "renderCodeSha256": "17cd757b4dff85ddbb30d8c2586f40260883a234b0e5321a0eed4e6280242a03",
+  "supersededReason": "1e29b0ba could not invoke the real download; 59867e85 lacked V4 receipt binding and durable output persistence; 582384a9 omitted the mandatory ddp.render.asset.sha256 OCI label.",
+  "renderCodeSha256": "602d843f0efb358b51257d9075f91a7638d32eb815e03a23ace85051cf4b78cc",
   "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
-  "buildTimestamp": "2026-08-24T21:32:50Z",
-  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V3",
+  "buildTimestamp": "2026-08-24T23:07:21Z",
+  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5",
   "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
   "liveCharacterDepartmentCapable": true,
   "realSourceDownloadCodeBaked": true,
   "authorizedRealSourceDownloadCapable": true,
+  "durableArtifactPersistenceCapable": true,
+  "requiredLiveAuthorizationName": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5",
   "defaultExecutionMode": "dry-run",
   "mandatoryDryRun": false,
   "requiresPaidAuthorization": true,
@@ -49,6 +55,6 @@
   "goatProductionReady": false,
   "runpodLaunchCount": 0,
   "runpodCostUsd": 0,
-  "provenWorkflowRunId": "32779944874",
-  "provenImageDigest": "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd"
+  "provenWorkflowRunId": "32787711415",
+  "provenImageDigest": "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0"
 }

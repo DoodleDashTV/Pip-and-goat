@@ -1,0 +1,35 @@
+{
+  "schema": "TIVVLEJOY_GOAT_V4_LIVE_OUTPUT_WORKER_PIN_RECEIPT_V1",
+  "status": "VERIFIED_IMAGE_BUILT_AND_PINNED",
+  "image": {
+    "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3",
+    "digest": "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3",
+    "architecture": "linux/amd64",
+    "blenderVersion": "4.2.2",
+    "sourceCommit": "c8168362d3e2034739efea30161f3ae45d23f986",
+    "renderCodeSha256": "6e4c1620410e82074d83df89e27435078f8b9dca09285ef9826a09a8fa414b6e",
+    "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+    "entrypoint": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V4",
+    "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
+    "requiredLiveAuthorization": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4"
+  },
+  "proof": {
+    "workflowRunId": "32784961285",
+    "workflowUrl": "https://github.com/DoodleDashTV/Pip-and-goat/actions/runs/32784961285",
+    "workflowConclusion": "success",
+    "registryVerify": "PASS",
+    "authorizedDownloadInvoked": 1,
+    "durableArtifactPersistenceCapable": true,
+    "sourceWritesForbidden": true,
+    "realGoatDownloadCount": 0,
+    "runpodCreateRequestCount": 0,
+    "costUsd": 0
+  },
+  "gates": {
+    "goatProductionReady": false,
+    "humanVisualApprovalRequired": true,
+    "productionUntouched": true,
+    "prReady": false,
+    "prMerged": false
+  }
+}

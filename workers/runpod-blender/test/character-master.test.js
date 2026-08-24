@@ -7,7 +7,12 @@ const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { test } = require('node:test');
 
-const { resolveJobKind, runCharacterMaster, isCharacterMasterJob } = require('../src/character-master');
+const {
+  resolveJobKind,
+  runCharacterMaster,
+  isCharacterMasterJob,
+  resolveDepartmentTimeoutMs,
+} = require('../src/character-master');
 const {
   materializeGoatSource,
   planCharacterSourceMaterialize,
@@ -70,6 +75,15 @@ test('unsupported job kinds fail closed', async () => {
   const ran = await runCharacterMaster({ env: { JOB_KIND: 'NOT_A_REAL_KIND' }, root: repoRoot });
   assert.equal(ran.ok, false);
   assert.equal(ran.code, 'UNSUPPORTED_JOB_KIND');
+});
+
+test('live character department uses the 165-minute stage ceiling instead of the old three-minute timeout', () => {
+  assert.equal(resolveDepartmentTimeoutMs({}, {}), 165 * 60_000);
+  assert.equal(
+    resolveDepartmentTimeoutMs({}, { MAX_JOB_RUNTIME_MINUTES: '120', CHARACTER_STOP_NEW_STAGES_MINUTES: '110' }),
+    110 * 60_000,
+  );
+  assert.equal(resolveDepartmentTimeoutMs({ timeoutMs: 42_000 }, {}), 42_000);
 });
 
 test('missing credentials fail before asset mutation', () => {
@@ -165,6 +179,8 @@ test('26 department stages and Goat materializer are discoverable', async () => 
   assert.equal(capability.liveCharacterDepartmentCapable, true);
   assert.equal(capability.realSourceDownloadCodeBaked, true);
   assert.equal(capability.authorizedRealSourceDownloadCapable, true);
+  assert.equal(capability.durableArtifactPersistenceCapable, true);
+  assert.equal(capability.requiredLiveAuthorizationName, 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5');
   assert.equal(capability.defaultExecutionMode, 'dry-run');
   assert.equal(capability.mandatoryDryRun, false);
   assert.equal(capability.requiresPaidAuthorization, true);

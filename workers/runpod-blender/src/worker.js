@@ -32,6 +32,7 @@ const { EXIT_CLASS, exitCodeFor, classifyCode } = require('./exit-codes');
 const { StartupWatchdog } = require('./watchdog');
 const { isCharacterMasterJob } = require('./character-master');
 const { dispatchCharacterMasterFromWorker } = require('./character-worker-entry');
+const { persistCharacterRun } = require('./character-artifacts');
 const { isFinal1080p, resolveDeclaredJobKind } = require('./character-job-kinds');
 
 const { strip } = r2;
@@ -295,7 +296,7 @@ async function main() {
     process.exitCode = exitCodeFor(health.classification);
     return;
   }
-  startupWatchdog.milestone('WORKER_READY');
+  startupWatchdog.reached('WORKER_READY');
   log('WORKER_READY');
   try {
     await persist('BOOTING', { kind: 'WORKER_READY', bootStage: 'WORKER_READY' });
@@ -314,9 +315,41 @@ async function main() {
       await terminateSelf('character_render_kind_collision');
       return;
     }
+    const executionId = strip(env.CHARACTER_EXECUTION_ID || jobId);
+    const workspaceDir = strip(env.CHARACTER_WORKSPACE_DIR) || path.join(os.tmpdir(), 'tivvlejoy-character', executionId || 'invalid');
+    const artifactDir = strip(env.CHARACTER_ARTIFACT_DIR) || path.join(workspaceDir, 'artifacts');
     let result;
+    let persistence = null;
     try {
-      result = await dispatchCharacterMasterFromWorker({ env, log });
+      result = await dispatchCharacterMasterFromWorker({
+        env,
+        log,
+        executionId,
+        workspaceDir,
+        artifactDir,
+      });
+      try {
+        persistence = await persistCharacterRun({
+          env,
+          executionId,
+          jobId: jobId || executionId,
+          artifactDir,
+          result,
+        });
+      } catch (error) {
+        log('character_artifact_persist_failed', {
+          code: error && error.code,
+          error: redactMessage(error && error.message),
+        });
+        result = {
+          ...result,
+          ok: false,
+          status: 'FAIL_CLOSED',
+          code: 'CHARACTER_ARTIFACT_PERSIST_FAILED',
+          reason: 'Character outputs were not durably persisted before cleanup.',
+          goatProductionReady: false,
+        };
+      }
     } finally {
       startupWatchdog.reached('CHARACTER_MASTER_RETURNED');
     }
@@ -324,6 +357,8 @@ async function main() {
       ok: Boolean(result && result.ok),
       code: result && result.code,
       jobKind: result && result.jobKind,
+      artifactsPersisted: Boolean(persistence && persistence.ok),
+      artifactManifestKey: persistence && persistence.manifestKey,
       goatProductionReady: false,
     });
     process.exitCode = result && result.ok ? 0 : exitCodeFor(classifyCode(result && result.code));

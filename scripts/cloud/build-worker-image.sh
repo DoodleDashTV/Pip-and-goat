@@ -67,6 +67,7 @@ docker build \
   --build-arg "DDP_SOURCE_COMMIT=$SOURCE_COMMIT" \
   --build-arg "DDP_WORKER_BUILD_TIME=$BUILD_TIME" \
   --build-arg "DDP_RENDER_CODE_SHA256=$RENDER_CODE_SHA256" \
+  --build-arg "DDP_RENDER_ASSET_SHA256=$RENDER_ASSET_SHA256" \
   -t "$BUILD_TAG" \
   . 2>&1 | tee "$EVIDENCE/01-docker-build.txt"
 
