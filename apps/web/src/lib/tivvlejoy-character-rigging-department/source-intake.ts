@@ -11,10 +11,16 @@ export type SourceSlot = {
   immutable: boolean;
 };
 
+export const GOAT_WORKING_DEPARTMENT_PATH =
+  'production-library/characters/goat/WORKING/CHAR_GOAT_001_working.blend' as const;
+export const GOAT_WORKING_CONVERSION_PATH =
+  'production-library/characters/goat/WORKING/goat_working_4_2_2.blend' as const;
+
 export const GOAT_SOURCE_SLOTS: readonly SourceSlot[] = [
   { copyClass: 'SOURCE', relativePath: 'production-library/characters/goat/SOURCE/Goat_FINN.zip', immutable: true },
-  { copyClass: 'WORKING', relativePath: 'production-library/characters/goat/WORKING/CHAR_GOAT_001_working.blend', immutable: false },
+  { copyClass: 'WORKING', relativePath: GOAT_WORKING_DEPARTMENT_PATH, immutable: false },
   { copyClass: 'PRODUCTION', relativePath: 'production-library/characters/goat/PRODUCTION/CHAR_GOAT_001_master.blend', immutable: true },
+  { copyClass: 'WORKING', relativePath: GOAT_WORKING_CONVERSION_PATH, immutable: false },
 ];
 
 export type SourceIntakeReport = {

@@ -15,7 +15,9 @@ import {
   buildGoatSourceReceipt,
   connectReceiptToCharacterPipeline,
   createGoatUploadSession,
+  compileGoatPostUploadPreflight,
   dryRunGoatSourceMaterialization,
+  READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
   emptyGoatSourceReceipt,
   handleCharacterSourceAction,
   inspectGoatZipOrFail,
@@ -248,6 +250,44 @@ describe('Goat character source intake bridge', () => {
     expect(connected.goatProductionReady).toBe(false);
     expect(connected.stages.filter((stage) => stage.stage === 'CHARACTER_MASTER_GATE')[0]?.disposition).toBe('BLOCKED');
     expect(connected.stages.filter((stage) => stage.stage === 'SOURCE_HASH_LOCK')[0]?.disposition).toBe('REUSED');
+  });
+
+  it('compiles a post-upload preflight that stops before paid GPU launch', () => {
+    const receipt = buildGoatSourceReceipt({
+      sourceSha256: GOAT_SOURCE_SHA256,
+      sourceSize: GOAT_SOURCE_SIZE_BYTES,
+      hashVerified: true,
+      zipIntegrityVerified: true,
+      sourceLocked: true,
+      bucketConfigured: true,
+    });
+    const preflight = compileGoatPostUploadPreflight({
+      receipt,
+      live: {
+        objectExists: true,
+        storedSize: GOAT_SOURCE_SIZE_BYTES,
+        storedSha256: GOAT_SOURCE_SHA256,
+        zipOk: true,
+        incompleteMultipartCount: 0,
+      },
+    });
+    expect(preflight.status).toBe(READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION);
+    expect(preflight.sourceImmutable).toBe(true);
+    expect(preflight.goatProductionReady).toBe(false);
+    expect(preflight.paidGpuLaunchCount).toBe(0);
+    expect(preflight.productionMutationCount).toBe(0);
+    expect(preflight.paidExecution.launched).toBe(false);
+    expect(preflight.paidExecution.proposedGpu).toBe('NVIDIA GeForce RTX 4090');
+    expect(preflight.paidExecution.cloudType).toBe('SECURE');
+    expect(preflight.working.conversionCopy).toContain('goat_working_4_2_2.blend');
+    expect(preflight.working.originalBlendOverwriteForbidden).toBe(true);
+    expect(preflight.blender.conversionClaimed).toBe(false);
+    expect(preflight.departmentStages).toHaveLength(26);
+    expect(preflight.departmentStages.find((stage) => stage.stage === 'SOURCE_INTAKE')?.disposition).toBe('REUSED');
+    expect(preflight.departmentStages.find((stage) => stage.stage === 'CHARACTER_MASTER_GATE')?.disposition).toBe(
+      'BLOCKED',
+    );
+    expect(preflight.nextAuthorizationAction).not.toContain('Upload Goat Source');
   });
 
   it('stays connection-ready without R2 and refuses Production mutations', async () => {

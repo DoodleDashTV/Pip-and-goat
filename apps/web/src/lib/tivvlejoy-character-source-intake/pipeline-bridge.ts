@@ -2,10 +2,15 @@ import { BUILD_STAGES, runGoatCharacterBuildPipeline } from '@/lib/tivvlejoy-cha
 import { verifyGoatSourceHash } from './validation';
 import type { GoatSourceReceipt } from './receipt';
 
-export function connectReceiptToCharacterPipeline(receipt: GoatSourceReceipt) {
-  const pipeline = runGoatCharacterBuildPipeline();
+export function connectReceiptToCharacterPipeline(
+  receipt: GoatSourceReceipt,
+  options?: { remoteHashLocked?: boolean },
+) {
   const hash = verifyGoatSourceHash(receipt.sourceSha256);
   const sourceReady = receipt.sourceLocked && hash.ok && receipt.hashVerified;
+  const pipeline = runGoatCharacterBuildPipeline({
+    remoteHashLocked: options?.remoteHashLocked ?? sourceReady,
+  });
   const stages = pipeline.stages.map((stage) => {
     if (!sourceReady) return stage;
     if (stage.stage === 'SOURCE_INTAKE' || stage.stage === 'SOURCE_HASH_LOCK') {

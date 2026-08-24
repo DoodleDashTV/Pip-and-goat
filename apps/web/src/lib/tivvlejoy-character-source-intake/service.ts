@@ -23,6 +23,7 @@ import {
 import { CharacterSourceError, assertCharacterSourceKey, goatSourceObjectKey } from './keys';
 import { dryRunGoatSourceMaterialization } from './materialization';
 import { connectReceiptToCharacterPipeline } from './pipeline-bridge';
+import { compileGoatPostUploadPreflight } from './post-upload-preflight';
 import { buildGoatSourceReceipt, emptyGoatSourceReceipt } from './receipt';
 import {
   assertCompleteParts,
@@ -149,10 +150,19 @@ async function handleInner(input: {
       state,
       receipt,
       checklist: operatorChecklist(state),
-      pipeline: connectReceiptToCharacterPipeline(receipt),
+      pipeline: connectReceiptToCharacterPipeline(receipt, {
+        remoteHashLocked: receipt.sourceLocked && discovered.objectExists,
+      }),
       materialization: dryRunGoatSourceMaterialization({
         objectExists: receipt.sourceLocked || discovered.objectExists,
         authAvailable: config.configured,
+      }),
+      postUploadPreflight: compileGoatPostUploadPreflight({
+        receipt,
+        live: {
+          objectExists: discovered.objectExists,
+          storedSize: discovered.storedSize,
+        },
       }),
       sessions: sessions.map(publicSession),
       goatProductionReady: false,

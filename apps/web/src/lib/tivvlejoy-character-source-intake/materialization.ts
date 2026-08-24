@@ -109,7 +109,7 @@ export function dryRunGoatSourceMaterialization(input?: {
     nextSafeAction:
       blockers.includes('R2_OBJECT_MISSING') || blockers.includes('R2_AUTH_UNAVAILABLE')
         ? 'Select Goat_FINN.zip and tap Upload Goat Source.'
-        : 'Keep SOURCE locked. Do not launch paid GPU. Conversion remains unclaimed until 4.2.2 is validated.',
+        : 'Keep SOURCE locked. Do not re-upload. Do not launch paid GPU until explicit Goat execution authorization.',
   };
 }
 

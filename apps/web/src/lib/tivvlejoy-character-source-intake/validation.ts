@@ -1,13 +1,18 @@
 import { SCENERY_PROHIBITED_EXTENSIONS } from '@/lib/scenery/intake/limits';
 import { assertSafeRelativeArchivePath, fileExtension } from '@/lib/scenery/intake/keys';
-import { listZipEntriesStreaming, memoryByteSource, type SafeArchiveInspection } from '@/lib/scenery/intake/safe-archive-inspect';
+import {
+  listZipEntriesStreaming,
+  memoryByteSource,
+  type ByteSource,
+  type SafeArchiveInspection,
+} from '@/lib/scenery/intake/safe-archive-inspect';
 import { rejectArchiveEntry } from '@/lib/scenery/intake/quarantine';
 import { GOAT_REQUIRED_ARCHIVE_MEMBERS } from './goat-spec';
 import { CharacterSourceError } from './keys';
 
 export { preflightGoatUpload, verifyGoatSourceHash, verifyGoatSourceSize } from './preflight';
 
-export async function inspectGoatZipBytes(bytes: Uint8Array): Promise<{
+export async function inspectGoatZipSource(source: ByteSource): Promise<{
   ok: boolean;
   zipIntegrityVerified: boolean;
   code: string;
@@ -16,7 +21,7 @@ export async function inspectGoatZipBytes(bytes: Uint8Array): Promise<{
   inspection: SafeArchiveInspection | null;
 }> {
   try {
-    const entries = await listZipEntriesStreaming(memoryByteSource(bytes));
+    const entries = await listZipEntriesStreaming(source);
     const members = entries.filter((item) => !item.directory).map((item) => item.path);
     const findings: string[] = [];
     for (const entry of entries) {
@@ -79,6 +84,10 @@ export async function inspectGoatZipBytes(bytes: Uint8Array): Promise<{
       'ZIP_CORRUPT',
     );
   }
+}
+
+export async function inspectGoatZipBytes(bytes: Uint8Array) {
+  return inspectGoatZipSource(memoryByteSource(bytes));
 }
 
 export async function inspectGoatZipOrFail(bytes: Uint8Array) {

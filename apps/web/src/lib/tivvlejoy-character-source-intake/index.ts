@@ -8,6 +8,7 @@ export * from './session';
 export * from './durable';
 export * from './materialization';
 export * from './pipeline-bridge';
+export * from './post-upload-preflight';
 export * from './states';
 export * from './store';
 export * from './service';
