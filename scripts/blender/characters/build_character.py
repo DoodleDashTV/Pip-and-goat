@@ -9,6 +9,7 @@ Safe defaults:
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -35,9 +36,14 @@ from visemes import plan_speech  # noqa: E402
 
 
 def repo_root_from_here() -> Path:
+    env_root = os.environ.get("CHARACTER_WORKER_ROOT")
+    if env_root:
+        return Path(env_root)
     here = Path(__file__).resolve()
     for parent in here.parents:
         if (parent / "apps" / "web").is_dir() and (parent / "scripts" / "blender").is_dir():
+            return parent
+        if (parent / "src" / "character-master.js").is_file() and (parent / "blender" / "characters").is_dir():
             return parent
     return here.parents[3]
 

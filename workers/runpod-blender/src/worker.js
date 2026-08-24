@@ -30,6 +30,8 @@ const {
 } = require('./boot-diagnostics');
 const { EXIT_CLASS, exitCodeFor, classifyCode } = require('./exit-codes');
 const { StartupWatchdog } = require('./watchdog');
+const { isCharacterMasterJob, runCharacterMaster } = require('./character-master');
+const { isFinal1080p, resolveDeclaredJobKind } = require('./character-job-kinds');
 
 const { strip } = r2;
 
@@ -302,6 +304,31 @@ async function main() {
 
   const jobId = strip(env.RENDER_JOB_ID);
   const apiUrl = strip(env.RENDER_API_URL);
+  const declaredKind = resolveDeclaredJobKind(env);
+
+  if (isCharacterMasterJob(env)) {
+    if (jobId && isFinal1080p(declaredKind)) {
+      log('character_render_kind_collision', { declaredKind });
+      process.exitCode = exitCodeFor(EXIT_CLASS.MANIFEST_FAILURE);
+      await terminateSelf('character_render_kind_collision');
+      return;
+    }
+    let result;
+    try {
+      result = await runCharacterMaster({ env, log });
+    } finally {
+      startupWatchdog.reached('CHARACTER_MASTER_RETURNED');
+    }
+    log('character_master_result', {
+      ok: Boolean(result && result.ok),
+      code: result && result.code,
+      jobKind: result && result.jobKind,
+      goatProductionReady: false,
+    });
+    process.exitCode = result && result.ok ? 0 : exitCodeFor(classifyCode(result && result.code));
+    await terminateSelf(result && result.ok ? 'character_master_complete' : `character_master_failed:${result && result.code}`);
+    return;
+  }
 
   // Single-shot mode takes precedence and requires no ingress.
   if (jobId) {

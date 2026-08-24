@@ -22,6 +22,8 @@ import {
   GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA,
   KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST,
   READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
+  RUNPOD_WORKER_IMAGE_PIN_BLOCKED,
+  resolveAuthorizedCharacterWorkerImage,
   emptyGoatSourceReceipt,
   handleCharacterSourceAction,
   inspectGoatZipOrFail,
@@ -406,6 +408,17 @@ describe('Goat character source intake bridge', () => {
       ]),
     );
     expect(overBudget.launch.allowed).toBe(false);
+  });
+
+  it('blocks RUNPOD_WORKER_IMAGE resolution on stale or missing character pins', () => {
+    const missing = resolveAuthorizedCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
+    expect(missing.ok).toBe(false);
+    expect(missing.code).toBe(RUNPOD_WORKER_IMAGE_PIN_BLOCKED);
+    const stale = resolveAuthorizedCharacterWorkerImage({
+      RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST}`,
+    });
+    expect(stale.ok).toBe(false);
+    expect(stale.code).toBe(RUNPOD_WORKER_IMAGE_PIN_BLOCKED);
   });
 
   it('stays connection-ready without R2 and refuses Production mutations', async () => {
