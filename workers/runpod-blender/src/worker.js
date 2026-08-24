@@ -30,7 +30,8 @@ const {
 } = require('./boot-diagnostics');
 const { EXIT_CLASS, exitCodeFor, classifyCode } = require('./exit-codes');
 const { StartupWatchdog } = require('./watchdog');
-const { isCharacterMasterJob, runCharacterMaster } = require('./character-master');
+const { isCharacterMasterJob } = require('./character-master');
+const { dispatchCharacterMasterFromWorker } = require('./character-worker-entry');
 const { isFinal1080p, resolveDeclaredJobKind } = require('./character-job-kinds');
 
 const { strip } = r2;
@@ -315,7 +316,7 @@ async function main() {
     }
     let result;
     try {
-      result = await runCharacterMaster({ env, log });
+      result = await dispatchCharacterMasterFromWorker({ env, log });
     } finally {
       startupWatchdog.reached('CHARACTER_MASTER_RETURNED');
     }

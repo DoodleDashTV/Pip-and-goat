@@ -164,6 +164,7 @@ export function provePinnedImageCannotInvokeRealDownload(repoRoot = process.cwd(
   reason: string;
   downloadFunctionBaked: boolean;
   characterMasterInvokesDownload: boolean;
+  workingTreeInvokesDownload: boolean;
   materializeAlwaysForbidsNetwork: boolean;
   imageSourceCommit: typeof GOAT_V3_REQUIRED_SOURCE_COMMIT;
   imageSourceCommitProven: boolean;
@@ -194,9 +195,10 @@ export function provePinnedImageCannotInvokeRealDownload(repoRoot = process.cwd(
       'The authorized 08d6fa5 / 1e29b0ba image bakes downloadAuthorizedGoatSource, but CHARACTER_MASTER_BUILD calls materializeGoatSource, which never performs the network download. Rebuilding is forbidden for this authorization. Stop before CREATE.',
     downloadFunctionBaked:
       imageFacts.materialize.downloadFunctionBaked || workingFacts.materialize.downloadFunctionBaked,
-    characterMasterInvokesDownload: imageFacts.master.invokesDownload || workingFacts.master.invokesDownload,
+    characterMasterInvokesDownload: imageFacts.master.invokesDownload,
+    workingTreeInvokesDownload: workingFacts.master.invokesDownload,
     materializeAlwaysForbidsNetwork:
-      imageCannotInvoke || workingCannotInvoke || imageFacts.materialize.materializeAlwaysForbidsNetwork,
+      imageCannotInvoke || imageFacts.materialize.materializeAlwaysForbidsNetwork,
     imageSourceCommit: GOAT_V3_REQUIRED_SOURCE_COMMIT,
     imageSourceCommitProven,
   };

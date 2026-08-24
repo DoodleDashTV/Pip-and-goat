@@ -82,6 +82,9 @@ echo "in-image fingerprint matches: $IN_IMAGE_FP"
 step "4b. synthetic live-path proof against the built image (before push)"
 bash scripts/cloud/prove-synthetic-live-path.sh "$BUILD_TAG" "$EVIDENCE/synthetic-live-path"
 
+step "4c. authorized download entrypoint proof against the built image (before push)"
+bash scripts/cloud/prove-authorized-download-entrypoint.sh "$BUILD_TAG" "$EVIDENCE/authorized-download-entrypoint"
+
 # And prove the scene assembly file itself is the one on this commit.
 REPO_ASSEMBLE="$(sha256sum scripts/blender/assemble_scene.py | cut -d' ' -f1)"
 IMAGE_ASSEMBLE="$(docker run --rm --entrypoint sha256sum "$BUILD_TAG" /opt/ddp-worker/blender/assemble_scene.py | cut -d' ' -f1)"

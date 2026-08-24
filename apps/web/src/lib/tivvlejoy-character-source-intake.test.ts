@@ -775,6 +775,7 @@ describe('Goat character source intake bridge', () => {
     expect(downloadProof.code).toBe('AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD');
     expect(downloadProof.downloadFunctionBaked).toBe(true);
     expect(downloadProof.characterMasterInvokesDownload).toBe(false);
+    expect(downloadProof.workingTreeInvokesDownload).toBe(true);
     expect(downloadProof.materializeAlwaysForbidsNetwork).toBe(true);
 
     const live = {

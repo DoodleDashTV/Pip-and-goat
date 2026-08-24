@@ -97,6 +97,8 @@ function liveImplementationComplete(baked) {
   const unconditionalForbid =
     /if \(allowReal\) \{\s*return fail\(\s*'REAL_GOAT_DOWNLOAD_FORBIDDEN'/s.test(materializer);
   const alwaysDryRun = /args\.push\('---dry-run'\)/.test(master) || /'--dry-run',\s*\]/.test(master);
+  const masterInvokesAuthorizedDownload =
+    master.includes('downloadAuthorizedGoatSource(') && master.includes('performNetworkDownload: true');
   const liveDispatch = master.includes("'--execute'") && master.includes('resolveExecutionMode');
   const executeFlag = io.includes('--execute') && io.includes('mutually exclusive');
   const executeImpl =
@@ -115,6 +117,7 @@ function liveImplementationComplete(baked) {
     executeImpl,
     wired,
     gateComplete,
+    masterInvokesAuthorizedDownload,
     streamPresent: Boolean(baked.streamHash),
   };
 }
@@ -134,7 +137,8 @@ function compileCharacterCapability(input = {}) {
     live.wired &&
     !live.alwaysDryRun;
   const realDownloadCodeBaked = Boolean(baked.characterMaterializer && baked.streamHash && baked.downloadGate);
-  const authorizedDownloadCapable = realDownloadCodeBaked && live.gateComplete && !live.unconditionalForbid;
+  const authorizedDownloadCapable =
+    realDownloadCodeBaked && live.gateComplete && !live.unconditionalForbid && live.masterInvokesAuthorizedDownload;
   return {
     schema: CAPABILITY_SCHEMA,
     previousSchema: CAPABILITY_SCHEMA_V1,

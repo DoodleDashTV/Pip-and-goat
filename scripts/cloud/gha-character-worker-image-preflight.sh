@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-EXPECTED_BRANCH="cursor/tivvlejoy-goat-live-worker-repair-73f1"
+EXPECTED_BRANCH="cursor/tivvlejoy-goat-real-download-entrypoint-repair-73f1"
 
 die() { echo "PREFLIGHT_ABORT: $*" >&2; exit 1; }
 
@@ -37,6 +37,7 @@ if grep -n "createPodForBenchmark\|podFindAndDeployOnDemand\|ALLOW_PAID_GPU_LAUN
   workers/runpod-blender/src/character-source-materialize.js \
   workers/runpod-blender/src/character-job-kinds.js \
   workers/runpod-blender/src/character-download-gate.js \
+  workers/runpod-blender/src/character-worker-entry.js \
   workers/runpod-blender/src/worker.js \
   .github/workflows/tivvlejoy-worker-image-build.yml; then
   die "paid-mutation tripwire tripped"

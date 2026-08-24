@@ -6,7 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const { inspectZipSafety, extractZipSafely } = require('./zip-safe');
+const { inspectZipSafety, extractZipSafely, inspectZipSafetyFromFile, extractZipSafelyFromFile } = require('./zip-safe');
 const { streamHashAndWrite, streamReadableHashAndWrite } = require('./character-stream-hash');
 const { evaluateRealDownloadAuthorization } = require('./character-download-gate');
 const {
@@ -80,6 +80,26 @@ function findRequired(extractedDir) {
   };
   walk(extractedDir);
   return found;
+}
+
+function removeQuietly(target) {
+  try {
+    if (target && fs.existsSync(target)) fs.unlinkSync(target);
+  } catch {
+    /* ignore */
+  }
+}
+
+function removeTreeQuietly(target) {
+  try {
+    if (target && fs.existsSync(target)) fs.rmSync(target, { recursive: true, force: true });
+  } catch {
+    /* ignore */
+  }
+}
+
+function isLoopbackUrl(value) {
+  return /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?(?:\/|$)/i.test(String(value || ''));
 }
 
 function assertOutsideLockedSource(target) {
@@ -229,6 +249,119 @@ function evaluateRealDownloadRequest(input = {}) {
       env,
       input.nowMs,
     ),
+  };
+}
+
+function extractValidatedArchiveFromFile(zipPath, workspace, input, env) {
+  assertOutsideLockedSource(workspace);
+  const zip = inspectZipSafetyFromFile(zipPath, REQUIRED);
+  if (!zip.ok) {
+    removeQuietly(zipPath);
+    return fail(zip.code, 'ZIP safety validation failed before extraction.', { zip });
+  }
+
+  const ephemeral = path.join(workspace, 'ephemeral');
+  const extractDir = path.join(ephemeral, 'extract');
+  const workingDir = path.join(workspace, 'WORKING');
+  fs.mkdirSync(extractDir, { recursive: true });
+
+  let extracted;
+  try {
+    extracted = extractZipSafelyFromFile(zipPath, extractDir);
+  } catch (error) {
+    removeTreeQuietly(extractDir);
+    removeQuietly(zipPath);
+    return fail(error.code || 'UNSAFE_EXTRACTION', error.message);
+  }
+
+  const files = findRequired(extractDir);
+  if (!files.blend || !files.fbx) {
+    removeTreeQuietly(extractDir);
+    removeQuietly(zipPath);
+    return fail('MISSING_REQUIRED_FILE', 'Extracted archive is missing Goat_FINN.blend or Goat_FINN.fbx.');
+  }
+  fs.chmodSync(files.blend, 0o444);
+
+  let blenderProbe = { ok: null, skipped: true, blenderCompatibility: 'UNTESTED_REAL_SOURCE' };
+  if (input.runBlenderProbe === true) {
+    blenderProbe = probeBlenderOpen(files.blend, env);
+    if (!blenderProbe.ok) {
+      return fail('BLENDER_CONVERSION_UNSAFE', 'Blender could not safely open the source. WORKING copy was not written.', {
+        blenderProbe,
+        blenderCompatibility: 'UNSAFE',
+        extractedBlendPreserved: true,
+        originalBlendOverwriteForbidden: true,
+      });
+    }
+  }
+
+  if (input.createWorkingCopy === true && blenderProbe.ok === true) {
+    let working;
+    try {
+      working = copyProtectedWorking(files.blend, workingDir);
+    } catch (error) {
+      return fail(error.code || 'WORKING_COPY_FAILED', error.message);
+    }
+    return {
+      ok: true,
+      launched: false,
+      paid: false,
+      gpuRequested: false,
+      goatProductionReady: false,
+      workingCopyCreated: true,
+      realGoatDownloaded: input.treatAsRealGoat === true,
+      blenderCompatibility: input.treatAsRealGoat === true ? 'TESTED_REAL_SOURCE' : 'SYNTHETIC_ONLY',
+      jobKind: CHARACTER_SOURCE_MATERIALIZE,
+      characterId: GOAT_CHARACTER_ID,
+      objectKey: input.objectKey || OBJECT_KEY,
+      observedSha256: input.observedSha256,
+      observedSize: input.observedSize,
+      zip,
+      extracted,
+      files,
+      working,
+      blenderProbe,
+      originalBlendPath: files.blend,
+      originalBlendOverwriteForbidden: true,
+      fbxIsEquivalentToBlend: false,
+      studioBlender: STUDIO_BLENDER,
+      status: 'WORKING_COPY_READY',
+      code: 'WORKING_COPY_READY',
+      paidFlagsSetByWorker: false,
+      streamed: true,
+      hashedWhileStreaming: true,
+      stagedZip: zipPath,
+    };
+  }
+
+  return {
+    ok: true,
+    launched: false,
+    paid: false,
+    gpuRequested: false,
+    goatProductionReady: false,
+    workingCopyCreated: false,
+    realGoatDownloaded: input.treatAsRealGoat === true,
+    blenderCompatibility: input.runBlenderProbe === true ? 'SYNTHETIC_ONLY' : 'UNTESTED_REAL_SOURCE',
+    jobKind: CHARACTER_SOURCE_MATERIALIZE,
+    characterId: GOAT_CHARACTER_ID,
+    objectKey: input.objectKey || OBJECT_KEY,
+    observedSha256: input.observedSha256,
+    observedSize: input.observedSize,
+    zip,
+    extracted,
+    files,
+    blenderProbe,
+    originalBlendOverwriteForbidden: true,
+    fbxIsEquivalentToBlend: false,
+    studioBlender: STUDIO_BLENDER,
+    status: input.runBlenderProbe === true ? 'EXTRACTED_PROBE_PENDING_WORKING' : 'EXTRACTED_CHECKS_PASSED',
+    code: 'HASH_AND_ZIP_VERIFIED',
+    reason: 'WORKING copies are withheld until hashing, ZIP validation, extraction, and Blender-open checks succeed.',
+    paidFlagsSetByWorker: false,
+    streamed: true,
+    hashedWhileStreaming: true,
+    stagedZip: zipPath,
   };
 }
 
@@ -424,6 +557,91 @@ function materializeGoatSource(input = {}) {
   };
 }
 
+function resolveAuthorizedStreamExpectation(input = {}, env = {}) {
+  const testTransport =
+    input.authorizedTestTransport === true ||
+    env.GOAT_SOURCE_TEST_TRANSPORT === 'true' ||
+    typeof input.sourceTransport === 'function';
+  if (!testTransport) {
+    return {
+      testMode: false,
+      expectedSize: EXPECTED_SIZE,
+      expectedSha256: EXPECTED_SHA,
+      treatAsRealGoat: true,
+    };
+  }
+  const expectedSize = Number(input.testExpectedSize || env.GOAT_SOURCE_TEST_EXPECTED_SIZE);
+  const expectedSha256 = String(input.testExpectedSha256 || env.GOAT_SOURCE_TEST_EXPECTED_SHA256 || '').toLowerCase();
+  if (!Number.isFinite(expectedSize) || expectedSize <= 0 || expectedSize === EXPECTED_SIZE) {
+    return {
+      testMode: true,
+      ok: false,
+      code: 'TEST_TRANSPORT_REFUSED',
+      reason: 'Authorized test transport cannot impersonate the locked Goat archive size.',
+    };
+  }
+  if (!/^[0-9a-f]{64}$/.test(expectedSha256) || expectedSha256 === EXPECTED_SHA) {
+    return {
+      testMode: true,
+      ok: false,
+      code: 'TEST_TRANSPORT_REFUSED',
+      reason: 'Authorized test transport cannot impersonate the locked Goat archive hash.',
+    };
+  }
+  return { testMode: true, ok: true, expectedSize, expectedSha256, treatAsRealGoat: false };
+}
+
+async function openAuthorizedSourceBody(input = {}, env = {}) {
+  if (typeof input.sourceTransport === 'function') {
+    const result = await input.sourceTransport({
+      method: 'GetObject',
+      key: OBJECT_KEY,
+      bucket: 'test-transport',
+    });
+    if (!result || !result.Body) {
+      const err = new Error('Authorized test transport returned no readable body.');
+      err.code = 'SOURCE_TRANSPORT_EMPTY';
+      throw err;
+    }
+    if (typeof result.putObject === 'function' || typeof result.deleteObject === 'function') {
+      const err = new Error('Source transport must be read-only.');
+      err.code = 'SOURCE_WRITE_FORBIDDEN';
+      throw err;
+    }
+    return result.Body;
+  }
+  if (env.GOAT_SOURCE_TEST_TRANSPORT === 'true') {
+    const url = String(env.GOAT_SOURCE_TEST_URL || '');
+    if (!isLoopbackUrl(url)) {
+      const err = new Error('Test transport URL must be loopback-only.');
+      err.code = 'TEST_TRANSPORT_REFUSED';
+      throw err;
+    }
+    const res = await fetch(url);
+    if (!res.ok || !res.body) {
+      const err = new Error(`Test transport HTTP ${res.status}`);
+      err.code = 'SOURCE_TRANSPORT_EMPTY';
+      throw err;
+    }
+    return res.body;
+  }
+  if (!credentialsPresent(env)) {
+    const err = new Error('R2 credentials are missing. Fail closed before any asset mutation.');
+    err.code = 'R2_CREDENTIALS_MISSING';
+    throw err;
+  }
+  if (env.TIVVLEJOY_FORBID_REAL_GOAT_DOWNLOAD === 'true' || input.forbidRealNetwork === true) {
+    const err = new Error('Real Goat network download is forbidden in this process. Download count remains 0.');
+    err.code = 'REAL_GOAT_DOWNLOAD_FORBIDDEN';
+    throw err;
+  }
+  const r2 = require('./r2-client');
+  const { GetObjectCommand } = require('@aws-sdk/client-s3');
+  const ctx = r2.createR2Client(env);
+  const res = await ctx.client.send(new GetObjectCommand({ Bucket: ctx.bucket, Key: OBJECT_KEY }));
+  return res.Body;
+}
+
 async function downloadAuthorizedGoatSource(input = {}) {
   const env = input.env || process.env;
   const gate = evaluateRealDownloadAuthorization(input, env, input.nowMs);
@@ -431,45 +649,72 @@ async function downloadAuthorizedGoatSource(input = {}) {
     return fail(gate.code, gate.reason, {
       failedConditions: gate.failedConditions,
       authorizationReceipt: gate.authorizationReceipt,
+      authorizedDownloadInvoked: 0,
+      networkDownloadInvoked: false,
     });
   }
   if (input.performNetworkDownload !== true) {
     return fail(
       'REAL_GOAT_DOWNLOAD_FORBIDDEN',
       'Authorized real download requires an explicit launcher network request. The worker does not start downloads on its own.',
+      { authorizedDownloadInvoked: 0, networkDownloadInvoked: false },
     );
   }
-  if (!credentialsPresent(env)) {
-    return fail('R2_CREDENTIALS_MISSING', 'R2 credentials are missing. Fail closed before any asset mutation.');
+  const expectation = resolveAuthorizedStreamExpectation(input, env);
+  if (expectation.testMode && expectation.ok === false) {
+    return fail(expectation.code, expectation.reason, { authorizedDownloadInvoked: 0, networkDownloadInvoked: false });
   }
-  if (env.TIVVLEJOY_FORBID_REAL_GOAT_DOWNLOAD === 'true' || input.forbidRealNetwork === true) {
-    return fail(
-      'REAL_GOAT_DOWNLOAD_FORBIDDEN',
-      'Real Goat network download is forbidden in this process. Download count remains 0.',
-    );
-  }
-  const r2 = require('./r2-client');
-  const { GetObjectCommand } = require('@aws-sdk/client-s3');
-  const ctx = r2.createR2Client(env);
   const workspace = input.workspaceDir || fs.mkdtempSync(path.join(os.tmpdir(), 'tivvlejoy-character-'));
-  assertOutsideLockedSource(workspace);
+  try {
+    assertOutsideLockedSource(workspace);
+  } catch (error) {
+    return fail(error.code, error.message, { authorizedDownloadInvoked: 0, networkDownloadInvoked: false });
+  }
   const dest = path.join(workspace, 'ephemeral', 'Goat_FINN.zip');
-  const res = await ctx.client.send(new GetObjectCommand({ Bucket: ctx.bucket, Key: OBJECT_KEY }));
-  const streamed = await streamReadableHashAndWrite(res.Body, dest, {
-    maxBytes: EXPECTED_SIZE,
-    expectedSize: EXPECTED_SIZE,
-    expectedSha256: EXPECTED_SHA,
-  });
-  const bytes = fs.readFileSync(dest);
-  return extractValidatedArchive(bytes, workspace, {
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  let body;
+  try {
+    body = await openAuthorizedSourceBody(input, env);
+  } catch (error) {
+    removeQuietly(dest);
+    return fail(error.code || 'SOURCE_TRANSPORT_FAILED', error.message, {
+      authorizedDownloadInvoked: 1,
+      networkDownloadInvoked: false,
+    });
+  }
+  let streamed;
+  try {
+    streamed = await streamReadableHashAndWrite(body, dest, {
+      maxBytes: expectation.expectedSize,
+      expectedSize: expectation.expectedSize,
+      expectedSha256: expectation.expectedSha256,
+    });
+  } catch (error) {
+    removeQuietly(dest);
+    return fail(error.code || 'STREAM_FAILED', error.message, {
+      observedSize: error.observedSize,
+      observedSha256: error.observedSha256,
+      authorizedDownloadInvoked: 1,
+      networkDownloadInvoked: true,
+    });
+  }
+  const extracted = extractValidatedArchiveFromFile(dest, workspace, {
     ...input,
     observedSha256: streamed.sha256,
     observedSize: streamed.size,
     objectKey: OBJECT_KEY,
-    treatAsRealGoat: true,
-    runBlenderProbe: input.runBlenderProbe !== false,
-    createWorkingCopy: input.createWorkingCopy !== false,
+    treatAsRealGoat: expectation.treatAsRealGoat === true,
+    runBlenderProbe: input.runBlenderProbe === true,
+    createWorkingCopy: input.createWorkingCopy === true,
   }, env);
+  return {
+    ...extracted,
+    authorizedDownloadInvoked: 1,
+    networkDownloadInvoked: true,
+    streamed: true,
+    hashedWhileStreaming: true,
+    bufferedEntireArchive: false,
+  };
 }
 
 module.exports = {
