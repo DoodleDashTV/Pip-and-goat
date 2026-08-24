@@ -357,7 +357,7 @@ describe('Goat character source intake bridge', () => {
     expect(decision.remainingBlockers).toContain('WORKER_IMAGE_WRONG_JOB_KIND');
     expect(decision.remainingBlockers).toContain('WORKER_IMAGE_CHARACTER_DEPARTMENT_NOT_BAKED');
     expect(decision.remainingBlockers).toContain('WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE');
-    expect(decision.remainingBlockers).toContain('LIVE_AUTHORIZATION_V3_REQUIRED');
+    expect(decision.remainingBlockers).toContain('LIVE_AUTHORIZATION_V4_REQUIRED');
     expect(decision.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
     expect(decision.goatProductionReady).toBe(false);
     expect(decision.paidGpuLaunched).toBe(false);
@@ -460,7 +460,7 @@ describe('Goat character source intake bridge', () => {
     expect([REJECTED_LIVE_EXECUTION_DIGEST, WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE]).toContain(v1.code);
   });
 
-  it('accepts the proven Capability V2 digest and rejects superseded digests, tags, and V1/V2 auths', () => {
+  it('accepts the proven Capability V2/V4 digest and rejects superseded digests, tags, and V1/V2/V3 auths', () => {
     const provenDigest = 'sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3';
     const v2 = {
       schema: REQUIRED_LIVE_CAPABILITY_SCHEMA,
@@ -524,6 +524,7 @@ describe('Goat character source intake bridge', () => {
     expect(INVALID_GOAT_PAID_AUTHORIZATIONS).toEqual([
       'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1',
       'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2',
+      'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3',
     ]);
     const v1Auth = evaluateGoatPaidExecutionAuthorization({
       authorizationPresent: true,
@@ -543,7 +544,7 @@ describe('Goat character source intake bridge', () => {
     });
     expect(v1Auth.launch.allowed).toBe(false);
     expect(v1Auth.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
-    expect(v1Auth.remainingBlockers).toContain('LIVE_AUTHORIZATION_V3_REQUIRED');
+    expect(v1Auth.remainingBlockers).toContain('LIVE_AUTHORIZATION_V4_REQUIRED');
     const v2Auth = evaluateGoatPaidExecutionAuthorization({
       authorizationPresent: true,
       env: { RUNPOD_WORKER_IMAGE: '', ALLOW_PAID_GPU_LAUNCH: 'false' },
@@ -562,7 +563,7 @@ describe('Goat character source intake bridge', () => {
     });
     expect(v2Auth.launch.allowed).toBe(false);
     expect(v2Auth.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
-    expect(v2Auth.remainingBlockers).toContain('LIVE_AUTHORIZATION_V3_REQUIRED');
+    expect(v2Auth.remainingBlockers).toContain('LIVE_AUTHORIZATION_V4_REQUIRED');
     expect(GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3).toBe(
       'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3',
     );
