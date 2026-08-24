@@ -158,12 +158,17 @@ test('26 department stages and Goat materializer are discoverable', async () => 
   const capability = compileCharacterCapability({ root: repoRoot });
   assert.equal(capability.goatMaterializerBaked, true);
   assert.equal(capability.characterMasterEntrypointBaked, true);
+  assert.equal(capability.characterDepartmentBaked, true);
+  assert.equal(capability.characterDepartmentStageCount, 26);
   const stages = fs.readFileSync(
     path.join(repoRoot, 'scripts/blender/characters/common/stages.py'),
     'utf8',
   );
+  assert.match(stages, /BUILD_STAGES/);
   assert.match(stages, /CHARACTER_MASTER_GATE/);
-  assert.equal([...stages.matchAll(/"[A-Z0-9_]+"/g)].length >= 26, true);
+  const tuple = stages.match(/BUILD_STAGES\s*=\s*\(([\s\S]*?)\)/);
+  assert.ok(tuple);
+  assert.equal([...tuple[1].matchAll(/"([A-Z0-9_]+)"/g)].length, 26);
   const ran = await runCharacterMaster({
     env: { CHARACTER_JOB_KIND: CHARACTER_MASTER_BUILD },
     root: repoRoot,

@@ -20,7 +20,9 @@ function readDepartmentStageCount(repoHint) {
   for (const file of candidates) {
     if (!fs.existsSync(file)) continue;
     const text = fs.readFileSync(file, 'utf8');
-    const stages = [...text.matchAll(/"([A-Z0-9_]+)"/g)].map((item) => item[1]);
+    const tuple = text.match(/BUILD_STAGES\s*=\s*\(([\s\S]*?)\)/);
+    if (!tuple) continue;
+    const stages = [...tuple[1].matchAll(/"([A-Z0-9_]+)"/g)].map((item) => item[1]);
     const unique = stages.filter((name, index) => stages.indexOf(name) === index);
     if (unique.includes('CHARACTER_MASTER_GATE')) return unique.length;
   }
