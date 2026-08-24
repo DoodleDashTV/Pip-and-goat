@@ -23,7 +23,10 @@ import {
   KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST,
   READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
   RUNPOD_WORKER_IMAGE_PIN_BLOCKED,
+  REJECTED_LIVE_EXECUTION_DIGEST,
+  WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE,
   resolveAuthorizedCharacterWorkerImage,
+  resolveLiveCharacterWorkerImage,
   emptyGoatSourceReceipt,
   handleCharacterSourceAction,
   inspectGoatZipOrFail,
@@ -335,6 +338,9 @@ describe('Goat character source intake bridge', () => {
     expect(decision.remainingBlockers).toContain('WORKER_IMAGE_MISSING');
     expect(decision.remainingBlockers).toContain('WORKER_IMAGE_WRONG_JOB_KIND');
     expect(decision.remainingBlockers).toContain('WORKER_IMAGE_CHARACTER_DEPARTMENT_NOT_BAKED');
+    expect(decision.remainingBlockers).toContain('WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE');
+    expect(decision.remainingBlockers).toContain('LIVE_AUTHORIZATION_V3_REQUIRED');
+    expect(decision.remainingBlockers).toContain('INVALID_SUPERSEDED_AUTHORIZATION');
     expect(decision.goatProductionReady).toBe(false);
     expect(decision.paidGpuLaunched).toBe(false);
     expect(decision.quote.withinAuthorization).toBe(true);
@@ -421,6 +427,15 @@ describe('Goat character source intake bridge', () => {
     });
     expect(stale.ok).toBe(false);
     expect(stale.code).toBe(RUNPOD_WORKER_IMAGE_PIN_BLOCKED);
+    const liveRejected = resolveLiveCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
+    expect(liveRejected.ok).toBe(false);
+    expect([REJECTED_LIVE_EXECUTION_DIGEST, WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE]).toContain(liveRejected.code);
+    const v1 = resolveLiveCharacterWorkerImage(
+      { RUNPOD_WORKER_IMAGE: '' },
+      { schema: 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V1', liveCharacterDepartmentCapable: true },
+    );
+    expect(v1.ok).toBe(false);
+    expect(v1.code).toBe(WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE);
   });
 
   it('stays connection-ready without R2 and refuses Production mutations', async () => {

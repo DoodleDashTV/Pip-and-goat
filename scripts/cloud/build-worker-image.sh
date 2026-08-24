@@ -79,6 +79,9 @@ IN_IMAGE_FP="$(printf '%s' "$IN_IMAGE" | grep -oE '"renderCodeSha256": "[0-9a-f]
   || die "image contains render code $IN_IMAGE_FP, expected $RENDER_CODE_SHA256"
 echo "in-image fingerprint matches: $IN_IMAGE_FP"
 
+step "4b. synthetic live-path proof against the built image (before push)"
+bash scripts/cloud/prove-synthetic-live-path.sh "$BUILD_TAG" "$EVIDENCE/synthetic-live-path"
+
 # And prove the scene assembly file itself is the one on this commit.
 REPO_ASSEMBLE="$(sha256sum scripts/blender/assemble_scene.py | cut -d' ' -f1)"
 IMAGE_ASSEMBLE="$(docker run --rm --entrypoint sha256sum "$BUILD_TAG" /opt/ddp-worker/blender/assemble_scene.py | cut -d' ' -f1)"

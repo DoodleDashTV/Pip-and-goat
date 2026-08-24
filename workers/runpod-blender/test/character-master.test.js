@@ -34,6 +34,7 @@ function sourceFiles() {
   return [
     'src/character-master.js',
     'src/character-source-materialize.js',
+    'src/character-download-gate.js',
     'src/character-job-kinds.js',
     'src/worker.js',
   ].map((rel) => fs.readFileSync(path.join(workerRoot, rel), 'utf8'));
@@ -78,7 +79,7 @@ test('missing credentials fail before asset mutation', () => {
     env: {},
   });
   assert.equal(result.ok, false);
-  assert.equal(result.code, 'R2_CREDENTIALS_MISSING');
+  assert.equal(result.code, 'REAL_GOAT_DOWNLOAD_FORBIDDEN');
   assert.equal(result.workingCopyCreated, false);
   assert.equal(result.realGoatDownloaded, false);
   const forbidden = materializeGoatSource({
@@ -158,7 +159,17 @@ test('26 department stages and Goat materializer are discoverable', async () => 
   const capability = compileCharacterCapability({ root: repoRoot });
   assert.equal(capability.goatMaterializerBaked, true);
   assert.equal(capability.characterMasterEntrypointBaked, true);
+  assert.equal(capability.schema, 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2');
   assert.equal(capability.characterDepartmentBaked, true);
+  assert.equal(capability.liveCharacterDepartmentCapable, true);
+  assert.equal(capability.realSourceDownloadCodeBaked, true);
+  assert.equal(capability.authorizedRealSourceDownloadCapable, true);
+  assert.equal(capability.defaultExecutionMode, 'dry-run');
+  assert.equal(capability.mandatoryDryRun, false);
+  assert.equal(capability.requiresPaidAuthorization, true);
+  assert.equal(capability.sourceWritesForbidden, true);
+  assert.equal(capability.syntheticLivePathVerified, true);
+  assert.equal(capability.realGoatSourceTested, false);
   assert.equal(capability.characterDepartmentStageCount, 26);
   const stages = fs.readFileSync(
     path.join(repoRoot, 'scripts/blender/characters/common/stages.py'),
@@ -195,6 +206,18 @@ test('paid-mutation tripwire: character runtime never creates a Pod', () => {
   assert.equal(joined.includes('podFindAndDeployOnDemand'), false);
   assert.equal(joined.includes('ALLOW_PAID_GPU_LAUNCH=true'), false);
   assert.equal(process.env.ALLOW_PAID_GPU_LAUNCH === 'true', false);
+});
+
+test('materialization refuses writes into the locked source prefix', () => {
+  const zip = validGoatLikeZip();
+  const result = materializeGoatSource({
+    syntheticBytes: zip,
+    expectedSize: zip.length,
+    expectedSha256: sha256(zip),
+    workspaceDir: '/tmp/tivvlejoy-assets/characters/CHAR_GOAT_001/source/working',
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'LOCKED_SOURCE_WRITE_FORBIDDEN');
 });
 
 test('real locked Goat archive is never processed by these tests', () => {

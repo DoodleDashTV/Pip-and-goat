@@ -44,4 +44,12 @@ def stage_record(
 
 
 def blocked_stage(stage: str, reason: str) -> dict[str, Any]:
-    return stage_record(stage, "BLOCKED", reason, status="BLOCKED_REAL_EXECUTION_REQUIRED")
+    return stage_record(stage, "BLOCKED", reason, status="BLOCKED_REAL_EXECUTION_REQUIRED", simulated=True)
+
+
+def executed_stage(stage: str, reason: str, **extra: Any) -> dict[str, Any]:
+    return stage_record(stage, extra.pop("disposition", "CREATED"), reason, status="EXECUTED", simulated=False, **extra)
+
+
+def failed_stage(stage: str, reason: str, **extra: Any) -> dict[str, Any]:
+    return stage_record(stage, "FAILED", reason, status="FAILED", simulated=False, **extra)

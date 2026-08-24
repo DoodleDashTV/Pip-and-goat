@@ -11,9 +11,11 @@ const dockerfile = readFileSync(path.join(repoRoot, 'workers/runpod-blender/Dock
 const master = readFileSync(path.join(repoRoot, 'workers/runpod-blender/src/character-master.js'), 'utf8');
 
 describe('character worker image workflow', () => {
-  it('is scoped to the character-worker branch and never talks to RunPod', () => {
-    assert.match(workflow, /cursor\/tivvlejoy-goat-character-worker-image-73f1/);
-    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-goat-character-worker-image-73f1"/);
+  it('is scoped to the live-worker-repair branch, path-filtered, and never talks to RunPod', () => {
+    assert.match(workflow, /cursor\/tivvlejoy-goat-live-worker-repair-73f1/);
+    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-goat-live-worker-repair-73f1"/);
+    assert.match(workflow, /workers\/runpod-blender\/\*\*/);
+    assert.equal(workflow.includes('config/cloud/character-worker-image.json'), false);
     assert.equal(workflow.includes('workflow_dispatch'), false);
     assert.equal(workflow.includes('api.runpod.io'), false);
     assert.equal(workflow.includes('RUNPOD_API_KEY'), false);
