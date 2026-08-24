@@ -483,9 +483,22 @@ describe('Goat character source intake bridge', () => {
     expect(mutable.ok).toBe(false);
     expect(mutable.code).toBe(RUNPOD_WORKER_IMAGE_PIN_BLOCKED);
 
-    const pinJson = JSON.parse(
-      readFileSync(path.resolve(process.cwd(), 'config/cloud/character-worker-image.json'), 'utf8'),
-    ) as { defaultExecutionMode?: string; goatProductionReady?: boolean };
+    const pinJsonPath = [
+      path.resolve(process.cwd(), 'config/cloud/character-worker-image.json'),
+      path.resolve(process.cwd(), '../../config/cloud/character-worker-image.json'),
+    ].find((candidate) => {
+      try {
+        readFileSync(candidate);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+    expect(pinJsonPath).toBeTruthy();
+    const pinJson = JSON.parse(readFileSync(pinJsonPath as string, 'utf8')) as {
+      defaultExecutionMode?: string;
+      goatProductionReady?: boolean;
+    };
     expect(pinJson.defaultExecutionMode).toBe('dry-run');
     expect(pinJson.goatProductionReady).toBe(false);
     expect(INVALID_GOAT_PAID_AUTHORIZATIONS).toEqual([
