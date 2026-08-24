@@ -38,6 +38,7 @@ import {
   REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS,
   SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST,
   SUPERSEDED_V3_NO_DURABLE_OUTPUT_DIGEST,
+  SUPERSEDED_V4_MISSING_ASSET_PROVENANCE_DIGEST,
   REQUIRED_LIVE_CAPABILITY_SCHEMA,
   RUNPOD_WORKER_IMAGE_PIN_BLOCKED,
   REJECTED_LIVE_EXECUTION_DIGEST,
@@ -436,9 +437,9 @@ describe('Goat character source intake bridge', () => {
 
   it('resolves RUNPOD_WORKER_IMAGE from the authoritative character pin and rejects stale digests', () => {
     const pin = readCharacterWorkerPin();
-    const provenDigest = 'sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3';
+    const provenDigest = 'sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0';
     expect(pin.digest).toBe(provenDigest);
-    expect(pin.sourceCommit).toBe('c8168362d3e2034739efea30161f3ae45d23f986');
+    expect(pin.sourceCommit).toBe('ec84229db8e4c14ecfcb9e3660f49830547cc833');
     const resolved = resolveAuthorizedCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
     expect(resolved.ok).toBe(true);
     expect(resolved.source).toBe('authoritative-pin');
@@ -461,7 +462,7 @@ describe('Goat character source intake bridge', () => {
   });
 
   it('accepts the proven Capability V2 digest and rejects superseded digests, tags, and V1/V2 auths', () => {
-    const provenDigest = 'sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3';
+    const provenDigest = 'sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0';
     const v2 = {
       schema: REQUIRED_LIVE_CAPABILITY_SCHEMA,
       liveCharacterDepartmentCapable: true,
@@ -484,6 +485,7 @@ describe('Goat character source intake bridge', () => {
     expect(REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS).toContain(REJECTED_GOAT_LIVE_WORKER_DIGEST);
     expect(REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS).toContain(SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST);
     expect(REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS).toContain(SUPERSEDED_V3_NO_DURABLE_OUTPUT_DIGEST);
+    expect(REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS).toContain(SUPERSEDED_V4_MISSING_ASSET_PROVENANCE_DIGEST);
     const superseded = resolveLiveCharacterWorkerImage(
       { RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST}` },
       v2,
@@ -775,8 +777,8 @@ describe('Goat character source intake bridge', () => {
     const pin = resolvePinnedV3ImageRef();
     expect(pin.ok).toBe(false);
     expect(pin.containsLiteralOrgPlaceholder).toBe(false);
-    expect(pin.digest).toBe('sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3');
-    expect(pin.sourceCommit).toBe('c8168362d3e2034739efea30161f3ae45d23f986');
+    expect(pin.digest).toBe('sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0');
+    expect(pin.sourceCommit).toBe('ec84229db8e4c14ecfcb9e3660f49830547cc833');
     expect(pin.digest).not.toBe(GOAT_V3_REQUIRED_DIGEST);
     expect(pin.sourceCommit).not.toBe(GOAT_V3_REQUIRED_SOURCE_COMMIT);
     expect(GOAT_V3_REQUIRED_DIGEST).toBe(SUPERSEDED_UNWIRED_GOAT_DOWNLOAD_DIGEST);
