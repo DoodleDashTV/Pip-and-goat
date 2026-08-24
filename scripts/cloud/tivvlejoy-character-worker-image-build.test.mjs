@@ -9,6 +9,10 @@ const workflow = readFileSync(path.join(repoRoot, '.github/workflows/tivvlejoy-w
 const preflight = readFileSync(path.join(repoRoot, 'scripts/cloud/gha-character-worker-image-preflight.sh'), 'utf8');
 const dockerfile = readFileSync(path.join(repoRoot, 'workers/runpod-blender/Dockerfile'), 'utf8');
 const master = readFileSync(path.join(repoRoot, 'workers/runpod-blender/src/character-master.js'), 'utf8');
+const authorizedProof = readFileSync(
+  path.join(repoRoot, 'scripts/cloud/prove-authorized-download-entrypoint.sh'),
+  'utf8',
+);
 
 describe('character worker image workflow', () => {
   it('is scoped to the download-entrypoint-repair branch, path-filtered, and never talks to RunPod', () => {
@@ -30,5 +34,6 @@ describe('character worker image workflow', () => {
     assert.match(dockerfile, /ddp.character.master="true"/);
     assert.match(master, /CHARACTER_MASTER_BUILD/);
     assert.match(master, /FINAL_1080P_CANNOT_IMPERSONATE_CHARACTER/);
+    assert.match(authorizedProof, /authorizedDownloadInvoked.:\[\[:space:\]\]\*1/);
   });
 });

@@ -19,7 +19,9 @@ docker run --rm \
   /opt/ddp-worker/src/prove-authorized-download-entrypoint.js \
   | tee "$EVIDENCE/prove-stdout.json"
 
-grep -q '"authorizedDownloadInvoked": 1' "$EVIDENCE/prove-stdout.json" \
+grep -Eq '"ok":[[:space:]]*true' "$EVIDENCE/prove-stdout.json" \
+  || die "in-image proof did not report ok"
+grep -Eq '"authorizedDownloadInvoked":[[:space:]]*1' "$EVIDENCE/prove-stdout.json" \
   || die "in-image proof did not invoke the authorized downloader exactly once"
 
 echo "AUTHORIZED_DOWNLOAD_ENTRYPOINT_VERIFIED $IMAGE"
