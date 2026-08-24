@@ -5,6 +5,7 @@ export * from './preflight';
 export * from './validation';
 export * from './receipt';
 export * from './session';
+export * from './durable';
 export * from './materialization';
 export * from './pipeline-bridge';
 export * from './states';

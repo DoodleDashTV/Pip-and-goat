@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { hashFileChunked } from '@/lib/scenery/intake/client-hash';
 import { uploadSignedPart } from '@/lib/scenery/intake/client-transfer';
 import {
@@ -9,6 +9,13 @@ import {
   GOAT_SOURCE_SIZE_BYTES,
 } from '@/lib/tivvlejoy-character-source-intake/goat-spec';
 import { preflightGoatUpload, verifyGoatSourceHash } from '@/lib/tivvlejoy-character-source-intake/preflight';
+
+const SAVED_SESSION_KEY = 'tivvlejoy.goat.source.intake.session.v1';
+
+type SavedSession = {
+  sessionId: string;
+  sha256: string;
+};
 
 type IntakeStatus = {
   state?: string;
@@ -57,10 +64,37 @@ export function GoatSourceIntake({ initial }: { initial: IntakeStatus }) {
   const showToken = Boolean(status.authorization?.publicPreview && status.authorization?.tokenConfigured);
   const selectedName = useMemo(() => file?.name ?? '', [file]);
 
+  function readSavedSession(): SavedSession | null {
+    try {
+      const raw = window.localStorage.getItem(SAVED_SESSION_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as SavedSession;
+      return parsed.sessionId && parsed.sha256 ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeSavedSession(next: SavedSession | null) {
+    if (!next) {
+      window.localStorage.removeItem(SAVED_SESSION_KEY);
+      return;
+    }
+    window.localStorage.setItem(SAVED_SESSION_KEY, JSON.stringify(next));
+  }
+
   async function refresh() {
     const response = await fetch('/api/character-source-intake');
     if (response.ok) setStatus((await response.json()) as IntakeStatus);
   }
+
+  useEffect(() => {
+    void refresh();
+    const saved = readSavedSession();
+    if (saved) {
+      setPhase('Interrupted upload can resume');
+    }
+  }, []);
 
   async function upload() {
     if (!file) {
@@ -86,27 +120,47 @@ export function GoatSourceIntake({ initial }: { initial: IntakeStatus }) {
         return;
       }
       setPhase('Opening upload session');
-      const created = await fetch('/api/character-source-intake', {
-        method: 'POST',
-        headers: headers(token),
-        body: JSON.stringify({
-          action: 'create-session',
-          filename: GOAT_SOURCE_FILENAME,
-          byteSize: hashed.byteSize,
-          sha256: hashed.sha256,
-        }),
-      });
-      const createdJson = (await created.json()) as {
+      type SessionPayload = {
         error?: string;
         alreadyPresent?: boolean;
         connectionReadyOnly?: boolean;
         session?: { sessionId: string; parts: Array<{ partNumber: number; start: number; end: number; hasEtag?: boolean }> };
       };
-      if (!created.ok) {
-        setError(createdJson.error ?? 'Upload session refused.');
-        return;
+      const saved = readSavedSession();
+      let createdJson: SessionPayload | null = null;
+      if (saved?.sha256 === hashed.sha256) {
+        const resumed = await fetch('/api/character-source-intake', {
+          method: 'POST',
+          headers: headers(token),
+          body: JSON.stringify({ action: 'resume', sessionId: saved.sessionId }),
+        });
+        const resumedJson = (await resumed.json()) as SessionPayload & { resume?: { resumable?: boolean } };
+        if (resumed.ok && resumedJson.session) {
+          createdJson = resumedJson;
+          setPhase('Resuming interrupted Goat upload');
+        } else {
+          writeSavedSession(null);
+        }
+      }
+      if (!createdJson) {
+        const created = await fetch('/api/character-source-intake', {
+          method: 'POST',
+          headers: headers(token),
+          body: JSON.stringify({
+            action: 'create-session',
+            filename: GOAT_SOURCE_FILENAME,
+            byteSize: hashed.byteSize,
+            sha256: hashed.sha256,
+          }),
+        });
+        createdJson = (await created.json()) as SessionPayload;
+        if (!created.ok) {
+          setError(createdJson.error ?? 'Upload session refused.');
+          return;
+        }
       }
       if (createdJson.alreadyPresent) {
+        writeSavedSession(null);
         setPhase('Source already locked');
         setProgress(100);
         await refresh();
@@ -117,6 +171,7 @@ export function GoatSourceIntake({ initial }: { initial: IntakeStatus }) {
         return;
       }
       const sessionId = createdJson.session.sessionId;
+      writeSavedSession({ sessionId, sha256: hashed.sha256 });
       const parts = createdJson.session.parts.filter((part) => !part.hasEtag);
       for (const [index, part] of parts.entries()) {
         setPhase(`Uploading part ${part.partNumber} of ${createdJson.session.parts.length}`);
@@ -150,6 +205,7 @@ export function GoatSourceIntake({ initial }: { initial: IntakeStatus }) {
             etag: uploaded.etag,
           }),
         });
+        writeSavedSession({ sessionId, sha256: hashed.sha256 });
       }
       setPhase('Verifying stored Goat source');
       const completed = await fetch('/api/character-source-intake', {
@@ -162,6 +218,7 @@ export function GoatSourceIntake({ initial }: { initial: IntakeStatus }) {
         setError(completedJson.error ?? 'Verification failed. SOURCE was not locked.');
         return;
       }
+      writeSavedSession(null);
       setProgress(100);
       setPhase('Goat source locked');
       await refresh();
@@ -186,7 +243,10 @@ export function GoatSourceIntake({ initial }: { initial: IntakeStatus }) {
       <Row done={checklist.goatSource.sourceLocked} label="Source Locked" />
       <div className="pt-2">
         <h3 className="font-display text-lg font-semibold">GOAT WORKING</h3>
-        <Row done={checklist.goatWorking} label="Blender Conversion Pending" />
+        <Row
+          done={checklist.goatWorking}
+          label={checklist.goatWorking ? 'Working copy ready' : 'Blender Conversion Pending'}
+        />
       </div>
       <div>
         <h3 className="font-display text-lg font-semibold">GOAT RIG</h3>

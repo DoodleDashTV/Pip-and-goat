@@ -17,7 +17,17 @@ TivvleJoy then hashes, uploads through signed private R2 multipart URLs, verifie
 
 `tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip`
 
+Receipt sidecar (hashes / provenance only, no credentials, no ZIP bytes):
+
+`tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.receipt.json`
+
+Interrupted multipart session metadata:
+
+`tivvlejoy-assets/characters/CHAR_GOAT_001/source/sessions/<sessionId>.json`
+
 Same existing Cloudflare R2 bucket / credentials / prefix family as scenery intake (`tivvlejoy-assets/`). Character source lives under `characters/CHAR_GOAT_001/` so scenery collection keys stay untouched.
+
+If Preview serverless memory recycles, status rediscovers the locked object by HEAD + receipt sidecar. A matching stored object is reused. A wrong-size object at the locked key fails closed and is never overwritten.
 
 ## Locked identity
 

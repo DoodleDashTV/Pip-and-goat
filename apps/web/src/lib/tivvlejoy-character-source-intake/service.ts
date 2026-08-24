@@ -13,6 +13,13 @@ import {
 } from '@/lib/scenery/intake/multipart';
 import { createConfiguredMultipartStorage } from '@/lib/scenery/intake/r2-multipart';
 import { GOAT_SOURCE_SHA256, GOAT_SOURCE_SIZE_BYTES } from './goat-spec';
+import {
+  loadPersistedGoatSession,
+  nextGoatSourceAction,
+  persistGoatSourceReceipt,
+  persistGoatUploadSession,
+  rediscoverGoatSource,
+} from './durable';
 import { CharacterSourceError, assertCharacterSourceKey, goatSourceObjectKey } from './keys';
 import { dryRunGoatSourceMaterialization } from './materialization';
 import { connectReceiptToCharacterPipeline } from './pipeline-bridge';
@@ -98,12 +105,24 @@ async function handleInner(input: {
   const store = getCharacterSourceStore();
   const config = describeSceneryStorageConfiguration(input.env);
   const storage = await storageFor(input.env, input.storage);
+  const discovered = await rediscoverGoatSource(storage);
+  if (discovered.receipt && !store.getReceipt()) {
+    store.lockReceipt(discovered.receipt);
+  }
   const receipt = store.getReceipt() ?? emptyGoatSourceReceipt(config.configured);
+  if (discovered.sizeConflict && input.action !== 'status') {
+    throw new CharacterSourceError(
+      'A Goat object is already stored at the locked key but the size does not match Goat_FINN.zip. SOURCE was not overwritten.',
+      'SOURCE_OVERWRITE_REFUSED',
+    );
+  }
 
   if (input.action === 'status') {
+    const sessions = store.listSessions();
     const state = deriveGoatSourceState({
       receipt,
       connectionReadyOnly: !config.configured,
+      resumable: sessions.some((item) => resumeGuidance(item).resumable),
     });
     return {
       schema: CHARACTER_SOURCE_INTAKE_SCHEMA,
@@ -127,31 +146,42 @@ async function handleInner(input: {
       checklist: operatorChecklist(state),
       pipeline: connectReceiptToCharacterPipeline(receipt),
       materialization: dryRunGoatSourceMaterialization({
-        objectExists: receipt.sourceLocked,
+        objectExists: receipt.sourceLocked || discovered.objectExists,
         authAvailable: config.configured,
       }),
-      sessions: store.listSessions().map(publicSession),
+      sessions: sessions.map(publicSession),
       goatProductionReady: false,
       safety: ZERO_INTAKE_SIDE_EFFECTS,
-      nextUserAction: 'Select Goat_FINN.zip and tap Upload Goat Source.',
+      nextUserAction: nextGoatSourceAction({
+        sourceLocked: receipt.sourceLocked,
+        connectionReadyOnly: !config.configured,
+        sizeConflict: discovered.sizeConflict,
+        resumable: sessions.some((item) => resumeGuidance(item).resumable),
+      }),
     };
   }
 
   if (input.action === 'create-session') {
+    const existingLockedSha256 =
+      receipt.sourceLocked || discovered.reusedExistingObject ? GOAT_SOURCE_SHA256 : null;
     const session = createGoatUploadSession({
       filename: String(input.body.filename ?? ''),
       byteSize: Number(input.body.byteSize ?? 0),
       sha256: String(input.body.sha256 ?? ''),
-      existingLockedSha256: receipt.sourceLocked ? receipt.sourceSha256 : null,
+      existingLockedSha256,
       env: input.env,
     });
     assertCharacterSourceKey(session.objectKey);
-    if (session.alreadyVerified) {
+    if (session.alreadyVerified || discovered.reusedExistingObject) {
+      if (discovered.receipt) store.lockReceipt(discovered.receipt);
+      session.alreadyVerified = true;
+      session.state = 'SOURCE_LOCKED';
       store.putSession(session);
+      await persistGoatUploadSession(session, storage);
       return {
         session: publicSession(session),
         alreadyPresent: true,
-        receipt,
+        receipt: store.getReceipt() ?? receipt,
         goatProductionReady: false,
       };
     }
@@ -174,10 +204,16 @@ async function handleInner(input: {
     session.uploadId = created.uploadId;
     session.state = 'UPLOADING';
     store.putSession(session);
+    await persistGoatUploadSession(session, storage);
     return { session: publicSession(session), receipt, goatProductionReady: false };
   }
 
-  const session = store.getSession(String(input.body.sessionId ?? ''));
+  const requestedSessionId = String(input.body.sessionId ?? '');
+  let session = store.getSession(requestedSessionId);
+  if (!session) {
+    session = await loadPersistedGoatSession(storage, requestedSessionId);
+    if (session) store.putSession(session);
+  }
   if (!session) {
     throw new CharacterSourceError('Unknown Goat source upload session.', 'UNKNOWN_SESSION');
   }
@@ -203,6 +239,7 @@ async function handleInner(input: {
     );
     session.state = 'UPLOADING';
     store.putSession(session);
+    await persistGoatUploadSession(session, storage);
     return { session: publicSession(session), signedUrl: signed.url, expiresAt: signed.expiresAt };
   }
 
@@ -213,6 +250,7 @@ async function handleInner(input: {
     const current = store.getSession(session.sessionId)!;
     current.state = remainingParts(current).length ? 'RESUMABLE' : current.state;
     store.putSession(current);
+    await persistGoatUploadSession(current, storage);
     return { session: publicSession(current), resume: resumeGuidance(current) };
   }
 
@@ -220,6 +258,7 @@ async function handleInner(input: {
     if (session.uploadId) await storage.abortMultipartUpload({ key: session.objectKey, uploadId: session.uploadId });
     session.state = 'FAILED';
     store.putSession(session);
+    await persistGoatUploadSession(session, storage);
     return { session: publicSession(session), aborted: true };
   }
 
@@ -232,6 +271,7 @@ async function handleInner(input: {
     }
     session.state = 'HASH_VERIFIED';
     store.putSession(session);
+    await persistGoatUploadSession(session, storage);
     return { hashVerified: true, session: publicSession(session) };
   }
 
@@ -245,14 +285,39 @@ async function handleInner(input: {
       throw new CharacterSourceError('A multipart part failed. Resume the missing part.', 'RESUMABLE');
     }
     const parts = assertCompleteParts(store.getSession(session.sessionId)!);
+    if (receipt.sourceLocked && receipt.sourceSha256 === GOAT_SOURCE_SHA256) {
+      return {
+        session: publicSession(current),
+        receipt,
+        alreadyCompleted: true,
+        pipeline: connectReceiptToCharacterPipeline(receipt),
+        goatProductionReady: false,
+        safety: ZERO_INTAKE_SIDE_EFFECTS,
+      };
+    }
     if (!current.uploadId) {
       throw new CharacterSourceError('Upload id is missing.', 'UNKNOWN_UPLOAD');
     }
-    const completed = await storage.completeMultipartUpload({
-      key: current.objectKey,
-      uploadId: current.uploadId,
-      parts,
-    });
+    let completed: { size: number };
+    try {
+      completed = await storage.completeMultipartUpload({
+        key: current.objectKey,
+        uploadId: current.uploadId,
+        parts,
+      });
+    } catch (error) {
+      const existing = await storage.headObject(current.objectKey);
+      if (existing.exists && existing.size === GOAT_SOURCE_SIZE_BYTES) {
+        completed = { size: existing.size };
+      } else {
+        throw error instanceof CharacterSourceError
+          ? error
+          : new CharacterSourceError(
+              'Multipart completion failed. Resume remaining parts. SOURCE was not locked.',
+              'RESUMABLE',
+            );
+      }
+    }
     const head = await storage.headObject(current.objectKey);
     if (!head.exists) {
       throw new CharacterSourceError('R2 object is missing after complete.', 'R2_OBJECT_MISSING');
@@ -286,8 +351,10 @@ async function handleInner(input: {
       workingCopyStatus: 'WORKING_COPY_PENDING',
     });
     store.lockReceipt(locked);
-    current.state = zipIntegrityVerified ? 'SOURCE_LOCKED' : 'HASH_VERIFIED';
+    await persistGoatSourceReceipt(locked, storage);
+    current.state = 'SOURCE_LOCKED';
     store.putSession(current);
+    await persistGoatUploadSession(current, storage);
     return {
       session: publicSession(current),
       receipt: locked,

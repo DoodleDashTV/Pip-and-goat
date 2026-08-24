@@ -4,10 +4,11 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, beforeEach } from 'vitest';
 import type { MultipartStoragePort } from './scenery/intake/multipart';
-import { ConnectionReadyMultipartStorage } from './scenery/intake/multipart';
+import { ConnectionReadyMultipartStorage, MemoryMultipartStorage } from './scenery/intake/multipart';
 import { resetIntakeRateLimit } from './scenery/intake/access';
 import {
   GOAT_SOURCE_OBJECT_KEY,
+  GOAT_SOURCE_RECEIPT_OBJECT_KEY,
   GOAT_SOURCE_SHA256,
   GOAT_SOURCE_SIZE_BYTES,
   buildGoatSourceReceipt,
@@ -18,6 +19,7 @@ import {
   handleCharacterSourceAction,
   inspectGoatZipOrFail,
   operatorChecklist,
+  persistGoatSourceReceipt,
   planGoatSourceMaterialization,
   preflightGoatUpload,
   receiptContainsSecrets,
@@ -46,6 +48,7 @@ const configuredEnv = {
 };
 
 function fakeStorage(overrides: Partial<MultipartStoragePort> = {}): MultipartStoragePort {
+  let stored = false;
   return {
     async createMultipartUpload() {
       return { uploadId: 'up-1' };
@@ -54,11 +57,14 @@ function fakeStorage(overrides: Partial<MultipartStoragePort> = {}): MultipartSt
       return { url: `https://example.invalid/part/${input.partNumber}`, expiresAt: new Date().toISOString() };
     },
     async completeMultipartUpload() {
+      stored = true;
       return { size: GOAT_SOURCE_SIZE_BYTES };
     },
     async abortMultipartUpload() {},
     async headObject() {
-      return { exists: true, size: GOAT_SOURCE_SIZE_BYTES };
+      return stored
+        ? { exists: true, size: GOAT_SOURCE_SIZE_BYTES }
+        : { exists: false, size: null };
     },
     ...overrides,
   };
@@ -281,6 +287,72 @@ describe('Goat character source intake bridge', () => {
     expect(resumeGuidance(session).resumable).toBe(true);
   });
 
+  it('rediscovers a size-matching R2 object after the in-memory lock is lost', async () => {
+    const memory = new MemoryMultipartStorage();
+    await memory.putObject(GOAT_SOURCE_OBJECT_KEY, new Uint8Array(GOAT_SOURCE_SIZE_BYTES));
+    await persistGoatSourceReceipt(
+      buildGoatSourceReceipt({
+        sourceSha256: GOAT_SOURCE_SHA256,
+        sourceSize: GOAT_SOURCE_SIZE_BYTES,
+        hashVerified: true,
+        zipIntegrityVerified: true,
+        sourceLocked: true,
+        bucketConfigured: true,
+      }),
+      memory,
+    );
+    resetCharacterSourceStore();
+    const status = await act('status', {}, { storage: memory });
+    const receipt = status.receipt as { sourceLocked: boolean; objectKey: string; goatProductionReady: boolean };
+    expect(receipt.sourceLocked).toBe(true);
+    expect(receipt.objectKey).toBe(GOAT_SOURCE_OBJECT_KEY);
+    expect(receipt.goatProductionReady).toBe(false);
+    expect(status.state).toBe('SOURCE_LOCKED');
+    const reused = await act('create-session', {
+      filename: 'Goat_FINN.zip',
+      byteSize: GOAT_SOURCE_SIZE_BYTES,
+      sha256: GOAT_SOURCE_SHA256,
+    }, { storage: memory });
+    expect(reused.alreadyPresent).toBe(true);
+  });
+
+  it('refuses to start a new upload over a stored Goat object with the wrong size', async () => {
+    const memory = new MemoryMultipartStorage();
+    await memory.putObject(GOAT_SOURCE_OBJECT_KEY, new Uint8Array(12));
+    await expect(
+      act(
+        'create-session',
+        {
+          filename: 'Goat_FINN.zip',
+          byteSize: GOAT_SOURCE_SIZE_BYTES,
+          sha256: GOAT_SOURCE_SHA256,
+        },
+        { storage: memory },
+      ),
+    ).rejects.toMatchObject({ code: 'SOURCE_OVERWRITE_REFUSED' });
+  });
+
+  it('reloads a persisted multipart session after the in-memory store is cleared', async () => {
+    const created = await act('create-session', {
+      filename: 'Goat_FINN.zip',
+      byteSize: GOAT_SOURCE_SIZE_BYTES,
+      sha256: GOAT_SOURCE_SHA256,
+    });
+    const sessionId = (created.session as { sessionId: string }).sessionId;
+    const memory = new MemoryMultipartStorage();
+    const { getCharacterSourceStore } = await import('./tivvlejoy-character-source-intake/store');
+    const session = getCharacterSourceStore().getSession(sessionId);
+    expect(session).toBeTruthy();
+    const { persistGoatUploadSession } = await import('./tivvlejoy-character-source-intake');
+    await persistGoatUploadSession(session!, memory);
+    resetCharacterSourceStore();
+    const resumed = await act('resume', { sessionId, partNumber: 1, etag: '"etag-1"' }, { storage: memory });
+    const resume = resumed.resume as { resumable: boolean; restartCompletedUpload: boolean; completedParts: number };
+    expect(resume.resumable).toBe(true);
+    expect(resume.restartCompletedUpload).toBe(false);
+    expect(resume.completedParts).toBe(1);
+  });
+
   it('runs the Python materialize dry-run without GPU', () => {
     const stdout = execFileSync(
       'python3',
@@ -300,6 +372,7 @@ describe('Goat character source intake bridge', () => {
       'utf8',
     );
     expect(doc).toContain(GOAT_SOURCE_OBJECT_KEY);
+    expect(doc).toContain(GOAT_SOURCE_RECEIPT_OBJECT_KEY);
     expect(doc).not.toMatch(/R2_SECRET_ACCESS_KEY=|sk_live_/);
   });
 });

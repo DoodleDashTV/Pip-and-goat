@@ -18,7 +18,12 @@ export type GoatSourceIntakeState = (typeof GOAT_SOURCE_INTAKE_STATES)[number];
 export const GOAT_SOURCE_OBJECT_KEY =
   'tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip' as const;
 
+export const GOAT_SOURCE_RECEIPT_OBJECT_KEY =
+  'tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.receipt.json' as const;
+
 export const GOAT_SOURCE_PREFIX = 'tivvlejoy-assets/characters/CHAR_GOAT_001' as const;
+export const GOAT_SOURCE_SESSION_PREFIX =
+  'tivvlejoy-assets/characters/CHAR_GOAT_001/source/sessions' as const;
 
 export const ZERO_INTAKE_SIDE_EFFECTS = Object.freeze({
   paidGpuLaunched: false,

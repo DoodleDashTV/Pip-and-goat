@@ -7,6 +7,7 @@ Updated: 2026-08-24
 Preview-only Goat source intake bridge. One operator action: select `Goat_FINN.zip` and tap Upload.
 
 - Draft branch: `cursor/tivvlejoy-goat-character-source-intake-73f1`
+- Draft PR: #100 (OPEN / DRAFT / UNMERGED / NOT READY)
 - Stacked on: `cursor/tivvlejoy-goat-production-rig-v1-73f1` (Draft PR #99 stays open / draft / unmerged)
 - Operator surface: `/character-rigging`
 - Exact R2 object key: `tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip`

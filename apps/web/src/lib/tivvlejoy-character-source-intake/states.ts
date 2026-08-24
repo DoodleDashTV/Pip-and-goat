@@ -13,9 +13,7 @@ export function deriveGoatSourceState(input: {
   if (input.uploading) return 'UPLOADING';
   if (input.resumable) return 'RESUMABLE';
   if (input.receipt.workingCopyStatus === 'WORKING_COPY_READY') return 'WORKING_COPY_READY';
-  if (input.receipt.sourceLocked && input.receipt.hashVerified) {
-    return input.receipt.zipIntegrityVerified ? 'SOURCE_LOCKED' : 'HASH_VERIFIED';
-  }
+  if (input.receipt.sourceLocked && input.receipt.hashVerified) return 'SOURCE_LOCKED';
   if (input.receipt.hashVerified) return 'HASH_VERIFIED';
   return 'NOT_UPLOADED';
 }
