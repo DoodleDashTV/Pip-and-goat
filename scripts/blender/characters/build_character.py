@@ -1,7 +1,7 @@
 """TivvleJoy character builder entry point.
 
 Safe defaults:
-- dry-run
+- dry-run unless the guarded dispatcher passes --execute
 - no GPU
 - no SOURCE overwrite
 - no false PASS
@@ -11,7 +11,9 @@ from __future__ import annotations
 
 import os
 import sys
+import traceback
 from pathlib import Path
+from typing import Any
 
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
@@ -20,10 +22,11 @@ if str(HERE) not in sys.path:
 from animation_tests import plan_animation_suite  # noqa: E402
 from audit import inventory_scene  # noqa: E402
 from common.bpy_guard import detect_bpy  # noqa: E402
-from common.io import emit, parse_args, write_report  # noqa: E402
+from common.io import ModeError, emit, parse_args, write_report  # noqa: E402
 from common.stages import BUILD_STAGES, blocked_stage  # noqa: E402
 from controls import plan_controls  # noqa: E402
 from correctives import plan_correctives  # noqa: E402
+from execute import execute_department  # noqa: E402
 from export import plan_export  # noqa: E402
 from face import plan_face  # noqa: E402
 from intake import inspect_source  # noqa: E402
@@ -48,27 +51,27 @@ def repo_root_from_here() -> Path:
     return here.parents[3]
 
 
-def run(argv: list[str] | None = None) -> dict:
-    args = parse_args(argv)
-    root = repo_root_from_here()
-    intake = inspect_source(root)
+def run_dry(args: Any, root: Path) -> dict:  # type: ignore[name-defined]
+    intake = inspect_source(root, extra_paths=[args.source_zip] if args.source_zip else None)
     bpy_available = detect_bpy() is not None
-    missing = "Real Goat_FINN.zip and offline Blender execution are required."
+    missing = "Real Goat_FINN.zip and explicit --execute are required for live department operations."
     stages = [blocked_stage(stage, missing) for stage in BUILD_STAGES]
     if intake["present"]:
         stages[0] = {
             "stage": "SOURCE_INTAKE",
             "disposition": "CREATED",
-            "reason": "Hashed real package bytes.",
+            "reason": "Hashed package bytes during dry-run planning.",
             "status": "HASH_LOCKED",
+            "simulated": True,
         }
         stages[1] = {
             "stage": "SOURCE_HASH_LOCK",
             "disposition": "CREATED",
-            "reason": "Source hash locked.",
+            "reason": "Source hash locked during dry-run planning.",
             "status": "HASH_LOCKED",
+            "simulated": True,
         }
-    gate = evaluate_master_gate(bool(intake["present"]), bpy_available)
+    gate = evaluate_master_gate(bool(intake["present"]), bpy_available, executed=False)
     reports = {
         "goat_source_audit.json": intake,
         "goat_topology_report.json": {"status": "BLOCKED_REAL_EXECUTION_REQUIRED", "blindDecimateForbidden": True},
@@ -104,15 +107,63 @@ def run(argv: list[str] | None = None) -> dict:
         render=plan_render_qa(),
         gate=gate,
         dryRun=True,
+        execute=False,
         gpuRequested=False,
         blenderExecuted=False,
         paidCompute=False,
+        goatProductionReady=False,
     )
-    return {"status": "BLOCKED", "stages": stages, "gate": gate, "reports": reports}
+    return {"status": "BLOCKED", "stages": stages, "gate": gate, "reports": reports, "dryRun": True}
+
+
+def run(argv: list[str] | None = None) -> dict:
+    try:
+        args = parse_args(argv)
+    except ModeError as error:
+        emit("FAIL_CLOSED", str(error), goatProductionReady=False, dryRun=False, execute=False)
+        raise
+    root = repo_root_from_here()
+    if args.execution_mode == "live":
+        result = execute_department(args, Path(args.artifact_dir))
+        write_report(args.artifact_dir, "goat_character_master_gate.json", result["gate"])
+        write_report(args.artifact_dir, "goat_live_department.json", {
+            "stages": result["stages"],
+            "failedStages": result["failedStages"],
+            "workingSha256": result["workingSha256"],
+            "objectDelta": result["objectDelta"],
+            "shapeKeys": result["shapeKeys"],
+            "simulated": False,
+        })
+        emit(
+            result["status"],
+            "Character builder live execute complete. Goat is not production-ready.",
+            characterId=args.character_id,
+            stages=result["stages"],
+            gate=result["gate"],
+            dryRun=False,
+            execute=True,
+            gpuRequested=False,
+            blenderExecuted=True,
+            paidCompute=False,
+            goatProductionReady=False,
+            workingSha256=result["workingSha256"],
+            objectDelta=result["objectDelta"],
+            datablocksChanged=result["datablocksChanged"],
+        )
+        return result
+    return run_dry(args, root)
 
 
 def main() -> int:
-    run()
+    try:
+        result = run()
+    except ModeError:
+        return 2
+    except Exception as error:  # noqa: BLE001
+        emit("FAIL_CLOSED", str(error), goatProductionReady=False, traceback=traceback.format_exc())
+        return 1
+    if result.get("failedStages"):
+        return 1
     return 0
 
 

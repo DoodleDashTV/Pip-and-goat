@@ -35,6 +35,9 @@ async function main(): Promise<number> {
     characterMaster: labels['ddp.character.master'] || null,
     jobKind: labels['ddp.character.job.kind'] || null,
     stageCount: labels['ddp.character.stage.count'] || null,
+    capabilitySchema: labels['ddp.character.capability.schema'] || null,
+    liveCapable: labels['ddp.character.live.capable'] || null,
+    mandatoryDryRun: labels['ddp.character.mandatory.dry.run'] || null,
   };
   console.log(JSON.stringify(report, null, 2));
   if (!registry.ok || !registry.amd64) return 1;
@@ -43,6 +46,9 @@ async function main(): Promise<number> {
   if (labels['ddp.character.job.kind'] !== 'CHARACTER_MASTER_BUILD') return 4;
   if (labels['ddp.character.stage.count'] !== '26') return 5;
   if (labels['ddp.character.blender'] !== '4.2.2') return 6;
+  if (labels['ddp.character.capability.schema'] !== 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2') return 8;
+  if (labels['ddp.character.live.capable'] !== 'true') return 9;
+  if (labels['ddp.character.mandatory.dry.run'] !== 'false') return 10;
   if (pin.sourceCommit && report.sourceCommit && report.sourceCommit !== pin.sourceCommit) return 7;
   return 0;
 }

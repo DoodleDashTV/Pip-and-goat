@@ -14,6 +14,12 @@ import {
 } from './goat-spec';
 import { GOAT_FIRST_PAID_EXECUTION } from './post-upload-preflight';
 import { GOAT_SOURCE_OBJECT_KEY, ZERO_INTAKE_SIDE_EFFECTS } from './types';
+import {
+  REJECTED_LIVE_CAPABILITY_SCHEMA,
+  REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS,
+  REQUIRED_LIVE_CAPABILITY_SCHEMA,
+} from './character-worker-pin-record';
+import { resolveLiveCharacterWorkerImage } from './character-worker-pin';
 
 export const GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA =
   'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1' as const;
@@ -53,6 +59,17 @@ export const REQUIRED_GOAT_WORKER_JOB_KINDS = [
   'CHARACTER_BUILD',
 ] as const;
 
+export const INVALID_GOAT_PAID_AUTHORIZATIONS = [
+  'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1',
+  'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2',
+] as const;
+
+export const GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3 =
+  'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3' as const;
+
+export const REJECTED_GOAT_LIVE_WORKER_DIGEST =
+  'sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e' as const;
+
 export type GoatPaidExecutionBlocker =
   | 'WORKER_IMAGE_MISSING'
   | 'WORKER_IMAGE_NOT_PINNED'
@@ -69,7 +86,12 @@ export type GoatPaidExecutionBlocker =
   | 'PRIOR_LAUNCH_ALREADY_CONSUMED'
   | 'COMMUNITY_CLOUD_REFUSED'
   | 'WRONG_GPU'
-  | 'BLENDER_CONVERSION_UNSAFE';
+  | 'BLENDER_CONVERSION_UNSAFE'
+  | 'WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE'
+  | 'WORKER_NOT_LIVE_CHARACTER_CAPABLE'
+  | 'REJECTED_LIVE_EXECUTION_DIGEST'
+  | 'INVALID_SUPERSEDED_AUTHORIZATION'
+  | 'LIVE_AUTHORIZATION_V3_REQUIRED';
 
 export type GoatWorkerImageResolution = {
   envConfigured: boolean;
@@ -114,6 +136,10 @@ export type GoatPaidLiveFacts = {
   knownCurrentImageJobKind?: string | null;
   knownCurrentImageHasCharacterDepartment?: boolean | null;
   knownCurrentImageHasGoatMaterialize?: boolean | null;
+  capabilitySchema?: string | null;
+  liveCharacterDepartmentCapable?: boolean | null;
+  mandatoryDryRun?: boolean | null;
+  authorizationName?: string | null;
   secure4090PriceUsdPerHr?: number | null;
   secure4090StockStatus?: string | null;
   existingBillablePodCount?: number;
@@ -250,6 +276,29 @@ export function evaluateGoatPaidExecutionAuthorization(input?: {
   if (requestedCloud !== 'SECURE') blockers.push('COMMUNITY_CLOUD_REFUSED');
   if (requestedGpu !== GOAT_PAID_EXECUTION_LIMITS.gpuTypeId) blockers.push('WRONG_GPU');
   if (live.blender42CanOpen43 === false) blockers.push('BLENDER_CONVERSION_UNSAFE');
+  const capabilitySchema = live.capabilitySchema ?? REJECTED_LIVE_CAPABILITY_SCHEMA;
+  if (capabilitySchema === REJECTED_LIVE_CAPABILITY_SCHEMA || capabilitySchema !== REQUIRED_LIVE_CAPABILITY_SCHEMA) {
+    blockers.push('WORKER_CAPABILITY_V1_FORBIDDEN_FOR_LIVE');
+  }
+  if (live.liveCharacterDepartmentCapable !== true || live.mandatoryDryRun === true) {
+    blockers.push('WORKER_NOT_LIVE_CHARACTER_CAPABLE');
+  }
+  const digest = worker.envValidation.digest;
+  if (digest && (REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS as readonly string[]).includes(digest)) {
+    blockers.push('REJECTED_LIVE_EXECUTION_DIGEST');
+  }
+  const authorizationName = live.authorizationName ?? GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA;
+  if ((INVALID_GOAT_PAID_AUTHORIZATIONS as readonly string[]).includes(authorizationName)) {
+    blockers.push('INVALID_SUPERSEDED_AUTHORIZATION');
+  }
+  if (authorizationName !== GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3) {
+    blockers.push('LIVE_AUTHORIZATION_V3_REQUIRED');
+  }
+  void resolveLiveCharacterWorkerImage(env, {
+    schema: capabilitySchema,
+    liveCharacterDepartmentCapable: live.liveCharacterDepartmentCapable === true,
+    mandatoryDryRun: live.mandatoryDryRun === true,
+  });
 
   const uniqueBlockers = [...new Set(blockers)];
   const launchAllowed = authorizationPresent && uniqueBlockers.length === 0 && worker.positivelyResolved;
