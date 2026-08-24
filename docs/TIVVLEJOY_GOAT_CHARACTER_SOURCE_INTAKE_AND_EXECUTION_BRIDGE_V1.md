@@ -13,6 +13,29 @@ On `/character-rigging`:
 
 TivvleJoy then hashes, uploads through signed private R2 multipart URLs, verifies, and locks SOURCE.
 
+On the public Preview host, the existing scenery studio session token is required in the same `x-tivvlejoy-scenery-intake-token` header already used by scenery intake. The value is never printed. Production stays refused.
+
+## Preview storage configuration
+
+Checkpoint: `TIVVLEJOY_GOAT_SOURCE_INTAKE_PREVIEW_STORAGE_CONFIG`
+
+These names are set on the Vercel `pip-and-goat` project for **Preview only**, git-branch limited to `cursor/tivvlejoy-goat-character-source-intake-73f1`. Production was not modified (`hiddenProductionEnvCount=0`).
+
+- `R2_BUCKET`
+- `R2_ENDPOINT`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `TIVVLEJOY_SCENERY_ASSET_PREFIX=tivvlejoy-assets`
+- `TIVVLEJOY_SCENERY_INTAKE_TOKEN` (server-only, not printed)
+
+Verified after Preview storage-config redeploy `dpl_Hg7dpPYUufN8bj1fF5pChnwm2kYr` (READY, not Production):
+
+- `/character-rigging` returns 200
+- `/api/character-source-intake` reports `storage.state=configured`, prefix `tivvlejoy-assets`, `tokenConfigured=true`, `goatProductionReady=false`
+- Missing or wrong intake token returns 401 `INTAKE_UNAUTHORIZED`
+- No credentials appear in Preview HTML or JSON
+- Hostname omitted from git
+
 ## Exact R2 object key
 
 `tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip`

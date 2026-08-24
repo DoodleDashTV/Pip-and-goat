@@ -14,6 +14,8 @@ Preview-only Goat source intake bridge. One operator action: select `Goat_FINN.z
 - Reuses existing private R2 multipart architecture
 - Expected SHA-256: `f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5`
 - Goat remains **not** production-ready
+- Preview storage: existing private R2 names copied as Preview-only, git-branch-limited env. Production not modified (`hiddenProductionEnvCount=0`)
+- Live Preview reports `storage.state=configured`, prefix `tivvlejoy-assets`, `tokenConfigured=true`
 - No paid GPU, no Production mutation, no SOURCE overwrite, ZIP not committed to Git
 
 ## TIVVLEJOY_CHARACTER_RIGGING_ANIMATION_DEPARTMENT_V1
