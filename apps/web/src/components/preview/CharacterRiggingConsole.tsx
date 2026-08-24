@@ -45,6 +45,7 @@ export function CharacterRiggingConsole({ model }: { model: Model }) {
           state: model.intake.state,
           nextUserAction: model.intake.nextUserAction,
           checklist: model.intake.checklist,
+          authorization: model.intake.authorization,
         }}
       />
 

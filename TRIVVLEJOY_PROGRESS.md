@@ -16,6 +16,7 @@ Preview-only Goat source intake bridge. One operator action: select `Goat_FINN.z
 - Goat remains **not** production-ready
 - Preview storage: existing private R2 names copied as Preview-only, git-branch-limited env. Production not modified (`hiddenProductionEnvCount=0`)
 - Live Preview reports `storage.state=configured`, prefix `tivvlejoy-assets`, `tokenConfigured=true`
+- 35% stall fix: Goat session-open uses the shared authenticated asset-intake primitive with Goat error codes; iPhone Safari reads the Studio session field from the input; failed session-open no longer stays on Opening upload session
 - No paid GPU, no Production mutation, no SOURCE overwrite, ZIP not committed to Git
 
 ## TIVVLEJOY_CHARACTER_RIGGING_ANIMATION_DEPARTMENT_V1

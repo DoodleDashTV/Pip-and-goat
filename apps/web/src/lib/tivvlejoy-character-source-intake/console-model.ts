@@ -19,6 +19,11 @@ export function buildGoatSourceIntakeConsoleModel() {
       checklist: operatorChecklist(state),
       nextUserAction: 'Select Goat_FINN.zip and tap Upload Goat Source.',
       goatProductionReady: false,
+      authorization: {
+        publicPreview: !process.env.DATABASE_URL,
+        tokenConfigured: Boolean(String(process.env.TIVVLEJOY_SCENERY_INTAKE_TOKEN ?? '').trim()),
+        productionMutationsRefused: String(process.env.VERCEL_ENV ?? '').trim() === 'production',
+      },
     },
   };
 }

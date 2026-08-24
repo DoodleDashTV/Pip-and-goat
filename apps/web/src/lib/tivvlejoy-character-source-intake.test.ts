@@ -6,6 +6,7 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import type { MultipartStoragePort } from './scenery/intake/multipart';
 import { ConnectionReadyMultipartStorage, MemoryMultipartStorage } from './scenery/intake/multipart';
 import { resetIntakeRateLimit } from './scenery/intake/access';
+import { describeGoatSessionOpenFailure } from './tivvlejoy-character-source-intake/client-failure';
 import {
   GOAT_SOURCE_OBJECT_KEY,
   GOAT_SOURCE_RECEIPT_OBJECT_KEY,
@@ -362,6 +363,73 @@ describe('Goat character source intake bridge', () => {
     expect(stdout).toContain('BLOCKED_REAL_EXECUTION_REQUIRED');
     expect(stdout).toContain('"paid": false');
     expect(stdout).toContain(GOAT_SOURCE_OBJECT_KEY);
+  });
+
+  it('reproduces the 35% session-open stall as a failed authorization, not a hang', () => {
+    const failure = describeGoatSessionOpenFailure({
+      httpStatus: 401,
+      code: 'INTAKE_UNAUTHORIZED',
+      error: 'Scenery asset intake mutations require the authorized TivvleJoy studio, not the public website preview.',
+      tokenPresented: false,
+    });
+    expect(failure.phase).toBe('Failed');
+    expect(failure.stoppedAfterHash).toBe(true);
+    expect(failure.code).toBe('INTAKE_UNAUTHORIZED');
+    expect(failure.error).toContain('INTAKE_UNAUTHORIZED');
+    expect(failure.nextUserAction).toContain('Goat_FINN.zip');
+  });
+
+  it('requires the Preview studio token on public Preview and accepts the correct token', async () => {
+    const previewEnv = {
+      VERCEL_ENV: 'preview',
+      TIVVLEJOY_SCENERY_INTAKE_TOKEN: 'preview-studio-token',
+      R2_BUCKET: 'bucket',
+      R2_ENDPOINT: 'https://example.invalid',
+      R2_ACCESS_KEY_ID: 'id',
+      R2_SECRET_ACCESS_KEY: 'secret',
+    };
+    await expect(
+      handleCharacterSourceAction({
+        action: 'create-session',
+        body: { filename: 'Goat_FINN.zip', byteSize: GOAT_SOURCE_SIZE_BYTES, sha256: GOAT_SOURCE_SHA256 },
+        env: previewEnv,
+        publicPreview: true,
+        storage: fakeStorage(),
+      }),
+    ).rejects.toMatchObject({ code: 'INTAKE_UNAUTHORIZED' });
+    await expect(
+      handleCharacterSourceAction({
+        action: 'create-session',
+        body: { filename: 'Goat_FINN.zip', byteSize: GOAT_SOURCE_SIZE_BYTES, sha256: GOAT_SOURCE_SHA256 },
+        env: previewEnv,
+        publicPreview: true,
+        studioToken: 'wrong-token',
+        storage: fakeStorage(),
+      }),
+    ).rejects.toMatchObject({ code: 'INTAKE_UNAUTHORIZED' });
+    const authorized = await handleCharacterSourceAction({
+      action: 'authorize',
+      body: {},
+      env: previewEnv,
+      publicPreview: true,
+      studioToken: 'preview-studio-token',
+      storage: fakeStorage(),
+    });
+    expect(authorized.authorized).toBe(true);
+    expect(authorized.sessionOpened).toBe(false);
+    expect(authorized.bytesUploaded).toBe(0);
+    expect(authorized.goatProductionReady).toBe(false);
+    const opened = await handleCharacterSourceAction({
+      action: 'create-session',
+      body: { filename: 'Goat_FINN.zip', byteSize: GOAT_SOURCE_SIZE_BYTES, sha256: GOAT_SOURCE_SHA256 },
+      env: previewEnv,
+      publicPreview: true,
+      studioToken: 'preview-studio-token',
+      storage: fakeStorage(),
+    });
+    expect((opened.session as { sessionId: string }).sessionId).toMatch(/^goat-/);
+    expect(opened.goatProductionReady).toBe(false);
+    expect(JSON.stringify(opened)).not.toMatch(/preview-studio-token|R2_SECRET_ACCESS_KEY/);
   });
 
   it('does not commit Goat_FINN.zip and does not expose secrets in docs', () => {

@@ -15,6 +15,14 @@ TivvleJoy then hashes, uploads through signed private R2 multipart URLs, verifie
 
 On the public Preview host, the existing scenery studio session token is required in the same `x-tivvlejoy-scenery-intake-token` header already used by scenery intake. The value is never printed. Production stays refused.
 
+## 35% session-open stall
+
+Checkpoint: `TIVVLEJOY_GOAT_SOURCE_UPLOAD_35_PERCENT_BLOCKER_FIX_V1`
+
+Hashing the 257 MiB ZIP reports progress up to 35%, then the browser opens a session. If the studio token is missing from the approved header, or does not match, session-open fails with `INTAKE_UNAUTHORIZED`. The UI must show that code and stop, not remain on "Opening upload session".
+
+Goat intake reuses the authenticated asset-intake primitive. It does not make the endpoint public. Scenery intake messages stay on the scenery routes.
+
 ## Preview storage configuration
 
 Checkpoint: `TIVVLEJOY_GOAT_SOURCE_INTAKE_PREVIEW_STORAGE_CONFIG`

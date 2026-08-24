@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { isPublicWebsitePreview } from '@/lib/public-preview';
-import { SCENERY_INTAKE_TOKEN_HEADER, publicAuthorizationFailure, redactSecretsFromText } from '@/lib/scenery/intake/access';
+import {
+  approvedIntakeTokenFromHeaders,
+  publicAssetIntakeAuthorizationFailure,
+} from '@/lib/asset-intake/access';
+import { redactSecretsFromText } from '@/lib/scenery/intake/access';
 import { SCENERY_INTAKE_LIMITS } from '@/lib/scenery/intake/limits';
 import { SceneryError } from '@/lib/scenery/types';
 import {
@@ -15,10 +19,24 @@ export const runtime = 'nodejs';
 function fail(error: unknown, token = '') {
   if (error instanceof SceneryError) {
     if (error.code === 'INTAKE_UNAUTHORIZED' || error.code === 'PRODUCTION_INTAKE_REFUSED') {
-      return NextResponse.json(publicAuthorizationFailure(error.code), { status: 401 });
+      return NextResponse.json(
+        publicAssetIntakeAuthorizationFailure({
+          code: error.code,
+          surface: 'goat-source',
+          providedToken: token,
+        }),
+        { status: 401 },
+      );
     }
     if (error.code === 'TOKEN_LOCATION_REFUSED') {
-      return NextResponse.json(publicAuthorizationFailure(error.code), { status: 400 });
+      return NextResponse.json(
+        publicAssetIntakeAuthorizationFailure({
+          code: error.code,
+          surface: 'goat-source',
+          providedToken: token,
+        }),
+        { status: 400 },
+      );
     }
     const status = error.code === 'REQUEST_TOO_LARGE' ? 413 : error.code === 'INTAKE_RATE_LIMIT' ? 429 : 400;
     return NextResponse.json(
@@ -45,7 +63,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const token = request.headers.get(SCENERY_INTAKE_TOKEN_HEADER) ?? '';
+  const token = approvedIntakeTokenFromHeaders(request.headers);
   try {
     const contentLength = Number(request.headers.get('content-length') ?? 0);
     if (Number.isFinite(contentLength) && contentLength > SCENERY_INTAKE_LIMITS.maxJsonBodyBytes) {

@@ -2,10 +2,10 @@ import {
   assertIntakeRateLimit,
   assertNoClientStorageCredentials,
   assertNoTokenReflection,
-  assertStudioIntakeAccess,
   assertTokenOnlyFromApprovedHeader,
   publicIntakeAuthorizationSnapshot,
 } from '@/lib/scenery/intake/access';
+import { assertAssetIntakeAccess } from '@/lib/asset-intake/access';
 import { describeSceneryStorageConfiguration } from '@/lib/scenery/intake/config';
 import {
   ConnectionReadyMultipartStorage,
@@ -46,7 +46,8 @@ export type CharacterSourceAction =
   | 'abort'
   | 'resume'
   | 'retry-part'
-  | 'verify';
+  | 'verify'
+  | 'authorize';
 
 async function storageFor(env: Record<string, string | undefined>, override?: MultipartStoragePort) {
   if (override) return override;
@@ -87,7 +88,11 @@ export async function handleCharacterSourceAction(input: {
   assertNoClientStorageCredentials(input.body);
   assertTokenOnlyFromApprovedHeader(input.body);
   if (input.action !== 'status') {
-    assertStudioIntakeAccess(env, input.studioToken);
+    assertAssetIntakeAccess({
+      env,
+      providedToken: input.studioToken,
+      surface: 'goat-source',
+    });
     assertIntakeRateLimit(input.clientKey ?? 'studio', env);
   }
   const result = await handleInner({ ...input, env });
@@ -110,7 +115,7 @@ async function handleInner(input: {
     store.lockReceipt(discovered.receipt);
   }
   const receipt = store.getReceipt() ?? emptyGoatSourceReceipt(config.configured);
-  if (discovered.sizeConflict && input.action !== 'status') {
+  if (discovered.sizeConflict && input.action !== 'status' && input.action !== 'authorize') {
     throw new CharacterSourceError(
       'A Goat object is already stored at the locked key but the size does not match Goat_FINN.zip. SOURCE was not overwritten.',
       'SOURCE_OVERWRITE_REFUSED',
@@ -158,6 +163,26 @@ async function handleInner(input: {
         sizeConflict: discovered.sizeConflict,
         resumable: sessions.some((item) => resumeGuidance(item).resumable),
       }),
+    };
+  }
+
+  if (input.action === 'authorize') {
+    return {
+      schema: CHARACTER_SOURCE_INTAKE_SCHEMA,
+      authorized: true,
+      sessionOpened: false,
+      bytesUploaded: 0,
+      previewRuntime: String(input.env.VERCEL_ENV ?? '') === 'preview',
+      publicPreview: input.publicPreview,
+      storage: {
+        state: config.state,
+        configured: config.configured,
+        prefix: config.prefix,
+      },
+      objectKey: goatSourceObjectKey(),
+      goatProductionReady: false,
+      safety: ZERO_INTAKE_SIDE_EFFECTS,
+      nextUserAction: 'Select Goat_FINN.zip and tap Upload Goat Source.',
     };
   }
 
