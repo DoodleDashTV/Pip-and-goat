@@ -152,3 +152,7 @@ The following do not count as substitutes for this gate:
 Until this gate passes, Pip and Goat remain **RIG_VALIDATION_PENDING** and episode animation/render execution must remain blocked for those characters.
 
 Once the gate passes, the approved rig version becomes the authoritative production input for the character and may be used by the episode animation pipeline.
+
+## Department implementation
+
+The reusable builder that applies this gate is documented in `docs/TIVVLEJOY_CHARACTER_RIGGING_ANIMATION_DEPARTMENT_V1.md`. Goat is not production-ready until real-asset execution passes this gate.

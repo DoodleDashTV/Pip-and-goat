@@ -14,3 +14,4 @@ required asset path is absent or does not exist.
 - `apply_lip_sync.py`
 - `render_frames.py`
 - `assemble_scene.py`
+- `characters/` — reusable TivvleJoy character build department (`build_character.py`). Dry-run safe. Never overwrites SOURCE. Never false-PASSes without real Goat bytes and Blender.

@@ -1,0 +1,6 @@
+{
+  "version": "goat.viseme.v1",
+  "set": ["REST", "AI", "E", "O", "U", "MBP", "FV", "L", "TH", "WQ", "CHSH", "KG", "R"],
+  "elevenLabsContacted": false,
+  "timingSource": "SYNTHETIC_FIXTURE"
+}

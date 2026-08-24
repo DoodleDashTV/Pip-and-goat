@@ -1,0 +1,22 @@
+{
+  "schema": "pip.character.manifest.v1.deferred",
+  "canonicalId": "CHAR_PIP_001",
+  "rigNow": false,
+  "reason": "Do not rig Pip until her final returned animation mesh is attached.",
+  "futureRequirements": [
+    "eyes",
+    "eyelids",
+    "upper/lower beak",
+    "long layered wings",
+    "wing expressive controls",
+    "legs",
+    "feet",
+    "three toes",
+    "planted rear hallux",
+    "three crest feathers",
+    "scarf",
+    "two backpack straps",
+    "backpack body",
+    "copper spiral accessory"
+  ]
+}

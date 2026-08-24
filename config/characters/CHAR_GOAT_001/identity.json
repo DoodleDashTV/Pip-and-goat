@@ -1,0 +1,14 @@
+{
+  "characterId": "CHAR_GOAT_001",
+  "displayName": "Goat",
+  "creamBody": true,
+  "horns": true,
+  "pinkNose": true,
+  "collar": true,
+  "roundTagReadingGoat": true,
+  "warmPlayfulBoyCompanion": true,
+  "scaleRelativeToPip": 1.5,
+  "noUnintendedSilhouetteChange": true,
+  "noFacialAppealLoss": true,
+  "noVisibleTextureDegradationAt1080x1920": true
+}

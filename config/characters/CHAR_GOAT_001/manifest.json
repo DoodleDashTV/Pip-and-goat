@@ -1,0 +1,50 @@
+{
+  "schema": "TIVVLEJOY_CHARACTER_BUILD_MANIFEST_V1",
+  "canonicalId": "CHAR_GOAT_001",
+  "displayName": "Goat",
+  "sourceFile": "production-library/characters/goat/SOURCE/Goat_FINN.zip",
+  "workingFile": "production-library/characters/goat/WORKING/CHAR_GOAT_001_working.blend",
+  "productionFile": "production-library/characters/goat/PRODUCTION/CHAR_GOAT_001_master.blend",
+  "sourceHash": null,
+  "blender": {
+    "authoredHint": "4.3",
+    "studioPin": "4.2.2",
+    "conversionCopyRequired": true,
+    "silentDowngradeForbidden": true,
+    "sourceOverwriteForbidden": true
+  },
+  "copies": {
+    "SOURCE": "immutable",
+    "WORKING": "rig-development",
+    "PRODUCTION": "approved-animation-master-only-after-gates"
+  },
+  "meshRoles": {
+    "body": "BODY",
+    "horns": "HORNS",
+    "collar": "COLLAR",
+    "tag": "TAG",
+    "eyes": "EYES",
+    "mouth": "MOUTH"
+  },
+  "textures": {
+    "resolutionHint": "2K",
+    "expectedCountHint": 21,
+    "laterHigherResSupportedWithoutReRig": true,
+    "doNotUpscaleInventDetail": true,
+    "roles": ["Base Color", "Normal", "Roughness", "Metallic", "Alpha", "Emission", "Displacement"]
+  },
+  "scale": {
+    "relativeToPip": 1.5
+  },
+  "versions": {
+    "rig": "goat.rig.v1",
+    "skeleton": "goat.skeleton.v1",
+    "faceRig": "goat.face.v1",
+    "viseme": "goat.viseme.v1",
+    "weight": "goat.weight.v1",
+    "animationValidation": "goat.animation.validation.v1",
+    "export": "goat.export.v1"
+  },
+  "gateStatus": "BLOCKED",
+  "goatProductionReady": false
+}

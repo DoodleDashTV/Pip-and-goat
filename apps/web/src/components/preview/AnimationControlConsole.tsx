@@ -33,6 +33,10 @@ export function AnimationControlConsole({ model }: { model: AnimationConsoleMode
           <Link href="/shot-assembly" className="font-bold underline">
             Shot Assembly
           </Link>
+          {' · '}
+          <Link href="/character-rigging" className="font-bold underline">
+            Character Rigging
+          </Link>
         </p>
       </div>
 

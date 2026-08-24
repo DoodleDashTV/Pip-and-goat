@@ -1,5 +1,30 @@
 # TrivvleJoy Studio Progress
 
+Updated: 2026-08-24
+
+## TIVVLEJOY_CHARACTER_RIGGING_ANIMATION_DEPARTMENT_V1
+
+Reusable Character Rigging & Animation Department. Goat is the first configured character. Pip is reserved and not rigged.
+
+- Draft branch: `cursor/tivvlejoy-goat-production-rig-v1-73f1`
+- Stacked on: `cursor/tivvlejoy-character-rig-animation-quality-gate-73f1`
+- Operator surface: `/character-rigging`
+- TypeScript: `apps/web/src/lib/tivvlejoy-character-rigging-department/`
+- Blender package: `scripts/blender/characters/`
+- Goat config: `config/characters/CHAR_GOAT_001/`
+- Real asset: **GOAT_REAL_ASSET_EXECUTION_BLOCKED** until `production-library/characters/goat/SOURCE/Goat_FINN.zip` is attached
+- Goat is **not** production-ready
+- No paid GPU, no ElevenLabs, no Production mutation, no SOURCE overwrite
+- Keep this Draft PR open and unmerged
+
+## Repository state
+
+Older scenery / voice / studio history below is unchanged. This section records the newest character-department increment only.
+
+---
+
+# TrivvleJoy Studio Progress (prior)
+
 Updated: 2026-08-18
 
 ## Repository state
