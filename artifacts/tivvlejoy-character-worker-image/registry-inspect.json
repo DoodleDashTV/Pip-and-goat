@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "amd64": true,
+  "digest": "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+  "detail": "config blob read; linux/amd64=true",
+  "sourceCommit": "fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3",
+  "blender": "4.2.2",
+  "characterMaster": "true",
+  "jobKind": "CHARACTER_MASTER_BUILD",
+  "stageCount": "26"
+}

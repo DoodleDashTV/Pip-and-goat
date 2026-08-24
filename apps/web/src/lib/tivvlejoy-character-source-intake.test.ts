@@ -410,10 +410,12 @@ describe('Goat character source intake bridge', () => {
     expect(overBudget.launch.allowed).toBe(false);
   });
 
-  it('blocks RUNPOD_WORKER_IMAGE resolution on stale or missing character pins', () => {
-    const missing = resolveAuthorizedCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
-    expect(missing.ok).toBe(false);
-    expect(missing.code).toBe(RUNPOD_WORKER_IMAGE_PIN_BLOCKED);
+  it('resolves RUNPOD_WORKER_IMAGE from the authoritative character pin and rejects stale digests', () => {
+    const resolved = resolveAuthorizedCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
+    expect(resolved.ok).toBe(true);
+    expect(resolved.source).toBe('authoritative-pin');
+    expect(resolved.digest).toBe('sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e');
+    expect(resolved.ref).toContain('@sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e');
     const stale = resolveAuthorizedCharacterWorkerImage({
       RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST}`,
     });
