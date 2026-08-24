@@ -1,0 +1,201 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_V3",
+  "status": "STOPPED_BEFORE_PAID_CREATE",
+  "authorization": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3",
+  "authorizationConsumed": false,
+  "consumptionPoint": "UNCONSUMED_PREFLIGHT_BLOCKER",
+  "podCreateRequestCount": 0,
+  "confirmedPodCount": 0,
+  "realGoatDownloadCount": 0,
+  "startingBranch": "cursor/tivvlejoy-goat-live-worker-repair-73f1",
+  "startingSha": "e1be8c15763acc40e8286131b1b0016f9d2cfa52",
+  "finalBranch": "cursor/tivvlejoy-goat-real-paid-execution-v3-73f1",
+  "finalSha": "a88c326dc4eb0324c07e4d4ee1bd664a99fc62a6",
+  "bindings": {
+    "authorizationName": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V3",
+    "characterId": "CHAR_GOAT_001",
+    "sourceKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip",
+    "expectedSha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+    "expectedSizeBytes": 269512136,
+    "digest": "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+    "sourceCommit": "08d6fa5e664fcfb620ad219bf0b3271ebc3bbcd4",
+    "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
+    "renderCodeSha256": "541aa82ab6dbd929be28b99e2e99b7914370b3c7cfde3b748452365cf22845a9",
+    "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+    "maxCreateRequests": 1,
+    "maxPods": 1,
+    "hardCostUsd": 5,
+    "cloudType": "SECURE",
+    "plannedPodName": "tivvlejoy-goat-v3-1e29b0ba",
+    "noRetry": true,
+    "mandatoryCleanup": true,
+    "humanVisualApprovalRequired": true,
+    "productionPromotionForbidden": true
+  },
+  "resolvedImageRefRedacted": "ghcr.io/<org>/ddp-runpod-blender@sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
+  "remainingBlockers": [
+    "AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD"
+  ],
+  "stages": [
+    {
+      "stage": "SOURCE_INTAKE",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "SOURCE_HASH_LOCK",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "BLENDER_VERSION_CHECK",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "OBJECT_INVENTORY",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "MATERIAL_INVENTORY",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "TEXTURE_INVENTORY",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "UV_VALIDATION",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "TOPOLOGY_AUDIT",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "SCALE_ORIENTATION_NORMALIZATION",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "CHARACTER_SEMANTIC_MAPPING",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "RIG_GUIDE_GENERATION",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "SKELETON_BUILD",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "CONTROL_RIG_BUILD",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "INITIAL_SKIN_BIND",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "WEIGHT_REFINEMENT",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "FACIAL_SYSTEM_BUILD",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "VISEME_SYSTEM_BUILD",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "SECONDARY_CONTROLS",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "CORRECTIVE_DEFORMATION_BUILD",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "ACCESSORY_BINDING",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "DEFORMATION_TESTS",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "ANIMATION_TESTS",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "PERFORMANCE_PROFILE",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "RENDER_QA",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "EXPORT_QA",
+      "executed": false,
+      "simulated": null,
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "stage": "CHARACTER_MASTER_GATE",
+      "executed": false,
+      "simulated": null,
+      "status": "BLOCKED_PENDING_HUMAN_VISUAL_APPROVAL"
+    }
+  ],
+  "goatProductionReady": false,
+  "characterMasterGate": "BLOCKED_PENDING_HUMAN_VISUAL_APPROVAL",
+  "actualRuntimeMinutes": 0,
+  "actualCostUsd": 0
+}

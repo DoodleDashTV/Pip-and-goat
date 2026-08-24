@@ -46,6 +46,28 @@ function git(args: string[]): string {
   return execFileSync('git', args, { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
 }
 
+function deepRedact(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return value
+      .replace(/ghcr\.io\/[^/]+\//g, 'ghcr.io/<org>/')
+      .replace(/github\.com\/[^/]+\//g, 'github.com/<org>/')
+      .replace(/"repository":\s*"[^"]+\/ddp-runpod-blender"/g, '"repository":"<org>/ddp-runpod-blender"');
+  }
+  if (Array.isArray(value)) return value.map(deepRedact);
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      if (key === 'repository' && typeof nested === 'string' && nested.endsWith('/ddp-runpod-blender')) {
+        out[key] = '<org>/ddp-runpod-blender';
+      } else {
+        out[key] = deepRedact(nested);
+      }
+    }
+    return out;
+  }
+  return value;
+}
+
 function credentialPresence() {
   return {
     runpodApiKeyPresent: Boolean(process.env.RUNPOD_API_KEY),
@@ -408,20 +430,20 @@ async function main() {
     authorization,
     consumptionPoint: 'UNCONSUMED_PREFLIGHT_BLOCKER',
   });
-  writeFileSync(path.join(OUT_DIR, 'preflight.json'), `${JSON.stringify(publicFacts, null, 2)}\n`);
+  writeFileSync(path.join(OUT_DIR, 'preflight.json'), `${JSON.stringify(deepRedact(publicFacts), null, 2)}\n`);
   writeFileSync(
     path.join(OUT_DIR, 'authorization.json'),
     `${JSON.stringify(
-      {
+      deepRedact({
         ...authorization,
         pin: { ...authorization.pin, ref: authorization.pin.refRedacted },
-      },
+      }),
       null,
       2,
     )}\n`,
   );
-  writeFileSync(path.join(OUT_DIR, 'final-report.json'), `${JSON.stringify(report, null, 2)}\n`);
-  console.log(JSON.stringify(publicFacts, null, 2));
+  writeFileSync(path.join(OUT_DIR, 'final-report.json'), `${JSON.stringify(deepRedact(report), null, 2)}\n`);
+  console.log(JSON.stringify(deepRedact(publicFacts), null, 2));
 }
 
 main().catch((error) => {

@@ -1,0 +1,16 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_V3",
+  "status": "STOPPED_BEFORE_PAID_CREATE",
+  "createEntered": false,
+  "authorizationConsumed": false,
+  "consumptionPoint": "UNCONSUMED_PREFLIGHT_BLOCKER",
+  "podCreateRequestCount": 0,
+  "confirmedPodCount": 0,
+  "realGoatDownloadCount": 0,
+  "allowPaidGpuLaunchLifted": false,
+  "paidExecutionAuthorizedLifted": false,
+  "remainingBlockers": [
+    "AUTHORIZED_IMAGE_CANNOT_INVOKE_REAL_DOWNLOAD"
+  ],
+  "reason": "The authorized 08d6fa5 / 1e29b0ba image bakes downloadAuthorizedGoatSource, but CHARACTER_MASTER_BUILD calls materializeGoatSource, which never performs the network download. Rebuilding is forbidden for this authorization. Stop before CREATE."
+}

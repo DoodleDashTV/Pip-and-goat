@@ -10,8 +10,6 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
-  GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3,
-  evaluateGoatV3PaidExecutionAuthorization,
   provePinnedImageCannotInvokeRealDownload,
   readGoatV3ConsumptionLedger,
 } from '../../../apps/web/src/lib/tivvlejoy-character-source-intake';
@@ -45,16 +43,15 @@ function main(): number {
   }
   const downloadProof = provePinnedImageCannotInvokeRealDownload(REPO_ROOT);
   const ledger = readGoatV3ConsumptionLedger(REPO_ROOT);
-  const decision = evaluateGoatV3PaidExecutionAuthorization({
-    env: process.env,
-    repoRoot: REPO_ROOT,
-    consumed: ledger.consumed,
-    live: {
-      authorizationName: GOAT_LIVE_PAID_EXECUTION_AUTHORIZATION_V3,
-      liveCharacterDepartmentCapable: true,
-      mandatoryDryRun: false,
-    },
-  });
+  let preflightBlockers: string[] = [];
+  try {
+    const facts = JSON.parse(readFileSync(path.join(OUT_DIR, 'preflight.json'), 'utf8')) as {
+      remainingBlockers?: string[];
+    };
+    preflightBlockers = facts.remainingBlockers ?? [];
+  } catch {
+    preflightBlockers = [];
+  }
   const launch = {
     schema: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_V3',
     status: 'STOPPED_BEFORE_PAID_CREATE' as const,
@@ -66,9 +63,7 @@ function main(): number {
     realGoatDownloadCount: 0,
     allowPaidGpuLaunchLifted: false,
     paidExecutionAuthorizedLifted: false,
-    remainingBlockers: [
-      ...new Set([...decision.remainingBlockers, downloadProof.code]),
-    ],
+    remainingBlockers: [...new Set([...preflightBlockers, downloadProof.code])],
     reason: downloadProof.reason,
   };
   writeFileSync(path.join(OUT_DIR, 'launch.json'), `${JSON.stringify(launch, null, 2)}\n`);
