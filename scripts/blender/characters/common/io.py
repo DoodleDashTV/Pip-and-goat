@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,12 +30,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if "--" in raw:
         raw = raw[raw.index("--") + 1 :]
     args = parser.parse_args(raw)
+    env_mode = os.environ.get("CHARACTER_EXECUTION_MODE", "").strip()
+    if not args.dry_run and not args.execute:
+        if env_mode == "live":
+            args.execute = True
+        elif env_mode == "dry-run":
+            args.dry_run = True
     if args.dry_run and args.execute:
         raise ModeError("CONFLICTING_EXECUTION_FLAGS: --dry-run and --execute are mutually exclusive.")
     if not args.dry_run and not args.execute:
         raise ModeError(
             "EXECUTION_MODE_REQUIRED: the guarded dispatcher must pass exactly one of --dry-run or --execute."
         )
+    if not args.working_blend:
+        args.working_blend = os.environ.get("CHARACTER_WORKING_BLEND", "")
+    if not args.source_zip:
+        args.source_zip = os.environ.get("CHARACTER_SOURCE_ZIP", "")
     args.execution_mode = "live" if args.execute else "dry-run"
     return args
 

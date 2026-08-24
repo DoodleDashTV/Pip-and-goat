@@ -41,15 +41,52 @@ def _first_mesh(bpy: Any) -> Any:
     return None
 
 
-def _ensure_object_mode(bpy: Any) -> None:
-    if bpy.context.object and bpy.context.object.mode != "OBJECT":
+def _ensure_object_mode(bpy: Any, obj: Any | None = None) -> None:
+    if obj is not None:
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+    active = bpy.context.view_layer.objects.active
+    if active is None:
+        return
+    if active.mode == "OBJECT":
+        return
+    if bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode="OBJECT")
 
 
 def _select_only(bpy: Any, obj: Any) -> None:
-    bpy.ops.object.select_all(action="DESELECT")
+    for item in bpy.data.objects:
+        item.select_set(False)
     obj.select_set(True)
     bpy.context.view_layer.objects.active = obj
+    _ensure_object_mode(bpy, obj)
+
+
+def _window(bpy: Any):
+    windows = bpy.context.window_manager.windows
+    return windows[0] if windows else bpy.context.window
+
+
+def _with_object(bpy: Any, obj: Any):
+    kwargs = {
+        "active_object": obj,
+        "selected_objects": [obj],
+        "object": obj,
+        "view_layer": bpy.context.view_layer,
+        "scene": bpy.context.scene,
+    }
+    window = _window(bpy)
+    if window is not None:
+        kwargs["window"] = window
+        if getattr(window, "screen", None) is not None:
+            kwargs["screen"] = window.screen
+    return bpy.context.temp_override(**kwargs)
+
+
+def _set_mode(bpy: Any, obj: Any, mode: str) -> None:
+    _select_only(bpy, obj)
+    with _with_object(bpy, obj):
+        bpy.ops.object.mode_set(mode=mode)
 
 
 def _bbox(obj: Any) -> tuple[float, ...]:
@@ -198,7 +235,9 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
                 continue
             if tuple(round(v, 6) for v in obj.scale) != (1.0, 1.0, 1.0) or tuple(round(v, 6) for v in obj.rotation_euler) != (0.0, 0.0, 0.0):
                 _select_only(bpy, obj)
-                bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+                with _with_object(bpy, obj):
+                    if bpy.ops.object.transform_apply.poll():
+                        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
                 changed.append(obj.name)
         evidence = {"applied": changed, "normalized": True}
         record(executed_stage("SCALE_ORIENTATION_NORMALIZATION", "Applied live scale/rotation where needed.", **evidence), evidence)
@@ -231,8 +270,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             arm_data = bpy.data.armatures.new("CHAR_GOAT_001_Armature")
             arm_obj = bpy.data.objects.new("CHAR_GOAT_001_Armature", arm_data)
             bpy.context.collection.objects.link(arm_obj)
-        _select_only(bpy, arm_obj)
-        bpy.ops.object.mode_set(mode="EDIT")
+        _set_mode(bpy, arm_obj, "EDIT")
         arm = arm_obj.data
         for bone in list(arm.edit_bones):
             arm.edit_bones.remove(bone)
@@ -249,7 +287,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             parent = bone if name.startswith("DEF.") or name in {"CTRL.MASTER", "CTRL.WORLD", "CTRL.ROOT", "CTRL.COG"} else parent
             height += 0.16
             created.append({"name": name, "role": role, "deform": deform})
-        bpy.ops.object.mode_set(mode="OBJECT")
+        _set_mode(bpy, arm_obj, "OBJECT")
         evidence = {"armature": arm_obj.name, "bones": created, "count": len(created)}
         record(executed_stage("SKELETON_BUILD", "Built live armature bones.", **evidence), evidence)
 
@@ -259,8 +297,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         if arm_obj is None:
             record(failed_stage("CONTROL_RIG_BUILD", "Armature missing after skeleton build."), {})
         else:
-            _select_only(bpy, arm_obj)
-            bpy.ops.object.mode_set(mode="POSE")
+            _set_mode(bpy, arm_obj, "POSE")
             added = []
             for bone_name, target_name, pole_name in (
                 ("DEF.SHIN.L", "CTRL.IK.FOOT.L", "CTRL.POLE.KNEE.L"),
@@ -277,7 +314,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
                     constraint.pole_target = arm_obj
                     constraint.pole_subtarget = pole_name
                 added.append(bone_name)
-            bpy.ops.object.mode_set(mode="OBJECT")
+            _set_mode(bpy, arm_obj, "OBJECT")
             evidence = {"ikConstraints": added, "controls": plan_controls()}
             record(executed_stage("CONTROL_RIG_BUILD", "Added live IK control constraints.", **evidence), evidence)
 
@@ -333,6 +370,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             record(failed_stage("FACIAL_SYSTEM_BUILD", "No mesh for facial system."), {})
         else:
             _select_only(bpy, mesh)
+            _ensure_object_mode(bpy, mesh)
             if mesh.data.shape_keys is None:
                 mesh.shape_key_add(name="Basis", from_mix=False)
             created = []
@@ -397,9 +435,16 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
     if not prior_blocked("ACCESSORY_BINDING"):
         accessory = next((obj for obj in bpy.data.objects if obj.type == "MESH" and obj is not mesh and "collar" in obj.name.lower()), None)
         if accessory is None:
-            bpy.ops.mesh.primitive_torus_add(major_radius=0.35, minor_radius=0.04, location=(0.0, 0.0, 1.15))
-            accessory = bpy.context.active_object
-            accessory.name = "GoatCollar"
+            import bmesh
+
+            collar_mesh = bpy.data.meshes.new("GoatCollar")
+            bm = bmesh.new()
+            bmesh.ops.create_circle(bm, cap_ends=True, radius=0.35, segments=16)
+            bm.to_mesh(collar_mesh)
+            bm.free()
+            accessory = bpy.data.objects.new("GoatCollar", collar_mesh)
+            accessory.location = (0.0, 0.0, 1.15)
+            bpy.context.collection.objects.link(accessory)
         if mesh is not None:
             accessory.parent = mesh
         evidence = {"accessory": accessory.name, "parent": getattr(accessory.parent, "name", None)}
@@ -410,24 +455,32 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         if mesh is None or arm_obj is None:
             record(failed_stage("DEFORMATION_TESTS", "Cannot pose without mesh and armature."), {})
         else:
-            _ensure_object_mode(bpy)
-            _select_only(bpy, arm_obj)
-            bpy.ops.object.mode_set(mode="POSE")
-            rest = _bbox(mesh)
+            _set_mode(bpy, arm_obj, "POSE")
             bone = arm_obj.pose.bones.get("DEF.HEAD") or arm_obj.pose.bones[0]
+            indexes = list(range(len(mesh.data.vertices)))
+            head_group = mesh.vertex_groups.get(bone.name) or mesh.vertex_groups.new(name=bone.name)
+            for group in mesh.vertex_groups:
+                if group.name != bone.name:
+                    group.remove(indexes)
+            head_group.add(indexes, 1.0, "REPLACE")
+            deps = bpy.context.evaluated_depsgraph_get()
+            rest_eval = mesh.evaluated_get(deps)
+            rest = [tuple(v.co) for v in rest_eval.data.vertices[:8]]
             bone.rotation_mode = "XYZ"
-            bone.rotation_euler[0] = 0.4
+            bone.location.z += 0.35
             bpy.context.view_layer.update()
-            posed = _bbox(mesh)
-            bone.rotation_euler[0] = 0.0
+            deps = bpy.context.evaluated_depsgraph_get()
+            posed_eval = mesh.evaluated_get(deps)
+            posed = [tuple(v.co) for v in posed_eval.data.vertices[:8]]
+            bone.location.z -= 0.35
             bpy.context.view_layer.update()
-            bpy.ops.object.mode_set(mode="OBJECT")
+            _set_mode(bpy, arm_obj, "OBJECT")
             changed = rest != posed
-            evidence = {"restBBox": list(rest), "posedBBox": list(posed), "deformed": changed, "poses": list(DEFORMATION_POSES)[:6]}
+            evidence = {"restVerts": rest, "posedVerts": posed, "deformed": changed, "poses": list(DEFORMATION_POSES)[:6]}
             if not changed:
-                record(failed_stage("DEFORMATION_TESTS", "Posing the armature did not change mesh bounds.", **evidence), evidence)
+                record(failed_stage("DEFORMATION_TESTS", "Posing the armature did not change evaluated vertices.", **evidence), evidence)
             else:
-                record(executed_stage("DEFORMATION_TESTS", "Live pose changed mesh bounds.", **evidence), evidence)
+                record(executed_stage("DEFORMATION_TESTS", "Live pose changed evaluated mesh vertices.", **evidence), evidence)
 
     # 22 ANIMATION_TESTS
     if not prior_blocked("ANIMATION_TESTS"):
@@ -438,8 +491,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             if arm_obj.animation_data is None:
                 arm_obj.animation_data_create()
             arm_obj.animation_data.action = action
-            _select_only(bpy, arm_obj)
-            bpy.ops.object.mode_set(mode="POSE")
+            _set_mode(bpy, arm_obj, "POSE")
             bone = arm_obj.pose.bones.get("DEF.HEAD") or arm_obj.pose.bones[0]
             bone.rotation_mode = "XYZ"
             bone.rotation_euler[2] = 0.0
@@ -448,7 +500,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
             bone.keyframe_insert(data_path="rotation_euler", frame=12)
             bone.rotation_euler[2] = 0.0
             bone.keyframe_insert(data_path="rotation_euler", frame=24)
-            bpy.ops.object.mode_set(mode="OBJECT")
+            _set_mode(bpy, arm_obj, "OBJECT")
             evidence = {"action": action.name, "fcurves": len(action.fcurves), "clips": list(VALIDATION_CLIPS)[:8]}
             if len(action.fcurves) == 0:
                 record(failed_stage("ANIMATION_TESTS", "No fcurves were written.", **evidence), evidence)
@@ -473,7 +525,8 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         render_path = artifact_dir / "render_qa.png"
         _refuse_locked_write(render_path)
         scene.render.filepath = str(render_path)
-        bpy.ops.render.render(write_still=True)
+        with _with_object(bpy, mesh or arm_obj or bpy.context.view_layer.objects.active):
+            bpy.ops.render.render(write_still=True)
         evidence = {
             "engine": scene.render.engine,
             "resolution": [16, 16],

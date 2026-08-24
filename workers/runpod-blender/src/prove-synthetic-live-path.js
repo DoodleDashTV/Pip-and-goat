@@ -165,7 +165,9 @@ async function main() {
     timeoutMs: 180_000,
   });
   if (!live.ok) {
-    die(`live department failed: ${live.code} ${live.department && live.department.stderr}`);
+    die(
+      `live department failed: ${live.code} exit=${live.department && live.department.exitCode} working=${live.materialize && live.materialize.working && live.materialize.working.department} stdout=${live.department && live.department.stdout} stderr=${live.department && live.department.stderr}`,
+    );
   }
   if (!live.department.executeFlagPresent || live.department.dryRunFlagPresent) {
     die(`live argv must include --execute and exclude --dry-run: ${JSON.stringify(live.department.sanitizedArgv)}`);

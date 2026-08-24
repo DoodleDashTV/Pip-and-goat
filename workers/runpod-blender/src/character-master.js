@@ -106,7 +106,7 @@ function runDepartment(input = {}) {
   }
   const useBlender = Boolean(blender) && mode.mode === EXECUTION_MODE_LIVE;
   const args = useBlender
-    ? ['--background', '--python', script, '--']
+    ? ['--background', '--python-exit-code', '1', '--python', script, '--']
     : [script];
   args.push(
     '--manifest',
@@ -131,7 +131,14 @@ function runDepartment(input = {}) {
   const result = spawnSync(bin, args, {
     encoding: 'utf8',
     timeout: input.timeoutMs || 180_000,
-    env: { ...process.env, ...(input.env || {}), CHARACTER_WORKER_ROOT: root },
+    env: {
+      ...process.env,
+      ...(input.env || {}),
+      CHARACTER_WORKER_ROOT: root,
+      CHARACTER_EXECUTION_MODE: mode.mode,
+      CHARACTER_WORKING_BLEND: input.workingBlend || '',
+      CHARACTER_SOURCE_ZIP: input.sourceZip || '',
+    },
   });
   let parsed = null;
   const stdout = String(result.stdout || '').trim();

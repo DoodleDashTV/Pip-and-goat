@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import sys
+import traceback
 from pathlib import Path
 from typing import Any
 
@@ -159,7 +160,7 @@ def main() -> int:
     except ModeError:
         return 2
     except Exception as error:  # noqa: BLE001
-        emit("FAIL_CLOSED", str(error), goatProductionReady=False)
+        emit("FAIL_CLOSED", str(error), goatProductionReady=False, traceback=traceback.format_exc())
         return 1
     if result.get("failedStages"):
         return 1

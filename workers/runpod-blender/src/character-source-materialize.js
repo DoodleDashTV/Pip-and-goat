@@ -162,6 +162,8 @@ function copyProtectedWorking(blendPath, workingDir) {
   fs.copyFileSync(blendPath, conversion);
   fs.copyFileSync(conversion, department);
   fs.chmodSync(blendPath, 0o444);
+  fs.chmodSync(conversion, 0o644);
+  fs.chmodSync(department, 0o644);
   return {
     conversion,
     department,
