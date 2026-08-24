@@ -35,6 +35,12 @@ def build_fixture(out_dir: Path) -> dict:
     bpy.ops.mesh.primitive_torus_add(major_radius=0.4, minor_radius=0.05, location=(0.0, 0.0, 1.1))
     collar = bpy.context.active_object
     collar.name = "GoatCollar"
+    cam_data = bpy.data.cameras.new("CHAR_GOAT_001_QA_Camera")
+    camera = bpy.data.objects.new("CHAR_GOAT_001_QA_Camera", cam_data)
+    camera.location = (0.0, -3.5, 1.2)
+    camera.rotation_euler = (1.2, 0.0, 0.0)
+    bpy.context.collection.objects.link(camera)
+    bpy.context.scene.camera = camera
     blend = out_dir / "Goat_FINN.blend"
     fbx = out_dir / "Goat_FINN.fbx"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend))

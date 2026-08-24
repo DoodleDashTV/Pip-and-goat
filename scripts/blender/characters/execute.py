@@ -518,6 +518,14 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
     # 24 RENDER_QA
     if not prior_blocked("RENDER_QA"):
         scene = bpy.context.scene
+        camera = bpy.data.objects.get("CHAR_GOAT_001_QA_Camera")
+        if camera is None or camera.type != "CAMERA":
+            cam_data = bpy.data.cameras.new("CHAR_GOAT_001_QA_Camera")
+            camera = bpy.data.objects.new("CHAR_GOAT_001_QA_Camera", cam_data)
+            camera.location = (0.0, -3.5, 1.2)
+            camera.rotation_euler = (1.2, 0.0, 0.0)
+            bpy.context.collection.objects.link(camera)
+        scene.camera = camera
         scene.render.engine = "BLENDER_WORKBENCH"
         scene.render.resolution_x = 16
         scene.render.resolution_y = 16
@@ -525,7 +533,7 @@ def execute_department(args: Any, artifact_dir: Path) -> dict[str, Any]:
         render_path = artifact_dir / "render_qa.png"
         _refuse_locked_write(render_path)
         scene.render.filepath = str(render_path)
-        with _with_object(bpy, mesh or arm_obj or bpy.context.view_layer.objects.active):
+        with _with_object(bpy, camera):
             bpy.ops.render.render(write_still=True)
         evidence = {
             "engine": scene.render.engine,
