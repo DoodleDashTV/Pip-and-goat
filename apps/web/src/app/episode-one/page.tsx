@@ -86,6 +86,7 @@ export default function EpisodeOnePage() {
               ['#rig-handoff', 'Rig handoff'],
               ['/episode-one/scenery', 'Scenery pull sheet'],
               ['/episode-one/audio', 'Audio cue sheet'],
+              ['/episode-one/animation', 'Animation blocking'],
               ['#readiness', 'Readiness'],
             ].map(([href, label]) => (
               <a
@@ -350,6 +351,12 @@ export default function EpisodeOnePage() {
         </dl>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Link
+            href="/episode-one/animation"
+            className="inline-flex min-h-touch items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-bold"
+          >
+            Open animation board
+          </Link>
           <Link
             href="/episode-one/audio"
             className="inline-flex min-h-touch items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-bold"
