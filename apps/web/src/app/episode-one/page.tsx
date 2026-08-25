@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Ep001ReviewWorksheet } from '@/components/preview/Ep001ReviewWorksheet';
 import { compileEp001ProductionPackage } from '@/lib/tivvlejoy-ep001-production-package/compile';
 
 export const metadata = {
@@ -78,6 +79,7 @@ export default function EpisodeOnePage() {
               ['#story', 'Story'],
               ['#timeline', 'Shot timeline'],
               ['#dialogue', 'Dialogue'],
+              ['#worksheet', 'Review worksheet'],
               ['#readiness', 'Readiness'],
             ].map(([href, label]) => (
               <a
@@ -288,6 +290,11 @@ export default function EpisodeOnePage() {
           ))}
         </ol>
       </section>
+
+      <Ep001ReviewWorksheet
+        packageSha256={episode.packageSha256}
+        workingTitle={episode.workingTitle}
+      />
 
       <section id="readiness" className="studio-card scroll-mt-6 p-4 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
