@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { Ep001RigHandoffMatrix } from '@/components/preview/Ep001RigHandoffMatrix';
 import { Ep001ReviewWorksheet } from '@/components/preview/Ep001ReviewWorksheet';
 import { compileEp001ProductionPackage } from '@/lib/tivvlejoy-ep001-production-package/compile';
+import { compileEp001RigHandoffMatrix } from '@/lib/tivvlejoy-ep001-rig-handoff';
 
 export const metadata = {
   title: 'Episode 1 Review | TivvleJoy',
@@ -21,6 +23,7 @@ const formatFrameTime = (frame: number, fps: number) => {
 
 export default function EpisodeOnePage() {
   const episode = compileEp001ProductionPackage();
+  const rigHandoff = compileEp001RigHandoffMatrix(episode);
   const dialogueByShot = new Map<string, typeof episode.dialogue>();
 
   for (const line of episode.dialogue) {
@@ -80,6 +83,7 @@ export default function EpisodeOnePage() {
               ['#timeline', 'Shot timeline'],
               ['#dialogue', 'Dialogue'],
               ['#worksheet', 'Review worksheet'],
+              ['#rig-handoff', 'Rig handoff'],
               ['#readiness', 'Readiness'],
             ].map(([href, label]) => (
               <a
@@ -295,6 +299,8 @@ export default function EpisodeOnePage() {
         packageSha256={episode.packageSha256}
         workingTitle={episode.workingTitle}
       />
+
+      <Ep001RigHandoffMatrix matrix={rigHandoff} />
 
       <section id="readiness" className="studio-card scroll-mt-6 p-4 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
