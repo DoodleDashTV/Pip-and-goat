@@ -1,0 +1,34 @@
+{
+  "created": [
+    "VISEME.REST",
+    "VISEME.AI",
+    "VISEME.E",
+    "VISEME.O",
+    "VISEME.U",
+    "VISEME.MBP",
+    "VISEME.FV",
+    "VISEME.L",
+    "VISEME.TH",
+    "VISEME.WQ",
+    "VISEME.CHSH",
+    "VISEME.KG",
+    "VISEME.R"
+  ],
+  "simulated": false,
+  "stage": "VISEME_SYSTEM_BUILD",
+  "visemes": [
+    "VISEME.REST",
+    "VISEME.AI",
+    "VISEME.E",
+    "VISEME.O",
+    "VISEME.U",
+    "VISEME.MBP",
+    "VISEME.FV",
+    "VISEME.L",
+    "VISEME.TH",
+    "VISEME.WQ",
+    "VISEME.CHSH",
+    "VISEME.KG",
+    "VISEME.R"
+  ]
+}

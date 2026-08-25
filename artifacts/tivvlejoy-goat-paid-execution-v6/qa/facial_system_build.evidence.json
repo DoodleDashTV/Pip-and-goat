@@ -1,0 +1,50 @@
+{
+  "controls": [
+    "eye_aim_master",
+    "eye_left",
+    "eye_right",
+    "blink",
+    "eyelid_upper",
+    "eyelid_lower",
+    "jaw",
+    "mouth_open",
+    "mouth_width",
+    "smile",
+    "frown",
+    "corners"
+  ],
+  "created": [
+    "FACE.happy",
+    "FACE.excited",
+    "FACE.curious",
+    "FACE.surprised",
+    "FACE.worried",
+    "FACE.confused",
+    "FACE.sad",
+    "FACE.determined",
+    "FACE.mischievous",
+    "FACE.laughing"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Iris Size",
+    "Pupil Size",
+    "Cornea Bulge",
+    "Cat",
+    "Goat",
+    "Reptile",
+    "Heart",
+    "FACE.happy",
+    "FACE.excited",
+    "FACE.curious",
+    "FACE.surprised",
+    "FACE.worried",
+    "FACE.confused",
+    "FACE.sad",
+    "FACE.determined",
+    "FACE.mischievous",
+    "FACE.laughing"
+  ],
+  "simulated": false,
+  "stage": "FACIAL_SYSTEM_BUILD"
+}

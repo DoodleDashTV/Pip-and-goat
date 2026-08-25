@@ -1,0 +1,11 @@
+{
+  "schema": "TIVVLEJOY_GOAT_V6_CONSUMPTION_LEDGER_V1",
+  "authorizationName": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6",
+  "executionId": "goat-v6-78f1b162-20260825",
+  "digest": "sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6",
+  "plannedPodName": "tivvlejoy-goat-v6-78f1b162",
+  "consumed": true,
+  "createAttempted": true,
+  "createRequestOrdinal": 1,
+  "consumedAt": "2026-08-25T02:01:02.485Z"
+}

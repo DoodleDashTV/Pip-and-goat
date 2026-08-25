@@ -1,0 +1,14 @@
+{
+  "blockers": [
+    "HUMAN_APPROVAL_REQUIRED",
+    "VISUAL_APPROVAL_REQUIRED",
+    "DEFORMATION_GATE_AWAITING_HUMAN_REVIEW",
+    "RENDER_QA_AWAITING_HUMAN_REVIEW"
+  ],
+  "executed": true,
+  "goatProductionReady": false,
+  "noFalsePass": true,
+  "status": "BLOCKED",
+  "verdict": "NOT_PRODUCTION_READY",
+  "visualApproval": false
+}

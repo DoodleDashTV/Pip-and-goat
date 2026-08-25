@@ -1,0 +1,15 @@
+{
+  "blenderVersion": "4.2.2 LTS",
+  "required": [
+    4,
+    2,
+    2
+  ],
+  "simulated": false,
+  "stage": "BLENDER_VERSION_CHECK",
+  "tuple": [
+    4,
+    2,
+    2
+  ]
+}

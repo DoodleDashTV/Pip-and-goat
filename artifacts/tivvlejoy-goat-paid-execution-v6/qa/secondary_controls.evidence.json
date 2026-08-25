@@ -1,0 +1,10 @@
+{
+  "preferDeterministicControls": true,
+  "secondary": [
+    "CTRL.EAR.L",
+    "CTRL.EAR.R",
+    "CTRL.COLLAR"
+  ],
+  "simulated": false,
+  "stage": "SECONDARY_CONTROLS"
+}

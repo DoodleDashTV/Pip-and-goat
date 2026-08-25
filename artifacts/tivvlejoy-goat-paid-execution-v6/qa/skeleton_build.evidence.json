@@ -1,0 +1,143 @@
+{
+  "armature": "CHAR_GOAT_001_Armature",
+  "bones": [
+    {
+      "deform": false,
+      "name": "CTRL.MASTER",
+      "role": "MASTER"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.WORLD",
+      "role": "WORLD_ROOT"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.ROOT",
+      "role": "CHARACTER_ROOT"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.COG",
+      "role": "COG"
+    },
+    {
+      "deform": true,
+      "name": "DEF.PELVIS",
+      "role": "PELVIS"
+    },
+    {
+      "deform": true,
+      "name": "DEF.SPINE_01",
+      "role": "SPINE"
+    },
+    {
+      "deform": true,
+      "name": "DEF.SPINE_02",
+      "role": "SPINE"
+    },
+    {
+      "deform": true,
+      "name": "DEF.CHEST",
+      "role": "CHEST"
+    },
+    {
+      "deform": true,
+      "name": "DEF.UPPER_CHEST",
+      "role": "UPPER_CHEST"
+    },
+    {
+      "deform": true,
+      "name": "DEF.NECK",
+      "role": "NECK"
+    },
+    {
+      "deform": true,
+      "name": "DEF.HEAD",
+      "role": "HEAD"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.HEAD_ISOLATE",
+      "role": "HEAD_ISOLATE"
+    },
+    {
+      "deform": true,
+      "name": "DEF.JAW",
+      "role": "JAW"
+    },
+    {
+      "deform": true,
+      "name": "DEF.EYE.L",
+      "role": "EYE"
+    },
+    {
+      "deform": true,
+      "name": "DEF.EYE.R",
+      "role": "EYE"
+    },
+    {
+      "deform": true,
+      "name": "DEF.THIGH.L",
+      "role": "THIGH"
+    },
+    {
+      "deform": true,
+      "name": "DEF.THIGH.R",
+      "role": "THIGH"
+    },
+    {
+      "deform": true,
+      "name": "DEF.SHIN.L",
+      "role": "SHIN"
+    },
+    {
+      "deform": true,
+      "name": "DEF.SHIN.R",
+      "role": "SHIN"
+    },
+    {
+      "deform": true,
+      "name": "DEF.ANKLE.L",
+      "role": "ANKLE"
+    },
+    {
+      "deform": true,
+      "name": "DEF.ANKLE.R",
+      "role": "ANKLE"
+    },
+    {
+      "deform": true,
+      "name": "DEF.FOOT.L",
+      "role": "FOOT"
+    },
+    {
+      "deform": true,
+      "name": "DEF.FOOT.R",
+      "role": "FOOT"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.IK.FOOT.L",
+      "role": "IK_TARGET"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.IK.FOOT.R",
+      "role": "IK_TARGET"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.POLE.KNEE.L",
+      "role": "POLE"
+    },
+    {
+      "deform": false,
+      "name": "CTRL.POLE.KNEE.R",
+      "role": "POLE"
+    }
+  ],
+  "count": 27,
+  "simulated": false,
+  "stage": "SKELETON_BUILD"
+}

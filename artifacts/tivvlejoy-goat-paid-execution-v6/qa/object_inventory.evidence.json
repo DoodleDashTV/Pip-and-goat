@@ -1,0 +1,27 @@
+{
+  "count": 20,
+  "objects": [
+    "Eye_L_GEO",
+    "Fur_01",
+    "Fur_01.001",
+    "Fur_01.002",
+    "Fur_01.003",
+    "Fur_01.004",
+    "Fur_01.005",
+    "Fur_01.006",
+    "Fur_01.007",
+    "Fur_01.008",
+    "Fur_01.009",
+    "Fur_01.010",
+    "Fur_01.011",
+    "Goat_Body_GEO",
+    "Goat_Horn_GEO",
+    "Goat_Mouth_Assets",
+    "Goat_Prop_Chain_GEO",
+    "Goat_Prop_Compass_GEO",
+    "Goat_Prop_Scarf_GEO",
+    "Hi-Light"
+  ],
+  "simulated": false,
+  "stage": "OBJECT_INVENTORY"
+}

@@ -1,0 +1,6 @@
+{
+  "accessory": "GoatCollar",
+  "parent": "Eye_L_GEO",
+  "simulated": false,
+  "stage": "ACCESSORY_BINDING"
+}

@@ -1,0 +1,16 @@
+{
+  "action": "CHAR_GOAT_001_Validation",
+  "clips": [
+    "neutral_idle",
+    "blink_look_around",
+    "head_turns",
+    "smile_frown_emotion_transitions",
+    "phoneme_viseme_sweep",
+    "talking_performance",
+    "walk_cycle",
+    "run_cycle"
+  ],
+  "fcurves": 3,
+  "simulated": false,
+  "stage": "ANIMATION_TESTS"
+}

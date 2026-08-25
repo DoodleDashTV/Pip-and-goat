@@ -1,0 +1,9 @@
+{
+  "blindDecimateForbidden": true,
+  "edges": 760,
+  "faces": 376,
+  "mesh": "Eye_L_GEO",
+  "simulated": false,
+  "stage": "TOPOLOGY_AUDIT",
+  "vertices": 387
+}

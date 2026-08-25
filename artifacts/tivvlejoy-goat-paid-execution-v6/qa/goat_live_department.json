@@ -1,0 +1,841 @@
+{
+  "failedStages": [],
+  "objectDelta": [
+    "CHAR_GOAT_001_Armature",
+    "CHAR_GOAT_001_QA_Camera",
+    "CHAR_GOAT_001_RigGuide",
+    "CTRL.COLLAR",
+    "CTRL.EAR.L",
+    "CTRL.EAR.R",
+    "GoatCollar"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Iris Size",
+    "Pupil Size",
+    "Cornea Bulge",
+    "Cat",
+    "Goat",
+    "Reptile",
+    "Heart",
+    "FACE.happy",
+    "FACE.excited",
+    "FACE.curious",
+    "FACE.surprised",
+    "FACE.worried",
+    "FACE.confused",
+    "FACE.sad",
+    "FACE.determined",
+    "FACE.mischievous",
+    "FACE.laughing",
+    "VISEME.REST",
+    "VISEME.AI",
+    "VISEME.E",
+    "VISEME.O",
+    "VISEME.U",
+    "VISEME.MBP",
+    "VISEME.FV",
+    "VISEME.L",
+    "VISEME.TH",
+    "VISEME.WQ",
+    "VISEME.CHSH",
+    "VISEME.KG",
+    "VISEME.R",
+    "CORR.shoulder_pinch",
+    "CORR.elbow_pinch",
+    "CORR.wrist_collapse",
+    "CORR.hip_collapse"
+  ],
+  "simulated": false,
+  "stages": [
+    {
+      "byteSize": 269512136,
+      "disposition": "CREATED",
+      "lockedSourceUntouched": true,
+      "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/ephemeral/Goat_FINN.zip",
+      "present": true,
+      "realAssetVerified": true,
+      "reason": "Hashed supplied source bytes.",
+      "sha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+      "simulated": false,
+      "stage": "SOURCE_INTAKE",
+      "status": "EXECUTED"
+    },
+    {
+      "byteSize": 269512136,
+      "disposition": "CREATED",
+      "locked": true,
+      "reason": "Source hash locked.",
+      "sha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+      "simulated": false,
+      "stage": "SOURCE_HASH_LOCK",
+      "status": "EXECUTED"
+    },
+    {
+      "blenderVersion": "4.2.2 LTS",
+      "disposition": "CREATED",
+      "reason": "Studio Blender 4.2.2 LTS confirmed.",
+      "required": [
+        4,
+        2,
+        2
+      ],
+      "simulated": false,
+      "stage": "BLENDER_VERSION_CHECK",
+      "status": "EXECUTED",
+      "tuple": [
+        4,
+        2,
+        2
+      ]
+    },
+    {
+      "count": 20,
+      "disposition": "CREATED",
+      "objects": [
+        "Eye_L_GEO",
+        "Fur_01",
+        "Fur_01.001",
+        "Fur_01.002",
+        "Fur_01.003",
+        "Fur_01.004",
+        "Fur_01.005",
+        "Fur_01.006",
+        "Fur_01.007",
+        "Fur_01.008",
+        "Fur_01.009",
+        "Fur_01.010",
+        "Fur_01.011",
+        "Goat_Body_GEO",
+        "Goat_Horn_GEO",
+        "Goat_Mouth_Assets",
+        "Goat_Prop_Chain_GEO",
+        "Goat_Prop_Compass_GEO",
+        "Goat_Prop_Scarf_GEO",
+        "Hi-Light"
+      ],
+      "reason": "Inventoried scene objects.",
+      "simulated": false,
+      "stage": "OBJECT_INVENTORY",
+      "status": "EXECUTED"
+    },
+    {
+      "count": 6,
+      "disposition": "CREATED",
+      "materials": [
+        "Eye_MAT",
+        "Goat_Body",
+        "Goat_Horn_Mouth",
+        "Goat_Props",
+        "spec",
+        "tripo_material_3eec9046-421b-4d5d-838e-2439a6e261d8.001"
+      ],
+      "reason": "Inventoried and ensured materials.",
+      "simulated": false,
+      "stage": "MATERIAL_INVENTORY",
+      "status": "EXECUTED"
+    },
+    {
+      "count": 27,
+      "disposition": "CREATED",
+      "images": [
+        "Baked_BaseColor",
+        "Baked_MetallicRoughness",
+        "Do_Not_Enter_Street_Corner_sm.exr",
+        "Eye_Shader_Diff.psd",
+        "Eye_Shader_Trans_Mask.png",
+        "Goat_Body_Alpha.png",
+        "Goat_Body_BaseColor.png",
+        "Goat_Body_Displacement.png",
+        "Goat_Body_Emission.png",
+        "Goat_Body_Metallic.png",
+        "Goat_Body_Normal.png",
+        "Goat_Body_Roughness.png",
+        "Goat_Horn_Mouth_Alpha.png",
+        "Goat_Horn_Mouth_BaseColor.png",
+        "Goat_Horn_Mouth_Displacement.png",
+        "Goat_Horn_Mouth_Emission.png",
+        "Goat_Horn_Mouth_Metallic.png",
+        "Goat_Horn_Mouth_Normal.png",
+        "Goat_Horn_Mouth_Roughness.png",
+        "Goat_Props_Alpha.png",
+        "Goat_Props_BaseColor.png",
+        "Goat_Props_Displacement.png",
+        "Goat_Props_Emission.png",
+        "Goat_Props_Metallic.png",
+        "Goat_Props_Normal.png",
+        "Goat_Props_Roughness.png",
+        "Render Result"
+      ],
+      "reason": "Inventoried texture datablocks.",
+      "simulated": false,
+      "stage": "TEXTURE_INVENTORY",
+      "status": "EXECUTED"
+    },
+    {
+      "disposition": "CREATED",
+      "mesh": "Eye_L_GEO",
+      "reason": "UV layers present.",
+      "simulated": false,
+      "stage": "UV_VALIDATION",
+      "status": "EXECUTED",
+      "uvLayers": [
+        "UVMap",
+        "Gradient"
+      ]
+    },
+    {
+      "blindDecimateForbidden": true,
+      "disposition": "CREATED",
+      "edges": 760,
+      "faces": 376,
+      "mesh": "Eye_L_GEO",
+      "reason": "Recorded live mesh topology.",
+      "simulated": false,
+      "stage": "TOPOLOGY_AUDIT",
+      "status": "EXECUTED",
+      "vertices": 387
+    },
+    {
+      "applied": [
+        "Eye_L_GEO",
+        "Fur_01",
+        "Fur_01.001",
+        "Fur_01.002",
+        "Fur_01.003",
+        "Fur_01.004",
+        "Fur_01.005",
+        "Fur_01.006",
+        "Fur_01.007",
+        "Fur_01.008",
+        "Fur_01.009",
+        "Fur_01.010",
+        "Fur_01.011",
+        "Goat_Prop_Chain_GEO",
+        "Goat_Prop_Compass_GEO",
+        "Hi-Light"
+      ],
+      "disposition": "CREATED",
+      "normalized": true,
+      "reason": "Applied live scale/rotation where needed.",
+      "simulated": false,
+      "stage": "SCALE_ORIENTATION_NORMALIZATION",
+      "status": "EXECUTED"
+    },
+    {
+      "disposition": "CREATED",
+      "mapping": {
+        "Eye_L_GEO": "EYES",
+        "Fur_01": "UNKNOWN",
+        "Fur_01.001": "UNKNOWN",
+        "Fur_01.002": "UNKNOWN",
+        "Fur_01.003": "UNKNOWN",
+        "Fur_01.004": "UNKNOWN",
+        "Fur_01.005": "UNKNOWN",
+        "Fur_01.006": "UNKNOWN",
+        "Fur_01.007": "UNKNOWN",
+        "Fur_01.008": "UNKNOWN",
+        "Fur_01.009": "UNKNOWN",
+        "Fur_01.010": "UNKNOWN",
+        "Fur_01.011": "UNKNOWN",
+        "Goat_Body_GEO": "BODY",
+        "Goat_Horn_GEO": "HORNS",
+        "Goat_Mouth_Assets": "MOUTH",
+        "Goat_Prop_Chain_GEO": "UNKNOWN",
+        "Goat_Prop_Compass_GEO": "UNKNOWN",
+        "Goat_Prop_Scarf_GEO": "SCARF",
+        "Hi-Light": "UNKNOWN"
+      },
+      "reason": "Mapped object names to semantic roles.",
+      "simulated": false,
+      "stage": "CHARACTER_SEMANTIC_MAPPING",
+      "status": "EXECUTED"
+    },
+    {
+      "created": true,
+      "disposition": "CREATED",
+      "guide": "CHAR_GOAT_001_RigGuide",
+      "reason": "Created live rig guide empty.",
+      "simulated": false,
+      "stage": "RIG_GUIDE_GENERATION",
+      "status": "EXECUTED"
+    },
+    {
+      "armature": "CHAR_GOAT_001_Armature",
+      "bones": [
+        {
+          "deform": false,
+          "name": "CTRL.MASTER",
+          "role": "MASTER"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.WORLD",
+          "role": "WORLD_ROOT"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.ROOT",
+          "role": "CHARACTER_ROOT"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.COG",
+          "role": "COG"
+        },
+        {
+          "deform": true,
+          "name": "DEF.PELVIS",
+          "role": "PELVIS"
+        },
+        {
+          "deform": true,
+          "name": "DEF.SPINE_01",
+          "role": "SPINE"
+        },
+        {
+          "deform": true,
+          "name": "DEF.SPINE_02",
+          "role": "SPINE"
+        },
+        {
+          "deform": true,
+          "name": "DEF.CHEST",
+          "role": "CHEST"
+        },
+        {
+          "deform": true,
+          "name": "DEF.UPPER_CHEST",
+          "role": "UPPER_CHEST"
+        },
+        {
+          "deform": true,
+          "name": "DEF.NECK",
+          "role": "NECK"
+        },
+        {
+          "deform": true,
+          "name": "DEF.HEAD",
+          "role": "HEAD"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.HEAD_ISOLATE",
+          "role": "HEAD_ISOLATE"
+        },
+        {
+          "deform": true,
+          "name": "DEF.JAW",
+          "role": "JAW"
+        },
+        {
+          "deform": true,
+          "name": "DEF.EYE.L",
+          "role": "EYE"
+        },
+        {
+          "deform": true,
+          "name": "DEF.EYE.R",
+          "role": "EYE"
+        },
+        {
+          "deform": true,
+          "name": "DEF.THIGH.L",
+          "role": "THIGH"
+        },
+        {
+          "deform": true,
+          "name": "DEF.THIGH.R",
+          "role": "THIGH"
+        },
+        {
+          "deform": true,
+          "name": "DEF.SHIN.L",
+          "role": "SHIN"
+        },
+        {
+          "deform": true,
+          "name": "DEF.SHIN.R",
+          "role": "SHIN"
+        },
+        {
+          "deform": true,
+          "name": "DEF.ANKLE.L",
+          "role": "ANKLE"
+        },
+        {
+          "deform": true,
+          "name": "DEF.ANKLE.R",
+          "role": "ANKLE"
+        },
+        {
+          "deform": true,
+          "name": "DEF.FOOT.L",
+          "role": "FOOT"
+        },
+        {
+          "deform": true,
+          "name": "DEF.FOOT.R",
+          "role": "FOOT"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.IK.FOOT.L",
+          "role": "IK_TARGET"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.IK.FOOT.R",
+          "role": "IK_TARGET"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.POLE.KNEE.L",
+          "role": "POLE"
+        },
+        {
+          "deform": false,
+          "name": "CTRL.POLE.KNEE.R",
+          "role": "POLE"
+        }
+      ],
+      "count": 27,
+      "disposition": "CREATED",
+      "reason": "Built live armature bones.",
+      "simulated": false,
+      "stage": "SKELETON_BUILD",
+      "status": "EXECUTED"
+    },
+    {
+      "controls": [
+        {
+          "features": [
+            "master",
+            "world",
+            "character_root",
+            "cog",
+            "pelvis"
+          ],
+          "id": "GLOBAL"
+        },
+        {
+          "features": [
+            "spine",
+            "chest",
+            "upper_chest",
+            "neck",
+            "head",
+            "head_isolate"
+          ],
+          "id": "TORSO"
+        },
+        {
+          "features": [
+            "thigh",
+            "shin",
+            "ankle",
+            "foot",
+            "toe",
+            "ik",
+            "fk",
+            "ik_fk_switch",
+            "pole",
+            "foot_roll",
+            "heel",
+            "toe_pivot",
+            "ball_pivot",
+            "knee_direction",
+            "limited_stretch"
+          ],
+          "id": "LEGS"
+        },
+        {
+          "features": [
+            "clavicle",
+            "upper_arm",
+            "forearm",
+            "wrist",
+            "hand",
+            "ik",
+            "fk",
+            "ik_fk_switch",
+            "pole",
+            "hand_space"
+          ],
+          "id": "ARMS"
+        },
+        {
+          "features": [
+            "eye_aim_master",
+            "eye_independent",
+            "blink",
+            "eyelid_upper",
+            "eyelid_lower",
+            "jaw",
+            "mouth_open",
+            "mouth_width",
+            "smile",
+            "frown",
+            "corners"
+          ],
+          "id": "FACE"
+        }
+      ],
+      "disposition": "CREATED",
+      "ikConstraints": [
+        "DEF.SHIN.L",
+        "DEF.SHIN.R"
+      ],
+      "reason": "Added live IK control constraints.",
+      "simulated": false,
+      "stage": "CONTROL_RIG_BUILD",
+      "status": "EXECUTED"
+    },
+    {
+      "armature": "CHAR_GOAT_001_Armature",
+      "disposition": "CREATED",
+      "mesh": "Eye_L_GEO",
+      "reason": "Bound mesh to armature with live vertex groups.",
+      "simulated": false,
+      "stage": "INITIAL_SKIN_BIND",
+      "status": "EXECUTED",
+      "vertexGroups": [
+        "c_eye.l",
+        "Mask",
+        "DEF.PELVIS",
+        "DEF.SPINE_01",
+        "DEF.SPINE_02",
+        "DEF.CHEST",
+        "DEF.UPPER_CHEST",
+        "DEF.NECK",
+        "DEF.HEAD",
+        "DEF.JAW",
+        "DEF.EYE.L",
+        "DEF.EYE.R",
+        "DEF.THIGH.L",
+        "DEF.THIGH.R",
+        "DEF.SHIN.L",
+        "DEF.SHIN.R",
+        "DEF.ANKLE.L",
+        "DEF.ANKLE.R",
+        "DEF.FOOT.L",
+        "DEF.FOOT.R"
+      ]
+    },
+    {
+      "disposition": "CREATED",
+      "maxInfluences": 4,
+      "normalized": true,
+      "reason": "Normalized live vertex weights to four influences.",
+      "simulated": false,
+      "stage": "WEIGHT_REFINEMENT",
+      "status": "EXECUTED",
+      "verticesRefined": 387
+    },
+    {
+      "controls": [
+        "eye_aim_master",
+        "eye_left",
+        "eye_right",
+        "blink",
+        "eyelid_upper",
+        "eyelid_lower",
+        "jaw",
+        "mouth_open",
+        "mouth_width",
+        "smile",
+        "frown",
+        "corners"
+      ],
+      "created": [
+        "FACE.happy",
+        "FACE.excited",
+        "FACE.curious",
+        "FACE.surprised",
+        "FACE.worried",
+        "FACE.confused",
+        "FACE.sad",
+        "FACE.determined",
+        "FACE.mischievous",
+        "FACE.laughing"
+      ],
+      "disposition": "CREATED",
+      "reason": "Created live facial shape keys.",
+      "shapeKeys": [
+        "Basis",
+        "Iris Size",
+        "Pupil Size",
+        "Cornea Bulge",
+        "Cat",
+        "Goat",
+        "Reptile",
+        "Heart",
+        "FACE.happy",
+        "FACE.excited",
+        "FACE.curious",
+        "FACE.surprised",
+        "FACE.worried",
+        "FACE.confused",
+        "FACE.sad",
+        "FACE.determined",
+        "FACE.mischievous",
+        "FACE.laughing"
+      ],
+      "simulated": false,
+      "stage": "FACIAL_SYSTEM_BUILD",
+      "status": "EXECUTED"
+    },
+    {
+      "created": [
+        "VISEME.REST",
+        "VISEME.AI",
+        "VISEME.E",
+        "VISEME.O",
+        "VISEME.U",
+        "VISEME.MBP",
+        "VISEME.FV",
+        "VISEME.L",
+        "VISEME.TH",
+        "VISEME.WQ",
+        "VISEME.CHSH",
+        "VISEME.KG",
+        "VISEME.R"
+      ],
+      "disposition": "CREATED",
+      "reason": "Created live viseme shape keys.",
+      "simulated": false,
+      "stage": "VISEME_SYSTEM_BUILD",
+      "status": "EXECUTED",
+      "visemes": [
+        "VISEME.REST",
+        "VISEME.AI",
+        "VISEME.E",
+        "VISEME.O",
+        "VISEME.U",
+        "VISEME.MBP",
+        "VISEME.FV",
+        "VISEME.L",
+        "VISEME.TH",
+        "VISEME.WQ",
+        "VISEME.CHSH",
+        "VISEME.KG",
+        "VISEME.R"
+      ]
+    },
+    {
+      "disposition": "CREATED",
+      "preferDeterministicControls": true,
+      "reason": "Created live secondary control empties.",
+      "secondary": [
+        "CTRL.EAR.L",
+        "CTRL.EAR.R",
+        "CTRL.COLLAR"
+      ],
+      "simulated": false,
+      "stage": "SECONDARY_CONTROLS",
+      "status": "EXECUTED"
+    },
+    {
+      "correctives": [
+        "CORR.shoulder_pinch",
+        "CORR.elbow_pinch",
+        "CORR.wrist_collapse",
+        "CORR.hip_collapse"
+      ],
+      "disposition": "CREATED",
+      "reason": "Created live corrective shape keys.",
+      "simulated": false,
+      "stage": "CORRECTIVE_DEFORMATION_BUILD",
+      "status": "EXECUTED"
+    },
+    {
+      "accessory": "GoatCollar",
+      "disposition": "CREATED",
+      "parent": "Eye_L_GEO",
+      "reason": "Bound live accessory to the character mesh.",
+      "simulated": false,
+      "stage": "ACCESSORY_BINDING",
+      "status": "EXECUTED"
+    },
+    {
+      "deformed": true,
+      "disposition": "CREATED",
+      "posedVerts": [
+        [
+          0.011345863342285156,
+          -0.44752267003059387,
+          0.02198207378387451
+        ],
+        [
+          0.017619088292121887,
+          -0.4405852258205414,
+          0.03753840923309326
+        ],
+        [
+          0.026945874094963074,
+          -0.42068883776664734,
+          0.0612027645111084
+        ],
+        [
+          0.03393067419528961,
+          -0.39215728640556335,
+          0.07968699932098389
+        ],
+        [
+          0.03600049018859863,
+          -0.3740210235118866,
+          0.08570563793182373
+        ],
+        [
+          0.03600050508975983,
+          -0.335681676864624,
+          0.08784902095794678
+        ],
+        [
+          0.030519738793373108,
+          -0.29952219128608704,
+          0.07661819458007812
+        ],
+        [
+          0.02039264142513275,
+          -0.2710474729537964,
+          0.05372297763824463
+        ]
+      ],
+      "poses": [
+        "neutral",
+        "arms_up",
+        "arms_forward",
+        "arms_crossed",
+        "elbows_max_flex",
+        "wrist_extremes"
+      ],
+      "reason": "Live pose changed evaluated mesh vertices.",
+      "restVerts": [
+        [
+          0.011345863342285156,
+          -0.09752266854047775,
+          0.02198207378387451
+        ],
+        [
+          0.017619088292121887,
+          -0.09058522433042526,
+          0.03753840923309326
+        ],
+        [
+          0.026945874094963074,
+          -0.07068882137537003,
+          0.0612027645111084
+        ],
+        [
+          0.03393067419528961,
+          -0.04215731471776962,
+          0.07968699932098389
+        ],
+        [
+          0.03600049018859863,
+          -0.024021022021770477,
+          0.08570563793182373
+        ],
+        [
+          0.03600050508975983,
+          0.014318324625492096,
+          0.08784902095794678
+        ],
+        [
+          0.030519738793373108,
+          0.05047782510519028,
+          0.07661819458007812
+        ],
+        [
+          0.02039264142513275,
+          0.07895252853631973,
+          0.05372297763824463
+        ]
+      ],
+      "simulated": false,
+      "stage": "DEFORMATION_TESTS",
+      "status": "EXECUTED"
+    },
+    {
+      "action": "CHAR_GOAT_001_Validation",
+      "clips": [
+        "neutral_idle",
+        "blink_look_around",
+        "head_turns",
+        "smile_frown_emotion_transitions",
+        "phoneme_viseme_sweep",
+        "talking_performance",
+        "walk_cycle",
+        "run_cycle"
+      ],
+      "disposition": "CREATED",
+      "fcurves": 3,
+      "reason": "Wrote live validation keyframes.",
+      "simulated": false,
+      "stage": "ANIMATION_TESTS",
+      "status": "EXECUTED"
+    },
+    {
+      "disposition": "CREATED",
+      "evaluatedObjects": 26,
+      "faces": 7743,
+      "reason": "Profiled live evaluated scene.",
+      "simulated": false,
+      "stage": "PERFORMANCE_PROFILE",
+      "status": "EXECUTED",
+      "vertices": 8106
+    },
+    {
+      "bytes": 358404,
+      "disposition": "CREATED",
+      "engine": "BLENDER_WORKBENCH",
+      "reason": "Rendered a live workbench still.",
+      "renders": [
+        {
+          "bytes": 124808,
+          "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa.png",
+          "wrote": true
+        },
+        {
+          "bytes": 120138,
+          "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa_three_quarter.png",
+          "wrote": true
+        },
+        {
+          "bytes": 113458,
+          "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa_side.png",
+          "wrote": true
+        }
+      ],
+      "resolution": [
+        512,
+        512
+      ],
+      "simulated": false,
+      "stage": "RENDER_QA",
+      "status": "EXECUTED",
+      "wrote": true
+    },
+    {
+      "bytes": 5801980,
+      "disposition": "CREATED",
+      "export": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/export_qa.fbx",
+      "productionMasterAllowed": false,
+      "reason": "Exported live QA FBX outside SOURCE/PRODUCTION.",
+      "simulated": false,
+      "stage": "EXPORT_QA",
+      "status": "EXECUTED",
+      "wrote": true
+    },
+    {
+      "disposition": "UPDATED",
+      "goatProductionReady": false,
+      "reason": "Live department evaluated. Visual approval is still required.",
+      "simulated": false,
+      "stage": "CHARACTER_MASTER_GATE",
+      "status": "EXECUTED"
+    }
+  ],
+  "workingSha256": "3a51619f60a6ea70c0f63edee72d60d0a9a1e59ebe54ac66084c01d67c2e18f9"
+}
