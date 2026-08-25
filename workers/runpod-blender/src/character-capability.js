@@ -114,6 +114,12 @@ function liveImplementationComplete(baked) {
     execute.includes('def execute_department') &&
     (execute.includes('simulated=False') || execute.includes('"simulated": False') || execute.includes('executed_stage'));
   const wired = builder.includes('execute_department') && builder.includes('--execute');
+  const artistRigAdmission =
+    execute.includes('evaluate_rig_contract') &&
+    execute.includes('automaticPlaceholderRigCreated') &&
+    execute.includes('automaticPlaceholderRigAllowed');
+  const semanticBodySelection = execute.includes('select_body_candidate') && !execute.includes('def _first_mesh');
+  const characterBoundQa = execute.includes('SEMANTIC_CHARACTER_BOUNDS') && execute.includes('qa_subject_names');
   const gateComplete =
     gate.includes('evaluateRealDownloadAuthorization') &&
     gate.includes('permitsRealSourceDownload') &&
@@ -128,6 +134,9 @@ function liveImplementationComplete(baked) {
     gateComplete,
     masterInvokesAuthorizedDownload,
     liveUsesBlenderRuntime,
+    artistRigAdmission,
+    semanticBodySelection,
+    characterBoundQa,
     streamPresent: Boolean(baked.streamHash),
   };
 }
@@ -146,6 +155,9 @@ function compileCharacterCapability(input = {}) {
     live.executeImpl &&
     live.wired &&
     live.liveUsesBlenderRuntime &&
+    live.artistRigAdmission &&
+    live.semanticBodySelection &&
+    live.characterBoundQa &&
     !live.alwaysDryRun &&
     Boolean(baked.characterArtifacts);
   const realDownloadCodeBaked = Boolean(baked.characterMaterializer && baked.streamHash && baked.downloadGate);
@@ -169,6 +181,10 @@ function compileCharacterCapability(input = {}) {
     characterMasterEntrypointBaked: Boolean(baked.characterMaster),
     liveCharacterDepartmentCapable: liveCapable,
     liveDepartmentUsesBlenderRuntime: live.liveUsesBlenderRuntime,
+    requiresArtistAuthoredRig: live.artistRigAdmission,
+    automaticPlaceholderRigAllowed: false,
+    semanticBodySelectionRequired: live.semanticBodySelection,
+    qaUsesCharacterBounds: live.characterBoundQa,
     realSourceDownloadCodeBaked: realDownloadCodeBaked,
     authorizedRealSourceDownloadCapable: authorizedDownloadCapable,
     durableArtifactPersistenceCapable: Boolean(baked.characterArtifacts),

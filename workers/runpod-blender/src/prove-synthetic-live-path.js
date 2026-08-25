@@ -188,13 +188,18 @@ async function main() {
   const working = live.materialize.working && live.materialize.working.department;
   if (!working || !fs.existsSync(working)) die('WORKING blend was not created');
   const workingHash = sha256(working);
-  if (workingHash === blendHashBefore) die('WORKING hash must differ from source blend hash after live execute');
+  if (workingHash !== blendHashBefore) die('validated WORKING copy changed despite source-rig preservation');
+  const qaWorking = path.join(artifacts, 'CHAR_GOAT_001_working_executed.blend');
+  if (!fs.existsSync(qaWorking)) die('validated QA working artifact was not created');
+  const qaWorkingHash = sha256(qaWorking);
   const reopen = spawnSync(blender, ['--background', '--python-expr', `import bpy; bpy.ops.wm.open_mainfile(filepath=r"${working}", load_ui=False); print("REOPEN_OK")`], {
     encoding: 'utf8',
     timeout: 60_000,
   });
   if (!String(reopen.stdout || '').includes('REOPEN_OK')) die('WORKING blend could not be reopened');
-  if (!live.department.parsed.datablocksChanged) die('live execute did not change datablocks');
+  if (live.department.parsed.sourceRigPreserved !== true) die('live execute did not preserve the artist-authored rig');
+  if (live.department.parsed.automaticPlaceholderRigCreated !== false) die('live execute created a placeholder rig');
+  if (live.department.parsed.rigContract?.ok !== true) die('synthetic artist-rig contract did not pass');
 
   const failed = await runCharacterMaster({
     env: { CHARACTER_JOB_KIND: CHARACTER_MASTER_BUILD, CHARACTER_EXECUTION_MODE: 'live', CHARACTER_WORKER_ROOT: root },
@@ -219,6 +224,10 @@ async function main() {
   if (capability.mandatoryDryRun !== false) die('mandatoryDryRun must be false');
   if (capability.liveCharacterDepartmentCapable !== true) die('liveCharacterDepartmentCapable must be true');
   if (capability.liveDepartmentUsesBlenderRuntime !== true) die('liveDepartmentUsesBlenderRuntime must be true');
+  if (capability.requiresArtistAuthoredRig !== true) die('requiresArtistAuthoredRig must be true');
+  if (capability.automaticPlaceholderRigAllowed !== false) die('automaticPlaceholderRigAllowed must be false');
+  if (capability.semanticBodySelectionRequired !== true) die('semanticBodySelectionRequired must be true');
+  if (capability.qaUsesCharacterBounds !== true) die('qaUsesCharacterBounds must be true');
   if (REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS.includes('sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e') !== true) {
     die('old digest is not rejected for live execution');
   }
@@ -240,6 +249,10 @@ async function main() {
     liveExecutionRuntime: live.department.executionRuntime,
     stages: stages.map((stage) => ({ stage: stage.stage, status: stage.status, simulated: stage.simulated })),
     workingSha256: workingHash,
+    qaWorkingSha256: qaWorkingHash,
+    rigContract: live.department.parsed.rigContract,
+    sourceRigPreserved: true,
+    automaticPlaceholderRigCreated: false,
     sourceSha256Unchanged: sourceHashBefore,
     goatProductionReady: false,
     realGoatDownloaded: false,

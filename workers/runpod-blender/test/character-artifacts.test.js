@@ -54,11 +54,27 @@ test('live character artifacts persist outside SOURCE and PRODUCTION with verifi
       executionMode: 'live',
       authorizedDownloadInvoked: 1,
       networkDownloadInvoked: true,
+      capability: {
+        schema: 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2',
+        entrypointVersion: 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V6',
+        liveCharacterDepartmentCapable: true,
+        liveDepartmentUsesBlenderRuntime: true,
+        requiresArtistAuthoredRig: true,
+        automaticPlaceholderRigAllowed: false,
+        semanticBodySelectionRequired: true,
+        qaUsesCharacterBounds: true,
+        authorizedRealSourceDownloadCapable: true,
+        durableArtifactPersistenceCapable: true,
+        sourceWritesForbidden: true,
+      },
       department: {
         ok: true,
         stageCount: 26,
+        executionMode: 'live',
+        executionRuntime: 'BLENDER_BPY',
         executeFlagPresent: true,
         dryRunFlagPresent: false,
+        parsed: { realGoatSourceTested: true },
         gate: { status: 'BLOCKED', goatProductionReady: false },
       },
     },
@@ -73,6 +89,18 @@ test('live character artifacts persist outside SOURCE and PRODUCTION with verifi
   assert.equal(status.status, 'COMPLETE');
   assert.equal(status.goatProductionReady, false);
   assert.equal(status.humanVisualApprovalRequired, true);
+  const compact = JSON.parse(
+    transport.objects
+      .get(`${CHARACTER_EVIDENCE_ROOT}/goat-v4-test-0001/character-result.json`)
+      .toString('utf8'),
+  );
+  assert.equal(compact.department.executionRuntime, 'BLENDER_BPY');
+  assert.equal(compact.department.parsed.realGoatSourceTested, true);
+  assert.equal(compact.capability.liveDepartmentUsesBlenderRuntime, true);
+  assert.equal(compact.capability.requiresArtistAuthoredRig, true);
+  assert.equal(compact.capability.automaticPlaceholderRigAllowed, false);
+  assert.equal(compact.capability.semanticBodySelectionRequired, true);
+  assert.equal(compact.capability.qaUsesCharacterBounds, true);
 });
 
 test('artifact persistence is mandatory and locked source files cannot enter evidence', async () => {

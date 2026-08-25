@@ -178,6 +178,10 @@ test('26 department stages and Goat materializer are discoverable', async () => 
   assert.equal(capability.characterDepartmentBaked, true);
   assert.equal(capability.liveCharacterDepartmentCapable, true);
   assert.equal(capability.liveDepartmentUsesBlenderRuntime, true);
+  assert.equal(capability.requiresArtistAuthoredRig, true);
+  assert.equal(capability.automaticPlaceholderRigAllowed, false);
+  assert.equal(capability.semanticBodySelectionRequired, true);
+  assert.equal(capability.qaUsesCharacterBounds, true);
   assert.equal(capability.realSourceDownloadCodeBaked, true);
   assert.equal(capability.authorizedRealSourceDownloadCapable, true);
   assert.equal(capability.durableArtifactPersistenceCapable, true);

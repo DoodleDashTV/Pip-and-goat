@@ -132,6 +132,9 @@ def run(argv: list[str] | None = None) -> dict:
             "workingSha256": result["workingSha256"],
             "objectDelta": result["objectDelta"],
             "shapeKeys": result["shapeKeys"],
+            "rigContract": result["rigContract"],
+            "realGoatSourceTested": result["realGoatSourceTested"],
+            "executionRuntime": "BLENDER_BPY",
             "simulated": False,
         })
         emit(
@@ -149,6 +152,9 @@ def run(argv: list[str] | None = None) -> dict:
             workingSha256=result["workingSha256"],
             objectDelta=result["objectDelta"],
             datablocksChanged=result["datablocksChanged"],
+            rigContract=result["rigContract"],
+            realGoatSourceTested=result["realGoatSourceTested"],
+            executionRuntime="BLENDER_BPY",
         )
         return result
     return run_dry(args, root)

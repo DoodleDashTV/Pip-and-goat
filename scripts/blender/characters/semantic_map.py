@@ -6,15 +6,16 @@ ROLE_HINTS = {
     "BACKPACK": ("backpack",),
     "STRAP": ("strap",),
     "ACCESSORY": ("spiral", "copper"),
+    "FUR": ("fur",),
     "HORNS": ("horn",),
     "EARS": ("ear",),
     "COLLAR": ("collar",),
-    "TAG": ("tag", "nameplate"),
+    "TAG": ("tag", "nameplate", "compass"),
     "SCARF": ("scarf",),
     "EYES": ("eye",),
     "MOUTH": ("mouth", "jaw", "beak"),
     "HEAD": ("head",),
-    "BODY": ("body", "mesh"),
+    "BODY": ("body",),
 }
 
 

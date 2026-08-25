@@ -107,6 +107,7 @@ function sha256File(file) {
 function compactCharacterResult(result) {
   const department = result?.department || null;
   const materialize = result?.materialize || null;
+  const capability = result?.capability || null;
   return {
     ok: result?.ok === true,
     status: result?.status || null,
@@ -118,6 +119,22 @@ function compactCharacterResult(result) {
     networkDownloadInvoked: result?.networkDownloadInvoked === true,
     goatProductionReady: false,
     characterMasterGate: result?.characterMasterGate || null,
+    capability: capability
+      ? {
+          schema: capability.schema || null,
+          entrypointVersion: capability.entrypointVersion || null,
+          liveCharacterDepartmentCapable: capability.liveCharacterDepartmentCapable === true,
+          liveDepartmentUsesBlenderRuntime: capability.liveDepartmentUsesBlenderRuntime === true,
+          requiresArtistAuthoredRig: capability.requiresArtistAuthoredRig === true,
+          automaticPlaceholderRigAllowed: false,
+          semanticBodySelectionRequired: capability.semanticBodySelectionRequired === true,
+          qaUsesCharacterBounds: capability.qaUsesCharacterBounds === true,
+          authorizedRealSourceDownloadCapable: capability.authorizedRealSourceDownloadCapable === true,
+          durableArtifactPersistenceCapable: capability.durableArtifactPersistenceCapable === true,
+          sourceWritesForbidden: capability.sourceWritesForbidden === true,
+          goatProductionReady: false,
+        }
+      : null,
     materialize: materialize
       ? {
           ok: materialize.ok === true,
@@ -138,6 +155,7 @@ function compactCharacterResult(result) {
           exitCode: department.exitCode ?? null,
           stageCount: department.stageCount ?? null,
           executionMode: department.executionMode || null,
+          executionRuntime: department.executionRuntime || null,
           executeFlagPresent: department.executeFlagPresent === true,
           dryRunFlagPresent: department.dryRunFlagPresent === true,
           gate: department.gate || null,

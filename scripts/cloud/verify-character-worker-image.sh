@@ -24,6 +24,7 @@ prove /opt/ddp-worker/src/character-worker-entry.js
 prove /opt/ddp-worker/src/prove-authorized-download-entrypoint.js
 prove /opt/ddp-worker/blender/characters/build_character.py
 prove /opt/ddp-worker/blender/characters/execute.py
+prove /opt/ddp-worker/blender/characters/rig_contract.py
 prove /opt/ddp-worker/blender/characters/common/stages.py
 prove /opt/ddp-worker/character-capability.json
 
@@ -37,6 +38,10 @@ echo "$CAPABILITY" | grep -q '"schema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V
 echo "$CAPABILITY" | grep -q '"characterDepartmentBaked": true' || die "department not baked"
 echo "$CAPABILITY" | grep -q '"liveCharacterDepartmentCapable": true' || die "live department not capable"
 echo "$CAPABILITY" | grep -q '"liveDepartmentUsesBlenderRuntime": true' || die "live department is not bound to Blender bpy runtime"
+echo "$CAPABILITY" | grep -q '"requiresArtistAuthoredRig": true' || die "artist-authored rig requirement missing"
+echo "$CAPABILITY" | grep -q '"automaticPlaceholderRigAllowed": false' || die "placeholder-rig refusal missing"
+echo "$CAPABILITY" | grep -q '"semanticBodySelectionRequired": true' || die "semantic body selection missing"
+echo "$CAPABILITY" | grep -q '"qaUsesCharacterBounds": true' || die "character-bound QA framing missing"
 echo "$CAPABILITY" | grep -q '"realSourceDownloadCodeBaked": true' || die "real download code not baked"
 echo "$CAPABILITY" | grep -q '"authorizedRealSourceDownloadCapable": true' || die "authorized download not capable"
 echo "$CAPABILITY" | grep -q '"durableArtifactPersistenceCapable": true' || die "durable artifact persistence not capable"
