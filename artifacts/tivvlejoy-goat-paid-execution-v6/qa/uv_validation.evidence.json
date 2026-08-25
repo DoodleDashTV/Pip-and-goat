@@ -1,0 +1,9 @@
+{
+  "mesh": "Eye_L_GEO",
+  "simulated": false,
+  "stage": "UV_VALIDATION",
+  "uvLayers": [
+    "UVMap",
+    "Gradient"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "bytes": 358404,
+  "engine": "BLENDER_WORKBENCH",
+  "renders": [
+    {
+      "bytes": 124808,
+      "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa.png",
+      "wrote": true
+    },
+    {
+      "bytes": 120138,
+      "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa_three_quarter.png",
+      "wrote": true
+    },
+    {
+      "bytes": 113458,
+      "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa_side.png",
+      "wrote": true
+    }
+  ],
+  "resolution": [
+    512,
+    512
+  ],
+  "simulated": false,
+  "stage": "RENDER_QA",
+  "wrote": true
+}

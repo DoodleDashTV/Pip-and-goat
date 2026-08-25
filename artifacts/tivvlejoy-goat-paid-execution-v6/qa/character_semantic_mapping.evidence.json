@@ -1,0 +1,26 @@
+{
+  "mapping": {
+    "Eye_L_GEO": "EYES",
+    "Fur_01": "UNKNOWN",
+    "Fur_01.001": "UNKNOWN",
+    "Fur_01.002": "UNKNOWN",
+    "Fur_01.003": "UNKNOWN",
+    "Fur_01.004": "UNKNOWN",
+    "Fur_01.005": "UNKNOWN",
+    "Fur_01.006": "UNKNOWN",
+    "Fur_01.007": "UNKNOWN",
+    "Fur_01.008": "UNKNOWN",
+    "Fur_01.009": "UNKNOWN",
+    "Fur_01.010": "UNKNOWN",
+    "Fur_01.011": "UNKNOWN",
+    "Goat_Body_GEO": "BODY",
+    "Goat_Horn_GEO": "HORNS",
+    "Goat_Mouth_Assets": "MOUTH",
+    "Goat_Prop_Chain_GEO": "UNKNOWN",
+    "Goat_Prop_Compass_GEO": "UNKNOWN",
+    "Goat_Prop_Scarf_GEO": "SCARF",
+    "Hi-Light": "UNKNOWN"
+  },
+  "simulated": false,
+  "stage": "CHARACTER_SEMANTIC_MAPPING"
+}

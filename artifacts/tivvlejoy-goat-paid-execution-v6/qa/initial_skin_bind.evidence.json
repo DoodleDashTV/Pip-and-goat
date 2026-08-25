@@ -1,0 +1,28 @@
+{
+  "armature": "CHAR_GOAT_001_Armature",
+  "mesh": "Eye_L_GEO",
+  "simulated": false,
+  "stage": "INITIAL_SKIN_BIND",
+  "vertexGroups": [
+    "c_eye.l",
+    "Mask",
+    "DEF.PELVIS",
+    "DEF.SPINE_01",
+    "DEF.SPINE_02",
+    "DEF.CHEST",
+    "DEF.UPPER_CHEST",
+    "DEF.NECK",
+    "DEF.HEAD",
+    "DEF.JAW",
+    "DEF.EYE.L",
+    "DEF.EYE.R",
+    "DEF.THIGH.L",
+    "DEF.THIGH.R",
+    "DEF.SHIN.L",
+    "DEF.SHIN.R",
+    "DEF.ANKLE.L",
+    "DEF.ANKLE.R",
+    "DEF.FOOT.L",
+    "DEF.FOOT.R"
+  ]
+}

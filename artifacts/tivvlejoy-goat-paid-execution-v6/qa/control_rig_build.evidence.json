@@ -1,0 +1,82 @@
+{
+  "controls": [
+    {
+      "features": [
+        "master",
+        "world",
+        "character_root",
+        "cog",
+        "pelvis"
+      ],
+      "id": "GLOBAL"
+    },
+    {
+      "features": [
+        "spine",
+        "chest",
+        "upper_chest",
+        "neck",
+        "head",
+        "head_isolate"
+      ],
+      "id": "TORSO"
+    },
+    {
+      "features": [
+        "thigh",
+        "shin",
+        "ankle",
+        "foot",
+        "toe",
+        "ik",
+        "fk",
+        "ik_fk_switch",
+        "pole",
+        "foot_roll",
+        "heel",
+        "toe_pivot",
+        "ball_pivot",
+        "knee_direction",
+        "limited_stretch"
+      ],
+      "id": "LEGS"
+    },
+    {
+      "features": [
+        "clavicle",
+        "upper_arm",
+        "forearm",
+        "wrist",
+        "hand",
+        "ik",
+        "fk",
+        "ik_fk_switch",
+        "pole",
+        "hand_space"
+      ],
+      "id": "ARMS"
+    },
+    {
+      "features": [
+        "eye_aim_master",
+        "eye_independent",
+        "blink",
+        "eyelid_upper",
+        "eyelid_lower",
+        "jaw",
+        "mouth_open",
+        "mouth_width",
+        "smile",
+        "frown",
+        "corners"
+      ],
+      "id": "FACE"
+    }
+  ],
+  "ikConstraints": [
+    "DEF.SHIN.L",
+    "DEF.SHIN.R"
+  ],
+  "simulated": false,
+  "stage": "CONTROL_RIG_BUILD"
+}

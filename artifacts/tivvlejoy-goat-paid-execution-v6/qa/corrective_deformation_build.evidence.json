@@ -1,0 +1,10 @@
+{
+  "correctives": [
+    "CORR.shoulder_pinch",
+    "CORR.elbow_pinch",
+    "CORR.wrist_collapse",
+    "CORR.hip_collapse"
+  ],
+  "simulated": false,
+  "stage": "CORRECTIVE_DEFORMATION_BUILD"
+}

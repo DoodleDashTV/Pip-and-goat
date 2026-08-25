@@ -1,0 +1,1202 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_V6_LAUNCH_V1",
+  "status": "OUTPUT_CONTRACT_FAILED",
+  "authorization": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6",
+  "authorizationConsumed": true,
+  "executionId": "goat-v6-78f1b162-20260825",
+  "workerImageDigestUsed": "sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6",
+  "gpuTypeId": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "createRequestCount": 1,
+  "confirmedPodCount": 1,
+  "podId": "ojs38egllebqnu",
+  "runtimeMinutes": 24.593,
+  "actualHourlyRateUsd": 0.74,
+  "estimatedCostUsd": 0.3033,
+  "hardCostUsd": 3,
+  "withinCostAuthorization": true,
+  "cleanup": {
+    "confirmed": true,
+    "exactNamePodsRemaining": 0,
+    "activePodsRemaining": 0
+  },
+  "terminalStatus": {
+    "jobId": "goat-v6-78f1b162-20260825",
+    "status": "COMPLETE",
+    "stage": "CHARACTER_MASTER",
+    "code": "LIVE_DEPARTMENT_EXECUTED_AWAITING_VISUAL_APPROVAL",
+    "outputPrefix": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825",
+    "manifestKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/manifest.json",
+    "resultKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/character-result.json",
+    "fileCount": 33,
+    "goatProductionReady": false,
+    "humanVisualApprovalRequired": true,
+    "at": "2026-08-25T02:25:14.169Z"
+  },
+  "artifactManifest": {
+    "schema": "TIVVLEJOY_CHARACTER_EXECUTION_ARTIFACT_MANIFEST_V1",
+    "executionId": "goat-v6-78f1b162-20260825",
+    "jobId": "goat-v6-78f1b162-20260825",
+    "characterId": "CHAR_GOAT_001",
+    "outputPrefix": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825",
+    "sourceWritesForbidden": true,
+    "productionWritesForbidden": true,
+    "lockedSourceUploaded": false,
+    "files": [
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/accessory_binding.evidence.json",
+        "relativePath": "accessory_binding.evidence.json",
+        "byteSize": 111,
+        "sha256": "d186e600cd93f625bf6feeb31d4ad928e3dfb645643eed02dd52ec926daafc53",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/animation_tests.evidence.json",
+        "relativePath": "animation_tests.evidence.json",
+        "byteSize": 320,
+        "sha256": "af23bde0e7b795ec613dcdd51ce640fa0e78a1f60b89c22481777b042d280f44",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/blender_version_check.evidence.json",
+        "relativePath": "blender_version_check.evidence.json",
+        "byteSize": 173,
+        "sha256": "641197f83b5b11e6ea7f0caf58ca9d29f30640e91b079d4a2c6d82ef81bb8095",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/CHAR_GOAT_001_working_executed.blend",
+        "relativePath": "CHAR_GOAT_001_working_executed.blend",
+        "byteSize": 298161606,
+        "sha256": "a676b73eb12fc9740b4752bcc9061a5233202356c3bd22eafe2e75e1749b9bff",
+        "contentType": "application/x-blender"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/character_master_gate.evidence.json",
+        "relativePath": "character_master_gate.evidence.json",
+        "byteSize": 391,
+        "sha256": "8e9936253a379ae533e952332f3a2648eab2275b5e6b7cc81d373275d2fc3692",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/character_semantic_mapping.evidence.json",
+        "relativePath": "character_semantic_mapping.evidence.json",
+        "byteSize": 688,
+        "sha256": "861e1af3769ef971c999b6150de153b5c65f07bbc37c9952ae4e6aeecb3fe029",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/control_rig_build.evidence.json",
+        "relativePath": "control_rig_build.evidence.json",
+        "byteSize": 1344,
+        "sha256": "d888ad1c99f6c842de85c24258f618c9d096b99150b7b94d5723ff1d712039c4",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/corrective_deformation_build.evidence.json",
+        "relativePath": "corrective_deformation_build.evidence.json",
+        "byteSize": 194,
+        "sha256": "612f683474ebd2f053077631d8e8058ad341ca44f68549e4b0830ec50e89e0e4",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/deformation_tests.evidence.json",
+        "relativePath": "deformation_tests.evidence.json",
+        "byteSize": 1756,
+        "sha256": "e404324f6c4edd7c77c8dee978459c1a4b9b130653fd1f4b77978424b9edf16d",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/export_qa.evidence.json",
+        "relativePath": "export_qa.evidence.json",
+        "byteSize": 212,
+        "sha256": "feadb24b3a93bec9576ce4f4f20b0917272fd503d0e0b3398160c36e3b157b37",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/export_qa.fbx",
+        "relativePath": "export_qa.fbx",
+        "byteSize": 5801980,
+        "sha256": "84e8dd0aa8a049110579745d070155b11ed7d60c4066104c2cc58b7f7b7fc56e",
+        "contentType": "application/octet-stream"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/facial_system_build.evidence.json",
+        "relativePath": "facial_system_build.evidence.json",
+        "byteSize": 845,
+        "sha256": "0ecb6dbea0a203827c7e0039b583b28f1fcc3d6ccfeed8008be6b725377fb28c",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/goat_character_master_gate.json",
+        "relativePath": "goat_character_master_gate.json",
+        "byteSize": 333,
+        "sha256": "7a4541fd6797fa64faa70c9aaf7e4e8e76c47e9b5830498742fd78f354929ed2",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/goat_live_department.json",
+        "relativePath": "goat_live_department.json",
+        "byteSize": 20172,
+        "sha256": "30a86bc8520c0587bf26987b046096bfa63fd53a11f59fdb25a80118b076850e",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/initial_skin_bind.evidence.json",
+        "relativePath": "initial_skin_bind.evidence.json",
+        "byteSize": 498,
+        "sha256": "5b62ee5f73e38bb3900dbe7e892fd3d80813309611c58bcbadf567eaabc49f7e",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/material_inventory.evidence.json",
+        "relativePath": "material_inventory.evidence.json",
+        "byteSize": 241,
+        "sha256": "04eb5de52e6856c389ebe9e8fa34c5d061684e661fb205819de22d0359122b0c",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/object_inventory.evidence.json",
+        "relativePath": "object_inventory.evidence.json",
+        "byteSize": 485,
+        "sha256": "a7bc9aef4e5dfc39e77c93e7e7dea03acf6335668349d207ff69d12c72fcc4dd",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/performance_profile.evidence.json",
+        "relativePath": "performance_profile.evidence.json",
+        "byteSize": 122,
+        "sha256": "b2bfa08969a8afe9d037e3a7905b901cb32179797a4713496432b83cd73acbbb",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/render_qa_side.png",
+        "relativePath": "render_qa_side.png",
+        "byteSize": 113458,
+        "sha256": "49a5fe17679fbc81929843e51bb87a4ec6d74b06113423488546a9e458aaa400",
+        "contentType": "image/png"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/render_qa_three_quarter.png",
+        "relativePath": "render_qa_three_quarter.png",
+        "byteSize": 120138,
+        "sha256": "b4cb01a6547641901c35aeabd14b4c58bcddc2c0c1c502437f355bb4de83eeb8",
+        "contentType": "image/png"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/render_qa.evidence.json",
+        "relativePath": "render_qa.evidence.json",
+        "byteSize": 640,
+        "sha256": "5e34eab39495d3f30006c5c09ec7cb66ced3f4eac617d9543b411368d6d22038",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/render_qa.png",
+        "relativePath": "render_qa.png",
+        "byteSize": 124808,
+        "sha256": "d21cd16fd70e2af0bb34e8ee7f4bb1a3766c5311c07fb8bb4d0abd2906f5c4a8",
+        "contentType": "image/png"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/rig_guide_generation.evidence.json",
+        "relativePath": "rig_guide_generation.evidence.json",
+        "byteSize": 116,
+        "sha256": "9551707bde18ab1e4ebaeaf9b0990840fec8bfb267a5ca3417e2a756c599ca6e",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/scale_orientation_normalization.evidence.json",
+        "relativePath": "scale_orientation_normalization.evidence.json",
+        "byteSize": 413,
+        "sha256": "8c5c3d56b066413366170dac4dabd527eea798d70451072cf8f7a5e5f296e554",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/secondary_controls.evidence.json",
+        "relativePath": "secondary_controls.evidence.json",
+        "byteSize": 173,
+        "sha256": "15a89d0b43b36a0ebcbfb0474f04163a537255347748f0fe52dd36c11fe61933",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/skeleton_build.evidence.json",
+        "relativePath": "skeleton_build.evidence.json",
+        "byteSize": 2479,
+        "sha256": "3649397ea771a4a10e55962695f526ca51a6d8db2d1deb67b4e02bd7a6aceb68",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/source_hash_lock.evidence.json",
+        "relativePath": "source_hash_lock.evidence.json",
+        "byteSize": 179,
+        "sha256": "7b4630a62ad91f78779ce678f41f3daa3a69ead98955b74b04b234187d89def3",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/source_intake.evidence.json",
+        "relativePath": "source_intake.evidence.json",
+        "byteSize": 327,
+        "sha256": "30b76f8af00c5f60f69982a37501613cfce76ec120d886d5672c20893cf27519",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/texture_inventory.evidence.json",
+        "relativePath": "texture_inventory.evidence.json",
+        "byteSize": 948,
+        "sha256": "7c8281ced1a8602078bf5620e786f6cd677b4c8fc9d93cd18a92c2d036193e31",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/topology_audit.evidence.json",
+        "relativePath": "topology_audit.evidence.json",
+        "byteSize": 162,
+        "sha256": "8b6bedb2b108451a221c8eab2eda8d6151c4d882058d9574a0607fb43cdc6695",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/uv_validation.evidence.json",
+        "relativePath": "uv_validation.evidence.json",
+        "byteSize": 125,
+        "sha256": "8d3ab686c4b9e0085ede772c694077782c8019126b6c3990ddac8445dc0c8f7e",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/viseme_system_build.evidence.json",
+        "relativePath": "viseme_system_build.evidence.json",
+        "byteSize": 539,
+        "sha256": "fec6d49991bc81cd09b6dfdc5af6070b3272d47e43ce178c57c0d0338e023424",
+        "contentType": "application/json"
+      },
+      {
+        "key": "tivvlejoy-assets/characters/CHAR_GOAT_001/executions/goat-v6-78f1b162-20260825/artifacts/weight_refinement.evidence.json",
+        "relativePath": "weight_refinement.evidence.json",
+        "byteSize": 127,
+        "sha256": "3a1bfe1237805d5e5aa9dff2a57475aca80b68a905ac82191a8c802af3430cda",
+        "contentType": "application/json"
+      }
+    ],
+    "fileCount": 33,
+    "totalBytes": 304356103,
+    "result": {
+      "ok": true,
+      "status": "LIVE_DEPARTMENT_EXECUTED_AWAITING_VISUAL_APPROVAL",
+      "code": "LIVE_DEPARTMENT_EXECUTED",
+      "jobKind": "CHARACTER_MASTER_BUILD",
+      "characterId": "CHAR_GOAT_001",
+      "executionMode": "live",
+      "authorizedDownloadInvoked": 1,
+      "networkDownloadInvoked": true,
+      "goatProductionReady": false,
+      "characterMasterGate": "BLOCKED",
+      "materialize": {
+        "ok": true,
+        "code": "WORKING_COPY_READY",
+        "objectKey": "tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip",
+        "observedSize": 269512136,
+        "observedSha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+        "streamed": true,
+        "hashedWhileStreaming": true,
+        "zipCode": "ZIP_SAFE",
+        "workingCopyCreated": true,
+        "sourceOverwritten": false
+      },
+      "department": {
+        "ok": true,
+        "exitCode": 0,
+        "stageCount": 26,
+        "executionMode": "live",
+        "executeFlagPresent": true,
+        "dryRunFlagPresent": false,
+        "gate": {
+          "blockers": [
+            "HUMAN_APPROVAL_REQUIRED",
+            "VISUAL_APPROVAL_REQUIRED",
+            "DEFORMATION_GATE_AWAITING_HUMAN_REVIEW",
+            "RENDER_QA_AWAITING_HUMAN_REVIEW"
+          ],
+          "executed": true,
+          "goatProductionReady": false,
+          "noFalsePass": true,
+          "status": "BLOCKED",
+          "verdict": "NOT_PRODUCTION_READY",
+          "visualApproval": false
+        },
+        "parsed": {
+          "blenderExecuted": true,
+          "characterId": "CHAR_GOAT_001",
+          "datablocksChanged": true,
+          "dryRun": false,
+          "execute": true,
+          "gate": {
+            "blockers": [
+              "HUMAN_APPROVAL_REQUIRED",
+              "VISUAL_APPROVAL_REQUIRED",
+              "DEFORMATION_GATE_AWAITING_HUMAN_REVIEW",
+              "RENDER_QA_AWAITING_HUMAN_REVIEW"
+            ],
+            "executed": true,
+            "goatProductionReady": false,
+            "noFalsePass": true,
+            "status": "BLOCKED",
+            "verdict": "NOT_PRODUCTION_READY",
+            "visualApproval": false
+          },
+          "goatProductionReady": false,
+          "gpuRequested": false,
+          "message": "Character builder live execute complete. Goat is not production-ready.",
+          "objectDelta": [
+            "CHAR_GOAT_001_Armature",
+            "CHAR_GOAT_001_QA_Camera",
+            "CHAR_GOAT_001_RigGuide",
+            "CTRL.COLLAR",
+            "CTRL.EAR.L",
+            "CTRL.EAR.R",
+            "GoatCollar"
+          ],
+          "paidCompute": false,
+          "stages": [
+            {
+              "byteSize": 269512136,
+              "disposition": "CREATED",
+              "lockedSourceUntouched": true,
+              "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/ephemeral/Goat_FINN.zip",
+              "present": true,
+              "realAssetVerified": true,
+              "reason": "Hashed supplied source bytes.",
+              "sha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+              "simulated": false,
+              "stage": "SOURCE_INTAKE",
+              "status": "EXECUTED"
+            },
+            {
+              "byteSize": 269512136,
+              "disposition": "CREATED",
+              "locked": true,
+              "reason": "Source hash locked.",
+              "sha256": "f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5",
+              "simulated": false,
+              "stage": "SOURCE_HASH_LOCK",
+              "status": "EXECUTED"
+            },
+            {
+              "blenderVersion": "4.2.2 LTS",
+              "disposition": "CREATED",
+              "reason": "Studio Blender 4.2.2 LTS confirmed.",
+              "required": [
+                4,
+                2,
+                2
+              ],
+              "simulated": false,
+              "stage": "BLENDER_VERSION_CHECK",
+              "status": "EXECUTED",
+              "tuple": [
+                4,
+                2,
+                2
+              ]
+            },
+            {
+              "count": 20,
+              "disposition": "CREATED",
+              "objects": [
+                "Eye_L_GEO",
+                "Fur_01",
+                "Fur_01.001",
+                "Fur_01.002",
+                "Fur_01.003",
+                "Fur_01.004",
+                "Fur_01.005",
+                "Fur_01.006",
+                "Fur_01.007",
+                "Fur_01.008",
+                "Fur_01.009",
+                "Fur_01.010",
+                "Fur_01.011",
+                "Goat_Body_GEO",
+                "Goat_Horn_GEO",
+                "Goat_Mouth_Assets",
+                "Goat_Prop_Chain_GEO",
+                "Goat_Prop_Compass_GEO",
+                "Goat_Prop_Scarf_GEO",
+                "Hi-Light"
+              ],
+              "reason": "Inventoried scene objects.",
+              "simulated": false,
+              "stage": "OBJECT_INVENTORY",
+              "status": "EXECUTED"
+            },
+            {
+              "count": 6,
+              "disposition": "CREATED",
+              "materials": [
+                "Eye_MAT",
+                "Goat_Body",
+                "Goat_Horn_Mouth",
+                "Goat_Props",
+                "spec",
+                "tripo_material_3eec9046-421b-4d5d-838e-2439a6e261d8.001"
+              ],
+              "reason": "Inventoried and ensured materials.",
+              "simulated": false,
+              "stage": "MATERIAL_INVENTORY",
+              "status": "EXECUTED"
+            },
+            {
+              "count": 27,
+              "disposition": "CREATED",
+              "images": [
+                "Baked_BaseColor",
+                "Baked_MetallicRoughness",
+                "Do_Not_Enter_Street_Corner_sm.exr",
+                "Eye_Shader_Diff.psd",
+                "Eye_Shader_Trans_Mask.png",
+                "Goat_Body_Alpha.png",
+                "Goat_Body_BaseColor.png",
+                "Goat_Body_Displacement.png",
+                "Goat_Body_Emission.png",
+                "Goat_Body_Metallic.png",
+                "Goat_Body_Normal.png",
+                "Goat_Body_Roughness.png",
+                "Goat_Horn_Mouth_Alpha.png",
+                "Goat_Horn_Mouth_BaseColor.png",
+                "Goat_Horn_Mouth_Displacement.png",
+                "Goat_Horn_Mouth_Emission.png",
+                "Goat_Horn_Mouth_Metallic.png",
+                "Goat_Horn_Mouth_Normal.png",
+                "Goat_Horn_Mouth_Roughness.png",
+                "Goat_Props_Alpha.png",
+                "Goat_Props_BaseColor.png",
+                "Goat_Props_Displacement.png",
+                "Goat_Props_Emission.png",
+                "Goat_Props_Metallic.png",
+                "Goat_Props_Normal.png",
+                "Goat_Props_Roughness.png",
+                "Render Result"
+              ],
+              "reason": "Inventoried texture datablocks.",
+              "simulated": false,
+              "stage": "TEXTURE_INVENTORY",
+              "status": "EXECUTED"
+            },
+            {
+              "disposition": "CREATED",
+              "mesh": "Eye_L_GEO",
+              "reason": "UV layers present.",
+              "simulated": false,
+              "stage": "UV_VALIDATION",
+              "status": "EXECUTED",
+              "uvLayers": [
+                "UVMap",
+                "Gradient"
+              ]
+            },
+            {
+              "blindDecimateForbidden": true,
+              "disposition": "CREATED",
+              "edges": 760,
+              "faces": 376,
+              "mesh": "Eye_L_GEO",
+              "reason": "Recorded live mesh topology.",
+              "simulated": false,
+              "stage": "TOPOLOGY_AUDIT",
+              "status": "EXECUTED",
+              "vertices": 387
+            },
+            {
+              "applied": [
+                "Eye_L_GEO",
+                "Fur_01",
+                "Fur_01.001",
+                "Fur_01.002",
+                "Fur_01.003",
+                "Fur_01.004",
+                "Fur_01.005",
+                "Fur_01.006",
+                "Fur_01.007",
+                "Fur_01.008",
+                "Fur_01.009",
+                "Fur_01.010",
+                "Fur_01.011",
+                "Goat_Prop_Chain_GEO",
+                "Goat_Prop_Compass_GEO",
+                "Hi-Light"
+              ],
+              "disposition": "CREATED",
+              "normalized": true,
+              "reason": "Applied live scale/rotation where needed.",
+              "simulated": false,
+              "stage": "SCALE_ORIENTATION_NORMALIZATION",
+              "status": "EXECUTED"
+            },
+            {
+              "disposition": "CREATED",
+              "mapping": {
+                "Eye_L_GEO": "EYES",
+                "Fur_01": "UNKNOWN",
+                "Fur_01.001": "UNKNOWN",
+                "Fur_01.002": "UNKNOWN",
+                "Fur_01.003": "UNKNOWN",
+                "Fur_01.004": "UNKNOWN",
+                "Fur_01.005": "UNKNOWN",
+                "Fur_01.006": "UNKNOWN",
+                "Fur_01.007": "UNKNOWN",
+                "Fur_01.008": "UNKNOWN",
+                "Fur_01.009": "UNKNOWN",
+                "Fur_01.010": "UNKNOWN",
+                "Fur_01.011": "UNKNOWN",
+                "Goat_Body_GEO": "BODY",
+                "Goat_Horn_GEO": "HORNS",
+                "Goat_Mouth_Assets": "MOUTH",
+                "Goat_Prop_Chain_GEO": "UNKNOWN",
+                "Goat_Prop_Compass_GEO": "UNKNOWN",
+                "Goat_Prop_Scarf_GEO": "SCARF",
+                "Hi-Light": "UNKNOWN"
+              },
+              "reason": "Mapped object names to semantic roles.",
+              "simulated": false,
+              "stage": "CHARACTER_SEMANTIC_MAPPING",
+              "status": "EXECUTED"
+            },
+            {
+              "created": true,
+              "disposition": "CREATED",
+              "guide": "CHAR_GOAT_001_RigGuide",
+              "reason": "Created live rig guide empty.",
+              "simulated": false,
+              "stage": "RIG_GUIDE_GENERATION",
+              "status": "EXECUTED"
+            },
+            {
+              "armature": "CHAR_GOAT_001_Armature",
+              "bones": [
+                {
+                  "deform": false,
+                  "name": "CTRL.MASTER",
+                  "role": "MASTER"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.WORLD",
+                  "role": "WORLD_ROOT"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.ROOT",
+                  "role": "CHARACTER_ROOT"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.COG",
+                  "role": "COG"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.PELVIS",
+                  "role": "PELVIS"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.SPINE_01",
+                  "role": "SPINE"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.SPINE_02",
+                  "role": "SPINE"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.CHEST",
+                  "role": "CHEST"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.UPPER_CHEST",
+                  "role": "UPPER_CHEST"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.NECK",
+                  "role": "NECK"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.HEAD",
+                  "role": "HEAD"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.HEAD_ISOLATE",
+                  "role": "HEAD_ISOLATE"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.JAW",
+                  "role": "JAW"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.EYE.L",
+                  "role": "EYE"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.EYE.R",
+                  "role": "EYE"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.THIGH.L",
+                  "role": "THIGH"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.THIGH.R",
+                  "role": "THIGH"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.SHIN.L",
+                  "role": "SHIN"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.SHIN.R",
+                  "role": "SHIN"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.ANKLE.L",
+                  "role": "ANKLE"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.ANKLE.R",
+                  "role": "ANKLE"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.FOOT.L",
+                  "role": "FOOT"
+                },
+                {
+                  "deform": true,
+                  "name": "DEF.FOOT.R",
+                  "role": "FOOT"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.IK.FOOT.L",
+                  "role": "IK_TARGET"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.IK.FOOT.R",
+                  "role": "IK_TARGET"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.POLE.KNEE.L",
+                  "role": "POLE"
+                },
+                {
+                  "deform": false,
+                  "name": "CTRL.POLE.KNEE.R",
+                  "role": "POLE"
+                }
+              ],
+              "count": 27,
+              "disposition": "CREATED",
+              "reason": "Built live armature bones.",
+              "simulated": false,
+              "stage": "SKELETON_BUILD",
+              "status": "EXECUTED"
+            },
+            {
+              "controls": [
+                {
+                  "features": [
+                    "master",
+                    "world",
+                    "character_root",
+                    "cog",
+                    "pelvis"
+                  ],
+                  "id": "GLOBAL"
+                },
+                {
+                  "features": [
+                    "spine",
+                    "chest",
+                    "upper_chest",
+                    "neck",
+                    "head",
+                    "head_isolate"
+                  ],
+                  "id": "TORSO"
+                },
+                {
+                  "features": [
+                    "thigh",
+                    "shin",
+                    "ankle",
+                    "foot",
+                    "toe",
+                    "ik",
+                    "fk",
+                    "ik_fk_switch",
+                    "pole",
+                    "foot_roll",
+                    "heel",
+                    "toe_pivot",
+                    "ball_pivot",
+                    "knee_direction",
+                    "limited_stretch"
+                  ],
+                  "id": "LEGS"
+                },
+                {
+                  "features": [
+                    "clavicle",
+                    "upper_arm",
+                    "forearm",
+                    "wrist",
+                    "hand",
+                    "ik",
+                    "fk",
+                    "ik_fk_switch",
+                    "pole",
+                    "hand_space"
+                  ],
+                  "id": "ARMS"
+                },
+                {
+                  "features": [
+                    "eye_aim_master",
+                    "eye_independent",
+                    "blink",
+                    "eyelid_upper",
+                    "eyelid_lower",
+                    "jaw",
+                    "mouth_open",
+                    "mouth_width",
+                    "smile",
+                    "frown",
+                    "corners"
+                  ],
+                  "id": "FACE"
+                }
+              ],
+              "disposition": "CREATED",
+              "ikConstraints": [
+                "DEF.SHIN.L",
+                "DEF.SHIN.R"
+              ],
+              "reason": "Added live IK control constraints.",
+              "simulated": false,
+              "stage": "CONTROL_RIG_BUILD",
+              "status": "EXECUTED"
+            },
+            {
+              "armature": "CHAR_GOAT_001_Armature",
+              "disposition": "CREATED",
+              "mesh": "Eye_L_GEO",
+              "reason": "Bound mesh to armature with live vertex groups.",
+              "simulated": false,
+              "stage": "INITIAL_SKIN_BIND",
+              "status": "EXECUTED",
+              "vertexGroups": [
+                "c_eye.l",
+                "Mask",
+                "DEF.PELVIS",
+                "DEF.SPINE_01",
+                "DEF.SPINE_02",
+                "DEF.CHEST",
+                "DEF.UPPER_CHEST",
+                "DEF.NECK",
+                "DEF.HEAD",
+                "DEF.JAW",
+                "DEF.EYE.L",
+                "DEF.EYE.R",
+                "DEF.THIGH.L",
+                "DEF.THIGH.R",
+                "DEF.SHIN.L",
+                "DEF.SHIN.R",
+                "DEF.ANKLE.L",
+                "DEF.ANKLE.R",
+                "DEF.FOOT.L",
+                "DEF.FOOT.R"
+              ]
+            },
+            {
+              "disposition": "CREATED",
+              "maxInfluences": 4,
+              "normalized": true,
+              "reason": "Normalized live vertex weights to four influences.",
+              "simulated": false,
+              "stage": "WEIGHT_REFINEMENT",
+              "status": "EXECUTED",
+              "verticesRefined": 387
+            },
+            {
+              "controls": [
+                "eye_aim_master",
+                "eye_left",
+                "eye_right",
+                "blink",
+                "eyelid_upper",
+                "eyelid_lower",
+                "jaw",
+                "mouth_open",
+                "mouth_width",
+                "smile",
+                "frown",
+                "corners"
+              ],
+              "created": [
+                "FACE.happy",
+                "FACE.excited",
+                "FACE.curious",
+                "FACE.surprised",
+                "FACE.worried",
+                "FACE.confused",
+                "FACE.sad",
+                "FACE.determined",
+                "FACE.mischievous",
+                "FACE.laughing"
+              ],
+              "disposition": "CREATED",
+              "reason": "Created live facial shape keys.",
+              "shapeKeys": [
+                "Basis",
+                "Iris Size",
+                "Pupil Size",
+                "Cornea Bulge",
+                "Cat",
+                "Goat",
+                "Reptile",
+                "Heart",
+                "FACE.happy",
+                "FACE.excited",
+                "FACE.curious",
+                "FACE.surprised",
+                "FACE.worried",
+                "FACE.confused",
+                "FACE.sad",
+                "FACE.determined",
+                "FACE.mischievous",
+                "FACE.laughing"
+              ],
+              "simulated": false,
+              "stage": "FACIAL_SYSTEM_BUILD",
+              "status": "EXECUTED"
+            },
+            {
+              "created": [
+                "VISEME.REST",
+                "VISEME.AI",
+                "VISEME.E",
+                "VISEME.O",
+                "VISEME.U",
+                "VISEME.MBP",
+                "VISEME.FV",
+                "VISEME.L",
+                "VISEME.TH",
+                "VISEME.WQ",
+                "VISEME.CHSH",
+                "VISEME.KG",
+                "VISEME.R"
+              ],
+              "disposition": "CREATED",
+              "reason": "Created live viseme shape keys.",
+              "simulated": false,
+              "stage": "VISEME_SYSTEM_BUILD",
+              "status": "EXECUTED",
+              "visemes": [
+                "VISEME.REST",
+                "VISEME.AI",
+                "VISEME.E",
+                "VISEME.O",
+                "VISEME.U",
+                "VISEME.MBP",
+                "VISEME.FV",
+                "VISEME.L",
+                "VISEME.TH",
+                "VISEME.WQ",
+                "VISEME.CHSH",
+                "VISEME.KG",
+                "VISEME.R"
+              ]
+            },
+            {
+              "disposition": "CREATED",
+              "preferDeterministicControls": true,
+              "reason": "Created live secondary control empties.",
+              "secondary": [
+                "CTRL.EAR.L",
+                "CTRL.EAR.R",
+                "CTRL.COLLAR"
+              ],
+              "simulated": false,
+              "stage": "SECONDARY_CONTROLS",
+              "status": "EXECUTED"
+            },
+            {
+              "correctives": [
+                "CORR.shoulder_pinch",
+                "CORR.elbow_pinch",
+                "CORR.wrist_collapse",
+                "CORR.hip_collapse"
+              ],
+              "disposition": "CREATED",
+              "reason": "Created live corrective shape keys.",
+              "simulated": false,
+              "stage": "CORRECTIVE_DEFORMATION_BUILD",
+              "status": "EXECUTED"
+            },
+            {
+              "accessory": "GoatCollar",
+              "disposition": "CREATED",
+              "parent": "Eye_L_GEO",
+              "reason": "Bound live accessory to the character mesh.",
+              "simulated": false,
+              "stage": "ACCESSORY_BINDING",
+              "status": "EXECUTED"
+            },
+            {
+              "deformed": true,
+              "disposition": "CREATED",
+              "posedVerts": [
+                [
+                  0.011345863342285156,
+                  -0.44752267003059387,
+                  0.02198207378387451
+                ],
+                [
+                  0.017619088292121887,
+                  -0.4405852258205414,
+                  0.03753840923309326
+                ],
+                [
+                  0.026945874094963074,
+                  -0.42068883776664734,
+                  0.0612027645111084
+                ],
+                [
+                  0.03393067419528961,
+                  -0.39215728640556335,
+                  0.07968699932098389
+                ],
+                [
+                  0.03600049018859863,
+                  -0.3740210235118866,
+                  0.08570563793182373
+                ],
+                [
+                  0.03600050508975983,
+                  -0.335681676864624,
+                  0.08784902095794678
+                ],
+                [
+                  0.030519738793373108,
+                  -0.29952219128608704,
+                  0.07661819458007812
+                ],
+                [
+                  0.02039264142513275,
+                  -0.2710474729537964,
+                  0.05372297763824463
+                ]
+              ],
+              "poses": [
+                "neutral",
+                "arms_up",
+                "arms_forward",
+                "arms_crossed",
+                "elbows_max_flex",
+                "wrist_extremes"
+              ],
+              "reason": "Live pose changed evaluated mesh vertices.",
+              "restVerts": [
+                [
+                  0.011345863342285156,
+                  -0.09752266854047775,
+                  0.02198207378387451
+                ],
+                [
+                  0.017619088292121887,
+                  -0.09058522433042526,
+                  0.03753840923309326
+                ],
+                [
+                  0.026945874094963074,
+                  -0.07068882137537003,
+                  0.0612027645111084
+                ],
+                [
+                  0.03393067419528961,
+                  -0.04215731471776962,
+                  0.07968699932098389
+                ],
+                [
+                  0.03600049018859863,
+                  -0.024021022021770477,
+                  0.08570563793182373
+                ],
+                [
+                  0.03600050508975983,
+                  0.014318324625492096,
+                  0.08784902095794678
+                ],
+                [
+                  0.030519738793373108,
+                  0.05047782510519028,
+                  0.07661819458007812
+                ],
+                [
+                  0.02039264142513275,
+                  0.07895252853631973,
+                  0.05372297763824463
+                ]
+              ],
+              "simulated": false,
+              "stage": "DEFORMATION_TESTS",
+              "status": "EXECUTED"
+            },
+            {
+              "action": "CHAR_GOAT_001_Validation",
+              "clips": [
+                "neutral_idle",
+                "blink_look_around",
+                "head_turns",
+                "smile_frown_emotion_transitions",
+                "phoneme_viseme_sweep",
+                "talking_performance",
+                "walk_cycle",
+                "run_cycle"
+              ],
+              "disposition": "CREATED",
+              "fcurves": 3,
+              "reason": "Wrote live validation keyframes.",
+              "simulated": false,
+              "stage": "ANIMATION_TESTS",
+              "status": "EXECUTED"
+            },
+            {
+              "disposition": "CREATED",
+              "evaluatedObjects": 26,
+              "faces": 7743,
+              "reason": "Profiled live evaluated scene.",
+              "simulated": false,
+              "stage": "PERFORMANCE_PROFILE",
+              "status": "EXECUTED",
+              "vertices": 8106
+            },
+            {
+              "bytes": 358404,
+              "disposition": "CREATED",
+              "engine": "BLENDER_WORKBENCH",
+              "reason": "Rendered a live workbench still.",
+              "renders": [
+                {
+                  "bytes": 124808,
+                  "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa.png",
+                  "wrote": true
+                },
+                {
+                  "bytes": 120138,
+                  "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa_three_quarter.png",
+                  "wrote": true
+                },
+                {
+                  "bytes": 113458,
+                  "path": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/render_qa_side.png",
+                  "wrote": true
+                }
+              ],
+              "resolution": [
+                512,
+                512
+              ],
+              "simulated": false,
+              "stage": "RENDER_QA",
+              "status": "EXECUTED",
+              "wrote": true
+            },
+            {
+              "bytes": 5801980,
+              "disposition": "CREATED",
+              "export": "/tmp/tivvlejoy-character/goat-v6-78f1b162-20260825/artifacts/export_qa.fbx",
+              "productionMasterAllowed": false,
+              "reason": "Exported live QA FBX outside SOURCE/PRODUCTION.",
+              "simulated": false,
+              "stage": "EXPORT_QA",
+              "status": "EXECUTED",
+              "wrote": true
+            },
+            {
+              "disposition": "UPDATED",
+              "goatProductionReady": false,
+              "reason": "Live department evaluated. Visual approval is still required.",
+              "simulated": false,
+              "stage": "CHARACTER_MASTER_GATE",
+              "status": "EXECUTED"
+            }
+          ],
+          "status": "LIVE_DEPARTMENT_EXECUTED",
+          "workingSha256": "3a51619f60a6ea70c0f63edee72d60d0a9a1e59ebe54ac66084c01d67c2e18f9"
+        },
+        "stderrTail": ""
+      }
+    },
+    "goatProductionReady": false,
+    "humanVisualApprovalRequired": true,
+    "persistedAt": "2026-08-25T02:25:12.917Z"
+  },
+  "outputContract": {
+    "ok": false,
+    "failedConditions": [
+      "LIVE_DEPARTMENT_PROOF"
+    ],
+    "missingFiles": []
+  },
+  "qaFilesDownloaded": [
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/accessory_binding.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/animation_tests.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/blender_version_check.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/character_master_gate.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/character_semantic_mapping.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/control_rig_build.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/corrective_deformation_build.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/deformation_tests.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/export_qa.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/facial_system_build.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/goat_character_master_gate.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/goat_live_department.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/initial_skin_bind.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/material_inventory.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/object_inventory.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/performance_profile.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/render_qa_side.png",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/render_qa_three_quarter.png",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/render_qa.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/render_qa.png",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/rig_guide_generation.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/scale_orientation_normalization.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/secondary_controls.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/skeleton_build.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/source_hash_lock.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/source_intake.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/texture_inventory.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/topology_audit.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/uv_validation.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/viseme_system_build.evidence.json",
+    "artifacts/tivvlejoy-goat-paid-execution-v6/qa/weight_refinement.evidence.json"
+  ],
+  "lockedSourceOverwritten": false,
+  "productionMutationCount": 0,
+  "goatProductionReady": false,
+  "characterMasterGate": "BLOCKED_PENDING_HUMAN_VISUAL_APPROVAL",
+  "humanVisualApprovalRequired": true
+}
