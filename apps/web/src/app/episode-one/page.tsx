@@ -84,6 +84,7 @@ export default function EpisodeOnePage() {
               ['#dialogue', 'Dialogue'],
               ['#worksheet', 'Review worksheet'],
               ['#rig-handoff', 'Rig handoff'],
+              ['/episode-one/scenery', 'Scenery pull sheet'],
               ['#readiness', 'Readiness'],
             ].map(([href, label]) => (
               <a
@@ -348,6 +349,12 @@ export default function EpisodeOnePage() {
         </dl>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Link
+            href="/episode-one/scenery"
+            className="inline-flex min-h-touch items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-bold"
+          >
+            Open scenery pull sheet
+          </Link>
           <Link href="/rig-arrival" className="btn-primary px-4 text-sm">
             Open rig arrival
           </Link>
