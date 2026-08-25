@@ -32,14 +32,54 @@ test('dry-run department argv includes --dry-run and not --execute', () => {
 });
 
 test('live department argv includes --execute and not --dry-run', () => {
+  let invocation = null;
   const department = runDepartment({
     root: repoRoot,
+    env: {},
     executionModeResolved: resolveExecutionMode({ executionMode: EXECUTION_MODE_LIVE }, {}),
+    spawnSync: (bin, args) => {
+      invocation = { bin, args };
+      return { status: 1, stdout: '', stderr: 'synthetic live refusal' };
+    },
   });
   assert.equal(department.executeFlagPresent, true);
   assert.equal(department.dryRunFlagPresent, false);
+  assert.equal(department.executionRuntime, 'BLENDER_BPY');
+  assert.equal(invocation.bin, 'blender');
+  assert.deepEqual(invocation.args.slice(0, 6), [
+    '--background',
+    '--python-exit-code',
+    '1',
+    '--python',
+    builder,
+    '--',
+  ]);
   assert.ok(department.sanitizedArgv.includes('--execute'));
   assert.equal(department.sanitizedArgv.includes('--dry-run'), false);
+  assert.equal(department.sanitizedArgv.includes('python3'), false);
+});
+
+test('live department never falls back to host Python when Blender is missing', () => {
+  let invocation = null;
+  const missing = new Error('spawn blender ENOENT');
+  missing.code = 'ENOENT';
+  const department = runDepartment({
+    root: repoRoot,
+    env: { BLENDER_BIN: '' },
+    pythonBin: '/forbidden/python3',
+    executionModeResolved: resolveExecutionMode({ executionMode: EXECUTION_MODE_LIVE }, {}),
+    spawnSync: (bin, args) => {
+      invocation = { bin, args };
+      return { status: null, stdout: '', stderr: '', error: missing };
+    },
+  });
+  assert.equal(invocation.bin, 'blender');
+  assert.equal(invocation.args.includes('--execute'), true);
+  assert.equal(department.ok, false);
+  assert.equal(department.code, 'BLENDER_NOT_FOUND');
+  assert.equal(department.exitCode, 127);
+  assert.equal(department.executionRuntime, 'BLENDER_BPY');
+  assert.equal(department.spawnErrorCode, 'ENOENT');
 });
 
 test('build_character.py refuses missing and conflicting mode flags', () => {

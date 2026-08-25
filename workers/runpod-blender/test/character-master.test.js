@@ -177,10 +177,11 @@ test('26 department stages and Goat materializer are discoverable', async () => 
   assert.equal(capability.schema, 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2');
   assert.equal(capability.characterDepartmentBaked, true);
   assert.equal(capability.liveCharacterDepartmentCapable, true);
+  assert.equal(capability.liveDepartmentUsesBlenderRuntime, true);
   assert.equal(capability.realSourceDownloadCodeBaked, true);
   assert.equal(capability.authorizedRealSourceDownloadCapable, true);
   assert.equal(capability.durableArtifactPersistenceCapable, true);
-  assert.equal(capability.requiredLiveAuthorizationName, 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5');
+  assert.equal(capability.requiredLiveAuthorizationName, 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6');
   assert.equal(capability.defaultExecutionMode, 'dry-run');
   assert.equal(capability.mandatoryDryRun, false);
   assert.equal(capability.requiresPaidAuthorization, true);

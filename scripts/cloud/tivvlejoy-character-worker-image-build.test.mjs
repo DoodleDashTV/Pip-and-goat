@@ -9,15 +9,16 @@ const workflow = readFileSync(path.join(repoRoot, '.github/workflows/tivvlejoy-w
 const preflight = readFileSync(path.join(repoRoot, 'scripts/cloud/gha-character-worker-image-preflight.sh'), 'utf8');
 const dockerfile = readFileSync(path.join(repoRoot, 'workers/runpod-blender/Dockerfile'), 'utf8');
 const master = readFileSync(path.join(repoRoot, 'workers/runpod-blender/src/character-master.js'), 'utf8');
+const worker = readFileSync(path.join(repoRoot, 'workers/runpod-blender/src/worker.js'), 'utf8');
 const authorizedProof = readFileSync(
   path.join(repoRoot, 'scripts/cloud/prove-authorized-download-entrypoint.sh'),
   'utf8',
 );
 
 describe('character worker image workflow', () => {
-  it('is scoped to the V4 live-output-repair branch, path-filtered, and never talks to RunPod', () => {
-    assert.match(workflow, /cursor\/tivvlejoy-goat-v4-live-output-repair-73f1/);
-    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-goat-v4-live-output-repair-73f1"/);
+  it('is scoped to the V5 Blender-runtime-repair branch, path-filtered, and never talks to RunPod', () => {
+    assert.match(workflow, /cursor\/tivvlejoy-goat-v5-blender-runtime-repair-73f1/);
+    assert.match(preflight, /EXPECTED_BRANCH="cursor\/tivvlejoy-goat-v5-blender-runtime-repair-73f1"/);
     assert.match(workflow, /workers\/runpod-blender\/\*\*/);
     assert.equal(workflow.includes('config/cloud/character-worker-image.json'), false);
     assert.equal(workflow.includes('workflow_dispatch'), false);
@@ -34,8 +35,13 @@ describe('character worker image workflow', () => {
     assert.match(dockerfile, /ddp.character.master="true"/);
     assert.match(master, /CHARACTER_MASTER_BUILD/);
     assert.match(master, /FINAL_1080P_CANNOT_IMPERSONATE_CHARACTER/);
-    assert.match(dockerfile, /TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5/);
-    assert.match(dockerfile, /TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5/);
+    assert.match(dockerfile, /BLENDER_BIN=\/usr\/local\/bin\/blender/);
+    assert.match(master, /const useBlender = mode.mode === EXECUTION_MODE_LIVE/);
+    assert.match(master, /env\.BLENDER_BIN \|\| 'blender'/);
+    assert.match(worker, /blenderBin: env\.BLENDER_BIN \|\| 'blender'/);
+    assert.match(dockerfile, /TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V6/);
+    assert.match(dockerfile, /TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6/);
+    assert.match(dockerfile, /ddp.character.live.blender.runtime="true"/);
     assert.match(dockerfile, /ddp.character.output.persistence="true"/);
     assert.match(dockerfile, /ARG DDP_RENDER_ASSET_SHA256=unknown/);
     assert.match(dockerfile, /ddp.render.asset.sha256="\$\{DDP_RENDER_ASSET_SHA256\}"/);

@@ -179,16 +179,21 @@ async function main() {
   if (!live.department || live.department.dryRunFlagPresent || !live.department.executeFlagPresent) {
     die(`live argv invalid: ${JSON.stringify(live.department && live.department.sanitizedArgv)}`);
   }
+  if (live.department.executionRuntime !== 'BLENDER_BPY') {
+    die(`live entrypoint did not invoke Blender bpy runtime: ${JSON.stringify(live.department)}`);
+  }
   if (live.goatProductionReady !== false) die('goatProductionReady must remain false');
   const capability = compileCharacterCapability({ root });
   if (capability.authorizedRealSourceDownloadCapable !== true) die('authorized download not capable');
   if (capability.liveCharacterDepartmentCapable !== true) die('live department not capable');
+  if (capability.liveDepartmentUsesBlenderRuntime !== true) die('live department is not Blender-runtime bound');
   const receipt = {
     schema: 'TIVVLEJOY_AUTHORIZED_DOWNLOAD_ENTRYPOINT_PROOF_V1',
     authorizedDownloadInvoked: live.authorizedDownloadInvoked,
     transportGets: gets,
     executeFlagPresent: live.department.executeFlagPresent,
     dryRunFlagPresent: live.department.dryRunFlagPresent,
+    executionRuntime: live.department.executionRuntime,
     observedSize: live.materialize && live.materialize.observedSize,
     observedSha256: live.materialize && live.materialize.observedSha256,
     goatProductionReady: false,

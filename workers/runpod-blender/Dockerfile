@@ -10,6 +10,7 @@ FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     BLENDER_VERSION=4.2.2 \
+    BLENDER_BIN=/usr/local/bin/blender \
     PYTHONUNBUFFERED=1 \
     IDLE_SHUTDOWN_MINUTES=5 \
     MAX_JOB_RUNTIME_MINUTES=180 \
@@ -110,10 +111,11 @@ LABEL org.opencontainers.image.title="ddp-runpod-blender" \
       ddp.character.capability.schema="TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2" \
       ddp.character.live.capable="true" \
       ddp.character.mandatory.dry.run="false" \
-      ddp.character.entrypoint="TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5" \
+      ddp.character.entrypoint="TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V6" \
       ddp.character.authorized.download.capable="true" \
       ddp.character.requires.paid.authorization="true" \
-      ddp.character.live.authorization="TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5" \
+      ddp.character.live.authorization="TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6" \
+      ddp.character.live.blender.runtime="true" \
       ddp.character.source.writes.forbidden="true" \
       ddp.character.output.persistence="true" \
       ddp.character.synthetic.live.verified="true"
