@@ -85,6 +85,7 @@ export default function EpisodeOnePage() {
               ['#worksheet', 'Review worksheet'],
               ['#rig-handoff', 'Rig handoff'],
               ['/episode-one/scenery', 'Scenery pull sheet'],
+              ['/episode-one/audio', 'Audio cue sheet'],
               ['#readiness', 'Readiness'],
             ].map(([href, label]) => (
               <a
@@ -349,6 +350,12 @@ export default function EpisodeOnePage() {
         </dl>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Link
+            href="/episode-one/audio"
+            className="inline-flex min-h-touch items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-bold"
+          >
+            Open audio cue sheet
+          </Link>
           <Link
             href="/episode-one/scenery"
             className="inline-flex min-h-touch items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-bold"
