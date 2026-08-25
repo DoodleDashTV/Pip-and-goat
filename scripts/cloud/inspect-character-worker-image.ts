@@ -40,6 +40,7 @@ async function main(): Promise<number> {
     mandatoryDryRun: labels['ddp.character.mandatory.dry.run'] || null,
     entrypoint: labels['ddp.character.entrypoint'] || null,
     liveAuthorization: labels['ddp.character.live.authorization'] || null,
+    liveBlenderRuntime: labels['ddp.character.live.blender.runtime'] || null,
     outputPersistence: labels['ddp.character.output.persistence'] || null,
   };
   console.log(JSON.stringify(report, null, 2));
@@ -52,9 +53,10 @@ async function main(): Promise<number> {
   if (labels['ddp.character.capability.schema'] !== 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2') return 8;
   if (labels['ddp.character.live.capable'] !== 'true') return 9;
   if (labels['ddp.character.mandatory.dry.run'] !== 'false') return 10;
-  if (labels['ddp.character.entrypoint'] !== 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5') return 11;
-  if (labels['ddp.character.live.authorization'] !== 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5') return 12;
+  if (labels['ddp.character.entrypoint'] !== 'TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V6') return 11;
+  if (labels['ddp.character.live.authorization'] !== 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6') return 12;
   if (labels['ddp.character.output.persistence'] !== 'true') return 13;
+  if (labels['ddp.character.live.blender.runtime'] !== 'true') return 14;
   if (pin.sourceCommit && report.sourceCommit && report.sourceCommit !== pin.sourceCommit) return 7;
   return 0;
 }

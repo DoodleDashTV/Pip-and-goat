@@ -1,9 +1,9 @@
 {
   "schema": "TIVVLEJOY_GOAT_CHARACTER_WORKER_IMAGE_PIN_V1",
   "repository": "ddp-runpod-blender",
-  "digest": "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0",
-  "ref": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0",
-  "sourceCommit": "ec84229db8e4c14ecfcb9e3660f49830547cc833",
+  "digest": "sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6",
+  "ref": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6",
+  "sourceCommit": "db8658c835ccb0e5a3adc3201d7ba90e9aaeaa46",
   "architecture": "linux/amd64",
   "blenderVersion": "4.2.2",
   "characterMasterCapable": true,
@@ -22,24 +22,27 @@
     "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
     "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
     "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
-    "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3"
+    "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3",
+    "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0"
   ],
   "supersededForRealExecution": [
     "sha256:1e29b0bac9a1af63137ca1c12d60c1819267d9990c029b1cc6867bc0639fe5f9",
     "sha256:59867e8569fdbd08929112939468fe540a22c5a572bd182bfd1d5d3bc455fbdd",
-    "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3"
+    "sha256:582384a9963015525f93ecc28a15ee7546a9c6378a5672db728a7ee1cd9e00e3",
+    "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0"
   ],
-  "supersededReason": "1e29b0ba could not invoke the real download; 59867e85 lacked V4 receipt binding and durable output persistence; 582384a9 omitted the mandatory ddp.render.asset.sha256 OCI label.",
-  "renderCodeSha256": "602d843f0efb358b51257d9075f91a7638d32eb815e03a23ace85051cf4b78cc",
+  "supersededReason": "1e29b0ba could not invoke the real download; 59867e85 lacked V4 receipt binding and durable output persistence; 582384a9 omitted the mandatory ddp.render.asset.sha256 OCI label; 0fb854aa invoked the live department with host Python instead of Blender bpy.",
+  "renderCodeSha256": "860c12ac626f3c0c6a310e35f48e9354c7bddb9f89edb8ccd11613b19ea920d1",
   "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
-  "buildTimestamp": "2026-08-24T23:07:21Z",
-  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V5",
+  "buildTimestamp": "2026-08-25T01:14:06Z",
+  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V6",
   "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
   "liveCharacterDepartmentCapable": true,
+  "liveDepartmentUsesBlenderRuntime": true,
   "realSourceDownloadCodeBaked": true,
   "authorizedRealSourceDownloadCapable": true,
   "durableArtifactPersistenceCapable": true,
-  "requiredLiveAuthorizationName": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5",
+  "requiredLiveAuthorizationName": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6",
   "defaultExecutionMode": "dry-run",
   "mandatoryDryRun": false,
   "requiresPaidAuthorization": true,
@@ -55,6 +58,6 @@
   "goatProductionReady": false,
   "runpodLaunchCount": 0,
   "runpodCostUsd": 0,
-  "provenWorkflowRunId": "32787711415",
-  "provenImageDigest": "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0"
+  "provenWorkflowRunId": "32796665610",
+  "provenImageDigest": "sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6"
 }

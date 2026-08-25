@@ -10,7 +10,7 @@ mkdir -p "$EVIDENCE"
 docker run --rm \
   --entrypoint node \
   -e CHARACTER_WORKER_ROOT=/opt/ddp-worker \
-  -e BLENDER_BIN=blender \
+  -e BLENDER_BIN= \
   -e PYTHON_BIN=python3 \
   -e TIVVLEJOY_FORBID_REAL_GOAT_DOWNLOAD=true \
   -e ALLOW_PAID_GPU_LAUNCH=false \

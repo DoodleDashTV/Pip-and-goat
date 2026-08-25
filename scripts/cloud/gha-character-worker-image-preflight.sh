@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-EXPECTED_BRANCH="cursor/tivvlejoy-goat-v4-live-output-repair-73f1"
+EXPECTED_BRANCH="cursor/tivvlejoy-goat-v5-blender-runtime-repair-73f1"
 
 die() { echo "PREFLIGHT_ABORT: $*" >&2; exit 1; }
 
@@ -23,6 +23,12 @@ fi
 
 grep -q 'BLENDER_VERSION=4.2.2' workers/runpod-blender/Dockerfile \
   || die "Dockerfile must pin Blender 4.2.2"
+grep -q 'BLENDER_BIN=/usr/local/bin/blender' workers/runpod-blender/Dockerfile \
+  || die "Dockerfile must expose the Blender runtime path"
+grep -q "const useBlender = mode.mode === EXECUTION_MODE_LIVE" workers/runpod-blender/src/character-master.js \
+  || die "live character department must always use Blender"
+grep -q "env.BLENDER_BIN || 'blender'" workers/runpod-blender/src/character-master.js \
+  || die "live character department must default to the Blender executable"
 test -f workers/runpod-blender/src/character-master.js || die "character-master.js missing"
 test -f workers/runpod-blender/src/character-source-materialize.js || die "character-source-materialize.js missing"
 test -f scripts/blender/characters/build_character.py || die "build_character.py missing"

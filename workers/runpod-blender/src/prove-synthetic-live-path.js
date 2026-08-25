@@ -108,9 +108,10 @@ function runGateMatrix() {
   assertForbidden('consumed', { ...base, authorizationReceipt: completeReceipt({ consumed: true }) }, env);
   assertForbidden('v2 invalid', { ...base, authorizationReceipt: completeReceipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V2' }) }, env);
   assertForbidden('v4 invalid', { ...base, authorizationReceipt: completeReceipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V4' }) }, env);
+  assertForbidden('v5 invalid', { ...base, authorizationReceipt: completeReceipt({ authorizationName: 'TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V5' }) }, env);
   const opened = evaluateRealDownloadAuthorization(base, env);
   if (!opened.ok) die(`complete gate unexpectedly failed: ${JSON.stringify(opened.failedConditions)}`);
-  return { negatives: 14, completeGateOpens: true };
+  return { negatives: 15, completeGateOpens: true };
 }
 
 async function main() {
@@ -152,7 +153,6 @@ async function main() {
       CHARACTER_JOB_KIND: CHARACTER_MASTER_BUILD,
       CHARACTER_EXECUTION_MODE: 'live',
       CHARACTER_WORKER_ROOT: root,
-      BLENDER_BIN: blender,
     },
     root,
     syntheticPath: fixture.zip,
@@ -160,7 +160,6 @@ async function main() {
     expectedSha256: fixture.zipSha256,
     workspaceDir: workspace,
     artifactDir: artifacts,
-    blenderBin: blender,
     runBlenderProbe: true,
     createWorkingCopy: true,
     timeoutMs: 180_000,
@@ -172,6 +171,12 @@ async function main() {
   }
   if (!live.department.executeFlagPresent || live.department.dryRunFlagPresent) {
     die(`live argv must include --execute and exclude --dry-run: ${JSON.stringify(live.department.sanitizedArgv)}`);
+  }
+  if (live.department.executionRuntime !== 'BLENDER_BPY') {
+    die(`live department did not use Blender bpy runtime: ${JSON.stringify(live.department)}`);
+  }
+  if (live.department.sanitizedArgv[0] !== 'blender') {
+    die(`live department did not exercise the default Blender executable: ${JSON.stringify(live.department.sanitizedArgv)}`);
   }
   const stages = live.department.parsed && live.department.parsed.stages;
   if (!stages || stages.length !== 26) die(`expected 26 stages, got ${stages && stages.length}`);
@@ -192,14 +197,13 @@ async function main() {
   if (!live.department.parsed.datablocksChanged) die('live execute did not change datablocks');
 
   const failed = await runCharacterMaster({
-    env: { CHARACTER_JOB_KIND: CHARACTER_MASTER_BUILD, CHARACTER_EXECUTION_MODE: 'live', CHARACTER_WORKER_ROOT: root, BLENDER_BIN: blender },
+    env: { CHARACTER_JOB_KIND: CHARACTER_MASTER_BUILD, CHARACTER_EXECUTION_MODE: 'live', CHARACTER_WORKER_ROOT: root },
     root,
     syntheticPath: fixture.zip,
     expectedSize: fixture.zipBytes,
     expectedSha256: fixture.zipSha256,
     workspaceDir: path.join(work, 'fail-workspace'),
     artifactDir: path.join(work, 'fail-artifacts'),
-    blenderBin: blender,
     injectStageFailure: 'UV_VALIDATION',
     timeoutMs: 180_000,
   });
@@ -214,8 +218,12 @@ async function main() {
   if (capability.schema !== 'TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2') die('capability schema is not V2');
   if (capability.mandatoryDryRun !== false) die('mandatoryDryRun must be false');
   if (capability.liveCharacterDepartmentCapable !== true) die('liveCharacterDepartmentCapable must be true');
+  if (capability.liveDepartmentUsesBlenderRuntime !== true) die('liveDepartmentUsesBlenderRuntime must be true');
   if (REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS.includes('sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e') !== true) {
     die('old digest is not rejected for live execution');
+  }
+  if (REJECTED_LIVE_CHARACTER_EXECUTION_DIGESTS.includes('sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0') !== true) {
+    die('V5 Python-runtime digest is not rejected for live execution');
   }
 
   const receipt = {
@@ -229,6 +237,7 @@ async function main() {
     },
     dryRunArgv: dry.department.sanitizedArgv,
     liveArgv: live.department.sanitizedArgv,
+    liveExecutionRuntime: live.department.executionRuntime,
     stages: stages.map((stage) => ({ stage: stage.stage, status: stage.status, simulated: stage.simulated })),
     workingSha256: workingHash,
     sourceSha256Unchanged: sourceHashBefore,

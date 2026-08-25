@@ -327,6 +327,7 @@ async function main() {
         executionId,
         workspaceDir,
         artifactDir,
+        blenderBin: env.BLENDER_BIN || 'blender',
       });
       try {
         persistence = await persistCharacterRun({

@@ -106,6 +106,9 @@ function liveImplementationComplete(baked) {
   const masterInvokesAuthorizedDownload =
     master.includes('downloadAuthorizedGoatSource(') && master.includes('performNetworkDownload: true');
   const liveDispatch = master.includes("'--execute'") && master.includes('resolveExecutionMode');
+  const liveUsesBlenderRuntime =
+    master.includes('const useBlender = mode.mode === EXECUTION_MODE_LIVE') &&
+    master.includes("env.BLENDER_BIN || 'blender'");
   const executeFlag = io.includes('--execute') && io.includes('mutually exclusive');
   const executeImpl =
     execute.includes('def execute_department') &&
@@ -124,6 +127,7 @@ function liveImplementationComplete(baked) {
     wired,
     gateComplete,
     masterInvokesAuthorizedDownload,
+    liveUsesBlenderRuntime,
     streamPresent: Boolean(baked.streamHash),
   };
 }
@@ -141,6 +145,7 @@ function compileCharacterCapability(input = {}) {
     live.executeFlag &&
     live.executeImpl &&
     live.wired &&
+    live.liveUsesBlenderRuntime &&
     !live.alwaysDryRun &&
     Boolean(baked.characterArtifacts);
   const realDownloadCodeBaked = Boolean(baked.characterMaterializer && baked.streamHash && baked.downloadGate);
@@ -163,6 +168,7 @@ function compileCharacterCapability(input = {}) {
     characterDepartmentBaked: departmentBaked,
     characterMasterEntrypointBaked: Boolean(baked.characterMaster),
     liveCharacterDepartmentCapable: liveCapable,
+    liveDepartmentUsesBlenderRuntime: live.liveUsesBlenderRuntime,
     realSourceDownloadCodeBaked: realDownloadCodeBaked,
     authorizedRealSourceDownloadCapable: authorizedDownloadCapable,
     durableArtifactPersistenceCapable: Boolean(baked.characterArtifacts),

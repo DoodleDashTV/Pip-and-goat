@@ -105,11 +105,12 @@ function resolveDepartmentTimeoutMs(input = {}, env = process.env) {
 function runDepartment(input = {}) {
   const root = input.root || process.cwd();
   const script = departmentScriptPath(root);
-  const python = input.pythonBin || process.env.PYTHON_BIN || 'python3';
-  const blender = input.blenderBin || process.env.BLENDER_BIN || '';
+  const env = input.env || process.env;
+  const python = input.pythonBin || env.PYTHON_BIN || 'python3';
+  const blender = input.blenderBin || env.BLENDER_BIN || 'blender';
   const manifest = input.manifestPath || path.join(root, 'config/characters/CHAR_GOAT_001/manifest.json');
   const artifactDir = input.artifactDir || path.join(root, 'artifacts/character-rigging/CHAR_GOAT_001');
-  const mode = input.executionModeResolved || resolveExecutionMode(input, input.env || process.env);
+  const mode = input.executionModeResolved || resolveExecutionMode(input, env);
   if (!mode.ok) {
     return {
       ok: false,
@@ -127,7 +128,9 @@ function runDepartment(input = {}) {
       blenderFlag: null,
     };
   }
-  const useBlender = Boolean(blender) && mode.mode === EXECUTION_MODE_LIVE;
+  // Live department code imports bpy and therefore MUST execute inside Blender's
+  // embedded Python runtime. Never fall back to host python for --execute.
+  const useBlender = mode.mode === EXECUTION_MODE_LIVE;
   const args = useBlender
     ? ['--background', '--python-exit-code', '1', '--python', script, '--']
     : [script];
@@ -154,12 +157,13 @@ function runDepartment(input = {}) {
   }
   const bin = useBlender ? blender : python;
   const sanitizedArgv = sanitizeArgv([bin, ...args]);
-  const result = spawnSync(bin, args, {
+  const spawnCommand = input.spawnSync || spawnSync;
+  const result = spawnCommand(bin, args, {
     encoding: 'utf8',
-    timeout: resolveDepartmentTimeoutMs(input, input.env || process.env),
+    timeout: resolveDepartmentTimeoutMs(input, env),
     env: {
       ...process.env,
-      ...(input.env || {}),
+      ...env,
       CHARACTER_WORKER_ROOT: root,
       CHARACTER_EXECUTION_MODE: mode.mode,
       CHARACTER_WORKING_BLEND: input.workingBlend || '',
@@ -181,8 +185,15 @@ function runDepartment(input = {}) {
     verdict: 'NOT_PRODUCTION_READY',
   };
   return {
-    ok: result.status === 0,
-    exitCode: result.status,
+    ok: result.status === 0 && !result.error,
+    exitCode: Number.isInteger(result.status) ? result.status : 127,
+    code: result.error
+      ? useBlender
+        ? 'BLENDER_NOT_FOUND'
+        : 'PYTHON_NOT_FOUND'
+      : result.status === 0
+        ? 'DEPARTMENT_COMPLETE'
+        : 'DEPARTMENT_FAILED',
     stdout,
     stderr: String(result.stderr || ''),
     parsed,
@@ -195,6 +206,8 @@ function runDepartment(input = {}) {
     sanitizedArgv,
     blenderFlag: mode.blenderFlag,
     executionMode: mode.mode,
+    executionRuntime: useBlender ? 'BLENDER_BPY' : 'PYTHON_DRY_RUN',
+    spawnErrorCode: result.error?.code || null,
     dryRunFlagPresent: sanitizedArgv.includes('--dry-run'),
     executeFlagPresent: sanitizedArgv.includes('--execute'),
   };
