@@ -1,0 +1,60 @@
+{
+  "schema": "TIVVLEJOY_GOAT_V6_BLENDER_RUNTIME_WORKER_PIN_RECEIPT_V1",
+  "status": "VERIFIED_IMAGE_BUILT_AND_PINNED",
+  "image": {
+    "ref": "ghcr.io/<org>/ddp-runpod-blender@sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6",
+    "digest": "sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6",
+    "architecture": "linux/amd64",
+    "blenderVersion": "4.2.2",
+    "blenderBin": "/usr/local/bin/blender",
+    "sourceCommit": "db8658c835ccb0e5a3adc3201d7ba90e9aaeaa46",
+    "renderCodeSha256": "860c12ac626f3c0c6a310e35f48e9354c7bddb9f89edb8ccd11613b19ea920d1",
+    "renderAssetSha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+    "entrypoint": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V6",
+    "capabilitySchema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V2",
+    "requiredLiveAuthorization": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V6",
+    "liveDepartmentUsesBlenderRuntime": true
+  },
+  "oci": {
+    "ddp.source.commit": "db8658c835ccb0e5a3adc3201d7ba90e9aaeaa46",
+    "ddp.render.code.sha256": "860c12ac626f3c0c6a310e35f48e9354c7bddb9f89edb8ccd11613b19ea920d1",
+    "ddp.render.asset.sha256": "7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7",
+    "ddp.character.live.blender.runtime": "true"
+  },
+  "proof": {
+    "workflowRunId": "32796665610",
+    "workflowUrl": "https://github.com/DoodleDashTV/Pip-and-goat/actions/runs/32796665610",
+    "workflowConclusion": "success",
+    "registryVerify": "PASS",
+    "independentRegistryVerify": "PASS",
+    "syntheticLivePathVerifiedWithBlenderBinCleared": true,
+    "authorizedDownloadInvoked": 1,
+    "durableArtifactPersistenceCapable": true,
+    "sourceWritesForbidden": true,
+    "realGoatDownloadCount": 0,
+    "runpodCreateRequestCount": 0,
+    "costUsd": 0
+  },
+  "supersededV5": {
+    "digest": "sha256:0fb854aa5298b25a8308d56f120b703f9406f7b14d4dc04f9574d0caf157f7b0",
+    "reason": "The live department fell back to host python3 when BLENDER_BIN was absent, so bpy was unavailable.",
+    "authorizationConsumed": true,
+    "createRequestCount": 1,
+    "replacementCreateRequestCount": 0,
+    "cleanupConfirmed": true,
+    "finalBillablePodCount": 0,
+    "estimatedCostUsd": 0.1412
+  },
+  "authorization": {
+    "v6Issued": false,
+    "v6Consumed": false,
+    "paidLaunchAuthorizedByThisReceipt": false
+  },
+  "gates": {
+    "goatProductionReady": false,
+    "humanVisualApprovalRequired": true,
+    "productionUntouched": true,
+    "prReady": false,
+    "prMerged": false
+  }
+}
