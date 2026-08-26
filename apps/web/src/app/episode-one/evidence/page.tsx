@@ -56,6 +56,12 @@ export default function EpisodeOneEvidencePage() {
             voice production, human review, and final-render authorization. Metadata can be checked
             here, but only the separate manual gates can resolve a blocker.
           </p>
+          <Link
+            href="/episode-one/rig-delivery"
+            className="btn-primary mt-4 inline-flex min-h-touch items-center px-4 text-sm"
+          >
+            Open exact Pip + Goat rig delivery contract →
+          </Link>
         </div>
 
         <dl className="grid grid-cols-2 gap-px bg-[var(--color-border)] sm:grid-cols-4">
