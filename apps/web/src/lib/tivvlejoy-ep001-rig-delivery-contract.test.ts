@@ -45,7 +45,10 @@ describe('TIVVLEJOY_EP001_RIG_DELIVERY_CONTRACT_V1', () => {
     expect(pip.requiredControlCount).toBe(25);
     expect(pip.requiredTestPoseCount).toBe(13);
     expect(pip.requiredTestPoses).toContain('backpack continuity');
-    expect(pip.requiredControls.map((control) => control.controlId)).toContain('PIP.HALLUX');
+    expect(pip.requiredControls.map((control) => control.controlId)).toContain('PIP.TOES');
+    expect(pip.preferredEpisodeControls.map((control) => control.controlId)).toEqual([
+      'PIP.HALLUX',
+    ]);
 
     expect(goat.requiredControlCount).toBe(18);
     expect(goat.requiredTestPoseCount).toBe(11);
