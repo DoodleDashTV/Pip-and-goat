@@ -223,7 +223,14 @@ export type Ep012DialogueRef = (typeof EP012_DIALOGUE_REFS)[number];
 
 export const RIG_ALLOWED_EXTENSIONS = ['.blend', '.glb', '.fbx'] as const;
 export const RIG_MIN_BYTES = 1024;
-export const RIG_MAX_BYTES = 256 * 1024 * 1024;
+// The verified Goat live working blend is 298,161,606 bytes. Keep a hard
+// intake ceiling while leaving enough room for that known-good production size.
+export const RIG_MAX_BYTES = 384 * 1024 * 1024;
+export const RIG_MAX_BYTES_BY_EXTENSION = {
+  '.blend': RIG_MAX_BYTES,
+  '.glb': 256 * 1024 * 1024,
+  '.fbx': 256 * 1024 * 1024,
+} as const;
 
 export const PRIORITY_QUEUE_ORDER = [
   'direct_mountain_glb',

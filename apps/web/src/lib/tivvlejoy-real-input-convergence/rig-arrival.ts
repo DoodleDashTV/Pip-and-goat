@@ -4,7 +4,7 @@ import {
   RIG_ALLOWED_EXTENSIONS,
   RIG_ARRIVAL_SCHEMA,
   RIG_ARRIVAL_STATES,
-  RIG_MAX_BYTES,
+  RIG_MAX_BYTES_BY_EXTENSION,
   RIG_MIN_BYTES,
   type RigArrivalState,
   type RigIntakeRecord,
@@ -47,7 +47,8 @@ export function admitRigMetadata(input: RigIntakeRequest): RigIntakeRecord {
     return fail(input.characterId, input.evidenceClass, 'RIG_EXTENSION_REJECTED');
   }
   if (input.byteSize < RIG_MIN_BYTES) return fail(input.characterId, input.evidenceClass, 'RIG_TOO_SMALL');
-  if (input.byteSize > RIG_MAX_BYTES) return fail(input.characterId, input.evidenceClass, 'RIG_TOO_LARGE');
+  const maxBytes = RIG_MAX_BYTES_BY_EXTENSION[extension as keyof typeof RIG_MAX_BYTES_BY_EXTENSION];
+  if (input.byteSize > maxBytes) return fail(input.characterId, input.evidenceClass, 'RIG_TOO_LARGE');
   const observed = input.bytes ? sha256Bytes(input.bytes) : input.sha256 ?? null;
   if (!isValidSha256(observed)) return fail(input.characterId, input.evidenceClass, 'RIG_HASH_REQUIRED');
   if (input.existingSha256s?.includes(observed)) {
