@@ -8,6 +8,7 @@ import {
   verifySourceHash,
   compileFirstEpisodePreflight,
   bindEp012VoiceReceipts,
+  RIG_MAX_BYTES,
 } from './tivvlejoy-real-input-convergence';
 
 describe('real evidence security', () => {
@@ -28,7 +29,7 @@ describe('real evidence security', () => {
     expect(
       admitRigMetadata({
         characterId: 'PIP',
-        byteSize: 300 * 1024 * 1024,
+        byteSize: RIG_MAX_BYTES + 1,
         extension: '.blend',
         sha256: 'ab'.repeat(32),
         evidenceClass: 'REAL_RIG_INTAKE',
