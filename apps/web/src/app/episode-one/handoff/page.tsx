@@ -55,6 +55,12 @@ export default function EpisodeOneHandoffPage() {
             to a future controlled preflight. No step can auto-advance or turn planning evidence
             into launch authority.
           </p>
+          <Link
+            href="/episode-one/evidence"
+            className="mt-4 inline-flex min-h-touch items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-bold"
+          >
+            Open evidence admission
+          </Link>
         </div>
 
         <dl className="grid grid-cols-2 gap-px bg-[var(--color-border)] sm:grid-cols-4">

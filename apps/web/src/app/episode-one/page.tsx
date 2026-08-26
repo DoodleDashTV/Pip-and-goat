@@ -89,6 +89,7 @@ export default function EpisodeOnePage() {
               ['/episode-one/animation', 'Animation blocking'],
               ['/episode-one/animatic', 'Structural animatic'],
               ['/episode-one/handoff', 'Production handoff'],
+              ['/episode-one/evidence', 'Evidence admission'],
               ['#readiness', 'Readiness'],
             ].map(([href, label]) => (
               <a
