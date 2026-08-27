@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          pnpm exec tsc --noEmit --pretty false --allowImportingTsExtensions false --skipLibCheck scripts/cloud/scenery-showcase-30s/contract.ts scripts/cloud/scenery-showcase-30s/preflight.ts scripts/cloud/scenery-showcase-30s/launch.ts || true
+          pnpm --filter @doodle-dash/web exec tsc --noEmit --pretty false --allowImportingTsExtensions false --skipLibCheck ../../scripts/cloud/scenery-showcase-30s/contract.ts ../../scripts/cloud/scenery-showcase-30s/preflight.ts ../../scripts/cloud/scenery-showcase-30s/launch.ts || true
           node --check workers/runpod-blender/src/scenery-showcase.js
           python3 -m py_compile scripts/blender/scenery/showcase_30s.py
 
@@ -72,7 +72,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          pnpm exec tsx scripts/cloud/scenery-showcase-30s/preflight.ts > /tmp/scenery-preflight.stdout 2> /tmp/scenery-preflight.stderr
+          pnpm --filter @doodle-dash/web exec tsx ../../scripts/cloud/scenery-showcase-30s/preflight.ts > /tmp/scenery-preflight.stdout 2> /tmp/scenery-preflight.stderr
           code=$?
           echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
           echo "preflight exit=${code}"
@@ -91,16 +91,21 @@ jobs:
             python3 - <<'PY'
           import json, re
           stderr = ''
+          stdout = ''
           try:
               stderr = open('/tmp/scenery-preflight.stderr', encoding='utf-8', errors='replace').read()
           except OSError:
               pass
+          try:
+              stdout = open('/tmp/scenery-preflight.stdout', encoding='utf-8', errors='replace').read()
+          except OSError:
+              pass
           candidates = []
-          for raw in stderr.splitlines():
+          for raw in (stderr + '\n' + stdout).splitlines():
               line = raw.strip()
               if not line:
                   continue
-              if any(marker in line for marker in ('Error', 'ERR_', 'Cannot find', 'Cannot resolve', 'MODULE_NOT_FOUND', 'SyntaxError', 'TypeError')):
+              if any(marker in line for marker in ('Error', 'ERR_', 'Cannot find', 'Cannot resolve', 'MODULE_NOT_FOUND', 'SyntaxError', 'TypeError', 'Command')):
                   line = re.sub(r'(?i)(secret|token|password|api[_-]?key)\s*[=:]\s*\S+', r'\1=<redacted>', line)
                   candidates.append(line[:400])
           diagnostic = ' | '.join(candidates[-6:])[:1200] or 'NO_SANITIZED_DIAGNOSTIC_AVAILABLE'
