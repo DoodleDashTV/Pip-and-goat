@@ -36,7 +36,18 @@ export async function POST(request: Request) {
   try {
     const body = await request.json() as Record<string, unknown>;
     const action = String(body.action ?? '') as Parameters<typeof handleEp001RigDeliveryIntake>[0]['action'];
-    const result = await handleEp001RigDeliveryIntake({ action, body, token, env: process.env });
+    const requestOrigin = request.headers.get('origin') ?? '';
+    const requestHost = request.headers.get('host') ?? '';
+    const trustedPreviewOrigin =
+      requestOrigin === `https://${requestHost}` && requestHost.endsWith('.vercel.app')
+        ? requestOrigin
+        : '';
+    const result = await handleEp001RigDeliveryIntake({
+      action,
+      body,
+      token,
+      env: { ...process.env, TIVVLEJOY_SCENERY_CORS_ORIGIN: trustedPreviewOrigin },
+    });
     return NextResponse.json(result.body, {
       status: result.status,
       headers: { 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex, nofollow' },
