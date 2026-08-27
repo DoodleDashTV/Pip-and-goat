@@ -1,0 +1,81 @@
+name: TivvleJoy Scenery Showcase Bridge Preflight V2
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-showcase-bridge-preflight-v2.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tivvlejoy-scenery-showcase-bridge-preflight-v2
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRIDGE_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s-v2
+      SCENERY_AUTHORIZATION: TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V2
+      EXPECTED_IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - name: Verify V2 bridge without paid mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RUNPOD_API_KEY"
+          code=$(curl --retry 8 --retry-all-errors --retry-delay 3 --max-time 90 -sS -o preflight-v2.json -w '%{http_code}' \
+            --request POST "$BRIDGE_URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $SCENERY_AUTHORIZATION" \
+            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+            --data '{"action":"preflight"}')
+          test "$code" = '200'
+          python3 - <<'PY'
+          import json, os
+          p=json.load(open('preflight-v2.json'))
+          assert p.get('schema') == 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V4'
+          assert p.get('paidMutationPerformed') is False
+          assert p.get('ready') is True
+          assert p.get('workerImage') == os.environ['EXPECTED_IMAGE']
+          assert p.get('workerImagePinned') is True
+          assert p.get('workerEntrypoint') == 'scenery-showcase-entry-v2.js'
+          assert p.get('dryShowcaseBaked') is True
+          assert p.get('runtimeDockerArgsRequired') is False
+          assert int(p.get('startupWatchdogRecommendedMinutes')) == 30
+          assets=p.get('assets') or {}
+          assert assets.get('ok') is True
+          assert assets.get('satisfiedRoleCount') == 12
+          assert assets.get('missingRoles') == []
+          runpod=p.get('runpod') or {}
+          rate=float(runpod.get('rate'))
+          assert 0 < rate <= 0.8
+          limits=p.get('limits') or {}
+          assert int(limits.get('maxCreates')) == 1
+          print(json.dumps({
+            'ready':p.get('ready'),
+            'workerImage':p.get('workerImage'),
+            'workerEntrypoint':p.get('workerEntrypoint'),
+            'dryShowcaseBaked':p.get('dryShowcaseBaked'),
+            'runtimeDockerArgsRequired':p.get('runtimeDockerArgsRequired'),
+            'startupWatchdogRecommendedMinutes':p.get('startupWatchdogRecommendedMinutes'),
+            'satisfiedRoleCount':assets.get('satisfiedRoleCount'),
+            'missingRoles':assets.get('missingRoles'),
+            'secureUsdPerHr':rate,
+            'stockStatus':runpod.get('stockStatus'),
+            'paidMutationPerformed':p.get('paidMutationPerformed'),
+          }))
+          PY
+
+      - name: Upload sanitized V2 preflight evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-showcase-bridge-preflight-v2
+          path: preflight-v2.json
+          if-no-files-found: error
+          retention-days: 14
