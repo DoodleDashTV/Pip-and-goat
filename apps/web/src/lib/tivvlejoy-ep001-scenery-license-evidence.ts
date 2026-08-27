@@ -32,15 +32,18 @@ export function compileEp001SceneryLicenseEvidence() {
   const inspectedSourceIds = inspected.sources.map((source) => source.sourceId);
   const additionalObservedIds = closure.additionalObservedSources.map((source) => source.sourceId);
   const publicCandidateIds = PUBLIC_MARKETPLACE_CANDIDATES.map((candidate) => candidate.sourceId);
-  const sourceIds = [...new Set([...slotSourceIds, ...inspectedSourceIds, ...additionalObservedIds, ...publicCandidateIds])].sort();
+  const slotSourceSet = new Set<string>(slotSourceIds);
+  const inspectedSourceSet = new Set<string>(inspectedSourceIds);
+  const additionalObservedSet = new Set<string>(additionalObservedIds);
+  const sourceIds = [...new Set<string>([...slotSourceIds, ...inspectedSourceIds, ...additionalObservedIds, ...publicCandidateIds])].sort();
 
   const records = sourceIds.map((sourceId) => ({
     sourceId,
-    dependencyClass: slotSourceIds.includes(sourceId)
+    dependencyClass: slotSourceSet.has(sourceId)
       ? 'ROLE_RESOLVING_SOURCE' as const
-      : inspectedSourceIds.includes(sourceId)
+      : inspectedSourceSet.has(sourceId)
         ? 'INSPECTED_SUPPORTING_SOURCE' as const
-        : additionalObservedIds.includes(sourceId)
+        : additionalObservedSet.has(sourceId)
           ? 'ADDITIONAL_INSPECTED_SOURCE' as const
           : 'PUBLIC_MATCH_SUPPORTING_SOURCE' as const,
     publicMarketplaceCandidate: PUBLIC_MARKETPLACE_CANDIDATES.find((candidate) => candidate.sourceId === sourceId) ?? null,
