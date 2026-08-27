@@ -8,6 +8,10 @@ import {
   type RigArrivalCandidate,
   type SceneryLicenseCandidate,
 } from '@/lib/tivvlejoy-ep001-external-arrival-validators';
+import {
+  validateEp001HumanDecisionReceipt,
+  type Ep001HumanDecisionReceiptInput,
+} from '@/lib/tivvlejoy-ep001-human-decision-receipt';
 
 export const EP001_EXTERNAL_ARRIVAL_RECEIPT_SCHEMA =
   'TIVVLEJOY_EP001_EXTERNAL_ARRIVAL_RECEIPT_V1' as const;
@@ -15,22 +19,37 @@ export const EP001_EXTERNAL_ARRIVAL_RECEIPT_SCHEMA =
 export type ExternalArrivalCandidate =
   | { arrivalType: 'RIG'; candidate: RigArrivalCandidate }
   | { arrivalType: 'SCENERY_LICENSE'; candidate: SceneryLicenseCandidate }
-  | { arrivalType: 'PAID_AUTHORIZATION'; candidate: PaidAuthorizationCandidate };
+  | { arrivalType: 'PAID_AUTHORIZATION'; candidate: PaidAuthorizationCandidate }
+  | { arrivalType: 'HUMAN_DECISION'; candidate: Ep001HumanDecisionReceiptInput };
 
 export function compileEp001ExternalArrivalReceipt(
   input: ExternalArrivalCandidate,
   now = new Date(),
 ) {
   const matrix = compileEp001ExternalArrivalTriggerMatrix();
-  const validation =
-    input.arrivalType === 'RIG'
-      ? validateRigArrival(input.candidate)
-      : input.arrivalType === 'SCENERY_LICENSE'
-        ? validateSceneryLicenseArrival(input.candidate)
-        : validatePaidAuthorizationArrival(input.candidate, now);
 
-  if (!validation.valid) {
-    throw new Error(`EXTERNAL_ARRIVAL_VALIDATION_FAILED:${validation.errors.join(',')}`);
+  let valid = false;
+  let errors: string[] = [];
+  if (input.arrivalType === 'RIG') {
+    const validation = validateRigArrival(input.candidate);
+    valid = validation.valid;
+    errors = validation.errors;
+  } else if (input.arrivalType === 'SCENERY_LICENSE') {
+    const validation = validateSceneryLicenseArrival(input.candidate);
+    valid = validation.valid;
+    errors = validation.errors;
+  } else if (input.arrivalType === 'PAID_AUTHORIZATION') {
+    const validation = validatePaidAuthorizationArrival(input.candidate, now);
+    valid = validation.valid;
+    errors = validation.errors;
+  } else {
+    const validation = validateEp001HumanDecisionReceipt(input.candidate);
+    valid = validation.structurallyValid;
+    errors = validation.issues;
+  }
+
+  if (!valid) {
+    throw new Error(`EXTERNAL_ARRIVAL_VALIDATION_FAILED:${errors.join(',')}`);
   }
 
   const body = {
