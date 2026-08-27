@@ -24,8 +24,8 @@ export function compileEp001AutonomousControlRoom() {
     episodeId: humanGates.episodeId,
     state: 'WAITING_ON_REAL_EXTERNAL_FOUNDATION_INPUTS' as const,
     headline: {
-      humanDecisionRows: humanGates.rows.length,
-      humanApprovalsIssued: humanGates.rows.filter((row) => row.status === 'APPROVED').length,
+      humanDecisionRows: humanGates.metrics.totalDecisionRows,
+      humanApprovalsIssued: humanGates.metrics.approvedRows,
       externalTriggers: controller.metrics.knownTriggers,
       observedExternalTriggers: controller.metrics.observedTriggers,
       safeActionsQueuedNow: controller.metrics.queuedSafeActions,
