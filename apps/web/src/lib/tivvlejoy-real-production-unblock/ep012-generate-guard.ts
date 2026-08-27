@@ -11,7 +11,12 @@ import {
   type Ep012NoProviderPreflight,
   type Ep012SideEffectTracker,
 } from './ep012-no-provider-preflight';
-import { assertCandidateOriginAllowed, isProductionVoiceRuntime, tokensMatch } from '@/lib/voice-production/candidate-gates';
+import {
+  assertCandidateOriginAllowed,
+  isPreviewOnlyVoiceRuntime,
+  isProductionVoiceRuntime,
+  tokensMatch,
+} from '@/lib/voice-production/candidate-gates';
 import {
   resolvePreviewVoiceLedgerStore,
   type DurableVoiceLedgerStore,
@@ -54,6 +59,13 @@ export const EP012_FORBIDDEN_CLIENT_FIELDS = [
   'use_speaker_boost',
   'batch',
   'requests',
+  'characterCount',
+  'storageKey',
+  'objectKey',
+  'audioKey',
+  'receiptKey',
+  'audioObjectKey',
+  'receiptObjectKey',
 ] as const;
 
 export type Ep012GenerateGuardStatus = 'ELIGIBLE' | 'ALREADY_SUCCEEDED' | 'BLOCKED';
@@ -159,9 +171,12 @@ export async function runEp012GenerateGuard(input: Ep012GenerateGuardInput): Pro
 
   const blockers: Ep012BlockerCode[] = [];
 
-  // 1-2. Preview runtime only. Refuse Production.
+  // 1-2. Preview runtime only. Refuse Production, local, and development.
   if (isProductionVoiceRuntime(env)) {
     blockers.push(EP012_BLOCKER_CODES.EP012_PRODUCTION_RUNTIME_REFUSED);
+  }
+  if (!isPreviewOnlyVoiceRuntime(env)) {
+    blockers.push(EP012_BLOCKER_CODES.EP012_PREVIEW_RUNTIME_REQUIRED);
   }
 
   // 3. Same-origin enforcement.

@@ -13,6 +13,7 @@ import {
 } from './ep012-voice-authorization';
 import {
   assertCandidateOriginAllowed,
+  isPreviewOnlyVoiceRuntime,
   isProductionVoiceRuntime,
   testTokenConfigured,
   tokensMatch,
@@ -29,6 +30,10 @@ import {
 import { isCanonicalPaidVoiceAuthorization } from '@/lib/voice-production/paid-authorization-convention';
 import { hasElevenLabsApiKey, isPaidVoiceGenerationEnabled, type VoiceEnv } from '@/lib/voice-production/safety';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError, type RegisteredCharacterId } from '@/lib/voice-production/types';
+import {
+  EP012_FINAL_GLOBAL_CHARACTER_CEILING,
+  EP012_FINAL_GLOBAL_REQUEST_CEILING,
+} from './ep012-paid-voice-constants';
 
 export const EP012_NO_PROVIDER_PREFLIGHT_SCHEMA = 'TIVVLEJOY_EP012_NO_PROVIDER_PREFLIGHT_V1' as const;
 export const EP012_REQUIRED_DIALOGUE_SHA256 =
@@ -87,6 +92,18 @@ export const EP012_BLOCKER_CODES = {
   EP012_REQUEST_ALREADY_RESERVED: 'EP012_REQUEST_ALREADY_RESERVED',
   EP012_REQUEST_FAILED_REQUIRES_REVIEW: 'EP012_REQUEST_FAILED_REQUIRES_REVIEW',
   EP012_REQUEST_UNFINALIZED_REQUIRES_REVIEW: 'EP012_REQUEST_UNFINALIZED_REQUIRES_REVIEW',
+  EP012_PREVIEW_RUNTIME_REQUIRED: 'EP012_PREVIEW_RUNTIME_REQUIRED',
+  EP012_GLOBAL_REQUEST_CEILING: 'EP012_GLOBAL_REQUEST_CEILING',
+  EP012_GLOBAL_CHARACTER_CEILING: 'EP012_GLOBAL_CHARACTER_CEILING',
+  EP012_EPISODE_REQUEST_CEILING: 'EP012_EPISODE_REQUEST_CEILING',
+  EP012_EPISODE_CHARACTER_CEILING: 'EP012_EPISODE_CHARACTER_CEILING',
+  EP012_RECOVERY_REQUIRED: 'EP012_RECOVERY_REQUIRED',
+  EP012_STORAGE_VERIFICATION_FAILED: 'EP012_STORAGE_VERIFICATION_FAILED',
+  EP012_STORAGE_NOT_CONFIGURED: 'EP012_STORAGE_NOT_CONFIGURED',
+  EP012_PROVIDER_RESPONSE_INVALID: 'EP012_PROVIDER_RESPONSE_INVALID',
+  EP012_PROVIDER_TRANSPORT_UNAVAILABLE: 'EP012_PROVIDER_TRANSPORT_UNAVAILABLE',
+  EP012_PATH_TRAVERSAL_REFUSED: 'EP012_PATH_TRAVERSAL_REFUSED',
+  EP012_ARTIFACT_NOT_FINALIZED: 'EP012_ARTIFACT_NOT_FINALIZED',
 } as const;
 
 export type Ep012BlockerCode = (typeof EP012_BLOCKER_CODES)[keyof typeof EP012_BLOCKER_CODES];
@@ -153,7 +170,7 @@ export type Ep012RequestCheck = {
 export type Ep012NoProviderPreflight = {
   schemaVersion: typeof EP012_NO_PROVIDER_PREFLIGHT_SCHEMA;
   ok: boolean;
-  status: 'READY' | 'BLOCKED';
+  status: 'READY' | 'BLOCKED' | 'COMPLETE';
   episodeId: 'EP012';
   title: 'The Bakery Map';
   dialogueSha256: string;
@@ -161,6 +178,7 @@ export type Ep012NoProviderPreflight = {
   checkedAt: string;
   serverGates: {
     previewRuntime: boolean;
+    previewOnlyRuntime: boolean;
     productionRuntime: boolean;
     paidVoiceGenerationEnabled: boolean;
     paidAuthorizationConvention: boolean;
@@ -182,6 +200,9 @@ export type Ep012NoProviderPreflight = {
     reservedRequests: number;
     reservedCharacters: number;
     unfinalizedCount: number;
+    reservations: number;
+    unfinalized: number;
+    recoveryRequired: number;
     ep012SucceededRequests: number;
     ep012SucceededCharacters: number;
     ep012RemainingRequests: number;
@@ -192,6 +213,12 @@ export type Ep012NoProviderPreflight = {
     completedCharacters: number;
     remainingRequests: number;
     remainingCharacters: number;
+    expectedFinalGlobalRequests: 15;
+    expectedFinalGlobalCharacters: 695;
+    providerRequestsMade: number;
+    storageVerifiedCount: number;
+    allArtifactsStorageVerified: boolean;
+    nextProviderContactPermitted: boolean;
     allPassed: boolean;
   };
   authorization: {
@@ -215,8 +242,9 @@ export type Ep012NoProviderPreflight = {
   blockedRequestChecks: number;
   blockers: Ep012BlockerCode[];
   readyForProviderContact: boolean;
+  nextProviderContactPermitted: boolean;
   providerContacted: false;
-  providerRequestsMade: 0;
+  providerRequestsMade: number;
   sceneryAccessed: false;
   sceneryRequestsMade: 0;
   commercialBytesDownloaded: 0;
@@ -390,8 +418,10 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
   void tracker;
   const blockers: Ep012BlockerCode[] = [];
   const productionRuntime = isProductionVoiceRuntime(env);
-  const previewRuntime = !productionRuntime;
+  const previewOnlyRuntime = isPreviewOnlyVoiceRuntime(env);
+  const previewRuntime = previewOnlyRuntime;
   if (productionRuntime) blockers.push(EP012_BLOCKER_CODES.EP012_PRODUCTION_RUNTIME_REFUSED);
+  if (!previewOnlyRuntime) blockers.push(EP012_BLOCKER_CODES.EP012_PREVIEW_RUNTIME_REQUIRED);
 
   const paidVoiceGenerationEnabled = isPaidVoiceGenerationEnabled(env);
   if (!paidVoiceGenerationEnabled) blockers.push(EP012_BLOCKER_CODES.EP012_PAID_VOICE_DISABLED);
@@ -488,6 +518,17 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
     requestChecks.push(check);
   }
 
+  let executions: Awaited<ReturnType<DurableVoiceLedgerStore['listEp012Executions']>> = [];
+  try {
+    executions = await store.listEp012Executions();
+  } catch {
+    executions = [];
+  }
+  const storageVerifiedCount = executions.filter((item) => item.storageVerified && item.status === 'succeeded').length;
+  const providerRequestsMade = executions.filter((item) => Boolean(item.providerAttemptedAt) || item.status === 'succeeded').length;
+  const recoveryRequired = executions.filter(
+    (item) => item.status === 'unfinalized' || item.status === 'provider_attempted',
+  ).length;
   const ep012RemainingRequests = 11 - ep012SucceededRequests;
   const ep012RemainingCharacters = 460 - ep012SucceededCharacters;
   const passedRequestChecks = requestChecks.filter((item) => item.passed).length;
@@ -496,6 +537,7 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
 
   const serverGates = {
     previewRuntime,
+    previewOnlyRuntime,
     productionRuntime,
     paidVoiceGenerationEnabled,
     paidAuthorizationConvention,
@@ -504,7 +546,7 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
     voiceTestMaxCharactersGate,
     sameOriginEnforced: true,
     allPassed:
-      previewRuntime &&
+      previewOnlyRuntime &&
       !productionRuntime &&
       paidVoiceGenerationEnabled &&
       paidAuthorizationConvention &&
@@ -531,18 +573,31 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
     !input.overrides?.applyLegacyThreeRequestAllowance;
 
   const uniqueBlockers = unique(blockers);
+  const complete =
+    uniqueBlockers.length === 0 &&
+    ep012SucceededRequests === 11 &&
+    ep012SucceededCharacters === 460 &&
+    record.paidRequests === EP012_FINAL_GLOBAL_REQUEST_CEILING &&
+    record.paidCharactersUsed === EP012_FINAL_GLOBAL_CHARACTER_CEILING &&
+    record.reservedRequests === 0 &&
+    record.unfinalizedCount === 0 &&
+    recoveryRequired === 0 &&
+    storageVerifiedCount === 11 &&
+    providerRequestsMade === 11;
   const ready =
+    !complete &&
     uniqueBlockers.length === 0 &&
     serverGates.allPassed &&
     ledgerAllPassed &&
     authorizationAllPassed &&
     blockedRequestChecks === 0 &&
     requestChecks.length === 11;
+  const nextProviderContactPermitted = ready && ep012RemainingRequests > 0;
 
   return {
     schemaVersion: EP012_NO_PROVIDER_PREFLIGHT_SCHEMA,
-    ok: ready,
-    status: ready ? 'READY' : 'BLOCKED',
+    ok: ready || complete,
+    status: complete ? 'COMPLETE' : ready ? 'READY' : 'BLOCKED',
     episodeId: 'EP012',
     title: 'The Bakery Map',
     dialogueSha256: EP012_REQUIRED_DIALOGUE_SHA256,
@@ -561,6 +616,9 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
       reservedRequests: record.reservedRequests,
       reservedCharacters: record.reservedCharacters,
       unfinalizedCount: record.unfinalizedCount,
+      reservations: record.reservedRequests,
+      unfinalized: record.unfinalizedCount,
+      recoveryRequired,
       ep012SucceededRequests,
       ep012SucceededCharacters,
       ep012RemainingRequests,
@@ -571,6 +629,12 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
       completedCharacters: ep012SucceededCharacters,
       remainingRequests: ep012RemainingRequests,
       remainingCharacters: ep012RemainingCharacters,
+      expectedFinalGlobalRequests: 15,
+      expectedFinalGlobalCharacters: 695,
+      providerRequestsMade,
+      storageVerifiedCount,
+      allArtifactsStorageVerified: storageVerifiedCount === 11,
+      nextProviderContactPermitted,
       allPassed: ledgerAllPassed,
     },
     authorization: {
@@ -593,9 +657,10 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
     passedRequestChecks,
     blockedRequestChecks,
     blockers: uniqueBlockers,
-    readyForProviderContact: ready,
+    readyForProviderContact: nextProviderContactPermitted,
+    nextProviderContactPermitted,
     providerContacted: false,
-    providerRequestsMade: 0,
+    providerRequestsMade,
     sceneryAccessed: false,
     sceneryRequestsMade: 0,
     commercialBytesDownloaded: 0,

@@ -634,11 +634,17 @@ describe('EP012 route and source boundaries', () => {
         }),
       }),
     );
-    const json = (await response.json()) as { status: string; blockers: string[]; providerContacted: boolean };
+    const json = (await response.json()) as {
+      schemaVersion: string;
+      status: string;
+      blockers: string[];
+      providerContacted: boolean;
+    };
     expect(json.providerContacted).toBe(false);
     expect(json.status).toBe('BLOCKED');
     expect(json.blockers).toContain(EP012_BLOCKER_CODES.EP012_CLIENT_FIELD_FORBIDDEN);
     expect(response.status).toBe(400);
+    expect(json.schemaVersion).toBe('TIVVLEJOY_EP012_PAID_VOICE_EXECUTION_V1');
     expect(EP012_GENERATION_ROUTE_GUARD_SCHEMA).toBe('TIVVLEJOY_EP012_GENERATION_ROUTE_GUARD_V1');
   });
 

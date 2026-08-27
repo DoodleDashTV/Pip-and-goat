@@ -1,4 +1,20 @@
 import {
+  EP012_AUTHORIZED_CHARACTER_COUNT,
+  EP012_AUTHORIZED_REQUEST_COUNT,
+  EP012_FINAL_GLOBAL_CHARACTER_CEILING,
+  EP012_FINAL_GLOBAL_REQUEST_CEILING,
+} from '@/lib/tivvlejoy-real-production-unblock/ep012-paid-voice-constants';
+import {
+  assertEp012ReservationIdentity,
+  countEp012Usage,
+  replayFromExecution,
+  type Ep012ExecutionRecord,
+  type Ep012ExecutionStatus,
+  type Ep012FinalizeInput,
+  type Ep012FinalizedReplay,
+  type Ep012ReserveInput,
+} from '@/lib/tivvlejoy-real-production-unblock/ep012-paid-voice-ledger';
+import {
   DURABLE_LEDGER_COPY,
   DURABLE_LEDGER_RECONCILE_PROCEDURE,
   PRIOR_PAID_USAGE_EVIDENCE,
@@ -12,6 +28,14 @@ import {
 } from './script-line';
 import { currentUsageMonth, emptyLedger, type VoiceEnv } from './safety';
 import { GOAT_CHARACTER_ID, PIP_CHARACTER_ID, VoiceProductionError, type VoiceUsageLedger } from './types';
+
+export type {
+  Ep012ExecutionRecord,
+  Ep012ExecutionStatus,
+  Ep012FinalizeInput,
+  Ep012FinalizedReplay,
+  Ep012ReserveInput,
+};
 
 export type DurableSpeaker = 'pip' | 'goat';
 export type DurableEntryStatus = 'reserved' | 'succeeded' | 'failed' | 'unfinalized' | 'reconciled';
@@ -64,6 +88,7 @@ export type DurableVoiceLedgerStore = {
   read(): Promise<DurableLedgerRecord>;
   readSync(): DurableLedgerRecord;
   getEntry(requestId: string): Promise<DurableLedgerEntry | null>;
+  listEntries(): Promise<DurableLedgerEntry[]>;
   reserve(input: ReserveInput): Promise<{ entry: DurableLedgerEntry; replay?: SafeVoiceReceipt }>;
   finalize(input: {
     requestId: string;
@@ -76,6 +101,23 @@ export type DurableVoiceLedgerStore = {
     paidCharacters: number;
     evidence: string;
   }): Promise<{ imported: boolean; record: DurableLedgerRecord }>;
+  reserveEp012(
+    input: Ep012ReserveInput,
+  ): Promise<{ entry: DurableLedgerEntry; execution: Ep012ExecutionRecord; replay?: Ep012FinalizedReplay }>;
+  markEp012ProviderAttempt(input: { requestId: string }): Promise<Ep012ExecutionRecord>;
+  finalizeEp012(input: Ep012FinalizeInput): Promise<{
+    record: DurableLedgerRecord;
+    entry: DurableLedgerEntry;
+    execution: Ep012ExecutionRecord;
+    receipt: SafeVoiceReceipt;
+  }>;
+  failEp012(input: { requestId: string; providerContacted: boolean }): Promise<{
+    record: DurableLedgerRecord;
+    execution: Ep012ExecutionRecord | null;
+  }>;
+  getEp012Execution(requestId: string): Promise<Ep012ExecutionRecord | null>;
+  getEp012ExecutionBySegment(segmentId: string): Promise<Ep012ExecutionRecord | null>;
+  listEp012Executions(): Promise<Ep012ExecutionRecord[]>;
   seedPaidUsage?(input: { requestId: string; character: DurableSpeaker; characterCount: number }): DurableLedgerRecord;
   seedEntry?(input: {
     requestId: string;
@@ -83,6 +125,7 @@ export type DurableVoiceLedgerStore = {
     characterCount: number;
     status: DurableEntryStatus;
   }): DurableLedgerRecord;
+  seedEp012Execution?(input: Ep012ExecutionRecord): void;
 };
 
 const UNAVAILABLE_RECORD: DurableLedgerRecord = {
@@ -139,10 +182,26 @@ export function createUnavailableDurableLedgerStore(): DurableVoiceLedgerStore {
     async getEntry() {
       return null;
     },
+    async listEntries() {
+      return [];
+    },
     reserve: blocked,
     finalize: blocked,
     fail: blocked,
     importPriorUsageOnce: blocked,
+    reserveEp012: blocked,
+    markEp012ProviderAttempt: blocked,
+    finalizeEp012: blocked,
+    failEp012: blocked,
+    async getEp012Execution() {
+      return null;
+    },
+    async getEp012ExecutionBySegment() {
+      return null;
+    },
+    async listEp012Executions() {
+      return [];
+    },
   };
 }
 
@@ -203,6 +262,12 @@ export function createSharedDurableLedgerStore(seed: DurableLedgerRecord = empty
     };
   }
 
+  const executions = new Map<string, Ep012ExecutionRecord>();
+
+  function executionByRequest(requestId: string): Ep012ExecutionRecord | null {
+    return executions.get(requestId) ? { ...executions.get(requestId)! } : null;
+  }
+
   return {
     kind: 'shared-memory',
     async read() {
@@ -213,6 +278,9 @@ export function createSharedDurableLedgerStore(seed: DurableLedgerRecord = empty
     },
     async getEntry(requestId) {
       return entries.get(requestId) ? { ...entries.get(requestId)! } : null;
+    },
+    async listEntries() {
+      return [...entries.values()].map((entry) => ({ ...entry }));
     },
     reserve(input) {
       return withLock(() => {
@@ -392,6 +460,254 @@ export function createSharedDurableLedgerStore(seed: DurableLedgerRecord = empty
         return { imported: true, record: cloneRecord(record) };
       });
     },
+    reserveEp012(input) {
+      return withLock(() => {
+        assertEp012ReservationIdentity(input);
+        if (!record.available) {
+          throw new VoiceProductionError(DURABLE_LEDGER_COPY.unavailable, 'DURABLE_LEDGER_UNAVAILABLE');
+        }
+        if (!record.reconciled) {
+          throw new VoiceProductionError(DURABLE_LEDGER_COPY.reconcile, 'PRIOR_USAGE_RECONCILIATION');
+        }
+        const existingExecution = executions.get(input.requestId);
+        const existingEntry = entries.get(input.requestId);
+        const replay = existingExecution ? replayFromExecution(existingExecution) : null;
+        if (replay && existingEntry?.status === 'succeeded') {
+          return { entry: { ...existingEntry }, execution: { ...existingExecution! }, replay };
+        }
+        if (existingEntry || existingExecution) {
+          throw new VoiceProductionError(
+            'This authorized EP012 segment was already submitted. It was not retried and was not billed again.',
+            'DUPLICATE_REQUEST',
+          );
+        }
+        if (record.reservedRequests > 0 || record.unfinalizedCount > 0) {
+          throw new VoiceProductionError(
+            'An unresolved EP012 reservation or recovery-required entry already exists.',
+            'EP012_RECOVERY_REQUIRED',
+          );
+        }
+        if ([...executions.values()].some((item) => item.status === 'provider_attempted')) {
+          throw new VoiceProductionError(
+            'An unresolved EP012 provider attempt requires recovery.',
+            'EP012_RECOVERY_REQUIRED',
+          );
+        }
+        const usage = countEp012Usage([...entries.values()]);
+        if (usage.succeededRequests + 1 > EP012_AUTHORIZED_REQUEST_COUNT) {
+          throw new VoiceProductionError('EP012 authorized request count would be exceeded.', 'EP012_EPISODE_REQUEST_CEILING');
+        }
+        if (usage.succeededCharacters + input.characterCount > EP012_AUTHORIZED_CHARACTER_COUNT) {
+          throw new VoiceProductionError(
+            'EP012 authorized character budget would be exceeded.',
+            'EP012_EPISODE_CHARACTER_CEILING',
+          );
+        }
+        if (record.paidRequests + record.reservedRequests + 1 > EP012_FINAL_GLOBAL_REQUEST_CEILING) {
+          throw new VoiceProductionError(
+            'Final Preview paid-request ceiling would be exceeded.',
+            'EP012_GLOBAL_REQUEST_CEILING',
+          );
+        }
+        if (record.paidCharactersUsed + record.reservedCharacters + input.characterCount > EP012_FINAL_GLOBAL_CHARACTER_CEILING) {
+          throw new VoiceProductionError(
+            'Final Preview paid-character ceiling would be exceeded.',
+            'EP012_GLOBAL_CHARACTER_CEILING',
+          );
+        }
+        const now = new Date().toISOString();
+        const entry: DurableLedgerEntry = {
+          idempotencyKey: input.requestId,
+          requestId: input.requestId,
+          character: input.character,
+          characterCount: input.characterCount,
+          status: 'reserved',
+          receiptRef: null,
+          createdAt: now,
+          updatedAt: now,
+          deploymentId: input.deploymentId ?? 'local-preview',
+        };
+        const execution: Ep012ExecutionRecord = {
+          requestId: input.requestId,
+          segmentId: input.segmentId,
+          character: input.character,
+          characterCount: input.characterCount,
+          status: 'reserved',
+          providerAttemptedAt: null,
+          audioSha256: null,
+          audioBytes: null,
+          storageVerified: false,
+          audioObjectKey: null,
+          receiptObjectKey: null,
+          receiptRef: null,
+          alignmentPresent: false,
+          deploymentId: entry.deploymentId,
+          createdAt: now,
+          updatedAt: now,
+        };
+        entries.set(input.requestId, entry);
+        executions.set(input.requestId, execution);
+        record = {
+          ...record,
+          reservedRequests: record.reservedRequests + 1,
+          reservedCharacters: record.reservedCharacters + input.characterCount,
+        };
+        return { entry: { ...entry }, execution: { ...execution } };
+      });
+    },
+    markEp012ProviderAttempt(input) {
+      return withLock(() => {
+        const execution = executions.get(input.requestId);
+        const entry = entries.get(input.requestId);
+        if (!execution || !entry || entry.status !== 'reserved' || execution.status !== 'reserved') {
+          throw new VoiceProductionError(
+            'EP012 provider attempt can only be marked on a reserved authorized segment.',
+            'EP012_REQUEST_ALREADY_RESERVED',
+          );
+        }
+        const now = new Date().toISOString();
+        const next: Ep012ExecutionRecord = {
+          ...execution,
+          status: 'provider_attempted',
+          providerAttemptedAt: now,
+          updatedAt: now,
+        };
+        executions.set(input.requestId, next);
+        entries.set(input.requestId, { ...entry, updatedAt: now });
+        return { ...next };
+      });
+    },
+    finalizeEp012(input) {
+      return withLock(() => {
+        const execution = executions.get(input.requestId);
+        const existing = entries.get(input.requestId);
+        if (!execution || !existing) {
+          throw new VoiceProductionError('Paid generation paused — durable ledger unavailable', 'DURABLE_LEDGER_UNAVAILABLE');
+        }
+        const replay = replayFromExecution(execution);
+        if (replay && existing.status === 'succeeded') {
+          return {
+            record: cloneRecord(record),
+            entry: { ...existing },
+            execution: { ...execution },
+            receipt: {
+              requestId: existing.requestId,
+              receiptRef: existing.receiptRef ?? replay.receiptRef,
+              character: existing.character,
+              characterCount: existing.characterCount,
+              createdAt: existing.createdAt,
+              status: 'succeeded' as const,
+              deploymentId: existing.deploymentId,
+            },
+          };
+        }
+        if (existing.status !== 'reserved' && existing.status !== 'unfinalized') {
+          throw new VoiceProductionError(
+            'This authorized EP012 segment was already submitted. It was not retried and was not billed again.',
+            'DUPLICATE_REQUEST',
+          );
+        }
+        if (execution.status !== 'provider_attempted' && execution.status !== 'unfinalized') {
+          throw new VoiceProductionError(
+            'EP012 success cannot be finalized before a durable provider attempt and storage verification.',
+            'EP012_STORAGE_VERIFICATION_FAILED',
+          );
+        }
+        const now = input.createdAt || new Date().toISOString();
+        const nextEntry: DurableLedgerEntry = {
+          ...existing,
+          status: 'succeeded',
+          receiptRef: input.receiptRef,
+          updatedAt: now,
+        };
+        const nextExecution: Ep012ExecutionRecord = {
+          ...execution,
+          status: 'succeeded',
+          receiptRef: input.receiptRef,
+          audioSha256: input.audioSha256,
+          audioBytes: input.audioBytes,
+          storageVerified: true,
+          audioObjectKey: input.audioObjectKey,
+          receiptObjectKey: input.receiptObjectKey,
+          alignmentPresent: input.alignmentPresent,
+          updatedAt: now,
+        };
+        entries.set(input.requestId, nextEntry);
+        executions.set(input.requestId, nextExecution);
+        record = {
+          ...record,
+          paidRequests: record.paidRequests + 1,
+          paidCharactersUsed: record.paidCharactersUsed + existing.characterCount,
+          reservedRequests: existing.status === 'reserved' ? Math.max(0, record.reservedRequests - 1) : record.reservedRequests,
+          reservedCharacters:
+            existing.status === 'reserved'
+              ? Math.max(0, record.reservedCharacters - existing.characterCount)
+              : record.reservedCharacters,
+          unfinalizedCount:
+            existing.status === 'unfinalized' ? Math.max(0, record.unfinalizedCount - 1) : record.unfinalizedCount,
+        };
+        return {
+          record: cloneRecord(record),
+          entry: { ...nextEntry },
+          execution: { ...nextExecution },
+          receipt: {
+            requestId: nextEntry.requestId,
+            receiptRef: input.receiptRef,
+            character: nextEntry.character,
+            characterCount: nextEntry.characterCount,
+            createdAt: nextEntry.createdAt,
+            status: 'succeeded',
+            deploymentId: nextEntry.deploymentId,
+          },
+        };
+      });
+    },
+    failEp012(input) {
+      return withLock(() => {
+        const existing = entries.get(input.requestId);
+        const execution = executions.get(input.requestId);
+        if (!existing) {
+          record = { ...record, failedAttempts: record.failedAttempts + 1 };
+          return { record: cloneRecord(record), execution: execution ? { ...execution } : null };
+        }
+        if (existing.status === 'succeeded') {
+          return { record: cloneRecord(record), execution: execution ? { ...execution } : null };
+        }
+        const providerMightHaveBeenContacted =
+          input.providerContacted || execution?.status === 'provider_attempted' || Boolean(execution?.providerAttemptedAt);
+        const nextStatus: DurableEntryStatus = providerMightHaveBeenContacted ? 'unfinalized' : 'failed';
+        const executionStatus: Ep012ExecutionStatus = nextStatus;
+        const now = new Date().toISOString();
+        entries.set(input.requestId, { ...existing, status: nextStatus, updatedAt: now });
+        if (execution) {
+          executions.set(input.requestId, { ...execution, status: executionStatus, updatedAt: now });
+        }
+        record = {
+          ...record,
+          failedAttempts: record.failedAttempts + 1,
+          reservedRequests: existing.status === 'reserved' ? Math.max(0, record.reservedRequests - 1) : record.reservedRequests,
+          reservedCharacters:
+            existing.status === 'reserved'
+              ? Math.max(0, record.reservedCharacters - existing.characterCount)
+              : record.reservedCharacters,
+          unfinalizedCount: nextStatus === 'unfinalized' ? record.unfinalizedCount + 1 : record.unfinalizedCount,
+        };
+        return {
+          record: cloneRecord(record),
+          execution: execution ? { ...executions.get(input.requestId)! } : null,
+        };
+      });
+    },
+    async getEp012Execution(requestId) {
+      return executionByRequest(requestId);
+    },
+    async getEp012ExecutionBySegment(segmentId) {
+      const found = [...executions.values()].find((item) => item.segmentId === segmentId);
+      return found ? { ...found } : null;
+    },
+    async listEp012Executions() {
+      return [...executions.values()].map((item) => ({ ...item }));
+    },
     seedPaidUsage(input) {
       const now = new Date().toISOString();
       entries.set(input.requestId, {
@@ -441,6 +757,9 @@ export function createSharedDurableLedgerStore(seed: DurableLedgerRecord = empty
         failedAttempts: input.status === 'failed' ? record.failedAttempts + 1 : record.failedAttempts,
       };
       return cloneRecord(record);
+    },
+    seedEp012Execution(input) {
+      executions.set(input.requestId, { ...input });
     },
   };
 }
