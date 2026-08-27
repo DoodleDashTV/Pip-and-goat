@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { canonicalControlsFor, emptyRigControlMapping, type AdapterCharacterId, type RigControlMapping } from '@/lib/tivvlejoy-rig-control-adapter';
+import { useState } from 'react';
+import type { AdapterCharacterId, CanonicalControl, RigControlMapping } from '@/lib/tivvlejoy-rig-control-adapter';
 
 type Validation = {
   valid: boolean;
@@ -12,9 +12,14 @@ type Validation = {
   normalized: RigControlMapping;
 };
 
-export function Ep001RigControlAdapterEditor({ characterId }: { characterId: AdapterCharacterId }) {
-  const controls = useMemo(() => canonicalControlsFor(characterId), [characterId]);
-  const [mapping, setMapping] = useState<RigControlMapping>(() => emptyRigControlMapping(characterId));
+export function Ep001RigControlAdapterEditor({ characterId, controls }: { characterId: AdapterCharacterId; controls: readonly CanonicalControl[] }) {
+  const [mapping, setMapping] = useState<RigControlMapping>(() => ({
+    schemaVersion: 'TIVVLEJOY_RIG_CONTROL_ADAPTER_V1',
+    characterId,
+    rigVersionId: '',
+    rigSourceSha256: '',
+    mappings: Object.fromEntries(controls.map((control) => [control.canonicalId, ''])),
+  }));
   const [validation, setValidation] = useState<Validation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const label = characterId === 'CHAR_PIP_001' ? 'Pip' : 'Goat';
