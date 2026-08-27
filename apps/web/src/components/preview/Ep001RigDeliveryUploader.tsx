@@ -5,6 +5,8 @@ import { useMemo, useState } from 'react';
 type CharacterId = 'CHAR_PIP_001' | 'CHAR_GOAT_001';
 type PlannedPart = { partNumber: number; start: number; end: number };
 type CreatedResponse = { versionId: string; partCount: number; parts: PlannedPart[]; approved: false };
+type CompletedPart = { partNumber: number; etag: string };
+type ActiveUpload = CreatedResponse & { filename: string; byteSize: number; completedParts: CompletedPart[] };
 type CompletedResponse = {
   versionId: string;
   characterId: CharacterId;
@@ -44,6 +46,7 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
   const [status, setStatus] = useState('WAITING_FOR_FILE');
   const [progress, setProgress] = useState(0);
   const [receipt, setReceipt] = useState<CompletedResponse | null>(null);
+  const [active, setActive] = useState<ActiveUpload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const label = characterId === 'CHAR_PIP_001' ? 'Pip' : 'Goat';
   const fileSummary = useMemo(() => file ? `${file.name} · ${humanBytes(file.size)}` : 'No file selected', [file]);
@@ -52,21 +55,27 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
     if (!file || !note.trim() || !token.trim()) return;
     setError(null);
     setReceipt(null);
-    setProgress(0);
-    let versionId: string | null = null;
     try {
-      setStatus('OPENING_PRIVATE_UPLOAD_SESSION');
-      const created = await postIntake(token, {
-        action: 'create', characterId, originalFilename: file.name, byteSize: file.size,
-        artistVersionNote: note.trim(), lastModified: file.lastModified,
-      }) as unknown as CreatedResponse;
-      versionId = created.versionId;
-      const completedParts: Array<{ partNumber: number; etag: string }> = [];
+      let session = active;
+      if (session && (session.filename !== file.name || session.byteSize !== file.size)) {
+        throw new Error('RIG_RECOVERY_FILE_DOES_NOT_MATCH_OPEN_SESSION');
+      }
+      if (!session) {
+        setStatus('OPENING_PRIVATE_UPLOAD_SESSION');
+        const created = await postIntake(token, {
+          action: 'create', characterId, originalFilename: file.name, byteSize: file.size,
+          artistVersionNote: note.trim(), lastModified: file.lastModified,
+        }) as unknown as CreatedResponse;
+        session = { ...created, filename: file.name, byteSize: file.size, completedParts: [] };
+        setActive(session);
+      }
 
-      for (let index = 0; index < created.parts.length; index += 1) {
-        const part = created.parts[index]!;
-        setStatus(`UPLOADING_PART_${part.partNumber}_OF_${created.partCount}`);
-        const signed = await postIntake(token, { action: 'sign-part', characterId, versionId, partNumber: part.partNumber });
+      const completedParts = [...session.completedParts];
+      for (let index = 0; index < session.parts.length; index += 1) {
+        const part = session.parts[index]!;
+        if (completedParts.some((item) => item.partNumber === part.partNumber)) continue;
+        setStatus(`UPLOADING_PART_${part.partNumber}_OF_${session.partCount}`);
+        const signed = await postIntake(token, { action: 'sign-part', characterId, versionId: session.versionId, partNumber: part.partNumber });
         const url = String(signed.url ?? '');
         if (!url.startsWith('https://')) throw new Error('RIG_SIGNED_URL_INVALID');
         const chunk = file.slice(part.start, part.end);
@@ -75,21 +84,30 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
         const etag = put.headers.get('etag');
         if (!etag) throw new Error(`RIG_PART_ETAG_MISSING_${part.partNumber}`);
         completedParts.push({ partNumber: part.partNumber, etag });
-        setProgress(Math.round(((index + 1) / created.parts.length) * 90));
+        session = { ...session, completedParts: [...completedParts] };
+        setActive(session);
+        setProgress(Math.round((completedParts.length / session.parts.length) * 90));
       }
 
       setStatus('VERIFYING_STORED_BYTES_AND_SHA256');
-      const completed = await postIntake(token, { action: 'complete', characterId, versionId, parts: completedParts }) as unknown as CompletedResponse;
+      const completed = await postIntake(token, { action: 'complete', characterId, versionId: session.versionId, parts: completedParts }) as unknown as CompletedResponse;
       setReceipt(completed);
+      setActive(null);
       setProgress(100);
       setStatus('RECEIVED_NOT_APPROVED');
     } catch (caught) {
       setStatus('RECOVERY_REQUIRED');
       setError(caught instanceof Error ? caught.message : 'RIG_UPLOAD_FAILED');
-      if (versionId) {
-        try { await postIntake(token, { action: 'abort', characterId, versionId }); } catch { /* preserve primary error */ }
-      }
     }
+  }
+
+  async function abandonOpenSession() {
+    if (!active || !token.trim()) return;
+    try { await postIntake(token, { action: 'abort', characterId, versionId: active.versionId }); } catch { /* clearing local recovery is still explicit */ }
+    setActive(null);
+    setError(null);
+    setProgress(0);
+    setStatus('WAITING_FOR_FILE');
   }
 
   const ready = Boolean(file && note.trim() && token.trim() && !receipt);
@@ -116,11 +134,12 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
 
       <div className="rounded-xl border border-[var(--color-border)] p-3 text-sm">
         <p><span className="font-bold">State:</span> {status}</p>
+        {active ? <p className="mt-1 break-all font-mono text-[11px]">Open version: {active.versionId} · {active.completedParts.length}/{active.partCount} parts retained in this browser session</p> : null}
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--color-surface-subtle)]"><div className="h-full bg-[var(--color-primary)] transition-all" style={{ width: `${progress}%` }} /></div>
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">{progress}%</p>
       </div>
 
-      {error ? <div className="rounded-xl border border-[var(--color-danger)] p-3 text-sm"><p className="font-bold">Upload stopped safely</p><p className="mt-1 font-mono text-xs">{error}</p></div> : null}
+      {error ? <div className="rounded-xl border border-[var(--color-danger)] p-3 text-sm"><p className="font-bold">Upload paused safely</p><p className="mt-1 font-mono text-xs">{error}</p><p className="mt-2 text-xs">Retry continues missing parts while this page remains open. Use “Abandon” only if you intentionally want a new delivery version.</p></div> : null}
 
       {receipt ? (
         <div className="rounded-xl border border-[var(--color-success)] p-3 text-sm">
@@ -130,7 +149,10 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
           <p className="mt-2">Technical inspection: waiting · human rig approval: waiting · episode admission: blocked.</p>
         </div>
       ) : (
-        <button type="button" disabled={!ready} onClick={() => void upload()} className="min-h-touch rounded-xl bg-[var(--color-primary)] px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">Upload {label} rig privately</button>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" disabled={!ready} onClick={() => void upload()} className="min-h-touch rounded-xl bg-[var(--color-primary)] px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">{active ? `Retry ${label} upload` : `Upload ${label} rig privately`}</button>
+          {active ? <button type="button" onClick={() => void abandonOpenSession()} className="min-h-touch rounded-xl border border-[var(--color-border)] px-4 py-3 text-sm font-bold">Abandon open version</button> : null}
+        </div>
       )}
     </section>
   );
