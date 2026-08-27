@@ -1,22 +1,21 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import {
+  parseRigUploadRecovery,
+  rigUploadRecoveryKey,
+  serializeRigUploadRecovery,
+  TIVVLEJOY_RIG_UPLOAD_BROWSER_RECOVERY_SCHEMA,
+  type RigUploadBrowserRecovery,
+  type RigUploadRecoveryCharacterId,
+  type RigUploadRecoveryCompletedPart,
+} from '@/lib/tivvlejoy-rig-upload-browser-recovery';
 
-type CharacterId = 'CHAR_PIP_001' | 'CHAR_GOAT_001';
+type CharacterId = RigUploadRecoveryCharacterId;
 type PlannedPart = { partNumber: number; start: number; end: number };
 type CreatedResponse = { versionId: string; partCount: number; parts: PlannedPart[]; approved: false };
-type CompletedPart = { partNumber: number; etag: string };
-type ActiveUpload = CreatedResponse & {
-  recoverySchema: 'TIVVLEJOY_RIG_UPLOAD_BROWSER_RECOVERY_V1';
-  characterId: CharacterId;
-  filename: string;
-  byteSize: number;
-  lastModified: number;
-  artistVersionNote: string;
-  completedParts: CompletedPart[];
-  openedAt: string;
-  updatedAt: string;
-};
+type CompletedPart = RigUploadRecoveryCompletedPart;
+type ActiveUpload = RigUploadBrowserRecovery;
 type CompletedResponse = {
   versionId: string;
   characterId: CharacterId;
@@ -31,23 +30,6 @@ type CompletedResponse = {
 
 const API = '/api/episode-one/rig-delivery-intake';
 const TOKEN_HEADER = 'x-tivvlejoy-character-intake-token';
-const RECOVERY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
-function recoveryKey(characterId: CharacterId) {
-  return `tivvlejoy:ep001:rig-upload-recovery:${characterId}`;
-}
-
-function validRecovery(value: unknown, characterId: CharacterId): value is ActiveUpload {
-  if (!value || typeof value !== 'object') return false;
-  const record = value as Partial<ActiveUpload>;
-  if (record.recoverySchema !== 'TIVVLEJOY_RIG_UPLOAD_BROWSER_RECOVERY_V1' || record.characterId !== characterId) return false;
-  if (!/^[a-f0-9-]{36}$/i.test(String(record.versionId ?? ''))) return false;
-  if (!record.filename || !Number.isSafeInteger(record.byteSize) || Number(record.byteSize) <= 0) return false;
-  if (!Number.isSafeInteger(record.lastModified) || Number(record.lastModified) < 0) return false;
-  if (!Array.isArray(record.parts) || !Array.isArray(record.completedParts)) return false;
-  if (!record.updatedAt || Date.now() - Date.parse(record.updatedAt) > RECOVERY_TTL_MS) return false;
-  return true;
-}
 
 async function postIntake(token: string, body: Record<string, unknown>) {
   const response = await fetch(API, {
@@ -81,16 +63,16 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
 
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(recoveryKey(characterId));
+      const raw = window.localStorage.getItem(rigUploadRecoveryKey(characterId));
       if (raw) {
-        const parsed: unknown = JSON.parse(raw);
-        if (validRecovery(parsed, characterId)) {
+        const parsed = parseRigUploadRecovery(raw, characterId);
+        if (parsed) {
           setActive(parsed);
           setNote(parsed.artistVersionNote);
           setProgress(Math.round((parsed.completedParts.length / Math.max(1, parsed.partCount)) * 90));
           setStatus('RECOVERY_RECORD_FOUND_RESELECT_SAME_FILE');
         } else {
-          window.localStorage.removeItem(recoveryKey(characterId));
+          window.localStorage.removeItem(rigUploadRecoveryKey(characterId));
         }
       }
     } catch {
@@ -103,8 +85,8 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
   useEffect(() => {
     if (!recoveryHydrated) return;
     try {
-      if (active) window.localStorage.setItem(recoveryKey(characterId), JSON.stringify(active));
-      else window.localStorage.removeItem(recoveryKey(characterId));
+      if (active) window.localStorage.setItem(rigUploadRecoveryKey(characterId), serializeRigUploadRecovery(active));
+      else window.localStorage.removeItem(rigUploadRecoveryKey(characterId));
     } catch {
       // Never block uploads because browser persistence is unavailable.
     }
@@ -135,7 +117,7 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
         const now = new Date().toISOString();
         session = {
           ...created,
-          recoverySchema: 'TIVVLEJOY_RIG_UPLOAD_BROWSER_RECOVERY_V1',
+          recoverySchema: TIVVLEJOY_RIG_UPLOAD_BROWSER_RECOVERY_SCHEMA,
           characterId,
           filename: file.name,
           byteSize: file.size,
@@ -148,7 +130,7 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
         setActive(session);
       }
 
-      const completedParts = [...session.completedParts];
+      const completedParts: CompletedPart[] = [...session.completedParts];
       for (let index = 0; index < session.parts.length; index += 1) {
         const part = session.parts[index]!;
         if (completedParts.some((item) => item.partNumber === part.partNumber)) continue;
