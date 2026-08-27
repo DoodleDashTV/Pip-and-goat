@@ -17,9 +17,10 @@ export default function EpisodeOneSceneryLicenseEvidencePage() {
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Commercial-use evidence gate</h1>
           <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">All required scenery roles have a source or native recipe, but purchased source packages remain blocked until exact purchase and license evidence is hash-bound and human-reviewed.</p>
         </div>
-        <dl className="grid gap-px bg-[var(--color-border)] sm:grid-cols-4">
+        <dl className="grid gap-px bg-[var(--color-border)] sm:grid-cols-5">
           {[
             ['Source records', evidence.metrics.purchasedSourceRecordCount],
+            ['Public matches', evidence.metrics.publicMarketplaceCandidateCount],
             ['Evidence bound', evidence.metrics.evidenceBoundCount],
             ['Commercial verified', evidence.metrics.commercialUseVerifiedCount],
             ['Admitted', evidence.metrics.admittedCount],
@@ -31,6 +32,13 @@ export default function EpisodeOneSceneryLicenseEvidencePage() {
         {evidence.records.map((record) => (
           <article key={record.sourceId} className="studio-card p-4 sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-3"><p className="break-all font-mono text-xs font-bold text-[var(--color-primary)]">{record.sourceId}</p><span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-subtle)] px-3 py-1 text-xs font-bold">AWAITING EVIDENCE</span></div>
+            {record.publicMarketplaceCandidate ? (
+              <div className="mt-3 rounded-2xl border border-[var(--color-success)] bg-[var(--color-success-soft)] p-3 text-sm leading-6 text-[var(--color-success-foreground)]">
+                <p className="font-bold">Strong public marketplace match · still not purchase proof</p>
+                <p>{record.publicMarketplaceCandidate.marketplace} · {record.publicMarketplaceCandidate.productTitle} · product #{record.publicMarketplaceCandidate.productId} · {record.publicMarketplaceCandidate.publicListingLicenseLabel}</p>
+                <p className="mt-1">{record.publicMarketplaceCandidate.publicTermsSummary}</p>
+              </div>
+            ) : null}
             <p className="mt-3 text-sm text-[var(--color-text-muted)]">Purchase receipt: absent · license hash: absent · commercial use: unverified · human review: absent · admission: blocked</p>
           </article>
         ))}
@@ -44,7 +52,7 @@ export default function EpisodeOneSceneryLicenseEvidencePage() {
       </section>
 
       <section className="rounded-3xl border border-[var(--color-warning)] bg-[var(--color-warning-soft)] p-4 text-sm leading-6 text-[var(--color-warning-foreground)]">
-        <p className="font-bold">No license approval is implied by source possession.</p>
+        <p className="font-bold">No license approval is implied by source possession or a public listing match.</p>
         <p className="mt-1">Capability complete · licenses unverified · Blender not launched · human approval absent · Production writes blocked.</p>
         <p className="mt-3 break-all font-mono text-[11px]">Scenery license evidence sha256: {evidence.sceneryLicenseEvidenceSha256}</p>
       </section>
