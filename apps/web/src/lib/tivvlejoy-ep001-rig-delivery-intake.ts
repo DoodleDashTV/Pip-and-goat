@@ -1,6 +1,7 @@
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 import { createConfiguredMultipartStorage } from '@/lib/scenery/intake/r2-multipart';
-import { planMultipartParts, type MultipartStoragePort } from '@/lib/scenery/intake/multipart';
+import type { MultipartStoragePort } from '@/lib/scenery/intake/multipart';
+import { planMultipartParts } from '@/lib/scenery/intake/keys';
 
 export const EP001_RIG_DELIVERY_INTAKE_SCHEMA = 'TIVVLEJOY_EP001_RIG_DELIVERY_INTAKE_V1' as const;
 export const EP001_RIG_INTAKE_TOKEN_HEADER = 'x-tivvlejoy-character-intake-token' as const;
