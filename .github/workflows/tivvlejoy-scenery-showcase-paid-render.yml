@@ -71,16 +71,33 @@ jobs:
         run: |
           set -euo pipefail
           terminal=''
+          consecutive_curl_failures=0
           for i in $(seq 1 420); do
-            curl -sS "$BRIDGE_URL" -o status.json
+            if curl --retry 8 --retry-all-errors --retry-delay 3 --max-time 50 -sS "$BRIDGE_URL" -o status.json; then
+              consecutive_curl_failures=0
+            else
+              consecutive_curl_failures=$((consecutive_curl_failures + 1))
+              echo "poll i=$i state=BRIDGE_UNREACHABLE startup=UNKNOWN curl_failures=$consecutive_curl_failures"
+              if [ "$consecutive_curl_failures" -ge 20 ]; then
+                echo 'Poll bridge unreachable for 20 consecutive attempts.'
+                exit 1
+              fi
+              sleep 15
+              continue
+            fi
             read -r state startup <<<"$(python3 - <<'PY'
           import json
-          p=json.load(open('status.json'))
+          try:
+            p=json.load(open('status.json'))
+          except Exception:
+            print('PARSE_ERROR', 'NO')
+            raise SystemExit(0)
           status=p.get('status') or {}
           startup=p.get('startup') or {}
           print(str(status.get('status') or 'NONE'), 'YES' if startup else 'NO')
           PY
           )"
+            echo "poll i=$i state=$state startup=$startup"
             if [ "$state" = 'COMPLETE' ]; then
               terminal='COMPLETE'
               break

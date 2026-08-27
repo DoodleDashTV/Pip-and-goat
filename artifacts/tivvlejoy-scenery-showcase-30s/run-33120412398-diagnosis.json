@@ -1,0 +1,43 @@
+{
+  "schema": "TIVVLEJOY_REAL_SCENERY_30S_FAILURE_REPORT_V1",
+  "workflowRunId": 33120412398,
+  "workflow": "TivvleJoy Real Scenery 30s Paid Render",
+  "headSha": "3f3053a08b941071594bb962691ec1bcec39acf0",
+  "exactFailingStage": "POLL_BRIDGE_CONNECTION_RESET_THEN_CLEANUP_KILLED_STARTING_POD",
+  "workflowConclusion": "failure",
+  "createEntered": true,
+  "createRequests": 1,
+  "retryCreate": false,
+  "workerEntrypoint": "scenery-showcase.js",
+  "dryShowcase": true,
+  "poll": {
+    "failedAt": "2026-08-27T22:02:25Z",
+    "minutesAfterCreate": 5.57,
+    "error": "curl: (35) Recv failure: Connection reset by peer",
+    "startupWatchdogMinutes": 15,
+    "watchdogReached": false
+  },
+  "startupStatusJsonWritten": false,
+  "statusJsonWritten": false,
+  "renderFramesProduced": 0,
+  "mp4Present": false,
+  "cleanupFromWorkflow": {
+    "matchedBefore": 1,
+    "terminatedCount": 1,
+    "remainingActiveExactName": 0,
+    "billingCleanupConfirmed": true
+  },
+  "recheckAt": "2026-08-27T23:00:00Z",
+  "recheck": {
+    "startup": null,
+    "status": null,
+    "assetsOk": true,
+    "satisfiedRoleCount": 12,
+    "missingRoles": [],
+    "exactNameActive": 0,
+    "activePods": 0,
+    "billingCleanupConfirmed": true
+  },
+  "anotherRetryAllowed": true,
+  "minimalPatchNext": "Harden the Actions poll so a single Vercel connection reset does not fail-closed and terminate the still-starting exact-name pod before the 15-minute startup watchdog."
+}
