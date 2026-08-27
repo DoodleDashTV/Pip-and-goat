@@ -17,7 +17,7 @@ export default function Ep001AutonomousControlRoomPage() {
     ['Safe actions queued', room.headline.safeActionsQueuedNow],
     ['Foundation inputs waiting', room.headline.foundationInputsWaiting],
     ['Synthetic scenarios', room.headline.syntheticScenariosCovered],
-    ['Authority leaks', room.headline.syntheticAuthorityLeaks],
+    ['Integrity issues', room.headline.crossContractIssueCount],
   ] as const;
 
   return (
@@ -27,7 +27,7 @@ export default function Ep001AutonomousControlRoomPage() {
           <Link href="/episode-one/critical-path" className="inline-flex min-h-touch items-center text-sm font-bold text-[var(--color-primary)]">← Critical path</Link>
           <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">Episode 1 consolidated control</p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Autonomous control room</h1>
-          <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">One deterministic view of human gates, external arrivals, synthetic handler coverage, critical-path inputs, and contract hashes. Authority remains closed.</p>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">One deterministic view of human gates, external arrivals, synthetic handler coverage, critical-path inputs, cross-contract integrity, and contract hashes. Authority remains closed.</p>
         </div>
         <dl className="grid gap-px bg-[var(--color-border)] sm:grid-cols-2 lg:grid-cols-4">
           {headlineRows.map(([label, value]) => (
@@ -42,6 +42,8 @@ export default function Ep001AutonomousControlRoomPage() {
       <section className="studio-card p-4 sm:p-6">
         <p className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">Current state</p>
         <h2 className="mt-1 font-display text-2xl font-bold">{room.state}</h2>
+        <p className="mt-3 text-sm text-[var(--color-text-muted)]">Cross-contract integrity: <span className="font-bold">{room.integrity.pass ? 'PASS' : 'FAIL'}</span></p>
+        <p className="mt-1 break-all font-mono text-[11px] text-[var(--color-text-muted)]">Integrity sha256: {room.integrity.crossContractIntegritySha256}</p>
         <h3 className="mt-5 font-bold">Parallel foundation inputs still required</h3>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-[var(--color-text-muted)]">
           {room.nextRequiredExternalInputs.map((input) => (
