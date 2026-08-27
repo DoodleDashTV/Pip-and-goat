@@ -17,7 +17,7 @@ export default function Ep001RigInspectionEvidenceInboxPage() {
         <Link href="/episode-one/rig-delivery-upload" className="inline-flex min-h-touch items-center text-sm font-bold text-[var(--color-primary)]">← Rig delivery upload</Link>
         <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">Episode 1 rig evidence</p>
         <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Inspection evidence inbox</h1>
-        <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">Upload the artist's playblasts, turntables, deformation proof, and rig README after a corrected rig has a verified delivery receipt. Every evidence object is bound to the exact rig version ID and source SHA-256.</p>
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">Upload the artist’s playblasts, turntables, deformation proof, and rig README after a corrected rig has a verified delivery receipt. Every evidence object is bound to the exact rig version ID and source SHA-256.</p>
         <dl className="mt-5 grid gap-px overflow-hidden rounded-2xl bg-[var(--color-border)] sm:grid-cols-4">
           {[['Required slots', contract.requiredCount], ['Pip slots', contract.pip.length], ['Goat slots', contract.goat.length], ['Auto approvals', 0]].map(([label, value]) => <div key={String(label)} className="bg-[var(--color-surface)] p-4"><dt className="text-xs font-bold uppercase text-[var(--color-text-muted)]">{label}</dt><dd className="mt-1 font-display text-2xl font-bold">{value}</dd></div>)}
         </dl>
