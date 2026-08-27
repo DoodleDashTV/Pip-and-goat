@@ -3,6 +3,25 @@ import { compileEp001SceneryGapClosure } from '@/lib/tivvlejoy-ep001-scenery-gap
 
 export const EP001_SCENERY_LICENSE_EVIDENCE_SCHEMA = 'TIVVLEJOY_EP001_SCENERY_LICENSE_EVIDENCE_V1' as const;
 
+const PUBLIC_MARKETPLACE_CANDIDATES = [
+  {
+    sourceId: 'FOREST_TEXTURES_4096_V1',
+    marketplace: 'CGTrader',
+    productTitle: 'Stylized Pine Forest Nature Kit',
+    productId: '4870567',
+    publicListingLicenseLabel: 'Royalty Free License',
+    publicListingMatch: 'STRONG_STATIC_MATCH_NOT_PURCHASE_PROOF' as const,
+    matchBasis: [
+      'listing provides 4096 TGA PBR texture maps',
+      'listing asset families include rocks, foliage, trunks/leaves, grass, flowers, ferns and shrubs',
+      'inspected archive is a 4096 TGA texture payload with matching rock/foliage/trunk/leaf families',
+    ],
+    publicTermsSummary: 'CGTrader Royalty Free terms permit incorporated commercial moving-image/animation use and prohibit redistribution of the downloaded source product.',
+    purchaseReceiptStillRequired: true as const,
+    exactPurchaseLicenseStillRequiresHumanReview: true as const,
+  },
+] as const;
+
 export function compileEp001SceneryLicenseEvidence() {
   const closure = compileEp001SceneryGapClosure();
   const purchasedSourceIds = [...new Set(
@@ -13,6 +32,7 @@ export function compileEp001SceneryLicenseEvidence() {
 
   const records = purchasedSourceIds.map((sourceId) => ({
     sourceId,
+    publicMarketplaceCandidate: PUBLIC_MARKETPLACE_CANDIDATES.find((candidate) => candidate.sourceId === sourceId) ?? null,
     evidenceState: 'AWAITING_LICENSE_EVIDENCE' as const,
     sellerOrMarketplace: null,
     productTitle: null,
@@ -35,6 +55,7 @@ export function compileEp001SceneryLicenseEvidence() {
     episodeId: closure.episodeId,
     sceneryGapClosureSha256: closure.sceneryGapClosureSha256,
     state: 'CAPABILITY_COMPLETE_LICENSE_EVIDENCE_NOT_YET_BOUND' as const,
+    publicMarketplaceCandidates: PUBLIC_MARKETPLACE_CANDIDATES,
     records,
     acceptedEvidenceClasses: [
       'marketplace purchase receipt or order record naming the exact product',
@@ -42,7 +63,7 @@ export function compileEp001SceneryLicenseEvidence() {
       'seller-issued commercial-use grant tied to the purchased product',
     ],
     rejectionRules: [
-      'A filename, archive presence, preview image, or purchase claim alone is not license evidence.',
+      'A filename, archive presence, preview image, public listing match, or purchase claim alone is not license evidence.',
       'A generic marketplace policy that cannot be tied to the exact purchased product is insufficient.',
       'Commercial-use permission must be explicit or unambiguously incorporated by the exact purchase license.',
       'Evidence must identify the product/source and be hash-bound before admission.',
@@ -52,6 +73,7 @@ export function compileEp001SceneryLicenseEvidence() {
     admissionRule: 'A selected purchased source may be admitted only after exact product identity, purchase evidence, license evidence, commercial-use permission, immutable evidence hashes, and explicit human review are all present.',
     metrics: {
       purchasedSourceRecordCount: records.length,
+      publicMarketplaceCandidateCount: PUBLIC_MARKETPLACE_CANDIDATES.length,
       evidenceBoundCount: 0 as const,
       commercialUseVerifiedCount: 0 as const,
       humanReviewedCount: 0 as const,
