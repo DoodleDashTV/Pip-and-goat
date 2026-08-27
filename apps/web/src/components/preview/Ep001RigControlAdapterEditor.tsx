@@ -22,12 +22,14 @@ type SavedReceipt = {
   productionEnabled: false;
 };
 
-export function Ep001RigControlAdapterEditor({ characterId, controls }: { characterId: AdapterCharacterId; controls: readonly CanonicalControl[] }) {
+type InitialRigBinding = { rigVersionId: string; rigSourceSha256: string; rigReceiptSha256?: string } | null;
+
+export function Ep001RigControlAdapterEditor({ characterId, controls, initialRigBinding = null }: { characterId: AdapterCharacterId; controls: readonly CanonicalControl[]; initialRigBinding?: InitialRigBinding }) {
   const [mapping, setMapping] = useState<RigControlMapping>(() => ({
     schemaVersion: 'TIVVLEJOY_RIG_CONTROL_ADAPTER_V1',
     characterId,
-    rigVersionId: '',
-    rigSourceSha256: '',
+    rigVersionId: initialRigBinding?.rigVersionId ?? '',
+    rigSourceSha256: initialRigBinding?.rigSourceSha256 ?? '',
     mappings: Object.fromEntries(controls.map((control) => [control.canonicalId, ''])),
   }));
   const [validation, setValidation] = useState<Validation | null>(null);
@@ -89,6 +91,8 @@ export function Ep001RigControlAdapterEditor({ characterId, controls }: { charac
         <h2 className="mt-1 font-display text-2xl font-bold">Map artist rig → TivvleJoy controls</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">This mapping does not change the artist rig. It creates a stable translation layer for TivvleJoy animation tooling.</p>
       </div>
+
+      {initialRigBinding ? <div className="rounded-xl border border-[var(--color-success)] p-3 text-xs"><p className="font-bold">Exact rig binding carried from verified delivery</p>{initialRigBinding.rigReceiptSha256 ? <p className="mt-1 break-all font-mono">Rig receipt SHA-256: {initialRigBinding.rigReceiptSha256}</p> : null}<p className="mt-1">Control mapping still requires validation and an immutable adapter receipt.</p></div> : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="text-sm font-bold">Rig version ID<input value={mapping.rigVersionId} disabled={Boolean(saved)} onChange={(e) => { invalidate(); setMapping((current) => ({ ...current, rigVersionId: e.target.value })); }} className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 font-mono text-xs" placeholder="UUID from rig receipt" /></label>

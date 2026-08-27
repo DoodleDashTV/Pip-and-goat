@@ -48,6 +48,16 @@ function humanBytes(value: number) {
   return `${Math.max(1, Math.round(value / 1024))} KB`;
 }
 
+function receiptQuery(receipt: CompletedResponse) {
+  const params = new URLSearchParams({
+    characterId: receipt.characterId,
+    rigVersionId: receipt.versionId,
+    rigSourceSha256: receipt.sourceSha256,
+    rigReceiptSha256: receipt.receiptSha256,
+  });
+  return params.toString();
+}
+
 export function Ep001RigDeliveryUploader({ characterId }: { characterId: CharacterId }) {
   const [file, setFile] = useState<File | null>(null);
   const [note, setNote] = useState('');
@@ -172,6 +182,7 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
   }
 
   const ready = Boolean(file && note.trim() && token.trim() && !receipt);
+  const query = receipt ? receiptQuery(receipt) : '';
   return (
     <section className="studio-card space-y-4 p-4 sm:p-5">
       <div>
@@ -207,9 +218,15 @@ export function Ep001RigDeliveryUploader({ characterId }: { characterId: Charact
       {receipt ? (
         <div className="rounded-xl border border-[var(--color-success)] p-3 text-sm">
           <p className="font-bold">Private upload verified — still NOT approved</p>
-          <p className="mt-2 break-all font-mono text-xs">Source SHA-256: {receipt.sourceSha256}</p>
+          <p className="mt-2 break-all font-mono text-xs">Version ID: {receipt.versionId}</p>
+          <p className="mt-1 break-all font-mono text-xs">Source SHA-256: {receipt.sourceSha256}</p>
           <p className="mt-1 break-all font-mono text-xs">Receipt SHA-256: {receipt.receiptSha256}</p>
           <p className="mt-2">Technical inspection: waiting · human rig approval: waiting · episode admission: blocked.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a href={`/episode-one/rig-inspection-evidence-inbox?${query}`} className="min-h-touch rounded-xl bg-[var(--color-primary)] px-4 py-3 font-bold text-white">Continue to evidence inbox</a>
+            <a href={`/episode-one/rig-control-adapter?${query}`} className="min-h-touch rounded-xl border border-[var(--color-border)] px-4 py-3 font-bold">Continue to control adapter</a>
+          </div>
+          <p className="mt-2 text-xs text-[var(--color-text-muted)]">These links carry only receipt identities. They do not select a canonical rig or grant approval.</p>
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
