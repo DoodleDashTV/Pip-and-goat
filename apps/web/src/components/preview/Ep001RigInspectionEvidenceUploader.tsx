@@ -8,6 +8,7 @@ const TOKEN_HEADER = 'x-tivvlejoy-character-intake-token';
 
 type Created = { evidenceId: string; partCount: number; parts: Array<{ partNumber: number; start: number; end: number }> };
 type Receipt = { evidenceId: string; evidenceSha256: string; receiptSha256: string; slotId: string; rigVersionId: string };
+type InitialRigBinding = { rigVersionId: string; rigSourceSha256: string; rigReceiptSha256?: string } | null;
 
 async function post(token: string, body: Record<string, unknown>) {
   const response = await fetch(API, {
@@ -20,13 +21,13 @@ async function post(token: string, body: Record<string, unknown>) {
   return payload as Record<string, unknown>;
 }
 
-export function Ep001RigInspectionEvidenceUploader({ characterId, slots }: { characterId: RigCharacterId; slots: RigEvidenceSlot[] }) {
-  const [rigVersionId, setRigVersionId] = useState('');
-  const [rigSourceSha256, setRigSourceSha256] = useState('');
+export function Ep001RigInspectionEvidenceUploader({ characterId, slots, initialRigBinding = null }: { characterId: RigCharacterId; slots: RigEvidenceSlot[]; initialRigBinding?: InitialRigBinding }) {
+  const [rigVersionId, setRigVersionId] = useState(initialRigBinding?.rigVersionId ?? '');
+  const [rigSourceSha256, setRigSourceSha256] = useState(initialRigBinding?.rigSourceSha256 ?? '');
   const [slotId, setSlotId] = useState(slots[0]?.id ?? '');
   const [file, setFile] = useState<File | null>(null);
   const [token, setToken] = useState('');
-  const [state, setState] = useState('WAITING_FOR_RIG_BINDING');
+  const [state, setState] = useState(initialRigBinding ? 'RIG_BINDING_RECEIVED_FROM_VERIFIED_UPLOAD' : 'WAITING_FOR_RIG_BINDING');
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
@@ -81,6 +82,7 @@ export function Ep001RigInspectionEvidenceUploader({ characterId, slots }: { cha
         <h2 className="mt-1 font-display text-2xl font-bold">Bind proof to exact rig delivery</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">Evidence can be uploaded only when the exact rig version ID and source SHA-256 are known. Uploading proof never approves the rig.</p>
       </div>
+      {initialRigBinding ? <div className="rounded-xl border border-[var(--color-success)] p-3 text-xs"><p className="font-bold">Exact rig receipt binding carried from upload</p>{initialRigBinding.rigReceiptSha256 ? <p className="mt-1 break-all font-mono">Rig receipt SHA-256: {initialRigBinding.rigReceiptSha256}</p> : null}<p className="mt-1">You can change the fields below only if intentionally inspecting a different immutable rig version.</p></div> : null}
       <label className="block text-sm font-bold">Rig version ID
         <input value={rigVersionId} onChange={(e) => setRigVersionId(e.target.value)} placeholder="UUID from rig delivery receipt" className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 font-mono text-xs" />
       </label>
