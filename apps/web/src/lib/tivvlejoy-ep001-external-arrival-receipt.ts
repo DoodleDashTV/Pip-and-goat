@@ -1,4 +1,5 @@
 import { sha256Canonical } from '@/lib/tivvlejoy-character-animation';
+import { compileEp001ExternalArrivalTriggerMatrix } from '@/lib/tivvlejoy-ep001-external-arrival-trigger-matrix';
 import {
   validatePaidAuthorizationArrival,
   validateRigArrival,
@@ -20,6 +21,7 @@ export function compileEp001ExternalArrivalReceipt(
   input: ExternalArrivalCandidate,
   now = new Date(),
 ) {
+  const matrix = compileEp001ExternalArrivalTriggerMatrix();
   const validation =
     input.arrivalType === 'RIG'
       ? validateRigArrival(input.candidate)
@@ -34,6 +36,7 @@ export function compileEp001ExternalArrivalReceipt(
   const body = {
     schemaVersion: EP001_EXTERNAL_ARRIVAL_RECEIPT_SCHEMA,
     episodeId: 'EP001' as const,
+    externalArrivalTriggerMatrixSha256: matrix.externalArrivalTriggerMatrixSha256,
     arrivalType: input.arrivalType,
     candidate: input.candidate,
     validation: {
@@ -54,3 +57,17 @@ export function compileEp001ExternalArrivalReceipt(
 }
 
 export type Ep001ExternalArrivalReceipt = ReturnType<typeof compileEp001ExternalArrivalReceipt>;
+
+export function validateEp001ExternalArrivalReceiptFreshness(
+  receipt: Pick<Ep001ExternalArrivalReceipt, 'externalArrivalTriggerMatrixSha256'>,
+) {
+  const matrix = compileEp001ExternalArrivalTriggerMatrix();
+  const current = receipt.externalArrivalTriggerMatrixSha256 === matrix.externalArrivalTriggerMatrixSha256;
+  return {
+    current,
+    expectedExternalArrivalTriggerMatrixSha256: matrix.externalArrivalTriggerMatrixSha256,
+    suppliedExternalArrivalTriggerMatrixSha256: receipt.externalArrivalTriggerMatrixSha256,
+    admissionGranted: false as const,
+    paidExecutionAuthorized: false as const,
+  };
+}
