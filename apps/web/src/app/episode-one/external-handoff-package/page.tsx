@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { compileEp001ExternalHandoffPackage } from '@/lib/tivvlejoy-ep001-external-handoff-package';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Episode 1 External Handoff | TivvleJoy',
   description: 'Immutable read-only EP001 external foundation-input handoff package.',
