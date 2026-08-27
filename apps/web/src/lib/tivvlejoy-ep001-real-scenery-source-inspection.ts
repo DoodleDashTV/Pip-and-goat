@@ -103,7 +103,7 @@ const SOURCES = [
 
 export function compileEp001RealScenerySourceInspection() {
   const admission = compileEp001SceneryAdmissionReadiness();
-  const supportedRoles = new Set(SOURCES.flatMap((source) => [...source.candidateRoles]));
+  const supportedRoles = new Set<string>(SOURCES.flatMap((source) => [...source.candidateRoles]));
   const slotAssessments = admission.slots.map((slot) => {
     const candidateSources = SOURCES.filter((source) => source.candidateRoles.includes(slot.semanticRole as never)).map((source) => source.sourceId);
     return {
