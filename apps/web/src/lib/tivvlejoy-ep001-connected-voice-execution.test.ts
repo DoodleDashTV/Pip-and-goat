@@ -15,7 +15,7 @@ describe('EP001 connected voice execution', () => {
 
   it('reserves before provider contact and refuses uncertain replay', () => {
     const reservationWrite = source.indexOf("putAndVerify(r2, reservationKey");
-    const providerCreate = source.indexOf('createEp012ElevenLabsTransport');
+    const providerCreate = source.indexOf('const transport = createEp012ElevenLabsTransport');
     expect(reservationWrite).toBeGreaterThan(-1);
     expect(providerCreate).toBeGreaterThan(reservationWrite);
     expect(source).toContain("return blocked('EP001_RECOVERY_REQUIRED'");
