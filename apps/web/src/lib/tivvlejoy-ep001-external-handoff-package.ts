@@ -17,6 +17,7 @@ export function compileEp001ExternalHandoffPackage() {
     triggerId: input.triggerId,
     subject: input.subject,
     arrivalClass: input.arrivalClass,
+    relatedDecisionIds: [...input.relatedDecisionIds],
     requiredEvidence: [...input.requiredArrivalEvidence],
     safeActionsAfterArrival: [...input.safeActionsAfterArrival],
     stillBlockedAfterArrival: [...input.stillRequiresHumanOrExplicitAuthority],
@@ -33,6 +34,7 @@ export function compileEp001ExternalHandoffPackage() {
         triggerId: input.triggerId,
         subject: input.subject,
         dependencyPhase: input.dependencyPhase,
+        relatedDecisionIds: [...input.relatedDecisionIds],
         requiredEvidence: [...input.requiredArrivalEvidence],
       })),
     verification: {
