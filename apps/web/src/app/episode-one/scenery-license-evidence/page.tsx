@@ -15,11 +15,11 @@ export default function EpisodeOneSceneryLicenseEvidencePage() {
           <Link href="/episode-one/scenery-gap-closure" className="inline-flex min-h-touch items-center text-sm font-bold text-[var(--color-primary)]">← Scenery capability closure</Link>
           <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">Episode 1 scenery provenance</p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Commercial-use evidence gate</h1>
-          <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">All required scenery roles have a source or native recipe, but purchased source packages remain blocked until exact purchase and license evidence is hash-bound and human-reviewed.</p>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">Every statically inspected source and supporting commercial dependency is represented here. Capability does not become admission until exact purchase and license evidence is hash-bound and human-reviewed.</p>
         </div>
         <dl className="grid gap-px bg-[var(--color-border)] sm:grid-cols-5">
           {[
-            ['Source records', evidence.metrics.purchasedSourceRecordCount],
+            ['Source records', evidence.metrics.sourceRecordCount],
             ['Public matches', evidence.metrics.publicMarketplaceCandidateCount],
             ['Evidence bound', evidence.metrics.evidenceBoundCount],
             ['Commercial verified', evidence.metrics.commercialUseVerifiedCount],
@@ -31,7 +31,7 @@ export default function EpisodeOneSceneryLicenseEvidencePage() {
       <section className="space-y-3">
         {evidence.records.map((record) => (
           <article key={record.sourceId} className="studio-card p-4 sm:p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3"><p className="break-all font-mono text-xs font-bold text-[var(--color-primary)]">{record.sourceId}</p><span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-subtle)] px-3 py-1 text-xs font-bold">AWAITING EVIDENCE</span></div>
+            <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="break-all font-mono text-xs font-bold text-[var(--color-primary)]">{record.sourceId}</p><p className="mt-1 text-xs font-bold text-[var(--color-text-muted)]">{record.dependencyClass}</p></div><span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-subtle)] px-3 py-1 text-xs font-bold">AWAITING EVIDENCE</span></div>
             {record.publicMarketplaceCandidate ? (
               <div className="mt-3 rounded-2xl border border-[var(--color-success)] bg-[var(--color-success-soft)] p-3 text-sm leading-6 text-[var(--color-success-foreground)]">
                 <p className="font-bold">Strong public marketplace match · still not purchase proof</p>
