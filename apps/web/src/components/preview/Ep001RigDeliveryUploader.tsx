@@ -1,0 +1,137 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+
+type CharacterId = 'CHAR_PIP_001' | 'CHAR_GOAT_001';
+type PlannedPart = { partNumber: number; start: number; end: number };
+type CreatedResponse = { versionId: string; partCount: number; parts: PlannedPart[]; approved: false };
+type CompletedResponse = {
+  versionId: string;
+  characterId: CharacterId;
+  sourceSha256: string;
+  byteSize: number;
+  receiptSha256: string;
+  uploadVerified: boolean;
+  technicalInspectionPassed: false;
+  humanApproved: false;
+  episodeAdmitted: false;
+};
+
+const API = '/api/episode-one/rig-delivery-intake';
+const TOKEN_HEADER = 'x-tivvlejoy-character-intake-token';
+
+async function postIntake(token: string, body: Record<string, unknown>) {
+  const response = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', [TOKEN_HEADER]: token },
+    body: JSON.stringify(body),
+  });
+  const payload = await response.json().catch(() => ({ code: 'RIG_INTAKE_RESPONSE_INVALID' }));
+  if (!response.ok) throw new Error(String(payload.code ?? payload.error ?? 'RIG_INTAKE_REFUSED'));
+  return payload as Record<string, unknown>;
+}
+
+function humanBytes(value: number) {
+  if (value >= 1024 ** 3) return `${(value / 1024 ** 3).toFixed(2)} GB`;
+  if (value >= 1024 ** 2) return `${(value / 1024 ** 2).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(value / 1024))} KB`;
+}
+
+export function Ep001RigDeliveryUploader({ characterId }: { characterId: CharacterId }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [note, setNote] = useState('');
+  const [token, setToken] = useState('');
+  const [status, setStatus] = useState('WAITING_FOR_FILE');
+  const [progress, setProgress] = useState(0);
+  const [receipt, setReceipt] = useState<CompletedResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const label = characterId === 'CHAR_PIP_001' ? 'Pip' : 'Goat';
+  const fileSummary = useMemo(() => file ? `${file.name} · ${humanBytes(file.size)}` : 'No file selected', [file]);
+
+  async function upload() {
+    if (!file || !note.trim() || !token.trim()) return;
+    setError(null);
+    setReceipt(null);
+    setProgress(0);
+    let versionId: string | null = null;
+    try {
+      setStatus('OPENING_PRIVATE_UPLOAD_SESSION');
+      const created = await postIntake(token, {
+        action: 'create', characterId, originalFilename: file.name, byteSize: file.size,
+        artistVersionNote: note.trim(), lastModified: file.lastModified,
+      }) as unknown as CreatedResponse;
+      versionId = created.versionId;
+      const completedParts: Array<{ partNumber: number; etag: string }> = [];
+
+      for (let index = 0; index < created.parts.length; index += 1) {
+        const part = created.parts[index]!;
+        setStatus(`UPLOADING_PART_${part.partNumber}_OF_${created.partCount}`);
+        const signed = await postIntake(token, { action: 'sign-part', characterId, versionId, partNumber: part.partNumber });
+        const url = String(signed.url ?? '');
+        if (!url.startsWith('https://')) throw new Error('RIG_SIGNED_URL_INVALID');
+        const chunk = file.slice(part.start, part.end);
+        const put = await fetch(url, { method: 'PUT', body: chunk });
+        if (!put.ok) throw new Error(`RIG_PART_UPLOAD_FAILED_${part.partNumber}`);
+        const etag = put.headers.get('etag');
+        if (!etag) throw new Error(`RIG_PART_ETAG_MISSING_${part.partNumber}`);
+        completedParts.push({ partNumber: part.partNumber, etag });
+        setProgress(Math.round(((index + 1) / created.parts.length) * 90));
+      }
+
+      setStatus('VERIFYING_STORED_BYTES_AND_SHA256');
+      const completed = await postIntake(token, { action: 'complete', characterId, versionId, parts: completedParts }) as unknown as CompletedResponse;
+      setReceipt(completed);
+      setProgress(100);
+      setStatus('RECEIVED_NOT_APPROVED');
+    } catch (caught) {
+      setStatus('RECOVERY_REQUIRED');
+      setError(caught instanceof Error ? caught.message : 'RIG_UPLOAD_FAILED');
+      if (versionId) {
+        try { await postIntake(token, { action: 'abort', characterId, versionId }); } catch { /* preserve primary error */ }
+      }
+    }
+  }
+
+  const ready = Boolean(file && note.trim() && token.trim() && !receipt);
+  return (
+    <section className="studio-card space-y-4 p-4 sm:p-5">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-primary)]">{label} delivery slot</p>
+        <h2 className="mt-1 font-display text-2xl font-bold">Upload final corrected rig</h2>
+        <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">Preferred: the artist-delivered `.blend` file. The original bytes are preserved; upload never equals rig approval.</p>
+      </div>
+
+      <label className="block text-sm font-bold">Rig file
+        <input type="file" accept=".blend,.fbx,.glb,.zip" className="mt-2 block w-full text-sm" disabled={Boolean(receipt)} onChange={(event) => setFile(event.target.files?.[0] ?? null)} />
+      </label>
+      <p className="break-all rounded-xl bg-[var(--color-surface-subtle)] p-3 font-mono text-xs">{fileSummary}</p>
+
+      <label className="block text-sm font-bold">Artist/version note
+        <textarea value={note} maxLength={1000} disabled={Boolean(receipt)} onChange={(event) => setNote(event.target.value)} placeholder="Example: Final corrected Goat rig, delivery v2" className="mt-2 min-h-24 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm" />
+      </label>
+
+      <label className="block text-sm font-bold">Private character intake token
+        <input type="password" value={token} autoComplete="off" disabled={Boolean(receipt)} onChange={(event) => setToken(event.target.value)} placeholder="Never stored in the page or URL" className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm" />
+      </label>
+
+      <div className="rounded-xl border border-[var(--color-border)] p-3 text-sm">
+        <p><span className="font-bold">State:</span> {status}</p>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--color-surface-subtle)]"><div className="h-full bg-[var(--color-primary)] transition-all" style={{ width: `${progress}%` }} /></div>
+        <p className="mt-1 text-xs text-[var(--color-text-muted)]">{progress}%</p>
+      </div>
+
+      {error ? <div className="rounded-xl border border-[var(--color-danger)] p-3 text-sm"><p className="font-bold">Upload stopped safely</p><p className="mt-1 font-mono text-xs">{error}</p></div> : null}
+
+      {receipt ? (
+        <div className="rounded-xl border border-[var(--color-success)] p-3 text-sm">
+          <p className="font-bold">Private upload verified — still NOT approved</p>
+          <p className="mt-2 break-all font-mono text-xs">Source SHA-256: {receipt.sourceSha256}</p>
+          <p className="mt-1 break-all font-mono text-xs">Receipt SHA-256: {receipt.receiptSha256}</p>
+          <p className="mt-2">Technical inspection: waiting · human rig approval: waiting · episode admission: blocked.</p>
+        </div>
+      ) : (
+        <button type="button" disabled={!ready} onClick={() => void upload()} className="min-h-touch rounded-xl bg-[var(--color-primary)] px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">Upload {label} rig privately</button>
+      )}
+    </section>
+  );
+}
