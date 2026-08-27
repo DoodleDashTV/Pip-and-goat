@@ -84,6 +84,15 @@ export function Ep001RigControlAdapterEditor({ characterId, controls, initialRig
     invalidate();
   }
 
+  const compatibilityHref = saved ? `/episode-one/rig-animation-compatibility?${new URLSearchParams({
+    characterId,
+    rigVersionId: mapping.rigVersionId,
+    rigSourceSha256: mapping.rigSourceSha256,
+    rigReceiptSha256: initialRigBinding?.rigReceiptSha256 ?? '',
+    adapterSha256: saved.adapterSha256,
+    adapterReceiptSha256: saved.receiptSha256,
+  }).toString()}` : '';
+
   return (
     <section className="studio-card space-y-4 p-4 sm:p-5">
       <div>
@@ -122,7 +131,7 @@ export function Ep001RigControlAdapterEditor({ characterId, controls, initialRig
 
       {error ? <p className="rounded-xl border border-[var(--color-danger)] p-3 font-mono text-xs">{error}</p> : null}
       {validation && !validation.valid ? <div className="rounded-xl border border-[var(--color-warning)] p-3 text-sm"><p className="font-bold">Mapping incomplete</p><p className="mt-1">{validation.mappedControlCount} / {validation.requiredControlCount} required roles mapped.</p><ul className="mt-2 list-disc pl-5 font-mono text-xs">{validation.errors.slice(0, 12).map((item) => <li key={item}>{item}</li>)}</ul></div> : null}
-      {saved ? <div className="rounded-xl border border-[var(--color-success)] p-3 text-sm"><p className="font-bold">Adapter stored immutably — rig still NOT approved</p><p className="mt-2 break-all font-mono text-[11px]">Adapter SHA-256: {saved.adapterSha256}</p><p className="mt-1 break-all font-mono text-[11px]">Receipt SHA-256: {saved.receiptSha256}</p><p className="mt-2">Technical inspection: waiting · human approval: waiting · Production: disabled.</p></div> : null}
+      {saved ? <div className="rounded-xl border border-[var(--color-success)] p-3 text-sm"><p className="font-bold">Adapter stored immutably — rig still NOT approved</p><p className="mt-2 break-all font-mono text-[11px]">Adapter SHA-256: {saved.adapterSha256}</p><p className="mt-1 break-all font-mono text-[11px]">Receipt SHA-256: {saved.receiptSha256}</p><p className="mt-2">Technical inspection: waiting · human approval: waiting · Production: disabled.</p><a href={compatibilityHref} className="mt-3 inline-flex min-h-touch items-center rounded-xl bg-[var(--color-primary)] px-4 py-2 font-bold text-white">Open bound compatibility suite →</a></div> : null}
     </section>
   );
 }

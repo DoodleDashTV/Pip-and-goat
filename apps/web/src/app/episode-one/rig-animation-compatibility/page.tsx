@@ -8,8 +8,21 @@ export const metadata = {
   description: 'Prebuilt animation compatibility and deformation test matrix for incoming Pip and Goat rigs.',
 };
 
-export default function Ep001RigAnimationCompatibilityPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+const one = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
+
+export default async function Ep001RigAnimationCompatibilityPage({ searchParams }: { searchParams: SearchParams }) {
   const suite = compileRigAnimationCompatibilitySuite();
+  const params = await searchParams;
+  const characterId = one(params.characterId);
+  const rigVersionId = String(one(params.rigVersionId) ?? '');
+  const rigSourceSha256 = String(one(params.rigSourceSha256) ?? '').toLowerCase();
+  const rigReceiptSha256 = String(one(params.rigReceiptSha256) ?? '').toLowerCase();
+  const adapterSha256 = String(one(params.adapterSha256) ?? '').toLowerCase();
+  const adapterReceiptSha256 = String(one(params.adapterReceiptSha256) ?? '').toLowerCase();
+  const bound = (characterId === 'CHAR_PIP_001' || characterId === 'CHAR_GOAT_001') && /^[a-f0-9-]{36}$/i.test(rigVersionId) && [rigSourceSha256, adapterSha256, adapterReceiptSha256].every((value) => /^[a-f0-9]{64}$/i.test(value)) && (!rigReceiptSha256 || /^[a-f0-9]{64}$/i.test(rigReceiptSha256));
+  const selectedTests = characterId === 'CHAR_PIP_001' ? suite.pip : characterId === 'CHAR_GOAT_001' ? suite.goat : [];
+  const jobHref = bound ? `/episode-one/rig-validation-job?${new URLSearchParams({ characterId: String(characterId), rigVersionId, rigSourceSha256, rigReceiptSha256, adapterSha256, adapterReceiptSha256 }).toString()}` : '';
   return (
     <main className="mx-auto min-h-screen w-full max-w-7xl space-y-4 px-4 py-6 sm:px-6 sm:py-10">
       <section className="studio-card p-4 sm:p-6">
@@ -23,6 +36,8 @@ export default function Ep001RigAnimationCompatibilityPage() {
         <p className="mt-4 break-all font-mono text-[11px] text-[var(--color-text-muted)]">Compatibility suite SHA-256: {suite.suiteSha256}</p>
       </section>
 
+      {bound ? <section className="studio-card p-4 sm:p-6"><p className="text-xs font-bold uppercase text-[var(--color-primary)]">Immutable validation binding</p><h2 className="mt-1 font-display text-2xl font-bold">{characterId === 'CHAR_PIP_001' ? 'Pip' : 'Goat'} · {selectedTests.length} tests ready to compile</h2><div className="mt-3 grid gap-2 font-mono text-[11px]"><p className="break-all">Rig version: {rigVersionId}</p><p className="break-all">Rig source SHA-256: {rigSourceSha256}</p><p className="break-all">Adapter SHA-256: {adapterSha256}</p><p className="break-all">Adapter receipt SHA-256: {adapterReceiptSha256}</p></div><a href={jobHref} className="mt-4 inline-flex min-h-touch items-center rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-bold text-white">Compile bound validation job →</a></section> : null}
+
       {([['Pip', suite.pip], ['Goat', suite.goat]] as const).map(([label, tests]) => (
         <section key={label} className="studio-card p-4 sm:p-6">
           <h2 className="font-display text-2xl font-bold">{label} test matrix</h2>
@@ -34,7 +49,7 @@ export default function Ep001RigAnimationCompatibilityPage() {
 
       <section className="rounded-3xl border border-[var(--color-warning)] bg-[var(--color-warning-soft)] p-4 text-sm leading-6 text-[var(--color-warning-foreground)]">
         <p className="font-bold">No compatibility test has been executed yet.</p>
-        <p className="mt-1">A synthetic or structurally complete adapter cannot pass the rig. Real Blender execution on the exact delivered source plus human visual review is still required.</p>
+        <p className="mt-1">A bound adapter still cannot pass the rig. Real Blender execution on the exact delivered source plus human visual review is required.</p>
       </section>
     </main>
   );
