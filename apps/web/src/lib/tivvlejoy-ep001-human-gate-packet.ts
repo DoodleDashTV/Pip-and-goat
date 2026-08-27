@@ -76,7 +76,7 @@ export function compileEp001HumanGatePacket() {
     schemaVersion: EP001_HUMAN_GATE_PACKET_SCHEMA,
     episodeId: evidence.episodeId,
     state: 'HUMAN_DECISION_PACKET_READY_NO_APPROVALS_ISSUED' as const,
-    evidenceAdmissionSha256: evidence.evidenceAdmissionSha256,
+    evidenceBoardSha256: evidence.evidenceBoardSha256,
     sceneryDeepInspectionPlanSha256: scenery.sceneryDeepInspectionPlanSha256,
     voiceExecutionReadinessSha256: voices.voiceExecutionReadinessSha256,
     rows,
