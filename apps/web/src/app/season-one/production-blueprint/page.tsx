@@ -1,0 +1,22 @@
+import Link from 'next/link';
+import { compileSeasonOneEpisodeProductionBlueprint } from '@/lib/tivvlejoy-season-one-episode-production-blueprint';
+
+export const metadata = {
+  title: 'Season 1 Production Blueprint | TivvleJoy',
+  description: 'Read-only reusable production blueprint for Season 1 episodes.',
+};
+
+export default function SeasonOneProductionBlueprintPage() {
+  const blueprint = compileSeasonOneEpisodeProductionBlueprint();
+  return (
+    <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6 sm:px-6 sm:py-10">
+      <section className="studio-card overflow-hidden"><div className="border-b border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-4 sm:p-6"><Link href="/episode-one/delivery-archive" className="inline-flex min-h-touch items-center text-sm font-bold text-[var(--color-primary)]">← Episode 1 delivery archive</Link><div className="mt-3 flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">TivvleJoy Season 1</p><h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Episode production blueprint</h1></div><span className="status-warning rounded-full px-3 py-1 text-xs font-bold">Future episodes not instantiated</span></div><p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--color-text-muted)]">Episode 1 acts as the proof pattern. Future episodes inherit the quality and safety gates, but never inherit story-specific approvals, evidence, paid authorization, or publishing authority.</p></div><div className="grid gap-px bg-[var(--color-border)] sm:grid-cols-4"><div className="bg-[var(--color-surface)] p-4"><p className="text-xs font-bold uppercase text-[var(--color-text-muted)]">Season episodes</p><p className="mt-1 font-display text-2xl font-bold">{blueprint.metrics.seasonEpisodeCount}</p></div><div className="bg-[var(--color-surface)] p-4"><p className="text-xs font-bold uppercase text-[var(--color-text-muted)]">Future templates</p><p className="mt-1 font-display text-2xl font-bold">{blueprint.metrics.futureEpisodeCount}</p></div><div className="bg-[var(--color-surface)] p-4"><p className="text-xs font-bold uppercase text-[var(--color-text-muted)]">Stages each</p><p className="mt-1 font-display text-2xl font-bold">{blueprint.metrics.stageCountPerEpisode}</p></div><div className="bg-[var(--color-surface)] p-4"><p className="text-xs font-bold uppercase text-[var(--color-text-muted)]">Default output</p><p className="mt-1 font-display text-sm font-bold">1080x1920 · 30 fps · 60s</p></div></div></section>
+
+      <section className="studio-card p-4 sm:p-6"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">Reusable stage path</p><h2 className="mt-2 font-display text-2xl font-bold">Ten fail-closed stages per episode</h2><ol className="mt-4 space-y-3">{blueprint.stages.map((stage) => <li key={stage.stageId} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-4"><div className="flex gap-3"><span className="font-display text-xl font-bold text-[var(--color-primary)]">{stage.order}</span><div><p className="font-mono text-xs font-bold text-[var(--color-primary)]">{stage.stageId}</p><p className="mt-1 text-sm leading-6">{stage.acceptancePurpose}</p><p className="mt-2 text-xs text-[var(--color-text-muted)]">NOT_STARTED · human gate required · no auto-approval</p></div></div></li>)}</ol></section>
+
+      <section className="studio-card p-4 sm:p-6"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">Per-episode identity</p><h2 className="mt-2 font-display text-2xl font-bold">Every episode gets fresh evidence</h2><ul className="mt-4 grid gap-2 sm:grid-cols-2">{blueprint.perEpisodeRequiredBindings.map((item) => <li key={item} className="rounded-xl bg-[var(--color-surface-subtle)] p-3 text-sm">{item}</li>)}</ul></section>
+
+      <section className="rounded-3xl border border-[var(--color-success)] bg-[var(--color-success-soft)] p-4 text-sm leading-6 text-[var(--color-success-foreground)]"><p className="font-bold">Blueprint only</p><p className="mt-1">0 future episode records generated · zero paid requests · zero network/storage/Production mutations · no publishing authority</p><p className="mt-3 break-all font-mono text-[11px]">Blueprint sha256:{blueprint.blueprintSha256}</p></section>
+    </main>
+  );
+}
