@@ -2,6 +2,7 @@ import { sha256Canonical } from '@/lib/tivvlejoy-character-animation';
 import { compileEp001AutonomousReadinessController } from '@/lib/tivvlejoy-ep001-autonomous-readiness-controller';
 import { compileCurrentEp001ContractSnapshot } from '@/lib/tivvlejoy-ep001-contract-watchdog';
 import { compileEp001CriticalPathScheduler } from '@/lib/tivvlejoy-ep001-critical-path-scheduler';
+import { compileEp001CrossContractIntegrityAudit } from '@/lib/tivvlejoy-ep001-cross-contract-integrity';
 import { compileEp001ExternalArrivalSimulationAudit } from '@/lib/tivvlejoy-ep001-external-arrival-simulation-audit';
 import { compileEp001HumanGatePacket } from '@/lib/tivvlejoy-ep001-human-gate-packet';
 
@@ -14,6 +15,7 @@ export function compileEp001AutonomousControlRoom() {
   const scheduler = compileEp001CriticalPathScheduler();
   const simulation = compileEp001ExternalArrivalSimulationAudit();
   const contractSnapshot = compileCurrentEp001ContractSnapshot();
+  const integrity = compileEp001CrossContractIntegrityAudit();
 
   const nextRequiredExternalInputs = scheduler.waitingLanes
     .filter((lane) => lane.phase === 0)
@@ -22,7 +24,9 @@ export function compileEp001AutonomousControlRoom() {
   const body = {
     schemaVersion: EP001_AUTONOMOUS_CONTROL_ROOM_SCHEMA,
     episodeId: humanGates.episodeId,
-    state: 'WAITING_ON_REAL_EXTERNAL_FOUNDATION_INPUTS' as const,
+    state: integrity.integrityPass
+      ? ('WAITING_ON_REAL_EXTERNAL_FOUNDATION_INPUTS' as const)
+      : ('CONTRACT_INTEGRITY_FAILURE' as const),
     headline: {
       humanDecisionRows: humanGates.metrics.totalDecisionRows,
       humanApprovalsIssued: humanGates.metrics.approvedRows,
@@ -32,6 +36,13 @@ export function compileEp001AutonomousControlRoom() {
       foundationInputsWaiting: scheduler.metrics.phaseZeroWaiting,
       syntheticScenariosCovered: simulation.metrics.scenarioCount,
       syntheticAuthorityLeaks: simulation.metrics.authorityLeakCount,
+      crossContractIntegrityPass: integrity.integrityPass,
+      crossContractIssueCount: integrity.metrics.issueCount,
+    },
+    integrity: {
+      pass: integrity.integrityPass,
+      issues: integrity.issues,
+      crossContractIntegritySha256: integrity.crossContractIntegritySha256,
     },
     nextRequiredExternalInputs,
     currentContracts: contractSnapshot,
