@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { describeSceneryStorageConfiguration } from '@/lib/scenery/intake/config';
 import {
   EP001_RIG_INTAKE_TOKEN_HEADER,
   handleEp001RigDeliveryIntake,
@@ -25,7 +26,17 @@ function publicFailure(error: unknown) {
 }
 
 export async function GET() {
-  return NextResponse.json(publicRigIntakeStatus(process.env), {
+  const storage = describeSceneryStorageConfiguration(process.env);
+  const status = publicRigIntakeStatus(process.env);
+  return NextResponse.json({
+    ...status,
+    privateStorageConfigured: storage.configured,
+    privateStorageDurable: storage.durable,
+    readyForPrivateRigUpload: status.previewRuntime && status.tokenConfigured && storage.configured && storage.durable,
+    providerCalls: 0,
+    storageMutations: 0,
+    paidRequests: 0,
+  }, {
     status: 200,
     headers: { 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex, nofollow' },
   });
