@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { compileEp001ExternalArrivalReceipt } from '@/lib/tivvlejoy-ep001-external-arrival-receipt';
+import {
+  compileEp001ExternalArrivalReceipt,
+  validateEp001ExternalArrivalReceiptFreshness,
+} from '@/lib/tivvlejoy-ep001-external-arrival-receipt';
 
 const SHA = 'b'.repeat(64);
 
@@ -18,9 +21,20 @@ describe('compileEp001ExternalArrivalReceipt', () => {
     const a = compileEp001ExternalArrivalReceipt(input);
     const b = compileEp001ExternalArrivalReceipt(input);
     expect(a.arrivalReceiptSha256).toBe(b.arrivalReceiptSha256);
+    expect(a.externalArrivalTriggerMatrixSha256).toMatch(/^[a-f0-9]{64}$/);
     expect(a.receiptState).toBe('STRUCTURALLY_VALID_EXTERNAL_CANDIDATE');
     expect(a.authority.admissionGranted).toBe(false);
     expect(a.authority.arrivalObserved).toBe(false);
+    expect(validateEp001ExternalArrivalReceiptFreshness(a).current).toBe(true);
+  });
+
+  it('rejects a receipt bound to a stale trigger-matrix hash', () => {
+    const freshness = validateEp001ExternalArrivalReceiptFreshness({
+      externalArrivalTriggerMatrixSha256: '0'.repeat(64),
+    });
+    expect(freshness.current).toBe(false);
+    expect(freshness.admissionGranted).toBe(false);
+    expect(freshness.paidExecutionAuthorized).toBe(false);
   });
 
   it('rejects invalid candidates before receipt creation', () => {
