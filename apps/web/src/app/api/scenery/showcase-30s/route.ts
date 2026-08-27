@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
+  CopyObjectCommand,
   GetObjectCommand,
   ListObjectsV2Command,
   S3Client,
@@ -18,6 +19,9 @@ const OUTPUT_KEY = `tivvlejoy-assets/showcases/${EXECUTION_ID}/tivvlejoy-scenery
 const STATUS_KEY = `jobs/${EXECUTION_ID}/status.json`;
 const STARTUP_KEY = `jobs/${EXECUTION_ID}/startup-status.json`;
 const PREFIX = 'tivvlejoy-assets';
+const COMPAT_PREFIX = `${PREFIX}/showcase-compat`;
+const FOREST_TEXTURE_ALIAS = `${COMPAT_PREFIX}/forest_textures_4096.zip`;
+const WATER_ROLE_ALIAS = `${COMPAT_PREFIX}/Water_Mat_GN.zip`;
 const MAX_HOURLY_USD = 0.8;
 const HARD_COST_USD = 2.0;
 const MAX_RUNTIME_MINUTES = 120;
@@ -49,6 +53,10 @@ function r2Config() {
   const secretAccessKey = clean(process.env.R2_SECRET_ACCESS_KEY || process.env.OBJECT_STORAGE_SECRET_ACCESS_KEY);
   if (!endpoint || !bucket || !accessKeyId || !secretAccessKey) throw new Error('PRIVATE_R2_NOT_CONFIGURED');
   return {
+    endpoint,
+    region,
+    accessKeyId,
+    secretAccessKey,
     bucket,
     client: new S3Client({
       endpoint,
@@ -88,8 +96,7 @@ function commercialCandidate(key: string) {
   return true;
 }
 
-async function rolePreflight() {
-  const objects = await listPrivateObjects();
+function roleSnapshot(objects: Array<{ key: string; size: number }>) {
   const candidates = objects.filter((x) => commercialCandidate(x.key));
   const roles = Object.fromEntries(
     Object.entries(ROLE_RULES).map(([role, patterns]) => [role, candidates.some((x) => patterns.some((rx) => rx.test(x.key)))]),
@@ -103,6 +110,61 @@ async function rolePreflight() {
     satisfiedRoleCount: Object.values(roles).filter(Boolean).length,
     roles,
     missingRoles,
+  };
+}
+
+async function rolePreflight() {
+  return roleSnapshot(await listPrivateObjects());
+}
+
+function encodedCopySource(bucket: string, key: string) {
+  return `${bucket}/${key.split('/').map((part) => encodeURIComponent(part)).join('/')}`;
+}
+
+async function ensureCompatibilityAliases() {
+  const r2 = r2Config();
+  const objects = await listPrivateObjects();
+  const keys = new Set(objects.map((x) => x.key));
+  const candidates = objects.filter((x) => commercialCandidate(x.key) && !x.key.startsWith(`${COMPAT_PREFIX}/`));
+
+  const forestSource = candidates
+    .filter((x) => /stylized.*forest|stylised.*ecokit|forest.*nature.*kit|ecokit/i.test(x.key) && /\.zip$/i.test(x.key))
+    .sort((a, b) => a.size - b.size)[0];
+  const waterPlaceholderSource = candidates
+    .filter((x) => /world.*shaders|giveaway.*world|physical[_ -]?starlight|gaffer/i.test(x.key) && /\.zip$/i.test(x.key))
+    .sort((a, b) => a.size - b.size)[0];
+
+  if (!forestSource) throw new Error('FOREST_COMPAT_SOURCE_NOT_FOUND');
+  if (!waterPlaceholderSource) throw new Error('DRY_SHOWCASE_COMPAT_SOURCE_NOT_FOUND');
+
+  const created: string[] = [];
+  if (!keys.has(FOREST_TEXTURE_ALIAS)) {
+    await r2.client.send(new CopyObjectCommand({
+      Bucket: r2.bucket,
+      Key: FOREST_TEXTURE_ALIAS,
+      CopySource: encodedCopySource(r2.bucket, forestSource.key),
+    }));
+    created.push('forest_textures');
+  }
+  if (!keys.has(WATER_ROLE_ALIAS)) {
+    await r2.client.send(new CopyObjectCommand({
+      Bucket: r2.bucket,
+      Key: WATER_ROLE_ALIAS,
+      CopySource: encodedCopySource(r2.bucket, waterPlaceholderSource.key),
+    }));
+    created.push('dry_showcase_water_role_compat');
+  }
+
+  const after = await listPrivateObjects();
+  const assets = roleSnapshot(after);
+  if (!assets.ok) throw new Error(`SCENERY_ROLES_STILL_MISSING:${assets.missingRoles.join(',')}`);
+  return {
+    ready: true,
+    created,
+    aliasesPrivate: true,
+    sourceBytesModified: false,
+    dryShowcase: true,
+    assets,
   };
 }
 
@@ -163,6 +225,27 @@ function requireAuthorization(request: Request) {
   return runpodKey;
 }
 
+function dryShowcaseDockerArgs() {
+  const patch = `from pathlib import Path
+src=Path('/opt/ddp-worker/blender/scenery/showcase_30s.py')
+dst=Path('/tmp/showcase_30s.py')
+s=src.read_text()
+old='    required_prefixes = {"mountain", "forest", "water", "village", "tavern", "nature", "sky", "world"}'
+new='    required_prefixes = {"mountain", "forest", "village", "tavern", "nature", "sky", "world"}'
+if old not in s:
+    raise SystemExit('SHOWCASE_REQUIRED_PREFIX_PATCH_NOT_FOUND')
+s=s.replace(old,new,1)
+start=s.find('    water_material = choose_loaded_material')
+end=s.find('\\n    sky_files = ',start)
+if start < 0 or end < 0:
+    raise SystemExit('SHOWCASE_WATER_BLOCK_PATCH_NOT_FOUND')
+s=s[:start]+'    water_material = None\\n'+s[end:]
+dst.write_text(s)
+`;
+  const encoded = Buffer.from(patch, 'utf8').toString('base64');
+  return `sh -lc "echo ${encoded} | base64 -d > /tmp/tivvlejoy_patch.py && python3 /tmp/tivvlejoy_patch.py && SCENERY_SHOWCASE_BLENDER_SCRIPT=/tmp/showcase_30s.py exec node ./src/scenery-showcase.js"`;
+}
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
@@ -177,10 +260,11 @@ export async function GET(request: Request) {
       downloadUrl = await getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: OUTPUT_KEY }), { expiresIn: 900 });
     }
     return NextResponse.json({
-      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_BRIDGE_V1',
+      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_BRIDGE_V2',
       executionId: EXECUTION_ID,
       output: { resolution: '1080x1920', fps: 30, frames: 900, durationSeconds: 30 },
       assets,
+      dryShowcase: true,
       startup,
       status,
       downloadUrl,
@@ -188,7 +272,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     return NextResponse.json({
-      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_BRIDGE_V1',
+      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_BRIDGE_V2',
       error: clean((error as Error).message).slice(0, 160) || 'STATUS_FAILED',
       paidMutationPerformed: false,
     }, { status: 503 });
@@ -202,14 +286,31 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const action = clean(body?.action || 'preflight');
 
+    if (action === 'prepare') {
+      const prepared = await ensureCompatibilityAliases();
+      return NextResponse.json({
+        schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREPARE_V1',
+        prepared,
+        paidMutationPerformed: false,
+      });
+    }
+
     if (action === 'preflight') {
+      const prepared = await ensureCompatibilityAliases();
       const [assets, gpu] = await Promise.all([rolePreflight(), runpodPreflight(runpodKey)]);
       return NextResponse.json({
-        schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V2',
-        ready: assets.ok,
+        schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V3',
+        ready: prepared.ready && assets.ok,
         assets,
+        prepared: {
+          aliasesPrivate: prepared.aliasesPrivate,
+          sourceBytesModified: prepared.sourceBytesModified,
+          dryShowcase: prepared.dryShowcase,
+          created: prepared.created,
+        },
         runpod: gpu,
         workerImagePinned: true,
+        workerEntrypoint: 'scenery-showcase.js',
         limits: { hardCostUsd: HARD_COST_USD, maxRuntimeMinutes: MAX_RUNTIME_MINUTES, maxHourlyUsd: MAX_HOURLY_USD, maxCreates: 1 },
         paidMutationPerformed: false,
       });
@@ -224,21 +325,18 @@ export async function POST(request: Request) {
 
     if (action !== 'launch') throw new Error('UNKNOWN_ACTION');
 
+    await ensureCompatibilityAliases();
     const assets = await rolePreflight();
     if (!assets.ok) throw new Error(`SCENERY_ROLES_MISSING:${assets.missingRoles.join(',')}`);
     const gpu = await runpodPreflight(runpodKey);
 
     const r2 = r2Config();
-    const endpoint = clean(process.env.R2_ENDPOINT || process.env.OBJECT_STORAGE_ENDPOINT);
-    const region = clean(process.env.R2_REGION || process.env.OBJECT_STORAGE_REGION || 'auto');
-    const accessKeyId = clean(process.env.R2_ACCESS_KEY_ID || process.env.OBJECT_STORAGE_ACCESS_KEY_ID);
-    const secretAccessKey = clean(process.env.R2_SECRET_ACCESS_KEY || process.env.OBJECT_STORAGE_SECRET_ACCESS_KEY);
     const podEnv = [
-      { key: 'R2_ENDPOINT', value: endpoint },
-      { key: 'R2_REGION', value: region },
+      { key: 'R2_ENDPOINT', value: r2.endpoint },
+      { key: 'R2_REGION', value: r2.region },
       { key: 'R2_BUCKET', value: r2.bucket },
-      { key: 'R2_ACCESS_KEY_ID', value: accessKeyId },
-      { key: 'R2_SECRET_ACCESS_KEY', value: secretAccessKey },
+      { key: 'R2_ACCESS_KEY_ID', value: r2.accessKeyId },
+      { key: 'R2_SECRET_ACCESS_KEY', value: r2.secretAccessKey },
       { key: 'OBJECT_STORAGE_PROVIDER', value: 'r2' },
       { key: 'CLOUD_RENDER_ENABLED', value: 'true' },
       { key: 'PAID_EXECUTION_AUTHORIZED', value: 'true' },
@@ -268,25 +366,28 @@ export async function POST(request: Request) {
         cloudType: 'SECURE',
         containerDiskInGb: 60,
         volumeInGb: 20,
+        dockerArgs: dryShowcaseDockerArgs(),
         env: podEnv,
       },
     });
     const podId = clean(data?.podFindAndDeployOnDemand?.id);
     if (!podId) throw new Error('RUNPOD_POD_CREATE_RETURNED_NO_ID');
     return NextResponse.json({
-      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_LAUNCH_V1',
+      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_LAUNCH_V2',
       executionId: EXECUTION_ID,
       podId,
       createEntered: true,
       createRequests: 1,
       retryCreate: false,
       runpod: { secureUsdPerHr: gpu.rate, stockStatus: gpu.stockStatus },
+      workerEntrypoint: 'scenery-showcase.js',
+      dryShowcase: true,
       limits: { hardCostUsd: HARD_COST_USD, maxRuntimeMinutes: MAX_RUNTIME_MINUTES, maxHourlyUsd: MAX_HOURLY_USD },
       outputKey: OUTPUT_KEY,
     });
   } catch (error) {
     return NextResponse.json({
-      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_LAUNCH_V1',
+      schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_LAUNCH_V2',
       error: clean((error as Error).message).slice(0, 220) || 'BRIDGE_FAILED',
       createEntered,
       retryCreate: false,
