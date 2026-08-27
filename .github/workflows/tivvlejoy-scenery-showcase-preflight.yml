@@ -89,9 +89,28 @@ jobs:
           mkdir -p artifacts/tivvlejoy-scenery-showcase-30s
           if [ ! -f artifacts/tivvlejoy-scenery-showcase-30s/preflight.json ]; then
             python3 - <<'PY'
-          import json
+          import json, re
+          stderr = ''
+          try:
+              stderr = open('/tmp/scenery-preflight.stderr', encoding='utf-8', errors='replace').read()
+          except OSError:
+              pass
+          candidates = []
+          for raw in stderr.splitlines():
+              line = raw.strip()
+              if not line:
+                  continue
+              if any(marker in line for marker in ('Error', 'ERR_', 'Cannot find', 'Cannot resolve', 'MODULE_NOT_FOUND', 'SyntaxError', 'TypeError')):
+                  line = re.sub(r'(?i)(secret|token|password|api[_-]?key)\s*[=:]\s*\S+', r'\1=<redacted>', line)
+                  candidates.append(line[:400])
+          diagnostic = ' | '.join(candidates[-6:])[:1200] or 'NO_SANITIZED_DIAGNOSTIC_AVAILABLE'
           with open('artifacts/tivvlejoy-scenery-showcase-30s/preflight.json','w') as f:
-              json.dump({'schema':'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V1','status':'PREFLIGHT_DID_NOT_PRODUCE_JSON','paidMutationPerformed':False}, f, indent=2)
+              json.dump({
+                  'schema':'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V1',
+                  'status':'PREFLIGHT_DID_NOT_PRODUCE_JSON',
+                  'diagnostic': diagnostic,
+                  'paidMutationPerformed':False,
+              }, f, indent=2)
               f.write('\n')
           PY
           fi
@@ -104,9 +123,11 @@ jobs:
               if forbidden in json.dumps(data):
                   raise SystemExit(f'Forbidden secret-shaped field in preflight artifact: {forbidden}')
           print(json.dumps({
+              'status': data.get('status'),
               'launchAllowed': data.get('launchAllowed'),
               'readyAwaitingAuthorization': data.get('readyAwaitingAuthorization'),
               'blockers': data.get('blockers', []),
+              'diagnostic': data.get('diagnostic'),
               'secureUsdPerHr': (data.get('runpod') or {}).get('secureUsdPerHr'),
               'stockStatus': (data.get('runpod') or {}).get('stockStatus'),
               'privateR2Configured': data.get('privateR2Configured'),
