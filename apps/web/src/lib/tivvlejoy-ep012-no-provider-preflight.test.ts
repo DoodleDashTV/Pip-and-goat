@@ -534,6 +534,28 @@ describe('EP012 generate and preflight global blockers', () => {
       store: createUnavailableDurableLedgerStore(),
     });
     expect(result.blockers).toContain(EP012_BLOCKER_CODES.EP012_LEDGER_UNAVAILABLE);
+    expect(result.blockers).not.toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+  });
+
+  it('blocks preflight when the dedicated execution ledger is unreadable', async () => {
+    const store = readyStore();
+    const failing: typeof store = {
+      ...store,
+      async listEp012Executions() {
+        throw new Error('execution-table-missing');
+      },
+      async getEp012Execution() {
+        throw new Error('execution-table-missing');
+      },
+      async getEp012ExecutionBySegment() {
+        throw new Error('execution-table-missing');
+      },
+    };
+    const result = await runEp012NoProviderPreflight({ env: readyEnv, store: failing });
+    expect(result.status).toBe('BLOCKED');
+    expect(result.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    expect(result.serverGates.allPassed).toBe(false);
+    expect(result.serverGates.executionLedgerReadable).toBe(false);
   });
 
   it('blocks when the durable ledger is unreconciled', async () => {

@@ -69,6 +69,7 @@ export const EP012_BLOCKER_CODES = {
   EP012_CHARACTER_GATE_CLOSED: 'EP012_CHARACTER_GATE_CLOSED',
   EP012_LEDGER_NOT_CONFIGURED: 'EP012_LEDGER_NOT_CONFIGURED',
   EP012_LEDGER_UNAVAILABLE: 'EP012_LEDGER_UNAVAILABLE',
+  EP012_EXECUTION_LEDGER_UNAVAILABLE: 'EP012_EXECUTION_LEDGER_UNAVAILABLE',
   EP012_LEDGER_RECONCILIATION_REQUIRED: 'EP012_LEDGER_RECONCILIATION_REQUIRED',
   EP012_LEDGER_NOT_AUTHORITATIVE: 'EP012_LEDGER_NOT_AUTHORITATIVE',
   EP012_LEDGER_RESERVED_REQUEST_PRESENT: 'EP012_LEDGER_RESERVED_REQUEST_PRESENT',
@@ -186,6 +187,7 @@ export type Ep012NoProviderPreflight = {
     voiceTestTokenConfigured: boolean;
     voiceTestMaxCharactersGate: boolean;
     sameOriginEnforced: boolean;
+    executionLedgerReadable: boolean;
     allPassed: boolean;
   };
   ledger: {
@@ -218,6 +220,7 @@ export type Ep012NoProviderPreflight = {
     providerRequestsMade: number;
     storageVerifiedCount: number;
     allArtifactsStorageVerified: boolean;
+    executionLedgerReadable: boolean;
     nextProviderContactPermitted: boolean;
     allPassed: boolean;
   };
@@ -519,10 +522,13 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
   }
 
   let executions: Awaited<ReturnType<DurableVoiceLedgerStore['listEp012Executions']>> = [];
+  let executionLedgerReadable = true;
   try {
     executions = await store.listEp012Executions();
   } catch {
+    executionLedgerReadable = false;
     executions = [];
+    blockers.push(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
   }
   const storageVerifiedCount = executions.filter((item) => item.storageVerified && item.status === 'succeeded').length;
   const providerRequestsMade = executions.filter((item) => Boolean(item.providerAttemptedAt) || item.status === 'succeeded').length;
@@ -545,6 +551,7 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
     voiceTestTokenConfigured,
     voiceTestMaxCharactersGate,
     sameOriginEnforced: true,
+    executionLedgerReadable,
     allPassed:
       previewOnlyRuntime &&
       !productionRuntime &&
@@ -552,7 +559,8 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
       paidAuthorizationConvention &&
       elevenLabsApiKeyConfigured &&
       voiceTestTokenConfigured &&
-      voiceTestMaxCharactersGate,
+      voiceTestMaxCharactersGate &&
+      executionLedgerReadable,
   };
 
   const ledgerAllPassed =
@@ -561,7 +569,8 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
     record.reconciled &&
     authoritative &&
     record.reservedRequests === 0 &&
-    record.unfinalizedCount === 0;
+    record.unfinalizedCount === 0 &&
+    executionLedgerReadable;
 
   const authorizationAllPassed =
     dialogueVerified &&
@@ -634,6 +643,7 @@ export async function runEp012NoProviderPreflight(input: Ep012PreflightInput = {
       providerRequestsMade,
       storageVerifiedCount,
       allArtifactsStorageVerified: storageVerifiedCount === 11,
+      executionLedgerReadable,
       nextProviderContactPermitted,
       allPassed: ledgerAllPassed,
     },

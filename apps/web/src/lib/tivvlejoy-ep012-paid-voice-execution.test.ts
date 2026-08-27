@@ -38,7 +38,14 @@ import {
   installEp012ExecutionAdapters,
   runEp012PaidVoiceExecution,
 } from './tivvlejoy-real-production-unblock/ep012-paid-voice-execution';
-import { retrieveEp012AuthorizedAudio } from './tivvlejoy-real-production-unblock/ep012-audio-retrieval';
+import {
+  installEp012RetrievalStorage,
+  retrieveEp012AuthorizedAudio,
+} from './tivvlejoy-real-production-unblock/ep012-audio-retrieval';
+import {
+  classifyEp012ExecutionLedgerFailure,
+  ep012ExecutionLedgerUnavailableError,
+} from './tivvlejoy-real-production-unblock/ep012-execution-ledger-errors';
 import { runEp012StorageProbe } from './tivvlejoy-real-production-unblock/ep012-storage-probe';
 import { deriveEp012AuthorizedRequest } from './tivvlejoy-real-production-unblock/ep012-no-provider-preflight';
 import { EP012_VOICE_AUTHORIZATION, getEp012AuthorizedVoiceRequest } from './tivvlejoy-real-production-unblock';
@@ -143,11 +150,13 @@ describe('TIVVLEJOY_EP012_PAID_VOICE_EXECUTION_V1', () => {
   beforeEach(() => {
     installPreviewVoiceLedgerStore(null);
     installEp012ExecutionAdapters(null);
+    installEp012RetrievalStorage(null);
   });
 
   afterEach(() => {
     installPreviewVoiceLedgerStore(null);
     installEp012ExecutionAdapters(null);
+    installEp012RetrievalStorage(null);
   });
 
   it('preserves historical 4/235 and the dedicated 11/460 and 15/695 ceilings', async () => {
@@ -171,6 +180,8 @@ describe('TIVVLEJOY_EP012_PAID_VOICE_EXECUTION_V1', () => {
     expect(preflight.ledger.providerRequestsMade).toBe(0);
     expect(preflight.nextProviderContactPermitted).toBe(true);
     expect(preflight.productionEnabled).toBe(false);
+    expect(preflight.serverGates.executionLedgerReadable).toBe(true);
+    expect(preflight.ledger.executionLedgerReadable).toBe(true);
   });
 
   it('derives text, settings, model, and storage keys server-side', async () => {
@@ -551,6 +562,260 @@ describe('TIVVLEJOY_EP012_PAID_VOICE_EXECUTION_V1', () => {
   });
 });
 
+function unreadableExecutionLedgerStore(base: DurableVoiceLedgerStore = historicalStore()): DurableVoiceLedgerStore {
+  const fail = async () => {
+    throw ep012ExecutionLedgerUnavailableError();
+  };
+  return {
+    ...base,
+    getEp012Execution: fail,
+    getEp012ExecutionBySegment: fail,
+    listEp012Executions: fail,
+  };
+}
+
+function executionRowUnreadableStore(base: DurableVoiceLedgerStore = historicalStore()): DurableVoiceLedgerStore {
+  const fail = async () => {
+    throw ep012ExecutionLedgerUnavailableError();
+  };
+  return {
+    ...base,
+    getEp012Execution: fail,
+    getEp012ExecutionBySegment: fail,
+  };
+}
+
+async function withPreviewProcessEnv<T>(run: () => Promise<T>): Promise<T> {
+  const keys = Object.keys(readyEnv);
+  const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
+  Object.assign(process.env, readyEnv);
+  try {
+    return await run();
+  } finally {
+    for (const key of keys) {
+      if (previous[key] === undefined) delete process.env[key];
+      else process.env[key] = previous[key];
+    }
+  }
+}
+
+describe('EP012 execution ledger fail-closed repair', () => {
+  beforeEach(() => {
+    installPreviewVoiceLedgerStore(null);
+    installEp012ExecutionAdapters(null);
+    installEp012RetrievalStorage(null);
+  });
+
+  afterEach(() => {
+    installPreviewVoiceLedgerStore(null);
+    installEp012ExecutionAdapters(null);
+    installEp012RetrievalStorage(null);
+  });
+
+  it('classifies Prisma table-missing failures without exposing secrets', () => {
+    expect(classifyEp012ExecutionLedgerFailure({ code: 'P2021' })).toBe('missing_table');
+    expect(classifyEp012ExecutionLedgerFailure({ code: 'P1001' })).toBe('unreachable');
+    expect(classifyEp012ExecutionLedgerFailure(new Error('postgresql://preview-ledger-test/unused'))).toBe('unreadable');
+    expect(JSON.stringify(classifyEp012ExecutionLedgerFailure({ code: 'P2021' }))).not.toMatch(
+      /postgresql:\/\/|DATABASE_URL|password/i,
+    );
+  });
+
+  it('blocks preflight when the execution ledger is unreadable and does not return HTTP 500', async () => {
+    const store = unreadableExecutionLedgerStore();
+    const preflight = await runEp012NoProviderPreflight({ env: readyEnv, store });
+    expect(preflight.status).toBe('BLOCKED');
+    expect(preflight.ok).toBe(false);
+    expect(preflight.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    expect(preflight.blockers).not.toContain(EP012_BLOCKER_CODES.EP012_LEDGER_UNAVAILABLE);
+    expect(preflight.serverGates.allPassed).toBe(false);
+    expect(preflight.serverGates.executionLedgerReadable).toBe(false);
+    expect(preflight.ledger.executionLedgerReadable).toBe(false);
+    expect(preflight.readyForProviderContact).toBe(false);
+    await withPreviewProcessEnv(async () => {
+      installPreviewVoiceLedgerStore(store);
+      const response = await getEp012Preflight();
+      expect(response.status).not.toBe(500);
+      const json = (await response.json()) as { status: string; blockers: string[]; serverGates: { allPassed: boolean } };
+      expect(json.status).toBe('BLOCKED');
+      expect(json.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+      expect(json.serverGates.allPassed).toBe(false);
+    });
+  });
+
+  it('keeps READY when the execution table is readable and empty', async () => {
+    const preflight = await runEp012NoProviderPreflight({ env: readyEnv, store: historicalStore() });
+    expect(preflight.status).toBe('READY');
+    expect(preflight.blockers).not.toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    expect(preflight.serverGates.executionLedgerReadable).toBe(true);
+    expect(preflight.ledger.providerRequestsMade).toBe(0);
+  });
+
+  it('returns HTTP 400 BLOCKED generate contract without resolving transport', async () => {
+    const store = unreadableExecutionLedgerStore();
+    let resolved = false;
+    let called = 0;
+    const { result } = await execute({
+      segmentId: 'DL_HOOK_01__PIP',
+      store,
+      transport: async () => {
+        called += 1;
+        throw new Error('provider-must-not-run');
+      },
+    });
+    expect(result.status).toBe('BLOCKED');
+    expect(result.ok).toBe(false);
+    expect(result.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    expect(result.providerContacted).toBe(false);
+    expect(result.providerRequestsMade).toBe(0);
+    expect((await store.read()).reservedRequests).toBe(0);
+    expect(called).toBe(0);
+
+    const rowStore = executionRowUnreadableStore();
+    installEp012ExecutionAdapters({
+      get transport() {
+        resolved = true;
+        return async () => {
+          called += 1;
+          throw new Error('provider-must-not-run');
+        };
+      },
+    });
+    const rowResult = await runEp012PaidVoiceExecution({
+      body: { segmentId: 'DL_HOOK_01__PIP', confirmed: true },
+      ...origin(),
+      env: readyEnv,
+      store: rowStore,
+    });
+    expect(rowResult.status).toBe('BLOCKED');
+    expect(rowResult.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    expect(resolved).toBe(false);
+    expect(called).toBe(0);
+    expect((await rowStore.read()).reservedRequests).toBe(0);
+
+    await withPreviewProcessEnv(async () => {
+      installPreviewVoiceLedgerStore(store);
+      const response = await postEp012Generate(
+        new Request('https://pip-and-goat-preview.vercel.app/api/voice-production/ep012/generate', {
+          method: 'POST',
+          headers: {
+            origin: 'https://pip-and-goat-preview.vercel.app',
+            host: 'pip-and-goat-preview.vercel.app',
+            'content-type': 'application/json',
+            [EP012_VOICE_TEST_TOKEN_HEADER]: 'preview-token',
+          },
+          body: JSON.stringify({ segmentId: 'DL_HOOK_01__PIP', confirmed: true }),
+        }),
+      );
+      expect(response.status).toBe(400);
+      expect(response.status).not.toBe(500);
+      const json = (await response.json()) as {
+        status: string;
+        blockers: string[];
+        providerContacted: boolean;
+        providerRequestsMade: number;
+      };
+      expect(json.status).toBe('BLOCKED');
+      expect(json.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+      expect(json.providerContacted).toBe(false);
+      expect(json.providerRequestsMade).toBe(0);
+    });
+  });
+
+  it('returns contract BLOCKED for receipt and MP3 when the execution ledger cannot be read', async () => {
+    const store = unreadableExecutionLedgerStore();
+    let storageReads = 0;
+    const storage = {
+      kind: 'r2' as const,
+      async putObject() {
+        throw new Error('storage-must-not-write');
+      },
+      async getObject() {
+        storageReads += 1;
+        throw new Error('storage-must-not-read');
+      },
+    };
+    const receipt = await retrieveEp012AuthorizedAudio({
+      segmentId: 'DL_HOOK_01__PIP',
+      kind: 'receipt',
+      ...origin(),
+      env: readyEnv,
+      store,
+      storage,
+    });
+    expect(receipt.ok).toBe(false);
+    if (!receipt.ok) {
+      expect(receipt.status).toBe('BLOCKED');
+      expect(receipt.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+      expect(receipt.blockers).not.toContain(EP012_BLOCKER_CODES.EP012_ARTIFACT_NOT_FINALIZED);
+    }
+    const mp3 = await retrieveEp012AuthorizedAudio({
+      segmentId: 'DL_HOOK_01__PIP',
+      kind: 'mp3',
+      ...origin(),
+      env: readyEnv,
+      store,
+      storage,
+    });
+    expect(mp3.ok).toBe(false);
+    if (!mp3.ok) {
+      expect(mp3.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    }
+    expect(storageReads).toBe(0);
+
+    const absent = await retrieveEp012AuthorizedAudio({
+      segmentId: 'DL_HOOK_01__PIP',
+      kind: 'receipt',
+      ...origin(),
+      env: readyEnv,
+      store: historicalStore(),
+      storage,
+    });
+    expect(absent.ok).toBe(false);
+    if (!absent.ok) {
+      expect(absent.blockers).toContain(EP012_BLOCKER_CODES.EP012_ARTIFACT_NOT_FINALIZED);
+      expect(absent.blockers).not.toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    }
+    expect(storageReads).toBe(0);
+
+    await withPreviewProcessEnv(async () => {
+      installPreviewVoiceLedgerStore(store);
+      installEp012RetrievalStorage(storage);
+      for (const kind of ['receipt', 'mp3'] as const) {
+        const response = await getEp012Audio(
+          new Request(
+            `https://pip-and-goat-preview.vercel.app/api/voice-production/ep012/audio?segmentId=DL_HOOK_01__PIP&kind=${kind}`,
+            {
+              headers: {
+                origin: 'https://pip-and-goat-preview.vercel.app',
+                host: 'pip-and-goat-preview.vercel.app',
+                [EP012_VOICE_TEST_TOKEN_HEADER]: 'preview-token',
+              },
+            },
+          ),
+        );
+        expect(response.status).toBe(400);
+        expect(response.status).not.toBe(500);
+        const json = (await response.json()) as { status: string; blockers: string[] };
+        expect(json.status).toBe('BLOCKED');
+        expect(json.blockers).toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+      }
+      expect(storageReads).toBe(0);
+    });
+  });
+
+  it('does not treat DURABLE_LEDGER_UNAVAILABLE from the monthly ledger as the execution-ledger blocker', async () => {
+    const { createUnavailableDurableLedgerStore } = await import('./voice-production/durable-voice-ledger');
+    const preflight = await runEp012NoProviderPreflight({
+      env: readyEnv,
+      store: createUnavailableDurableLedgerStore(),
+    });
+    expect(preflight.blockers).toContain(EP012_BLOCKER_CODES.EP012_LEDGER_UNAVAILABLE);
+    expect(preflight.blockers).not.toContain(EP012_BLOCKER_CODES.EP012_EXECUTION_LEDGER_UNAVAILABLE);
+    expect(preflight.status).toBe('BLOCKED');
+  });
+});
+
 describe('EP012 paid execution source and route boundaries', () => {
   it('keeps preflight and probe isolated from scenery and candidate-provider', () => {
     const preflight = readRepo('apps/web/src/lib/tivvlejoy-real-production-unblock/ep012-no-provider-preflight.ts');
@@ -570,6 +835,10 @@ describe('EP012 paid execution source and route boundaries', () => {
     expect(probe).not.toMatch(/\bfetch\s*\(/);
     expect(retrieve).not.toMatch(/\bfetch\s*\(/);
     expect(SCRIPT_TO_VOICE_MAX_PAID_REQUESTS).toBe(3);
+    const postgres = readRepo('apps/web/src/lib/voice-production/durable-voice-ledger-postgres.ts');
+    expect(postgres).toMatch(/wrapEp012ExecutionLedgerQuery/);
+    expect(generateRoute).toMatch(/createEp012GenerateFailClosedResult/);
+    expect(generateRoute).toMatch(/catch/);
   });
 
   it('refuses GET on the storage probe and does not execute it from the route helper', async () => {
