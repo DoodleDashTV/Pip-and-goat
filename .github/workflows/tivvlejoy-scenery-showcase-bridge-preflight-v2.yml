@@ -1,3 +1,4 @@
+# Second safe push after workflow registration; this workflow never creates a pod.
 name: TivvleJoy Scenery Showcase Bridge Preflight V2
 
 on:
