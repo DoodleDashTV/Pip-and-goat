@@ -1,0 +1,20 @@
+
+> doodle-dash-tv-studio@0.1.0 cloud:verify-image /home/runner/work/Pip-and-goat/Pip-and-goat
+> pnpm --filter @doodle-dash/database exec tsx ../../scripts/cloud/verify-worker-image.ts
+
+image:            ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e
+expected commit:  fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3
+expected code:    12764e0212230a24315a1fdb2c074aa678ebb4d1a443567dc86cc40bdd3aaa0a
+expected assets:  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7
+checkout code:    12764e0212230a24315a1fdb2c074aa678ebb4d1a443567dc86cc40bdd3aaa0a (60 files)
+checkout assets:  7876ac737de602578b67a8a20d85ea8a917c7ac4dac5e668f8bae37343e8f4b7 (4 files)
+
+registry read:    ok=true amd64=true — config blob read; linux/amd64=true
+  ddp.source.commit = fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3
+  ddp.worker.build.time = 2026-08-24T18:05:38Z
+  ddp.render.code.sha256 = 12764e0212230a24315a1fdb2c074aa678ebb4d1a443567dc86cc40bdd3aaa0a
+  org.opencontainers.image.revision = fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3
+  org.opencontainers.image.created = 2026-08-24T18:05:38Z
+
+VERIFY: PASS code=OK
+  image sha256:f732091b0fc1… contains this checkout's render code (12764e021223…) and its approved assets (7876ac737de6…)

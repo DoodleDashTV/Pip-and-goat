@@ -1,0 +1,20 @@
+{
+  "schema": "TIVVLEJOY_GOAT_CHARACTER_WORKER_IMAGE_BUILD_AND_PIN_V1",
+  "imageRef": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+  "digest": "sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e",
+  "sourceCommit": "fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3",
+  "architecture": "linux/amd64",
+  "blenderVersion": "4.2.2",
+  "goatMaterializerBaked": true,
+  "characterDepartmentBaked": true,
+  "stageCount": 26,
+  "characterMasterCapable": true,
+  "realGoatDownloadCount": 0,
+  "realCompatibility": "UNTESTED_REAL_SOURCE",
+  "characterMasterGate": "BLOCKED_REAL_EXECUTION_REQUIRED",
+  "goatProductionReady": false,
+  "runpodLaunchCount": 0,
+  "runpodCostUsd": 0.0,
+  "billablePodsRemaining": 0,
+  "workflowRunId": "32760297028"
+}

@@ -9,7 +9,7 @@
 FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    BLENDER_VERSION=4.2.3 \
+    BLENDER_VERSION=4.2.2 \
     PYTHONUNBUFFERED=1 \
     IDLE_SHUTDOWN_MINUTES=5 \
     MAX_JOB_RUNTIME_MINUTES=180 \
@@ -90,7 +90,8 @@ ENV DDP_SOURCE_COMMIT=${DDP_SOURCE_COMMIT} \
     DDP_RENDER_CODE_SHA256=${DDP_RENDER_CODE_SHA256} \
     DDP_PROVENANCE_FILE=/opt/ddp-worker/provenance.json
 
-RUN node ./src/provenance.js --write "$DDP_PROVENANCE_FILE" --expect "$DDP_RENDER_CODE_SHA256"
+RUN node ./src/provenance.js --write "$DDP_PROVENANCE_FILE" --expect "$DDP_RENDER_CODE_SHA256" && \
+    node ./src/character-capability.js --write /opt/ddp-worker/character-capability.json --root /opt/ddp-worker
 
 LABEL org.opencontainers.image.title="ddp-runpod-blender" \
       org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat" \
@@ -98,7 +99,11 @@ LABEL org.opencontainers.image.title="ddp-runpod-blender" \
       org.opencontainers.image.created="${DDP_WORKER_BUILD_TIME}" \
       ddp.source.commit="${DDP_SOURCE_COMMIT}" \
       ddp.worker.build.time="${DDP_WORKER_BUILD_TIME}" \
-      ddp.render.code.sha256="${DDP_RENDER_CODE_SHA256}"
+      ddp.render.code.sha256="${DDP_RENDER_CODE_SHA256}" \
+      ddp.character.master="true" \
+      ddp.character.job.kind="CHARACTER_MASTER_BUILD" \
+      ddp.character.stage.count="26" \
+      ddp.character.blender="${BLENDER_VERSION}"
 
 # Health endpoint / check.
 # Force REQUIRE_GPU_HEALTH=false for the Docker HEALTHCHECK: the pod sets

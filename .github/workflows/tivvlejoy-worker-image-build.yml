@@ -1,0 +1,101 @@
+# TivvleJoy character-capable RunPod worker image — GHCR publish only.
+# Never talks to RunPod. Never creates a Pod. Never downloads the real Goat ZIP.
+name: TivvleJoy Character Worker Image Build
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-goat-character-worker-image-73f1
+
+concurrency:
+  group: tivvlejoy-character-worker-image-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-worker-image:
+    name: Build publish and verify character worker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      IMAGE_TAG: ${{ github.sha }}
+    steps:
+      - name: Print safe checkout identity
+        run: |
+          set -euo pipefail
+          echo "github.sha=${GITHUB_SHA}"
+          echo "github.ref_name=${GITHUB_REF_NAME}"
+
+      - name: Refuse any other branch
+        run: |
+          set -euo pipefail
+          expected='cursor/tivvlejoy-goat-character-worker-image-73f1'
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "REFUSED: this workflow only runs on ${expected}"
+            exit 1
+          fi
+
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack pnpm
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Zero-cost character worker tests
+        run: |
+          set -euo pipefail
+          node --test scripts/cloud/tivvlejoy-character-worker-image-build.test.mjs
+          pnpm --filter @doodle-dash/runpod-blender-worker test
+          pnpm --filter @doodle-dash/runpod-blender-worker check
+          pnpm db:generate
+          pnpm --filter @doodle-dash/web typecheck
+          pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-character-source-intake.test.ts src/lib/tivvlejoy-character-rigging-department.test.ts src/lib/runpod-worker-image.test.ts
+
+      - name: Pre-build safety
+        id: preflight
+        run: bash scripts/cloud/gha-character-worker-image-preflight.sh
+
+      - name: Resolve GHCR repository
+        run: |
+          set -euo pipefail
+          owner="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          echo "IMAGE_REPO=ghcr.io/${owner}/ddp-runpod-blender" >> "$GITHUB_ENV"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build verify and publish worker image
+        run: bash scripts/cloud/build-worker-image.sh
+
+      - name: Prove character runtime is baked into the published image
+        run: bash scripts/cloud/verify-character-worker-image.sh
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: character-worker-image-evidence
+          path: artifacts/worker-image/
+          if-no-files-found: ignore
+          retention-days: 14

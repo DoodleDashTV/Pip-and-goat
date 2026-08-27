@@ -1,0 +1,24 @@
+{
+  "schema": "TIVVLEJOY_CHARACTER_WORKER_CAPABILITY_V1",
+  "sourceCommit": "fdf0b28c2d656a06f7ca4a38880ab3b56cd25cd3",
+  "digest": null,
+  "architecture": "linux/amd64",
+  "blenderVersion": "4.2.2",
+  "supportedJobKinds": [
+    "CHARACTER_MASTER_BUILD",
+    "CHARACTER_SOURCE_MATERIALIZE",
+    "CHARACTER_BUILD",
+    "FINAL_1080P_RENDER"
+  ],
+  "characterMasterCapable": true,
+  "supportedCharacterMaterializer": "CHAR_GOAT_001",
+  "characterDepartmentStageCount": 26,
+  "entrypointVersion": "TIVVLEJOY_CHARACTER_MASTER_DISPATCH_V1",
+  "buildTimestamp": "2026-08-24T18:05:38Z",
+  "goatMaterializerBaked": true,
+  "characterDepartmentBaked": true,
+  "characterMasterEntrypointBaked": true,
+  "realGoatSourceBaked": false,
+  "credentialsBaked": false,
+  "goatProductionReady": false
+}

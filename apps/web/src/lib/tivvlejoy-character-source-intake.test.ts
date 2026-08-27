@@ -22,6 +22,8 @@ import {
   GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_SCHEMA,
   KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST,
   READY_FOR_EXPLICIT_GOAT_PAID_EXECUTION_AUTHORIZATION,
+  RUNPOD_WORKER_IMAGE_PIN_BLOCKED,
+  resolveAuthorizedCharacterWorkerImage,
   emptyGoatSourceReceipt,
   handleCharacterSourceAction,
   inspectGoatZipOrFail,
@@ -406,6 +408,19 @@ describe('Goat character source intake bridge', () => {
       ]),
     );
     expect(overBudget.launch.allowed).toBe(false);
+  });
+
+  it('resolves RUNPOD_WORKER_IMAGE from the authoritative character pin and rejects stale digests', () => {
+    const resolved = resolveAuthorizedCharacterWorkerImage({ RUNPOD_WORKER_IMAGE: '' });
+    expect(resolved.ok).toBe(true);
+    expect(resolved.source).toBe('authoritative-pin');
+    expect(resolved.digest).toBe('sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e');
+    expect(resolved.ref).toContain('@sha256:f732091b0fc1035aff09ed5897672eec786b1d618b2c2ac07d5ad4d217c0008e');
+    const stale = resolveAuthorizedCharacterWorkerImage({
+      RUNPOD_WORKER_IMAGE: `ghcr.io/example-org/ddp-runpod-blender@${KNOWN_CURRENT_TIVVLEJOY_WORKER_DIGEST}`,
+    });
+    expect(stale.ok).toBe(false);
+    expect(stale.code).toBe(RUNPOD_WORKER_IMAGE_PIN_BLOCKED);
   });
 
   it('stays connection-ready without R2 and refuses Production mutations', async () => {
