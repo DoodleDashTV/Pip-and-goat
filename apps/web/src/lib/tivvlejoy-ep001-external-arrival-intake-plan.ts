@@ -16,6 +16,7 @@ function resolveTriggerId(input: ExternalArrivalCandidate) {
       : 'GOAT_RIG_ARRIVES';
   }
   if (input.arrivalType === 'SCENERY_LICENSE') return 'SCENERY_LICENSE_EVIDENCE_ARRIVES';
+  if (input.arrivalType === 'HUMAN_DECISION') return 'HUMAN_DECISION_RECEIPT_ARRIVES';
   return input.candidate.scope === 'EP001_VOICE_GENERATION'
     ? 'VOICE_PAID_AUTHORIZATION_ARRIVES'
     : 'FINAL_RENDER_AUTHORIZATION_ARRIVES';
