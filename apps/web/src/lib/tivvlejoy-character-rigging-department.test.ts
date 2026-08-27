@@ -57,6 +57,11 @@ describe('TivvleJoy character rigging department', () => {
     expect(pipeline.gate.status).toBe('BLOCKED');
     expect(pipeline.gate.verdict).toBe('NOT_PRODUCTION_READY');
     expect(pipeline.gate.blockers).toContain(GOAT_REAL_ASSET_EXECUTION_BLOCKED);
+    const reused = runGoatCharacterBuildPipeline({ repoRoot, remoteHashLocked: true });
+    expect(reused.stages.find((item) => item.stage === 'SOURCE_INTAKE')?.disposition).toBe('REUSED');
+    expect(reused.stages.find((item) => item.stage === 'SOURCE_HASH_LOCK')?.disposition).toBe('REUSED');
+    expect(reused.stages.find((item) => item.stage === 'CHARACTER_MASTER_GATE')?.disposition).toBe('BLOCKED');
+    expect(reused.gate.goatProductionReady).toBe(false);
     expect(pipeline.gate.reports.goat_character_master_gate).toBe('BLOCKED');
     expect(Object.values(pipeline.gate.reports)).not.toContain('PASS');
   });

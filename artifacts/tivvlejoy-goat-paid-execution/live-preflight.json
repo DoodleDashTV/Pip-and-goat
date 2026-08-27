@@ -1,0 +1,38 @@
+{
+  "schema": "TIVVLEJOY_GOAT_REAL_PAID_EXECUTION_AUTHORIZATION_V1",
+  "runpodAuthOk": true,
+  "gpu4090Present": true,
+  "secureQuoteUsdPerHr": 0.74,
+  "stockStatus": "Low",
+  "billablePodCount": 0,
+  "podNames": [],
+  "source": {
+    "objectExists": true,
+    "storedSize": 269512136,
+    "hashVerified": true,
+    "zipOk": true,
+    "zipCode": "ZIP_SAFE",
+    "memberCount": 24,
+    "requiredBlendPresent": true,
+    "requiredFbxPresent": true,
+    "receiptLocked": true,
+    "incompleteMultipartCount": 0
+  },
+  "worker": {
+    "envConfigured": false,
+    "positivelyResolved": false,
+    "knownCurrentDigest": "sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed",
+    "knownCurrentReachable": true,
+    "knownCurrentAmd64": true,
+    "knownCurrentSourceCommit": "1ea2cf58c9cfc015929d0a4ca63446898d59ba79",
+    "knownCurrentRefRedacted": "ghcr.io/<org>/ddp-runpod-blender@sha256:b53fcbf5fc973ad8e1e5f1e240f58d12885143e11494a3871f579c6fb351faed",
+    "jobKind": "FINAL_1080P_RENDER"
+  },
+  "authorizationStatus": "FAIL_CLOSED_DO_NOT_LAUNCH",
+  "remainingBlockers": [
+    "WORKER_IMAGE_MISSING",
+    "WORKER_IMAGE_WRONG_JOB_KIND",
+    "WORKER_IMAGE_CHARACTER_DEPARTMENT_NOT_BAKED"
+  ],
+  "launchAllowed": false
+}

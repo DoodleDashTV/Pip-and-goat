@@ -48,28 +48,38 @@ function stage(
   };
 }
 
-export function runGoatCharacterBuildPipeline(input?: { repoRoot?: string }) {
+export function runGoatCharacterBuildPipeline(input?: {
+  repoRoot?: string;
+  remoteHashLocked?: boolean;
+}) {
   const repoRoot = input?.repoRoot ?? resolveRepoRoot();
   const intake = inspectGoatSourcePackage(repoRoot);
   const gate = evaluateGoatCharacterMasterGate({ repoRoot });
   const missing =
     'Real Goat_FINN.zip bytes and offline Blender execution are required. Stage is planned and fail-closed.';
-  const hashLocked = Boolean(intake.present && intake.sha256);
+  const remoteHashLocked = input?.remoteHashLocked === true;
+  const hashLocked = Boolean(intake.present && intake.sha256) || remoteHashLocked;
   const laterBlocked = true;
 
   const stages: PipelineStageResult[] = [
     stage(
       'SOURCE_INTAKE',
-      intake.present ? intake.nextInputRequired : intake.nextInputRequired,
+      remoteHashLocked
+        ? 'R2 SOURCE is locked. Local worker materialization is still required before Blender stages.'
+        : intake.nextInputRequired,
       'goat_source_audit.json',
-      { intake: intake.status },
-      { blocked: !intake.present },
+      { intake: intake.status, remoteHashLocked },
+      { blocked: !intake.present && !remoteHashLocked },
     ),
     stage(
       'SOURCE_HASH_LOCK',
-      hashLocked ? 'Source hash locked from real bytes.' : intake.nextInputRequired,
+      hashLocked
+        ? remoteHashLocked
+          ? 'R2 SOURCE hash is locked. Local worker materialization is still required before Blender stages.'
+          : 'Source hash locked from real bytes.'
+        : intake.nextInputRequired,
       'goat_source_audit.json',
-      { hash: intake.sha256 },
+      { hash: intake.sha256, remoteHashLocked },
       { blocked: !hashLocked },
     ),
     stage(
@@ -165,6 +175,15 @@ export function runGoatCharacterBuildPipeline(input?: { repoRoot?: string }) {
     stage('EXPORT_QA', missing, 'goat_character_master_gate.json', {}, { blocked: laterBlocked }),
     stage('CHARACTER_MASTER_GATE', gate.reason, 'goat_character_master_gate.json', {}, { blocked: laterBlocked }),
   ];
+
+  if (remoteHashLocked) {
+    for (const item of stages) {
+      if (item.stage === 'SOURCE_INTAKE' || item.stage === 'SOURCE_HASH_LOCK') {
+        item.disposition = 'REUSED';
+        item.status = 'PLANNED';
+      }
+    }
+  }
 
   if (stages.length !== BUILD_STAGES.length) {
     throw new Error('Pipeline must emit every character-build stage.');

@@ -21,9 +21,11 @@ export function sceneryIntakeTokenConfigured(
 }
 
 export function intakeTokensMatch(provided: string, expected: string): boolean {
-  if (!provided || !expected) return false;
-  const left = createHash('sha256').update(provided).digest();
-  const right = createHash('sha256').update(expected).digest();
+  const leftValue = provided.trim();
+  const rightValue = expected.trim();
+  if (!leftValue || !rightValue) return false;
+  const left = createHash('sha256').update(leftValue).digest();
+  const right = createHash('sha256').update(rightValue).digest();
   return timingSafeEqual(left, right);
 }
 

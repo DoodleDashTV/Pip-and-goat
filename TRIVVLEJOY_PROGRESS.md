@@ -2,6 +2,23 @@
 
 Updated: 2026-08-24
 
+## TIVVLEJOY_GOAT_CHARACTER_SOURCE_INTAKE_AND_EXECUTION_BRIDGE_V1
+
+Preview-only Goat source intake bridge. One operator action: select `Goat_FINN.zip` and tap Upload.
+
+- Draft branch: `cursor/tivvlejoy-goat-character-source-intake-73f1`
+- Draft PR: #100 (OPEN / DRAFT / UNMERGED / NOT READY)
+- Stacked on: `cursor/tivvlejoy-goat-production-rig-v1-73f1` (Draft PR #99 stays open / draft / unmerged)
+- Operator surface: `/character-rigging`
+- Exact R2 object key: `tivvlejoy-assets/characters/CHAR_GOAT_001/source/Goat_FINN.zip`
+- Reuses existing private R2 multipart architecture
+- Expected SHA-256: `f5e85122f5af476e07df58c884b16a9663e05aaeef668f4d218fb7a410162ea5`
+- Goat remains **not** production-ready
+- Preview storage: existing private R2 names copied as Preview-only, git-branch-limited env. Production not modified (`hiddenProductionEnvCount=0`)
+- Live Preview reports `storage.state=configured`, prefix `tivvlejoy-assets`, `tokenConfigured=true`
+- 35% stall fix: Goat session-open uses the shared authenticated asset-intake primitive with Goat error codes; iPhone Safari reads the Studio session field from the input; failed session-open no longer stays on Opening upload session
+- No paid GPU, no Production mutation, no SOURCE overwrite, ZIP not committed to Git
+
 ## TIVVLEJOY_CHARACTER_RIGGING_ANIMATION_DEPARTMENT_V1
 
 Reusable Character Rigging & Animation Department. Goat is the first configured character. Pip is reserved and not rigged.
