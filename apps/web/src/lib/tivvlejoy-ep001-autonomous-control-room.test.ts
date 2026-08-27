@@ -12,6 +12,9 @@ describe('compileEp001AutonomousControlRoom', () => {
     expect(room.headline.foundationInputsWaiting).toBe(4);
     expect(room.headline.syntheticScenariosCovered).toBe(6);
     expect(room.headline.syntheticAuthorityLeaks).toBe(0);
+    expect(room.headline.crossContractIntegrityPass).toBe(true);
+    expect(room.headline.crossContractIssueCount).toBe(0);
+    expect(room.integrity.pass).toBe(true);
     expect(room.nextRequiredExternalInputs).toHaveLength(4);
     expect(room.authority.admissionGranted).toBe(false);
     expect(room.authority.paidGpuExecutionAuthorized).toBe(false);
