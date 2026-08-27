@@ -24,14 +24,20 @@ const PUBLIC_MARKETPLACE_CANDIDATES = [
 
 export function compileEp001SceneryLicenseEvidence() {
   const closure = compileEp001SceneryGapClosure();
-  const purchasedSourceIds = [...new Set(
-    closure.slots
-      .filter((slot) => slot.capabilityState === 'REAL_SOURCE_CANDIDATE_OBSERVED')
-      .flatMap((slot) => slot.closureRef),
-  )].sort();
+  const slotSourceIds = closure.slots
+    .filter((slot) => slot.capabilityState === 'REAL_SOURCE_CANDIDATE_OBSERVED')
+    .flatMap((slot) => slot.closureRef);
+  const inspectedDependencyIds = closure.additionalObservedSources.map((source) => source.sourceId);
+  const publicCandidateIds = PUBLIC_MARKETPLACE_CANDIDATES.map((candidate) => candidate.sourceId);
+  const sourceIds = [...new Set([...slotSourceIds, ...inspectedDependencyIds, ...publicCandidateIds])].sort();
 
-  const records = purchasedSourceIds.map((sourceId) => ({
+  const records = sourceIds.map((sourceId) => ({
     sourceId,
+    dependencyClass: slotSourceIds.includes(sourceId)
+      ? 'ROLE_RESOLVING_SOURCE' as const
+      : inspectedDependencyIds.includes(sourceId)
+        ? 'ADDITIONAL_INSPECTED_SOURCE' as const
+        : 'SUPPORTING_SOURCE_DEPENDENCY' as const,
     publicMarketplaceCandidate: PUBLIC_MARKETPLACE_CANDIDATES.find((candidate) => candidate.sourceId === sourceId) ?? null,
     evidenceState: 'AWAITING_LICENSE_EVIDENCE' as const,
     sellerOrMarketplace: null,
@@ -67,12 +73,15 @@ export function compileEp001SceneryLicenseEvidence() {
       'A generic marketplace policy that cannot be tied to the exact purchased product is insufficient.',
       'Commercial-use permission must be explicit or unambiguously incorporated by the exact purchase license.',
       'Evidence must identify the product/source and be hash-bound before admission.',
+      'Supporting texture, material, sky, and library dependencies require provenance even if they do not independently resolve a geometry role.',
       'No evidence record may grant permission to redistribute source files unless the license explicitly says so.',
       'Human review is required; machine parsing cannot issue the final license approval.',
     ],
-    admissionRule: 'A selected purchased source may be admitted only after exact product identity, purchase evidence, license evidence, commercial-use permission, immutable evidence hashes, and explicit human review are all present.',
+    admissionRule: 'A selected purchased source and every supporting commercial dependency it uses may be admitted only after exact product identity, purchase evidence, license evidence, commercial-use permission, immutable evidence hashes, and explicit human review are all present.',
     metrics: {
       purchasedSourceRecordCount: records.length,
+      roleResolvingSourceCount: records.filter((record) => record.dependencyClass === 'ROLE_RESOLVING_SOURCE').length,
+      supportingDependencyCount: records.filter((record) => record.dependencyClass !== 'ROLE_RESOLVING_SOURCE').length,
       publicMarketplaceCandidateCount: PUBLIC_MARKETPLACE_CANDIDATES.length,
       evidenceBoundCount: 0 as const,
       commercialUseVerifiedCount: 0 as const,
