@@ -2,7 +2,7 @@
 /** Zero-cost preflight for the 30-second scenery showcase. Never creates a Pod. */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { resolveObjectStorageConfig } from '@doodle-dash/shared';
+import { resolveObjectStorageConfig } from '../../../packages/shared/src/index';
 import { RunpodClient } from '../../../packages/production/src/cloud/runpod-client';
 import { validateRunpodWorkerImageRef } from '../../../packages/production/src/cloud/config';
 import {
