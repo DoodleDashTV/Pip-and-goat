@@ -1,5 +1,6 @@
 import { sha256Canonical } from '@/lib/tivvlejoy-character-animation';
 import { compileEp001SceneryGapClosure } from '@/lib/tivvlejoy-ep001-scenery-gap-closure';
+import { compileEp001RealScenerySourceInspection } from '@/lib/tivvlejoy-ep001-real-scenery-source-inspection';
 
 export const EP001_SCENERY_LICENSE_EVIDENCE_SCHEMA = 'TIVVLEJOY_EP001_SCENERY_LICENSE_EVIDENCE_V1' as const;
 
@@ -24,20 +25,24 @@ const PUBLIC_MARKETPLACE_CANDIDATES = [
 
 export function compileEp001SceneryLicenseEvidence() {
   const closure = compileEp001SceneryGapClosure();
+  const inspected = compileEp001RealScenerySourceInspection();
   const slotSourceIds = closure.slots
     .filter((slot) => slot.capabilityState === 'REAL_SOURCE_CANDIDATE_OBSERVED')
     .flatMap((slot) => slot.closureRef);
-  const inspectedDependencyIds = closure.additionalObservedSources.map((source) => source.sourceId);
+  const inspectedSourceIds = inspected.sources.map((source) => source.sourceId);
+  const additionalObservedIds = closure.additionalObservedSources.map((source) => source.sourceId);
   const publicCandidateIds = PUBLIC_MARKETPLACE_CANDIDATES.map((candidate) => candidate.sourceId);
-  const sourceIds = [...new Set([...slotSourceIds, ...inspectedDependencyIds, ...publicCandidateIds])].sort();
+  const sourceIds = [...new Set([...slotSourceIds, ...inspectedSourceIds, ...additionalObservedIds, ...publicCandidateIds])].sort();
 
   const records = sourceIds.map((sourceId) => ({
     sourceId,
     dependencyClass: slotSourceIds.includes(sourceId)
       ? 'ROLE_RESOLVING_SOURCE' as const
-      : inspectedDependencyIds.includes(sourceId)
-        ? 'ADDITIONAL_INSPECTED_SOURCE' as const
-        : 'SUPPORTING_SOURCE_DEPENDENCY' as const,
+      : inspectedSourceIds.includes(sourceId)
+        ? 'INSPECTED_SUPPORTING_SOURCE' as const
+        : additionalObservedIds.includes(sourceId)
+          ? 'ADDITIONAL_INSPECTED_SOURCE' as const
+          : 'PUBLIC_MATCH_SUPPORTING_SOURCE' as const,
     publicMarketplaceCandidate: PUBLIC_MARKETPLACE_CANDIDATES.find((candidate) => candidate.sourceId === sourceId) ?? null,
     evidenceState: 'AWAITING_LICENSE_EVIDENCE' as const,
     sellerOrMarketplace: null,
@@ -60,6 +65,7 @@ export function compileEp001SceneryLicenseEvidence() {
     schemaVersion: EP001_SCENERY_LICENSE_EVIDENCE_SCHEMA,
     episodeId: closure.episodeId,
     sceneryGapClosureSha256: closure.sceneryGapClosureSha256,
+    realScenerySourceInspectionSha256: inspected.realScenerySourceInspectionSha256,
     state: 'CAPABILITY_COMPLETE_LICENSE_EVIDENCE_NOT_YET_BOUND' as const,
     publicMarketplaceCandidates: PUBLIC_MARKETPLACE_CANDIDATES,
     records,
@@ -74,12 +80,14 @@ export function compileEp001SceneryLicenseEvidence() {
       'Commercial-use permission must be explicit or unambiguously incorporated by the exact purchase license.',
       'Evidence must identify the product/source and be hash-bound before admission.',
       'Supporting texture, material, sky, and library dependencies require provenance even if they do not independently resolve a geometry role.',
+      'Every statically inspected commercial source is represented in this evidence gate; source omission cannot be used to bypass provenance.',
       'No evidence record may grant permission to redistribute source files unless the license explicitly says so.',
       'Human review is required; machine parsing cannot issue the final license approval.',
     ],
     admissionRule: 'A selected purchased source and every supporting commercial dependency it uses may be admitted only after exact product identity, purchase evidence, license evidence, commercial-use permission, immutable evidence hashes, and explicit human review are all present.',
     metrics: {
-      purchasedSourceRecordCount: records.length,
+      sourceRecordCount: records.length,
+      staticallyInspectedSourceCount: inspectedSourceIds.length,
       roleResolvingSourceCount: records.filter((record) => record.dependencyClass === 'ROLE_RESOLVING_SOURCE').length,
       supportingDependencyCount: records.filter((record) => record.dependencyClass !== 'ROLE_RESOLVING_SOURCE').length,
       publicMarketplaceCandidateCount: PUBLIC_MARKETPLACE_CANDIDATES.length,
