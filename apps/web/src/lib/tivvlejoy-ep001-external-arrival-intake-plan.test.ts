@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { sha256Canonical } from '@/lib/tivvlejoy-character-animation';
 import { compileEp001ExternalArrivalIntakePlan } from '@/lib/tivvlejoy-ep001-external-arrival-intake-plan';
+import { compileEp001HumanGatePacket } from '@/lib/tivvlejoy-ep001-human-gate-packet';
+import { EP001_HUMAN_DECISION_RECEIPT_SCHEMA } from '@/lib/tivvlejoy-ep001-human-decision-receipt';
 
 const SHA = 'c'.repeat(64);
 
@@ -35,6 +38,38 @@ describe('compileEp001ExternalArrivalIntakePlan', () => {
     expect(plan.triggerId).toBe('VOICE_PAID_AUTHORIZATION_ARRIVES');
     expect(plan.safeActions.map((item) => item.action)).toContain('select EP001_DL_01 as canary');
     expect(plan.safeActions.map((item) => item.action)).not.toContain('batch-generate all eight lines before canary success');
+  });
+
+  it('routes a valid SHA-bound human decision receipt to the human decision handler', () => {
+    const packet = compileEp001HumanGatePacket();
+    const row = packet.rows[0];
+    const reviewedAt = '2026-08-27T12:00:00.000Z';
+    const evidenceRefs = ['review://example'];
+    const canonicalReceiptBody = {
+      schemaVersion: EP001_HUMAN_DECISION_RECEIPT_SCHEMA,
+      episodeId: packet.episodeId,
+      decisionId: row.decisionId,
+      bindingSha256: row.bindingSha256,
+      decision: 'REJECTED' as const,
+      reviewerId: 'reviewer-test',
+      reviewedAt,
+      evidenceRefs,
+    };
+    const plan = compileEp001ExternalArrivalIntakePlan({
+      arrivalType: 'HUMAN_DECISION',
+      candidate: {
+        decisionId: row.decisionId,
+        bindingSha256: row.bindingSha256,
+        decision: 'REJECTED',
+        reviewerId: 'reviewer-test',
+        reviewedAt,
+        evidenceRefs,
+        receiptSha256: sha256Canonical(canonicalReceiptBody),
+      },
+    });
+    expect(plan.triggerId).toBe('HUMAN_DECISION_RECEIPT_ARRIVES');
+    expect(plan.safeActions.map((item) => item.action)).toContain('validate receipt structure');
+    expect(plan.authority.humanApprovalGranted).toBe(false);
   });
 
   it('maps final-render authorization to guarded preflight without launching', () => {
