@@ -29,7 +29,6 @@ export async function POST(request: Request) {
   const result = validateEp001HumanDecisionReceipt(payload);
   return NextResponse.json(
     {
-      schemaVersion: 'TIVVLEJOY_EP001_HUMAN_DECISION_VALIDATION_ROUTE_V1',
       success: true,
       ...result,
     },
