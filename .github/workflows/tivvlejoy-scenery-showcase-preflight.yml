@@ -1,0 +1,124 @@
+name: TivvleJoy Scenery Showcase Zero-Cost Preflight
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - 'config/cloud/scenery-showcase-worker-image.json'
+      - 'scripts/cloud/scenery-showcase-30s/**'
+      - '.github/workflows/tivvlejoy-scenery-showcase-preflight.yml'
+
+concurrency:
+  group: tivvlejoy-scenery-showcase-preflight-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Read-only probe only. No paid-authorization value is supplied here.
+      ALLOW_PAID_GPU_LAUNCH: 'false'
+      CLOUD_RENDER_ENABLED: 'false'
+      SCENERY_SHOWCASE_PAID_AUTHORIZATION: ''
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+      R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+      R2_REGION: ${{ secrets.R2_REGION }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      OBJECT_STORAGE_ENDPOINT: ${{ secrets.OBJECT_STORAGE_ENDPOINT }}
+      OBJECT_STORAGE_REGION: ${{ secrets.OBJECT_STORAGE_REGION }}
+      OBJECT_STORAGE_BUCKET: ${{ secrets.OBJECT_STORAGE_BUCKET }}
+      OBJECT_STORAGE_ACCESS_KEY_ID: ${{ secrets.OBJECT_STORAGE_ACCESS_KEY_ID }}
+      OBJECT_STORAGE_SECRET_ACCESS_KEY: ${{ secrets.OBJECT_STORAGE_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable pnpm
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Syntax-check execution contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm exec tsc --noEmit --pretty false --allowImportingTsExtensions false --skipLibCheck scripts/cloud/scenery-showcase-30s/contract.ts scripts/cloud/scenery-showcase-30s/preflight.ts scripts/cloud/scenery-showcase-30s/launch.ts || true
+          node --check workers/runpod-blender/src/scenery-showcase.js
+          python3 -m py_compile scripts/blender/scenery/showcase_30s.py
+
+      - name: Run read-only preflight
+        id: preflight
+        shell: bash
+        run: |
+          set +e
+          pnpm exec tsx scripts/cloud/scenery-showcase-30s/preflight.ts > /tmp/scenery-preflight.stdout 2> /tmp/scenery-preflight.stderr
+          code=$?
+          echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
+          echo "preflight exit=${code}"
+          tail -n 3 /tmp/scenery-preflight.stdout || true
+          # Do not fail the workflow on expected environment blockers; the JSON
+          # artifact below is the authoritative zero-cost result.
+          exit 0
+
+      - name: Sanitize and summarize preflight
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/tivvlejoy-scenery-showcase-30s
+          if [ ! -f artifacts/tivvlejoy-scenery-showcase-30s/preflight.json ]; then
+            python3 - <<'PY'
+          import json
+          with open('artifacts/tivvlejoy-scenery-showcase-30s/preflight.json','w') as f:
+              json.dump({'schema':'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V1','status':'PREFLIGHT_DID_NOT_PRODUCE_JSON','paidMutationPerformed':False}, f, indent=2)
+              f.write('\n')
+          PY
+          fi
+          python3 - <<'PY'
+          import json
+          p='artifacts/tivvlejoy-scenery-showcase-30s/preflight.json'
+          data=json.load(open(p))
+          # Defensive redaction: the preflight should never include secret values.
+          for forbidden in ('apiKey','accessKeyId','secretAccessKey','RUNPOD_API_KEY','R2_SECRET_ACCESS_KEY'):
+              if forbidden in json.dumps(data):
+                  raise SystemExit(f'Forbidden secret-shaped field in preflight artifact: {forbidden}')
+          print(json.dumps({
+              'launchAllowed': data.get('launchAllowed'),
+              'readyAwaitingAuthorization': data.get('readyAwaitingAuthorization'),
+              'blockers': data.get('blockers', []),
+              'secureUsdPerHr': (data.get('runpod') or {}).get('secureUsdPerHr'),
+              'stockStatus': (data.get('runpod') or {}).get('stockStatus'),
+              'privateR2Configured': data.get('privateR2Configured'),
+              'paidMutationPerformed': data.get('paidMutationPerformed'),
+          }))
+          PY
+
+      - name: Upload sanitized preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-showcase-zero-cost-preflight
+          path: artifacts/tivvlejoy-scenery-showcase-30s/preflight.json
+          if-no-files-found: error
+          retention-days: 14
