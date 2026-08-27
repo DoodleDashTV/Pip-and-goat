@@ -1,0 +1,22 @@
+import Link from 'next/link';
+import { compileEp001DialogueAnimationManifest } from '@/lib/tivvlejoy-ep001-dialogue-animation-manifest';
+import { compileEp001AnimationWorkerPayload } from '@/lib/tivvlejoy-ep001-animation-worker-payload';
+
+export const dynamic = 'force-dynamic';
+export const metadata = { title: 'Episode 1 Animation Worker Payload | TivvleJoy', description: 'Fail-closed future animation-worker payload contract.' };
+
+const H = (char: string) => char.repeat(64);
+export default function Ep001AnimationWorkerPayloadPage() {
+  const lines = compileEp001DialogueAnimationManifest().lines;
+  const template = compileEp001AnimationWorkerPayload({
+    pip: { characterId: 'CHAR_PIP_001', packageSha256: H('a'), canonicalBlendSha256: H('b'), adapterSha256: H('c'), humanApprovalReceiptSha256: H('d') },
+    goat: { characterId: 'CHAR_GOAT_001', packageSha256: H('e'), canonicalBlendSha256: H('f'), adapterSha256: H('1'), humanApprovalReceiptSha256: H('2') },
+    sceneryPackageSha256: H('3'), sceneryAdmissionReceiptSha256: H('4'),
+    voiceBindings: lines.map((line, index) => ({ lineId: line.lineId, audioSourceSha256: String((index + 5) % 10).repeat(64), voiceReceiptSha256: H('a'), lineTimingReceiptSha256: H('b'), wordTimingReceiptSha256: H('c') })),
+  });
+  return <main className="mx-auto min-h-screen w-full max-w-7xl space-y-4 px-4 py-6 sm:px-6 sm:py-10">
+    <section className="studio-card p-4 sm:p-6"><Link href="/episode-one/shot-animation-evidence" className="inline-flex min-h-touch items-center text-sm font-bold text-[var(--color-primary)]">← Shot animation evidence</Link><p className="mt-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">Episode 1 animation execution</p><h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">The future worker payload is already compiled—and cannot launch</h1><p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--color-text-muted)]">This template demonstrates the exact payload shape using synthetic valid hashes only. Real execution requires approved Pip/Goat package identities, scenery admission, eight real voice/timing receipts and a separate explicit paid execution authorization.</p><dl className="mt-5 grid gap-px overflow-hidden rounded-xl bg-[var(--color-border)] sm:grid-cols-5">{[['Shot jobs',template.metrics.shotJobCount],['Voice bindings',template.metrics.voiceBindingCount],['Worker launches',template.metrics.workerLaunchCount],['Paid requests',template.metrics.paidRequestCount],['GPU ceiling','$0']].map(([k,v]) => <div key={String(k)} className="bg-[var(--color-surface)] p-3"><dt className="text-xs font-bold uppercase text-[var(--color-text-muted)]">{k}</dt><dd className="mt-1 font-display text-2xl font-bold">{v}</dd></div>)}</dl></section>
+    <section className="space-y-3">{template.shotJobs.map((job) => <article key={job.shotId} className="studio-card p-4 sm:p-5"><div className="flex flex-wrap items-start justify-between gap-2"><div><p className="font-display text-xl font-bold">{job.shotId}</p><p className="mt-1 font-mono text-[11px]">frames {job.frameRange.start}–{job.frameRange.endExclusive} · {job.characterPlans.length} evidenced character plans</p></div><span className="status-warning rounded-full px-3 py-1 text-xs font-bold">launch disabled</span></div><p className="mt-3 break-all font-mono text-[11px]">Payload SHA-256: {job.workerPayloadSha256}</p><div className="mt-3 grid gap-2 sm:grid-cols-4">{[['Blender',job.execution.blenderVersion],['Wall clock',`${job.execution.maxWallClockMinutes} min`],['GPU spend',`$${job.execution.maxGpuSpendUsd}`],['Paid authorized',String(job.execution.paidExecutionAuthorized)]].map(([k,v]) => <div key={k} className="rounded-xl border border-[var(--color-border)] p-2"><p className="text-[10px] font-bold uppercase text-[var(--color-text-muted)]">{k}</p><p className="mt-1 text-xs font-bold">{v}</p></div>)}</div></article>)}</section>
+    <section className="rounded-3xl border border-[var(--color-warning)] bg-[var(--color-warning-soft)] p-4 text-sm leading-6 text-[var(--color-warning-foreground)]"><p className="font-bold">Template hashes are synthetic and confer zero authority.</p><p className="mt-1">No worker, pod, Blender session, provider request, storage mutation or Production write is launched from this page.</p><p className="mt-3 break-all font-mono text-[11px]">Plan SHA-256: {template.animationWorkerPlanSha256}</p></section>
+  </main>;
+}
