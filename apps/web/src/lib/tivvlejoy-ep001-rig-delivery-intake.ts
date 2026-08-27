@@ -2,6 +2,7 @@ import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 import { createConfiguredMultipartStorage } from '@/lib/scenery/intake/r2-multipart';
 import type { MultipartStoragePort } from '@/lib/scenery/intake/multipart';
 import { planMultipartParts } from '@/lib/scenery/intake/keys';
+import { sha256StoredObjectByRange } from '@/lib/tivvlejoy-ep001-rig-delivery-stream-hash';
 
 export const EP001_RIG_DELIVERY_INTAKE_SCHEMA = 'TIVVLEJOY_EP001_RIG_DELIVERY_INTAKE_V1' as const;
 export const EP001_RIG_INTAKE_TOKEN_HEADER = 'x-tivvlejoy-character-intake-token' as const;
@@ -89,10 +90,6 @@ function sessionKey(characterId: CharacterId, versionId: string): string {
 
 function receiptKey(characterId: CharacterId, versionId: string): string {
   return `${deliveryPrefix(characterId)}/${versionId}/receipt.json`;
-}
-
-function sha256(bytes: Uint8Array): string {
-  return createHash('sha256').update(bytes).digest('hex');
 }
 
 async function readJson<T>(storage: MultipartStoragePort, key: string): Promise<T | null> {
@@ -206,14 +203,15 @@ export async function handleEp001RigDeliveryIntake(input: {
     if (new Set(parts.map((part) => part.partNumber)).size !== session.partCount) throw new Error('RIG_MULTIPART_COMPLETION_DUPLICATE_PART');
     const completed = await storage.completeMultipartUpload({ key: session.objectKey, uploadId: session.uploadId, parts });
     if (completed.size !== session.byteSize) throw new Error('RIG_STORED_SIZE_MISMATCH');
-    const stored = await storage.getObject?.(session.objectKey);
-    if (!stored || stored.byteLength !== session.byteSize) throw new Error('RIG_STORED_BYTES_UNREADABLE');
-    const storedSha256 = sha256(stored);
+    const verifiedHash = await sha256StoredObjectByRange({ storage, key: session.objectKey, byteSize: session.byteSize });
+    if (verifiedHash.bytesRead !== session.byteSize) throw new Error('RIG_STORED_BYTES_UNREADABLE');
+    const storedSha256 = verifiedHash.sha256;
     if (session.clientSha256 && storedSha256 !== session.clientSha256) throw new Error('RIG_STORED_SHA256_MISMATCH');
     const receiptBody = {
       schemaVersion: 'TIVVLEJOY_EP001_RIG_DELIVERY_RECEIPT_V1', episodeId: 'EP001', versionId,
       characterId, characterSlug: characterSlug(characterId), originalFilename: session.originalFilename,
       normalizedFilename: session.normalizedFilename, byteSize: session.byteSize, sourceSha256: storedSha256,
+      hashVerification: { method: 'BOUNDED_RANGE_SHA256', chunksRead: verifiedHash.chunksRead, chunkBytes: verifiedHash.chunkBytes },
       artistVersionNote: session.artistVersionNote, objectKey: session.objectKey, receivedAt: new Date().toISOString(),
       immutableOriginal: true, uploadVerified: true, technicalInspectionPassed: false,
       humanApproved: false, episodeAdmitted: false, productionEnabled: false,
