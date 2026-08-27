@@ -53,6 +53,9 @@ export function compileEp001AutonomousControlRoom() {
       '/episode-one/arrival-simulation',
       '/episode-one/contract-watchdog',
       '/episode-one/critical-path',
+      '/episode-one/missing-inputs',
+      '/episode-one/cross-contract-integrity',
+      '/episode-one/unblocking-combinations',
     ],
     authority: {
       admissionGranted: false as const,
