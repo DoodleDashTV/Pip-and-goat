@@ -1,0 +1,54 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T22:24:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "commit": "f9b0f80",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev36",
+  "acceptance": {
+    "A_immediately_identifiable_water": false,
+    "B_shot02_not_road_path_ribbon": false,
+    "C_irregular_natural_banks": false,
+    "D_depth_cues": false,
+    "E_controlled_reflections": false,
+    "F_world_fit_not_unnatural_blue": "partial",
+    "G_subtle_cinematic_ripples": false,
+    "H_no_knife_seam": false,
+    "I_believable_in_all_six": false,
+    "J_clean_enough_to_judge": true
+  },
+  "measurements": {
+    "SHOT_01": {"meanLum": 107.5, "midBminusG": -8.0, "botBminusG": -20.5},
+    "SHOT_02": {"meanLum": 92.5, "midBminusG": -6.5, "botBminusG": -18.5},
+    "SHOT_03": {"meanLum": 89.3, "midBminusG": -0.2, "botBminusG": -16.2},
+    "SHOT_04": {"meanLum": 98.9, "midBminusG": -14.7, "botBminusG": -13.5},
+    "SHOT_05": {"meanLum": 121.5, "midBminusG": 2.3, "botBminusG": -12.1},
+    "SHOT_06": {"meanLum": 86.9, "midBminusG": -12.9, "botBminusG": -14.2}
+  },
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/street/ridge hold. Stream is a winding light strip, not a creek.",
+    "SHOT_02": "FAIL — bank-side downward look. Still a pale glossy ribbon with a hard grass seam. Bed margins do not read.",
+    "SHOT_03": "PARTIAL — framed forest opening holds. River not the subject.",
+    "SHOT_04": "PARTIAL — street/cart/fence/mountains hold. Foreground water is a flat light ribbon.",
+    "SHOT_05": "PARTIAL — compression holds.",
+    "SHOT_06": "PARTIAL — street/cart/fence hold."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape"
+  ],
+  "progressThisRepair": {
+    "twoLayerArchitectureLanded": true,
+    "variableWidthSpline": true,
+    "bankOutlinePatchesRemoved": true,
+    "transmissionLoweredAfterFoilLookdev35": true,
+    "stillReadsAsRibbon": true
+  },
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "smallestNextAction": "Make the dark bed the hero silhouette from SHOT_02: much wider wet-earth channel, water film only in the deepest third, and 3D bank slopes the camera cannot miss. Do not CREATE.",
+  "honestConclusion": "Two-layer channel is in the scene graph. It does not yet read as water. Do not CREATE. Do not return FINAL_RESULT."
+}
