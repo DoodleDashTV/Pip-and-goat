@@ -1,0 +1,28 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:59:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "ec1a177",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev19",
+  "shots": {
+    "SHOT_01": "FAIL — river is still a light-blue stream ribbon with tan banks. Village cluster and Louis ridge remain.",
+    "SHOT_02": "FAIL — cabin discovery holds; water is a dark blue-grey band, not a stream.",
+    "SHOT_03": "PARTIAL — forest frame from earlier passes.",
+    "SHOT_04": "PARTIAL — street holds. Solid blue band at the bottom.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "PARTIAL — street readable."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. 1856Z timer inspect was 0 pods and a stale rejected-pin bridge. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
