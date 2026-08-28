@@ -648,24 +648,25 @@ def packed_meadow_image():
 
 def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: float = 140.0) -> tuple[int, str]:
     """Cover the HDRI gray hemisphere with purchased grassy/dirt albedo, never Grass01 cards."""
-    packed = packed_meadow_image()
+    packed = None
     img_path = None
     source = 'none'
-    if packed is not None:
-        source = f'packed:{packed.name}'
-    else:
-        candidates = [
-            p for p in files
-            if p.is_file()
-            and p.suffix.lower() in IMAGE_EXTS
-            and not is_grass_card_texture_name(p.name)
-            and any(word in p.name.lower() for word in ('dirt', 'soil', 'moss', 'ground', 'rock', 'meadow', 'terrain'))
-            and not any(word in p.name.lower() for word in NON_ALBEDO_WORDS)
-        ]
-        img_path = pick_ground_image_path(candidates) if candidates else None
-        if img_path and is_grass_card_texture_name(img_path.name):
-            img_path = None
-        source = img_path.name if img_path else 'authored_meadow_grade'
+    # Louis Texture.png reads as a blown-out gray slab in this lighting.
+    # Prefer a forest dirt/rock albedo multiplied with a meadow grade.
+    candidates = [
+        p for p in files
+        if p.is_file()
+        and p.suffix.lower() in IMAGE_EXTS
+        and not is_grass_card_texture_name(p.name)
+        and any(word in p.name.lower() for word in ('dirt', 'soil', 'moss', 'ground', 'rock', 'meadow', 'terrain', 'basecolor'))
+        and not any(word in p.name.lower() for word in NON_ALBEDO_WORDS)
+        and 'foliage' not in p.name.lower()
+        and 'leaf' not in p.name.lower()
+    ]
+    img_path = pick_ground_image_path(candidates) if candidates else None
+    if img_path and is_grass_card_texture_name(img_path.name):
+        img_path = None
+    source = img_path.name if img_path else 'authored_meadow_grade'
     bpy.ops.mesh.primitive_plane_add(size=max(90.0, float(size)), location=center)
     ground = bpy.context.object
     ground.name = 'TJ_ValleyFloor_PurchasedMeadow'
@@ -727,11 +728,16 @@ def create_purchased_stream(center=(0.0, 16.0, -0.03), size=(8.0, 42.0)) -> int:
     bpy.ops.mesh.primitive_cube_add(size=1.0, location=center)
     stream = bpy.context.object
     stream.name = 'TJ_River_From_Purchased_Water_Mat'
-    stream.scale = (size[0] * 0.5, size[1] * 0.5, 0.08)
+    stream.scale = (size[0] * 0.7, size[1] * 0.5, 0.12)
     bpy.context.view_layer.update()
     if water_mat is not None:
         stream.data.materials.clear()
         stream.data.materials.append(water_mat)
+        bsdf = next((n for n in (water_mat.node_tree.nodes if water_mat.node_tree else []) if n.type == 'BSDF_PRINCIPLED'), None)
+        if bsdf and 'Base Color' in bsdf.inputs:
+            bsdf.inputs['Base Color'].default_value = (0.18, 0.42, 0.52, 1.0)
+            if 'Roughness' in bsdf.inputs:
+                bsdf.inputs['Roughness'].default_value = 0.12
     else:
         mat = bpy.data.materials.new('TJ_PurchasedWaterFallback')
         mat.use_nodes = True
@@ -1078,7 +1084,7 @@ def kit_target_size(path: Path) -> float:
     if 'mountain' in name or 'grassy' in name or 'meadow' in name:
         return 90.0
     if 'nature_kit' in name or 'forest' in name:
-        return 24.0
+        return 10.0
     if 'swarm' in name:
         return 14.0
     if 'rock' in name:
@@ -1408,7 +1414,18 @@ def main() -> int:
             radius=9.0,
         )
         members.extend(extras)
-        bound = bind_purchased_textures(members, expanded.get('village_textures', []) + files)
+        foliage = [p for p in files if p.is_file() and 'basecolor' in p.name.lower()]
+        bound = bind_purchased_textures(members, foliage or files)
+        if bound == 0:
+            for obj in members:
+                if obj.type != 'MESH':
+                    continue
+                img = next((p for p in foliage if 'foliage' in p.name.lower() or 'leaf' in p.name.lower()), None) or (foliage[0] if foliage else None)
+                if img is None:
+                    break
+                obj.data.materials.clear()
+                obj.data.materials.append(image_material(f'TJ_Forest_{obj.name}'[:55], img))
+                bound += 1
         contributions[role] = {
             'type': 'visible_geometry',
             'objectCount': len(members),
