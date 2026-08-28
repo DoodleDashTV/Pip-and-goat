@@ -384,7 +384,28 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(wave.outputs["Color"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
-    links.new(body.outputs["BSDF"], out.inputs["Surface"])
+    gloss = nodes.new("ShaderNodeBsdfPrincipled")
+    if "Base Color" in gloss.inputs:
+        gloss.inputs["Base Color"].default_value = (0.10, 0.16, 0.18, 1.0)
+    if "Roughness" in gloss.inputs:
+        gloss.inputs["Roughness"].default_value = 0.14
+    if "Metallic" in gloss.inputs:
+        gloss.inputs["Metallic"].default_value = 0.0
+    if "Specular IOR Level" in gloss.inputs:
+        gloss.inputs["Specular IOR Level"].default_value = 0.72
+    if "Normal" in gloss.inputs:
+        links.new(bump.outputs["Normal"], gloss.inputs["Normal"])
+    weight = nodes.new("ShaderNodeLayerWeight")
+    weight.inputs["Blend"].default_value = 0.24
+    invert = nodes.new("ShaderNodeMath")
+    invert.operation = "SUBTRACT"
+    invert.inputs[0].default_value = 1.0
+    links.new(weight.outputs["Facing"], invert.inputs[1])
+    mix_sh = nodes.new("ShaderNodeMixShader")
+    links.new(invert.outputs["Value"], mix_sh.inputs["Fac"])
+    links.new(body.outputs["BSDF"], mix_sh.inputs[1])
+    links.new(gloss.outputs["BSDF"], mix_sh.inputs[2])
+    links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
     return mat
 
 
@@ -464,7 +485,7 @@ def spline_edge_mesh(name: str, centers: list[Vector], inner_half: float, outer_
     faces = []
     for i, center in enumerate(centers):
         side = _side_from_centers(centers, i) * side_sign
-        wobble = 0.55 * math.sin(i * 0.41) + 0.22 * math.sin(i * 1.15)
+        wobble = 0.22 * math.sin(i * 0.31)
         inner = center + side * (inner_half + wobble * 0.2)
         outer = center + side * (outer_half + wobble)
         inner.z = center.z + z_inner
@@ -539,13 +560,13 @@ def dirt_bank_material() -> bpy.types.Material:
 
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
-    centers = evaluated_centerline(guide, samples=80)
-    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=2.15, z_offset=0.02, width_wobble=0.35)
+    centers = evaluated_centerline(guide, samples=120)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=2.15, z_offset=0.02, width_wobble=0.16)
     assigned = assign_purchased_water(river)
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
-        bank = spline_edge_mesh(name, centers, inner_half=0.85, outer_half=5.2, z_inner=0.03, z_outer=0.20, side_sign=sign)
+        bank = spline_edge_mesh(name, centers, inner_half=1.55, outer_half=5.4, z_inner=0.04, z_outer=0.16, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
     return river, assigned, banks
