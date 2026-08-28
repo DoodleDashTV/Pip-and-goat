@@ -135,17 +135,33 @@ def shade_smooth(obj: bpy.types.Object) -> None:
         poly.use_smooth = True
 
 
+def _walk_image_nodes(nodes):
+    found = []
+    for node in nodes:
+        if node.type == "TEX_IMAGE" and getattr(node, "image", None):
+            name = node.image.name.lower()
+            if "slope" in name or "mask" in name or "nrm" in name:
+                continue
+            found.append(node.image)
+        tree = getattr(node, "node_tree", None)
+        if node.type == "GROUP" and tree is not None:
+            found.extend(_walk_image_nodes(tree.nodes))
+    return found
+
+
 def purchased_meadow_image():
-    """Louis Meadow/Grassy albedos only. Rocks_A reads as sand from the south camera."""
+    """Louis Meadow/Grassy packed Gaea albedos live inside node groups."""
+    images = []
     for mat in bpy.data.materials:
         if not mat or not mat.node_tree:
             continue
         if not any(token in mat.name.lower() for token in ("meadow", "grassy")):
             continue
-        for node in mat.node_tree.nodes:
-            if node.type == "TEX_IMAGE" and getattr(node, "image", None):
-                return node.image
-    return None
+        images.extend(_walk_image_nodes(mat.node_tree.nodes))
+    for group in bpy.data.node_groups:
+        if any(token in group.name.lower() for token in ("meadow", "grassy", "rockygreen")):
+            images.extend(_walk_image_nodes(group.nodes))
+    return images[0] if images else None
 
 
 def in_village(x: float, y: float) -> bool:
@@ -154,6 +170,10 @@ def in_village(x: float, y: float) -> bool:
 
 def in_mountain_corridor(x: float, y: float) -> bool:
     return abs(x) < MOUNTAIN_CORRIDOR_X and y > -24.0
+
+
+def in_shot03_corridor(x: float, y: float) -> bool:
+    return dist_to_polyline(x, y, ((-34.0, 16.0, 0.0), (-24.0, 32.0, 0.0), (-16.0, 42.0, 0.0))) < 9.5
 
 
 def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, ...] = ()) -> list[Path]:
@@ -189,7 +209,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
                 (y - VILLAGE_Y_MIN) / 3.0,
                 (VILLAGE_Y_MAX - y) / 3.0,
             )
-            pad = max(0.10, 1.0 - max(0.0, min(1.0, edge)) * 0.90)
+            pad = max(0.32, 1.0 - max(0.0, min(1.0, edge)) * 0.68)
         height *= pad
         vert.co.z = height
     ground.data.update()
@@ -249,7 +269,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
         mix = _mix_rgb(nodes)
         if "Color1" in mix.inputs:
-            mix.inputs["Fac"].default_value = 0.22
+            mix.inputs["Fac"].default_value = 0.48
             links.new(ramp.outputs["Color"], mix.inputs["Color1"])
             links.new(tex.outputs["Color"], mix.inputs["Color2"])
             color = mix.outputs["Color"]
@@ -259,8 +279,8 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     abs_x.operation = "ABSOLUTE"
     links.new(sep.outputs["X"], abs_x.inputs[0])
     path_w = nodes.new("ShaderNodeMapRange")
-    path_w.inputs["From Min"].default_value = 0.6
-    path_w.inputs["From Max"].default_value = 3.6
+    path_w.inputs["From Min"].default_value = 0.45
+    path_w.inputs["From Max"].default_value = 2.4
     path_w.inputs["To Min"].default_value = 1.0
     path_w.inputs["To Max"].default_value = 0.0
     links.new(abs_x.outputs["Value"], path_w.inputs["Value"])
@@ -336,7 +356,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Specular IOR Level" in spec.inputs:
         spec.inputs["Specular IOR Level"].default_value = 0.88
     if "Metallic" in spec.inputs:
-        spec.inputs["Metallic"].default_value = 0.12
+        spec.inputs["Metallic"].default_value = 0.04
     fresnel = nodes.new("ShaderNodeFresnel")
     fresnel.inputs["IOR"].default_value = 1.333
     mix = nodes.new("ShaderNodeMixShader")
@@ -356,7 +376,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         wave.inputs["Detail"].default_value = 4.0
     links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.42
+    bump.inputs["Strength"].default_value = 0.62
     if "Distance" in bump.inputs:
         bump.inputs["Distance"].default_value = 0.10
     links.new(wave.outputs["Color"], bump.inputs["Height"])
@@ -510,18 +530,51 @@ def dirt_bank_material() -> bpy.types.Material:
     return mat
 
 
+def displace_water(obj: bpy.types.Object, strength: float = 0.07) -> None:
+    tex = bpy.data.textures.new(obj.name + "_Waves", type="CLOUDS")
+    tex.noise_scale = 1.8
+    if hasattr(tex, "noise_depth"):
+        tex.noise_depth = 2
+    mod = obj.modifiers.new("TJ_RiverWaves", "DISPLACE")
+    mod.texture = tex
+    mod.strength = strength
+    mod.mid_level = 0.5
+
+
+def build_discovery_pool() -> bpy.types.Object:
+    bpy.ops.mesh.primitive_circle_add(vertices=28, radius=1.0, fill_type="NGON", location=(-6.0, -12.2, -0.62))
+    pool = bpy.context.object
+    pool.name = "TJ_River_DiscoveryPool"
+    pool.scale = (7.6, 3.8, 1.0)
+    try:
+        bpy.ops.object.transform_apply(scale=True)
+    except Exception:
+        pass
+    for vert in pool.data.vertices:
+        vert.co.z += 0.08 + 0.03 * math.sin(vert.co.x * 0.7 + vert.co.y * 0.4)
+    pool.data.update()
+    shade_smooth(pool)
+    displace_water(pool, 0.05)
+    if hasattr(pool, "visible_shadow"):
+        pool.visible_shadow = False
+    return pool
+
+
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
     centers = evaluated_centerline(guide, samples=80)
     river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=3.35, z_offset=0.08, width_wobble=0.22)
     assigned = assign_purchased_water(river)
+    displace_water(river, 0.06)
+    pool = build_discovery_pool()
+    pool.data.materials.append(river.data.materials[0])
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
         bank = spline_edge_mesh(name, centers, inner_half=3.05, outer_half=6.8, z_inner=0.06, z_outer=0.22, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
-    return river, assigned, banks
+    return river, assigned, banks + [pool]
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0) -> None:
@@ -647,6 +700,10 @@ def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, ra
             if in_mountain_corridor(loc[0], loc[1]):
                 continue
             if dist_to_polyline(loc[0], loc[1]) < 6.0:
+                continue
+            if in_shot03_corridor(loc[0], loc[1]):
+                continue
+            if math.hypot(loc[0] + 34.0, loc[1] - 16.0) < 12.0:
                 continue
             extras.append(duplicate_mesh_in_world(src, loc, scale * (0.85 + 0.08 * ((i + clump) % 5))))
     return extras
@@ -883,7 +940,7 @@ def main() -> int:
     )
     for obj in members:
         link_exclusive(obj, collections["WORLD_VILLAGE"])
-    prop_files = role_files(village_files, ("cart", "fence", "gate", "barrel", "crate", "firewood", "bucket"), ("grass01",))
+    prop_files = role_files(village_files, ("cart", "fence", "gate", "barrel", "crate", "firewoods", "bucket"), ("grass01",))
     prop_members, prop_imported, prop_placed = import_kit_groups(
         prop_files,
         "village_blender",
@@ -956,8 +1013,8 @@ def main() -> int:
     ]
     if not trees:
         trees = [obj for obj in bpy.data.objects if obj.type == "MESH" and "tree" in obj.name.lower()]
-    west_fg = scatter_clumps(trees, (-24.0, 10.0, 0.0), 3, 2, 7.0, 1.05, 3)
-    west_mg = scatter_clumps(trees, (-30.0, 30.0, 0.0), 3, 2, 8.0, 1.35, 7)
+    west_fg = scatter_clumps(trees, (-26.0, 6.0, 0.0), 3, 2, 7.0, 1.05, 3)
+    west_mg = scatter_clumps(trees, (-44.0, 40.0, 0.0), 3, 2, 8.0, 1.35, 7)
     east_fg = scatter_clumps(trees, (24.0, 12.0, 0.0), 3, 2, 7.0, 1.08, 5)
     east_mg = scatter_clumps(trees, (28.0, 32.0, 0.0), 3, 2, 8.0, 1.40, 11)
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)

@@ -1,0 +1,34 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:33:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "46f3faa",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev11",
+  "shots": {
+    "SHOT_01": "FAIL — Louis LP ranges now sit as a real backdrop, but the valley floor is still a lime slab, the river is blue tape with tan strips, and the village is a brown pad.",
+    "SHOT_02": "FAIL — Bezier ribbon still reads as a flat blue-gray tape. No pool, no reflection, jagged bank edge.",
+    "SHOT_03": "FAIL — camera looks into a black trunk. Passage is gone.",
+    "SHOT_04": "FAIL — two cabins and a cart on a sand/lime pad. Water at the bottom is a cyan strip.",
+    "SHOT_05": "FAIL — chimney still cropped at the bottom; look was aimed at peak height so the village became a chimney portrait. Mountains are layered now, which is progress.",
+    "SHOT_06": "FAIL — two-cabin pad with a blue block river and a hard seam to the ridge."
+  },
+  "automaticFailuresHit": [
+    "flat_lime_or_pale_green_ground",
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "low_poly_asset_test_appearance",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "Louis LP Meadow/Grassy ranges placed instead of smashed 70x34 HP tiles",
+    "Eight Cabin A/B files on a longer street",
+    "River uses fresnel water, not Water_Mat ice"
+  ],
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "honestConclusion": "Not a visual pass. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT. Next: use packed Gaea Texture.png from Louis node groups on the meadow, add a discovery pool, keep trees out of the SHOT_03 corridor, and aim SHOT_05 below the peaks."
+}

@@ -110,6 +110,7 @@ def test_six_shot_plan():
     assert abs(shot05["start"]["location"][0]) >= 16.0
     assert shot05["start"]["look"][1] >= 40.0
     assert shot05["start"]["location"][1] <= -70.0
+    assert shot05["start"]["look"][2] <= 20.0
     shot03 = next(cam for cam in cameras if cam["id"] == "SHOT_03")
     assert shot03["start"]["location"][0] <= -28.0
     assert shot03["start"]["look"][0] <= -12.0
