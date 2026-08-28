@@ -541,6 +541,8 @@ def ensure_purchased_albedos(files: list[Path]) -> int:
             if node.type != 'TEX_IMAGE':
                 continue
             current = (node.image.name if node.image else node.name).lower()
+            if any(word in current for word in ('nrm', 'nor', 'spe', 'rough', 'metal', 'occ', 'ao_', 'emi')):
+                continue
             chosen = None
             if 'cabin' in current or 'building' in current:
                 chosen = cabin
@@ -555,7 +557,45 @@ def ensure_purchased_albedos(files: list[Path]) -> int:
             if node.image != chosen:
                 node.image = chosen
                 bound += 1
+    sanitize_purchased_materials()
     return bound
+
+
+def sanitize_purchased_materials() -> None:
+    """Drop missing SPE/NRM links that crush cabin/tree shading to black."""
+    for mat in bpy.data.materials:
+        if not mat.node_tree:
+            continue
+        bsdf = next((node for node in mat.node_tree.nodes if node.type == 'BSDF_PRINCIPLED'), None)
+        if bsdf is None:
+            continue
+        for name in ('Normal', 'Specular', 'Specular IOR Level', 'Roughness', 'Metallic'):
+            if name not in bsdf.inputs:
+                continue
+            for link in list(bsdf.inputs[name].links):
+                src = link.from_node
+                img = getattr(src, 'image', None) if src.type == 'TEX_IMAGE' else None
+                missing = False
+                if src.type == 'TEX_IMAGE':
+                    if img is None:
+                        missing = True
+                    elif not getattr(img, 'packed_file', None):
+                        raw = str(getattr(img, 'filepath', '') or '')
+                        try:
+                            missing = not (Path(bpy.path.abspath(raw)).is_file() and Path(bpy.path.abspath(raw)).stat().st_size > 64)
+                        except Exception:
+                            missing = True
+                    if img and any(word in img.name.lower() for word in ('_alb', 'alb.')):
+                        missing = True
+                if missing:
+                    try:
+                        mat.node_tree.links.remove(link)
+                    except Exception:
+                        pass
+        if 'Roughness' in bsdf.inputs and not bsdf.inputs['Roughness'].links:
+            bsdf.inputs['Roughness'].default_value = 0.48
+        if 'Metallic' in bsdf.inputs and not bsdf.inputs['Metallic'].links:
+            bsdf.inputs['Metallic'].default_value = 0.0
 
 
 def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) -> int:
@@ -667,11 +707,11 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
             mix = nodes.new('ShaderNodeMix')
             if hasattr(mix, 'data_type'):
                 mix.data_type = 'RGBA'
-        mix.blend_type = 'MIX'
+        mix.blend_type = 'MULTIPLY'
         if 'Fac' in mix.inputs:
-            mix.inputs['Fac'].default_value = 0.48
+            mix.inputs['Fac'].default_value = 1.0
         if 'Color2' in mix.inputs:
-            mix.inputs['Color2'].default_value = (0.27, 0.46, 0.16, 1.0)
+            mix.inputs['Color2'].default_value = (0.32, 0.52, 0.18, 1.0)
         links.new(tex.outputs['Color'], mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6])
         color_src = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
     if color_src is not None:
@@ -780,6 +820,8 @@ def place_mountain_ridge(members: list[bpy.types.Object], origin: Vector) -> int
                 obj.location += Vector(loc) - Vector((center.x, center.y, mins.z))
             else:
                 obj.location = loc
+            if hasattr(obj, 'visible_shadow'):
+                obj.visible_shadow = False
             placed += 1
         except Exception as exc:
             print(json.dumps({'event': 'mountain_place_warning', 'object': obj.name, 'error': str(exc)[:160]}), flush=True)
@@ -909,7 +951,7 @@ def setup_world(hdri_files: list[Path], shader_files: list[Path] | None = None) 
         mix.inputs[6].default_value = (0.42, 0.62, 0.88, 1.0)
         links.new(env.outputs['Color'], mix.inputs[7])
     bg = nodes.new('ShaderNodeBackground')
-    bg.inputs['Strength'].default_value = 1.45
+    bg.inputs['Strength'].default_value = 1.05
     out = nodes.new('ShaderNodeOutputWorld')
     color_out = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
     links.new(color_out, bg.inputs['Color'])
@@ -949,6 +991,17 @@ def setup_lighting():
     bounce.rotation_euler = (math.radians(90), 0.0, 0.0)
     if hasattr(bounce.data, 'color'):
         bounce.data.color = (1.0, 0.90, 0.70)
+    bpy.ops.object.light_add(type='AREA', location=(0.0, -22.0, 15.0))
+    key = bpy.context.object
+    key.name = 'TJ_VillageKey'
+    key.data.energy = 5200
+    key.data.shape = 'RECTANGLE'
+    key.data.size = 28
+    if hasattr(key.data, 'size_y'):
+        key.data.size_y = 16
+    key.rotation_euler = (math.radians(62), 0.0, 0.0)
+    if hasattr(key.data, 'color'):
+        key.data.color = (1.0, 0.95, 0.82)
 
 
 def setup_atmosphere():
@@ -1186,7 +1239,7 @@ def configure_render(args):
         if hasattr(scene, 'view_settings'):
             scene.view_settings.view_transform = 'AgX'
             scene.view_settings.look = 'AgX - Medium Contrast'
-            scene.view_settings.exposure = 0.48
+            scene.view_settings.exposure = 0.22
     except Exception:
         pass
 
