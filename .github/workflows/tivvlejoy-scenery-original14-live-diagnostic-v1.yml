@@ -1,0 +1,47 @@
+name: TivvleJoy Scenery Original14 Live Diagnostic V1
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-original14-live-diagnostic-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+      POD_NAME: tivvlejoy-scenery-original14-30s-v1
+      EXPECTED_IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:ffcb91e5ee9f2b04fc49f9148d68871d237dd80c6b3fc3980eca18c0c053326c
+    steps:
+      - name: Read exact Original14 pod only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RUNPOD_API_KEY"
+          curl --fail --silent --show-error --max-time 60 -H "Authorization: Bearer $RUNPOD_API_KEY" https://rest.runpod.io/v1/pods > pods.json
+          python3 - <<'PY'
+          import json, os
+          raw=json.load(open('pods.json')); pods=raw if isinstance(raw,list) else raw.get('pods',[]) if isinstance(raw,dict) else []
+          exact=[p for p in pods if isinstance(p,dict) and p.get('name')==os.environ['POD_NAME']]
+          def safe(p):
+            runtime=p.get('runtime') if isinstance(p.get('runtime'),dict) else None
+            return {'id':p.get('id'),'name':p.get('name'),'desiredStatus':p.get('desiredStatus'),'status':p.get('status'),'costPerHr':p.get('costPerHr'),'imageName':p.get('imageName'),'templateId':p.get('templateId'),'machineId':p.get('machineId'),'lastStatusChange':p.get('lastStatusChange'),'createdAt':p.get('createdAt'),'runtime':None if runtime is None else {'uptimeInSeconds':runtime.get('uptimeInSeconds'),'portsCount':len(runtime.get('ports') or []),'gpus':runtime.get('gpus')}}
+          out={'schema':'TIVVLEJOY_SCENERY_ORIGINAL14_LIVE_DIAGNOSTIC_V1','exactCount':len(exact),'exact':[safe(p) for p in exact],'mutationPerformed':False}
+          print(json.dumps(out,indent=2))
+          open('original14-live-diagnostic.json','w').write(json.dumps(out,indent=2)+'\n')
+          assert len(exact) == 1
+          assert exact[0].get('imageName') == os.environ['EXPECTED_IMAGE']
+          PY
+      - name: Upload sanitized live diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-original14-live-diagnostic-v1
+          path: original14-live-diagnostic.json
+          if-no-files-found: error
+          retention-days: 3
