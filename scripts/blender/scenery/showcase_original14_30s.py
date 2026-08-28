@@ -737,11 +737,11 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
             mix = nodes.new('ShaderNodeMix')
             if hasattr(mix, 'data_type'):
                 mix.data_type = 'RGBA'
-        mix.blend_type = 'MULTIPLY'
+        mix.blend_type = 'MIX'
         if 'Fac' in mix.inputs:
-            mix.inputs['Fac'].default_value = 1.0
+            mix.inputs['Fac'].default_value = 0.72
         if 'Color2' in mix.inputs:
-            mix.inputs['Color2'].default_value = (0.22, 0.42, 0.12, 1.0)
+            mix.inputs['Color2'].default_value = (0.26, 0.44, 0.14, 1.0)
         links.new(tex.outputs['Color'], mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6])
         color_src = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
     if color_src is not None:
@@ -754,10 +754,16 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
 
 def create_purchased_stream(center=(0.0, 16.0, -0.03), size=(8.0, 42.0)) -> int:
     water_mat = next((m for m in bpy.data.materials if m and str(m.name).startswith('Water_Mat')), None)
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=center)
+    bpy.ops.mesh.primitive_plane_add(size=1.0, location=center)
     stream = bpy.context.object
     stream.name = 'TJ_River_From_Purchased_Water_Mat'
-    stream.scale = (size[0] * 0.7, size[1] * 0.5, 0.12)
+    stream.scale = (max(size[0], 4.0), max(size[1], 3.0), 1.0)
+    bpy.ops.object.mode_set(mode='EDIT')
+    try:
+        bpy.ops.mesh.subdivide(number_cuts=6)
+    except Exception:
+        pass
+    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.view_layer.update()
     if water_mat is not None:
         stream.data.materials.clear()
@@ -1369,6 +1375,19 @@ def main() -> int:
         'assembledAsVillageKit': True,
     }
 
+    village_trees = [
+        o for o in bpy.data.objects
+        if o.type == 'MESH' and 'tree' in o.name.lower()
+        and not is_forest_camera_subject_name(o.name, subject_parent_name(o))
+    ]
+    forest_band = scatter_purchased_meshes(
+        village_trees,
+        (village_center.x, village_center.y + 30.0, 0.0),
+        copies=8,
+        radius=12.0,
+    )
+    print(json.dumps({'event': 'village_tree_forest_band', 'copies': len(forest_band)}), flush=True)
+
     # Project File.blend is a water/flora/terrain library. Terrain_003 is an
     # empty 12 m plane — do not scale it into another slab. Use packed flora
     # as riverbank dressing and Water_Mat_1 on an authored stream strip.
@@ -1502,7 +1521,21 @@ def main() -> int:
         all_extracted.extend(role_files)
     remapped = remap_missing_images(all_extracted)
     forced = ensure_purchased_albedos(all_extracted)
-    print(json.dumps({'event': 'purchased_image_remap', 'remapped': remapped, 'forcedAlbedos': forced}), flush=True)
+    leaf_img = _load_named_albedo(all_extracted, 'colored', 'leaf', 'alb') or _load_named_albedo(all_extracted, 'leaf', 'alb')
+    tree_leaves = 0
+    if leaf_img is not None:
+        leaf_path = Path(bpy.path.abspath(leaf_img.filepath)) if leaf_img.filepath else None
+        for obj in bpy.data.objects:
+            if obj.type != 'MESH' or 'tree' not in obj.name.lower():
+                continue
+            mat = image_material(f'TJ_TreeLeaf_{obj.name}'[:55], leaf_path if leaf_path and leaf_path.is_file() else None)
+            tex = next((n for n in mat.node_tree.nodes if n.type == 'TEX_IMAGE'), None) if mat.node_tree else None
+            if tex is not None:
+                tex.image = leaf_img
+            obj.data.materials.clear()
+            obj.data.materials.append(mat)
+            tree_leaves += 1
+    print(json.dumps({'event': 'purchased_image_remap', 'remapped': remapped, 'forcedAlbedos': forced, 'treeLeafBinds': tree_leaves}), flush=True)
 
     ground_count, ground_source = create_valley_ground(
         expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []) + mountain_files,

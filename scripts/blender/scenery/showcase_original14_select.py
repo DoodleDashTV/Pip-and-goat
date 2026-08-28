@@ -371,10 +371,10 @@ def cinematic_world_camera_keys(
         {'camera': (vx + 10.0, vy - 52.0, village_min_z + 26.0), 'look': (mx, my, mz), 'lens': 24.0},
         # Descend toward the forest and river corridor.
         {'camera': (vx + 12.0, vy - 34.0, village_min_z + 16.0), 'look': (fx, (fy + my) * 0.5, (fz + mz) * 0.45), 'lens': 28.0},
-        # Travel along the river with vegetation and depth.
-        {'camera': (vx + 16.0, vy - 20.0, village_min_z + 9.2), 'look': (fx, fy, fz), 'lens': 32.0},
-        # Cross the river toward the village street.
-        {'camera': (vx + 18.0, vy - 22.0, village_min_z + 8.2), 'look': (vx, vy + 8.0, look_z), 'lens': 34.0},
+        # Travel along the river; keep village and mountains in the same 9:16 frame.
+        {'camera': (vx + 14.0, vy - 28.0, village_min_z + 13.0), 'look': (vx, vy + 16.0, look_z + 4.0), 'lens': 28.0},
+        # Cross the river toward the village street, still wide.
+        {'camera': (vx + 16.0, vy - 30.0, village_min_z + 12.0), 'look': (vx, vy + 10.0, look_z + 2.5), 'lens': 30.0},
         # Village becomes the destination, still wide enough for the valley layers.
         {'camera': (vx + 16.0, vy - 32.0, village_min_z + 10.5), 'look': (vx, vy + 4.0, look_z + 1.2), 'lens': 32.0},
         # Composed village hero, forest and mountains behind, not a roof-top.
