@@ -1,0 +1,50 @@
+name: TivvleJoy Scenery Paid V3 Contract Check
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-showcase-paid-render-v3.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate paid V3 workflow is fail-closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          f='.github/workflows/tivvlejoy-scenery-showcase-paid-render-v3.yml'
+          auth='artifacts/tivvlejoy-scenery-showcase-30s/PAID_AUTHORIZATION_V3.json'
+          test -f "$f"
+          grep -F -- "$auth" "$f"
+          grep -F -- 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V3' "$f"
+          grep -F -- '6yz7wkmu34' "$f"
+          grep -F -- 'RUNPOD_REST_TEMPLATE' "$f"
+          grep -F -- 'One authorized REST template CREATE' "$f"
+          grep -F -- 'Always terminate exact V3 showcase pod' "$f"
+          grep -F -- 'createRequests' "$f"
+          grep -F -- "assert int(p.get('createRequests')) == 1" "$f"
+          grep -F -- "assert p.get('retryCreate') is False" "$f"
+          grep -F -- "assert int((p.get('limits') or {}).get('maxCreates')) == 1" "$f"
+          grep -F -- "assert p.get('commercialAssetsPublished') is False" "$f"
+          grep -F -- "assert p.get('billingCleanupConfirmed') is True" "$f"
+          grep -F -- "assert int(p.get('remainingActiveExactName') or 0) == 0" "$f"
+          test "$(grep -F -- '--data '\''{\"action\":\"launch\"}'\''' "$f" | wc -l | tr -d ' ')" = '1'
+          ! grep -E 'workflow_dispatch|schedule:' "$f"
+          if [ -e "$auth" ]; then
+            echo 'V3 authorization unexpectedly exists; refusing contract PASS.'
+            exit 1
+          fi
+          echo 'TIVVLEJOY_SCENERY_PAID_V3_CONTRACT_PASS: no paid mutation performed'
