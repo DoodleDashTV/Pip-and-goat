@@ -88,7 +88,8 @@ function podIsActive(p:any){ const state=clean(p?.desiredStatus||p?.status||p?.p
 function sanitizePod(p:any){ return {id:clean(p?.id)||null,name:clean(p?.name)||null,desiredStatus:clean(p?.desiredStatus||p?.status||p?.podStatus)||null,costPerHr:Number(p?.costPerHr??p?.costPerHour??p?.machine?.costPerHr??0)||null,machineId:clean(p?.machineId||p?.machine?.id)||null,runtime:p?.runtime?{uptimeInSeconds:Number(p.runtime?.uptimeInSeconds??0)||null,portsCount:Array.isArray(p.runtime?.ports)?p.runtime.ports.length:null}:null}; }
 async function preflightAll(request:Request,key:string){
   const [assets,template,gpu,pods,objectCount]=await Promise.all([exactAssetPreflight(request),verifyTemplate(key),secure4090Preflight(key),listPods(key),listPrivateObjectCount()]);
-  const active=pods.filter(podIsActive); if(active.length>0) throw new Error('ACTIVE_RUNPOD_POD_PRESENT'); return {assets,template,gpu,activePodCount:0,listedObjectCount:objectCount};
+  const active=pods.filter(podIsActive);
+  return {assets,template,gpu,activePodCount:active.length,listedObjectCount:objectCount};
 }
 
 export async function GET(request:Request){
@@ -105,7 +106,7 @@ export async function POST(request:Request){
     const key=requireAuthorization(request); const body=await request.json().catch(()=>({})); const action=clean(body?.action||'preflight');
     if(action==='preflight'){
       const c=await preflightAll(request,key);
-      return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_PREFLIGHT_V1',ready:true,assets:c.assets,template:c.template,runpod:c.gpu,activePodCount:0,listedObjectCount:c.listedObjectCount,workerImage:c.template.imageName,workerImageDigest:WORKER_IMAGE_DIGEST,workerImagePinned:true,workerEntrypoint:'scenery-showcase-original14-entry.js',launchTransport:'RUNPOD_REST_TEMPLATE',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,collectionCount:4,internalResolution:'540x960',finalResolution:'1080x1920',samples:12,limits:{hardCostUsd:HARD_COST_USD,maxRuntimeMinutes:MAX_RUNTIME_MINUTES,maxHourlyUsd:MAX_HOURLY_USD,maxCreates:1,hardInputCapBytes:HARD_INPUT_CAP_BYTES},paidMutationPerformed:false});
+      return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_PREFLIGHT_V1',ready:true,assets:c.assets,template:c.template,runpod:c.gpu,activePodCount:c.activePodCount,createBlocked:c.activePodCount>0,listedObjectCount:c.listedObjectCount,workerImage:c.template.imageName,workerImageDigest:WORKER_IMAGE_DIGEST,workerImagePinned:true,workerEntrypoint:'scenery-showcase-original14-entry.js',launchTransport:'RUNPOD_REST_TEMPLATE',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,collectionCount:4,internalResolution:'540x960',finalResolution:'1080x1920',samples:12,limits:{hardCostUsd:HARD_COST_USD,maxRuntimeMinutes:MAX_RUNTIME_MINUTES,maxHourlyUsd:MAX_HOURLY_USD,maxCreates:1,hardInputCapBytes:HARD_INPUT_CAP_BYTES},paidMutationPerformed:false});
     }
     if(action==='pod-status'){
       const pods=await listPods(key); const exact=pods.filter((p:any)=>clean(p?.name)===POD_NAME&&podIsActive(p)); return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_POD_STATUS_V1',exactActiveCount:exact.length,exact:exact.map(sanitizePod),paidMutationPerformed:false});
@@ -116,7 +117,9 @@ export async function POST(request:Request){
       const after=await listPods(key); const remaining=after.filter((p:any)=>clean(p?.name)===POD_NAME&&podIsActive(p)); return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_CLEANUP_V1',matchedBefore:exact.length,terminatedCount,remainingActiveExactName:remaining.length,billingCleanupConfirmed:remaining.length===0,createPerformed:false});
     }
     if(action!=='launch') throw new Error('UNKNOWN_ACTION');
-    const c=await preflightAll(request,key); const r2=r2Config();
+    const c=await preflightAll(request,key);
+    if(c.activePodCount>0) throw new Error('ACTIVE_RUNPOD_POD_PRESENT');
+    const r2=r2Config();
     const env:Record<string,string>={
       R2_ENDPOINT:r2.endpoint,R2_REGION:r2.region,R2_BUCKET:r2.bucket,R2_ACCESS_KEY_ID:r2.accessKeyId,R2_SECRET_ACCESS_KEY:r2.secretAccessKey,
       OBJECT_STORAGE_PROVIDER:'r2',CLOUD_RENDER_ENABLED:'true',PAID_EXECUTION_AUTHORIZED:'true',SCENERY_SHOWCASE_EXECUTION_MODE:'live',TIVVLEJOY_SCENERY_ASSET_PREFIX:'tivvlejoy-assets',
