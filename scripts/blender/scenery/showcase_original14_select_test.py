@@ -52,8 +52,12 @@ def test_extract_sort_puts_individual_blend_before_dump_obj():
 
 def test_hdri_extract_limit_is_small():
     assert extract_role_limit('sky_hdri') == 8
-    assert extract_role_limit('village_textures') == 12
-    assert extract_role_limit('forest_nature') == 24
+    assert extract_role_limit('village_textures') == 40
+    assert extract_role_limit('forest_nature') == 48
+
+
+def test_extracts_mtl_sidecar_for_obj_materials():
+    assert should_extract_member('Pine_Tree_01.mtl', 1200, 'forest_nature') is True
 
 
 if __name__ == '__main__':

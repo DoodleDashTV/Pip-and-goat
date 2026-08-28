@@ -37,11 +37,11 @@ VISIBLE_GEOMETRY_ROLES = {
 }
 SUPPORT_ROLES = {'sky_machine_v1', 'sky_machine_v2', 'sky_extra_update', 'world_shaders'}
 RENDERABLE_ROLES = VISIBLE_GEOMETRY_ROLES | {'village_textures', 'sky_hdri'} | SUPPORT_ROLES
-MAX_OBJECTS_PER_BLEND = 4
-MAX_MATERIALS_PER_BLEND = 8
-MAX_MESHES_PER_ROLE = 5
-TARGET_FACES_PER_MESH = 7000
-TARGET_FACES_SCENE = 90000
+MAX_OBJECTS_PER_BLEND = 8
+MAX_MATERIALS_PER_BLEND = 16
+MAX_MESHES_PER_ROLE = 8
+TARGET_FACES_PER_MESH = 12000
+TARGET_FACES_SCENE = 180000
 PROGRESS_PATH: Path | None = None
 
 
@@ -174,7 +174,7 @@ def import_geometry(path: Path, role: str) -> list[bpy.types.Object]:
     before = set(bpy.data.objects.keys())
     try:
         if ext == '.fbx':
-            bpy.ops.import_scene.fbx(filepath=str(path), use_image_search=False)
+            bpy.ops.import_scene.fbx(filepath=str(path), use_image_search=True)
         elif ext in {'.glb', '.gltf'}:
             bpy.ops.import_scene.gltf(filepath=str(path))
         elif ext == '.obj':
@@ -188,7 +188,7 @@ def import_geometry(path: Path, role: str) -> list[bpy.types.Object]:
 
 
 def geometry_candidates(files: list[Path], role: str) -> list[Path]:
-    return pick_geometry_paths(files, role, limit=1)
+    return pick_geometry_paths(files, role, limit=3)
 
 
 def mesh_face_count(obj) -> int:
@@ -309,6 +309,44 @@ def image_material(name: str, image: Path | None):
         except Exception:
             pass
     return mat
+
+
+def mesh_needs_purchased_texture(obj) -> bool:
+    if obj.type != 'MESH':
+        return False
+    if not obj.data.materials:
+        return True
+    for slot in obj.material_slots:
+        mat = slot.material
+        if mat is None:
+            return True
+        color = getattr(mat, 'diffuse_color', None)
+        if color is not None and len(color) >= 3 and color[0] > 0.8 and color[1] < 0.2 and color[2] > 0.8:
+            return True
+        if mat.use_nodes:
+            for node in mat.node_tree.nodes:
+                if node.type == 'TEX_IMAGE' and getattr(node, 'image', None):
+                    return False
+    return True
+
+
+def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) -> int:
+    images = [p for p in files if p.is_file() and p.suffix.lower() in IMAGE_EXTS]
+    images.sort(key=lambda p: (-min(p.stat().st_size, 8 * 1024 * 1024), p.name.lower()))
+    if not images:
+        return 0
+    bound = 0
+    idx = 0
+    for obj in objects:
+        if not mesh_needs_purchased_texture(obj):
+            continue
+        img = images[idx % len(images)]
+        mat = image_material(f'TJ_PurchasedTex_{obj.name}'[:60], img)
+        obj.data.materials.clear()
+        obj.data.materials.append(mat)
+        idx += 1
+        bound += 1
+    return bound
 
 
 def create_purchased_texture_ground(files: list[Path]) -> int:
@@ -513,11 +551,11 @@ def main() -> int:
 
     contributions: dict[str, dict] = {}
     placements = {
-        'forest_nature': (62.0, (-32.0, 76.0, 0.0)),
-        'forest_ecokit': (58.0, (31.0, 72.0, 0.0)),
-        'village_blender': (58.0, (0.0, 5.0, 0.0)),
-        'village_project': (30.0, (-38.0, -10.0, 0.0)),
-        'village_fbx': (28.0, (36.0, -12.0, 0.0)),
+        'village_blender': (42.0, (0.0, 8.0, 0.0)),
+        'village_project': (28.0, (-22.0, -6.0, 0.0)),
+        'village_fbx': (26.0, (22.0, -8.0, 0.0)),
+        'forest_nature': (38.0, (-16.0, 48.0, 0.0)),
+        'forest_ecokit': (36.0, (16.0, 46.0, 0.0)),
     }
     for role in VISIBLE_GEOMETRY_ROLES:
         files = expanded.get(role, [])
@@ -536,7 +574,9 @@ def main() -> int:
         if root:
             size, loc = placements[role]
             normalize_group(root, members, size, loc)
-        contributions[role] = {'type':'visible_geometry','objectCount':len(members),'importedFileCount':imported_files}
+        texture_files = expanded.get('village_textures', []) + expanded.get(role, [])
+        bound = bind_purchased_textures(members, texture_files)
+        contributions[role] = {'type':'visible_geometry','objectCount':len(members),'importedFileCount':imported_files,'purchasedTexturesBound':bound}
 
     ground_count = create_purchased_texture_ground(expanded.get('village_textures', []))
     if not ground_count:

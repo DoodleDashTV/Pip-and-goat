@@ -11,7 +11,7 @@ from pathlib import Path
 
 GEOMETRY_EXTS = {'.blend', '.fbx', '.glb', '.gltf', '.obj'}
 IMAGE_EXTS = {'.png', '.jpg', '.jpeg', '.tga', '.bmp', '.exr', '.hdr'}
-SUPPORT_EXTS = GEOMETRY_EXTS | IMAGE_EXTS | {'.zip'}
+SUPPORT_EXTS = GEOMETRY_EXTS | IMAGE_EXTS | {'.zip', '.mtl'}
 
 EXT_RANK = {'.blend': 0, '.fbx': 1, '.glb': 2, '.gltf': 3, '.obj': 4}
 
@@ -57,10 +57,12 @@ def extract_role_limit(role: str) -> int:
     if role == 'sky_hdri':
         return 8
     if role == 'village_textures':
-        return 12
+        return 40
+    if role in {'forest_nature', 'forest_ecokit', 'village_fbx', 'village_blender', 'village_project'}:
+        return 48
     if role in {'sky_machine_v1', 'sky_machine_v2', 'sky_extra_update', 'world_shaders'}:
         return 16
-    return 24
+    return 32
 
 
 def should_extract_member(filename: str, file_size: int, role: str) -> bool:
