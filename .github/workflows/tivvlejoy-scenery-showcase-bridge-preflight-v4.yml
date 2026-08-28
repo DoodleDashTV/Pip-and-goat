@@ -1,3 +1,4 @@
+# Registration touch; preflight is read-only against RunPod and cannot create a pod.
 name: TivvleJoy Scenery Showcase Bridge Preflight V4
 
 on:
