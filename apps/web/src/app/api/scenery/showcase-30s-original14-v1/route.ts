@@ -11,7 +11,7 @@ const POD_NAME = 'tivvlejoy-scenery-original14-30s-v1';
 const AUTHORIZATION = 'TIVVLEJOY_SCENERY_ORIGINAL14_30S_STANDING_AUTHORIZATION_V1';
 const TEMPLATE_ID = 'u4glgdj076';
 const TEMPLATE_NAME = 'TivvleJoy Scenery Original14 30s V1';
-const WORKER_IMAGE_DIGEST = 'sha256:515089f432d86d7a32516511d1c5f7fbcbb862770497356a152d9fa040d0ab56';
+const WORKER_IMAGE_DIGEST = 'sha256:421b24fb74379aa440386e79a5b4a18f1016a17a2560d721ac0a1d27b361ad93';
 const WORKER_IMAGE_PLACEHOLDER = `ghcr.io/<ghcr-owner>/ddp-runpod-blender@${WORKER_IMAGE_DIGEST}`;
 function imageMatchesPin(imageName: string) {
   const image = clean(imageName);
