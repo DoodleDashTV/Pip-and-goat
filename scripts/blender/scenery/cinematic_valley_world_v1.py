@@ -854,30 +854,6 @@ def build_broken_bank_patches(centers: list[Vector]) -> list:
     return patches
 
 
-def build_exposed_soil_lumps(centers: list[Vector]) -> list:
-    """Occasional dark soil/rock patches on the wet bed. Not a continuous outline."""
-    lumps = []
-    mat = dirt_bank_material()
-    for i, center in enumerate(centers):
-        if i % 14 not in {4, 9}:
-            continue
-        left, right = _channel_halves_for_index(centers, i)
-        side = _side_from_centers(centers, i)
-        sign = -1.0 if (i // 14) % 2 == 0 else 1.0
-        half = left if sign < 0.0 else right
-        offset = half * 0.55 * BED_WIDTH_SCALE
-        loc = center + side * (offset * sign)
-        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.42 + 0.12 * ((i // 7) % 3), location=(loc.x, loc.y, BED_SHOULDER_Z + 0.08))
-        lump = bpy.context.object
-        lump.name = f"TJ_RiverBedLump_{i}"
-        lump.scale = (1.6 + 0.3 * math.sin(i), 1.1, 0.28)
-        lump.data.materials.clear()
-        lump.data.materials.append(mat)
-        shade_smooth(lump)
-        lumps.append(lump)
-    return lumps
-
-
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
     centers = evaluated_centerline(guide, samples=180)
@@ -906,7 +882,8 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     assigned = assign_purchased_water(river)
     extras = [bed]
     extras.extend(build_broken_bank_patches(centers))
-    extras.extend(build_exposed_soil_lumps(centers))
+    # Ico-sphere bed lumps read as manhole covers from SHOT_02. Keep soil as
+    # irregular bank patches and the dark bed mesh only.
     print(json.dumps({
         "event": "geometry_first_channel_built",
         "bed": bed.name,
