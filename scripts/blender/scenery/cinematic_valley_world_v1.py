@@ -370,7 +370,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     nodes.clear()
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
-    body_col = tint or (0.016, 0.040, 0.034, 1.0)
+    body_col = tint or (0.007, 0.016, 0.022, 1.0)
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
@@ -378,7 +378,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     mix = _mix_rgb(nodes)
     if "Color1" in mix.inputs:
         mix.inputs["Color1"].default_value = body_col
-        mix.inputs["Color2"].default_value = (0.16, 0.17, 0.14, 1.0)
+        mix.inputs["Color2"].default_value = (0.07, 0.08, 0.07, 1.0)
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     elif "Base Color" in body.inputs:
@@ -392,21 +392,21 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Transmission Weight" in body.inputs:
         body.inputs["Transmission Weight"].default_value = 0.0
     mapping = nodes.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (0.22, 1.8, 1.0)
+    mapping.inputs["Scale"].default_value = (0.12, 0.85, 1.0)
     links.new(coord.outputs["Object"], mapping.inputs["Vector"])
     wave = nodes.new("ShaderNodeTexWave")
     wave.wave_type = "BANDS"
-    wave.inputs["Scale"].default_value = 4.2
+    wave.inputs["Scale"].default_value = 1.6
     if "Distortion" in wave.inputs:
-        wave.inputs["Distortion"].default_value = 3.4
+        wave.inputs["Distortion"].default_value = 1.8
     links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
     ripples = nodes.new("ShaderNodeTexWave")
     ripples.wave_type = "BANDS"
-    ripples.inputs["Scale"].default_value = 16.0
+    ripples.inputs["Scale"].default_value = 5.5
     if "Distortion" in ripples.inputs:
-        ripples.inputs["Distortion"].default_value = 8.0
+        ripples.inputs["Distortion"].default_value = 2.4
     ripple_map = nodes.new("ShaderNodeMapping")
-    ripple_map.inputs["Scale"].default_value = (0.55, 2.4, 1.0)
+    ripple_map.inputs["Scale"].default_value = (0.28, 1.4, 1.0)
     links.new(coord.outputs["Object"], ripple_map.inputs["Vector"])
     links.new(ripple_map.outputs["Vector"], ripples.inputs["Vector"])
     wave_mix = _mix_rgb(nodes)
@@ -422,7 +422,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         links.new(ripples.outputs["Color"], add_waves.inputs[1])
         bump_height = add_waves.outputs["Value"]
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.62
+    bump.inputs["Strength"].default_value = 0.38
     links.new(bump_height, bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
@@ -448,7 +448,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(weight.outputs["Facing"], invert.inputs[1])
     cap = nodes.new("ShaderNodeMath")
     cap.operation = "MULTIPLY"
-    cap.inputs[1].default_value = 0.48
+    cap.inputs[1].default_value = 0.36
     links.new(invert.outputs["Value"], cap.inputs[0])
     mix_sh = nodes.new("ShaderNodeMixShader")
     links.new(cap.outputs["Value"], mix_sh.inputs["Fac"])
@@ -469,9 +469,9 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
         if src and "Base Color" in src.inputs:
             src_col = src.inputs["Base Color"].default_value
             tint = (
-                max(0.012, min(0.026, float(src_col[0]) * 0.10)),
-                max(0.032, min(0.052, float(src_col[1]) * 0.14)),
-                max(0.026, min(0.044, float(src_col[2]) * 0.09)),
+                max(0.006, min(0.012, float(src_col[0]) * 0.04)),
+                max(0.012, min(0.020, float(src_col[1]) * 0.05)),
+                max(0.016, min(0.028, float(src_col[2]) * 0.06)),
                 1.0,
             )
     surface = cinematic_river_material(tint)
@@ -615,13 +615,8 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     centers = evaluated_centerline(guide, samples=120)
     river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=3.45, z_offset=0.04, width_wobble=0.38)
     assigned = assign_purchased_water(river)
-    banks = []
-    bank_mat = dirt_bank_material()
-    for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
-        bank = spline_edge_mesh(name, centers, inner_half=3.20, outer_half=7.6, z_inner=0.05, z_outer=0.26, side_sign=sign)
-        bank.data.materials.append(bank_mat)
-        banks.append(bank)
-    return river, assigned, banks
+    # No separate bank meshes. A hard dirt outline makes the stream read as a road.
+    return river, assigned, []
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0) -> None:
@@ -1085,7 +1080,16 @@ def main() -> int:
             loc = cam_xy + along * (t * span) + side * offset
             west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
         west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))
-        for item in ((-17.0, -21.5, 0.82), (12.5, -19.0, 0.74), (-8.5, -22.0, 0.68), (22.0, -21.0, 0.90)):
+        for item in (
+            (-17.0, -21.5, 0.82),
+            (12.5, -19.0, 0.74),
+            (-8.5, -22.0, 0.68),
+            (22.0, -21.0, 0.90),
+            (-14.0, -22.4, 0.32),
+            (-3.5, -23.0, 0.26),
+            (6.5, -21.6, 0.30),
+            (16.5, -23.2, 0.34),
+        ):
             west_fg.append(duplicate_mesh_in_world(trees[int(abs(item[0])) % src_count], (item[0], item[1], 0.0), item[2]))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
     east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
@@ -1180,7 +1184,7 @@ def main() -> int:
         "cameraPath": "six_shot_markers",
         "lighting": "single_key_sun_plus_sky_fill_plus_restrained_bounce",
         "groundSource": "shaped_valley_carrier_purchased_meadow",
-        "riverSource": "flat_wide_stream_capped_grazing_gloss",
+        "riverSource": "dark_slate_stream_no_bank_outline",
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
