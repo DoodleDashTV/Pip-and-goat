@@ -657,12 +657,21 @@ def lift_purchased_shading() -> int:
             continue
         roof = any(word in blob for word in ('straw', 'roof', 'thatch'))
         cabin = any(word in blob for word in ('cabin', 'building', 'wood')) and not roof
-        if not roof and not cabin:
+        tree = any(word in blob for word in ('tree', 'pine', 'needles', 'canopy')) and not roof
+        if not roof and not cabin and not tree:
             continue
         if 'Base Color' not in bsdf.inputs:
             continue
-        warm = (0.64, 0.50, 0.24, 1.0) if roof else (0.46, 0.32, 0.20, 1.0)
-        mix = _mix_color_node(mat.node_tree.nodes, fac=0.36 if roof else 0.18, color2=warm)
+        if roof:
+            warm = (0.64, 0.50, 0.24, 1.0)
+            fac = 0.36
+        elif tree:
+            warm = (0.16, 0.30, 0.10, 1.0)
+            fac = 0.32
+        else:
+            warm = (0.46, 0.32, 0.20, 1.0)
+            fac = 0.18
+        mix = _mix_color_node(mat.node_tree.nodes, fac=fac, color2=warm)
         color1, _color2, color_out = _mix_color_sockets(mix)
         links = list(bsdf.inputs['Base Color'].links)
         if links:
@@ -806,29 +815,29 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
     coord = nodes.new('ShaderNodeTexCoord')
     voronoi = nodes.new('ShaderNodeTexVoronoi')
-    voronoi.inputs['Scale'].default_value = 0.048 if meadow else 0.09
+    voronoi.inputs['Scale'].default_value = 0.038 if meadow else 0.09
     if 'Randomness' in voronoi.inputs:
-        voronoi.inputs['Randomness'].default_value = 0.85
+        voronoi.inputs['Randomness'].default_value = 0.92
     links.new(coord.outputs['Object'], voronoi.inputs['Vector'])
-    noise = nodes.new('ShaderNodeTexNoise')
-    noise.inputs['Scale'].default_value = 0.11 if meadow else 0.16
-    if 'Detail' in noise.inputs:
-        noise.inputs['Detail'].default_value = 3.0
-    links.new(coord.outputs['Object'], noise.inputs['Vector'])
-    add_fac = nodes.new('ShaderNodeMath')
-    add_fac.operation = 'MULTIPLY'
-    voronoi_fac = voronoi.outputs['Distance'] if 'Distance' in voronoi.outputs else voronoi.outputs[0]
-    links.new(voronoi_fac, add_fac.inputs[0])
-    links.new(noise.outputs['Fac'], add_fac.inputs[1])
-    patch = _mix_color_node(
-        nodes,
-        fac=0.5,
-        color2=(0.40, 0.54, 0.16, 1.0) if meadow else (0.30, 0.22, 0.12, 1.0),
-    )
-    c1, _c2, patch_out = _mix_color_sockets(patch)
-    c1.default_value = (0.10, 0.20, 0.07, 1.0) if meadow else (0.38, 0.26, 0.13, 1.0)
-    links.new(add_fac.outputs['Value'], patch.inputs['Fac'] if 'Fac' in patch.inputs else patch.inputs[0])
-    color_src = patch_out
+    to_bw = nodes.new('ShaderNodeRGBToBW')
+    voronoi_color = voronoi.outputs['Color'] if 'Color' in voronoi.outputs else voronoi.outputs[0]
+    links.new(voronoi_color, to_bw.inputs['Color'] if 'Color' in to_bw.inputs else to_bw.inputs[0])
+    # Hard steps so 20–30 m patches survive AgX and a 360 px south camera.
+    ramp = nodes.new('ShaderNodeValToRGB')
+    ramp.color_ramp.interpolation = 'CONSTANT'
+    ramp.color_ramp.elements[0].position = 0.0
+    if meadow:
+        ramp.color_ramp.elements[0].color = (0.07, 0.16, 0.05, 1.0)
+        ramp.color_ramp.elements[1].position = 0.38
+        ramp.color_ramp.elements[1].color = (0.22, 0.38, 0.10, 1.0)
+        extra = ramp.color_ramp.elements.new(0.68)
+        extra.color = (0.40, 0.56, 0.14, 1.0)
+    else:
+        ramp.color_ramp.elements[0].color = (0.28, 0.18, 0.10, 1.0)
+        ramp.color_ramp.elements[1].position = 0.55
+        ramp.color_ramp.elements[1].color = (0.40, 0.28, 0.14, 1.0)
+    links.new(to_bw.outputs['Val'], ramp.inputs['Fac'])
+    color_src = ramp.outputs['Color']
     if img_path is not None:
         tex = nodes.new('ShaderNodeTexImage')
         tex.image = bpy.data.images.load(str(img_path), check_existing=True)
@@ -843,7 +852,7 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
         links.new(tex.outputs['Color'], g1)
         weave = _mix_color_node(nodes, fac=0.28 if meadow else 0.40)
         w1, w2, weave_out = _mix_color_sockets(weave)
-        links.new(patch_out, w1)
+        links.new(color_src, w1)
         links.new(grade_out, w2)
         color_src = weave_out
     if meadow:
@@ -869,8 +878,8 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
         abs_x.operation = 'ABSOLUTE'
         links.new(sep.outputs['X'], abs_x.inputs[0])
         path_w = nodes.new('ShaderNodeMapRange')
-        path_w.inputs['From Min'].default_value = 0.6
-        path_w.inputs['From Max'].default_value = 4.2
+        path_w.inputs['From Min'].default_value = 0.8
+        path_w.inputs['From Max'].default_value = 5.6
         path_w.inputs['To Min'].default_value = 1.0
         path_w.inputs['To Max'].default_value = 0.0
         links.new(abs_x.outputs['Value'], path_w.inputs['Value'])
@@ -891,7 +900,7 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
         path_fac.operation = 'MULTIPLY'
         links.new(path_w.outputs['Result'] if 'Result' in path_w.outputs else path_w.outputs[0], path_fac.inputs[0])
         links.new(y_fade.outputs['Result'] if 'Result' in y_fade.outputs else y_fade.outputs[0], path_fac.inputs[1])
-        dirt = _mix_color_node(nodes, fac=0.0, color2=(0.36, 0.24, 0.12, 1.0))
+        dirt = _mix_color_node(nodes, fac=0.0, color2=(0.42, 0.26, 0.11, 1.0))
         d1, _d2, dirt_out = _mix_color_sockets(dirt)
         links.new(color_src, d1)
         links.new(path_fac.outputs['Value'], dirt.inputs['Fac'] if 'Fac' in dirt.inputs else dirt.inputs[0])
@@ -984,11 +993,11 @@ def _river_water_material() -> bpy.types.Material:
     if bsdf is None:
         return mat
     if 'Base Color' in bsdf.inputs:
-        bsdf.inputs['Base Color'].default_value = (0.045, 0.12, 0.15, 1.0)
+        bsdf.inputs['Base Color'].default_value = (0.05, 0.14, 0.17, 1.0)
     if 'Roughness' in bsdf.inputs:
-        bsdf.inputs['Roughness'].default_value = 0.08
+        bsdf.inputs['Roughness'].default_value = 0.16
     if 'Specular IOR Level' in bsdf.inputs:
-        bsdf.inputs['Specular IOR Level'].default_value = 0.78
+        bsdf.inputs['Specular IOR Level'].default_value = 0.62
     # Keep transmission low. Pale ground shining through reads as tape-blue.
     if 'Transmission Weight' in bsdf.inputs:
         bsdf.inputs['Transmission Weight'].default_value = 0.08
@@ -1003,23 +1012,8 @@ def _river_water_material() -> bpy.types.Material:
     links.new(wave.outputs['Color'], bump.inputs['Height'])
     if 'Normal' in bsdf.inputs:
         links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
-    glossy = nodes.new('ShaderNodeBsdfGlossy')
-    if 'Roughness' in glossy.inputs:
-        glossy.inputs['Roughness'].default_value = 0.05
-    if 'Color' in glossy.inputs:
-        glossy.inputs['Color'].default_value = (0.62, 0.78, 0.88, 1.0)
-    mix_sh = nodes.new('ShaderNodeMixShader')
-    mix_sh.inputs['Fac'].default_value = 0.38
-    out = nodes.get('Material Output') or next((n for n in nodes if n.type == 'OUTPUT_MATERIAL'), None)
-    if out is not None:
-        for link in list(links):
-            if link.to_node == out and link.to_socket == out.inputs['Surface']:
-                links.remove(link)
-        links.new(bsdf.outputs['BSDF'], mix_sh.inputs[1])
-        links.new(glossy.outputs['BSDF'], mix_sh.inputs[2])
-        links.new(mix_sh.outputs['Shader'], out.inputs['Surface'])
+    # No glossy mix. From the south establish the river became a sky mirror.
     if water_mat is not None and water_mat.node_tree:
-        # Keep our river grade. EcoKit Water_Mat defaults read as tape-blue.
         pass
     return mat
 
@@ -1372,6 +1366,17 @@ def setup_lighting():
     key.rotation_euler = (math.radians(58), 0.0, 0.0)
     if hasattr(key.data, 'color'):
         key.data.color = (1.0, 0.96, 0.84)
+    bpy.ops.object.light_add(type='AREA', location=(0.0, 36.0, 26.0))
+    canopy = bpy.context.object
+    canopy.name = 'TJ_CanopyFill'
+    canopy.data.energy = 2400
+    canopy.data.shape = 'RECTANGLE'
+    canopy.data.size = 40
+    if hasattr(canopy.data, 'size_y'):
+        canopy.data.size_y = 18
+    canopy.rotation_euler = (math.radians(110), 0.0, 0.0)
+    if hasattr(canopy.data, 'color'):
+        canopy.data.color = (0.78, 0.90, 0.70)
     bpy.ops.object.light_add(type='AREA', location=(0.0, 1.0, 22.0))
     roof = bpy.context.object
     roof.name = 'TJ_RoofFill'
