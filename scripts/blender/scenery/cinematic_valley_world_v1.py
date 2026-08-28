@@ -344,25 +344,25 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     spec = nodes.new("ShaderNodeBsdfPrincipled")
-    body_col = tint or (0.010, 0.038, 0.042, 1.0)
+    body_col = tint or (0.012, 0.040, 0.044, 1.0)
     if "Base Color" in body.inputs:
         body.inputs["Base Color"].default_value = body_col
     if "Roughness" in body.inputs:
-        body.inputs["Roughness"].default_value = 0.32
+        body.inputs["Roughness"].default_value = 0.38
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.42
+        body.inputs["Specular IOR Level"].default_value = 0.35
     if "Transmission Weight" in body.inputs:
         body.inputs["Transmission Weight"].default_value = 0.0
     if "Base Color" in spec.inputs:
-        spec.inputs["Base Color"].default_value = (0.05, 0.09, 0.10, 1.0)
+        spec.inputs["Base Color"].default_value = (0.72, 0.80, 0.84, 1.0)
     if "Roughness" in spec.inputs:
-        spec.inputs["Roughness"].default_value = 0.06
+        spec.inputs["Roughness"].default_value = 0.045
     if "Specular IOR Level" in spec.inputs:
-        spec.inputs["Specular IOR Level"].default_value = 0.88
+        spec.inputs["Specular IOR Level"].default_value = 0.95
     if "Metallic" in spec.inputs:
-        spec.inputs["Metallic"].default_value = 0.04
+        spec.inputs["Metallic"].default_value = 0.62
     weight = nodes.new("ShaderNodeLayerWeight")
-    weight.inputs["Blend"].default_value = 0.08
+    weight.inputs["Blend"].default_value = 0.30
     invert = nodes.new("ShaderNodeMath")
     invert.operation = "SUBTRACT"
     invert.inputs[0].default_value = 1.0
@@ -384,7 +384,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         wave.inputs["Detail"].default_value = 4.0
     links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.62
+    bump.inputs["Strength"].default_value = 0.18
     if "Distance" in bump.inputs:
         bump.inputs["Distance"].default_value = 0.10
     links.new(wave.outputs["Color"], bump.inputs["Height"])
@@ -408,9 +408,9 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
         if src and "Base Color" in src.inputs:
             src_col = src.inputs["Base Color"].default_value
             tint = (
-                max(0.012, float(src_col[0]) * 0.12),
-                max(0.030, float(src_col[1]) * 0.16),
-                max(0.038, float(src_col[2]) * 0.18),
+                max(0.008, min(0.03, float(src_col[0]) * 0.08)),
+                max(0.020, min(0.05, float(src_col[1]) * 0.10)),
+                max(0.024, min(0.06, float(src_col[2]) * 0.12)),
                 1.0,
             )
     surface = cinematic_river_material(tint)
@@ -474,7 +474,7 @@ def spline_edge_mesh(name: str, centers: list[Vector], inner_half: float, outer_
     faces = []
     for i, center in enumerate(centers):
         side = _side_from_centers(centers, i) * side_sign
-        wobble = 0.12 * math.sin(i * 0.28)
+        wobble = 0.55 * math.sin(i * 0.41) + 0.22 * math.sin(i * 1.15)
         inner = center + side * (inner_half + wobble * 0.2)
         outer = center + side * (outer_half + wobble)
         inner.z = center.z + z_inner
@@ -531,8 +531,8 @@ def dirt_bank_material() -> bpy.types.Material:
         noise.inputs["Scale"].default_value = 0.7
         links.new(coord.outputs["Object"], noise.inputs["Vector"])
         ramp = nodes.new("ShaderNodeValToRGB")
-        ramp.color_ramp.elements[0].color = (0.12, 0.08, 0.05, 1.0)
-        ramp.color_ramp.elements[1].color = (0.24, 0.16, 0.09, 1.0)
+        ramp.color_ramp.elements[0].color = (0.055, 0.048, 0.028, 1.0)
+        ramp.color_ramp.elements[1].color = (0.09, 0.07, 0.04, 1.0)
         links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
         links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
     return mat
@@ -553,16 +553,15 @@ def build_discovery_pool() -> bpy.types.Object:
     bpy.ops.mesh.primitive_circle_add(vertices=28, radius=1.0, fill_type="NGON", location=(-6.0, -12.2, -0.62))
     pool = bpy.context.object
     pool.name = "TJ_River_DiscoveryPool"
-    pool.scale = (4.4, 2.2, 1.0)
+    pool.scale = (5.8, 3.2, 1.0)
     try:
         bpy.ops.object.transform_apply(scale=True)
     except Exception:
         pass
     for vert in pool.data.vertices:
-        vert.co.z += 0.08 + 0.03 * math.sin(vert.co.x * 0.7 + vert.co.y * 0.4)
+        vert.co.z += 0.07 + 0.015 * math.sin(vert.co.x * 0.7 + vert.co.y * 0.4)
     pool.data.update()
     shade_smooth(pool)
-    displace_water(pool, 0.05)
     if hasattr(pool, "visible_shadow"):
         pool.visible_shadow = False
     return pool
@@ -573,7 +572,6 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     centers = evaluated_centerline(guide, samples=80)
     river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=1.55, z_offset=0.06, width_wobble=0.18)
     assigned = assign_purchased_water(river)
-    displace_water(river, 0.06)
     pool = build_discovery_pool()
     pool.data.materials.append(river.data.materials[0])
     banks = []
@@ -1026,15 +1024,27 @@ def main() -> int:
     east_fg = scatter_clumps(trees, (24.0, 12.0, 0.0), 3, 2, 7.0, 1.08, 5)
     east_mg = scatter_clumps(trees, (28.0, 32.0, 0.0), 3, 2, 8.0, 1.40, 11)
     if trees:
-        for loc, scale in (
-            ((-40.0, 20.0, 0.0), 1.25),
-            ((-39.0, 28.0, 0.0), 1.15),
-            ((-8.0, 22.0, 0.0), 1.20),
-            ((-6.0, 30.0, 0.0), 1.30),
-            ((-42.0, 24.0, 0.0), 1.10),
-            ((-5.0, 26.0, 0.0), 1.18),
-        ):
-            west_fg.append(duplicate_mesh_in_world(trees[0], loc, scale))
+        cam_xy = Vector((-34.0, 16.0, 0.0))
+        look_xy = Vector((-14.0, 36.0, 0.0))
+        along = look_xy - cam_xy
+        span = along.length
+        along.normalize()
+        side = Vector((-along.y, along.x, 0.0))
+        src_count = len(trees)
+        for i, (t, offset, scale) in enumerate((
+            (0.26, 4.0, 1.22),
+            (0.26, -4.2, 1.18),
+            (0.42, 4.8, 1.32),
+            (0.42, -4.6, 1.24),
+            (0.58, 5.2, 1.38),
+            (0.58, -5.0, 1.28),
+            (0.74, 5.6, 1.42),
+            (0.74, -5.4, 1.34),
+        )):
+            loc = cam_xy + along * (t * span) + side * offset
+            west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
+        for loc, scale in ((-11.0, -5.4, 0.0, 1.08), (-1.8, -4.6, 0.0, 1.02), (5.2, -6.2, 0.0, 0.96)):
+            west_fg.append(duplicate_mesh_in_world(trees[0], loc[:3], loc[3]))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
     east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
     foreground = west_fg + east_fg
