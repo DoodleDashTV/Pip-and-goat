@@ -44,21 +44,27 @@ from showcase_original14_30s import (  # noqa: E402
     setup_world,
 )
 
-# East-flowing valley river. Shared by terrain trench + visible water strip.
+# East-flowing valley river. Asymmetric bends; widths vary left/right independently.
 RIVER_SPLINE = (
     (-44.0, -22.0, -0.62),
+    (-36.0, -18.4, -0.66),
     (-30.0, -15.0, -0.68),
+    (-22.0, -17.2, -0.70),
     (-16.0, -10.5, -0.70),
+    (-8.0, -8.6, -0.71),
     (-2.0, -12.2, -0.72),
+    (6.0, -8.0, -0.70),
     (12.0, -9.0, -0.70),
+    (20.0, -14.8, -0.68),
     (26.0, -13.5, -0.66),
+    (34.0, -16.6, -0.64),
     (42.0, -19.0, -0.62),
 )
-# Horizontal water sits in a deeper bed. Do not paint water onto the meadow.
-WATER_SURFACE_Z = -0.12
-WATER_HALF_WIDTH = 1.72
-BANK_HALF_WIDTH = 3.90
-BED_BELOW_WATER = 0.045
+# Two-layer channel: dark bed under a thin water film. Do not paint water onto the meadow.
+WATER_SURFACE_Z = -0.10
+WATER_HALF_WIDTH = 1.55
+BANK_HALF_WIDTH = 4.40
+BED_BELOW_WATER = 0.18
 VILLAGE_X_HALF = 16.0
 VILLAGE_Y_MIN = -8.0
 VILLAGE_Y_MAX = 22.0
@@ -119,18 +125,40 @@ def link_exclusive(obj: bpy.types.Object, collection: bpy.types.Collection) -> N
 
 
 def dist_to_polyline(x: float, y: float, points=RIVER_SPLINE) -> float:
+    return channel_profile(x, y, points)[0]
+
+
+def channel_profile(x: float, y: float, points=RIVER_SPLINE) -> tuple[float, float, float, float, float]:
+    """Distance, signed offset, along-metres, left half-width, right half-width."""
     best = 1e9
+    signed = 0.0
+    along = 0.0
+    acc = 0.0
     for index in range(len(points) - 1):
         ax, ay = points[index][0], points[index][1]
         bx, by = points[index + 1][0], points[index + 1][1]
         vx, vy = bx - ax, by - ay
-        length2 = vx * vx + vy * vy or 1.0
-        t = max(0.0, min(1.0, ((x - ax) * vx + (y - ay) * vy) / length2))
+        length = math.hypot(vx, vy) or 1.0
+        t = max(0.0, min(1.0, ((x - ax) * vx + (y - ay) * vy) / (length * length)))
         px, py = ax + t * vx, ay + t * vy
-        dist = math.hypot(x - px, y - py)
+        dx, dy = x - px, y - py
+        dist = math.hypot(dx, dy)
+        cross = vx * dy - vy * dx
         if dist < best:
             best = dist
-    return best
+            signed = dist if cross >= 0.0 else -dist
+            along = acc + t * length
+        acc += length
+    left = 1.48 + 0.72 * math.sin(along * 0.17) + 0.30 * math.sin(along * 0.43)
+    right = 1.36 + 0.80 * math.sin(along * 0.15 + 1.4) + 0.34 * math.cos(along * 0.39)
+    left = max(1.08, min(2.55, left))
+    right = max(1.08, min(2.55, right))
+    return best, signed, along, left, right
+
+
+def channel_half_at(x: float, y: float) -> float:
+    _dist, signed, _along, left, right = channel_profile(x, y)
+    return left if signed < 0.0 else right
 
 
 def shade_smooth(obj: bpy.types.Object) -> None:
@@ -217,18 +245,19 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         if y < -6.0:
             height += 0.38 * math.sin(x * 0.075) * math.cos(y * 0.10)
             height += 0.16 * math.sin(x * 0.29 + y * 0.17)
-        river_dist = dist_to_polyline(x, y)
-        # Deeper flat bed under a separate horizontal water mesh.
-        # V-trough walls read as a blue path from SHOT_02; painted masks read as tape.
-        bank_wobble = 0.42 * math.sin(x * 0.37 + y * 0.21)
-        lip = WATER_HALF_WIDTH + 0.10
-        bank_half = BANK_HALF_WIDTH + bank_wobble
-        bed_z = WATER_SURFACE_Z - BED_BELOW_WATER
+        river_dist, _signed, along, left_half, right_half = channel_profile(x, y)
+        local_half = left_half if _signed < 0.0 else right_half
+        bank_wobble = 0.55 * math.sin(along * 0.29 + x * 0.11)
+        lip = local_half * 0.90
+        bank_half = local_half + 2.6 + bank_wobble
+        depth = 0.12 + 0.10 * (0.5 + 0.5 * math.sin(along * 0.13))
+        bed_z = WATER_SURFACE_Z - 0.08 - depth
         if river_dist < lip:
-            # Just under the ribbon. A deeper shelf made the water read as a raised slab.
-            height = bed_z
+            # Deeper in the center so the film can show a dark bed, not a painted path.
+            center = 1.0 - min(1.0, river_dist / max(0.35, lip)) ** 1.35
+            height = bed_z - 0.06 * center
         else:
-            rise = min(1.0, (river_dist - lip) / max(0.40, bank_half - lip))
+            rise = min(1.0, (river_dist - lip) / max(0.55, bank_half - lip))
             smooth = rise * rise * (3.0 - 2.0 * rise)
             height = bed_z + (height - bed_z) * smooth
         pad = 1.0
@@ -372,12 +401,15 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
     if color is None:
         return
     for index, vert in enumerate(mesh.vertices):
-        dist = dist_to_polyline(vert.co.x, vert.co.y)
-        if dist < WATER_HALF_WIDTH:
+        dist, _signed, _along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
+        local_half = left_half if _signed < 0.0 else right_half
+        inner = local_half * 0.88
+        outer = local_half + 2.4
+        if dist < inner:
             value = 0.0
-        elif dist < BANK_HALF_WIDTH:
-            t = (dist - WATER_HALF_WIDTH) / (BANK_HALF_WIDTH - WATER_HALF_WIDTH)
-            value = math.sin(min(1.0, max(0.0, t)) * math.pi) * 0.82
+        elif dist < outer:
+            t = (dist - inner) / max(0.4, outer - inner)
+            value = math.sin(min(1.0, max(0.0, t)) * math.pi) * 0.88
         else:
             value = 0.0
         color.data[index].color = (value, value, value, 1.0)
@@ -398,7 +430,7 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     wet = _mix_rgb(nodes)
     if "Color1" in wet.inputs:
         links.new(incoming, wet.inputs["Color1"])
-        wet.inputs["Color2"].default_value = (0.045, 0.038, 0.022, 1.0)
+        wet.inputs["Color2"].default_value = (0.038, 0.030, 0.016, 1.0)
         mask = attr.outputs.get("Color") or attr.outputs[0]
         links.new(mask, wet.inputs["Fac"])
         for link in list(bsdf.inputs["Base Color"].links):
@@ -415,12 +447,47 @@ def apply_stream_tint(tint) -> None:
             node.inputs["Base Color"].default_value = tint
 
 
-def cinematic_river_material(tint=None) -> bpy.types.Material:
-    """Horizontal mountain stream: purchased tint, foam edges, fresnel gloss.
+def cinematic_riverbed_material() -> bpy.types.Material:
+    """Dark wet earth/stone bed. Visible through the thin water film."""
+    mat = bpy.data.materials.new("TJ_CinematicRiverBed")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    nodes.clear()
+    out = nodes.new("ShaderNodeOutputMaterial")
+    body = nodes.new("ShaderNodeBsdfPrincipled")
+    attr = nodes.new("ShaderNodeVertexColor")
+    if hasattr(attr, "layer_name"):
+        attr.layer_name = "TJ_RiverDepth"
+    coord = nodes.new("ShaderNodeTexCoord")
+    mix = _mix_rgb(nodes)
+    if "Color1" in mix.inputs:
+        mix.inputs["Color1"].default_value = (0.016, 0.014, 0.010, 1.0)
+        mix.inputs["Color2"].default_value = (0.055, 0.042, 0.026, 1.0)
+        links.new(attr.outputs["Color"], mix.inputs["Fac"])
+        links.new(mix.outputs["Color"], body.inputs["Base Color"])
+    if "Roughness" in body.inputs:
+        body.inputs["Roughness"].default_value = 0.94
+    if "Metallic" in body.inputs:
+        body.inputs["Metallic"].default_value = 0.0
+    if "Specular IOR Level" in body.inputs:
+        body.inputs["Specular IOR Level"].default_value = 0.12
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 4.5
+    if "Detail" in noise.inputs:
+        noise.inputs["Detail"].default_value = 5.0
+    links.new(coord.outputs["Object"], noise.inputs["Vector"])
+    bump = nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.55
+    links.new(noise.outputs["Fac"], bump.inputs["Height"])
+    if "Normal" in body.inputs:
+        links.new(bump.outputs["Normal"], body.inputs["Normal"])
+    links.new(body.outputs["BSDF"], out.inputs["Surface"])
+    return mat
 
-    Visible as its own mesh in the trench. Do not V-trough. Do not use metallic.
-    Do not put Water_Mat ice tiles on the grazing plane.
-    """
+
+def cinematic_river_material(tint=None) -> bpy.types.Material:
+    """Thin transmissive film over the bed. Water_Mat tint only. No metallic. No ice tiles."""
     mat = bpy.data.materials.new("TJ_CinematicRiver")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -429,7 +496,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    body_col = tint or (0.020, 0.040, 0.034, 1.0)
+    body_col = tint or (0.024, 0.038, 0.032, 1.0)
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
@@ -437,7 +504,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     foam = _mix_rgb(nodes)
     if "Color1" in foam.inputs:
         foam.inputs["Color1"].default_value = body_col
-        foam.inputs["Color2"].default_value = (0.28, 0.30, 0.26, 1.0)
+        foam.inputs["Color2"].default_value = (0.16, 0.17, 0.14, 1.0)
         links.new(attr.outputs["Color"], foam.inputs["Fac"])
         links.new(foam.outputs["Color"], body.inputs["Base Color"])
     elif "Base Color" in body.inputs:
@@ -445,8 +512,8 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     rough = nodes.new("ShaderNodeMapRange")
     rough.inputs["From Min"].default_value = 0.0
     rough.inputs["From Max"].default_value = 1.0
-    rough.inputs["To Min"].default_value = 0.08
-    rough.inputs["To Max"].default_value = 0.26
+    rough.inputs["To Min"].default_value = 0.10
+    rough.inputs["To Max"].default_value = 0.28
     links.new(attr.outputs["Color"], rough.inputs["Value"])
     river_mask = purchased_river_mask_image()
     if river_mask is not None:
@@ -455,12 +522,12 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         if mask_tex.image and mask_tex.image.colorspace_settings:
             mask_tex.image.colorspace_settings.name = "Non-Color"
         mapping = nodes.new("ShaderNodeMapping")
-        mapping.inputs["Scale"].default_value = (0.055, 0.055, 0.055)
+        mapping.inputs["Scale"].default_value = (0.048, 0.048, 0.048)
         links.new(coord.outputs["Object"], mapping.inputs["Vector"])
         links.new(mapping.outputs["Vector"], mask_tex.inputs["Vector"])
         mask_mul = nodes.new("ShaderNodeMath")
         mask_mul.operation = "MULTIPLY"
-        mask_mul.inputs[1].default_value = 0.18
+        mask_mul.inputs[1].default_value = 0.16
         links.new(mask_tex.outputs["Color"], mask_mul.inputs[0])
         rough_add = nodes.new("ShaderNodeMath")
         rough_add.operation = "ADD"
@@ -471,22 +538,24 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     elif "Roughness" in body.inputs:
         links.new(rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0], body.inputs["Roughness"])
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.52
+        body.inputs["Specular IOR Level"].default_value = 0.46
     if "IOR" in body.inputs:
         body.inputs["IOR"].default_value = 1.333
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     if "Transmission Weight" in body.inputs:
-        body.inputs["Transmission Weight"].default_value = 0.0
+        body.inputs["Transmission Weight"].default_value = 0.58
+    if "Transmission Extra" in body.inputs:
+        body.inputs["Transmission Extra"].default_value = 0.0
     ripples = nodes.new("ShaderNodeTexNoise")
-    ripples.inputs["Scale"].default_value = 1.8
+    ripples.inputs["Scale"].default_value = 2.6
     if "Detail" in ripples.inputs:
-        ripples.inputs["Detail"].default_value = 6.0
+        ripples.inputs["Detail"].default_value = 7.0
     if "Roughness" in ripples.inputs:
-        ripples.inputs["Roughness"].default_value = 0.55
+        ripples.inputs["Roughness"].default_value = 0.62
     links.new(coord.outputs["Object"], ripples.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.22
+    bump.inputs["Strength"].default_value = 0.16
     links.new(ripples.outputs["Fac"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
@@ -495,25 +564,24 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     except Exception:
         gloss = nodes.new("ShaderNodeBsdfPrincipled")
     if "Color" in gloss.inputs:
-        gloss.inputs["Color"].default_value = (0.42, 0.46, 0.44, 1.0)
+        gloss.inputs["Color"].default_value = (0.46, 0.50, 0.48, 1.0)
     elif "Base Color" in gloss.inputs:
-        gloss.inputs["Base Color"].default_value = (0.30, 0.34, 0.32, 1.0)
+        gloss.inputs["Base Color"].default_value = (0.32, 0.36, 0.34, 1.0)
         if "Metallic" in gloss.inputs:
             gloss.inputs["Metallic"].default_value = 0.0
     if "Roughness" in gloss.inputs:
-        gloss.inputs["Roughness"].default_value = 0.16
+        gloss.inputs["Roughness"].default_value = 0.14
     if "Normal" in gloss.inputs:
         links.new(bump.outputs["Normal"], gloss.inputs["Normal"])
-    # Fresnel: more reflection at grazing (SHOT_02), less when facing (SHOT_01).
     weight = nodes.new("ShaderNodeLayerWeight")
-    weight.inputs["Blend"].default_value = 0.22
+    weight.inputs["Blend"].default_value = 0.24
     invert = nodes.new("ShaderNodeMath")
     invert.operation = "SUBTRACT"
     invert.inputs[0].default_value = 1.0
     links.new(weight.outputs["Facing"], invert.inputs[1])
     cap = nodes.new("ShaderNodeMath")
     cap.operation = "MULTIPLY"
-    cap.inputs[1].default_value = 0.44
+    cap.inputs[1].default_value = 0.32
     links.new(invert.outputs["Value"], cap.inputs[0])
     mix_sh = nodes.new("ShaderNodeMixShader")
     links.new(cap.outputs["Value"], mix_sh.inputs["Fac"])
@@ -552,7 +620,7 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
         "name": water.name if water else surface.name,
         "purchased": water is not None,
         "surface": surface.name,
-        "shape": "horizontal_trench_ribbon",
+        "shape": "two_layer_film_over_bed",
         "visible": True,
         "riverMask": bool(purchased_river_mask_image()),
     }), flush=True)
@@ -608,8 +676,8 @@ def spline_edge_mesh(name: str, centers: list[Vector], inner_half: float, outer_
         wobble = 0.22 * math.sin(i * 0.31)
         inner = center + side * (inner_half + wobble * 0.2)
         outer = center + side * (outer_half + wobble)
-        inner.z = center.z + z_inner
-        outer.z = center.z + z_outer
+        inner.z = z_inner
+        outer.z = z_outer
         verts.extend([(inner.x, inner.y, inner.z), (outer.x, outer.y, outer.z)])
         if i > 0:
             v = i * 2
@@ -623,24 +691,44 @@ def spline_edge_mesh(name: str, centers: list[Vector], inner_half: float, outer_
     return obj
 
 
-def spline_strip_mesh(name: str, centers: list[Vector], half_width: float, z_offset: float, width_wobble: float) -> bpy.types.Object:
-    """Five-row horizontal ribbon at WATER_SURFACE_Z, inside the terrain banks."""
+def _channel_halves_for_index(centers: list[Vector], index: int) -> tuple[float, float]:
+    center = centers[index]
+    _dist, _signed, along, left, right = channel_profile(center.x, center.y)
+    return left, right
+
+
+def spline_channel_mesh(
+    name: str,
+    centers: list[Vector],
+    width_scale: float,
+    z_center: float,
+    z_edge: float,
+    rows: int,
+    foam_edges: bool,
+) -> bpy.types.Object:
+    """Variable-width strip. Left and right halves are independent."""
     verts = []
     faces = []
     depths = []
-    row_offsets = (-1.0, -0.5, 0.0, 0.5, 1.0)
-    row_foam = (0.92, 0.40, 0.04, 0.40, 0.92)
-    row_lift = (0.010, 0.003, 0.0, 0.003, 0.010)
-    rows = len(row_offsets)
-    surface_z = WATER_SURFACE_Z + z_offset
+    if rows < 3:
+        rows = 3
+    offsets = [(-1.0 + 2.0 * i / (rows - 1)) for i in range(rows)]
     for i, center in enumerate(centers):
         side = _side_from_centers(centers, i)
-        half = half_width + width_wobble * math.sin(i * 0.19)
-        for offset, foam, lift in zip(row_offsets, row_foam, row_lift):
-            point = center + side * (half * offset)
-            point.z = surface_z + lift
+        left, right = _channel_halves_for_index(centers, i)
+        left *= width_scale
+        right *= width_scale
+        along_depth = 0.55 + 0.45 * (0.5 + 0.5 * math.sin(i * 0.17))
+        for col, offset in enumerate(offsets):
+            half = left if offset < 0.0 else right
+            point = center + side * (half * abs(offset) * (1.0 if offset >= 0.0 else -1.0))
+            edge = abs(offset)
+            point.z = z_center + (z_edge - z_center) * edge
             verts.append((point.x, point.y, point.z))
-            depths.append(foam)
+            if foam_edges:
+                depths.append(min(1.0, edge * edge * 1.15))
+            else:
+                depths.append(min(1.0, (1.0 - along_depth * (1.0 - edge)) ))
         if i > 0:
             v = i * rows
             prev = v - rows
@@ -656,6 +744,19 @@ def spline_strip_mesh(name: str, centers: list[Vector], half_width: float, z_off
     bpy.context.scene.collection.objects.link(obj)
     shade_smooth(obj)
     return obj
+
+
+def spline_strip_mesh(name: str, centers: list[Vector], half_width: float, z_offset: float, width_wobble: float) -> bpy.types.Object:
+    """Compatibility wrapper. Prefer spline_channel_mesh for the two-layer river."""
+    return spline_channel_mesh(
+        name,
+        centers,
+        width_scale=max(0.4, half_width / max(0.1, WATER_HALF_WIDTH)),
+        z_center=WATER_SURFACE_Z + z_offset,
+        z_edge=WATER_SURFACE_Z + z_offset + 0.006,
+        rows=5,
+        foam_edges=True,
+    )
 
 
 def dirt_bank_material() -> bpy.types.Material:
@@ -681,19 +782,71 @@ def dirt_bank_material() -> bpy.types.Material:
     return mat
 
 
+def build_broken_bank_patches(centers: list[Vector]) -> list:
+    """Short wet-earth patches, not a continuous road outline."""
+    patches = []
+    mat = dirt_bank_material()
+    step = 7
+    for start in range(3, max(4, len(centers) - 6), step):
+        if (start // step) % 2 == 0:
+            continue
+        chunk = centers[start:start + 4]
+        if len(chunk) < 3:
+            continue
+        side_sign = 1.0 if (start // step) % 4 == 1 else -1.0
+        left, right = _channel_halves_for_index(centers, start)
+        local = left if side_sign < 0.0 else right
+        bank = spline_edge_mesh(
+            f"TJ_RiverBankPatch_{start}",
+            chunk,
+            inner_half=local * 0.92,
+            outer_half=local * 0.92 + 0.85 + 0.25 * math.sin(start * 0.4),
+            z_inner=WATER_SURFACE_Z - 0.03,
+            z_outer=WATER_SURFACE_Z + 0.04,
+            side_sign=side_sign,
+        )
+        bank.data.materials.clear()
+        bank.data.materials.append(mat)
+        patches.append(bank)
+    return patches
+
+
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
-    centers = evaluated_centerline(guide, samples=120)
-    river = spline_strip_mesh(
+    centers = evaluated_centerline(guide, samples=160)
+    bed = spline_channel_mesh(
+        "TJ_River_DarkBed",
+        centers,
+        width_scale=1.12,
+        z_center=WATER_SURFACE_Z - BED_BELOW_WATER,
+        z_edge=WATER_SURFACE_Z - 0.06,
+        rows=7,
+        foam_edges=False,
+    )
+    bed.data.materials.clear()
+    bed.data.materials.append(cinematic_riverbed_material())
+    if hasattr(bed, "visible_shadow"):
+        bed.visible_shadow = False
+    river = spline_channel_mesh(
         "TJ_River_PurchasedWater",
         centers,
-        half_width=WATER_HALF_WIDTH,
-        z_offset=0.0,
-        width_wobble=0.36,
+        width_scale=0.78,
+        z_center=WATER_SURFACE_Z,
+        z_edge=WATER_SURFACE_Z + 0.004,
+        rows=5,
+        foam_edges=True,
     )
     assigned = assign_purchased_water(river)
-    # Banks are terrain. No second dirt-outline mesh.
-    return river, assigned, []
+    banks = build_broken_bank_patches(centers)
+    extras = [bed] + banks
+    print(json.dumps({
+        "event": "two_layer_channel_built",
+        "bed": bed.name,
+        "film": river.name,
+        "bankPatches": len(banks),
+        "centers": len(centers),
+    }), flush=True)
+    return river, assigned, extras
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0) -> None:
@@ -1166,6 +1319,10 @@ def main() -> int:
             (-3.5, -23.0, 0.26),
             (6.5, -21.6, 0.30),
             (16.5, -23.2, 0.34),
+            (-15.8, -16.4, 0.38),
+            (-6.2, -15.6, 0.30),
+            (2.4, -16.8, 0.34),
+            (9.6, -15.2, 0.28),
         ):
             west_fg.append(duplicate_mesh_in_world(trees[int(abs(item[0])) % src_count], (item[0], item[1], 0.0), item[2]))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
@@ -1261,7 +1418,7 @@ def main() -> int:
         "cameraPath": "six_shot_markers",
         "lighting": "single_key_sun_plus_sky_fill_plus_restrained_bounce",
         "groundSource": "shaped_valley_carrier_purchased_meadow",
-        "riverSource": "horizontal_purchased_tint_ribbon_in_terrain_trench",
+        "riverSource": "two_layer_dark_bed_and_transmissive_film",
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
