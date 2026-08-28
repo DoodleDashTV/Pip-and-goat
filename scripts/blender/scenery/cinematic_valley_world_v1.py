@@ -27,6 +27,7 @@ from cinematic_standards import (  # noqa: E402
     visible_use_record,
 )
 from showcase_original14_30s import (  # noqa: E402
+    append_named_objects,
     duplicate_mesh_in_world,
     ensure_purchased_albedos,
     expand_asset,
@@ -536,6 +537,37 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     return river, assigned, banks
 
 
+def place_purchased_water_gn(files: list[Path], collection: bpy.types.Collection) -> str | None:
+    project = next((path for path in files if path.name.lower() == "project file.blend"), None)
+    if project is None:
+        return None
+    before = set(bpy.data.objects.keys())
+    append_named_objects(project, ["Water_GN_Plane"])
+    leftovers = [
+        obj for obj in list(bpy.data.objects)
+        if obj.name not in before and "water" not in obj.name.lower()
+    ]
+    for obj in leftovers:
+        obj.hide_render = True
+        obj.hide_viewport = True
+        try:
+            obj.location = (0.0, -420.0, -90.0)
+        except Exception:
+            pass
+        print(json.dumps({"event": "hidden_project_leftover", "name": obj.name}), flush=True)
+    water = next((obj for obj in bpy.data.objects if obj.name.startswith("Water_GN_Plane")), None)
+    if water is None:
+        return None
+    water.name = "TJ_River_PurchasedWaterGN"
+    water.parent = None
+    water.location = (0.0, -11.2, -0.58)
+    water.scale = (1.35, 0.13, 1.0)
+    water.rotation_euler = (0.0, 0.0, 0.0)
+    link_exclusive(water, collection)
+    print(json.dumps({"event": "purchased_water_gn_placed", "name": water.name}), flush=True)
+    return water.name
+
+
 def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, radius: float, scale: float, seed: int) -> list:
     extras = []
     live = [obj for obj in sources if obj and obj.type == "MESH"]
@@ -757,6 +789,7 @@ def main() -> int:
     link_exclusive(river, collections["WORLD_RIVER"])
     for bank in banks:
         link_exclusive(bank, collections["WORLD_RIVER"])
+    water_gn = place_purchased_water_gn(expanded.get("village_project", []), collections["WORLD_RIVER"])
 
     village_center = Vector((0.0, 0.0, 0.0))
     village_files = expanded.get("village_blender", [])
@@ -890,10 +923,10 @@ def main() -> int:
             "village_project",
             downloaded=True,
             extracted=True,
-            datablockLoaded=water_loaded > 0,
-            renderedPixels=river_material.startswith("Water_Mat"),
-            shotIds=["SHOT_02"] if river_material.startswith("Water_Mat") else [],
-            evidence=f"river_material:{river_material}" if river_material.startswith("Water_Mat") else "",
+            datablockLoaded=water_loaded > 0 or bool(water_gn),
+            renderedPixels=bool(water_gn) or river_material.startswith("Water_Mat"),
+            shotIds=["SHOT_02"] if water_gn or river_material.startswith("Water_Mat") else [],
+            evidence=f"object:{water_gn}" if water_gn else (f"river_material:{river_material}" if river_material.startswith("Water_Mat") else ""),
         ),
         "forest_nature": visible_use_record(
             "forest_nature",
@@ -931,6 +964,7 @@ def main() -> int:
         "forestCopies": len(foreground) + len(midground) + len(background),
         "streetTreeFiles": street_tree_placed,
         "riverMaterial": river_material,
+        "purchasedWaterGn": water_gn,
         "waterMaterialsLoaded": water_loaded,
         "remapped": remapped,
         "forcedAlbedos": forced,
