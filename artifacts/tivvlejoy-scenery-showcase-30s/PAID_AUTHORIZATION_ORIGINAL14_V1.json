@@ -23,5 +23,5 @@
   "purchasedSceneryOnly": true,
   "commercialAssetsPublished": false,
   "workerImageDigest": "sha256:4d33c0b26d868dd5891dadb05c0a11f6504ae5554dbb663c5c834e8385d0d72f",
-  "repair": "prefer-individual-purchased-geometry-after-forest-kit-timeout"
+  "repair": "ignore-stale-r2-failed-status-after-forest-kit-timeout"
 }

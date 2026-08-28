@@ -145,6 +145,7 @@ jobs:
           pod=p.get('podId'); assert isinstance(pod,str) and pod
           print('pod_id='+pod)
           PY
+          echo "WATCH_CUTOFF=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
 
       - name: Watch Original14 materialization render encode and upload
         shell: bash
@@ -173,11 +174,17 @@ jobs:
               echo "poll=$i r2Status=BRIDGE_UNREACHABLE"; sleep 15; continue
             fi
             read -r exact_count desired uptime startup_stage startup_index frames_written render_state <<<"$(python3 - <<'PY'
-          import json
+          import json, os
           pod=json.load(open('pod-status.json')); render=json.load(open('render-status.json'))
           exact=pod.get('exact') or []; first=exact[0] if exact else {}; runtime=first.get('runtime') or {}
           startup=render.get('startup') or {}; status=render.get('status') or {}
-          print(int(pod.get('exactActiveCount') or 0),str(first.get('desiredStatus') or 'NONE').replace(' ','_'),int(runtime.get('uptimeInSeconds') or 0),str(startup.get('stage') or startup.get('result') or 'NONE').replace(' ','_'),int(startup.get('index') or 0),int(startup.get('framesWritten') or startup.get('frame') or 0),str(status.get('status') or 'NONE').replace(' ','_'))
+          cutoff=os.environ.get('WATCH_CUTOFF') or ''
+          status_at=str(status.get('at') or '')
+          render_state=str(status.get('status') or 'NONE').replace(' ','_')
+          # Ignore leftover R2 terminal status from a previous attempt with the same execution id.
+          if render_state in {'FAILED','COMPLETE'} and cutoff and status_at and status_at < cutoff:
+            render_state='STALE'
+          print(int(pod.get('exactActiveCount') or 0),str(first.get('desiredStatus') or 'NONE').replace(' ','_'),int(runtime.get('uptimeInSeconds') or 0),str(startup.get('stage') or startup.get('result') or 'NONE').replace(' ','_'),int(startup.get('index') or 0),int(startup.get('framesWritten') or startup.get('frame') or 0),render_state)
           PY
           )"
             if [ "$startup_stage" != "$last_startup" ] || [ "$startup_index" != '0' ] || [ "$frames_written" != "$last_frames" ]; then
