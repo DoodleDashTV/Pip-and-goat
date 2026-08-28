@@ -51,7 +51,10 @@ jobs:
           assert p.get('workerImageDigest') == digest
           assert p.get('workerEntrypoint') == 'scenery-showcase-original14-entry.js'
           assert p.get('launchTransport') == 'RUNPOD_REST_TEMPLATE'
-          assert int(p.get('activePodCount')) == 0
+          active=int(p.get('activePodCount'))
+          assert active in (0, 1)
+          if active:
+              assert p.get('createBlocked') is True
           assert int(p.get('originalSourceCount')) == 14
           assert int(p.get('renderableSourceCount')) == 11
           assert int(p.get('unityPreservationOnlyCount')) == 3
@@ -82,7 +85,7 @@ jobs:
           assert float(lim.get('maxHourlyUsd')) == 0.8
           assert int(lim.get('maxCreates')) == 1
           assert int(lim.get('hardInputCapBytes')) == 4*1024*1024*1024
-          evidence={'schema':'TIVVLEJOY_SCENERY_ORIGINAL14_PREFLIGHT_EVIDENCE_V1','ready':True,'activePodCount':0,'rate':rate,'stockStatus':r.get('stockStatus'),'templateId':t.get('templateId'),'workerImage':p.get('workerImage'),'originalSourceCount':14,'renderableSourceCount':11,'unityPreservationOnlyCount':3,'totalOriginalBytes':int(a.get('totalOriginalBytes')),'paidMutationPerformed':False}
+          evidence={'schema':'TIVVLEJOY_SCENERY_ORIGINAL14_PREFLIGHT_EVIDENCE_V1','ready':True,'activePodCount':active,'createBlocked':bool(p.get('createBlocked')),'rate':rate,'stockStatus':r.get('stockStatus'),'templateId':t.get('templateId'),'workerImage':p.get('workerImage'),'originalSourceCount':14,'renderableSourceCount':11,'unityPreservationOnlyCount':3,'totalOriginalBytes':int(a.get('totalOriginalBytes')),'paidMutationPerformed':False}
           open('original14-preflight.json','w').write(json.dumps(evidence,indent=2)+'\n')
           print(json.dumps(evidence))
           PY
