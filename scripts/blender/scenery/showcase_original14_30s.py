@@ -927,9 +927,9 @@ def _river_water_material() -> bpy.types.Material:
     if bsdf is None:
         return mat
     if 'Base Color' in bsdf.inputs:
-        bsdf.inputs['Base Color'].default_value = (0.03, 0.07, 0.09, 1.0)
+        bsdf.inputs['Base Color'].default_value = (0.07, 0.18, 0.22, 1.0)
     if 'Roughness' in bsdf.inputs:
-        bsdf.inputs['Roughness'].default_value = 0.34
+        bsdf.inputs['Roughness'].default_value = 0.20
     if 'Specular IOR Level' in bsdf.inputs:
         bsdf.inputs['Specular IOR Level'].default_value = 0.55
     if 'Transmission Weight' in bsdf.inputs:
@@ -1693,7 +1693,10 @@ def main() -> int:
                     village_center.y + bank_slots[i][1],
                     bank_slots[i][2],
                 ))
-            paint_simple_color(obj, f'TJ_BankFlora_{obj.name}', (0.16, 0.24, 0.09), 0.88)
+            # Project flora reads as mint lumps in 9:16. Keep them loaded
+            # for the usage proof, but do not put them in the hero strip.
+            obj.hide_render = True
+            obj.hide_viewport = True
     # Put the stream south of the village so a north-looking 9:16 camera
     # sees water in front of the cabins instead of hidden behind them.
     river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.03), (40.0, 4.4))
