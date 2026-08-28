@@ -190,7 +190,7 @@ def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, 
 
 
 def build_terrain(_files: list[Path]) -> bpy.types.Object:
-    bpy.ops.mesh.primitive_grid_add(x_subdivisions=140, y_subdivisions=140, size=180.0, location=(0.0, 8.0, 0.0))
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=260, y_subdivisions=260, size=180.0, location=(0.0, 8.0, 0.0))
     ground = bpy.context.object
     ground.name = "TJ_Ground_ValleyCarrier"
     try:
@@ -391,39 +391,17 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         body.inputs["Metallic"].default_value = 0.0
     if "Transmission Weight" in body.inputs:
         body.inputs["Transmission Weight"].default_value = 0.0
-    mapping = nodes.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (0.12, 0.85, 1.0)
-    links.new(coord.outputs["Object"], mapping.inputs["Vector"])
-    wave = nodes.new("ShaderNodeTexWave")
-    wave.wave_type = "BANDS"
-    wave.inputs["Scale"].default_value = 1.6
-    if "Distortion" in wave.inputs:
-        wave.inputs["Distortion"].default_value = 1.8
-    links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
-    ripples = nodes.new("ShaderNodeTexWave")
-    ripples.wave_type = "BANDS"
-    ripples.inputs["Scale"].default_value = 5.5
-    if "Distortion" in ripples.inputs:
-        ripples.inputs["Distortion"].default_value = 2.4
-    ripple_map = nodes.new("ShaderNodeMapping")
-    ripple_map.inputs["Scale"].default_value = (0.28, 1.4, 1.0)
-    links.new(coord.outputs["Object"], ripple_map.inputs["Vector"])
-    links.new(ripple_map.outputs["Vector"], ripples.inputs["Vector"])
-    wave_mix = _mix_rgb(nodes)
-    if "Color1" in wave_mix.inputs:
-        wave_mix.inputs["Fac"].default_value = 0.45
-        links.new(wave.outputs["Color"], wave_mix.inputs["Color1"])
-        links.new(ripples.outputs["Color"], wave_mix.inputs["Color2"])
-        bump_height = wave_mix.outputs["Color"]
-    else:
-        add_waves = nodes.new("ShaderNodeMath")
-        add_waves.operation = "ADD"
-        links.new(wave.outputs["Color"], add_waves.inputs[0])
-        links.new(ripples.outputs["Color"], add_waves.inputs[1])
-        bump_height = add_waves.outputs["Value"]
+    # Irregular noise only. Wave Bands read as a ribbed carpet from SHOT_01/04.
+    ripples = nodes.new("ShaderNodeTexNoise")
+    ripples.inputs["Scale"].default_value = 2.4
+    if "Detail" in ripples.inputs:
+        ripples.inputs["Detail"].default_value = 4.0
+    if "Roughness" in ripples.inputs:
+        ripples.inputs["Roughness"].default_value = 0.45
+    links.new(coord.outputs["Object"], ripples.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.38
-    links.new(bump_height, bump.inputs["Height"])
+    bump.inputs["Strength"].default_value = 0.28
+    links.new(ripples.outputs["Fac"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
     try:
@@ -613,7 +591,7 @@ def dirt_bank_material() -> bpy.types.Material:
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
     centers = evaluated_centerline(guide, samples=120)
-    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=3.45, z_offset=0.04, width_wobble=0.38)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=2.85, z_offset=0.10, width_wobble=0.32)
     assigned = assign_purchased_water(river)
     # No separate bank meshes. A hard dirt outline makes the stream read as a road.
     return river, assigned, []
@@ -1184,7 +1162,7 @@ def main() -> int:
         "cameraPath": "six_shot_markers",
         "lighting": "single_key_sun_plus_sky_fill_plus_restrained_bounce",
         "groundSource": "shaped_valley_carrier_purchased_meadow",
-        "riverSource": "dark_slate_stream_no_bank_outline",
+        "riverSource": "dark_slate_irregular_noise_no_wave_bands",
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
