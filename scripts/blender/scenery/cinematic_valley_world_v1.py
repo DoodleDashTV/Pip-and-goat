@@ -448,11 +448,17 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         jag = 0.85 * math.sin(x * 1.73 + y * 0.91) + 0.55 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.35 * math.sin(x * 0.61 + y * 1.27)
         fade += jag
-        if dist < bed:
-            value = 0.78 + 0.20 * (1.0 - min(1.0, dist / max(0.25, bed)))
+        inner = bed * 0.55
+        shelf = local_half * 0.98
+        if dist < inner:
+            value = 0.88
+        elif dist < shelf:
+            t = (dist - inner) / max(0.25, shelf - inner)
+            value = 0.88 - 0.48 * t
         elif dist < fade:
-            t = (dist - bed) / max(0.35, fade - bed)
-            value = (0.78 * ((1.0 - t) ** 0.85)) * (0.70 + 0.30 * (0.5 + 0.5 * math.sin(along * 0.33 + x * 0.8)))
+            t = (dist - shelf) / max(0.40, fade - shelf)
+            jag_t = t + 0.12 * math.sin(along * 0.33 + x * 0.8)
+            value = max(0.0, 0.38 * ((1.0 - min(1.0, jag_t)) ** 1.35))
         else:
             value = 0.0
         color.data[index].color = (value, value, value, 1.0)
