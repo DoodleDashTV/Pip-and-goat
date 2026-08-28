@@ -1,41 +1,41 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T16:22:30Z",
+  "inspectedAt": "2026-08-28T16:26:30Z",
   "engine": "CYCLES_CPU",
   "resolution": "360x640",
   "samples": 16,
-  "commit": "ca11c93",
-  "stillsDir": "/tmp/o14-lookdev/stills12",
+  "commit": "6b41907",
+  "stillsDir": "/tmp/o14-lookdev/stills13",
   "stills": {
-    "0001": "Sky + jagged mountains + cabin cluster + fence/cart. River is still a blue strip. Ground is a flat green plane. Pines exist behind the cabins but do not read as a forest wall.",
-    "0450": "Same stacked valley. A row of pines sits behind the cabin. River rectangle and slab floor remain.",
-    "0900": "Village + mountains + sky in one 9:16 frame, but it still reads as a kit test."
+    "0001": "Sky + mountains + one cabin cluster. River is now a curved blue ribbon, not water. Ground is a lime slab. Pines cluster around the cabin, not a forest wall.",
+    "0450": "Closer cabin portrait with fence and red cart. Same ribbon river and flat floor. Not a valley journey beat.",
+    "0900": "Same stacked kit: cabin, a few pines, curved blue strip, jagged mountains. Still an asset test."
   },
   "whatImprovedVersusRejectedCabinOrbit": [
     "South-to-north camera keeps village + mountains + sky in one frame",
-    "Cabin01 albedo is visible on log walls; fence and cart dress the street",
-    "Village mix is 4 Cabin*A + 3 trees + cart/gate/fence (no Cabin*B, no Swarm)",
-    "30 authored pine copies now exist in the scene (scatter after remap)",
-    "Louis grassy mountains and daylight sk2 sky remain in frame",
-    "Magenta Grass01 cards are not used as ground"
+    "Cabin01 albedo, fence, and cart are visible",
+    "Village mix is 4 Cabin*A + 3 trees + cart/gate/fence",
+    "River ribbon is bent instead of a perfect rectangle",
+    "37 authored pine copies exist in the scene",
+    "Louis mountains and daylight sk2 sky remain in frame"
   ],
   "rejectionMatches": [
     "still reads as an asset test, not a finished cinematic shot",
-    "flat green ground, not a valley meadow with path/river banks",
-    "river still reads as a blue rectangle",
-    "pine copies clustered around the village instead of a layered forest wall",
-    "crushed-dark roofs and harsh shadows",
-    "every still is almost the same wide south view",
+    "flat lime ground, not a valley meadow",
+    "river reads as a blue ribbon, not water with banks",
+    "pines cluster around the cabin instead of a layered forest wall",
+    "mid cameras turned into cabin portraits",
+    "crushed-dark tree undersides and noisy roofs",
     "weak atmospheric depth"
   ],
-  "honestConclusion": "Local look-dev stills still fail the visual gate. Paid path is idle (0 pods). Do not CREATE. Do not present as approval.",
+  "honestConclusion": "Local look-dev stills still fail the visual gate. Green CI is not visual approval. Paid path is idle (0 pods). Do not CREATE. Do not present as approval.",
   "paidRenderAuthorized": false,
   "paidProgressCheck": {
     "activeExactNamePods": 0,
     "billingCleanupConfirmed": true,
     "createPerformed": false,
     "livePinnedDigest": "sha256:236664936427f47824472df3965e66f42ee061bf5e14fe29921d6d579a3cdf06",
-    "reasonNoCreate": "Look-dev FAIL; live pin is rejected cabin-orbit image; standing auth consumed/wrong identity"
+    "reasonNoCreate": "Look-dev FAIL; live pin is rejected cabin-orbit image; standing auth consumed/wrong identity; green CI is not paid authorization"
   }
 }
