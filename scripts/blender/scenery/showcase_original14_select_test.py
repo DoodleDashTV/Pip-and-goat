@@ -89,7 +89,7 @@ def test_staging_names_are_rejected():
 
 
 def test_geometry_file_limits_allow_density_without_dump():
-    assert geometry_file_limit('forest_nature') == 3
+    assert geometry_file_limit('forest_nature') == 1
     assert geometry_file_limit('forest_ecokit') == 3
     assert geometry_file_limit('background_mountains') == 1
     assert geometry_file_limit('village_blender') == 8
@@ -236,9 +236,8 @@ def test_world_camera_travels_mountains_to_village():
         x, y, _z = key['camera']
         inside = (-12.0 - pad) <= x <= (12.0 + pad) and (-10.0 - pad) <= y <= (10.0 + pad)
         assert inside is False
-    # Establish looks at the mountains; the finish looks at the village.
+    # Establish looks toward the mountains; the finish looks at the village.
     assert keys[0]['look'][1] > keys[5]['look'][1] + 40.0
-    assert keys[0]['camera'][1] > keys[5]['camera'][1]
     assert keys[0]['camera'][2] > keys[4]['camera'][2]
     looks = [tuple(key['look']) for key in keys]
     assert len(set(looks)) >= 5

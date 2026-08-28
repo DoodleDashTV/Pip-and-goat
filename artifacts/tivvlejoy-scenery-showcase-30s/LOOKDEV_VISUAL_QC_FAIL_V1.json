@@ -1,0 +1,23 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T15:42:00Z",
+  "engine": "CYCLES_CPU",
+  "resolution": "270x480",
+  "samples": 8,
+  "stills": {
+    "0001": "Distant mountain silhouette over a flat ground slab. No village, river, or forest. Not a valley establish.",
+    "0450": "One dark cabin over empty pink/void ground. No river corridor or layered forest.",
+    "0900": "Close cabin pair on a pink missing-texture ground. Crushed-dark logs. No mountains or forest."
+  },
+  "rejectionMatches": [
+    "dark cabin cluster",
+    "crushed-black architecture",
+    "flat empty ground",
+    "missing mountain/river/forest contributions in the same frames",
+    "pink missing-texture ground",
+    "asset-test composition, not a cinematic world"
+  ],
+  "honestConclusion": "Local look-dev stills fail the visual gate. Do not present as approval. Do not start a 900-frame paid render from this composition.",
+  "paidRenderAuthorized": false
+}

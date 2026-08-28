@@ -352,18 +352,18 @@ def cinematic_world_camera_keys(
     mz = village_min_z + 18.0 if mountain_z is None else float(mountain_z)
 
     beats = (
-        # Wide valley establish: far past the forest, high, lots of sky + peaks.
-        {'camera': (mx + 10.0, my + 28.0, village_min_z + 34.0), 'look': (mx, my, mz), 'lens': 24.0},
-        # Descend toward forest and river.
-        {'camera': (fx + 8.0, (my + fy) * 0.5, village_min_z + 16.0), 'look': (fx, fy + 8.0, fz + 2.0), 'lens': 28.0},
-        # Through trees along the river corridor.
-        {'camera': (fx + 7.0, fy + 4.0, village_min_z + 8.5), 'look': (fx, fy - 6.0, fz), 'lens': 32.0},
+        # Wide establish from the valley side: mountains ahead, sky above, land below.
+        {'camera': (vx + 22.0, fy + 18.0, village_min_z + 32.0), 'look': (mx, my, mz), 'lens': 24.0},
+        # Descend toward the forest and river corridor.
+        {'camera': (vx + 14.0, fy + 6.0, village_min_z + 15.0), 'look': (fx, fy + 10.0, fz + 1.0), 'lens': 28.0},
+        # Through trees along the river.
+        {'camera': (vx + 10.0, fy - 4.0, village_min_z + 8.5), 'look': (fx, (fy + vy) * 0.55, fz), 'lens': 32.0},
         # River travel toward the village.
-        {'camera': (vx + 9.0, (fy + vy) * 0.5, village_min_z + 7.5), 'look': (vx, (fy + vy) * 0.35, look_z), 'lens': 34.0},
+        {'camera': (vx + 11.0, (fy + vy) * 0.45, village_min_z + 7.8), 'look': (vx, vy + 6.0, look_z), 'lens': 34.0},
         # Village appears as the destination.
-        {'camera': (vx + 14.0, vy + 22.0, village_min_z + 9.0), 'look': (vx, vy + 1.0, look_z), 'lens': 36.0},
-        # Composed village hero with forest/mountains behind.
-        {'camera': (vx + 18.0, vy - 24.0, village_min_z + 13.0), 'look': (vx, vy + 2.0, look_z + 1.0), 'lens': 32.0},
+        {'camera': (vx + 16.0, vy + 20.0, village_min_z + 9.0), 'look': (vx, vy + 1.0, look_z), 'lens': 36.0},
+        # Composed 3/4 village hero, forest/mountains behind, not a roof-top.
+        {'camera': (vx + 22.0, vy - 26.0, village_min_z + 7.2), 'look': (vx, vy + 2.0, look_z), 'lens': 34.0},
     )
     keys: list[dict] = []
     for beat in beats:
@@ -407,7 +407,10 @@ def geometry_file_limit(role: str) -> int:
         return 6
     if role == 'village_project':
         return 1
-    if role in {'forest_nature', 'forest_ecokit'}:
+    if role == 'forest_nature':
+        # Combined kit dump. One FBX is enough; a second pick was the same OBJ dump.
+        return 1
+    if role == 'forest_ecokit':
         return 3
     if role == 'background_mountains':
         return 1

@@ -76,6 +76,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument('--samples', type=int, default=12)
     p.add_argument('--proof-path', required=True)
     p.add_argument('--progress-path', default='')
+    p.add_argument('--stills-only', action='store_true')
+    p.add_argument('--stills-frames', default='1,150,300,450,600,750,900')
+    p.add_argument('--engine', default='BLENDER_EEVEE_NEXT')
     return p.parse_args(argv)
 
 
@@ -168,6 +171,10 @@ def select_blend_names(names: list[str], role: str, limit: int = 10, allow_water
         and not is_high_lod_name(n)
     ]
     preferred = [n for n in usable if any(w in n.lower() for w in words)]
+    if role == 'background_mountains':
+        lp = [n for n in usable if n.lower().startswith('lp_')]
+        if lp:
+            return lp[:limit]
     if role in {'village_blender', 'village_fbx', 'village_project'}:
         ordered = preferred + [n for n in usable if n not in preferred]
         if ordered:
@@ -591,8 +598,9 @@ def load_support(files: list[Path], role: str) -> int:
     return count
 
 
-def setup_world(files: list[Path]) -> str:
-    image = largest_image(files)
+def setup_world(hdri_files: list[Path], shader_files: list[Path] | None = None) -> str:
+    shader_files = shader_files or []
+    image = largest_image(hdri_files)
     if not image:
         raise RuntimeError('Purchased HDRI/JPG sky pack contributed no usable image')
     world = bpy.data.worlds.new('TJ_PurchasedSkyWorld') if not bpy.context.scene.world else bpy.context.scene.world
@@ -616,7 +624,7 @@ def setup_lighting():
     bpy.ops.object.light_add(type='SUN', location=(36, -48, 70))
     sun = bpy.context.object
     sun.name = 'TJ_Sun'
-    sun.data.energy = 5.4
+    sun.data.energy = 7.2
     sun.data.angle = math.radians(3.6)
     sun.rotation_euler = (math.radians(48), math.radians(4), math.radians(-38))
     if hasattr(sun.data, 'use_shadow'):
@@ -626,7 +634,7 @@ def setup_lighting():
     bpy.ops.object.light_add(type='AREA', location=(-22, 12, 32))
     fill = bpy.context.object
     fill.name = 'TJ_SkyFill'
-    fill.data.energy = 380
+    fill.data.energy = 1100
     fill.data.shape = 'DISK'
     fill.data.size = 42
     fill.rotation_euler = (math.radians(28), 0.0, math.radians(18))
@@ -646,7 +654,7 @@ def setup_atmosphere():
     nodes.clear()
     volume = nodes.new('ShaderNodeVolumePrincipled')
     if 'Density' in volume.inputs:
-        volume.inputs['Density'].default_value = 0.0011
+        volume.inputs['Density'].default_value = 0.00018
     if 'Anisotropy' in volume.inputs:
         volume.inputs['Anisotropy'].default_value = 0.22
     if 'Color' in volume.inputs:
@@ -841,7 +849,16 @@ def configure_render(args):
     scene.render.fps = args.fps
     scene.frame_start = args.start_frame
     scene.frame_end = args.end_frame
-    scene.render.engine = 'BLENDER_EEVEE_NEXT'
+    engine = str(getattr(args, 'engine', '') or 'BLENDER_EEVEE_NEXT')
+    scene.render.engine = engine
+    if engine == 'CYCLES' and hasattr(scene, 'cycles'):
+        scene.cycles.samples = max(1, int(args.samples))
+        if hasattr(scene.cycles, 'use_denoising'):
+            scene.cycles.use_denoising = False
+        try:
+            scene.cycles.device = 'CPU'
+        except Exception:
+            pass
     scene.render.image_settings.file_format = 'PNG'
     scene.render.image_settings.color_mode = 'RGB'
     scene.render.image_settings.color_depth = '8'
@@ -875,7 +892,7 @@ def configure_render(args):
             scene.eevee.volumetric_samples = 32
     try:
         scene.view_settings.look = 'AgX - Medium High Contrast'
-        scene.view_settings.exposure = 0.25
+        scene.view_settings.exposure = 0.55
     except Exception:
         pass
 
@@ -980,9 +997,6 @@ def main() -> int:
     for candidate in geometry_candidates(files, role):
         objs = import_geometry(candidate, role)
         water_objs = []
-        if candidate.suffix.lower() == '.blend':
-            water_objs = append_blend_geometry(candidate, role, allow_water=True)[0]
-            water_objs = [o for o in water_objs if o and is_water_or_ocean_name(o.name)]
         if objs:
             heroes = keep_hero_meshes(objs, role, 16)
             for hero in heroes:
@@ -1000,12 +1014,11 @@ def main() -> int:
     if river_members:
         river_root = parent_group(river_members, 'TJ_River_From_Purchased_Project')
         if river_root:
-            normalize_group(river_root, river_members, 36.0, (village_center.x, village_center.y + 24.0, -0.05))
-            river_root.scale = (
-                river_root.scale[0] * 0.22,
-                river_root.scale[1] * 1.35,
-                max(river_root.scale[2], 0.15),
-            )
+            normalize_group(river_root, river_members, 28.0, (village_center.x, village_center.y + 22.0, -0.04))
+            bpy.context.view_layer.update()
+            # Project File water is a giant GN pond. Force a stream-sized strip.
+            river_root.dimensions = (7.0, 38.0, max(0.25, float(river_root.dimensions.z)))
+            river_root.location = (village_center.x, village_center.y + 22.0, -0.04)
     bound = bind_purchased_textures(members + river_members, expanded.get('village_textures', []) + files)
     contributions[role] = {
         'type': 'visible_geometry',
@@ -1061,7 +1074,7 @@ def main() -> int:
         if members:
             root = parent_group(members, 'TJ_background_mountains_PurchasedRoot')
             if root:
-                normalize_group(root, members, 120.0, (village_center.x, village_center.y + 96.0, 0.0))
+                normalize_group(root, members, 72.0, (village_center.x, village_center.y + 140.0, 0.0))
             bound = bind_purchased_textures(members, mountain_files)
             contributions[mountain_role] = {
                 'type': 'visible_geometry',
@@ -1088,7 +1101,7 @@ def main() -> int:
         raise RuntimeError('Purchased village texture pack contributed no usable image')
     contributions['village_textures'] = {'type':'visible_texture','objectCount':ground_count}
 
-    sky_name = setup_world(expanded.get('sky_hdri', []))
+    sky_name = setup_world(expanded.get('sky_hdri', []), expanded.get('world_shaders', []))
     contributions['sky_hdri'] = {'type':'world_environment','imageLoaded':True}
 
     for role in SUPPORT_ROLES:
@@ -1097,8 +1110,9 @@ def main() -> int:
             raise RuntimeError(f'Purchased support source {role} contributed no loadable data')
         contributions[role] = {'type':'support_data','loadedDataCount':count}
 
-    if set(contributions) != RENDERABLE_ROLES:
-        raise RuntimeError('Not all 11 renderable Original-14 sources contributed to scene construction')
+    missing_roles = sorted(RENDERABLE_ROLES - set(contributions))
+    if missing_roles:
+        raise RuntimeError(f'Original-14 renderable sources missing from scene: {missing_roles}')
 
     leftover_images = []
     for role_files in expanded.values():
@@ -1136,7 +1150,6 @@ def main() -> int:
     cap_scene_faces()
     write_progress('BUILD_SCENE', frame=0, framesWritten=0, totalFrames=args.end_frame)
     setup_lighting()
-    setup_atmosphere()
     setup_camera(args.start_frame, args.end_frame)
     configure_render(args)
     install_frame_handlers(args.end_frame)
@@ -1155,12 +1168,23 @@ def main() -> int:
         'commercialAssetPathsEmitted':False,
         'cameraPath':'mountains_forest_river_village',
         'lighting':'bright_daylight_shadows_gtao',
+        'stillsOnly':bool(args.stills_only),
+        'engine':str(args.engine),
     }
     Path(args.proof_path).write_text(json.dumps(proof,indent=2)+'\n',encoding='utf-8')
-    print(json.dumps({'event':'tivvlejoy_original14_render_start','frames':proof['frameCount'],'resolution':args.resolution,'samples':args.samples}), flush=True)
+    print(json.dumps({'event':'tivvlejoy_original14_render_start','frames':proof['frameCount'],'resolution':args.resolution,'samples':args.samples,'stillsOnly':bool(args.stills_only),'engine':args.engine}), flush=True)
     write_progress('BLENDER_STARTED', frame=0, framesWritten=0, totalFrames=proof['frameCount'])
-    bpy.ops.render.render(animation=True)
-    print(json.dumps({'event':'tivvlejoy_original14_render_complete','frames':proof['frameCount']}))
+    if args.stills_only:
+        frames = [int(x) for x in str(args.stills_frames).split(',') if str(x).strip()]
+        scene = bpy.context.scene
+        for frame in frames:
+            scene.frame_set(frame)
+            scene.render.filepath = str(Path(args.output_dir) / f'lookdev_{frame:04d}')
+            bpy.ops.render.render(write_still=True)
+            write_progress('LOOKDEV_STILL', frame=frame, framesWritten=frame, totalFrames=args.end_frame)
+    else:
+        bpy.ops.render.render(animation=True)
+    print(json.dumps({'event':'tivvlejoy_original14_render_complete','frames':proof['frameCount'],'stillsOnly':bool(args.stills_only)}))
     return 0
 
 
