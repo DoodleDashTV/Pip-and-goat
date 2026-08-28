@@ -31,7 +31,11 @@
   "honestConclusion": "Forest wall is real now. Stills still fail the cinematic gate. Green CI is not visual approval. Paid path idle (0 pods). Do not CREATE. Do not present as approval.",
   "paidRenderAuthorized": false,
   "paidProgressCheck": {
-    "checkedAt": "2026-08-28T16:28:50Z",
+    "checkedAt": "2026-08-28T16:39:20Z",
+    "paidWorkflowLatest": "failed 2026-08-28T11:28:31Z, none running",
+    "bridgeStartup": "stale RUNNING frame 248/900 at 2026-08-28T15:29:20Z",
+    "bridgeStatus": null,
+    "downloadUrl": null,
     "activeExactNamePods": 0,
     "billingCleanupConfirmed": true,
     "createPerformed": false,
