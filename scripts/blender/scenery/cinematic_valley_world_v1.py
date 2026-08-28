@@ -343,7 +343,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     nodes.clear()
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
-    body_col = tint or (0.014, 0.042, 0.046, 1.0)
+    body_col = tint or (0.008, 0.028, 0.032, 1.0)
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
@@ -357,7 +357,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
             mix.data_type = "RGBA"
     if "Color1" in mix.inputs:
         mix.inputs["Color1"].default_value = body_col
-        mix.inputs["Color2"].default_value = (0.07, 0.08, 0.06, 1.0)
+        mix.inputs["Color2"].default_value = (0.11, 0.10, 0.07, 1.0)
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     elif "Base Color" in body.inputs:
@@ -375,12 +375,12 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(coord.outputs["Object"], mapping.inputs["Vector"])
     wave = nodes.new("ShaderNodeTexWave")
     wave.wave_type = "BANDS"
-    wave.inputs["Scale"].default_value = 6.0
+    wave.inputs["Scale"].default_value = 11.0
     if "Distortion" in wave.inputs:
-        wave.inputs["Distortion"].default_value = 3.2
+        wave.inputs["Distortion"].default_value = 6.5
     links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.20
+    bump.inputs["Strength"].default_value = 0.48
     links.new(wave.outputs["Color"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
@@ -566,7 +566,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
-        bank = spline_edge_mesh(name, centers, inner_half=1.55, outer_half=5.4, z_inner=0.04, z_outer=0.16, side_sign=sign)
+        bank = spline_edge_mesh(name, centers, inner_half=1.85, outer_half=6.2, z_inner=0.06, z_outer=0.22, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
     return river, assigned, banks
