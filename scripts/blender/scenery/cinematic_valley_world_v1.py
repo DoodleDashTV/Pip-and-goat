@@ -344,7 +344,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     spec = nodes.new("ShaderNodeBsdfPrincipled")
-    body_col = tint or (0.022, 0.075, 0.078, 1.0)
+    body_col = tint or (0.010, 0.038, 0.042, 1.0)
     if "Base Color" in body.inputs:
         body.inputs["Base Color"].default_value = body_col
     if "Roughness" in body.inputs:
@@ -354,7 +354,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Transmission Weight" in body.inputs:
         body.inputs["Transmission Weight"].default_value = 0.0
     if "Base Color" in spec.inputs:
-        spec.inputs["Base Color"].default_value = (0.16, 0.26, 0.30, 1.0)
+        spec.inputs["Base Color"].default_value = (0.05, 0.09, 0.10, 1.0)
     if "Roughness" in spec.inputs:
         spec.inputs["Roughness"].default_value = 0.06
     if "Specular IOR Level" in spec.inputs:
@@ -362,7 +362,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Metallic" in spec.inputs:
         spec.inputs["Metallic"].default_value = 0.04
     weight = nodes.new("ShaderNodeLayerWeight")
-    weight.inputs["Blend"].default_value = 0.16
+    weight.inputs["Blend"].default_value = 0.08
     invert = nodes.new("ShaderNodeMath")
     invert.operation = "SUBTRACT"
     invert.inputs[0].default_value = 1.0
@@ -553,7 +553,7 @@ def build_discovery_pool() -> bpy.types.Object:
     bpy.ops.mesh.primitive_circle_add(vertices=28, radius=1.0, fill_type="NGON", location=(-6.0, -12.2, -0.62))
     pool = bpy.context.object
     pool.name = "TJ_River_DiscoveryPool"
-    pool.scale = (7.6, 3.8, 1.0)
+    pool.scale = (4.4, 2.2, 1.0)
     try:
         bpy.ops.object.transform_apply(scale=True)
     except Exception:
@@ -571,7 +571,7 @@ def build_discovery_pool() -> bpy.types.Object:
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
     centers = evaluated_centerline(guide, samples=80)
-    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=3.35, z_offset=0.08, width_wobble=0.22)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=1.55, z_offset=0.06, width_wobble=0.18)
     assigned = assign_purchased_water(river)
     displace_water(river, 0.06)
     pool = build_discovery_pool()
@@ -579,7 +579,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
-        bank = spline_edge_mesh(name, centers, inner_half=3.05, outer_half=6.8, z_inner=0.06, z_outer=0.22, side_sign=sign)
+        bank = spline_edge_mesh(name, centers, inner_half=1.15, outer_half=4.6, z_inner=0.04, z_outer=0.28, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
     return river, assigned, banks + [pool]
@@ -1025,6 +1025,16 @@ def main() -> int:
     west_mg = scatter_clumps(trees, (-44.0, 40.0, 0.0), 3, 2, 8.0, 1.35, 7)
     east_fg = scatter_clumps(trees, (24.0, 12.0, 0.0), 3, 2, 7.0, 1.08, 5)
     east_mg = scatter_clumps(trees, (28.0, 32.0, 0.0), 3, 2, 8.0, 1.40, 11)
+    if trees:
+        for loc, scale in (
+            ((-40.0, 20.0, 0.0), 1.25),
+            ((-39.0, 28.0, 0.0), 1.15),
+            ((-8.0, 22.0, 0.0), 1.20),
+            ((-6.0, 30.0, 0.0), 1.30),
+            ((-42.0, 24.0, 0.0), 1.10),
+            ((-5.0, 26.0, 0.0), 1.18),
+        ):
+            west_fg.append(duplicate_mesh_in_world(trees[0], loc, scale))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
     east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
     foreground = west_fg + east_fg
