@@ -193,6 +193,110 @@ def village_orbit_radius(rx: float, ry: float) -> float:
     return min(max(half + max(10.0, 0.55 * max(rx, ry, 4.0)), 16.0), 36.0)
 
 
+def is_village_camera_subject_name(name: str, parent_name: str = '') -> bool:
+    """Cabin/cart/fence kit pieces belong to the village; forest kit does not."""
+    blob = f'{parent_name} {name}'.lower()
+    if 'forest_' in blob or 'ecokit' in blob:
+        return False
+    if 'village_project' in blob:
+        return False
+    if 'village' in blob:
+        return True
+    return is_authored_village_mesh_name(name) or any(
+        word in str(name or '').lower() for word in ('cart', 'fence', 'gate')
+    )
+
+
+def is_forest_camera_subject_name(name: str, parent_name: str = '') -> bool:
+    blob = f'{parent_name} {name}'.lower()
+    return 'forest_' in blob or 'ecokit' in blob
+
+
+def point_outside_aabb(
+    x: float,
+    y: float,
+    min_x: float,
+    min_y: float,
+    max_x: float,
+    max_y: float,
+    pad: float = 6.0,
+) -> tuple[float, float]:
+    """Push a camera XY outside the padded village AABB so we never clip inside."""
+    inside_x = (min_x - pad) <= x <= (max_x + pad)
+    inside_y = (min_y - pad) <= y <= (max_y + pad)
+    if not (inside_x and inside_y):
+        return (float(x), float(y))
+    cx = (min_x + max_x) * 0.5
+    cy = (min_y + max_y) * 0.5
+    rx = max((max_x - min_x) * 0.5, 4.0)
+    ry = max((max_y - min_y) * 0.5, 4.0)
+    vx, vy = x - cx, y - cy
+    n = math.hypot(vx, vy)
+    if n < 1e-6:
+        vx, vy, n = 0.0, -1.0, 1.0
+    extra = max(rx, ry) + pad + 2.0
+    return (cx + vx / n * extra, cy + vy / n * extra)
+
+
+def cinematic_camera_keys(
+    min_x: float,
+    min_y: float,
+    max_x: float,
+    max_y: float,
+    min_z: float,
+    vert: float,
+    forest_x: float | None = None,
+    forest_y: float | None = None,
+    forest_z: float | None = None,
+) -> list[dict]:
+    """Village establish → street → cabins → forest edge → trees → crane-up sky.
+
+    Camera XY stays outside the village AABB. Look targets may sit inside the
+    cluster so the lens looks *at* the village, then travels to forest and sky.
+    This is a journey, not a six-point orbit of one look-at.
+    """
+    cx = (min_x + max_x) * 0.5
+    cy = (min_y + max_y) * 0.5
+    rx = max((max_x - min_x) * 0.5, 4.0)
+    ry = max((max_y - min_y) * 0.5, 4.0)
+    safe = village_orbit_radius(rx, ry)
+    look_z = min_z + min(max(vert * 0.38, 2.4), 5.5)
+    sky_z = min_z + min(max(vert * 1.25, 16.0), 30.0)
+    fx = cx if forest_x is None else float(forest_x)
+    fy = cy + max(ry * 1.7, 20.0) if forest_y is None else float(forest_y)
+    fz = min_z + min(max(vert * 0.7, 4.0), 9.0) if forest_z is None else float(forest_z)
+
+    # Angles are from village center: 0=+X, 90=+Y. Radii are * safe outside orbit.
+    beats = (
+        # Wide establishing: far SW, high, lots of portrait sky.
+        {'angle': 210.0, 'r': 1.90, 'h': 24.0, 'look': (cx, cy, look_z), 'lens': 26.0},
+        # Street approach: closer, lower, still outside.
+        {'angle': 192.0, 'r': 1.30, 'h': 11.5, 'look': (cx + rx * 0.10, cy + ry * 0.12, look_z), 'lens': 32.0},
+        # Among cabins: south edge looking through the street.
+        {'angle': 174.0, 'r': 1.10, 'h': 7.0, 'look': (cx + rx * 0.16, cy + ry * 0.38, look_z * 0.90), 'lens': 38.0},
+        # Forest edge: SE, look past cabins toward the forest cluster.
+        {'angle': 138.0, 'r': 1.20, 'h': 8.8, 'look': (fx, (cy + fy) * 0.5, (look_z + fz) * 0.5), 'lens': 34.0},
+        # Through trees: nearer the forest, still outside the village AABB.
+        {'angle': 78.0, 'r': 1.42, 'h': 9.2, 'look': (fx, fy, fz), 'lens': 32.0},
+        # Crane-up sky ending: pull back and up; look rises into the HDRI.
+        {'angle': 248.0, 'r': 2.05, 'h': 30.0, 'look': (cx, cy + ry * 0.35, sky_z), 'lens': 24.0},
+    )
+
+    keys: list[dict] = []
+    for beat in beats:
+        ang = math.radians(beat['angle'])
+        radius = safe * beat['r']
+        x = cx + math.cos(ang) * radius
+        y = cy + math.sin(ang) * radius
+        x, y = point_outside_aabb(x, y, min_x, min_y, max_x, max_y, pad=6.0)
+        keys.append({
+            'camera': (float(x), float(y), float(min_z + beat['h'])),
+            'look': tuple(float(v) for v in beat['look']),
+            'lens': float(beat['lens']),
+        })
+    return keys
+
+
 def village_file_rank(name: str) -> tuple:
     n = str(name or '').lower()
     cabin_a = 0 if is_cabin_a_name(n) else 1

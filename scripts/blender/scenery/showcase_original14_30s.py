@@ -26,6 +26,7 @@ from showcase_original14_select import (  # noqa: E402
     IMAGE_EXTS,
     NON_ALBEDO_WORDS,
     SUPPORT_EXTS,
+    cinematic_camera_keys,
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
@@ -35,10 +36,11 @@ from showcase_original14_select import (  # noqa: E402
     is_camera_hero_name,
     is_dominating_plane,
     is_foliage_card_name,
+    is_forest_camera_subject_name,
     is_high_lod_name,
     is_primitive_name,
+    is_village_camera_subject_name,
     is_water_or_ocean_name,
-    village_orbit_radius,
     mesh_keep_rank,
     pick_geometry_paths,
     pick_ground_image_path,
@@ -496,9 +498,9 @@ def create_purchased_texture_ground(files: list[Path], center=(0.0, 12.0, -0.15)
     ground.data.materials.append(image_material(
         'TJ_PurchasedVillageGround',
         img,
-        tile=4.0,
-        mix_color=(0.22, 0.32, 0.14),
-        mix_fac=0.12,
+        tile=2.0,
+        mix_color=(0.20, 0.30, 0.12),
+        mix_fac=0.28,
     ))
     return 1
 
@@ -597,7 +599,7 @@ def setup_world(files: list[Path]) -> str:
     env = nodes.new('ShaderNodeTexEnvironment')
     env.image = bpy.data.images.load(str(image), check_existing=True)
     bg = nodes.new('ShaderNodeBackground')
-    bg.inputs['Strength'].default_value = 0.9
+    bg.inputs['Strength'].default_value = 0.38
     out = nodes.new('ShaderNodeOutputWorld')
     links.new(env.outputs['Color'], bg.inputs['Color'])
     links.new(bg.outputs['Background'], out.inputs['Surface'])
@@ -605,18 +607,56 @@ def setup_world(files: list[Path]) -> str:
 
 
 def setup_lighting():
-    bpy.ops.object.light_add(type='SUN', location=(25, -35, 80))
+    # Golden-hour key: low sun so purchased cabins get long shadows and rim.
+    bpy.ops.object.light_add(type='SUN', location=(40, -55, 28))
     sun = bpy.context.object
     sun.name = 'TJ_Sun'
-    sun.data.energy = 6.0
-    sun.data.angle = math.radians(5)
-    sun.rotation_euler = (math.radians(28), math.radians(-18), math.radians(-32))
-    bpy.ops.object.light_add(type='AREA', location=(-25, 5, 38))
+    sun.data.energy = 9.5
+    sun.data.angle = math.radians(2.8)
+    sun.rotation_euler = (math.radians(72), math.radians(6), math.radians(-48))
+    if hasattr(sun.data, 'use_shadow'):
+        sun.data.use_shadow = True
+    bpy.ops.object.light_add(type='SUN', location=(-50, 30, 22))
+    rim = bpy.context.object
+    rim.name = 'TJ_WarmRim'
+    rim.data.energy = 3.2
+    rim.data.angle = math.radians(4.5)
+    rim.rotation_euler = (math.radians(78), math.radians(-4), math.radians(128))
+    if hasattr(rim.data, 'use_shadow'):
+        rim.data.use_shadow = False
+    bpy.ops.object.light_add(type='AREA', location=(-18, 8, 26))
     fill = bpy.context.object
     fill.name = 'TJ_SoftFill'
-    fill.data.energy = 500
+    fill.data.energy = 220
     fill.data.shape = 'DISK'
-    fill.data.size = 30
+    fill.data.size = 36
+    fill.rotation_euler = (math.radians(35), 0.0, math.radians(20))
+    if hasattr(fill.data, 'color'):
+        fill.data.color = (1.0, 0.86, 0.68)
+
+
+def setup_atmosphere():
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(0.0, 4.0, 18.0))
+    fog = bpy.context.object
+    fog.name = 'TJ_Atmosphere'
+    fog.scale = (180.0, 200.0, 70.0)
+    mat = bpy.data.materials.new('TJ_AtmosphereMaterial')
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    nodes.clear()
+    volume = nodes.new('ShaderNodeVolumePrincipled')
+    if 'Density' in volume.inputs:
+        volume.inputs['Density'].default_value = 0.0022
+    if 'Anisotropy' in volume.inputs:
+        volume.inputs['Anisotropy'].default_value = 0.22
+    if 'Color' in volume.inputs:
+        volume.inputs['Color'].default_value = (0.86, 0.78, 0.68, 1.0)
+    out = nodes.new('ShaderNodeOutputMaterial')
+    links.new(volume.outputs['Volume'], out.inputs['Volume'])
+    fog.data.materials.append(mat)
+    fog.display_type = 'WIRE'
+    fog.hide_select = True
 
 
 def track_camera(camera, target):
@@ -709,63 +749,73 @@ def import_kit_groups(files: list[Path], role: str, slots: list[tuple], origin: 
     return members, imported, placed
 
 
+def subject_parent_name(obj) -> str:
+    parent = getattr(obj, 'parent', None)
+    return str(getattr(parent, 'name', '') or '')
+
+
 def setup_camera(start: int, end: int):
-    meshes = [o for o in bpy.data.objects if is_camera_hero_object(o)]
-    if not meshes:
-        meshes = [
+    heroes = [o for o in bpy.data.objects if is_camera_hero_object(o)]
+    village = [
+        o for o in heroes
+        if is_village_camera_subject_name(o.name, subject_parent_name(o))
+    ]
+    forest = [
+        o for o in heroes
+        if is_forest_camera_subject_name(o.name, subject_parent_name(o))
+    ]
+    if not village:
+        village = [
             o for o in bpy.data.objects
             if o.type == 'MESH'
             and not str(o.name).startswith('TJ_Ground')
             and not is_foliage_card_name(o.name)
             and not is_water_or_ocean_name(o.name)
             and not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
+            and not is_forest_camera_subject_name(o.name, subject_parent_name(o))
         ]
-    bounds = group_bounds(meshes)
+    bounds = group_bounds(village)
+    forest_bounds = group_bounds(forest)
     if bounds:
         mins, maxs = bounds
-        center = (mins + maxs) * 0.5
-        rx = max((maxs - mins).x * 0.5, 4.0)
-        ry = max((maxs - mins).y * 0.5, 4.0)
-        vert = max((maxs - mins).z, 3.0)
-        look_z = mins.z + min(vert * 0.42, 6.0)
-        look = (center.x, center.y, look_z)
-        # Village-kit COMPLETE clipped through cabins at frames 360 and 720.
-        # Orbit outside the cluster AABB instead of cutting through it.
-        radius = village_orbit_radius(rx, ry)
-        cam_h = min(max(vert * 0.35 + 5.0, 7.0), 16.0)
-        cams = []
-        for deg in (90.0, 150.0, 30.0, 210.0, 330.0, 270.0):
-            ang = math.radians(deg)
-            cams.append((
-                center.x + math.cos(ang) * radius,
-                center.y + math.sin(ang) * radius,
-                mins.z + cam_h,
-            ))
-        pad = 6.0
-        for i, (x, y, z) in enumerate(cams):
-            inside_x = (mins.x - pad) <= x <= (maxs.x + pad)
-            inside_y = (mins.y - pad) <= y <= (maxs.y + pad)
-            if inside_x and inside_y:
-                vx, vy = x - center.x, y - center.y
-                n = math.hypot(vx, vy) or 1.0
-                extra = max(rx, ry) + pad + 2.0
-                cams[i] = (center.x + vx / n * extra, center.y + vy / n * extra, z)
-        targets = [look, look, look, look, look, look]
+        forest_look = None
+        if forest_bounds:
+            fmin, fmax = forest_bounds
+            fcenter = (fmin + fmax) * 0.5
+            forest_look = (fcenter.x, fcenter.y, fmin.z + min((fmax - fmin).z * 0.55, 8.0))
+        keys = cinematic_camera_keys(
+            float(mins.x), float(mins.y), float(maxs.x), float(maxs.y),
+            float(mins.z), float(max((maxs - mins).z, 3.0)),
+            forest_x=None if forest_look is None else forest_look[0],
+            forest_y=None if forest_look is None else forest_look[1],
+            forest_z=None if forest_look is None else forest_look[2],
+        )
     else:
-        cams = [(0,145,42),(-24,105,24),(24,70,18),(-18,30,12),(20,-12,16),(0,-58,38)]
-        targets = [(0,92,10),(0,68,6),(0,42,5),(0,10,4),(0,-6,5),(0,18,9)]
-    bpy.ops.object.camera_add(location=cams[0])
+        keys = cinematic_camera_keys(-12.0, -10.0, 12.0, 10.0, 0.0, 8.0)
+    bpy.ops.object.camera_add(location=keys[0]['camera'])
     cam = bpy.context.object
     cam.name = 'TJ_Original14_Camera'
-    cam.data.lens = 32
+    cam.data.lens = keys[0]['lens']
+    cam.data.sensor_width = 32
     bpy.context.scene.camera = cam
     target = bpy.data.objects.new('TJ_Original14_Target', None)
     bpy.context.scene.collection.objects.link(target)
     track_camera(cam, target)
-    frames = [start, start+179, start+359, start+539, start+719, end]
-    for f,c,t in zip(frames,cams,targets):
-        key_loc(cam,f,c); key_loc(target,f,t)
-    smooth(cam); smooth(target)
+    frames = [start, start + 179, start + 359, start + 539, start + 719, end]
+    for frame, key in zip(frames, keys):
+        key_loc(cam, frame, key['camera'])
+        key_loc(target, frame, key['look'])
+        cam.data.lens = key['lens']
+        cam.data.keyframe_insert(data_path='lens', frame=frame)
+    smooth(cam)
+    smooth(target)
+    print(json.dumps({
+        'event': 'cinematic_camera_path',
+        'villageHeroCount': len(village),
+        'forestHeroCount': len(forest),
+        'lenses': [k['lens'] for k in keys],
+        'looksDistinct': len({tuple(k['look']) for k in keys}),
+    }), flush=True)
 
 
 def configure_render(args):
@@ -791,13 +841,27 @@ def configure_render(args):
         if hasattr(scene.eevee, 'use_raytracing'):
             scene.eevee.use_raytracing = False
         if hasattr(scene.eevee, 'use_shadows'):
-            scene.eevee.use_shadows = False
+            scene.eevee.use_shadows = True
         if hasattr(scene.eevee, 'use_volumetric_shadows'):
             scene.eevee.use_volumetric_shadows = False
         if hasattr(scene.eevee, 'use_gtao'):
-            scene.eevee.use_gtao = False
+            scene.eevee.use_gtao = True
+        if hasattr(scene.eevee, 'gtao_distance'):
+            scene.eevee.gtao_distance = 0.35
+        if hasattr(scene.eevee, 'gtao_quality'):
+            scene.eevee.gtao_quality = 0.45
+        if hasattr(scene.eevee, 'volumetric_tile_size'):
+            try:
+                scene.eevee.volumetric_tile_size = '8'
+            except Exception:
+                pass
+        if hasattr(scene.eevee, 'volumetric_end'):
+            scene.eevee.volumetric_end = 80.0
+        if hasattr(scene.eevee, 'volumetric_samples'):
+            scene.eevee.volumetric_samples = 32
     try:
         scene.view_settings.look = 'AgX - Medium High Contrast'
+        scene.view_settings.exposure = 0.25
     except Exception:
         pass
 
@@ -1014,6 +1078,7 @@ def main() -> int:
     cap_scene_faces()
     write_progress('BUILD_SCENE', frame=0, framesWritten=0, totalFrames=args.end_frame)
     setup_lighting()
+    setup_atmosphere()
     setup_camera(args.start_frame, args.end_frame)
     configure_render(args)
     install_frame_handlers(args.end_frame)
@@ -1030,6 +1095,8 @@ def main() -> int:
         'purchasedSkyImageLoaded':bool(sky_name),
         'randomOrGeneratedStockAssetCount':0,
         'commercialAssetPathsEmitted':False,
+        'cameraPath':'village_establish_street_forest_sky',
+        'lighting':'golden_hour_shadows_gtao',
     }
     Path(args.proof_path).write_text(json.dumps(proof,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({'event':'tivvlejoy_original14_render_start','frames':proof['frameCount'],'resolution':args.resolution,'samples':args.samples}), flush=True)

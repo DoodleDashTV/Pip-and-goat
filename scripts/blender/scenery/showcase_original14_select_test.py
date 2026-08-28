@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 
 from showcase_original14_select import (
+    cinematic_camera_keys,
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
@@ -14,13 +15,16 @@ from showcase_original14_select import (
     is_dominating_plane,
     is_dump_name,
     is_foliage_card_name,
+    is_forest_camera_subject_name,
     is_high_lod_name,
     is_primitive_name,
     is_staging_name,
+    is_village_camera_subject_name,
     is_water_or_ocean_name,
     is_authored_village_mesh_name,
     is_cabin_texture_name,
     mesh_keep_rank,
+    point_outside_aabb,
     village_orbit_radius,
     pick_geometry_records,
     pick_ground_image_records,
@@ -218,6 +222,52 @@ def test_camera_stays_outside_village_cluster():
     assert tight > math.hypot(6.0, 5.0)
 
 
+def test_cinematic_camera_is_a_journey_not_an_orbit():
+    keys = cinematic_camera_keys(
+        -12.0, -10.0, 12.0, 10.0, 0.0, 8.0,
+        forest_x=6.0, forest_y=28.0, forest_z=6.0,
+    )
+    assert len(keys) == 6
+    pad = 6.0
+    for key in keys:
+        x, y, z = key['camera']
+        inside = (-12.0 - pad) <= x <= (12.0 + pad) and (-10.0 - pad) <= y <= (10.0 + pad)
+        assert inside is False
+        assert z > 0.0
+    def horiz(key):
+        return math.hypot(key['camera'][0], key['camera'][1])
+    # Establish and sky ending are wide; the cabin beat is closer.
+    assert horiz(keys[0]) > horiz(keys[2])
+    assert horiz(keys[5]) > horiz(keys[2])
+    # Crane-up is the highest camera; sky look is above the village look.
+    assert keys[5]['camera'][2] > keys[2]['camera'][2] + 10.0
+    assert keys[5]['look'][2] > keys[0]['look'][2] + 8.0
+    # Look targets travel; this is not one locked look-at.
+    looks = [tuple(key['look']) for key in keys]
+    assert len(set(looks)) >= 4
+    assert keys[4]['look'][1] > keys[0]['look'][1]
+    lenses = [key['lens'] for key in keys]
+    assert len(set(lenses)) >= 3
+    assert keys[0]['lens'] < keys[2]['lens']
+    assert keys[5]['lens'] <= 26.0
+
+
+def test_point_outside_aabb_pushes_interior_cameras():
+    x, y = point_outside_aabb(0.0, 0.0, -8.0, -8.0, 8.0, 8.0, pad=6.0)
+    assert abs(x) >= 16.0 or abs(y) >= 16.0
+    kept = point_outside_aabb(40.0, -30.0, -8.0, -8.0, 8.0, 8.0, pad=6.0)
+    assert kept == (40.0, -30.0)
+
+
+def test_village_and_forest_camera_subjects_split():
+    assert is_village_camera_subject_name('Building04_LOD0', 'TJ_village_blender_0_Cabin01A') is True
+    assert is_village_camera_subject_name('Cart01', 'TJ_village_fbx_4_Cart01') is True
+    assert is_village_camera_subject_name('Pine_01', 'TJ_forest_nature_0_Pine') is False
+    assert is_forest_camera_subject_name('Pine_01', 'TJ_forest_nature_0_Pine') is True
+    assert is_forest_camera_subject_name('Building04', 'TJ_village_blender_0_Cabin01A') is False
+    assert is_village_camera_subject_name('Bush_03', 'TJ_village_project_PurchasedRoot') is False
+
+
 def test_camera_hero_rejects_lily_pad_and_water():
     assert is_camera_hero_name('Building04_LOD0') is True
     assert is_camera_hero_name('Roof04') is True
@@ -251,5 +301,8 @@ if __name__ == '__main__':
     test_village_picker_prefers_cabin_a_over_interior_and_skips_none()
     test_village_extract_sort_keeps_large_cabin_a_first()
     test_camera_stays_outside_village_cluster()
+    test_cinematic_camera_is_a_journey_not_an_orbit()
+    test_point_outside_aabb_pushes_interior_cameras()
+    test_village_and_forest_camera_subjects_split()
     test_camera_hero_rejects_lily_pad_and_water()
     print('showcase_original14_select_test PASS')
