@@ -39,16 +39,52 @@ STAGING_MARKERS = (
     'debug_floor',
 )
 
-GROUND_WORDS = (
-    'grass', 'dirt', 'ground', 'soil', 'cobble', 'path', 'moss',
-    'forest', 'village', 'road', 'sand', 'leaf', 'bark',
-)
-
 ALBEDO_WORDS = ('albedo', 'diffuse', 'diff', 'basecolor', 'base_color', 'color', 'col_')
 NON_ALBEDO_WORDS = (
     'normal', 'nrm', 'norm_', '_n.', 'rough', 'metal', 'spec', 'ao_', 'occlusion',
     'height', 'bump', 'disp', 'emiss', 'mask', 'orm',
 )
+
+# High-contrast leaf/claw tiles looked like a debug floor in the camera-framing
+# COMPLETE. Prefer real grass/dirt albedos and demote pattern/leaf maps.
+PREFERRED_GROUND_WORDS = ('grass', 'dirt', 'soil', 'moss', 'ground')
+GROUND_WORDS = PREFERRED_GROUND_WORDS + (
+    'cobble', 'path', 'forest', 'village', 'road', 'sand',
+)
+PENALTY_GROUND_WORDS = (
+    'leaf', 'bark', 'pattern', 'stencil', 'checker', 'tile_test', 'debug',
+    'noise', 'alpha', 'opacity', 'detail',
+)
+
+PRIMITIVE_MARKERS = (
+    'defaultcube', 'solidbox', 'proxy_box', 'dummy', 'placeholder',
+    'bounding', 'volume_box',
+)
+PRIMITIVE_EXACT = {
+    'cube', 'box', 'plane', 'grid', 'nurbs', 'circle', 'ico', 'suzanne', 'monkey',
+}
+
+
+def is_primitive_name(name: str) -> bool:
+    n = str(name or '').lower().replace('\\', '/')
+    stem = Path(n).stem.split('.')[0]
+    if stem in PRIMITIVE_EXACT:
+        return True
+    return any(marker in n for marker in PRIMITIVE_MARKERS)
+
+
+def is_box_mesh(face_count: int = 0, dimensions: tuple | None = None) -> bool:
+    faces = int(face_count or 0)
+    if faces > 14:
+        return False
+    if not dimensions or len(dimensions) < 3:
+        return faces <= 8
+    vals = [abs(float(x)) for x in dimensions[:3]]
+    mx = max(vals) if vals else 0.0
+    positives = [v for v in vals if v > 1e-6]
+    mn = min(positives) if positives else 0.001
+    return mx / mn < 2.8
+
 
 # Combined dump OBJs expand into multi-GB render scenes even when the file
 # itself is modest. Keep individual assets; allow larger .blend village files.
@@ -99,13 +135,13 @@ def extract_role_limit(role: str) -> int:
 
 
 def geometry_file_limit(role: str) -> int:
-    # Texture-quality repair imported 3 files/role and could not stay inside
-    # the 55-minute Blender timeout. Keep the first complete's 1-file speed
-    # for heavy forest kits; allow two village files for houses + fence.
+    # Camera-framing COMPLETE finished in ~7 minutes at 540x960 / 12 samples,
+    # so one extra forest file and a third village file still fit the timeout
+    # while filling the empty platform look.
     if role in {'forest_nature', 'forest_ecokit'}:
-        return 1
-    if role in {'village_blender', 'village_project', 'village_fbx'}:
         return 2
+    if role in {'village_blender', 'village_project', 'village_fbx'}:
+        return 3
     return 1
 
 
@@ -141,6 +177,7 @@ def mesh_keep_rank(name: str, role: str, face_count: int = 0, dimensions: tuple 
     n = str(name or '').lower()
     words = HERO_WORDS.get(role, ())
     staging = 1 if is_staging_name(n) else 0
+    primitive = 1 if is_primitive_name(n) or is_box_mesh(face_count, dimensions) else 0
     flat = 0
     if dimensions and len(dimensions) >= 3:
         mx = max(dimensions)
@@ -148,7 +185,7 @@ def mesh_keep_rank(name: str, role: str, face_count: int = 0, dimensions: tuple 
         if mx > 3 and mn < 0.22 * max(mx, 0.001):
             flat = 1
     hero_miss = 0 if (not words or any(w in n for w in words)) else 1
-    return (staging, flat, hero_miss, -int(face_count or 0), n)
+    return (staging, primitive, flat, hero_miss, -int(face_count or 0), n)
 
 
 def pick_ground_image_records(records: list[dict]) -> dict | None:
@@ -158,9 +195,11 @@ def pick_ground_image_records(records: list[dict]) -> dict | None:
         name = str(rec.get('name') or '').lower()
         size = int(rec.get('size') or 0)
         non_albedo = 1 if any(w in name for w in NON_ALBEDO_WORDS) else 0
+        penalty = 1 if any(w in name for w in PENALTY_GROUND_WORDS) else 0
+        preferred_miss = 0 if any(w in name for w in PREFERRED_GROUND_WORDS) else 1
         ground_hit = 0 if any(w in name for w in GROUND_WORDS) else 1
         albedo_miss = 0 if any(w in name for w in ALBEDO_WORDS + GROUND_WORDS) else 1
-        return (non_albedo, ground_hit, albedo_miss, -min(size, 6 * 1024 * 1024), name)
+        return (non_albedo, penalty, preferred_miss, ground_hit, albedo_miss, -min(size, 6 * 1024 * 1024), name)
 
     images.sort(key=rank)
     return images[0] if images else None

@@ -28,6 +28,8 @@ from showcase_original14_select import (  # noqa: E402
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
+    is_box_mesh,
+    is_primitive_name,
     mesh_keep_rank,
     pick_geometry_paths,
     pick_ground_image_path,
@@ -40,11 +42,11 @@ VISIBLE_GEOMETRY_ROLES = {
 }
 SUPPORT_ROLES = {'sky_machine_v1', 'sky_machine_v2', 'sky_extra_update', 'world_shaders'}
 RENDERABLE_ROLES = VISIBLE_GEOMETRY_ROLES | {'village_textures', 'sky_hdri'} | SUPPORT_ROLES
-MAX_OBJECTS_PER_BLEND = 6
+MAX_OBJECTS_PER_BLEND = 10
 MAX_MATERIALS_PER_BLEND = 12
-MAX_MESHES_PER_ROLE = 5
+MAX_MESHES_PER_ROLE = 8
 TARGET_FACES_PER_MESH = 8000
-TARGET_FACES_SCENE = 80000
+TARGET_FACES_SCENE = 120000
 PROGRESS_PATH: Path | None = None
 
 
@@ -143,9 +145,14 @@ def select_blend_names(names: list[str], role: str, limit: int = 10) -> list[str
         'forest_nature': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump'),
         'forest_ecokit': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump'),
     }.get(role, ())
-    preferred = [n for n in names if any(w in n.lower() for w in words)]
+    usable = [n for n in names if not is_primitive_name(n)]
+    preferred = [n for n in usable if any(w in n.lower() for w in words)]
     chosen = preferred[:limit]
-    return chosen if chosen else names[:min(limit, len(names))]
+    if chosen:
+        return chosen
+    if usable:
+        return usable[:min(limit, len(usable))]
+    return names[:min(limit, len(names))]
 
 
 def append_blend_geometry(path: Path, role: str) -> tuple[list[bpy.types.Object], int]:
@@ -231,7 +238,12 @@ def keep_hero_meshes(objects: list[bpy.types.Object], role: str, limit: int = MA
     meshes = [o for o in objects if o and o.name in bpy.data.objects and o.type == 'MESH']
     extras = [o for o in objects if o and o.name in bpy.data.objects and o.type in {'CAMERA', 'LIGHT', 'CURVE', 'FONT', 'EMPTY'}]
     meshes.sort(key=lambda o: mesh_keep_rank(o.name, role, mesh_face_count(o), object_dimensions(o)))
-    keep = meshes[: max(1, int(limit))] if meshes else []
+    heroes = [
+        o for o in meshes
+        if not is_primitive_name(o.name) and not is_box_mesh(mesh_face_count(o), object_dimensions(o))
+    ]
+    pool = heroes or meshes
+    keep = pool[: max(1, int(limit))] if pool else []
     keep_set = set(keep)
     for obj in meshes + extras:
         if obj in keep_set:
@@ -306,7 +318,13 @@ def largest_image(files: list[Path]) -> Path | None:
     return images[0] if images else None
 
 
-def image_material(name: str, image: Path | None, tile: float = 1.0):
+def image_material(
+    name: str,
+    image: Path | None,
+    tile: float = 1.0,
+    mix_color: tuple | None = None,
+    mix_fac: float = 0.0,
+):
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -326,7 +344,23 @@ def image_material(name: str, image: Path | None, tile: float = 1.0):
                 mapping.inputs['Scale'].default_value = (tile, tile, tile)
                 links.new(coord.outputs['UV'], mapping.inputs['Vector'])
                 links.new(mapping.outputs['Vector'], tex.inputs['Vector'])
-            links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
+            color_out = tex.outputs['Color']
+            if mix_color and mix_fac > 0:
+                try:
+                    mix = nodes.new('ShaderNodeMixRGB')
+                except Exception:
+                    mix = nodes.new('ShaderNodeMix')
+                    if hasattr(mix, 'data_type'):
+                        mix.data_type = 'RGBA'
+                mix.blend_type = 'MIX'
+                if 'Fac' in mix.inputs:
+                    mix.inputs['Fac'].default_value = float(mix_fac)
+                color2 = (*[float(c) for c in mix_color[:3]], 1.0)
+                if 'Color2' in mix.inputs:
+                    mix.inputs['Color2'].default_value = color2
+                links.new(color_out, mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6])
+                color_out = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
+            links.new(color_out, bsdf.inputs['Base Color'])
         except Exception:
             pass
     return mat
@@ -340,6 +374,9 @@ def material_has_valid_image(mat) -> bool:
             continue
         img = getattr(node, 'image', None)
         if img is None:
+            continue
+        linked = any(link.from_node == node for link in mat.node_tree.links)
+        if not linked:
             continue
         if getattr(img, 'packed_file', None):
             return True
@@ -395,7 +432,7 @@ def create_purchased_texture_ground(files: list[Path]) -> int:
     img = pick_ground_image_path(files) or largest_image(files)
     if not img:
         return 0
-    bpy.ops.mesh.primitive_plane_add(size=420, location=(0, 28, -0.15))
+    bpy.ops.mesh.primitive_plane_add(size=1600, location=(0, 12, -0.15))
     ground = bpy.context.object
     ground.name = 'TJ_Ground_Using_Purchased_Village_Texture'
     bpy.ops.object.mode_set(mode='EDIT')
@@ -404,7 +441,13 @@ def create_purchased_texture_ground(files: list[Path]) -> int:
     except Exception:
         pass
     bpy.ops.object.mode_set(mode='OBJECT')
-    ground.data.materials.append(image_material('TJ_PurchasedVillageGround', img, tile=18.0))
+    ground.data.materials.append(image_material(
+        'TJ_PurchasedVillageGround',
+        img,
+        tile=5.0,
+        mix_color=(0.22, 0.32, 0.14),
+        mix_fac=0.42,
+    ))
     return 1
 
 
@@ -516,24 +559,27 @@ def setup_camera(start: int, end: int):
     if bounds:
         mins, maxs = bounds
         center = (mins + maxs) * 0.5
-        span = max((maxs - mins).x, (maxs - mins).y, (maxs - mins).z, 8.0)
-        height = max(span * 0.18, 6.0)
-        look = (center.x, center.y, mins.z + span * 0.12)
+        horiz = max((maxs - mins).x, (maxs - mins).y, 10.0)
+        vert = max((maxs - mins).z, 4.0)
+        look_z = mins.z + min(vert * 0.42, 8.0)
+        look = (center.x, center.y, look_z)
+        cam_h = max(vert * 0.55, 4.5)
+        dist = max(horiz * 0.38, 12.0)
         cams = [
-            (center.x, center.y + span * 0.55, mins.z + height),
-            (center.x - span * 0.22, center.y + span * 0.32, mins.z + height * 0.7),
-            (center.x + span * 0.16, center.y + span * 0.08, mins.z + height * 0.42),
-            (center.x - span * 0.10, center.y - span * 0.12, mins.z + height * 0.36),
-            (center.x + span * 0.14, center.y - span * 0.28, mins.z + height * 0.48),
-            (center.x, center.y - span * 0.42, mins.z + height * 0.85),
+            (center.x, center.y + dist * 0.95, mins.z + cam_h),
+            (center.x - dist * 0.35, center.y + dist * 0.62, mins.z + cam_h * 0.85),
+            (center.x + dist * 0.28, center.y + dist * 0.18, mins.z + cam_h * 0.62),
+            (center.x - dist * 0.18, center.y - dist * 0.12, mins.z + cam_h * 0.55),
+            (center.x + dist * 0.22, center.y - dist * 0.38, mins.z + cam_h * 0.68),
+            (center.x, center.y - dist * 0.55, mins.z + cam_h * 0.9),
         ]
         targets = [
-            (look[0], look[1] + span * 0.18, look[2]),
-            (look[0], look[1] + span * 0.06, look[2]),
+            (look[0], look[1] + dist * 0.12, look[2]),
+            (look[0], look[1] + dist * 0.04, look[2]),
             look,
-            (look[0], look[1] - span * 0.08, look[2]),
-            (look[0], look[1] - span * 0.04, look[2] + span * 0.03),
-            (look[0], look[1] + span * 0.04, look[2] + span * 0.05),
+            (look[0], look[1] - dist * 0.06, look[2]),
+            (look[0], look[1] - dist * 0.02, look[2] + vert * 0.04),
+            (look[0], look[1] + dist * 0.02, look[2] + vert * 0.06),
         ]
     else:
         cams = [(0,145,42),(-24,105,24),(24,70,18),(-18,30,12),(20,-12,16),(0,-58,38)]
@@ -541,7 +587,7 @@ def setup_camera(start: int, end: int):
     bpy.ops.object.camera_add(location=cams[0])
     cam = bpy.context.object
     cam.name = 'TJ_Original14_Camera'
-    cam.data.lens = 28
+    cam.data.lens = 32
     bpy.context.scene.camera = cam
     target = bpy.data.objects.new('TJ_Original14_Target', None)
     bpy.context.scene.collection.objects.link(target)
@@ -618,11 +664,11 @@ def main() -> int:
 
     contributions: dict[str, dict] = {}
     placements = {
-        'village_blender': (42.0, (0.0, 8.0, 0.0)),
-        'village_project': (28.0, (-22.0, -6.0, 0.0)),
-        'village_fbx': (26.0, (22.0, -8.0, 0.0)),
-        'forest_nature': (38.0, (-16.0, 48.0, 0.0)),
-        'forest_ecokit': (36.0, (16.0, 46.0, 0.0)),
+        'village_blender': (34.0, (0.0, 6.0, 0.0)),
+        'village_project': (22.0, (-12.0, -3.0, 0.0)),
+        'village_fbx': (20.0, (12.0, -4.0, 0.0)),
+        'forest_nature': (30.0, (-9.0, 20.0, 0.0)),
+        'forest_ecokit': (28.0, (9.0, 18.0, 0.0)),
     }
     for role in VISIBLE_GEOMETRY_ROLES:
         files = expanded.get(role, [])
@@ -641,7 +687,14 @@ def main() -> int:
         root = parent_group(members, f'TJ_{role}_PurchasedRoot')
         if root:
             normalize_group(root, members, size, loc)
-        extras = scatter_purchased_meshes(members, loc, copies=4 if role.startswith('forest') else 3, radius=14.0 if role.startswith('forest') else 11.0)
+        extras = scatter_purchased_meshes(
+            members,
+            loc,
+            copies=8 if role.startswith('forest') else 6,
+            radius=16.0 if role.startswith('forest') else 10.0,
+        )
+        if role.startswith('forest'):
+            extras.extend(scatter_purchased_meshes(members, loc, copies=6, radius=24.0))
         members.extend(extras)
         texture_files = expanded.get('village_textures', []) + expanded.get(role, [])
         bound = bind_purchased_textures(members, texture_files)
@@ -672,6 +725,19 @@ def main() -> int:
         leftover_images,
     )
     print(json.dumps({'event': 'leftover_texture_bind', 'bound': leftover}), flush=True)
+
+    dropped_boxes = 0
+    for obj in list(bpy.data.objects):
+        if obj.type != 'MESH' or str(obj.name).startswith('TJ_Ground'):
+            continue
+        if not (is_primitive_name(obj.name) or is_box_mesh(mesh_face_count(obj), object_dimensions(obj))):
+            continue
+        try:
+            bpy.data.objects.remove(obj, do_unlink=True)
+            dropped_boxes += 1
+        except Exception:
+            pass
+    print(json.dumps({'event': 'dropped_primitive_boxes', 'count': dropped_boxes}), flush=True)
 
     cap_scene_faces()
     write_progress('BUILD_SCENE', frame=0, framesWritten=0, totalFrames=args.end_frame)

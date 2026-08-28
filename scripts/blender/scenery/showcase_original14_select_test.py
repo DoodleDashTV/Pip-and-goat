@@ -6,7 +6,9 @@ from showcase_original14_select import (
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
+    is_box_mesh,
     is_dump_name,
+    is_primitive_name,
     is_staging_name,
     mesh_keep_rank,
     pick_geometry_records,
@@ -70,10 +72,10 @@ def test_staging_names_are_rejected():
     assert is_staging_name('Pine_Tree_01') is False
 
 
-def test_geometry_file_limits_keep_forest_to_one_file():
-    assert geometry_file_limit('forest_nature') == 1
-    assert geometry_file_limit('forest_ecokit') == 1
-    assert geometry_file_limit('village_blender') == 2
+def test_geometry_file_limits_allow_density_without_dump():
+    assert geometry_file_limit('forest_nature') == 2
+    assert geometry_file_limit('forest_ecokit') == 2
+    assert geometry_file_limit('village_blender') == 3
 
 
 def test_geometry_picker_skips_staging_when_heroes_exist():
@@ -112,6 +114,26 @@ def test_ground_picker_skips_normal_maps():
     assert chosen['name'] == 'Forest_Dirt_Diffuse.jpg'
 
 
+def test_ground_picker_skips_high_contrast_leaf_tiles():
+    records = [
+        {'name': 'Leaf_Pattern_Albedo.png', 'ext': '.png', 'size': 5_000_000},
+        {'name': 'Village_Grass_Albedo.jpg', 'ext': '.jpg', 'size': 2_000_000},
+    ]
+    chosen = pick_ground_image_records(records)
+    assert chosen['name'] == 'Village_Grass_Albedo.jpg'
+
+
+def test_primitive_boxes_rank_behind_hero_meshes():
+    assert is_primitive_name('Cube') is True
+    assert is_primitive_name('Cube.001') is True
+    assert is_primitive_name('Cabin_Hero') is False
+    assert is_box_mesh(6, (2.0, 2.0, 2.0)) is True
+    assert is_box_mesh(4000, (3.0, 3.0, 8.0)) is False
+    hero = mesh_keep_rank('Cabin_Hero', 'village_blender', 1800, (4, 3, 3))
+    cube = mesh_keep_rank('Cube', 'village_blender', 6, (2, 2, 2))
+    assert hero < cube
+
+
 if __name__ == '__main__':
     test_dump_name_detects_combined_forest_kit()
     test_extract_skips_huge_obj_and_keeps_individual_assets()
@@ -121,9 +143,11 @@ if __name__ == '__main__':
     test_hdri_extract_limit_is_small()
     test_extracts_mtl_sidecar_for_obj_materials()
     test_staging_names_are_rejected()
-    test_geometry_file_limits_keep_forest_to_one_file()
+    test_geometry_file_limits_allow_density_without_dump()
     test_geometry_picker_skips_staging_when_heroes_exist()
     test_mesh_keep_rank_prefers_hero_over_flat_platform()
     test_ground_picker_prefers_grass_over_random_huge_atlas()
     test_ground_picker_skips_normal_maps()
+    test_ground_picker_skips_high_contrast_leaf_tiles()
+    test_primitive_boxes_rank_behind_hero_meshes()
     print('showcase_original14_select_test PASS')
