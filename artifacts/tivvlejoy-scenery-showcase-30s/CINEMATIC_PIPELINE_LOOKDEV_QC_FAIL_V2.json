@@ -1,0 +1,42 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T17:33:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "441414a",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev4",
+  "contactSheet": "/opt/cursor/artifacts/tivvlejoy-cinematic-pipeline/CONTACT_SHEET_LOOKDEV_FAST_V2.png",
+  "architectureProgress": [
+    "SHOT_01 river is a winding strip instead of a 44x7 sickle plane",
+    "SHOT_01 trees sit on east/west flanks instead of a rectangular wall behind the cabins",
+    "SHOT_05 now shows Louis peaks instead of a pine wall / chimney portrait",
+    "Water_Mat_1 is assigned and wrapped; it is still not readable water",
+    "Four Cabin*A street slots exist; the village still reads as a pad cluster"
+  ],
+  "shots": {
+    "SHOT_01": "FAIL — valley stack is readable (street, flanks, peaks, sky) but the carrier is still a pale quilt, the river is a dark ribbon, and the village is a kit cluster.",
+    "SHOT_02": "FAIL — low river angle exists; wrapped Water_Mat_1 still reads as solid blue tape, not water.",
+    "SHOT_03": "FAIL — intended forest passage; look vector still continues into the street, so the frame is a dark cabin portrait.",
+    "SHOT_04": "FAIL — two cabins, cart, and fence are readable; still a pad cluster with crushed shadows and a tape sliver of river.",
+    "SHOT_05": "FAIL — long-lens peaks are now visible, but the frame is only harsh mountains. No village/forest compression, no atmosphere.",
+    "SHOT_06": "FAIL — hero close is another cabin-and-cart pad shot; river remains a blue plane."
+  },
+  "automaticFailuresHit": [
+    "flat_lime_or_pale_green_ground",
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "low_poly_asset_test_appearance",
+    "excessive_noise"
+  ],
+  "automaticFailuresClearedThisPass": [
+    "rectangular_forest_wall_on_SHOT_01",
+    "SHOT_05_pine_wall_with_no_peaks"
+  ],
+  "eeveeVersusCycles": "EEVEE aborted on this host (missing libEGL). Cycles CPU used for LOOKDEV_FAST. No GPU A/B yet.",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "honestConclusion": "Architecture moved. Images still fail the cinematic visual gate. Do not CREATE. Do not present as approval. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
