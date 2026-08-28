@@ -1,0 +1,65 @@
+name: TivvleJoy Scenery Compatibility V4
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-compat-v4.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  compat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-compat-v4
+      AUTH: TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V3
+    steps:
+      - name: Prepare private role alias and prove worker-equivalent selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl --retry 5 --retry-all-errors --retry-delay 2 --max-time 90 -sS -o compat.json -w '%{http_code}' \
+            --request POST "$URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $AUTH" \
+            --data '{}')
+          cat compat.json
+          test "$code" = '200'
+          python3 - <<'PY'
+          import json
+          p=json.load(open('compat.json'))
+          assert p.get('schema') == 'TIVVLEJOY_SCENERY_COMPAT_V4'
+          assert p.get('ready') is True
+          assert p.get('ok') is True
+          assert p.get('missingRole') is None
+          assert int(p.get('selectedRoleCount')) == 12
+          assert p.get('selectedRoles') == [
+            'mountain_geometry','background_mountains','forest_geometry','forest_textures',
+            'water_system','village_geometry','village_textures','tavern_geometry',
+            'nature_library','sky_hdri','sky_machine','world_shaders'
+          ]
+          assert p.get('natureAliasPrivate') is True
+          assert p.get('sourceBytesModified') is False
+          assert p.get('paidMutationPerformed') is False
+          print('TIVVLEJOY_SCENERY_COMPAT_V4_PASS')
+          PY
+
+      - name: Verify stable GET selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --retry 5 --retry-all-errors --retry-delay 2 --max-time 60 -sS --fail "$URL" -o get.json
+          cat get.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('get.json'))
+          assert p.get('ok') is True
+          assert p.get('missingRole') is None
+          assert int(p.get('selectedRoleCount')) == 12
+          assert p.get('paidMutationPerformed') is False
+          print('TIVVLEJOY_SCENERY_COMPAT_V4_STABLE_PASS')
+          PY
