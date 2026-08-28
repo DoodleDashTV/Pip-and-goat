@@ -503,7 +503,7 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(blotch_range.outputs["Result"] if "Result" in blotch_range.outputs else blotch_range.outputs[0], mask_mul.inputs[1])
     mask = mask_mul.outputs["Value"]
     links.new(incoming, damp.inputs["Color1"])
-    damp.inputs["Color2"].default_value = (0.16, 0.11, 0.050, 1.0)
+    damp.inputs["Color2"].default_value = (0.068, 0.052, 0.028, 1.0)
     damp_fac = nodes.new("ShaderNodeMapRange")
     damp_fac.inputs["From Min"].default_value = 0.0
     damp_fac.inputs["From Max"].default_value = 0.58
@@ -553,9 +553,9 @@ def apply_stream_tint(tint) -> None:
             mix.inputs["Color1"].default_value = tint
             if "Color2" in mix.inputs:
                 mix.inputs["Color2"].default_value = (
-                    min(0.042, tint[0] + 0.014),
-                    min(0.068, tint[1] + 0.022),
-                    min(0.052, tint[2] + 0.014),
+                    min(0.048, tint[0] + 0.018),
+                    min(0.078, tint[1] + 0.028),
+                    min(0.058, tint[2] + 0.018),
                     1.0,
                 )
             continue
@@ -579,8 +579,8 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     coord = nodes.new("ShaderNodeTexCoord")
     mix = _mix_rgb(nodes)
     if "Color1" in mix.inputs:
-        mix.inputs["Color1"].default_value = (0.008, 0.007, 0.005, 1.0)
-        mix.inputs["Color2"].default_value = (0.052, 0.058, 0.030, 1.0)
+        mix.inputs["Color1"].default_value = (0.010, 0.009, 0.006, 1.0)
+        mix.inputs["Color2"].default_value = (0.030, 0.026, 0.016, 1.0)
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     if "Roughness" in body.inputs:
@@ -633,11 +633,11 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    deep = tint or (0.016, 0.036, 0.030, 1.0)
+    deep = tint or (0.018, 0.042, 0.036, 1.0)
     shallow = (
-        min(0.042, deep[0] + 0.016),
-        min(0.068, deep[1] + 0.024),
-        min(0.052, deep[2] + 0.016),
+        min(0.048, deep[0] + 0.018),
+        min(0.078, deep[1] + 0.028),
+        min(0.058, deep[2] + 0.018),
         1.0,
     )
     attr = nodes.new("ShaderNodeVertexColor")
