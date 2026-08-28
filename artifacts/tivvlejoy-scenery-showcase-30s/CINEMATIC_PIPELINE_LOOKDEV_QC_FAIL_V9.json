@@ -1,0 +1,36 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:41:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "c3e5d62",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev14",
+  "shots": {
+    "SHOT_01": "FAIL — layered valley and Louis ridge exist; river is a narrow light-blue tape with tan bank strips; village is still a cabin cluster on a flat floor.",
+    "SHOT_02": "FAIL — cabin/cart/trees compose; water is still a grainy blue ribbon on a slab.",
+    "SHOT_03": "FAIL — forest gate did not read. Empty olive meadow plus dark peaks. Not a passage.",
+    "SHOT_04": "PARTIAL — street and ridge. River tape. Flat floor.",
+    "SHOT_05": "PARTIAL — village-against-ridge compression holds. Stream reads as a grey/blue ribbon. Neon tree tips.",
+    "SHOT_06": "FAIL — cabins on a pad with a blue strip and a hard seam to the peaks."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "flat_lime_or_pale_green_ground",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "Louis LP Meadow/Grassy ranges replace smashed 70x34 HP tiles",
+    "SHOT_05 is a compression shot, not a chimney portrait",
+    "Meadow uses Louis Texture.png, not Rocks_A sand or Vegetation.png frost",
+    "Eight Cabin A/B files on a longer street",
+    "Water_Mat ice is no longer the visible river surface"
+  ],
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT. A 30s 1080 native MP4 is not justified until stills pass and Justin approves this identity."
+}
