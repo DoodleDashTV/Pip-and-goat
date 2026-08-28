@@ -1,0 +1,19 @@
+{
+  "schema": "TIVVLEJOY_PAID_PROGRESS_INSPECT_V1",
+  "inspectedAt": "2026-08-28T18:56:00Z",
+  "exactNamePodCount": 0,
+  "totalPods": 0,
+  "paidWorkflowRunning": false,
+  "paidWorkflowLatestConclusion": "failure",
+  "paidWorkflowLatestAt": "2026-08-28T11:28:31Z",
+  "bridgeStartupResult": "RUNNING",
+  "bridgeStartupFrame": 248,
+  "bridgeStartupAt": "2026-08-28T15:29:20Z",
+  "bridgeStatus": null,
+  "bridgePaidMutationPerformed": false,
+  "workerDigestPrefix": "sha256:23666493",
+  "workerDigestIsRejectedCabinOrbit": true,
+  "visualGate": "FAIL",
+  "createPerformed": false,
+  "reason": "Same stale rejected-pin bridge. 0 pods. Look-dev FAIL. Do not CREATE."
+}

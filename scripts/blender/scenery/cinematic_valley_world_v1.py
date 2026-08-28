@@ -335,7 +335,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
 
 
 def cinematic_river_material(tint=None) -> bpy.types.Material:
-    """Single dark Principled. Metallic/mix-gloss blew out to a white road."""
+    """Dark channel + wet-edge attribute. No metallic. No transmission."""
     mat = bpy.data.materials.new("TJ_CinematicRiver")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -343,18 +343,33 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     nodes.clear()
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
-    body_col = tint or (0.016, 0.048, 0.052, 1.0)
-    if "Base Color" in body.inputs:
+    body_col = tint or (0.014, 0.042, 0.046, 1.0)
+    attr = nodes.new("ShaderNodeVertexColor")
+    if hasattr(attr, "layer_name"):
+        attr.layer_name = "TJ_RiverDepth"
+    coord = nodes.new("ShaderNodeTexCoord")
+    mix = None
+    try:
+        mix = nodes.new("ShaderNodeMixRGB")
+    except Exception:
+        mix = nodes.new("ShaderNodeMix")
+        if hasattr(mix, "data_type"):
+            mix.data_type = "RGBA"
+    if "Color1" in mix.inputs:
+        mix.inputs["Color1"].default_value = body_col
+        mix.inputs["Color2"].default_value = (0.07, 0.08, 0.06, 1.0)
+        links.new(attr.outputs["Color"], mix.inputs["Fac"])
+        links.new(mix.outputs["Color"], body.inputs["Base Color"])
+    elif "Base Color" in body.inputs:
         body.inputs["Base Color"].default_value = body_col
     if "Roughness" in body.inputs:
-        body.inputs["Roughness"].default_value = 0.22
+        body.inputs["Roughness"].default_value = 0.28
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.55
+        body.inputs["Specular IOR Level"].default_value = 0.42
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     if "Transmission Weight" in body.inputs:
         body.inputs["Transmission Weight"].default_value = 0.0
-    coord = nodes.new("ShaderNodeTexCoord")
     mapping = nodes.new("ShaderNodeMapping")
     mapping.inputs["Scale"].default_value = (1.4, 0.22, 1.0)
     links.new(coord.outputs["Object"], mapping.inputs["Vector"])
@@ -363,13 +378,9 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     wave.inputs["Scale"].default_value = 6.0
     if "Distortion" in wave.inputs:
         wave.inputs["Distortion"].default_value = 3.2
-    if "Detail" in wave.inputs:
-        wave.inputs["Detail"].default_value = 2.0
     links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.22
-    if "Distance" in bump.inputs:
-        bump.inputs["Distance"].default_value = 0.08
+    bump.inputs["Strength"].default_value = 0.20
     links.new(wave.outputs["Color"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
@@ -472,21 +483,30 @@ def spline_edge_mesh(name: str, centers: list[Vector], inner_half: float, outer_
 
 
 def spline_strip_mesh(name: str, centers: list[Vector], half_width: float, z_offset: float, width_wobble: float) -> bpy.types.Object:
+    """Three-row channel: dark trough in the middle, wet edges under the banks."""
     verts = []
     faces = []
+    depths = []
     for i, center in enumerate(centers):
         side = _side_from_centers(centers, i)
         half = half_width + width_wobble * math.sin(i * 0.22)
         left = center + side * half
+        mid = center.copy()
         right = center - side * half
-        left.z = center.z + z_offset
-        right.z = center.z + z_offset
-        verts.extend([(left.x, left.y, left.z), (right.x, right.y, right.z)])
+        left.z = center.z + z_offset + 0.03
+        mid.z = center.z + z_offset - 0.10
+        right.z = center.z + z_offset + 0.03
+        verts.extend([(left.x, left.y, left.z), (mid.x, mid.y, mid.z), (right.x, right.y, right.z)])
+        depths.extend([0.85, 0.08, 0.85])
         if i > 0:
-            v = i * 2
-            faces.append((v - 2, v - 1, v + 1, v))
+            v = i * 3
+            faces.append((v - 3, v - 2, v + 1, v))
+            faces.append((v - 2, v - 1, v + 2, v + 1))
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(verts, [], faces)
+    color = mesh.color_attributes.new(name="TJ_RiverDepth", type="FLOAT_COLOR", domain="POINT")
+    for index, value in enumerate(depths):
+        color.data[index].color = (value, value, value, 1.0)
     mesh.update()
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.scene.collection.objects.link(obj)
