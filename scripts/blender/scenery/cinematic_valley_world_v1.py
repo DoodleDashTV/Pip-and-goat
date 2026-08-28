@@ -27,7 +27,6 @@ from cinematic_standards import (  # noqa: E402
     visible_use_record,
 )
 from showcase_original14_30s import (  # noqa: E402
-    _meadow_or_dirt_material,
     duplicate_mesh_in_world,
     ensure_purchased_albedos,
     expand_asset,
@@ -205,9 +204,127 @@ def build_terrain(files: list[Path]) -> bpy.types.Object:
     ground.data.update()
     shade_smooth(ground)
     img = purchased_ground_image(files)
-    ground.data.materials.append(_meadow_or_dirt_material("TJ_PurchasedValleyMeadow", img, meadow=True))
+    ground.data.materials.append(cinematic_meadow_material(img))
     print(json.dumps({"event": "terrain_ground_image", "path": img.name if img else None}), flush=True)
     return ground
+
+
+def cinematic_meadow_material(img_path: Path | None) -> bpy.types.Material:
+    """Darker south-camera meadow. The retired helper graded toward lime."""
+    mat = bpy.data.materials.new("TJ_CinematicValleyMeadow")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    nodes.clear()
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
+    if "Roughness" in bsdf.inputs:
+        bsdf.inputs["Roughness"].default_value = 0.94
+    coord = nodes.new("ShaderNodeTexCoord")
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 0.03
+    if "Detail" in noise.inputs:
+        noise.inputs["Detail"].default_value = 2.0
+    links.new(coord.outputs["Object"], noise.inputs["Vector"])
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "EASE"
+    ramp.color_ramp.elements[0].position = 0.20
+    ramp.color_ramp.elements[0].color = (0.07, 0.10, 0.05, 1.0)
+    ramp.color_ramp.elements[1].position = 0.80
+    ramp.color_ramp.elements[1].color = (0.16, 0.22, 0.08, 1.0)
+    mid = ramp.color_ramp.elements.new(0.50)
+    mid.color = (0.11, 0.16, 0.06, 1.0)
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    color = ramp.outputs["Color"]
+    if img_path is not None:
+        tex = nodes.new("ShaderNodeTexImage")
+        tex.image = bpy.data.images.load(str(img_path), check_existing=True)
+        if tex.image and tex.image.colorspace_settings:
+            tex.image.colorspace_settings.name = "sRGB"
+        mapping = nodes.new("ShaderNodeMapping")
+        mapping.inputs["Scale"].default_value = (0.018, 0.018, 0.018)
+        links.new(coord.outputs["Object"], mapping.inputs["Vector"])
+        links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+        mix = nodes.new("ShaderNodeMixRGB") if "ShaderNodeMixRGB" in dir(bpy.types) else nodes.new("ShaderNodeMix")
+        try:
+            mix = nodes.new("ShaderNodeMixRGB")
+        except Exception:
+            mix = nodes.new("ShaderNodeMix")
+            if hasattr(mix, "data_type"):
+                mix.data_type = "RGBA"
+        if "Color1" in mix.inputs:
+            mix.inputs["Fac"].default_value = 0.32
+            links.new(ramp.outputs["Color"], mix.inputs["Color1"])
+            links.new(tex.outputs["Color"], mix.inputs["Color2"])
+            color = mix.outputs["Color"]
+    sep = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(coord.outputs["Object"], sep.inputs["Vector"])
+    abs_x = nodes.new("ShaderNodeMath")
+    abs_x.operation = "ABSOLUTE"
+    links.new(sep.outputs["X"], abs_x.inputs[0])
+    path_w = nodes.new("ShaderNodeMapRange")
+    path_w.inputs["From Min"].default_value = 0.9
+    path_w.inputs["From Max"].default_value = 4.8
+    path_w.inputs["To Min"].default_value = 1.0
+    path_w.inputs["To Max"].default_value = 0.0
+    links.new(abs_x.outputs["Value"], path_w.inputs["Value"])
+    y_center = nodes.new("ShaderNodeMath")
+    y_center.operation = "SUBTRACT"
+    y_center.inputs[1].default_value = 2.0
+    links.new(sep.outputs["Y"], y_center.inputs[0])
+    y_abs = nodes.new("ShaderNodeMath")
+    y_abs.operation = "ABSOLUTE"
+    links.new(y_center.outputs["Value"], y_abs.inputs[0])
+    y_fade = nodes.new("ShaderNodeMapRange")
+    y_fade.inputs["From Min"].default_value = 6.0
+    y_fade.inputs["From Max"].default_value = 14.0
+    y_fade.inputs["To Min"].default_value = 1.0
+    y_fade.inputs["To Max"].default_value = 0.0
+    links.new(y_abs.outputs["Value"], y_fade.inputs["Value"])
+    path_fac = nodes.new("ShaderNodeMath")
+    path_fac.operation = "MULTIPLY"
+    links.new(path_w.outputs["Result"] if "Result" in path_w.outputs else path_w.outputs[0], path_fac.inputs[0])
+    links.new(y_fade.outputs["Result"] if "Result" in y_fade.outputs else y_fade.outputs[0], path_fac.inputs[1])
+    dirt = nodes.new("ShaderNodeMixRGB") if True else None
+    try:
+        dirt = nodes.new("ShaderNodeMixRGB")
+    except Exception:
+        dirt = nodes.new("ShaderNodeMix")
+        if hasattr(dirt, "data_type"):
+            dirt.data_type = "RGBA"
+    if "Color1" in dirt.inputs:
+        links.new(color, dirt.inputs["Color1"])
+        dirt.inputs["Color2"].default_value = (0.28, 0.18, 0.09, 1.0)
+        links.new(path_fac.outputs["Value"], dirt.inputs["Fac"])
+        color = dirt.outputs["Color"]
+    bank_y = nodes.new("ShaderNodeMath")
+    bank_y.operation = "SUBTRACT"
+    bank_y.inputs[1].default_value = -12.0
+    links.new(sep.outputs["Y"], bank_y.inputs[0])
+    bank_abs = nodes.new("ShaderNodeMath")
+    bank_abs.operation = "ABSOLUTE"
+    links.new(bank_y.outputs["Value"], bank_abs.inputs[0])
+    bank_w = nodes.new("ShaderNodeMapRange")
+    bank_w.inputs["From Min"].default_value = 2.4
+    bank_w.inputs["From Max"].default_value = 7.0
+    bank_w.inputs["To Min"].default_value = 0.55
+    bank_w.inputs["To Max"].default_value = 0.0
+    links.new(bank_abs.outputs["Value"], bank_w.inputs["Value"])
+    bank = nodes.new("ShaderNodeMixRGB")
+    try:
+        bank = nodes.new("ShaderNodeMixRGB")
+    except Exception:
+        bank = nodes.new("ShaderNodeMix")
+        if hasattr(bank, "data_type"):
+            bank.data_type = "RGBA"
+    if "Color1" in bank.inputs:
+        links.new(color, bank.inputs["Color1"])
+        bank.inputs["Color2"].default_value = (0.16, 0.12, 0.07, 1.0)
+        links.new(bank_w.outputs["Result"] if "Result" in bank_w.outputs else bank_w.outputs[0], bank.inputs["Fac"])
+        color = bank.outputs["Color"]
+    links.new(color, bsdf.inputs["Base Color"])
+    return mat
 
 
 def fallback_water_material() -> bpy.types.Material:
@@ -241,24 +358,59 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
     water = next((mat for mat in bpy.data.materials if mat and str(mat.name).startswith("Water_Mat")), None)
     if water is None:
         water = next((mat for mat in bpy.data.materials if mat and "water" in mat.name.lower() and mat.node_tree), None)
-    if water is None:
-        water = fallback_water_material()
-        assigned = water.name
-        used_purchased = False
+    if water is None or not water.node_tree:
+        fallback = fallback_water_material()
+        river.data.materials.clear()
+        river.data.materials.append(fallback)
+        print(json.dumps({"event": "river_material_assigned", "name": fallback.name, "purchased": False}), flush=True)
+        return fallback.name
+    # Water_Mat_1 reads as tiled shingles on a grazing 9:16 camera. Keep the
+    # purchased graph as color/detail, but wrap it in a dark water BSDF.
+    wrapped = bpy.data.materials.new("TJ_River_PurchasedWater_Wrapped")
+    wrapped.use_nodes = True
+    nodes = wrapped.node_tree.nodes
+    links = wrapped.node_tree.links
+    nodes.clear()
+    group = None
+    purchased_out = None
+    if water.node_tree:
+        group_src = next((ng for ng in bpy.data.node_groups if ng and "water" in ng.name.lower()), None)
+        if group_src is not None:
+            group = nodes.new("ShaderNodeGroup")
+            group.node_tree = group_src
+            purchased_out = group.outputs[0] if group.outputs else None
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    if "Base Color" in bsdf.inputs:
+        bsdf.inputs["Base Color"].default_value = (0.03, 0.08, 0.10, 1.0)
+    if "Roughness" in bsdf.inputs:
+        bsdf.inputs["Roughness"].default_value = 0.18
+    if "Specular IOR Level" in bsdf.inputs:
+        bsdf.inputs["Specular IOR Level"].default_value = 0.55
+    if "Transmission Weight" in bsdf.inputs:
+        bsdf.inputs["Transmission Weight"].default_value = 0.08
+    wave = nodes.new("ShaderNodeTexWave")
+    wave.inputs["Scale"].default_value = 3.6
+    if "Distortion" in wave.inputs:
+        wave.inputs["Distortion"].default_value = 1.7
+    bump = nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.14
+    links.new(wave.outputs["Color"], bump.inputs["Height"])
+    if "Normal" in bsdf.inputs:
+        links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    mix = nodes.new("ShaderNodeMixShader")
+    mix.inputs[0].default_value = 0.28
+    if purchased_out is not None:
+        links.new(purchased_out, mix.inputs[1])
+        links.new(bsdf.outputs["BSDF"], mix.inputs[2])
+        surface = mix.outputs[0]
     else:
-        assigned = water.name
-        used_purchased = True
-        if water.node_tree:
-            for node in water.node_tree.nodes:
-                if node.type == "BSDF_PRINCIPLED":
-                    if "Transmission Weight" in node.inputs and node.inputs["Transmission Weight"].default_value > 0.14:
-                        node.inputs["Transmission Weight"].default_value = 0.10
-                    if "Roughness" in node.inputs and node.inputs["Roughness"].default_value < 0.10:
-                        node.inputs["Roughness"].default_value = 0.16
+        surface = bsdf.outputs["BSDF"]
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(surface, out.inputs["Surface"])
     river.data.materials.clear()
-    river.data.materials.append(water)
-    print(json.dumps({"event": "river_material_assigned", "name": assigned, "purchased": used_purchased}), flush=True)
-    return assigned
+    river.data.materials.append(wrapped)
+    print(json.dumps({"event": "river_material_assigned", "name": water.name, "purchased": True, "wrapped": wrapped.name}), flush=True)
+    return water.name
 
 
 def build_river_guide() -> bpy.types.Object:
