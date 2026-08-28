@@ -1,0 +1,35 @@
+# TivvleJoy V5: thin Blender-resilience repair over the V4 image that already
+# reached real purchased-asset materialization and Blender on RunPod.
+FROM ghcr.io/doodledashtv/ddp-runpod-blender@sha256:1bef7ad588e74f6a59ef1a8e0ebcebc67cb94e75868d930a57fa8f07d30f44a6
+
+WORKDIR /opt/ddp-worker
+COPY workers/runpod-blender/scenery-showcase-v5-patch.py /tmp/scenery-showcase-v5-patch.py
+RUN python3 /tmp/scenery-showcase-v5-patch.py && rm /tmp/scenery-showcase-v5-patch.py
+
+ARG TIVVLEJOY_SCENERY_SOURCE_COMMIT=unknown
+ARG TIVVLEJOY_SCENERY_BUILD_TIME=unknown
+ENV TIVVLEJOY_SCENERY_SOURCE_COMMIT=${TIVVLEJOY_SCENERY_SOURCE_COMMIT} \
+    TIVVLEJOY_SCENERY_BUILD_TIME=${TIVVLEJOY_SCENERY_BUILD_TIME}
+
+LABEL org.opencontainers.image.title="tivvlejoy-scenery-showcase-worker-v5" \
+      org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat" \
+      org.opencontainers.image.revision="${TIVVLEJOY_SCENERY_SOURCE_COMMIT}" \
+      tivvlejoy.scenery.showcase="30s-v5-blender-resilience" \
+      tivvlejoy.scenery.parent.digest="sha256:1bef7ad588e74f6a59ef1a8e0ebcebc67cb94e75868d930a57fa8f07d30f44a6" \
+      tivvlejoy.scenery.required.role.count="10" \
+      tivvlejoy.scenery.nature.required="false" \
+      tivvlejoy.scenery.water.required="false" \
+      tivvlejoy.scenery.purchased.only="true" \
+      tivvlejoy.scenery.commercial.assets.baked="false"
+
+RUN node --check ./src/scenery-showcase.js && \
+    python3 -m py_compile ./blender/scenery/showcase_30s.py ./blender/scenery/showcase_30s_dry.py && \
+    grep -F 'const stderrTail = String(render.stderr' ./src/scenery-showcase.js >/dev/null && \
+    grep -F "Purchased HDRI proof missing" ./src/scenery-showcase.js >/dev/null && \
+    ! grep -F "Purchased water/HDRI proof missing" ./src/scenery-showcase.js >/dev/null && \
+    grep -F '"event": "asset_import_warning"' ./blender/scenery/showcase_30s.py >/dev/null && \
+    grep -F 'dst.materials = []' ./blender/scenery/showcase_30s.py >/dev/null && \
+    test "$SCENERY_SHOWCASE_BLENDER_SCRIPT" = '/opt/ddp-worker/blender/scenery/showcase_30s_dry.py' && \
+    blender --version | head -n 1 | grep -F 'Blender 4.2.2'
+
+CMD ["node", "./src/scenery-showcase-entry-v2.js"]
