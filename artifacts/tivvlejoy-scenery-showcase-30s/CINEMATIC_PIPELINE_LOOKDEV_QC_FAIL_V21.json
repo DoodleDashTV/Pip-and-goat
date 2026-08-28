@@ -1,0 +1,29 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:40:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "60e4d2d",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev26",
+  "shots": {
+    "SHOT_01": "PARTIAL — establish still reads as a valley with a cabin cluster. River is a small light-blue pond in the lower left.",
+    "SHOT_02": "FAIL — along-channel path with a hard water cut. Meadow still a slab.",
+    "SHOT_03": "PARTIAL — framed opening holds.",
+    "SHOT_04": "FAIL — 34mm down a 18m-wide plaza only shows cabin corners and a fence. Cart/street never enter the frustum.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "FAIL — same empty corridor; fence and one cabin corner, no hero street."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "village_reads_as_kit_on_a_pad",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Village cameras are on the pad but the street is a plaza too wide for 34–42mm. Tighten the street. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

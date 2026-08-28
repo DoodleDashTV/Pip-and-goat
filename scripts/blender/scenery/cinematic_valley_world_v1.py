@@ -54,7 +54,7 @@ RIVER_SPLINE = (
     (26.0, -13.5, -0.66),
     (42.0, -19.0, -0.62),
 )
-VILLAGE_X_HALF = 18.0
+VILLAGE_X_HALF = 12.0
 VILLAGE_Y_MIN = -8.0
 VILLAGE_Y_MAX = 22.0
 MOUNTAIN_CORRIDOR_X = 8.0
@@ -306,8 +306,8 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     abs_x.operation = "ABSOLUTE"
     links.new(sep.outputs["X"], abs_x.inputs[0])
     path_w = nodes.new("ShaderNodeMapRange")
-    path_w.inputs["From Min"].default_value = 0.45
-    path_w.inputs["From Max"].default_value = 2.4
+    path_w.inputs["From Min"].default_value = 0.35
+    path_w.inputs["From Max"].default_value = 1.6
     path_w.inputs["To Min"].default_value = 1.0
     path_w.inputs["To Max"].default_value = 0.0
     links.new(abs_x.outputs["Value"], path_w.inputs["Value"])
@@ -942,14 +942,14 @@ def main() -> int:
         key=lambda path: path.name.lower(),
     )[:8]
     street_slots = [
-        (-9.2, -2.0, 0.0),
-        (9.4, -0.2, 0.0),
-        (-9.8, 5.0, 0.0),
-        (9.8, 6.6, 0.0),
-        (-10.2, 11.6, 0.0),
-        (10.0, 13.0, 0.0),
-        (-9.4, 17.8, 0.0),
-        (10.4, 19.2, 0.0),
+        (-5.8, -2.0, 0.0),
+        (6.0, -0.2, 0.0),
+        (-6.2, 5.0, 0.0),
+        (6.4, 6.6, 0.0),
+        (-6.4, 11.6, 0.0),
+        (6.6, 13.0, 0.0),
+        (-5.8, 17.8, 0.0),
+        (6.8, 19.2, 0.0),
     ]
     members, imported, placed = import_kit_groups(
         cabin_files,
@@ -983,14 +983,14 @@ def main() -> int:
         tree_files,
         "village_blender",
         [
-            (-14.2, -1.2, 0.0),
-            (14.6, 1.6, 0.0),
-            (-14.8, 6.8, 0.0),
-            (15.0, 8.8, 0.0),
-            (-15.0, 13.6, 0.0),
-            (15.2, 15.8, 0.0),
-            (-14.4, 19.6, 0.0),
-            (15.4, 21.4, 0.0),
+            (-9.2, -1.2, 0.0),
+            (9.4, 1.6, 0.0),
+            (-9.6, 6.8, 0.0),
+            (9.8, 8.8, 0.0),
+            (-9.8, 13.6, 0.0),
+            (10.0, 15.8, 0.0),
+            (-9.4, 19.6, 0.0),
+            (10.2, 21.4, 0.0),
         ],
         village_center,
         6,
