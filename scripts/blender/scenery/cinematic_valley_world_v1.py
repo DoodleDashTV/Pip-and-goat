@@ -161,7 +161,11 @@ def purchased_meadow_image():
     for group in bpy.data.node_groups:
         if any(token in group.name.lower() for token in ("meadow", "grassy", "rockygreen")):
             images.extend(_walk_image_nodes(group.nodes))
-    return images[0] if images else None
+    preferred = [
+        img for img in images
+        if img.name.lower().startswith("texture") and "veget" not in img.name.lower()
+    ]
+    return preferred[0] if preferred else None
 
 
 def in_village(x: float, y: float) -> bool:
@@ -173,7 +177,7 @@ def in_mountain_corridor(x: float, y: float) -> bool:
 
 
 def in_shot03_corridor(x: float, y: float) -> bool:
-    return dist_to_polyline(x, y, ((-34.0, 16.0, 0.0), (-24.0, 32.0, 0.0), (-16.0, 42.0, 0.0))) < 9.5
+    return dist_to_polyline(x, y, ((-34.0, 16.0, 0.0), (-14.0, 36.0, 0.0), (-8.0, 44.0, 0.0))) < 9.5
 
 
 def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, ...] = ()) -> list[Path]:
@@ -340,7 +344,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     spec = nodes.new("ShaderNodeBsdfPrincipled")
-    body_col = tint or (0.018, 0.055, 0.062, 1.0)
+    body_col = tint or (0.022, 0.075, 0.078, 1.0)
     if "Base Color" in body.inputs:
         body.inputs["Base Color"].default_value = body_col
     if "Roughness" in body.inputs:
@@ -357,10 +361,14 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         spec.inputs["Specular IOR Level"].default_value = 0.88
     if "Metallic" in spec.inputs:
         spec.inputs["Metallic"].default_value = 0.04
-    fresnel = nodes.new("ShaderNodeFresnel")
-    fresnel.inputs["IOR"].default_value = 1.333
+    weight = nodes.new("ShaderNodeLayerWeight")
+    weight.inputs["Blend"].default_value = 0.16
+    invert = nodes.new("ShaderNodeMath")
+    invert.operation = "SUBTRACT"
+    invert.inputs[0].default_value = 1.0
+    links.new(weight.outputs["Facing"], invert.inputs[1])
     mix = nodes.new("ShaderNodeMixShader")
-    links.new(fresnel.outputs["Fac"], mix.inputs["Fac"])
+    links.new(invert.outputs["Value"], mix.inputs["Fac"])
     links.new(body.outputs["BSDF"], mix.inputs[1])
     links.new(spec.outputs["BSDF"], mix.inputs[2])
     coord = nodes.new("ShaderNodeTexCoord")
@@ -384,8 +392,8 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
     if "Normal" in spec.inputs:
         links.new(bump.outputs["Normal"], spec.inputs["Normal"])
-    if "Normal" in fresnel.inputs:
-        links.new(bump.outputs["Normal"], fresnel.inputs["Normal"])
+    if "Normal" in weight.inputs:
+        links.new(bump.outputs["Normal"], weight.inputs["Normal"])
     links.new(mix.outputs["Shader"], out.inputs["Surface"])
     return mat
 
@@ -618,8 +626,8 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
                 bpy.data.objects.remove(obj, do_unlink=True)
             except Exception:
                 pass
-    foothill_slots = ((-38.0, 26.0, 0.18), (8.0, 28.0, 0.17), (48.0, 30.0, 0.16))
-    peak_slots = ((-42.0, 68.0, 0.30), (6.0, 74.0, 0.32), (46.0, 70.0, 0.28))
+    foothill_slots = ((10.0, 46.0, 0.16), (52.0, 48.0, 0.15))
+    peak_slots = ((-36.0, 78.0, 0.30), (8.0, 84.0, 0.32), (50.0, 80.0, 0.28))
     placed = []
     foothills = [obj for obj in members if obj and "meadowrange" in obj.name.lower()]
     peaks = [obj for obj in members if obj and "grassymountain" in obj.name.lower()]
