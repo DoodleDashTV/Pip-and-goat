@@ -359,33 +359,33 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
     water = next((mat for mat in bpy.data.materials if mat and str(mat.name).startswith("Water_Mat")), None)
     if water is None:
         water = next((mat for mat in bpy.data.materials if mat and "water" in mat.name.lower() and mat.node_tree), None)
-    if water is None:
-        water = fallback_water_material()
-        purchased = False
-    else:
-        purchased = True
-        if water.node_tree:
-            for node in water.node_tree.nodes:
-                if node.type != "BSDF_PRINCIPLED":
-                    continue
-                if "Transmission Weight" in node.inputs:
-                    node.inputs["Transmission Weight"].default_value = min(
-                        float(node.inputs["Transmission Weight"].default_value), 0.08
-                    )
-                if "Roughness" in node.inputs and float(node.inputs["Roughness"].default_value) < 0.16:
-                    node.inputs["Roughness"].default_value = 0.22
+    surface = fallback_water_material()
+    purchased = water is not None
+    # Water_Mat_1 reads as cracked ice / tiles on a 9:16 river camera.
+    # Keep it loaded for visible-use tint, but the spline surface must read as water.
+    if water is not None and water.node_tree and surface.node_tree:
+        src = next((n for n in water.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+        dst = surface.node_tree.nodes.get("Principled BSDF")
+        if src and dst and "Base Color" in src.inputs and "Base Color" in dst.inputs:
+            src_col = src.inputs["Base Color"].default_value
+            dst.inputs["Base Color"].default_value = (
+                max(0.02, float(src_col[0]) * 0.18),
+                max(0.04, float(src_col[1]) * 0.20),
+                max(0.05, float(src_col[2]) * 0.22),
+                1.0,
+            )
     river.data.materials.clear()
-    river.data.materials.append(water)
+    river.data.materials.append(surface)
     if hasattr(river, "visible_shadow"):
         river.visible_shadow = False
     print(json.dumps({
         "event": "river_material_assigned",
-        "name": water.name,
+        "name": water.name if water else surface.name,
         "purchased": purchased,
-        "surface": water.name,
+        "surface": surface.name,
         "shape": "spline_strip",
     }), flush=True)
-    return water.name
+    return (water.name if water else surface.name)
 
 
 def build_river_guide() -> bpy.types.Object:
@@ -871,7 +871,7 @@ def main() -> int:
             if objs:
                 mountain_members.extend(keep_hero_meshes(objs, "background_mountains", 5))
         if mountain_members:
-            place_mountain_ridge(mountain_members, village_center)
+            place_mountain_ridge(mountain_members, village_center + Vector((0.0, 22.0, 0.0)))
             for obj in mountain_members:
                 link_exclusive(obj, collections["WORLD_MOUNTAINS_BACKGROUND"])
                 if hasattr(obj, "visible_shadow"):
