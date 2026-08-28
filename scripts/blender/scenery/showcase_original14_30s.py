@@ -1354,8 +1354,13 @@ def main() -> int:
         'assembledAsVillageKit': True,
     }
 
+    fbx_files = expanded.get('village_fbx', [])
+    fbx_dressing = [
+        p for p in geometry_candidates(fbx_files, 'village_fbx')
+        if any(word in p.name.lower() for word in ('tree', 'fence', 'gate', 'cart'))
+    ]
     members, imported_files, placed = import_kit_groups(
-        expanded.get('village_fbx', []),
+        fbx_dressing or fbx_files,
         'village_fbx',
         fbx_slots,
         village_center,
