@@ -1,41 +1,38 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T16:35:40Z",
+  "inspectedAt": "2026-08-28T16:41:20Z",
   "engine": "CYCLES_CPU",
   "resolution": "360x640",
   "samples": 16,
-  "commit": "3cdc807",
-  "stillsDir": "/tmp/o14-lookdev/stills15",
+  "commit": "579678b",
+  "stillsDir": "/tmp/o14-lookdev/stills16",
   "stills": {
-    "0001": "Forest wall sits behind the cabins, not through the roofs. River is still a blue strip with mint rock lumps. Ground is a pale green slab.",
-    "0450": "Dense pine wall + village + mountains + sky. Cabin is dark. Ribbon river and slab floor remain.",
-    "0900": "Same stacked kit. Neon needle tips, crushed canopy shadows, lime floor. Not cinematic."
+    "0001": "Village + pine wall + mountains + sky. River is still a bright blue strip with mint bush lumps. Ground is a pale green slab.",
+    "0450": "Same stacked kit. Forest wall is real. Cabin, fence, red cart readable. Water still tape-blue.",
+    "0900": "Same wide south view. Low-poly game layout, not a cinematic valley."
   },
   "whatImprovedVersusRejectedCabinOrbit": [
-    "Unparenting copies put a real pine wall behind the village instead of a cabin-local cluster",
-    "South-to-north camera keeps village + forest + mountains + sky in one frame",
+    "Pine copies are a real forest wall behind the village (unparented into world space)",
+    "Foliage-alpha clip no longer punches neon tips on pine atlases",
     "Cabin01 albedo, fence, and cart are visible",
     "Village mix is 4 Cabin*A + trees + cart/gate/fence",
-    "River ribbon is bent; EcoKit rocks sit along it",
     "Louis mountains and daylight sk2 sky remain in frame"
   ],
   "rejectionMatches": [
     "still reads as an asset test, not a finished cinematic shot",
     "flat pale-green ground, not a valley meadow",
-    "river reads as a blue strip, not water with banks",
-    "forest is a dark rectangular block, not a layered midground",
-    "neon needle tips and crushed-black canopy shadows",
+    "river reads as a bright blue strip with mint bushes, not water with banks",
+    "forest is a dark rectangular wall, not a layered midground",
+    "every still is almost the same wide south view",
     "weak atmospheric depth"
   ],
-  "honestConclusion": "Forest wall is real now. Stills still fail the cinematic gate. Green CI is not visual approval. Paid path idle (0 pods). Do not CREATE. Do not present as approval.",
+  "honestConclusion": "Forest wall is real. Stills still fail the cinematic gate. Green CI is not visual approval. Paid path idle (0 pods). Do not CREATE. Do not present as approval.",
   "paidRenderAuthorized": false,
   "paidProgressCheck": {
     "checkedAt": "2026-08-28T16:39:20Z",
     "paidWorkflowLatest": "failed 2026-08-28T11:28:31Z, none running",
     "bridgeStartup": "stale RUNNING frame 248/900 at 2026-08-28T15:29:20Z",
-    "bridgeStatus": null,
-    "downloadUrl": null,
     "activeExactNamePods": 0,
     "billingCleanupConfirmed": true,
     "createPerformed": false,
