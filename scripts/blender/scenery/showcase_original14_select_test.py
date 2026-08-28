@@ -273,6 +273,11 @@ def test_world_camera_travels_mountains_to_village():
         assert key['look'][1] >= 10.0
         assert key['camera'][1] <= -36.0
         assert key['lens'] <= 28.0
+    # Establish is a real pull-back; the finish is a closer stacked village beat.
+    assert keys[0]['camera'][1] <= -70.0
+    assert keys[0]['camera'][1] < keys[2]['camera'][1]
+    assert keys[5]['camera'][1] >= -52.0
+    assert keys[0]['camera'][2] > keys[5]['camera'][2] + 12.0
 
 
 def test_mountain_extract_keeps_grassy_and_allows_large_blend():

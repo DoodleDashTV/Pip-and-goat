@@ -787,6 +787,11 @@ def _dirt_or_rock_path(files: list[Path]) -> Path | None:
 
 
 def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> bpy.types.Material:
+    """World-metre meadow. Object coords must already equal world metres.
+
+    Large patches and a wide dirt lane have to read from a south 9:16 camera
+    at y≈-80. Fine Generated noise disappears into one pale slab.
+    """
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -797,22 +802,32 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
     if 'Roughness' in bsdf.inputs:
         bsdf.inputs['Roughness'].default_value = 0.94 if meadow else 0.88
     if 'Specular IOR Level' in bsdf.inputs:
-        bsdf.inputs['Specular IOR Level'].default_value = 0.10
+        bsdf.inputs['Specular IOR Level'].default_value = 0.08
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
     coord = nodes.new('ShaderNodeTexCoord')
+    voronoi = nodes.new('ShaderNodeTexVoronoi')
+    voronoi.inputs['Scale'].default_value = 0.048 if meadow else 0.09
+    if 'Randomness' in voronoi.inputs:
+        voronoi.inputs['Randomness'].default_value = 0.85
+    links.new(coord.outputs['Object'], voronoi.inputs['Vector'])
     noise = nodes.new('ShaderNodeTexNoise')
-    noise.inputs['Scale'].default_value = 14.0 if meadow else 8.0
+    noise.inputs['Scale'].default_value = 0.11 if meadow else 0.16
     if 'Detail' in noise.inputs:
-        noise.inputs['Detail'].default_value = 4.0
-    links.new(coord.outputs['Generated'], noise.inputs['Vector'])
+        noise.inputs['Detail'].default_value = 3.0
+    links.new(coord.outputs['Object'], noise.inputs['Vector'])
+    add_fac = nodes.new('ShaderNodeMath')
+    add_fac.operation = 'MULTIPLY'
+    voronoi_fac = voronoi.outputs['Distance'] if 'Distance' in voronoi.outputs else voronoi.outputs[0]
+    links.new(voronoi_fac, add_fac.inputs[0])
+    links.new(noise.outputs['Fac'], add_fac.inputs[1])
     patch = _mix_color_node(
         nodes,
         fac=0.5,
-        color2=(0.34, 0.48, 0.16, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
+        color2=(0.40, 0.54, 0.16, 1.0) if meadow else (0.30, 0.22, 0.12, 1.0),
     )
     c1, _c2, patch_out = _mix_color_sockets(patch)
-    c1.default_value = (0.14, 0.22, 0.08, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
-    links.new(noise.outputs['Fac'], patch.inputs['Fac'] if 'Fac' in patch.inputs else patch.inputs[0])
+    c1.default_value = (0.10, 0.20, 0.07, 1.0) if meadow else (0.38, 0.26, 0.13, 1.0)
+    links.new(add_fac.outputs['Value'], patch.inputs['Fac'] if 'Fac' in patch.inputs else patch.inputs[0])
     color_src = patch_out
     if img_path is not None:
         tex = nodes.new('ShaderNodeTexImage')
@@ -820,13 +835,13 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
         if tex.image and tex.image.colorspace_settings:
             tex.image.colorspace_settings.name = 'sRGB'
         mapping = nodes.new('ShaderNodeMapping')
-        mapping.inputs['Scale'].default_value = (0.045, 0.045, 0.045)
+        mapping.inputs['Scale'].default_value = (0.035, 0.035, 0.035)
         links.new(coord.outputs['Object'], mapping.inputs['Vector'])
         links.new(mapping.outputs['Vector'], tex.inputs['Vector'])
-        grade = _mix_color_node(nodes, fac=0.82 if meadow else 0.55, color2=(0.26, 0.42, 0.14, 1.0) if meadow else (0.36, 0.26, 0.14, 1.0))
+        grade = _mix_color_node(nodes, fac=0.70 if meadow else 0.55, color2=(0.24, 0.40, 0.12, 1.0) if meadow else (0.36, 0.26, 0.14, 1.0))
         g1, _g2, grade_out = _mix_color_sockets(grade)
         links.new(tex.outputs['Color'], g1)
-        weave = _mix_color_node(nodes, fac=0.22 if meadow else 0.40)
+        weave = _mix_color_node(nodes, fac=0.28 if meadow else 0.40)
         w1, w2, weave_out = _mix_color_sockets(weave)
         links.new(patch_out, w1)
         links.new(grade_out, w2)
@@ -834,26 +849,41 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
     if meadow:
         sep = nodes.new('ShaderNodeSeparateXYZ')
         links.new(coord.outputs['Object'], sep.inputs['Vector'])
+        # Darker toward the forest (+Y) so the floor is not one slab.
+        y_tint = _mix_color_node(nodes, fac=0.5, color2=(0.42, 0.58, 0.30, 1.0))
+        yt1, _yt2, y_tint_out = _mix_color_sockets(y_tint)
+        yt1.default_value = (1.10, 1.12, 0.95, 1.0)
+        y_fac = nodes.new('ShaderNodeMapRange')
+        y_fac.inputs['From Min'].default_value = -36.0
+        y_fac.inputs['From Max'].default_value = 46.0
+        links.new(sep.outputs['Y'], y_fac.inputs['Value'])
+        links.new(y_fac.outputs['Result'] if 'Result' in y_fac.outputs else y_fac.outputs[0], y_tint.inputs['Fac'] if 'Fac' in y_tint.inputs else y_tint.inputs[0])
+        mul = _mix_color_node(nodes, fac=1.0)
+        mul.blend_type = 'MULTIPLY'
+        m1, m2, mul_out = _mix_color_sockets(mul)
+        links.new(color_src, m1)
+        links.new(y_tint_out, m2)
+        color_src = mul_out
+        # Dirt lane between river (y≈-10) and village (y≈0), in world metres.
         abs_x = nodes.new('ShaderNodeMath')
         abs_x.operation = 'ABSOLUTE'
         links.new(sep.outputs['X'], abs_x.inputs[0])
         path_w = nodes.new('ShaderNodeMapRange')
-        path_w.inputs['From Min'].default_value = 0.4
-        path_w.inputs['From Max'].default_value = 2.6
+        path_w.inputs['From Min'].default_value = 0.6
+        path_w.inputs['From Max'].default_value = 4.2
         path_w.inputs['To Min'].default_value = 1.0
         path_w.inputs['To Max'].default_value = 0.0
         links.new(abs_x.outputs['Value'], path_w.inputs['Value'])
-        # Keep the path only between river and village; fade outside with |Y+1|.
         y_center = nodes.new('ShaderNodeMath')
         y_center.operation = 'SUBTRACT'
-        y_center.inputs[1].default_value = -1.0
+        y_center.inputs[1].default_value = -2.0
         links.new(sep.outputs['Y'], y_center.inputs[0])
         y_abs = nodes.new('ShaderNodeMath')
         y_abs.operation = 'ABSOLUTE'
         links.new(y_center.outputs['Value'], y_abs.inputs[0])
         y_fade = nodes.new('ShaderNodeMapRange')
-        y_fade.inputs['From Min'].default_value = 8.0
-        y_fade.inputs['From Max'].default_value = 16.0
+        y_fade.inputs['From Min'].default_value = 5.0
+        y_fade.inputs['From Max'].default_value = 11.0
         y_fade.inputs['To Min'].default_value = 1.0
         y_fade.inputs['To Max'].default_value = 0.0
         links.new(y_abs.outputs['Value'], y_fade.inputs['Value'])
@@ -861,11 +891,30 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
         path_fac.operation = 'MULTIPLY'
         links.new(path_w.outputs['Result'] if 'Result' in path_w.outputs else path_w.outputs[0], path_fac.inputs[0])
         links.new(y_fade.outputs['Result'] if 'Result' in y_fade.outputs else y_fade.outputs[0], path_fac.inputs[1])
-        dirt = _mix_color_node(nodes, fac=0.0, color2=(0.39, 0.27, 0.14, 1.0))
+        dirt = _mix_color_node(nodes, fac=0.0, color2=(0.36, 0.24, 0.12, 1.0))
         d1, _d2, dirt_out = _mix_color_sockets(dirt)
         links.new(color_src, d1)
         links.new(path_fac.outputs['Value'], dirt.inputs['Fac'] if 'Fac' in dirt.inputs else dirt.inputs[0])
         color_src = dirt_out
+        # Soft river-bank dirt along y≈-10, painted in-shader (no extra planes).
+        bank_y = nodes.new('ShaderNodeMath')
+        bank_y.operation = 'SUBTRACT'
+        bank_y.inputs[1].default_value = -10.0
+        links.new(sep.outputs['Y'], bank_y.inputs[0])
+        bank_abs = nodes.new('ShaderNodeMath')
+        bank_abs.operation = 'ABSOLUTE'
+        links.new(bank_y.outputs['Value'], bank_abs.inputs[0])
+        bank_w = nodes.new('ShaderNodeMapRange')
+        bank_w.inputs['From Min'].default_value = 2.2
+        bank_w.inputs['From Max'].default_value = 5.4
+        bank_w.inputs['To Min'].default_value = 0.72
+        bank_w.inputs['To Max'].default_value = 0.0
+        links.new(bank_abs.outputs['Value'], bank_w.inputs['Value'])
+        bank = _mix_color_node(nodes, fac=0.0, color2=(0.22, 0.18, 0.10, 1.0))
+        b1, _b2, bank_out = _mix_color_sockets(bank)
+        links.new(color_src, b1)
+        links.new(bank_w.outputs['Result'] if 'Result' in bank_w.outputs else bank_w.outputs[0], bank.inputs['Fac'] if 'Fac' in bank.inputs else bank.inputs[0])
+        color_src = bank_out
     links.new(color_src, bsdf.inputs['Base Color'])
     return mat
 
@@ -884,17 +933,25 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
     except Exception:
         pass
     bpy.ops.object.mode_set(mode='OBJECT')
-    cx, cy, _cz = center
+    # Bake world metres into the mesh so the shader Object coords match the
+    # river (y≈-10) and village (y≈0). A located 150 m plane left the path
+    # painted at object Y≈-1, which is world Y≈17 — inside the forest.
+    try:
+        bpy.ops.object.transform_apply(location=True, rotation=False, scale=True)
+    except Exception:
+        pass
     for vert in ground.data.vertices:
-        wx = cx + vert.co.x
-        wy = cy + vert.co.y
-        h = 0.22 * math.sin(vert.co.x * 0.10) * math.cos(vert.co.y * 0.07)
+        wx = vert.co.x
+        wy = vert.co.y
+        h = 1.15 * math.sin(vert.co.x * 0.055) * math.cos(vert.co.y * 0.042)
         if -8.0 <= wy <= 12.0 and abs(wx) < 18.0:
-            h *= 0.12
+            h *= 0.10
         if -14.0 < wy < -6.0:
-            h -= 0.20
-        if wy > 50.0:
-            h += min(1.6, (wy - 50.0) * 0.035)
+            h -= 0.42
+        if -16.5 < wy < -14.0 or -6.0 < wy < -3.5:
+            h += 0.16
+        if wy > 46.0:
+            h += min(2.4, (wy - 46.0) * 0.045)
         vert.co.z += h
     ground.data.update()
     ground.data.materials.append(_meadow_or_dirt_material('TJ_PurchasedValleyMeadow', img_path, meadow=True))
@@ -927,27 +984,43 @@ def _river_water_material() -> bpy.types.Material:
     if bsdf is None:
         return mat
     if 'Base Color' in bsdf.inputs:
-        bsdf.inputs['Base Color'].default_value = (0.07, 0.18, 0.22, 1.0)
+        bsdf.inputs['Base Color'].default_value = (0.045, 0.12, 0.15, 1.0)
     if 'Roughness' in bsdf.inputs:
-        bsdf.inputs['Roughness'].default_value = 0.20
+        bsdf.inputs['Roughness'].default_value = 0.08
     if 'Specular IOR Level' in bsdf.inputs:
-        bsdf.inputs['Specular IOR Level'].default_value = 0.55
+        bsdf.inputs['Specular IOR Level'].default_value = 0.78
+    # Keep transmission low. Pale ground shining through reads as tape-blue.
     if 'Transmission Weight' in bsdf.inputs:
-        bsdf.inputs['Transmission Weight'].default_value = 0.28
+        bsdf.inputs['Transmission Weight'].default_value = 0.08
     elif 'Transmission' in bsdf.inputs:
-        bsdf.inputs['Transmission'].default_value = 0.28
+        bsdf.inputs['Transmission'].default_value = 0.08
     wave = nodes.new('ShaderNodeTexWave')
-    wave.inputs['Scale'].default_value = 4.5
+    wave.inputs['Scale'].default_value = 3.2
     if 'Distortion' in wave.inputs:
-        wave.inputs['Distortion'].default_value = 2.2
+        wave.inputs['Distortion'].default_value = 1.6
     bump = nodes.new('ShaderNodeBump')
-    bump.inputs['Strength'].default_value = 0.18
+    bump.inputs['Strength'].default_value = 0.12
     links.new(wave.outputs['Color'], bump.inputs['Height'])
     if 'Normal' in bsdf.inputs:
         links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
+    glossy = nodes.new('ShaderNodeBsdfGlossy')
+    if 'Roughness' in glossy.inputs:
+        glossy.inputs['Roughness'].default_value = 0.05
+    if 'Color' in glossy.inputs:
+        glossy.inputs['Color'].default_value = (0.62, 0.78, 0.88, 1.0)
+    mix_sh = nodes.new('ShaderNodeMixShader')
+    mix_sh.inputs['Fac'].default_value = 0.38
+    out = nodes.get('Material Output') or next((n for n in nodes if n.type == 'OUTPUT_MATERIAL'), None)
+    if out is not None:
+        for link in list(links):
+            if link.to_node == out and link.to_socket == out.inputs['Surface']:
+                links.remove(link)
+        links.new(bsdf.outputs['BSDF'], mix_sh.inputs[1])
+        links.new(glossy.outputs['BSDF'], mix_sh.inputs[2])
+        links.new(mix_sh.outputs['Shader'], out.inputs['Surface'])
     if water_mat is not None and water_mat.node_tree:
-        src = next((n for n in water_mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
-        # Keep our darker river grade. EcoKit Water_Mat defaults read as tape-blue.
+        # Keep our river grade. EcoKit Water_Mat defaults read as tape-blue.
+        pass
     return mat
 
 
@@ -1464,8 +1537,8 @@ def setup_camera(start: int, end: int):
     # can hold village / river / forest / mountains / sky.
     keys = cinematic_world_camera_keys(
         -8.0, -7.0, 8.0, 7.0, 0.0, 8.0,
-        forest_x=0.0, forest_y=32.0, forest_z=6.0,
-        mountain_x=0.0, mountain_y=64.0, mountain_z=18.0,
+        forest_x=0.0, forest_y=36.0, forest_z=7.0,
+        mountain_x=0.0, mountain_y=72.0, mountain_z=22.0,
     )
     bpy.ops.object.camera_add(location=keys[0]['camera'])
     cam = bpy.context.object
@@ -1700,7 +1773,7 @@ def main() -> int:
             obj.hide_viewport = True
     # Put the stream south of the village so a north-looking 9:16 camera
     # sees water in front of the cabins instead of hidden behind them.
-    river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.03), (40.0, 4.4))
+    river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.08), (46.0, 6.2))
     bank_count = 0
     if not members and river_count <= 0:
         raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
@@ -1823,10 +1896,12 @@ def main() -> int:
         and 'forest_' not in subject_parent_name(o).lower()
     ]
     # Keep grove copies north of the cabins so they do not stab through roofs.
-    grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 12.0, 0.0), copies=4, radius=5.0)
-    near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 28.0, 0.0), 16, 44.0, 4.0, 1.55)
-    far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 42.0, 0.0), 16, 50.0, 5.0, 1.85)
-    forest_band = grove + near_band + far_band
+    grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 11.0, 0.0), copies=3, radius=7.5)
+    front_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 18.0, 0.0), 8, 36.0, 7.0, 1.15)
+    near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 28.0, 0.0), 13, 46.0, 8.0, 1.50)
+    mid_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 40.0, 0.0), 12, 52.0, 9.0, 1.85)
+    far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 54.0, 0.0), 9, 58.0, 7.0, 2.20)
+    forest_band = grove + front_band + near_band + mid_band + far_band
     for obj in forest_band:
         if hasattr(obj, 'visible_shadow'):
             obj.visible_shadow = False
@@ -1847,8 +1922,8 @@ def main() -> int:
     ground_files = expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []) + mountain_files
     ground_count, ground_source = create_valley_ground(
         ground_files,
-        (village_center.x, village_center.y + 18.0, -0.08),
-        150.0,
+        (village_center.x, village_center.y + 8.0, -0.08),
+        180.0,
     )
     path_count = 0
     if not ground_count:

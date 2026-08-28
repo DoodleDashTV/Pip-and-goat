@@ -368,19 +368,20 @@ def cinematic_world_camera_keys(
 
     # 9:16 stacks layers vertically. Stay far south and keep every look
     # aimed up-valley so river / village / forest / mountains / sky share the frame.
+    # Frames 1 / 450 / 900 must read as different beats, not one locked south view.
     beats = (
-        # Wide establish: far south, high. Look past the village to the peaks.
-        {'camera': (vx + 10.0, vy - 56.0, village_min_z + 28.0), 'look': (mx, my, mz), 'lens': 24.0},
+        # Wide establish: farther south and higher. Peaks dominate; village is small.
+        {'camera': (vx + 8.0, vy - 78.0, village_min_z + 34.0), 'look': (mx, my, mz), 'lens': 24.0},
         # Descend toward the forest and river corridor, still a valley shot.
-        {'camera': (vx + 10.0, vy - 46.0, village_min_z + 18.0), 'look': (fx, (fy + my) * 0.5, (fz + mz) * 0.45), 'lens': 26.0},
+        {'camera': (vx + 14.0, vy - 66.0, village_min_z + 24.0), 'look': (fx, (fy + my) * 0.55, (fz + mz) * 0.50), 'lens': 25.0},
         # Travel along the river; village and mountains stay in the same 9:16 frame.
-        {'camera': (vx + 8.0, vy - 42.0, village_min_z + 16.0), 'look': (vx, vy + 28.0, look_z + 5.0), 'lens': 26.0},
+        {'camera': (vx + 6.0, vy - 56.0, village_min_z + 18.0), 'look': (vx, vy + 34.0, look_z + 6.0), 'lens': 26.0},
         # Cross the river toward the village street, never a cabin portrait.
-        {'camera': (vx + 10.0, vy - 42.0, village_min_z + 15.0), 'look': (vx, vy + 24.0, look_z + 4.0), 'lens': 27.0},
+        {'camera': (vx + 10.0, vy - 50.0, village_min_z + 15.5), 'look': (vx, vy + 26.0, look_z + 4.4), 'lens': 27.0},
         # Village becomes the destination; forest and peaks remain stacked.
-        {'camera': (vx + 10.0, vy - 44.0, village_min_z + 14.0), 'look': (vx, vy + 22.0, look_z + 3.2), 'lens': 27.0},
+        {'camera': (vx + 8.0, vy - 46.0, village_min_z + 13.6), 'look': (vx, vy + 22.0, look_z + 3.4), 'lens': 27.0},
         # Composed village hero with the valley layers still readable.
-        {'camera': (vx + 12.0, vy - 46.0, village_min_z + 15.0), 'look': (vx, vy + 24.0, look_z + 3.6), 'lens': 26.0},
+        {'camera': (vx + 16.0, vy - 48.0, village_min_z + 14.2), 'look': (vx, vy + 20.0, look_z + 3.8), 'lens': 26.0},
     )
     keys: list[dict] = []
     for beat in beats:
