@@ -605,46 +605,60 @@ def smooth(obj):
             kp.handle_right_type = 'AUTO_CLAMPED'
 
 
+def world_height(obj) -> float:
+    try:
+        zs = [(obj.matrix_world @ Vector(c)).z for c in obj.bound_box]
+        return float(max(zs) - min(zs))
+    except Exception:
+        return 0.0
+
+
+def is_camera_hero_object(obj) -> bool:
+    if not obj or obj.type != 'MESH' or str(obj.name).startswith('TJ_Ground'):
+        return False
+    dims = object_dimensions(obj)
+    if is_primitive_name(obj.name) or is_box_mesh(mesh_face_count(obj), dims) or is_dominating_plane(mesh_face_count(obj), dims):
+        return False
+    return world_height(obj) >= 1.2
+
+
 def setup_camera(start: int, end: int):
-    meshes = [
-        o for o in bpy.data.objects
-        if o.type == 'MESH'
-        and not str(o.name).startswith('TJ_Ground')
-        and not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
-    ]
+    meshes = [o for o in bpy.data.objects if is_camera_hero_object(o)]
+    if not meshes:
+        meshes = [
+            o for o in bpy.data.objects
+            if o.type == 'MESH'
+            and not str(o.name).startswith('TJ_Ground')
+            and not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
+        ]
     bounds = group_bounds(meshes)
     if bounds:
         mins, maxs = bounds
         center = (mins + maxs) * 0.5
-        horiz = max((maxs - mins).x, (maxs - mins).y, 10.0)
-        vert = max((maxs - mins).z, 4.0)
-        look_z = mins.z + min(vert * 0.42, 8.0)
+        horiz = max((maxs - mins).x, (maxs - mins).y, 6.0)
+        vert = max((maxs - mins).z, 3.0)
+        look_z = mins.z + min(vert * 0.38, 5.0)
         look = (center.x, center.y, look_z)
-        cam_h = max(vert * 0.45, 3.5)
-        dist = max(horiz * 0.22, 8.0)
+        # Stay inside the hero cluster for every keyframe. Wide orbits were
+        # turning 5/6 shots into empty horizon even when assets existed.
+        cam_h = min(max(vert * 0.55, 3.0), 8.0)
+        dist = min(max(horiz * 0.55, 6.0), 14.0)
         cams = [
-            (center.x, center.y + dist * 0.95, mins.z + cam_h),
-            (center.x - dist * 0.35, center.y + dist * 0.62, mins.z + cam_h * 0.85),
-            (center.x + dist * 0.28, center.y + dist * 0.18, mins.z + cam_h * 0.62),
-            (center.x - dist * 0.18, center.y - dist * 0.12, mins.z + cam_h * 0.55),
-            (center.x + dist * 0.22, center.y - dist * 0.38, mins.z + cam_h * 0.68),
-            (center.x, center.y - dist * 0.55, mins.z + cam_h * 0.9),
+            (center.x, center.y + dist, mins.z + cam_h),
+            (center.x - dist * 0.72, center.y + dist * 0.62, mins.z + cam_h * 0.9),
+            (center.x + dist * 0.78, center.y + dist * 0.18, mins.z + cam_h * 0.75),
+            (center.x - dist * 0.55, center.y - dist * 0.35, mins.z + cam_h * 0.7),
+            (center.x + dist * 0.62, center.y - dist * 0.55, mins.z + cam_h * 0.8),
+            (center.x, center.y - dist * 0.85, mins.z + cam_h * 0.95),
         ]
-        targets = [
-            (look[0], look[1] + dist * 0.12, look[2]),
-            (look[0], look[1] + dist * 0.04, look[2]),
-            look,
-            (look[0], look[1] - dist * 0.06, look[2]),
-            (look[0], look[1] - dist * 0.02, look[2] + vert * 0.04),
-            (look[0], look[1] + dist * 0.02, look[2] + vert * 0.06),
-        ]
+        targets = [look, look, look, look, look, look]
     else:
         cams = [(0,145,42),(-24,105,24),(24,70,18),(-18,30,12),(20,-12,16),(0,-58,38)]
         targets = [(0,92,10),(0,68,6),(0,42,5),(0,10,4),(0,-6,5),(0,18,9)]
     bpy.ops.object.camera_add(location=cams[0])
     cam = bpy.context.object
     cam.name = 'TJ_Original14_Camera'
-    cam.data.lens = 32
+    cam.data.lens = 35
     bpy.context.scene.camera = cam
     target = bpy.data.objects.new('TJ_Original14_Target', None)
     bpy.context.scene.collection.objects.link(target)
@@ -722,10 +736,10 @@ def main() -> int:
     contributions: dict[str, dict] = {}
     placements = {
         'village_blender': (0.0, (0.0, 0.0, 0.0)),
-        'village_project': (18.0, (-22.0, -8.0, 0.0)),
-        'village_fbx': (16.0, (22.0, -8.0, 0.0)),
-        'forest_nature': (12.0, (-18.0, 28.0, 0.0)),
-        'forest_ecokit': (12.0, (18.0, 26.0, 0.0)),
+        'village_project': (14.0, (-8.0, -4.0, 0.0)),
+        'village_fbx': (14.0, (8.0, -4.0, 0.0)),
+        'forest_nature': (12.0, (-8.0, 10.0, 0.0)),
+        'forest_ecokit': (12.0, (8.0, 9.0, 0.0)),
     }
     village_center = Vector((0.0, 0.0, 0.0))
     for role in ('village_blender', 'village_project', 'village_fbx', 'forest_nature', 'forest_ecokit'):
@@ -780,16 +794,16 @@ def main() -> int:
             'authoredLayoutKept': role == 'village_blender',
         }
 
-    scene_meshes = [o for o in bpy.data.objects if o.type == 'MESH']
+    scene_meshes = [o for o in bpy.data.objects if is_camera_hero_object(o)]
     bounds = group_bounds(scene_meshes)
     if bounds:
         mins, maxs = bounds
         center = (mins + maxs) * 0.5
-        horiz = max((maxs - mins).x, (maxs - mins).y, 40.0)
-        ground_size = min(max(horiz * 2.4, 80.0), 360.0)
+        horiz = max((maxs - mins).x, (maxs - mins).y, 16.0)
+        ground_size = min(max(horiz * 1.8, 40.0), 90.0)
         ground_loc = (center.x, center.y, mins.z - 0.12)
     else:
-        ground_size = 160.0
+        ground_size = 60.0
         ground_loc = (0.0, 0.0, -0.15)
     ground_count = create_purchased_texture_ground(expanded.get('village_textures', []), ground_loc, ground_size)
     if not ground_count:

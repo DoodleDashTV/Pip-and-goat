@@ -137,6 +137,7 @@ def test_village_picker_prefers_authored_blend_over_tiny_fbx():
 
 def test_dominating_plane_is_rejected_for_camera_bounds():
     assert is_dominating_plane(8, (400.0, 400.0, 0.2)) is True
+    assert is_dominating_plane(8, (16.0, 16.0, 0.15)) is True
     assert is_dominating_plane(4000, (3.0, 3.0, 8.0)) is False
     hero = mesh_keep_rank('Cabin_Hero', 'village_blender', 1800, (4, 3, 3))
     water = mesh_keep_rank('Ocean', 'village_blender', 8, (400, 400, 0.2))

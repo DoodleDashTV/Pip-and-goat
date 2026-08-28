@@ -79,7 +79,7 @@ def is_dominating_plane(face_count: int = 0, dimensions: tuple | None = None) ->
         return False
     vals = sorted(abs(float(x)) for x in dimensions[:3])
     mn, _mid, mx = vals
-    return mx >= 40.0 and mn <= max(0.8, 0.08 * mx)
+    return mx >= 12.0 and mn <= max(0.5, 0.12 * mx)
 
 
 def is_box_mesh(face_count: int = 0, dimensions: tuple | None = None) -> bool:
