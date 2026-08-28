@@ -1,3 +1,4 @@
+# Registration touch; this workflow builds/publishes GHCR only and never contacts RunPod.
 name: TivvleJoy Scenery Showcase Worker Image V4
 
 on:
