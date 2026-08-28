@@ -488,15 +488,20 @@ def remap_missing_images(files: list[Path]) -> int:
     for img in bpy.data.images:
         if getattr(img, 'packed_file', None):
             continue
-        try:
-            width = int((img.size or [0])[0])
-        except Exception:
-            width = 0
         raw = str(getattr(img, 'filepath', '') or img.name)
         name = Path(raw.replace('\\', '/')).name.lower()
         if not name or name not in index:
             continue
-        if width > 16:
+        try:
+            abs_path = bpy.path.abspath(raw)
+        except Exception:
+            abs_path = raw
+        on_disk = False
+        try:
+            on_disk = Path(abs_path).is_file() and Path(abs_path).stat().st_size > 64
+        except Exception:
+            on_disk = False
+        if on_disk:
             continue
         try:
             img.filepath = str(index[name])
@@ -505,6 +510,52 @@ def remap_missing_images(files: list[Path]) -> int:
         except Exception as exc:
             print(json.dumps({'event': 'image_remap_warning', 'name': name, 'error': str(exc)[:160]}), flush=True)
     return remapped
+
+
+def _load_named_albedo(files: list[Path], *needles: str) -> bpy.types.Image | None:
+    for path in files:
+        if not path.is_file() or path.suffix.lower() not in IMAGE_EXTS:
+            continue
+        name = path.name.lower()
+        if is_grass_card_texture_name(name) or 'wood01' in name:
+            continue
+        if all(needle in name for needle in needles):
+            try:
+                return bpy.data.images.load(str(path), check_existing=True)
+            except Exception:
+                return None
+    return None
+
+
+def ensure_purchased_albedos(files: list[Path]) -> int:
+    """Force authored cabin/tree image nodes onto the real extracted albedos."""
+    cabin = _load_named_albedo(files, 'colored', 'cabin', 'alb') or _load_named_albedo(files, 'cabin', 'alb')
+    straw = _load_named_albedo(files, 'colored', 'straw', 'alb') or _load_named_albedo(files, 'straw', 'alb')
+    leaf = _load_named_albedo(files, 'colored', 'leaf', 'alb') or _load_named_albedo(files, 'leaf', 'alb')
+    trunk = _load_named_albedo(files, 'colored', 'trunk', 'alb') or _load_named_albedo(files, 'trunk', 'alb')
+    bound = 0
+    for img_node_owner in bpy.data.materials:
+        if not img_node_owner.node_tree:
+            continue
+        for node in img_node_owner.node_tree.nodes:
+            if node.type != 'TEX_IMAGE':
+                continue
+            current = (node.image.name if node.image else node.name).lower()
+            chosen = None
+            if 'cabin' in current or 'building' in current:
+                chosen = cabin
+            elif 'straw' in current or 'roof' in current:
+                chosen = straw
+            elif 'leaf' in current:
+                chosen = leaf
+            elif 'trunk' in current:
+                chosen = trunk
+            if chosen is None:
+                continue
+            if node.image != chosen:
+                node.image = chosen
+                bound += 1
+    return bound
 
 
 def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) -> int:
@@ -584,43 +635,49 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
     except Exception:
         pass
     bpy.ops.object.mode_set(mode='OBJECT')
-    mat = image_material(
-        'TJ_PurchasedValleyMeadow',
-        img_path,
-        tile=2.4,
-        mix_color=(0.30, 0.46, 0.18),
-        mix_fac=0.22 if (packed or img_path) else 0.0,
-    )
-    if packed is not None:
-        nodes = mat.node_tree.nodes
-        links = mat.node_tree.links
-        bsdf = nodes.get('Principled BSDF')
+    mat = bpy.data.materials.new('TJ_PurchasedValleyMeadow')
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    nodes.clear()
+    bsdf = nodes.new('ShaderNodeBsdfPrincipled')
+    out = nodes.new('ShaderNodeOutputMaterial')
+    if 'Roughness' in bsdf.inputs:
+        bsdf.inputs['Roughness'].default_value = 0.94
+    if 'Specular IOR Level' in bsdf.inputs:
+        bsdf.inputs['Specular IOR Level'].default_value = 0.12
+    links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
+    color_src = None
+    if packed is not None or img_path is not None:
         tex = nodes.new('ShaderNodeTexImage')
-        tex.image = packed
-        if packed.colorspace_settings:
-            packed.colorspace_settings.name = 'sRGB'
+        if packed is not None:
+            tex.image = packed
+        else:
+            tex.image = bpy.data.images.load(str(img_path), check_existing=True)
+        if tex.image and tex.image.colorspace_settings:
+            tex.image.colorspace_settings.name = 'sRGB'
         coord = nodes.new('ShaderNodeTexCoord')
         mapping = nodes.new('ShaderNodeMapping')
-        mapping.inputs['Scale'].default_value = (2.4, 2.4, 2.4)
+        mapping.inputs['Scale'].default_value = (3.2, 3.2, 3.2)
         links.new(coord.outputs['UV'], mapping.inputs['Vector'])
         links.new(mapping.outputs['Vector'], tex.inputs['Vector'])
-        if bsdf:
-            try:
-                mix = nodes.new('ShaderNodeMixRGB')
-            except Exception:
-                mix = nodes.new('ShaderNodeMix')
-                if hasattr(mix, 'data_type'):
-                    mix.data_type = 'RGBA'
-            mix.blend_type = 'MIX'
-            if 'Fac' in mix.inputs:
-                mix.inputs['Fac'].default_value = 0.18
-            if 'Color2' in mix.inputs:
-                mix.inputs['Color2'].default_value = (0.30, 0.46, 0.18, 1.0)
-            links.new(tex.outputs['Color'], mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6])
-            color_out = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
-            links.new(color_out, bsdf.inputs['Base Color'])
-    elif not img_path and mat.node_tree.nodes.get('Principled BSDF'):
-        mat.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value = (0.30, 0.46, 0.18, 1.0)
+        try:
+            mix = nodes.new('ShaderNodeMixRGB')
+        except Exception:
+            mix = nodes.new('ShaderNodeMix')
+            if hasattr(mix, 'data_type'):
+                mix.data_type = 'RGBA'
+        mix.blend_type = 'MIX'
+        if 'Fac' in mix.inputs:
+            mix.inputs['Fac'].default_value = 0.48
+        if 'Color2' in mix.inputs:
+            mix.inputs['Color2'].default_value = (0.27, 0.46, 0.16, 1.0)
+        links.new(tex.outputs['Color'], mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6])
+        color_src = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
+    if color_src is not None:
+        links.new(color_src, bsdf.inputs['Base Color'])
+    else:
+        bsdf.inputs['Base Color'].default_value = (0.30, 0.46, 0.18, 1.0)
     ground.data.materials.append(mat)
     return 1, source
 
@@ -865,9 +922,9 @@ def setup_lighting():
     bpy.ops.object.light_add(type='SUN', location=(28, -40, 62))
     sun = bpy.context.object
     sun.name = 'TJ_Sun'
-    sun.data.energy = 4.8
-    sun.data.angle = math.radians(2.8)
-    sun.rotation_euler = (math.radians(52), math.radians(6), math.radians(-28))
+    sun.data.energy = 3.4
+    sun.data.angle = math.radians(4.2)
+    sun.rotation_euler = (math.radians(58), math.radians(2), math.radians(8))
     if hasattr(sun.data, 'use_shadow'):
         sun.data.use_shadow = True
     if hasattr(sun.data, 'color'):
@@ -875,7 +932,7 @@ def setup_lighting():
     bpy.ops.object.light_add(type='AREA', location=(-18, -8, 28))
     fill = bpy.context.object
     fill.name = 'TJ_SkyFill'
-    fill.data.energy = 1600
+    fill.data.energy = 2400
     fill.data.shape = 'DISK'
     fill.data.size = 48
     fill.rotation_euler = (math.radians(35), 0.0, math.radians(12))
@@ -884,7 +941,7 @@ def setup_lighting():
     bpy.ops.object.light_add(type='AREA', location=(8, -20, 14))
     bounce = bpy.context.object
     bounce.name = 'TJ_GroundBounce'
-    bounce.data.energy = 420
+    bounce.data.energy = 900
     bounce.data.shape = 'RECTANGLE'
     bounce.data.size = 36
     if hasattr(bounce.data, 'size_y'):
@@ -967,8 +1024,14 @@ def kit_target_size(path: Path) -> float:
         return 11.0
     if 'mountain' in name or 'grassy' in name or 'meadow' in name:
         return 90.0
+    if 'nature_kit' in name or 'forest' in name:
+        return 24.0
+    if 'swarm' in name:
+        return 14.0
+    if 'rock' in name:
+        return 5.5
     if 'tree' in name:
-        return 9.0
+        return 10.0
     if 'fence' in name or 'gate' in name:
         return 6.5
     if 'cart' in name:
@@ -1035,37 +1098,14 @@ def setup_camera(start: int, end: int):
             and not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
             and not is_forest_camera_subject_name(o.name, subject_parent_name(o))
         ]
-    bounds = group_bounds(village)
-    forest_bounds = group_bounds(forest)
-    if bounds:
-        mins, maxs = bounds
-        forest_look = None
-        if forest_bounds:
-            fmin, fmax = forest_bounds
-            fcenter = (fmin + fmax) * 0.5
-            forest_look = (fcenter.x, fcenter.y, fmin.z + min((fmax - fmin).z * 0.55, 8.0))
-        mountain = [
-            o for o in heroes
-            if is_mountain_camera_subject_name(o.name, subject_parent_name(o))
-        ]
-        mountain_bounds = group_bounds(mountain)
-        mountain_look = None
-        if mountain_bounds:
-            mmin, mmax = mountain_bounds
-            mcenter = (mmin + mmax) * 0.5
-            mountain_look = (mcenter.x, mcenter.y, mmin.z + min((mmax - mmin).z * 0.45, 22.0))
-        keys = cinematic_world_camera_keys(
-            float(mins.x), float(mins.y), float(maxs.x), float(maxs.y),
-            float(mins.z), float(max((maxs - mins).z, 3.0)),
-            forest_x=None if forest_look is None else forest_look[0],
-            forest_y=None if forest_look is None else forest_look[1],
-            forest_z=None if forest_look is None else forest_look[2],
-            mountain_x=None if mountain_look is None else mountain_look[0],
-            mountain_y=None if mountain_look is None else mountain_look[1],
-            mountain_z=None if mountain_look is None else mountain_look[2],
-        )
-    else:
-        keys = cinematic_world_camera_keys(-12.0, -10.0, 12.0, 10.0, 0.0, 8.0)
+    # Measured AABBs swallowed the north outskirts and pulled the camera
+    # into a cabin close-up. Author the valley path so every 9:16 still
+    # can hold village / river / forest / mountains / sky.
+    keys = cinematic_world_camera_keys(
+        -8.0, -7.0, 8.0, 7.0, 0.0, 8.0,
+        forest_x=0.0, forest_y=32.0, forest_z=6.0,
+        mountain_x=0.0, mountain_y=64.0, mountain_z=18.0,
+    )
     bpy.ops.object.camera_add(location=keys[0]['camera'])
     cam = bpy.context.object
     cam.name = 'TJ_Original14_Camera'
@@ -1146,7 +1186,7 @@ def configure_render(args):
         if hasattr(scene, 'view_settings'):
             scene.view_settings.view_transform = 'AgX'
             scene.view_settings.look = 'AgX - Medium Contrast'
-            scene.view_settings.exposure = 0.28
+            scene.view_settings.exposure = 0.48
     except Exception:
         pass
 
@@ -1360,7 +1400,8 @@ def main() -> int:
     for role_files in expanded.values():
         all_extracted.extend(role_files)
     remapped = remap_missing_images(all_extracted)
-    print(json.dumps({'event': 'purchased_image_remap', 'remapped': remapped}), flush=True)
+    forced = ensure_purchased_albedos(all_extracted)
+    print(json.dumps({'event': 'purchased_image_remap', 'remapped': remapped, 'forcedAlbedos': forced}), flush=True)
 
     ground_count, ground_source = create_valley_ground(
         expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []) + mountain_files,
@@ -1373,6 +1414,7 @@ def main() -> int:
         'type': 'visible_texture',
         'objectCount': ground_count,
         'cabinAlbedoRemapped': remapped,
+        'forcedAlbedos': forced,
         'groundSource': ground_source,
         'usedGrass01Card': False,
     }

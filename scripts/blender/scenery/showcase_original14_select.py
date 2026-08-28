@@ -375,10 +375,10 @@ def cinematic_world_camera_keys(
         {'camera': (vx + 16.0, vy - 20.0, village_min_z + 9.2), 'look': (fx, fy, fz), 'lens': 32.0},
         # Cross the river toward the village street.
         {'camera': (vx + 18.0, vy - 22.0, village_min_z + 8.2), 'look': (vx, vy + 8.0, look_z), 'lens': 34.0},
-        # Village becomes the destination.
-        {'camera': (vx + 20.0, vy - 24.0, village_min_z + 7.6), 'look': (vx, vy + 1.5, look_z), 'lens': 36.0},
-        # Composed 3/4 village hero, forest and mountains behind.
-        {'camera': (vx + 22.0, vy - 28.0, village_min_z + 7.2), 'look': (vx, vy + 2.0, look_z), 'lens': 34.0},
+        # Village becomes the destination, still wide enough for the valley layers.
+        {'camera': (vx + 16.0, vy - 32.0, village_min_z + 10.5), 'look': (vx, vy + 4.0, look_z + 1.2), 'lens': 32.0},
+        # Composed village hero, forest and mountains behind, not a roof-top.
+        {'camera': (vx + 18.0, vy - 36.0, village_min_z + 11.0), 'look': (vx, vy + 6.0, look_z + 1.6), 'lens': 30.0},
     )
     keys: list[dict] = []
     for beat in beats:
