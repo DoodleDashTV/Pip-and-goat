@@ -444,7 +444,7 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         dist, signed, along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
-        fade = local_half + (4.2 if signed < 0.0 else 2.8)
+        fade = local_half + (5.6 if signed < 0.0 else 3.0)
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
@@ -523,6 +523,23 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     for link in list(bsdf.inputs["Base Color"].links):
         links.remove(link)
     links.new(wet.outputs["Color"], bsdf.inputs["Base Color"])
+    bump = next((node for node in nodes if node.type == "BUMP"), None)
+    if bump is not None and "Height" in bump.inputs and bump.inputs["Height"].links:
+        height_in = bump.inputs["Height"].links[0].from_socket
+        links.remove(bump.inputs["Height"].links[0])
+        damp_b = nodes.new("ShaderNodeMath")
+        damp_b.operation = "MULTIPLY"
+        damp_b.inputs[1].default_value = 0.78
+        links.new(mask, damp_b.inputs[0])
+        inv = nodes.new("ShaderNodeMath")
+        inv.operation = "SUBTRACT"
+        inv.inputs[0].default_value = 1.0
+        links.new(damp_b.outputs["Value"], inv.inputs[1])
+        scale = nodes.new("ShaderNodeMath")
+        scale.operation = "MULTIPLY"
+        links.new(height_in, scale.inputs[0])
+        links.new(inv.outputs["Value"], scale.inputs[1])
+        links.new(scale.outputs["Value"], bump.inputs["Height"])
 
 
 def apply_stream_tint(tint) -> None:
@@ -1270,6 +1287,19 @@ def setup_lighting_hierarchy() -> None:
         forest.data.color = (1.0, 0.88, 0.70)
     if hasattr(forest, "visible_glossy"):
         forest.visible_glossy = False
+    bpy.ops.object.light_add(type="AREA", location=(2.0, -12.0, 5.5))
+    creek = bpy.context.object
+    creek.name = "TJ_CreekFill"
+    creek.data.energy = 70
+    creek.data.size = 28
+    creek.rotation_euler = (0.0, 0.0, 0.0)
+    if hasattr(creek.data, "color"):
+        creek.data.color = (0.72, 0.86, 0.80)
+    if hasattr(creek, "visible_glossy"):
+        creek.visible_glossy = False
+    for lamp in (sky, bounce, forest, creek):
+        if hasattr(lamp.data, "use_shadow"):
+            lamp.data.use_shadow = False
 
 
 def setup_mist_and_compositor() -> None:
