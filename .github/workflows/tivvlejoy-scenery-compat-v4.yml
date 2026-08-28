@@ -63,3 +63,5 @@ jobs:
           assert p.get('paidMutationPerformed') is False
           print('TIVVLEJOY_SCENERY_COMPAT_V4_STABLE_PASS')
           PY
+
+# Registration touch: zero-cost only; never creates a RunPod pod.
