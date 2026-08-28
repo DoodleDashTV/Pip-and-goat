@@ -1,0 +1,28 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:07:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "9a5fab9",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev21",
+  "shots": {
+    "SHOT_01": "FAIL — river is still a light-blue thread. Village and Louis ridge remain.",
+    "SHOT_02": "PARTIAL — along-river composition holds (cabin on the bank, winding channel). Surface is still a flat matte blue path with sharp edges.",
+    "SHOT_03": "PARTIAL — forest frame from earlier passes.",
+    "SHOT_04": "PARTIAL — street holds.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "PARTIAL — street readable."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Grazing sheen did not make the channel read as water. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
