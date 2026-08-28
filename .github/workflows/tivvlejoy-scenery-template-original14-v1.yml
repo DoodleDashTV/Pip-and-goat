@@ -20,8 +20,8 @@ jobs:
     timeout-minutes: 15
     env:
       RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
-      IMAGE: ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:1fed123a1474bad6673018f1219f532571a703d0fdb7e8c262cf25049172889a
-      IMAGE_DIGEST: sha256:1fed123a1474bad6673018f1219f532571a703d0fdb7e8c262cf25049172889a
+      IMAGE: ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:b128923fab60368121510441e024721cb62316b61d8ae9f509fa39f82736a3aa
+      IMAGE_DIGEST: sha256:b128923fab60368121510441e024721cb62316b61d8ae9f509fa39f82736a3aa
       TEMPLATE_NAME: TivvleJoy Scenery Original14 30s V1
       TEMPLATE_ID: u4glgdj076
     steps:
