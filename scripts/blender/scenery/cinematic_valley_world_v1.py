@@ -525,7 +525,7 @@ def dirt_bank_material() -> bpy.types.Material:
 
 def build_river() -> tuple[bpy.types.Object, str, list]:
     build_river_guide()
-    river = spline_strip_mesh("TJ_River_PurchasedWater", half_width=2.15, z_offset=0.0, width_wobble=0.45)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", half_width=2.15, z_offset=0.16, width_wobble=0.45)
     assigned = assign_purchased_water(river)
     banks = []
     bank_mat = dirt_bank_material()
@@ -822,8 +822,8 @@ def main() -> int:
             if hasattr(obj, "visible_shadow"):
                 obj.visible_shadow = False
         if nature_members:
-            west = duplicate_mesh_in_world(nature_members[0], (-26.0, 36.0, 0.0), 2.1)
-            east = duplicate_mesh_in_world(nature_members[0], (28.0, 40.0, 0.0), 2.3)
+            west = duplicate_mesh_in_world(nature_members[0], (-44.0, 54.0, 0.0), 1.6)
+            east = duplicate_mesh_in_world(nature_members[0], (46.0, 56.0, 0.0), 1.7)
             for obj in nature_members:
                 obj.hide_render = True
                 obj.hide_viewport = True
