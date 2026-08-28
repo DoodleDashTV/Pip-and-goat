@@ -360,9 +360,9 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Specular IOR Level" in spec.inputs:
         spec.inputs["Specular IOR Level"].default_value = 0.95
     if "Metallic" in spec.inputs:
-        spec.inputs["Metallic"].default_value = 0.62
+        spec.inputs["Metallic"].default_value = 0.28
     weight = nodes.new("ShaderNodeLayerWeight")
-    weight.inputs["Blend"].default_value = 0.30
+    weight.inputs["Blend"].default_value = 0.22
     invert = nodes.new("ShaderNodeMath")
     invert.operation = "SUBTRACT"
     invert.inputs[0].default_value = 1.0
@@ -570,14 +570,14 @@ def build_discovery_pool() -> bpy.types.Object:
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
     centers = evaluated_centerline(guide, samples=80)
-    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=1.55, z_offset=0.06, width_wobble=0.18)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=1.45, z_offset=0.02, width_wobble=0.28)
     assigned = assign_purchased_water(river)
     pool = build_discovery_pool()
     pool.data.materials.append(river.data.materials[0])
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
-        bank = spline_edge_mesh(name, centers, inner_half=1.15, outer_half=4.6, z_inner=0.04, z_outer=0.28, side_sign=sign)
+        bank = spline_edge_mesh(name, centers, inner_half=0.85, outer_half=5.2, z_inner=0.03, z_outer=0.20, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
     return river, assigned, banks + [pool]
@@ -1043,8 +1043,7 @@ def main() -> int:
         )):
             loc = cam_xy + along * (t * span) + side * offset
             west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
-        for item in ((-11.0, -5.4, 0.0, 1.08), (-1.8, -4.6, 0.0, 1.02), (5.2, -6.2, 0.0, 0.96)):
-            west_fg.append(duplicate_mesh_in_world(trees[0], item[:3], item[3]))
+        west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
     east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
     foreground = west_fg + east_fg
