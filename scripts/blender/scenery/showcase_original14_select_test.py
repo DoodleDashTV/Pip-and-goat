@@ -75,7 +75,8 @@ def test_staging_names_are_rejected():
 def test_geometry_file_limits_allow_density_without_dump():
     assert geometry_file_limit('forest_nature') == 2
     assert geometry_file_limit('forest_ecokit') == 2
-    assert geometry_file_limit('village_blender') == 3
+    assert geometry_file_limit('village_blender') == 1
+    assert geometry_file_limit('village_fbx') == 2
 
 
 def test_geometry_picker_skips_staging_when_heroes_exist():
@@ -123,6 +124,16 @@ def test_ground_picker_skips_high_contrast_leaf_tiles():
     assert chosen['name'] == 'Village_Grass_Albedo.jpg'
 
 
+def test_village_picker_prefers_authored_blend_over_tiny_fbx():
+    records = [
+        {'name': 'Fence_Post.fbx', 'ext': '.fbx', 'size': 80_000},
+        {'name': 'Village.blend', 'ext': '.blend', 'size': 6_000_000},
+        {'name': 'Cart.fbx', 'ext': '.fbx', 'size': 120_000},
+    ]
+    chosen = pick_geometry_records(records, 'village_blender', limit=1)
+    assert chosen[0]['name'] == 'Village.blend'
+
+
 def test_primitive_boxes_rank_behind_hero_meshes():
     assert is_primitive_name('Cube') is True
     assert is_primitive_name('Cube.001') is True
@@ -149,5 +160,6 @@ if __name__ == '__main__':
     test_ground_picker_prefers_grass_over_random_huge_atlas()
     test_ground_picker_skips_normal_maps()
     test_ground_picker_skips_high_contrast_leaf_tiles()
+    test_village_picker_prefers_authored_blend_over_tiny_fbx()
     test_primitive_boxes_rank_behind_hero_meshes()
     print('showcase_original14_select_test PASS')

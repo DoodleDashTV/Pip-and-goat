@@ -140,8 +140,10 @@ def geometry_file_limit(role: str) -> int:
     # while filling the empty platform look.
     if role in {'forest_nature', 'forest_ecokit'}:
         return 2
-    if role in {'village_blender', 'village_project', 'village_fbx'}:
-        return 3
+    if role == 'village_blender':
+        return 1
+    if role in {'village_project', 'village_fbx'}:
+        return 2
     return 1
 
 
@@ -214,7 +216,14 @@ def pick_geometry_records(records: list[dict], role: str, limit: int = 1) -> lis
         ext = str(rec.get('ext') or '').lower()
         size = int(rec.get('size') or 0)
         word_miss = 0 if (not words or any(w in name for w in words)) else 1
-        return (1 if is_dump_name(name) else 0, 1 if is_staging_name(name) else 0, word_miss, EXT_RANK.get(ext, 9), size, name)
+        dump = 1 if is_dump_name(name) else 0
+        staging = 1 if is_staging_name(name) else 0
+        if str(role).startswith('village'):
+            blend_miss = 0 if ext == '.blend' else 1
+            scene_miss = 0 if any(token in name for token in ('village', 'scene', 'full')) else 1
+            # Prefer the authored village .blend over the smallest leftover FBX.
+            return (dump, staging, blend_miss, scene_miss, word_miss, -size, name)
+        return (dump, staging, word_miss, EXT_RANK.get(ext, 9), size, name)
 
     geo.sort(key=rank)
     preferred = [r for r in geo if not is_dump_name(str(r.get('name') or '')) and not is_staging_name(str(r.get('name') or ''))]

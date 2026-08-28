@@ -24,6 +24,7 @@ if str(SCRIPT_DIR) not in sys.path:
 from showcase_original14_select import (  # noqa: E402
     GEOMETRY_EXTS,
     IMAGE_EXTS,
+    NON_ALBEDO_WORDS,
     SUPPORT_EXTS,
     extract_role_limit,
     extract_sort_key,
@@ -42,11 +43,12 @@ VISIBLE_GEOMETRY_ROLES = {
 }
 SUPPORT_ROLES = {'sky_machine_v1', 'sky_machine_v2', 'sky_extra_update', 'world_shaders'}
 RENDERABLE_ROLES = VISIBLE_GEOMETRY_ROLES | {'village_textures', 'sky_hdri'} | SUPPORT_ROLES
-MAX_OBJECTS_PER_BLEND = 10
-MAX_MATERIALS_PER_BLEND = 12
+MAX_OBJECTS_PER_BLEND = 80
+MAX_MATERIALS_PER_BLEND = 24
 MAX_MESHES_PER_ROLE = 8
+MAX_MESHES_VILLAGE_BLEND = 60
 TARGET_FACES_PER_MESH = 8000
-TARGET_FACES_SCENE = 120000
+TARGET_FACES_SCENE = 160000
 PROGRESS_PATH: Path | None = None
 
 
@@ -147,6 +149,10 @@ def select_blend_names(names: list[str], role: str, limit: int = 10) -> list[str
     }.get(role, ())
     usable = [n for n in names if not is_primitive_name(n)]
     preferred = [n for n in usable if any(w in n.lower() for w in words)]
+    if role == 'village_blender':
+        ordered = preferred + [n for n in usable if n not in preferred]
+        if ordered:
+            return ordered[:limit]
     chosen = preferred[:limit]
     if chosen:
         return chosen
@@ -410,7 +416,11 @@ def mesh_needs_purchased_texture(obj) -> bool:
 
 
 def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) -> int:
-    images = [p for p in files if p.is_file() and p.suffix.lower() in IMAGE_EXTS]
+    images = [
+        p for p in files
+        if p.is_file() and p.suffix.lower() in IMAGE_EXTS
+        and not any(word in p.name.lower() for word in NON_ALBEDO_WORDS)
+    ]
     images.sort(key=lambda p: (-min(p.stat().st_size, 8 * 1024 * 1024), p.name.lower()))
     if not images:
         return 0
@@ -428,11 +438,11 @@ def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) 
     return bound
 
 
-def create_purchased_texture_ground(files: list[Path]) -> int:
+def create_purchased_texture_ground(files: list[Path], center=(0.0, 12.0, -0.15), size: float = 160.0) -> int:
     img = pick_ground_image_path(files) or largest_image(files)
     if not img:
         return 0
-    bpy.ops.mesh.primitive_plane_add(size=1600, location=(0, 12, -0.15))
+    bpy.ops.mesh.primitive_plane_add(size=max(80.0, float(size)), location=center)
     ground = bpy.context.object
     ground.name = 'TJ_Ground_Using_Purchased_Village_Texture'
     bpy.ops.object.mode_set(mode='EDIT')
@@ -444,11 +454,47 @@ def create_purchased_texture_ground(files: list[Path]) -> int:
     ground.data.materials.append(image_material(
         'TJ_PurchasedVillageGround',
         img,
-        tile=5.0,
+        tile=4.0,
         mix_color=(0.22, 0.32, 0.14),
-        mix_fac=0.42,
+        mix_fac=0.12,
     ))
     return 1
+
+
+def enable_foliage_alpha(objects: list[bpy.types.Object]) -> int:
+    marked = 0
+    words = ('leaf', 'leaves', 'foliage', 'tree', 'bush', 'grass', 'fern', 'pine', 'plant')
+    for obj in objects:
+        if not obj or obj.type != 'MESH' or not any(w in obj.name.lower() for w in words):
+            continue
+        for slot in obj.material_slots:
+            mat = slot.material
+            if not mat or not getattr(mat, 'use_nodes', False) or not mat.node_tree:
+                continue
+            try:
+                mat.blend_method = 'CLIP'
+                if hasattr(mat, 'alpha_threshold'):
+                    mat.alpha_threshold = 0.35
+            except Exception:
+                pass
+            bsdf = mat.node_tree.nodes.get('Principled BSDF')
+            if not bsdf or 'Alpha' not in bsdf.inputs:
+                continue
+            for node in mat.node_tree.nodes:
+                if node.type != 'TEX_IMAGE' or not node.image:
+                    continue
+                already = any(
+                    link.from_node == node and link.to_socket == bsdf.inputs['Alpha']
+                    for link in mat.node_tree.links
+                )
+                if already:
+                    continue
+                try:
+                    mat.node_tree.links.new(node.outputs['Alpha'], bsdf.inputs['Alpha'])
+                    marked += 1
+                except Exception:
+                    pass
+    return marked
 
 
 def scatter_purchased_meshes(members: list[bpy.types.Object], origin: tuple, copies: int = 4, radius: float = 16.0) -> list[bpy.types.Object]:
@@ -664,43 +710,77 @@ def main() -> int:
 
     contributions: dict[str, dict] = {}
     placements = {
-        'village_blender': (34.0, (0.0, 6.0, 0.0)),
-        'village_project': (22.0, (-12.0, -3.0, 0.0)),
-        'village_fbx': (20.0, (12.0, -4.0, 0.0)),
-        'forest_nature': (30.0, (-9.0, 20.0, 0.0)),
-        'forest_ecokit': (28.0, (9.0, 18.0, 0.0)),
+        'village_blender': (0.0, (0.0, 0.0, 0.0)),
+        'village_project': (18.0, (-22.0, -8.0, 0.0)),
+        'village_fbx': (16.0, (22.0, -8.0, 0.0)),
+        'forest_nature': (12.0, (-18.0, 28.0, 0.0)),
+        'forest_ecokit': (12.0, (18.0, 26.0, 0.0)),
     }
-    for role in VISIBLE_GEOMETRY_ROLES:
+    village_center = Vector((0.0, 0.0, 0.0))
+    for role in ('village_blender', 'village_project', 'village_fbx', 'forest_nature', 'forest_ecokit'):
         files = expanded.get(role, [])
         members: list[bpy.types.Object] = []
         imported_files = 0
+        mesh_limit = MAX_MESHES_VILLAGE_BLEND if role == 'village_blender' else MAX_MESHES_PER_ROLE
         for candidate in geometry_candidates(files, role):
             objs = import_geometry(candidate, role)
             if objs:
-                heroes = keep_hero_meshes(objs, role, MAX_MESHES_PER_ROLE)
+                heroes = keep_hero_meshes(objs, role, mesh_limit)
                 for hero in heroes:
                     decimate_mesh(hero)
                 members.extend(heroes); imported_files += 1
         if not members:
             raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
         size, loc = placements[role]
+        extras: list[bpy.types.Object] = []
         root = parent_group(members, f'TJ_{role}_PurchasedRoot')
-        if root:
-            normalize_group(root, members, size, loc)
-        extras = scatter_purchased_meshes(
-            members,
-            loc,
-            copies=8 if role.startswith('forest') else 6,
-            radius=16.0 if role.startswith('forest') else 10.0,
-        )
-        if role.startswith('forest'):
-            extras.extend(scatter_purchased_meshes(members, loc, copies=6, radius=24.0))
-        members.extend(extras)
+        if role == 'village_blender':
+            # Keep the authored village layout. Shrinking it onto a giant ground
+            # plane is what made the last COMPLETE look like toys on a platform.
+            if root:
+                bpy.context.view_layer.update()
+                bounds = group_bounds(members)
+                if bounds:
+                    mins, maxs = bounds
+                    village_center = (mins + maxs) * 0.5
+                    village_center = Vector((village_center.x, village_center.y, 0.0))
+        else:
+            if root:
+                normalize_group(root, members, size, (
+                    village_center.x + loc[0],
+                    village_center.y + loc[1],
+                    loc[2],
+                ))
+            extras = scatter_purchased_meshes(
+                members,
+                (village_center.x + loc[0], village_center.y + loc[1], loc[2]),
+                copies=8 if role.startswith('forest') else 4,
+                radius=18.0 if role.startswith('forest') else 8.0,
+            )
+            members.extend(extras)
         texture_files = expanded.get('village_textures', []) + expanded.get(role, [])
         bound = bind_purchased_textures(members, texture_files)
-        contributions[role] = {'type':'visible_geometry','objectCount':len(members),'importedFileCount':imported_files,'purchasedTexturesBound':bound,'scatteredPurchasedCopies':len(extras)}
+        contributions[role] = {
+            'type': 'visible_geometry',
+            'objectCount': len(members),
+            'importedFileCount': imported_files,
+            'purchasedTexturesBound': bound,
+            'scatteredPurchasedCopies': len(extras),
+            'authoredLayoutKept': role == 'village_blender',
+        }
 
-    ground_count = create_purchased_texture_ground(expanded.get('village_textures', []))
+    scene_meshes = [o for o in bpy.data.objects if o.type == 'MESH']
+    bounds = group_bounds(scene_meshes)
+    if bounds:
+        mins, maxs = bounds
+        center = (mins + maxs) * 0.5
+        horiz = max((maxs - mins).x, (maxs - mins).y, 40.0)
+        ground_size = min(max(horiz * 2.4, 80.0), 360.0)
+        ground_loc = (center.x, center.y, mins.z - 0.12)
+    else:
+        ground_size = 160.0
+        ground_loc = (0.0, 0.0, -0.15)
+    ground_count = create_purchased_texture_ground(expanded.get('village_textures', []), ground_loc, ground_size)
     if not ground_count:
         raise RuntimeError('Purchased village texture pack contributed no usable image')
     contributions['village_textures'] = {'type':'visible_texture','objectCount':ground_count}
@@ -738,6 +818,11 @@ def main() -> int:
         except Exception:
             pass
     print(json.dumps({'event': 'dropped_primitive_boxes', 'count': dropped_boxes}), flush=True)
+
+    foliage_alpha = enable_foliage_alpha(
+        [o for o in bpy.data.objects if o.type == 'MESH' and not str(o.name).startswith('TJ_Ground')]
+    )
+    print(json.dumps({'event': 'foliage_alpha_clip', 'linked': foliage_alpha}), flush=True)
 
     cap_scene_faces()
     write_progress('BUILD_SCENE', frame=0, framesWritten=0, totalFrames=args.end_frame)
