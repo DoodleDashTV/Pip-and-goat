@@ -4,6 +4,7 @@
 FAILED at `PRIVATE_SCENERY_DISCOVERY` after the single authorized V3 CREATE.
 
 - workflow run: `33130281845`
+- commit: `fcf58c54eaa4bf6c757ffbfd2f6d5cec846fa88e`
 - pod: `24iy85zk8tzqk6`
 - pod name: `tivvlejoy-scenery-showcase-30s-v3`
 - template: `6yz7wkmu34`
@@ -28,7 +29,25 @@ This proves the container and Node worker executed. Blender was not reached beca
 
 `Required purchased scenery role missing: nature_library`
 
-The web preflight had reported 12/12 roles, but its role check only tested whether at least one object matched each role independently. The worker uses a stricter greedy selection and requires a distinct unused object key for every role. The preflight therefore produced a false positive when a candidate needed by `nature_library` had already been consumed by an earlier role.
+## Corrected root cause
+This is **not** a unique-key collision.
+
+A live replay of the exact worker selector against the private inventory showed:
+
+- Independent web/bridge preflight: 12/12 because Botaniq matches `nature_library` include with no size filter.
+- Worker greedy unique-key selection: 8 roles selected, then `nature_library` has zero unused passing candidate.
+
+The only include-hits for `nature_library` were:
+
+| object | size | worker reject |
+| --- | --- | --- |
+| `botaniq_full-7.2.0.paq.zip` | 4915.1 MiB | `maxBytes>900MiB` |
+| `botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip` | 5.3 MiB | `exclude` `/geoscatter.*biomes/` |
+| GeoScatter receipt JSON | 0 MiB | `exclude` |
+
+The purchased forest nature kit (660.7 MiB) is already used as `forest_geometry` and does **not** match the worker `nature_library` include patterns, so it cannot fill that role unless copied to a distinct compatibility key.
+
+Raising the 900 MiB cap to admit Botaniq is not viable for the next paid run: Botaniq alone is 4.9 GiB and would blow the 5 GiB materialization cap together with mountain/forest/sky packages.
 
 ## Cleanup
 - matchedBefore: 1
@@ -36,13 +55,18 @@ The web preflight had reported 12/12 roles, but its role check only tested wheth
 - remainingActiveExactName: 0
 - billingCleanupConfirmed: true
 - cleanup createPerformed: false
+- live recheck: 0 RunPod pods
 
 No active/billable V3 showcase pod remains.
 
 ## Authorization
 V3 authorization is exhausted. Do not retry V3 and do not re-send the paid CREATE.
 
-## Next zero-cost fix
-Add a worker-equivalent role-selection preflight using the exact unique-key selection rules. If the only collision is `nature_library`, create one private compatibility alias copied from an actual purchased nature-library candidate, then prove all 12 roles can be selected as 12 distinct private objects before requesting any new paid authorization.
+## Zero-cost follow-up already applied
+A private compatibility alias was copied from the purchased `Stylized_Forest_Nature_Kit.zip` to:
+
+`tivvlejoy-assets/showcase-compat/Assets Library.zip`
+
+That key matches the already-baked worker `/assets library/i` rule, is 660.7 MiB, and is a distinct object. Worker-equivalent unique-key + maxBytes selection now returns 12/12 distinct purchased objects. Source bytes were not modified. No new CREATE was performed.
 
 PR #169 remains OPEN / DRAFT / UNMERGED / NOT READY.

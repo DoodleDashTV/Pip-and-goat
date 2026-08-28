@@ -1,0 +1,50 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_SHOWCASE_30S_V3_DIAGNOSIS",
+  "workflowRun": "33130281845",
+  "headSha": "fcf58c54eaa4bf6c757ffbfd2f6d5cec846fa88e",
+  "authorization": "TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V3",
+  "executionId": "scenery-showcase-30s-v3-20260828",
+  "podId": "24iy85zk8tzqk6",
+  "podName": "tivvlejoy-scenery-showcase-30s-v3",
+  "templateId": "6yz7wkmu34",
+  "launchTransport": "RUNPOD_REST_TEMPLATE",
+  "workerImage": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+  "secureUsdPerHr": 0.74,
+  "createRequests": 1,
+  "retryCreate": false,
+  "startupObserved": "PRIVATE_SCENERY_DISCOVERY",
+  "blenderReached": false,
+  "frames": 0,
+  "mp4": false,
+  "failure": {
+    "code": "SCENERY_ROLE_MISSING",
+    "message": "Required purchased scenery role missing: nature_library",
+    "rootCause": "WORKER_NATURE_LIBRARY_MAXBYTES",
+    "notRootCause": "UNIQUE_KEY_COLLISION"
+  },
+  "inventory": {
+    "listedObjectCount": 180,
+    "independentPreflightSatisfied": 12,
+    "workerSelectedBeforeFailure": 8,
+    "natureLibraryHits": [
+      {
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_BOTANIQ_FULL_7_2_0/botaniq_full-7.2.0.paq.zip",
+        "mib": 4915.1,
+        "workerReject": "maxBytes>900MiB"
+      },
+      {
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_BOTANIQ_GEOSCATTER_BIOMES_7_1_1/botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip",
+        "mib": 5.3,
+        "workerReject": "exclude"
+      }
+    ]
+  },
+  "cleanup": {
+    "matchedBefore": 1,
+    "terminatedCount": 1,
+    "remainingActiveExactName": 0,
+    "billingCleanupConfirmed": true,
+    "activePodsAfter": 0
+  },
+  "paidMutationAfterDiagnosis": false
+}

@@ -8,6 +8,7 @@ WORKDIR /opt/ddp-worker
 
 # Only the scenery-specific execution layer changes. Reuse the proven base
 # runtime (Blender 4.2.2, ffmpeg, AWS SDK, R2 client, GL/EGL stack, render core).
+COPY workers/runpod-blender/src/scenery-showcase-roles.js ./src/scenery-showcase-roles.js
 COPY workers/runpod-blender/src/scenery-showcase.js ./src/scenery-showcase.js
 COPY workers/runpod-blender/src/scenery-showcase-entry-v2.js ./src/scenery-showcase-entry-v2.js
 COPY scripts/blender/scenery/showcase_30s.py ./blender/scenery/showcase_30s.py
@@ -43,7 +44,8 @@ LABEL org.opencontainers.image.title="tivvlejoy-scenery-showcase-worker" \
 
 # Fail the image build if the scripts are not syntactically valid or the
 # inherited runtime is not the expected Blender release.
-RUN node --check ./src/scenery-showcase.js && \
+RUN node --check ./src/scenery-showcase-roles.js && \
+    node --check ./src/scenery-showcase.js && \
     node --check ./src/scenery-showcase-entry-v2.js && \
     python3 -m py_compile ./blender/scenery/showcase_30s.py ./blender/scenery/showcase_30s_dry.py && \
     blender --version | head -n 1 | grep -F 'Blender 4.2.2'

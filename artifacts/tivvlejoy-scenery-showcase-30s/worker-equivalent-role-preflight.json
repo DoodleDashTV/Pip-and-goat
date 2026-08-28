@@ -1,0 +1,175 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_WORKER_EQUIVALENT_ROLE_PREFLIGHT_V1",
+  "paidMutationPerformed": false,
+  "runpodContacted": false,
+  "requiredRoles": [
+    "mountain_geometry",
+    "background_mountains",
+    "forest_geometry",
+    "forest_textures",
+    "water_system",
+    "village_geometry",
+    "village_textures",
+    "tavern_geometry",
+    "nature_library",
+    "sky_hdri",
+    "sky_machine",
+    "world_shaders"
+  ],
+  "listedObjectCount": 181,
+  "independentPreflight": {
+    "ok": true,
+    "satisfiedRoleCount": 12,
+    "missingRoles": []
+  },
+  "workerBeforeAlias": {
+    "ok": false,
+    "missingRole": "nature_library",
+    "code": "SCENERY_ROLE_MISSING",
+    "selected": [
+      {
+        "role": "mountain_geometry",
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_3DT_MOUNTAIN_PACK_GLB/3DT_Pack_Mountains_GLB.glb",
+        "mib": 1476.7
+      },
+      {
+        "role": "background_mountains",
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_LOUIS_BG_MOUNTAINS_V1/LouisBGMountainsV1.zip",
+        "mib": 512.1
+      },
+      {
+        "role": "forest_geometry",
+        "key": "tivvlejoy-assets/source/stylized-forest/Stylized_Forest_Nature_Kit.zip",
+        "mib": 660.7
+      },
+      {
+        "role": "forest_textures",
+        "key": "tivvlejoy-assets/showcase-compat/forest_textures_4096.zip",
+        "mib": 638.5
+      },
+      {
+        "role": "water_system",
+        "key": "tivvlejoy-assets/showcase-compat/Water_Mat_GN.zip",
+        "mib": 0.1
+      },
+      {
+        "role": "village_geometry",
+        "key": "tivvlejoy-assets/source/village/Village _FBX_.zip",
+        "mib": 2
+      },
+      {
+        "role": "village_textures",
+        "key": "tivvlejoy-assets/source/village/Village _Textures_.zip",
+        "mib": 68.7
+      },
+      {
+        "role": "tavern_geometry",
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_STYLIZED_TAVERN_INTERIOR_BLEND_ZIP_WRAPPER/Stylized Tavern Interior.blend.zip",
+        "mib": 1.8
+      }
+    ],
+    "totalMib": 3360.6,
+    "rejectedNature": [
+      {
+        "key": "tivvlejoy-assets/catalogs/purchased-tool-receipts/SRC_BOTANIQ_GEOSCATTER_BIOMES_7_1_1.json",
+        "mib": 0,
+        "reasons": [
+          "exclude"
+        ]
+      },
+      {
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_BOTANIQ_FULL_7_2_0/botaniq_full-7.2.0.paq.zip",
+        "mib": 4915.1,
+        "reasons": [
+          "maxBytes>900MiB"
+        ]
+      },
+      {
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_BOTANIQ_GEOSCATTER_BIOMES_7_1_1/botaniq_full_geoscatter_biomes-7.1.1.scatpack.zip",
+        "mib": 5.3,
+        "reasons": [
+          "exclude"
+        ]
+      }
+    ]
+  },
+  "natureAlias": {
+    "key": "tivvlejoy-assets/showcase-compat/Assets Library.zip",
+    "sourceKey": "tivvlejoy-assets/source/stylized-forest/Stylized_Forest_Nature_Kit.zip",
+    "created": true,
+    "sourceSize": 692830820,
+    "aliasSize": 692830820,
+    "sourceBytesModified": false,
+    "fabricated": false
+  },
+  "workerAfter": {
+    "ok": true,
+    "missingRole": null,
+    "code": null,
+    "selected": [
+      {
+        "role": "mountain_geometry",
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_3DT_MOUNTAIN_PACK_GLB/3DT_Pack_Mountains_GLB.glb",
+        "mib": 1476.7
+      },
+      {
+        "role": "background_mountains",
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_LOUIS_BG_MOUNTAINS_V1/LouisBGMountainsV1.zip",
+        "mib": 512.1
+      },
+      {
+        "role": "forest_geometry",
+        "key": "tivvlejoy-assets/source/stylized-forest/Stylized_Forest_Nature_Kit.zip",
+        "mib": 660.7
+      },
+      {
+        "role": "forest_textures",
+        "key": "tivvlejoy-assets/showcase-compat/forest_textures_4096.zip",
+        "mib": 638.5
+      },
+      {
+        "role": "water_system",
+        "key": "tivvlejoy-assets/showcase-compat/Water_Mat_GN.zip",
+        "mib": 0.1
+      },
+      {
+        "role": "village_geometry",
+        "key": "tivvlejoy-assets/source/village/Village _FBX_.zip",
+        "mib": 2
+      },
+      {
+        "role": "village_textures",
+        "key": "tivvlejoy-assets/source/village/Village _Textures_.zip",
+        "mib": 68.7
+      },
+      {
+        "role": "tavern_geometry",
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_STYLIZED_TAVERN_INTERIOR_BLEND_ZIP_WRAPPER/Stylized Tavern Interior.blend.zip",
+        "mib": 1.8
+      },
+      {
+        "role": "nature_library",
+        "key": "tivvlejoy-assets/showcase-compat/Assets Library.zip",
+        "mib": 660.7
+      },
+      {
+        "role": "sky_hdri",
+        "key": "tivvlejoy-assets/source/sky-hdri/HDRi_JPG_Pack.zip",
+        "mib": 899.5
+      },
+      {
+        "role": "sky_machine",
+        "key": "tivvlejoy-assets/source/sky-hdri/SkyMachineV2.zip",
+        "mib": 48.9
+      },
+      {
+        "role": "world_shaders",
+        "key": "tivvlejoy-assets/source/purchased-blender-tools/SRC_PHYSICAL_STARLIGHT_1_9_4/physical_starlight_atmosphere-1.9.4.zip",
+        "mib": 31.7
+      }
+    ],
+    "totalMib": 5001.4,
+    "rejectedNature": []
+  },
+  "readyForNextPaidAuthorization": true
+}

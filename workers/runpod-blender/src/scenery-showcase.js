@@ -19,78 +19,7 @@ const { ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const r2 = require('./r2-client');
 const core = require('./render-core');
 const { resolveHeadlessGlConfig, applyHeadlessGlEnv } = require('./headless-gl');
-
-const REQUIRED_ROLES = [
-  'mountain_geometry',
-  'background_mountains',
-  'forest_geometry',
-  'forest_textures',
-  'water_system',
-  'village_geometry',
-  'village_textures',
-  'tavern_geometry',
-  'nature_library',
-  'sky_hdri',
-  'sky_machine',
-  'world_shaders',
-];
-
-const ROLE_RULES = {
-  mountain_geometry: {
-    include: [/3dt.*mountain/i, /mountain.*pack/i, /mountains.*glb/i],
-    prefer: [/\.glb$/i, /blender\.zip$/i, /fbx.*textures\.zip$/i],
-    exclude: [/ue5/i, /background/i],
-  },
-  background_mountains: {
-    include: [/louisbgmountains/i, /background.*mountain/i],
-    prefer: [/\.zip$/i, /\.blend$/i, /\.fbx$/i],
-  },
-  forest_geometry: {
-    include: [/stylized.*forest/i, /stylised.*ecokit/i, /forest.*nature.*kit/i, /ecokit/i],
-    prefer: [/\.zip$/i, /\.blend$/i, /\.fbx$/i, /\.glb$/i],
-    exclude: [/4096|2048|1024/i],
-  },
-  forest_textures: {
-    include: [/4096/i, /forest.*texture/i, /rocks_[ab]/i, /foliage_0[12]/i],
-    prefer: [/4096.*\.zip$/i, /\.zip$/i],
-  },
-  water_system: {
-    include: [/water[_ -]?mat.*gn/i, /water.*\.blend$/i, /river.*\.blend$/i],
-    prefer: [/water[_ -]?mat.*gn.*\.blend$/i, /\.blend$/i],
-  },
-  village_geometry: {
-    include: [/village.*fbx/i, /village.*blender/i, /assembled.*project.*\.blend/i, /source\/village/i],
-    prefer: [/village.*fbx.*\.zip$/i, /assembled.*\.blend$/i, /blender.*\.zip$/i],
-    exclude: [/texture/i, /unity/i],
-  },
-  village_textures: {
-    include: [/village.*texture/i],
-    prefer: [/\.zip$/i],
-  },
-  tavern_geometry: {
-    include: [/stylized.*tavern.*interior.*\.blend/i, /stylized.*tavern.*package.*\.fbx/i, /tavern/i],
-    prefer: [/\.blend$/i, /\.fbx$/i, /\.blend\.zip$/i, /package\.zip$/i],
-    exclude: [/texture/i],
-  },
-  nature_library: {
-    include: [/procedural.*nature/i, /assets library/i, /flora/i, /rock[_ -]?model/i, /scatter/i, /botaniq_full-7\.2\.0/i],
-    prefer: [/\.blend$/i, /assets library\.zip$/i, /\.zip$/i],
-    exclude: [/geoscatter.*biomes/i],
-    maxBytes: 900 * 1024 * 1024,
-  },
-  sky_hdri: {
-    include: [/(^|\/)sk1\.zip$/i, /hdri.*jpg.*pack/i, /sky.*hdri/i, /\.hdr$/i],
-    prefer: [/sk1\.zip$/i, /\.hdr$/i, /hdri.*\.zip$/i],
-  },
-  sky_machine: {
-    include: [/skymachinev2/i, /sky.*machine.*v2/i],
-    prefer: [/skymachinev2\.zip$/i, /\.blend$/i],
-  },
-  world_shaders: {
-    include: [/world.*shaders/i, /giveaway.*world/i, /physical[_ -]?starlight[_ -]?atmosphere-1\.9\.4/i, /gaffer 3\.2\.10/i],
-    prefer: [/world.*shaders.*\.zip$/i, /physical.*1\.9\.4.*\.zip$/i, /gaffer 3\.2\.10.*\.zip$/i],
-  },
-};
+const { REQUIRED_ROLES, selectAssets } = require('./scenery-showcase-roles');
 
 function strip(v) {
   return String(v || '').replace(/[\r\n]+/g, '').trim();
@@ -136,60 +65,6 @@ async function listAllObjects(ctx, prefix) {
     token = page.IsTruncated ? page.NextContinuationToken : undefined;
   } while (token);
   return out;
-}
-
-function isCommercialSceneryCandidate(item) {
-  const k = item.key.toLowerCase();
-  if (!k.startsWith('tivvlejoy-assets')) return false;
-  if (/\/characters\//.test(k)) return false;
-  if (/\/executions\//.test(k)) return false;
-  if (/\/qa\//.test(k)) return false;
-  if (/receipt\.json$|status\.json$|manifest\.json$|\.part\b/.test(k)) return false;
-  return true;
-}
-
-function score(item, role, rule) {
-  const key = item.key;
-  if (rule.exclude && rule.exclude.some((rx) => rx.test(key))) return -Infinity;
-  if (!rule.include.some((rx) => rx.test(key))) return -Infinity;
-  const maxBytes = Number(rule.maxBytes || 1500 * 1024 * 1024);
-  if (item.size > maxBytes) return -Infinity;
-  let value = 100;
-  for (let i = 0; i < (rule.prefer || []).length; i += 1) {
-    if (rule.prefer[i].test(key)) value += 80 - i * 8;
-  }
-  if (/\.blend$/i.test(key)) value += 32;
-  if (/\.glb$/i.test(key)) value += 30;
-  if (/\.fbx$/i.test(key)) value += 28;
-  if (/\.zip$/i.test(key)) value += 16;
-  // Prefer canonical direct source over wrappers/backups/historical duplicates.
-  if (/wrapper|backup|historical|ue5/i.test(key)) value -= 60;
-  // Small metadata-like files should never beat actual source packages.
-  value += Math.min(24, Math.log2(Math.max(1, item.size / (1024 * 1024))) * 2);
-  return value;
-}
-
-function selectAssets(items) {
-  const candidates = items.filter(isCommercialSceneryCandidate);
-  const selected = [];
-  const usedKeys = new Set();
-  for (const role of REQUIRED_ROLES) {
-    const rule = ROLE_RULES[role];
-    const ranked = candidates
-      .map((item) => ({ item, score: score(item, role, rule) }))
-      .filter((entry) => Number.isFinite(entry.score))
-      .sort((a, b) => b.score - a.score || a.item.size - b.item.size);
-    const choice = ranked.find((entry) => !usedKeys.has(entry.item.key));
-    if (!choice) throw Object.assign(new Error(`Required purchased scenery role missing: ${role}`), { code: 'SCENERY_ROLE_MISSING' });
-    usedKeys.add(choice.item.key);
-    selected.push({ role, ...choice.item });
-  }
-  const totalBytes = selected.reduce((sum, item) => sum + item.size, 0);
-  const hardMaterializeCap = Number(process.env.SCENERY_SHOWCASE_MAX_INPUT_BYTES || 5 * 1024 * 1024 * 1024);
-  if (totalBytes > hardMaterializeCap) {
-    throw Object.assign(new Error(`Selected scenery input ${totalBytes} exceeds hard materialization cap ${hardMaterializeCap}`), { code: 'SCENERY_INPUT_CAP' });
-  }
-  return { selected, totalBytes, listedObjectCount: items.length };
 }
 
 function spawnBlender({ env, args, timeoutMs }) {
