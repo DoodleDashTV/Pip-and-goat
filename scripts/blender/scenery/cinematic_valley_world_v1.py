@@ -449,10 +449,10 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         jag += 0.35 * math.sin(x * 0.61 + y * 1.27)
         fade += jag
         if dist < bed:
-            value = 0.62 + 0.36 * (1.0 - min(1.0, dist / max(0.25, bed)))
+            value = 0.78 + 0.20 * (1.0 - min(1.0, dist / max(0.25, bed)))
         elif dist < fade:
             t = (dist - bed) / max(0.35, fade - bed)
-            value = 0.48 * ((1.0 - t) ** 1.15) * (0.55 + 0.45 * (0.5 + 0.5 * math.sin(along * 0.33 + x * 0.8)))
+            value = (0.78 * ((1.0 - t) ** 0.85)) * (0.70 + 0.30 * (0.5 + 0.5 * math.sin(along * 0.33 + x * 0.8)))
         else:
             value = 0.0
         color.data[index].color = (value, value, value, 1.0)
@@ -604,16 +604,16 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Roughness" in body.inputs:
         links.new(rough_out, body.inputs["Roughness"])
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.34
+        body.inputs["Specular IOR Level"].default_value = 0.20
     if "IOR" in body.inputs:
-        body.inputs["IOR"].default_value = 1.333
+        body.inputs["IOR"].default_value = 1.18
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     trans = nodes.new("ShaderNodeMapRange")
     trans.inputs["From Min"].default_value = 0.0
     trans.inputs["From Max"].default_value = 1.0
-    trans.inputs["To Min"].default_value = 0.72
-    trans.inputs["To Max"].default_value = 0.38
+    trans.inputs["To Min"].default_value = 0.58
+    trans.inputs["To Max"].default_value = 0.28
     links.new(attr.outputs["Color"], trans.inputs["Value"])
     if "Transmission Weight" in body.inputs:
         links.new(trans.outputs["Result"] if "Result" in trans.outputs else trans.outputs[0], body.inputs["Transmission Weight"])
