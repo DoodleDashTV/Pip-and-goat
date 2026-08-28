@@ -7,6 +7,7 @@ individual purchased assets and keep combined dumps as a last resort.
 """
 from __future__ import annotations
 
+import math
 import re
 from pathlib import Path
 
@@ -171,6 +172,17 @@ def is_camera_hero_name(name: str) -> bool:
     if is_foliage_card_name(n) or is_water_or_ocean_name(n):
         return False
     return any(word in n for word in CAMERA_HERO_WORDS)
+
+
+def is_authored_village_mesh_name(name: str) -> bool:
+    n = str(name or '').lower()
+    return any(word in n for word in ('building', 'roof', 'cabin', 'house', 'cottage', 'hut'))
+
+
+def village_orbit_radius(rx: float, ry: float) -> float:
+    """Keep every camera keyframe outside the village AABB."""
+    half = math.hypot(max(rx, 4.0), max(ry, 4.0))
+    return min(max(half + max(10.0, 0.55 * max(rx, ry, 4.0)), 16.0), 36.0)
 
 
 def village_file_rank(name: str) -> tuple:

@@ -2,6 +2,7 @@
 """Zero-cost ranking tests for the Original-14 scenery speed repair."""
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 from showcase_original14_select import (
@@ -17,7 +18,9 @@ from showcase_original14_select import (
     is_primitive_name,
     is_staging_name,
     is_water_or_ocean_name,
+    is_authored_village_mesh_name,
     mesh_keep_rank,
+    village_orbit_radius,
     pick_geometry_records,
     pick_ground_image_records,
     should_extract_member,
@@ -198,6 +201,19 @@ def test_village_extract_sort_keeps_large_cabin_a_first():
     assert [Path(item[0]).name for item in ordered[:2]] == ['Cabin04A.blend', 'Cabin01A.blend']
 
 
+def test_camera_stays_outside_village_cluster():
+    assert is_authored_village_mesh_name('Building04_LOD0') is True
+    assert is_authored_village_mesh_name('Roof04') is True
+    assert is_authored_village_mesh_name('Pine_Tree_01') is False
+    tight = village_orbit_radius(6.0, 5.0)
+    wide = village_orbit_radius(20.0, 18.0)
+    assert tight >= 16.0
+    assert wide > tight
+    assert wide <= 36.0
+    # A 12x10 cluster must not use a radius that lands inside the AABB.
+    assert tight > math.hypot(6.0, 5.0)
+
+
 def test_camera_hero_rejects_lily_pad_and_water():
     assert is_camera_hero_name('Building04_LOD0') is True
     assert is_camera_hero_name('Roof04') is True
@@ -230,5 +246,6 @@ if __name__ == '__main__':
     test_primitive_boxes_rank_behind_hero_meshes()
     test_village_picker_prefers_cabin_a_over_interior_and_skips_none()
     test_village_extract_sort_keeps_large_cabin_a_first()
+    test_camera_stays_outside_village_cluster()
     test_camera_hero_rejects_lily_pad_and_water()
     print('showcase_original14_select_test PASS')

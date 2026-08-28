@@ -29,6 +29,7 @@ from showcase_original14_select import (  # noqa: E402
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
+    is_authored_village_mesh_name,
     is_box_mesh,
     is_camera_hero_name,
     is_dominating_plane,
@@ -36,6 +37,7 @@ from showcase_original14_select import (  # noqa: E402
     is_high_lod_name,
     is_primitive_name,
     is_water_or_ocean_name,
+    village_orbit_radius,
     mesh_keep_rank,
     pick_geometry_paths,
     pick_ground_image_path,
@@ -433,6 +435,10 @@ def material_has_valid_image(mat) -> bool:
 def mesh_needs_purchased_texture(obj) -> bool:
     if obj.type != 'MESH':
         return False
+    # Cabin kit blends already ship Building/Roof albedos. Rebinding them
+    # produced neon-green log stripes on the village-kit COMPLETE.
+    if is_authored_village_mesh_name(obj.name) and obj.data.materials:
+        return False
     if not obj.data.materials:
         return True
     for slot in obj.material_slots:
@@ -714,22 +720,32 @@ def setup_camera(start: int, end: int):
     if bounds:
         mins, maxs = bounds
         center = (mins + maxs) * 0.5
-        horiz = max((maxs - mins).x, (maxs - mins).y, 6.0)
+        rx = max((maxs - mins).x * 0.5, 4.0)
+        ry = max((maxs - mins).y * 0.5, 4.0)
         vert = max((maxs - mins).z, 3.0)
-        look_z = mins.z + min(vert * 0.38, 5.0)
+        look_z = mins.z + min(vert * 0.42, 6.0)
         look = (center.x, center.y, look_z)
-        # Stay inside the hero cluster for every keyframe. Wide orbits were
-        # turning 5/6 shots into empty horizon even when assets existed.
-        cam_h = min(max(vert * 0.5, 2.8), 7.0)
-        dist = min(max(horiz * 0.7, 8.0), 18.0)
-        cams = [
-            (center.x, center.y + dist, mins.z + cam_h),
-            (center.x - dist * 0.72, center.y + dist * 0.62, mins.z + cam_h * 0.9),
-            (center.x + dist * 0.78, center.y + dist * 0.18, mins.z + cam_h * 0.75),
-            (center.x - dist * 0.55, center.y - dist * 0.35, mins.z + cam_h * 0.7),
-            (center.x + dist * 0.62, center.y - dist * 0.55, mins.z + cam_h * 0.8),
-            (center.x, center.y - dist * 0.85, mins.z + cam_h * 0.95),
-        ]
+        # Village-kit COMPLETE clipped through cabins at frames 360 and 720.
+        # Orbit outside the cluster AABB instead of cutting through it.
+        radius = village_orbit_radius(rx, ry)
+        cam_h = min(max(vert * 0.35 + 5.0, 7.0), 16.0)
+        cams = []
+        for deg in (90.0, 150.0, 30.0, 210.0, 330.0, 270.0):
+            ang = math.radians(deg)
+            cams.append((
+                center.x + math.cos(ang) * radius,
+                center.y + math.sin(ang) * radius,
+                mins.z + cam_h,
+            ))
+        pad = 6.0
+        for i, (x, y, z) in enumerate(cams):
+            inside_x = (mins.x - pad) <= x <= (maxs.x + pad)
+            inside_y = (mins.y - pad) <= y <= (maxs.y + pad)
+            if inside_x and inside_y:
+                vx, vy = x - center.x, y - center.y
+                n = math.hypot(vx, vy) or 1.0
+                extra = max(rx, ry) + pad + 2.0
+                cams[i] = (center.x + vx / n * extra, center.y + vy / n * extra, z)
         targets = [look, look, look, look, look, look]
     else:
         cams = [(0,145,42),(-24,105,24),(24,70,18),(-18,30,12),(20,-12,16),(0,-58,38)]
@@ -737,7 +753,7 @@ def setup_camera(start: int, end: int):
     bpy.ops.object.camera_add(location=cams[0])
     cam = bpy.context.object
     cam.name = 'TJ_Original14_Camera'
-    cam.data.lens = 35
+    cam.data.lens = 32
     bpy.context.scene.camera = cam
     target = bpy.data.objects.new('TJ_Original14_Target', None)
     bpy.context.scene.collection.objects.link(target)
