@@ -22,8 +22,8 @@ jobs:
       BRIDGE_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s-original14-v1 # pragma: allowlist secret
       SCENERY_AUTHORIZATION: TIVVLEJOY_SCENERY_ORIGINAL14_30S_STANDING_AUTHORIZATION_V1
       EXPECTED_TEMPLATE_ID: u4glgdj076
-      EXPECTED_IMAGE: ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:421b24fb74379aa440386e79a5b4a18f1016a17a2560d721ac0a1d27b361ad93
-      EXPECTED_IMAGE_DIGEST: sha256:421b24fb74379aa440386e79a5b4a18f1016a17a2560d721ac0a1d27b361ad93
+      EXPECTED_IMAGE: ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:7dfedd6ba367e8f881aae6430f0f1a61dd78a033dc77d4ca712c1e20c8bd30f4
+      EXPECTED_IMAGE_DIGEST: sha256:7dfedd6ba367e8f881aae6430f0f1a61dd78a033dc77d4ca712c1e20c8bd30f4
       RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
     steps:
       - name: Zero-cost Original14 live preflight
