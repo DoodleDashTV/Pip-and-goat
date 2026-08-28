@@ -1,0 +1,61 @@
+name: TivvleJoy Scenery V5 Deep Pod Diagnostic
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-v5-deep-pod-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+      POD_NAME: tivvlejoy-scenery-showcase-30s-v5
+    steps:
+      - name: Read exact pod details only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RUNPOD_API_KEY"
+          curl --fail --silent --show-error --max-time 60 \
+            -H "Authorization: Bearer $RUNPOD_API_KEY" \
+            https://rest.runpod.io/v1/pods > pods.json
+          python3 - <<'PY'
+          import json, os
+          raw=json.load(open('pods.json'))
+          pods=raw if isinstance(raw,list) else raw.get('pods',[]) if isinstance(raw,dict) else []
+          exact=[p for p in pods if isinstance(p,dict) and p.get('name')==os.environ['POD_NAME']]
+          def clean(p):
+              runtime=p.get('runtime') if isinstance(p.get('runtime'),dict) else None
+              machine=p.get('machine') if isinstance(p.get('machine'),dict) else None
+              return {
+                'id':p.get('id'),'name':p.get('name'),'desiredStatus':p.get('desiredStatus'),
+                'status':p.get('status'),'podStatus':p.get('podStatus'),'costPerHr':p.get('costPerHr'),
+                'imageName':p.get('imageName'),'templateId':p.get('templateId'),
+                'machineId':p.get('machineId') or (machine or {}).get('id'),
+                'gpuTypeId':p.get('gpuTypeId') or (machine or {}).get('gpuTypeId'),
+                'lastStatusChange':p.get('lastStatusChange'),'createdAt':p.get('createdAt'),
+                'runtime': None if runtime is None else {
+                  'uptimeInSeconds':runtime.get('uptimeInSeconds'),
+                  'portsCount':len(runtime.get('ports') or []),
+                  'gpus':runtime.get('gpus'),
+                  'container':runtime.get('container'),
+                },
+              }
+          out={'schema':'TIVVLEJOY_SCENERY_V5_DEEP_POD_DIAGNOSTIC_V1','exactCount':len(exact),'exact':[clean(p) for p in exact],'mutationPerformed':False}
+          print(json.dumps(out,indent=2))
+          open('pod-deep-safe.json','w').write(json.dumps(out,indent=2)+'\n')
+          PY
+      - name: Upload sanitized diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-v5-deep-pod-diagnostic
+          path: pod-deep-safe.json
+          if-no-files-found: error
+          retention-days: 3
