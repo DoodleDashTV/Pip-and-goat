@@ -270,11 +270,13 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
         return shoulder_z + 0.20 * (t ** 1.35) + irreg
     t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
     shelf = shoulder_z + 0.20
-    if t < 0.40:
-        u = t / 0.40
-        return shelf + (crest_z - shelf) * (u ** 0.70)
-    u = (t - 0.40) / 0.60
-    return crest_z + (meadow_z - crest_z) * (u ** 1.20)
+    # Jagged crest so the grass seam is not a knife-cut.
+    crest_z += 0.10 * math.sin(x * 1.17 + y * 0.83) + 0.06 * math.sin(along * 0.91)
+    if t < 0.48:
+        u = t / 0.48
+        return shelf + (crest_z - shelf) * (u ** 0.82)
+    u = (t - 0.48) / 0.52
+    return crest_z + (meadow_z - crest_z) * (u ** 1.05)
 
 
 def build_terrain(_files: list[Path]) -> bpy.types.Object:
@@ -441,12 +443,12 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         dist, signed, along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
-        bank = local_half + (2.2 if signed < 0.0 else 1.3)
+        bank = local_half + (2.6 if signed < 0.0 else 1.6) + 0.55 * math.sin(along * 0.37)
         if dist < bed:
             value = 0.72 + 0.26 * (1.0 - min(1.0, dist / max(0.25, bed)))
         elif dist < bank:
             t = (dist - bed) / max(0.25, bank - bed)
-            value = 0.62 * (1.0 - t) * (0.75 + 0.25 * math.sin(along * 0.41))
+            value = 0.58 * (1.0 - t) ** 0.85 * (0.62 + 0.38 * math.sin(along * 0.41 + signed * 2.1))
         else:
             value = 0.0
         color.data[index].color = (value, value, value, 1.0)
@@ -533,7 +535,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    body_col = tint or (0.018, 0.030, 0.026, 1.0)
+    body_col = tint or (0.012, 0.020, 0.018, 1.0)
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
@@ -549,8 +551,8 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     rough = nodes.new("ShaderNodeMapRange")
     rough.inputs["From Min"].default_value = 0.0
     rough.inputs["From Max"].default_value = 1.0
-    rough.inputs["To Min"].default_value = 0.10
-    rough.inputs["To Max"].default_value = 0.28
+    rough.inputs["To Min"].default_value = 0.18
+    rough.inputs["To Max"].default_value = 0.46
     links.new(attr.outputs["Color"], rough.inputs["Value"])
     river_mask = purchased_river_mask_image()
     if river_mask is not None:
@@ -575,13 +577,13 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     elif "Roughness" in body.inputs:
         links.new(rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0], body.inputs["Roughness"])
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.46
+        body.inputs["Specular IOR Level"].default_value = 0.28
     if "IOR" in body.inputs:
         body.inputs["IOR"].default_value = 1.333
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     if "Transmission Weight" in body.inputs:
-        body.inputs["Transmission Weight"].default_value = 0.18
+        body.inputs["Transmission Weight"].default_value = 0.32
     if "Transmission Extra" in body.inputs:
         body.inputs["Transmission Extra"].default_value = 0.0
     ripples = nodes.new("ShaderNodeTexNoise")
@@ -601,13 +603,13 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     except Exception:
         gloss = nodes.new("ShaderNodeBsdfPrincipled")
     if "Color" in gloss.inputs:
-        gloss.inputs["Color"].default_value = (0.46, 0.50, 0.48, 1.0)
+        gloss.inputs["Color"].default_value = (0.16, 0.20, 0.18, 1.0)
     elif "Base Color" in gloss.inputs:
-        gloss.inputs["Base Color"].default_value = (0.32, 0.36, 0.34, 1.0)
+        gloss.inputs["Base Color"].default_value = (0.12, 0.16, 0.14, 1.0)
         if "Metallic" in gloss.inputs:
             gloss.inputs["Metallic"].default_value = 0.0
     if "Roughness" in gloss.inputs:
-        gloss.inputs["Roughness"].default_value = 0.14
+        gloss.inputs["Roughness"].default_value = 0.22
     if "Normal" in gloss.inputs:
         links.new(bump.outputs["Normal"], gloss.inputs["Normal"])
     weight = nodes.new("ShaderNodeLayerWeight")
@@ -618,7 +620,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(weight.outputs["Facing"], invert.inputs[1])
     cap = nodes.new("ShaderNodeMath")
     cap.operation = "MULTIPLY"
-    cap.inputs[1].default_value = 0.22
+    cap.inputs[1].default_value = 0.10
     links.new(invert.outputs["Value"], cap.inputs[0])
     mix_sh = nodes.new("ShaderNodeMixShader")
     links.new(cap.outputs["Value"], mix_sh.inputs["Fac"])
@@ -639,9 +641,9 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
         if src and "Base Color" in src.inputs:
             src_col = src.inputs["Base Color"].default_value
             tint = (
-                max(0.014, min(0.034, float(src_col[0]) * 0.14)),
-                max(0.024, min(0.046, float(src_col[1]) * 0.13)),
-                max(0.020, min(0.038, float(src_col[2]) * 0.08)),
+                max(0.010, min(0.024, float(src_col[0]) * 0.10)),
+                max(0.016, min(0.032, float(src_col[1]) * 0.09)),
+                max(0.014, min(0.026, float(src_col[2]) * 0.06)),
                 1.0,
             )
     surface = cinematic_river_material(tint)
@@ -881,9 +883,8 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     )
     assigned = assign_purchased_water(river)
     extras = [bed]
-    extras.extend(build_broken_bank_patches(centers))
-    # Ico-sphere bed lumps read as manhole covers from SHOT_02. Keep soil as
-    # irregular bank patches and the dark bed mesh only.
+    # Rectangular bank patches read as planks/bridges. Terrain wet-mask,
+    # dark bed, and crest trees carry the breakup.
     print(json.dumps({
         "event": "geometry_first_channel_built",
         "bed": bed.name,
@@ -892,7 +893,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
         "waterWidthScale": WATER_WIDTH_SCALE,
         "bedCenterZ": BED_CENTER_Z,
         "bankCrestZ": BANK_CREST_Z,
-        "bankPatches": len(extras) - 1,
+        "bankPatches": 0,
         "centers": len(centers),
     }), flush=True)
     return river, assigned, extras
