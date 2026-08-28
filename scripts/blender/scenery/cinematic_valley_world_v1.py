@@ -224,18 +224,18 @@ def cinematic_meadow_material(img_path: Path | None) -> bpy.types.Material:
         bsdf.inputs["Roughness"].default_value = 0.94
     coord = nodes.new("ShaderNodeTexCoord")
     noise = nodes.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 0.03
+    noise.inputs["Scale"].default_value = 0.018
     if "Detail" in noise.inputs:
         noise.inputs["Detail"].default_value = 2.0
     links.new(coord.outputs["Object"], noise.inputs["Vector"])
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE"
-    ramp.color_ramp.elements[0].position = 0.20
-    ramp.color_ramp.elements[0].color = (0.07, 0.10, 0.05, 1.0)
-    ramp.color_ramp.elements[1].position = 0.80
-    ramp.color_ramp.elements[1].color = (0.16, 0.22, 0.08, 1.0)
+    ramp.color_ramp.elements[0].position = 0.18
+    ramp.color_ramp.elements[0].color = (0.05, 0.07, 0.04, 1.0)
+    ramp.color_ramp.elements[1].position = 0.82
+    ramp.color_ramp.elements[1].color = (0.10, 0.13, 0.06, 1.0)
     mid = ramp.color_ramp.elements.new(0.50)
-    mid.color = (0.11, 0.16, 0.06, 1.0)
+    mid.color = (0.07, 0.10, 0.05, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
     color = ramp.outputs["Color"]
     if img_path is not None:
@@ -359,63 +359,33 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
     water = next((mat for mat in bpy.data.materials if mat and str(mat.name).startswith("Water_Mat")), None)
     if water is None:
         water = next((mat for mat in bpy.data.materials if mat and "water" in mat.name.lower() and mat.node_tree), None)
-    purchased_name = water.name if water else ""
-    # Do not mix the purchased Water_Mat shader onto the surface. On a grazing
-    # 9:16 camera it reads as tiled shingles / blue tape. Keep the purchased
-    # albedo as a darkened tint so visible-use is real without owning the look.
-    mat = bpy.data.materials.new("TJ_River_DarkWater_FromPurchasedTint")
-    mat.use_nodes = True
-    nodes = mat.node_tree.nodes
-    links = mat.node_tree.links
-    bsdf = nodes.get("Principled BSDF")
-    tint = (0.025, 0.055, 0.06, 1.0)
-    if water and water.node_tree:
-        src = next((n for n in water.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
-        if src and "Base Color" in src.inputs:
-            src_col = src.inputs["Base Color"].default_value
-            tint = (
-                max(0.015, float(src_col[0]) * 0.22),
-                max(0.03, float(src_col[1]) * 0.22),
-                max(0.04, float(src_col[2]) * 0.22),
-                1.0,
-            )
-    if bsdf:
-        if "Base Color" in bsdf.inputs:
-            bsdf.inputs["Base Color"].default_value = tint
-        if "Roughness" in bsdf.inputs:
-            bsdf.inputs["Roughness"].default_value = 0.34
-        if "Specular IOR Level" in bsdf.inputs:
-            bsdf.inputs["Specular IOR Level"].default_value = 0.38
-        if "Transmission Weight" in bsdf.inputs:
-            bsdf.inputs["Transmission Weight"].default_value = 0.04
-        layer = nodes.new("ShaderNodeLayerWeight")
-        layer.inputs["Blend"].default_value = 0.42
-        rough = nodes.new("ShaderNodeMapRange")
-        rough.inputs["From Min"].default_value = 0.0
-        rough.inputs["From Max"].default_value = 1.0
-        rough.inputs["To Min"].default_value = 0.22
-        rough.inputs["To Max"].default_value = 0.48
-        links.new(layer.outputs["Facing"], rough.inputs["Value"])
-        if "Roughness" in bsdf.inputs:
-            links.new(rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0], bsdf.inputs["Roughness"])
-        wave = nodes.new("ShaderNodeTexWave")
-        wave.inputs["Scale"].default_value = 2.8
-        if "Distortion" in wave.inputs:
-            wave.inputs["Distortion"].default_value = 2.1
-        bump = nodes.new("ShaderNodeBump")
-        bump.inputs["Strength"].default_value = 0.20
-        links.new(wave.outputs["Color"], bump.inputs["Height"])
-        if "Normal" in bsdf.inputs:
-            links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    if water is None:
+        water = fallback_water_material()
+        purchased = False
+    else:
+        purchased = True
+        if water.node_tree:
+            for node in water.node_tree.nodes:
+                if node.type != "BSDF_PRINCIPLED":
+                    continue
+                if "Transmission Weight" in node.inputs:
+                    node.inputs["Transmission Weight"].default_value = min(
+                        float(node.inputs["Transmission Weight"].default_value), 0.08
+                    )
+                if "Roughness" in node.inputs and float(node.inputs["Roughness"].default_value) < 0.16:
+                    node.inputs["Roughness"].default_value = 0.22
     river.data.materials.clear()
-    river.data.materials.append(mat)
+    river.data.materials.append(water)
+    if hasattr(river, "visible_shadow"):
+        river.visible_shadow = False
     print(json.dumps({
         "event": "river_material_assigned",
-        "name": purchased_name or mat.name,
-        "purchased": bool(purchased_name),
-        "surface": mat.name,
+        "name": water.name,
+        "purchased": purchased,
+        "surface": water.name,
+        "shape": "spline_strip",
     }), flush=True)
-    return purchased_name or mat.name
+    return water.name
 
 
 def build_river_guide() -> bpy.types.Object:
@@ -526,12 +496,12 @@ def dirt_bank_material() -> bpy.types.Material:
 
 def build_river() -> tuple[bpy.types.Object, str, list]:
     build_river_guide()
-    river = spline_strip_mesh("TJ_River_PurchasedWater", half_width=2.15, z_offset=0.16, width_wobble=0.45)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", half_width=2.05, z_offset=0.04, width_wobble=0.55)
     assigned = assign_purchased_water(river)
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
-        bank = spline_edge_mesh(name, inner_half=2.05, outer_half=4.4, z_offset=0.05, side_sign=sign)
+        bank = spline_edge_mesh(name, inner_half=1.55, outer_half=5.2, z_offset=0.10, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
     return river, assigned, banks
@@ -567,12 +537,13 @@ def place_purchased_water_gn(files: list[Path], collection: bpy.types.Collection
             except Exception:
                 mod.show_render = False
                 mod.show_viewport = False
-    water.location = (-2.0, -11.4, -0.52)
-    water.scale = (0.42, 0.12, 1.0)
-    water.rotation_euler = (0.0, 0.0, 0.12)
-    link_exclusive(water, collection)
-    print(json.dumps({"event": "purchased_water_gn_placed", "name": water.name}), flush=True)
-    return water.name
+    # Material donor only. A visible rectangle reads as a floating water card.
+    water.hide_render = True
+    water.hide_viewport = True
+    water.location = (0.0, -420.0, -90.0)
+    donated = next((mat.name for mat in bpy.data.materials if mat and str(mat.name).startswith("Water_Mat")), water.name)
+    print(json.dumps({"event": "purchased_water_mat_donated", "name": donated}), flush=True)
+    return donated
 
 
 def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, radius: float, scale: float, seed: int) -> list:
@@ -614,7 +585,7 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="AREA", location=(0.0, -12.0, 48.0))
     sky = bpy.context.object
     sky.name = "TJ_SkyFill"
-    sky.data.energy = 140
+    sky.data.energy = 220
     sky.data.size = 72
     sky.rotation_euler = (math.radians(0), 0.0, 0.0)
     if hasattr(sky.data, "color"):
@@ -931,9 +902,9 @@ def main() -> int:
             downloaded=True,
             extracted=True,
             datablockLoaded=water_loaded > 0 or bool(water_gn),
-            renderedPixels=bool(water_gn) or river_material.startswith("Water_Mat"),
-            shotIds=["SHOT_02"] if water_gn or river_material.startswith("Water_Mat") else [],
-            evidence=f"object:{water_gn}" if water_gn else (f"river_material:{river_material}" if river_material.startswith("Water_Mat") else ""),
+            renderedPixels=river_material.startswith("Water_Mat"),
+            shotIds=["SHOT_02"] if river_material.startswith("Water_Mat") else [],
+            evidence=f"spline_strip:{river_material}" if river_material.startswith("Water_Mat") else "",
         ),
         "forest_nature": visible_use_record(
             "forest_nature",
