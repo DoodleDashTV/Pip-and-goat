@@ -364,21 +364,21 @@ def cinematic_world_camera_keys(
     my = fy + 48.0 if mountain_y is None else float(mountain_y)
     mz = village_min_z + 18.0 if mountain_z is None else float(mountain_z)
 
-    # 9:16 stacks layers vertically. Stand south of the village and look north
-    # so village / river / forest / mountains / sky stay in one frame.
+    # 9:16 stacks layers vertically. Stay far south and keep every look
+    # aimed up-valley so river / village / forest / mountains / sky share the frame.
     beats = (
         # Wide establish: far south, high. Look past the village to the peaks.
-        {'camera': (vx + 10.0, vy - 52.0, village_min_z + 26.0), 'look': (mx, my, mz), 'lens': 24.0},
-        # Descend toward the forest and river corridor.
-        {'camera': (vx + 12.0, vy - 34.0, village_min_z + 16.0), 'look': (fx, (fy + my) * 0.5, (fz + mz) * 0.45), 'lens': 28.0},
-        # Travel along the river; keep village and mountains in the same 9:16 frame.
-        {'camera': (vx + 14.0, vy - 28.0, village_min_z + 13.0), 'look': (vx, vy + 16.0, look_z + 4.0), 'lens': 28.0},
-        # Cross the river toward the village street, still wide.
-        {'camera': (vx + 16.0, vy - 30.0, village_min_z + 12.0), 'look': (vx, vy + 10.0, look_z + 2.5), 'lens': 30.0},
-        # Village becomes the destination, still wide enough for the valley layers.
-        {'camera': (vx + 16.0, vy - 32.0, village_min_z + 10.5), 'look': (vx, vy + 4.0, look_z + 1.2), 'lens': 32.0},
-        # Composed village hero, forest and mountains behind, not a roof-top.
-        {'camera': (vx + 18.0, vy - 36.0, village_min_z + 11.0), 'look': (vx, vy + 6.0, look_z + 1.6), 'lens': 30.0},
+        {'camera': (vx + 10.0, vy - 56.0, village_min_z + 28.0), 'look': (mx, my, mz), 'lens': 24.0},
+        # Descend toward the forest and river corridor, still a valley shot.
+        {'camera': (vx + 12.0, vy - 46.0, village_min_z + 20.0), 'look': (fx, (fy + my) * 0.5, (fz + mz) * 0.45), 'lens': 26.0},
+        # Travel along the river; village and mountains stay in the same 9:16 frame.
+        {'camera': (vx + 8.0, vy - 42.0, village_min_z + 17.0), 'look': (vx, vy + 28.0, look_z + 5.0), 'lens': 26.0},
+        # Cross the river toward the village street, never a cabin portrait.
+        {'camera': (vx + 10.0, vy - 40.0, village_min_z + 16.0), 'look': (vx, vy + 22.0, look_z + 4.0), 'lens': 27.0},
+        # Village becomes the destination; forest and peaks remain stacked.
+        {'camera': (vx + 10.0, vy - 42.0, village_min_z + 15.0), 'look': (vx, vy + 18.0, look_z + 3.0), 'lens': 28.0},
+        # Composed village hero with the valley layers still readable.
+        {'camera': (vx + 12.0, vy - 44.0, village_min_z + 16.0), 'look': (vx, vy + 20.0, look_z + 3.5), 'lens': 27.0},
     )
     keys: list[dict] = []
     for beat in beats:
@@ -418,7 +418,8 @@ def geometry_file_limit(role: str) -> int:
     # Village zip is a kit of individual cabin/tree/fence files, not one scene.
     # Import several Cabin*A buildings so the camera has a real village cluster.
     if role == 'village_blender':
-        return 8
+        # Four Cabin*A plus trees, cart, gate, and fence so the path is dressed.
+        return 10
     if role == 'village_fbx':
         return 6
     if role == 'village_project':

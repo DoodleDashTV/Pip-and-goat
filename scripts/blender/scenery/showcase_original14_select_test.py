@@ -96,7 +96,7 @@ def test_geometry_file_limits_allow_density_without_dump():
     assert geometry_file_limit('forest_nature') == 1
     assert geometry_file_limit('forest_ecokit') == 3
     assert geometry_file_limit('background_mountains') == 1
-    assert geometry_file_limit('village_blender') == 8
+    assert geometry_file_limit('village_blender') == 10
     assert geometry_file_limit('village_fbx') == 6
     assert extract_role_limit('village_blender') == 40
     assert extract_role_limit('village_fbx') == 40
@@ -246,6 +246,11 @@ def test_world_camera_travels_mountains_to_village():
     looks = [tuple(key['look']) for key in keys]
     assert len(set(looks)) >= 5
     assert keys[0]['lens'] < keys[4]['lens']
+    # Mid and late looks stay up-valley so 9:16 still stacks river/forest/peaks.
+    for key in keys:
+        assert key['look'][1] >= 10.0
+        assert key['camera'][1] <= -40.0
+        assert key['lens'] <= 28.0
 
 
 def test_mountain_extract_keeps_grassy_and_allows_large_blend():

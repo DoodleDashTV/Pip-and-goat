@@ -377,6 +377,28 @@ def largest_image(files: list[Path]) -> Path | None:
     return images[0] if images else None
 
 
+def _mix_color_node(nodes, blend: str = 'MIX', fac: float = 0.5, color2=(1.0, 1.0, 1.0, 1.0)):
+    try:
+        mix = nodes.new('ShaderNodeMixRGB')
+    except Exception:
+        mix = nodes.new('ShaderNodeMix')
+        if hasattr(mix, 'data_type'):
+            mix.data_type = 'RGBA'
+    mix.blend_type = blend
+    if 'Fac' in mix.inputs:
+        mix.inputs['Fac'].default_value = float(fac)
+    if 'Color2' in mix.inputs:
+        mix.inputs['Color2'].default_value = tuple(float(c) for c in color2[:3]) + (1.0,)
+    return mix
+
+
+def _mix_color_sockets(mix):
+    color1 = mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6]
+    color2 = mix.inputs['Color2'] if 'Color2' in mix.inputs else mix.inputs[7]
+    out = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
+    return color1, color2, out
+
+
 def image_material(
     name: str,
     image: Path | None,
@@ -617,10 +639,86 @@ def sanitize_purchased_materials() -> None:
                         mat.node_tree.links.remove(link)
                     except Exception:
                         pass
+            if 'Roughness' in bsdf.inputs and not bsdf.inputs['Roughness'].links:
+                bsdf.inputs['Roughness'].default_value = 0.48
+            if 'Metallic' in bsdf.inputs and not bsdf.inputs['Metallic'].links:
+                bsdf.inputs['Metallic'].default_value = 0.0
+
+
+def lift_purchased_shading() -> int:
+    """Keep straw roofs and log walls readable instead of crushed-black."""
+    lifted = 0
+    for mat in bpy.data.materials:
+        if not mat.node_tree:
+            continue
+        blob = f'{mat.name}'.lower()
+        bsdf = next((node for node in mat.node_tree.nodes if node.type == 'BSDF_PRINCIPLED'), None)
+        if bsdf is None:
+            continue
+        roof = any(word in blob for word in ('straw', 'roof', 'thatch'))
+        cabin = any(word in blob for word in ('cabin', 'building', 'wood')) and not roof
+        if not roof and not cabin:
+            continue
+        if 'Base Color' not in bsdf.inputs:
+            continue
+        warm = (0.64, 0.50, 0.24, 1.0) if roof else (0.46, 0.32, 0.20, 1.0)
+        mix = _mix_color_node(mat.node_tree.nodes, fac=0.36 if roof else 0.18, color2=warm)
+        color1, _color2, color_out = _mix_color_sockets(mix)
+        links = list(bsdf.inputs['Base Color'].links)
+        if links:
+            src = links[0].from_socket
+            try:
+                mat.node_tree.links.remove(links[0])
+            except Exception:
+                pass
+            mat.node_tree.links.new(src, color1)
+        else:
+            color1.default_value = bsdf.inputs['Base Color'].default_value
+        mat.node_tree.links.new(color_out, bsdf.inputs['Base Color'])
         if 'Roughness' in bsdf.inputs and not bsdf.inputs['Roughness'].links:
-            bsdf.inputs['Roughness'].default_value = 0.48
-        if 'Metallic' in bsdf.inputs and not bsdf.inputs['Metallic'].links:
-            bsdf.inputs['Metallic'].default_value = 0.0
+            bsdf.inputs['Roughness'].default_value = 0.70 if roof else 0.52
+        if 'Specular IOR Level' in bsdf.inputs and not bsdf.inputs['Specular IOR Level'].links:
+            bsdf.inputs['Specular IOR Level'].default_value = 0.18
+        lifted += 1
+    return lifted
+
+
+def paint_simple_color(obj, name: str, color: tuple, roughness: float = 0.8) -> None:
+    if obj is None or obj.type != 'MESH':
+        return
+    mat = bpy.data.materials.new(name[:60])
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes.get('Principled BSDF')
+    if bsdf and 'Base Color' in bsdf.inputs:
+        bsdf.inputs['Base Color'].default_value = (*[float(c) for c in color[:3]], 1.0)
+        if 'Roughness' in bsdf.inputs:
+            bsdf.inputs['Roughness'].default_value = float(roughness)
+    obj.data.materials.clear()
+    obj.data.materials.append(mat)
+
+
+def hide_or_paint_broken_trees() -> int:
+    """FBX/dump trees with no albedo render paper-white. Paint them dark pine or hide."""
+    fixed = 0
+    for obj in list(bpy.data.objects):
+        if obj.type != 'MESH':
+            continue
+        blob = f'{obj.name} {subject_parent_name(obj)}'.lower()
+        if 'tree' not in blob and 'pine' not in blob and 'forest_' not in blob:
+            continue
+        if str(obj.name).startswith(('TJ_Ground', 'TJ_River')):
+            continue
+        has_img = any(material_has_valid_image(slot.material) for slot in obj.material_slots)
+        if has_img:
+            continue
+        if 'forest_' in blob or 'dump' in blob or 'nature_kit' in blob:
+            paint_simple_color(obj, f'TJ_ForestCanopy_{obj.name}', (0.07, 0.14, 0.06), 0.88)
+            if hasattr(obj, 'visible_shadow'):
+                obj.visible_shadow = False
+        else:
+            paint_simple_color(obj, f'TJ_PineFallback_{obj.name}', (0.10, 0.20, 0.08), 0.82)
+        fixed += 1
+    return fixed
 
 
 def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) -> int:
@@ -671,13 +769,7 @@ def packed_meadow_image():
     return None
 
 
-def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: float = 140.0) -> tuple[int, str]:
-    """Cover the HDRI gray hemisphere with purchased grassy/dirt albedo, never Grass01 cards."""
-    packed = None
-    img_path = None
-    source = 'none'
-    # Louis Texture.png reads as a blown-out gray slab in this lighting.
-    # Prefer a forest dirt/rock albedo multiplied with a meadow grade.
+def _dirt_or_rock_path(files: list[Path]) -> Path | None:
     candidates = [
         p for p in files
         if p.is_file()
@@ -690,22 +782,16 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
     ]
     rock_only = [
         p for p in candidates
-        if any(word in p.name.lower() for word in ('rock', 'dirt', 'soil', 'moss', 'ground', 'meadow', 'terrain'))
+        if any(word in p.name.lower() for word in ('dirt', 'soil', 'moss', 'ground', 'meadow', 'terrain'))
     ]
     img_path = pick_ground_image_path(rock_only or candidates) if (rock_only or candidates) else None
     if img_path and (is_grass_card_texture_name(img_path.name) or 'leaf' in img_path.name.lower() or 'foliage' in img_path.name.lower()):
-        img_path = None
-    source = img_path.name if img_path else 'authored_meadow_grade'
-    bpy.ops.mesh.primitive_plane_add(size=max(90.0, float(size)), location=center)
-    ground = bpy.context.object
-    ground.name = 'TJ_Ground_ValleyFloor_PurchasedMeadow'
-    bpy.ops.object.mode_set(mode='EDIT')
-    try:
-        bpy.ops.uv.smart_project(angle_limit=66.0, island_margin=0.02)
-    except Exception:
-        pass
-    bpy.ops.object.mode_set(mode='OBJECT')
-    mat = bpy.data.materials.new('TJ_PurchasedValleyMeadow')
+        return None
+    return img_path
+
+
+def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> bpy.types.Material:
+    mat = bpy.data.materials.new(name)
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
     links = mat.node_tree.links
@@ -713,80 +799,204 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
     bsdf = nodes.new('ShaderNodeBsdfPrincipled')
     out = nodes.new('ShaderNodeOutputMaterial')
     if 'Roughness' in bsdf.inputs:
-        bsdf.inputs['Roughness'].default_value = 0.94
+        bsdf.inputs['Roughness'].default_value = 0.94 if meadow else 0.88
     if 'Specular IOR Level' in bsdf.inputs:
-        bsdf.inputs['Specular IOR Level'].default_value = 0.12
+        bsdf.inputs['Specular IOR Level'].default_value = 0.10
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
-    color_src = None
-    if packed is not None or img_path is not None:
+    coord = nodes.new('ShaderNodeTexCoord')
+    noise = nodes.new('ShaderNodeTexNoise')
+    noise.inputs['Scale'].default_value = 0.28 if meadow else 0.55
+    if 'Detail' in noise.inputs:
+        noise.inputs['Detail'].default_value = 4.0
+    links.new(coord.outputs['Object'], noise.inputs['Vector'])
+    patch = _mix_color_node(
+        nodes,
+        fac=0.5,
+        color2=(0.34, 0.48, 0.16, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
+    )
+    c1, _c2, patch_out = _mix_color_sockets(patch)
+    c1.default_value = (0.22, 0.38, 0.12, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
+    links.new(noise.outputs['Fac'], patch.inputs['Fac'] if 'Fac' in patch.inputs else patch.inputs[0])
+    color_src = patch_out
+    if img_path is not None:
         tex = nodes.new('ShaderNodeTexImage')
-        if packed is not None:
-            tex.image = packed
-        else:
-            tex.image = bpy.data.images.load(str(img_path), check_existing=True)
+        tex.image = bpy.data.images.load(str(img_path), check_existing=True)
         if tex.image and tex.image.colorspace_settings:
             tex.image.colorspace_settings.name = 'sRGB'
-        coord = nodes.new('ShaderNodeTexCoord')
         mapping = nodes.new('ShaderNodeMapping')
-        mapping.inputs['Scale'].default_value = (1.15, 1.15, 1.15)
-        links.new(coord.outputs['UV'], mapping.inputs['Vector'])
+        mapping.inputs['Scale'].default_value = (0.045, 0.045, 0.045)
+        links.new(coord.outputs['Object'], mapping.inputs['Vector'])
         links.new(mapping.outputs['Vector'], tex.inputs['Vector'])
-        try:
-            mix = nodes.new('ShaderNodeMixRGB')
-        except Exception:
-            mix = nodes.new('ShaderNodeMix')
-            if hasattr(mix, 'data_type'):
-                mix.data_type = 'RGBA'
-        mix.blend_type = 'MIX'
-        if 'Fac' in mix.inputs:
-            mix.inputs['Fac'].default_value = 0.72
-        if 'Color2' in mix.inputs:
-            mix.inputs['Color2'].default_value = (0.26, 0.44, 0.14, 1.0)
-        links.new(tex.outputs['Color'], mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6])
-        color_src = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
-    if color_src is not None:
-        links.new(color_src, bsdf.inputs['Base Color'])
-    else:
-        bsdf.inputs['Base Color'].default_value = (0.30, 0.46, 0.18, 1.0)
-    ground.data.materials.append(mat)
-    return 1, source
+        grade = _mix_color_node(nodes, fac=0.82 if meadow else 0.55, color2=(0.26, 0.42, 0.14, 1.0) if meadow else (0.36, 0.26, 0.14, 1.0))
+        g1, _g2, grade_out = _mix_color_sockets(grade)
+        links.new(tex.outputs['Color'], g1)
+        weave = _mix_color_node(nodes, fac=0.22 if meadow else 0.40)
+        w1, w2, weave_out = _mix_color_sockets(weave)
+        links.new(patch_out, w1)
+        links.new(grade_out, w2)
+        color_src = weave_out
+    if meadow:
+        sep = nodes.new('ShaderNodeSeparateXYZ')
+        links.new(coord.outputs['Object'], sep.inputs['Vector'])
+        abs_x = nodes.new('ShaderNodeMath')
+        abs_x.operation = 'ABSOLUTE'
+        links.new(sep.outputs['X'], abs_x.inputs[0])
+        path_w = nodes.new('ShaderNodeMapRange')
+        path_w.inputs['From Min'].default_value = 0.4
+        path_w.inputs['From Max'].default_value = 2.6
+        path_w.inputs['To Min'].default_value = 1.0
+        path_w.inputs['To Max'].default_value = 0.0
+        links.new(abs_x.outputs['Value'], path_w.inputs['Value'])
+        # Keep the path only between river and village; fade outside with |Y+1|.
+        y_center = nodes.new('ShaderNodeMath')
+        y_center.operation = 'SUBTRACT'
+        y_center.inputs[1].default_value = -1.0
+        links.new(sep.outputs['Y'], y_center.inputs[0])
+        y_abs = nodes.new('ShaderNodeMath')
+        y_abs.operation = 'ABSOLUTE'
+        links.new(y_center.outputs['Value'], y_abs.inputs[0])
+        y_fade = nodes.new('ShaderNodeMapRange')
+        y_fade.inputs['From Min'].default_value = 8.0
+        y_fade.inputs['From Max'].default_value = 16.0
+        y_fade.inputs['To Min'].default_value = 1.0
+        y_fade.inputs['To Max'].default_value = 0.0
+        links.new(y_abs.outputs['Value'], y_fade.inputs['Value'])
+        path_fac = nodes.new('ShaderNodeMath')
+        path_fac.operation = 'MULTIPLY'
+        links.new(path_w.outputs['Result'] if 'Result' in path_w.outputs else path_w.outputs[0], path_fac.inputs[0])
+        links.new(y_fade.outputs['Result'] if 'Result' in y_fade.outputs else y_fade.outputs[0], path_fac.inputs[1])
+        dirt = _mix_color_node(nodes, fac=0.0, color2=(0.39, 0.27, 0.14, 1.0))
+        d1, _d2, dirt_out = _mix_color_sockets(dirt)
+        links.new(color_src, d1)
+        links.new(path_fac.outputs['Value'], dirt.inputs['Fac'] if 'Fac' in dirt.inputs else dirt.inputs[0])
+        color_src = dirt_out
+    links.new(color_src, bsdf.inputs['Base Color'])
+    return mat
 
 
-def create_purchased_stream(center=(0.0, 16.0, -0.03), size=(8.0, 42.0)) -> int:
-    water_mat = next((m for m in bpy.data.materials if m and str(m.name).startswith('Water_Mat')), None)
-    bpy.ops.mesh.primitive_plane_add(size=1.0, location=center)
-    stream = bpy.context.object
-    stream.name = 'TJ_River_From_Purchased_Water_Mat'
-    stream.scale = (max(size[0], 4.0), max(size[1], 3.0), 1.0)
+def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: float = 140.0) -> tuple[int, str]:
+    """Meadow floor with a dirt path. Never Grass01 cards. Keep the TJ_Ground prefix."""
+    img_path = _dirt_or_rock_path(files)
+    source = f'meadow_noise+path+{img_path.name}' if img_path else 'meadow_noise+path'
+    bpy.ops.mesh.primitive_plane_add(size=max(90.0, float(size)), location=center)
+    ground = bpy.context.object
+    ground.name = 'TJ_Ground_ValleyFloor_PurchasedMeadow'
     bpy.ops.object.mode_set(mode='EDIT')
     try:
-        bpy.ops.mesh.subdivide(number_cuts=6)
+        bpy.ops.mesh.subdivide(number_cuts=16)
+        bpy.ops.uv.smart_project(angle_limit=66.0, island_margin=0.02)
     except Exception:
         pass
     bpy.ops.object.mode_set(mode='OBJECT')
+    cx, cy, _cz = center
+    for vert in ground.data.vertices:
+        wx = cx + vert.co.x
+        wy = cy + vert.co.y
+        h = 0.22 * math.sin(vert.co.x * 0.10) * math.cos(vert.co.y * 0.07)
+        if -8.0 <= wy <= 12.0 and abs(wx) < 18.0:
+            h *= 0.12
+        if -14.0 < wy < -6.0:
+            h -= 0.20
+        if wy > 50.0:
+            h += min(1.6, (wy - 50.0) * 0.035)
+        vert.co.z += h
+    ground.data.update()
+    ground.data.materials.append(_meadow_or_dirt_material('TJ_PurchasedValleyMeadow', img_path, meadow=True))
+    return 1, source
+
+
+def create_dirt_path(center=(0.0, -1.0, -0.045), size=(4.4, 26.0), files: list[Path] | None = None) -> int:
+    img_path = _dirt_or_rock_path(files or [])
+    bpy.ops.mesh.primitive_plane_add(size=1.0, location=center)
+    path = bpy.context.object
+    path.name = 'TJ_Ground_DirtPath'
+    path.scale = (max(size[0], 2.5), max(size[1], 8.0), 1.0)
+    bpy.ops.object.mode_set(mode='EDIT')
+    try:
+        bpy.ops.mesh.subdivide(number_cuts=4)
+    except Exception:
+        pass
+    bpy.ops.object.mode_set(mode='OBJECT')
+    path.data.materials.append(_meadow_or_dirt_material('TJ_PurchasedDirtPath', img_path, meadow=False))
+    return 1
+
+
+def _river_water_material() -> bpy.types.Material:
+    water_mat = next((m for m in bpy.data.materials if m and str(m.name).startswith('Water_Mat')), None)
+    mat = bpy.data.materials.new('TJ_PurchasedRiverWater')
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = nodes.get('Principled BSDF')
+    if bsdf is None:
+        return mat
+    if 'Base Color' in bsdf.inputs:
+        bsdf.inputs['Base Color'].default_value = (0.08, 0.22, 0.28, 1.0)
+    if 'Roughness' in bsdf.inputs:
+        bsdf.inputs['Roughness'].default_value = 0.16
+    if 'Specular IOR Level' in bsdf.inputs:
+        bsdf.inputs['Specular IOR Level'].default_value = 0.55
+    if 'Transmission Weight' in bsdf.inputs:
+        bsdf.inputs['Transmission Weight'].default_value = 0.28
+    elif 'Transmission' in bsdf.inputs:
+        bsdf.inputs['Transmission'].default_value = 0.28
+    wave = nodes.new('ShaderNodeTexWave')
+    wave.inputs['Scale'].default_value = 4.5
+    if 'Distortion' in wave.inputs:
+        wave.inputs['Distortion'].default_value = 2.2
+    bump = nodes.new('ShaderNodeBump')
+    bump.inputs['Strength'].default_value = 0.18
+    links.new(wave.outputs['Color'], bump.inputs['Height'])
+    if 'Normal' in bsdf.inputs:
+        links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
+    if water_mat is not None and water_mat.node_tree:
+        src = next((n for n in water_mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+        if src and 'Base Color' in src.inputs and not src.inputs['Base Color'].links:
+            bsdf.inputs['Base Color'].default_value = src.inputs['Base Color'].default_value
+    return mat
+
+
+def create_river_banks(center=(0.0, -10.0, -0.02), files: list[Path] | None = None) -> int:
+    img_path = _dirt_or_rock_path(files or [])
+    created = 0
+    for i, (name, y_off) in enumerate((('TJ_RiverBank_South', -3.4), ('TJ_RiverBank_North', 3.4))):
+        bpy.ops.mesh.primitive_plane_add(size=1.0, location=(center[0], center[1] + y_off, -0.01))
+        bank = bpy.context.object
+        bank.name = name
+        bank.scale = (46.0, 3.4, 1.0)
+        bpy.ops.object.mode_set(mode='EDIT')
+        try:
+            bpy.ops.mesh.subdivide(number_cuts=3)
+        except Exception:
+            pass
+        bpy.ops.object.mode_set(mode='OBJECT')
+        for vert in bank.data.vertices:
+            vert.co.z += 0.04 * math.sin(vert.co.x * math.pi * 2.0)
+        bank.data.update()
+        bank.data.materials.append(_meadow_or_dirt_material(f'TJ_PurchasedRiverBank_{i}', img_path, meadow=False))
+        created += 1
+    return created
+
+
+def create_purchased_stream(center=(0.0, 16.0, -0.03), size=(8.0, 42.0)) -> int:
+    bpy.ops.mesh.primitive_plane_add(size=1.0, location=center)
+    stream = bpy.context.object
+    stream.name = 'TJ_River_From_Purchased_Water_Mat'
+    # size is (width along X, length along Y) for an east-west river in front of the village.
+    stream.scale = (max(size[0], 8.0), max(size[1], 3.0), 1.0)
+    bpy.ops.object.mode_set(mode='EDIT')
+    try:
+        bpy.ops.mesh.subdivide(number_cuts=10)
+    except Exception:
+        pass
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for vert in stream.data.vertices:
+        vert.co.y += 0.14 * math.sin(vert.co.x * math.pi * 2.2)
+        vert.co.x += 0.03 * math.sin(vert.co.y * math.pi * 3.0)
+    stream.data.update()
     bpy.context.view_layer.update()
-    if water_mat is not None:
-        stream.data.materials.clear()
-        stream.data.materials.append(water_mat)
-        bsdf = next((n for n in (water_mat.node_tree.nodes if water_mat.node_tree else []) if n.type == 'BSDF_PRINCIPLED'), None)
-        if bsdf and 'Base Color' in bsdf.inputs:
-            bsdf.inputs['Base Color'].default_value = (0.18, 0.42, 0.52, 1.0)
-            if 'Roughness' in bsdf.inputs:
-                bsdf.inputs['Roughness'].default_value = 0.12
-    else:
-        mat = bpy.data.materials.new('TJ_PurchasedWaterFallback')
-        mat.use_nodes = True
-        bsdf = mat.node_tree.nodes.get('Principled BSDF')
-        if bsdf:
-            if 'Base Color' in bsdf.inputs:
-                bsdf.inputs['Base Color'].default_value = (0.22, 0.42, 0.55, 1.0)
-            if 'Roughness' in bsdf.inputs:
-                bsdf.inputs['Roughness'].default_value = 0.08
-            if 'Transmission Weight' in bsdf.inputs:
-                bsdf.inputs['Transmission Weight'].default_value = 0.55
-            elif 'Transmission' in bsdf.inputs:
-                bsdf.inputs['Transmission'].default_value = 0.55
-        stream.data.materials.append(mat)
+    stream.data.materials.clear()
+    stream.data.materials.append(_river_water_material())
     return 1
 
 
@@ -1001,48 +1211,59 @@ def setup_world(hdri_files: list[Path], shader_files: list[Path] | None = None) 
 
 
 def setup_lighting():
-    # Bright warm daylight: readable cabin detail, not crushed dusk.
-    bpy.ops.object.light_add(type='SUN', location=(28, -40, 62))
+    # Soft south daylight: readable roofs and log walls, not crushed dusk.
+    bpy.ops.object.light_add(type='SUN', location=(8, -36, 70))
     sun = bpy.context.object
     sun.name = 'TJ_Sun'
-    sun.data.energy = 3.4
-    sun.data.angle = math.radians(4.2)
-    sun.rotation_euler = (math.radians(58), math.radians(2), math.radians(8))
+    sun.data.energy = 2.6
+    sun.data.angle = math.radians(8.0)
+    sun.rotation_euler = (math.radians(46), math.radians(2), math.radians(4))
     if hasattr(sun.data, 'use_shadow'):
         sun.data.use_shadow = True
     if hasattr(sun.data, 'color'):
-        sun.data.color = (1.0, 0.96, 0.86)
-    bpy.ops.object.light_add(type='AREA', location=(-18, -8, 28))
+        sun.data.color = (1.0, 0.96, 0.88)
+    bpy.ops.object.light_add(type='AREA', location=(-16, -10, 30))
     fill = bpy.context.object
     fill.name = 'TJ_SkyFill'
-    fill.data.energy = 2400
+    fill.data.energy = 3400
     fill.data.shape = 'DISK'
-    fill.data.size = 48
-    fill.rotation_euler = (math.radians(35), 0.0, math.radians(12))
+    fill.data.size = 56
+    fill.rotation_euler = (math.radians(28), 0.0, math.radians(10))
     if hasattr(fill.data, 'color'):
-        fill.data.color = (0.72, 0.84, 1.0)
-    bpy.ops.object.light_add(type='AREA', location=(8, -20, 14))
+        fill.data.color = (0.74, 0.86, 1.0)
+    bpy.ops.object.light_add(type='AREA', location=(8, -18, 12))
     bounce = bpy.context.object
     bounce.name = 'TJ_GroundBounce'
-    bounce.data.energy = 900
+    bounce.data.energy = 1600
     bounce.data.shape = 'RECTANGLE'
-    bounce.data.size = 36
+    bounce.data.size = 40
     if hasattr(bounce.data, 'size_y'):
-        bounce.data.size_y = 24
+        bounce.data.size_y = 28
     bounce.rotation_euler = (math.radians(90), 0.0, 0.0)
     if hasattr(bounce.data, 'color'):
-        bounce.data.color = (1.0, 0.90, 0.70)
-    bpy.ops.object.light_add(type='AREA', location=(0.0, -22.0, 15.0))
+        bounce.data.color = (1.0, 0.92, 0.74)
+    bpy.ops.object.light_add(type='AREA', location=(0.0, -24.0, 16.0))
     key = bpy.context.object
     key.name = 'TJ_VillageKey'
-    key.data.energy = 2800
+    key.data.energy = 3600
     key.data.shape = 'RECTANGLE'
-    key.data.size = 28
+    key.data.size = 30
     if hasattr(key.data, 'size_y'):
-        key.data.size_y = 16
-    key.rotation_euler = (math.radians(62), 0.0, 0.0)
+        key.data.size_y = 18
+    key.rotation_euler = (math.radians(58), 0.0, 0.0)
     if hasattr(key.data, 'color'):
-        key.data.color = (1.0, 0.95, 0.82)
+        key.data.color = (1.0, 0.96, 0.84)
+    bpy.ops.object.light_add(type='AREA', location=(0.0, 1.0, 22.0))
+    roof = bpy.context.object
+    roof.name = 'TJ_RoofFill'
+    roof.data.energy = 2000
+    roof.data.shape = 'RECTANGLE'
+    roof.data.size = 22
+    if hasattr(roof.data, 'size_y'):
+        roof.data.size_y = 16
+    roof.rotation_euler = (0.0, 0.0, 0.0)
+    if hasattr(roof.data, 'color'):
+        roof.data.color = (1.0, 0.94, 0.80)
 
 
 def setup_atmosphere():
@@ -1280,7 +1501,7 @@ def configure_render(args):
         if hasattr(scene, 'view_settings'):
             scene.view_settings.view_transform = 'AgX'
             scene.view_settings.look = 'AgX - Medium Contrast'
-            scene.view_settings.exposure = 0.22
+            scene.view_settings.exposure = 0.36
     except Exception:
         pass
 
@@ -1318,12 +1539,13 @@ def main() -> int:
     contributions: dict[str, dict] = {}
     village_center = Vector((0.0, 0.0, 0.0))
     village_slots = [
-        (-6.5, -2.0, 0.0), (0.5, 3.5, 0.0), (7.0, -1.0, 0.0), (8.0, 5.5, 0.0),
-        (1.5, -6.5, 0.0), (-8.0, 5.0, 0.0), (4.5, 8.0, 0.0), (-4.5, -6.0, 0.0),
+        (-5.0, 0.5, 0.0), (1.5, 2.8, 0.0), (6.5, 0.0, 0.0), (-2.5, 6.0, 0.0),
+        (8.5, 5.5, 0.0), (-9.0, 4.0, 0.0), (10.0, 3.0, 0.0), (0.5, 8.5, 0.0),
+        (2.0, -4.5, 0.0), (-4.0, -3.5, 0.0),
     ]
     fbx_slots = [
-        (-9.0, 10.0, 0.0), (9.0, 11.0, 0.0), (0.0, 13.5, 0.0),
-        (12.0, 6.5, 0.0), (-12.0, 7.0, 0.0), (5.0, 15.0, 0.0),
+        (3.2, -6.0, 0.0), (-3.4, -5.5, 0.0), (0.2, -3.2, 0.0),
+        (6.5, -2.5, 0.0), (-6.8, -2.0, 0.0), (1.4, 1.5, 0.0),
     ]
     forest_slots = {
         'forest_nature': [(-8.0, 30.0, 0.0), (8.0, 34.0, 0.0), (0.0, 38.0, 0.0)],
@@ -1356,11 +1578,15 @@ def main() -> int:
 
     fbx_files = expanded.get('village_fbx', [])
     fbx_dressing = [
-        p for p in geometry_candidates(fbx_files, 'village_fbx')
-        if any(word in p.name.lower() for word in ('tree', 'fence', 'gate', 'cart'))
+        p for p in fbx_files
+        if p.is_file()
+        and p.suffix.lower() in GEOMETRY_EXTS
+        and any(word in p.name.lower() for word in ('fence', 'gate', 'cart'))
     ]
+    if not fbx_dressing:
+        raise RuntimeError('Purchased source village_fbx contributed no fence/gate/cart dressing')
     members, imported_files, placed = import_kit_groups(
-        fbx_dressing or fbx_files,
+        fbx_dressing,
         'village_fbx',
         fbx_slots,
         village_center,
@@ -1384,14 +1610,33 @@ def main() -> int:
         o for o in bpy.data.objects
         if o.type == 'MESH' and 'tree' in o.name.lower()
         and not is_forest_camera_subject_name(o.name, subject_parent_name(o))
+        and 'fbx' not in subject_parent_name(o).lower()
+        and any(material_has_valid_image(slot.material) for slot in o.material_slots)
     ]
-    forest_band = scatter_purchased_meshes(
+    grove = scatter_purchased_meshes(
         village_trees,
-        (village_center.x, village_center.y + 30.0, 0.0),
-        copies=8,
-        radius=12.0,
+        (village_center.x, village_center.y + 1.5, 0.0),
+        copies=6,
+        radius=9.0,
     )
-    print(json.dumps({'event': 'village_tree_forest_band', 'copies': len(forest_band)}), flush=True)
+    near_band = scatter_purchased_meshes(
+        village_trees,
+        (village_center.x, village_center.y + 22.0, 0.0),
+        copies=10,
+        radius=16.0,
+    )
+    far_band = scatter_purchased_meshes(
+        village_trees,
+        (village_center.x, village_center.y + 36.0, 0.0),
+        copies=10,
+        radius=15.0,
+    )
+    forest_band = grove + near_band + far_band
+    print(json.dumps({
+        'event': 'village_tree_forest_band',
+        'copies': len(forest_band),
+        'sourceTrees': len(village_trees),
+    }), flush=True)
 
     # Project File.blend is a water/flora/terrain library. Terrain_003 is an
     # empty 12 m plane — do not scale it into another slab. Use packed flora
@@ -1434,19 +1679,24 @@ def main() -> int:
                 ))
     # Put the stream south of the village so a north-looking 9:16 camera
     # sees water in front of the cabins instead of hidden behind them.
-    river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.02), (36.0, 7.0))
+    river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.03), (44.0, 6.2))
+    bank_count = create_river_banks(
+        (village_center.x, village_center.y - 10.0, -0.02),
+        expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []),
+    )
     if not members and river_count <= 0:
         raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
     remapped_project = remap_missing_images(expanded.get('village_textures', []) + files)
     contributions[role] = {
         'type': 'visible_geometry',
-        'objectCount': len(members) + river_count,
+        'objectCount': len(members) + river_count + bank_count,
         'importedFileCount': imported_files,
         'purchasedTexturesBound': remapped_project,
         'scatteredPurchasedCopies': 0,
         'authoredLayoutKept': False,
         'placedAsRiverBanks': True,
         'riverObjectCount': river_count,
+        'riverBankCount': bank_count,
         'visibleAsRiver': river_count > 0,
         'waterMaterialsLoaded': water_loaded,
     }
@@ -1462,25 +1712,36 @@ def main() -> int:
         )
         if not members:
             raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
-        extras = scatter_purchased_meshes(
-            members,
-            (village_center.x + forest_slots[role][0][0], village_center.y + 33.0, 0.0),
-            copies=4,
-            radius=9.0,
-        )
-        members.extend(extras)
-        foliage = [p for p in files if p.is_file() and 'basecolor' in p.name.lower()]
-        bound = bind_purchased_textures(members, foliage or files)
-        if bound == 0:
+        extras: list[bpy.types.Object] = []
+        bound = 0
+        if role == 'forest_nature':
+            # Combined dump has no extractable 4k foliage (over the image cap).
+            # Paint it as a dark canopy mass; do not rebind leaf cards or scatter copies.
             for obj in members:
                 if obj.type != 'MESH':
                     continue
-                img = next((p for p in foliage if 'foliage' in p.name.lower() or 'leaf' in p.name.lower()), None) or (foliage[0] if foliage else None)
-                if img is None:
-                    break
-                obj.data.materials.clear()
-                obj.data.materials.append(image_material(f'TJ_Forest_{obj.name}'[:55], img))
+                paint_simple_color(obj, f'TJ_ForestCanopy_{obj.name}', (0.07, 0.15, 0.07), 0.9)
+                if hasattr(obj, 'visible_shadow'):
+                    obj.visible_shadow = False
                 bound += 1
+        else:
+            live = [
+                o for o in members
+                if o.type == 'MESH' and 'swarm' not in o.name.lower()
+            ]
+            for obj in members:
+                if 'swarm' in obj.name.lower():
+                    obj.hide_render = True
+                    obj.hide_viewport = True
+            extras = scatter_purchased_meshes(
+                live,
+                (village_center.x, village_center.y - 10.0, 0.0),
+                copies=5,
+                radius=14.0,
+            )
+            members.extend(extras)
+            # Keep authored rock materials. Only bind when a mesh has nothing.
+            bound = bind_purchased_textures(live, files)
         contributions[role] = {
             'type': 'visible_geometry',
             'objectCount': len(members),
@@ -1489,6 +1750,7 @@ def main() -> int:
             'scatteredPurchasedCopies': len(extras),
             'authoredLayoutKept': False,
             'kitFilesPlaced': placed,
+            'usedAsCanopyMass': role == 'forest_nature',
         }
 
     mountain_role = 'background_mountains'
@@ -1526,12 +1788,24 @@ def main() -> int:
         all_extracted.extend(role_files)
     remapped = remap_missing_images(all_extracted)
     forced = ensure_purchased_albedos(all_extracted)
-    print(json.dumps({'event': 'purchased_image_remap', 'remapped': remapped, 'forcedAlbedos': forced}), flush=True)
+    lifted = lift_purchased_shading()
+    print(json.dumps({
+        'event': 'purchased_image_remap',
+        'remapped': remapped,
+        'forcedAlbedos': forced,
+        'liftedShading': lifted,
+    }), flush=True)
 
+    ground_files = expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []) + mountain_files
     ground_count, ground_source = create_valley_ground(
-        expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []) + mountain_files,
+        ground_files,
         (village_center.x, village_center.y + 18.0, -0.08),
         150.0,
+    )
+    path_count = create_dirt_path(
+        (village_center.x, village_center.y - 1.0, -0.045),
+        (4.6, 26.0),
+        ground_files,
     )
     if not ground_count:
         raise RuntimeError('Valley floor could not be created from purchased meadow/dirt sources')
@@ -1542,6 +1816,8 @@ def main() -> int:
         'forcedAlbedos': forced,
         'groundSource': ground_source,
         'usedGrass01Card': False,
+        'dirtPathCount': path_count,
+        'liftedShading': lifted,
     }
 
     sky_name = setup_world(expanded.get('sky_hdri', []), expanded.get('world_shaders', []))
@@ -1578,6 +1854,9 @@ def main() -> int:
             pass
     print(json.dumps({'event': 'dropped_primitive_boxes', 'count': dropped_boxes}), flush=True)
 
+    broken_trees = hide_or_paint_broken_trees()
+    print(json.dumps({'event': 'broken_tree_fallback', 'count': broken_trees}), flush=True)
+
     foliage_alpha = enable_foliage_alpha(
         [o for o in bpy.data.objects if o.type == 'MESH' and not str(o.name).startswith('TJ_Ground')]
     )
@@ -1603,7 +1882,7 @@ def main() -> int:
         'randomOrGeneratedStockAssetCount':0,
         'commercialAssetPathsEmitted':False,
         'cameraPath':'mountains_forest_river_village',
-        'lighting':'bright_daylight_agx_medium_contrast',
+        'lighting':'soft_south_daylight_agx_medium_contrast',
         'groundSource': contributions.get('village_textures', {}).get('groundSource'),
         'stillsOnly':bool(args.stills_only),
         'engine':str(args.engine),
