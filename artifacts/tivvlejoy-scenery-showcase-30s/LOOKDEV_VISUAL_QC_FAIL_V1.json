@@ -1,23 +1,32 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T15:42:00Z",
+  "inspectedAt": "2026-08-28T15:59:00Z",
   "engine": "CYCLES_CPU",
-  "resolution": "270x480",
-  "samples": 8,
+  "resolution": "360x640",
+  "samples": 16,
+  "commit": "20c7b6e",
   "stills": {
-    "0001": "Distant mountain silhouette over a flat ground slab. No village, river, or forest. Not a valley establish.",
-    "0450": "One dark cabin over empty pink/void ground. No river corridor or layered forest.",
-    "0900": "Close cabin pair on a pink missing-texture ground. Crushed-dark logs. No mountains or forest."
+    "0001": "Village cluster and Louis mountains now share one 9:16 frame over a green floor. Still an asset-test layout: tiled ground, crushed roof shadows, a red FBX cabin, white tree, no readable river or layered forest.",
+    "0450": "Close cabin three-quarter. Wood atlas is visible on logs. Roof still crushed-black. Ground is a green slab. No river corridor. A mountain/forest piece clips the upper frame.",
+    "0900": "Cabin hero with mountains behind. Green floor is present (no longer the HDRI void). Harsh shadows, missing river, forest not a midground band, neon tree tips, white tree."
   },
-  "rejectionMatches": [
-    "dark cabin cluster",
-    "crushed-black architecture",
-    "flat empty ground",
-    "missing mountain/river/forest contributions in the same frames",
-    "pink missing-texture ground",
-    "asset-test composition, not a cinematic world"
+  "whatImprovedVersusRejectedCabinOrbit": [
+    "South-to-north camera puts village + mountains + sky in one frame",
+    "Cabin01 albedo is visible on several log walls",
+    "Louis grassy mountains are in frame",
+    "Daylight sk2 plate instead of dusk/pink HDRI",
+    "Valley floor is no longer deleted; magenta Grass01 cards are not used as ground"
   ],
-  "honestConclusion": "Local look-dev stills fail the visual gate. Do not present as approval. Do not start a 900-frame paid render from this composition.",
+  "rejectionMatches": [
+    "still reads as an asset test, not a finished cinematic shot",
+    "crushed-black roofs and unreadable shadow detail",
+    "flat tiled ground, not a valley meadow with path/river banks",
+    "missing river contribution in the stills",
+    "missing layered forest midground",
+    "incorrect/broken materials on at least one red cabin and one white tree",
+    "weak atmospheric depth"
+  ],
+  "honestConclusion": "Local look-dev stills still fail the visual gate. Do not present as approval. Do not start a 900-frame paid render from this composition.",
   "paidRenderAuthorized": false
 }
