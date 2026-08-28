@@ -560,9 +560,16 @@ def place_purchased_water_gn(files: list[Path], collection: bpy.types.Collection
         return None
     water.name = "TJ_River_PurchasedWaterGN"
     water.parent = None
-    water.location = (0.0, -11.2, -0.58)
-    water.scale = (1.35, 0.13, 1.0)
-    water.rotation_euler = (0.0, 0.0, 0.0)
+    for mod in list(getattr(water, "modifiers", []) or []):
+        if getattr(mod, "type", "") == "NODES":
+            try:
+                water.modifiers.remove(mod)
+            except Exception:
+                mod.show_render = False
+                mod.show_viewport = False
+    water.location = (-2.0, -11.4, -0.52)
+    water.scale = (0.42, 0.12, 1.0)
+    water.rotation_euler = (0.0, 0.0, 0.12)
     link_exclusive(water, collection)
     print(json.dumps({"event": "purchased_water_gn_placed", "name": water.name}), flush=True)
     return water.name
