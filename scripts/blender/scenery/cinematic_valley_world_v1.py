@@ -69,7 +69,7 @@ BED_CENTER_Z = -1.62
 BED_SHOULDER_Z = -0.58
 BANK_CREST_Z = 0.78
 WATER_WIDTH_SCALE = 0.30
-BED_WIDTH_SCALE = 0.86
+BED_WIDTH_SCALE = 0.68
 VILLAGE_X_HALF = 16.0
 VILLAGE_Y_MIN = -8.0
 VILLAGE_Y_MAX = 22.0
@@ -476,7 +476,7 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     if "Color1" not in damp.inputs or "Color1" not in wet.inputs:
         return
     links.new(incoming, damp.inputs["Color1"])
-    damp.inputs["Color2"].default_value = (0.048, 0.036, 0.018, 1.0)
+    damp.inputs["Color2"].default_value = (0.062, 0.042, 0.020, 1.0)
     damp_fac = nodes.new("ShaderNodeMapRange")
     damp_fac.inputs["From Min"].default_value = 0.0
     damp_fac.inputs["From Max"].default_value = 0.42
@@ -604,9 +604,9 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Roughness" in body.inputs:
         links.new(rough_out, body.inputs["Roughness"])
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.20
+        body.inputs["Specular IOR Level"].default_value = 0.28
     if "IOR" in body.inputs:
-        body.inputs["IOR"].default_value = 1.18
+        body.inputs["IOR"].default_value = 1.22
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     trans = nodes.new("ShaderNodeMapRange")
@@ -1100,14 +1100,16 @@ def setup_lighting_hierarchy() -> None:
     sun.rotation_euler = (math.radians(52), math.radians(6), math.radians(28))
     if hasattr(sun.data, "color"):
         sun.data.color = (1.0, 0.88, 0.70)
-    bpy.ops.object.light_add(type="AREA", location=(0.0, -12.0, 48.0))
+    bpy.ops.object.light_add(type="AREA", location=(0.0, 18.0, 56.0))
     sky = bpy.context.object
     sky.name = "TJ_SkyFill"
-    sky.data.energy = 200
+    sky.data.energy = 120
     sky.data.size = 80
     sky.rotation_euler = (math.radians(0), 0.0, 0.0)
     if hasattr(sky.data, "color"):
         sky.data.color = (0.74, 0.84, 1.0)
+    if hasattr(sky, "visible_glossy"):
+        sky.visible_glossy = False
     bpy.ops.object.light_add(type="AREA", location=(0.0, 4.0, 1.6))
     bounce = bpy.context.object
     bounce.name = "TJ_GroundBounce"
@@ -1116,6 +1118,8 @@ def setup_lighting_hierarchy() -> None:
     bounce.rotation_euler = (math.radians(90), 0.0, 0.0)
     if hasattr(bounce.data, "color"):
         bounce.data.color = (1.0, 0.86, 0.62)
+    if hasattr(bounce, "visible_glossy"):
+        bounce.visible_glossy = False
     bpy.ops.object.light_add(type="AREA", location=(-28.0, 22.0, 9.0))
     forest = bpy.context.object
     forest.name = "TJ_ForestFill"
@@ -1124,6 +1128,8 @@ def setup_lighting_hierarchy() -> None:
     forest.rotation_euler = (math.radians(58), 0.0, math.radians(18))
     if hasattr(forest.data, "color"):
         forest.data.color = (1.0, 0.88, 0.70)
+    if hasattr(forest, "visible_glossy"):
+        forest.visible_glossy = False
 
 
 def setup_mist_and_compositor() -> None:
