@@ -303,8 +303,8 @@ def setup_mist_and_compositor() -> None:
     scene = bpy.context.scene
     if hasattr(scene.world, "mist_settings"):
         scene.world.mist_settings.use_mist = True
-        scene.world.mist_settings.start = 18.0
-        scene.world.mist_settings.depth = 90.0
+        scene.world.mist_settings.start = 42.0
+        scene.world.mist_settings.depth = 140.0
         scene.world.mist_settings.falloff = "QUADRATIC"
     view = scene.view_layers[0]
     if hasattr(view, "use_pass_mist"):
@@ -319,12 +319,20 @@ def setup_mist_and_compositor() -> None:
     composite = nodes.new("CompositorNodeComposite")
     mix = nodes.new("CompositorNodeMixRGB")
     mix.blend_type = "MIX"
-    mix.inputs["Fac"].default_value = 0.18
-    mix.inputs["Color2"].default_value = (0.70, 0.78, 0.88, 1.0)
+    fac = mix.inputs.get("Fac") or mix.inputs[0]
+    color1 = mix.inputs.get("Color1") or mix.inputs.get("A") or mix.inputs[1]
+    color2 = mix.inputs.get("Color2") or mix.inputs.get("B") or mix.inputs[2]
+    fac.default_value = 0.08
+    color2.default_value = (0.72, 0.80, 0.90, 1.0)
     if "Mist" in render.outputs:
-        links.new(render.outputs["Mist"], mix.inputs["Fac"])
-    links.new(render.outputs["Image"], mix.inputs["Color1"])
-    links.new(mix.outputs["Color"], composite.inputs["Image"])
+        scale = nodes.new("CompositorNodeMath")
+        scale.operation = "MULTIPLY"
+        scale.inputs[1].default_value = 0.22
+        links.new(render.outputs["Mist"], scale.inputs[0])
+        links.new(scale.outputs["Value"], fac)
+    links.new(render.outputs["Image"], color1)
+    out_sock = mix.outputs.get("Color") or mix.outputs.get("Result") or mix.outputs[0]
+    links.new(out_sock, composite.inputs["Image"])
 
 
 def setup_six_cameras() -> list[str]:
@@ -340,7 +348,7 @@ def setup_six_cameras() -> list[str]:
         cam.name = spec["camera"]
         cam.data.lens = start["lens"]
         cam.data.sensor_width = 32
-        cam.data.dof.use_dof = True
+        cam.data.dof.use_dof = False
         cam.data.dof.aperture_fstop = 5.6
         target = bpy.data.objects.new(spec["camera"] + "_LOOK", None)
         scene.collection.objects.link(target)
@@ -396,7 +404,7 @@ def apply_profile(profile_name: str, args) -> dict:
             except Exception:
                 scene.cycles.device = "CPU"
                 print(json.dumps({"event": "cycles_gpu_unavailable", "fallback": "CPU"}), flush=True)
-        elif profile != "FINAL":
+        else:
             try:
                 scene.cycles.device = "CPU"
             except Exception:
@@ -412,7 +420,7 @@ def apply_profile(profile_name: str, args) -> dict:
             scene.eevee.use_volumetric_shadows = True
     if hasattr(scene, "view_settings"):
         scene.view_settings.view_transform = "AgX"
-        scene.view_settings.look = "AgX - Medium Contrast"
+        scene.view_settings.look = "AgX - Medium High Contrast"
         scene.view_settings.exposure = 0.20
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGB"

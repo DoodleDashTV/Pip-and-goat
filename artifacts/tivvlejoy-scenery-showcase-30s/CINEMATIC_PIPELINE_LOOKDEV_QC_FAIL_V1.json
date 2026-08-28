@@ -1,0 +1,33 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T17:17:40Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "eaf3b61",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev2",
+  "contactSheet": "/opt/cursor/artifacts/tivvlejoy-cinematic-pipeline/CONTACT_SHEET_LOOKDEV_FAST_V1.png",
+  "shots": {
+    "SHOT_01": "FAIL — valley stack is now readable (cabin, pines, Louis peaks, sky) but ground is still a grainy carrier, river is a sickle, a tree clips a roof.",
+    "SHOT_02": "FAIL — low river angle exists, but water is matte blue geometry, not purchased Water_Mat as visible water.",
+    "SHOT_03": "FAIL — forest passage is a dark close-up of repeated pines, not species-layered woodland.",
+    "SHOT_04": "FAIL — cabin/cart/fence readable; still a single-asset cluster, crushed shadows, tree/roof risk.",
+    "SHOT_05": "FAIL — intended long-lens mountain compression; frame is a dark pine wall with almost no peaks.",
+    "SHOT_06": "FAIL — hero close clips trees through architecture; river remains a blue plane."
+  },
+  "automaticFailuresHit": [
+    "flat_lime_or_pale_green_ground",
+    "river_reads_as_road_path_or_blue_tape",
+    "rectangular_forest_wall",
+    "roof_tree_intersections",
+    "village_as_small_asset_cluster",
+    "identical-looking close forest beats",
+    "low_poly_asset_test_appearance",
+    "excessive_noise"
+  ],
+  "eeveeVersusCycles": "EEVEE aborted on this host (missing libEGL). Cycles CPU used for LOOKDEV_FAST. No GPU A/B yet.",
+  "paidRenderAuthorized": false,
+  "honestConclusion": "Pipeline contracts and six cameras exist. Images do not pass the cinematic visual gate. Do not CREATE. Do not present as approval."
+}
