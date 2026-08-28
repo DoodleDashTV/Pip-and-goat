@@ -512,10 +512,10 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(mask, damp_fac.inputs["Value"])
     links.new(damp_fac.outputs["Result"] if "Result" in damp_fac.outputs else damp_fac.outputs[0], damp.inputs["Fac"])
     links.new(damp.outputs["Color"], wet.inputs["Color1"])
-    wet.inputs["Color2"].default_value = (0.036, 0.030, 0.016, 1.0)
+    wet.inputs["Color2"].default_value = (0.042, 0.034, 0.018, 1.0)
     wet_fac = nodes.new("ShaderNodeMapRange")
-    wet_fac.inputs["From Min"].default_value = 0.34
-    wet_fac.inputs["From Max"].default_value = 0.96
+    wet_fac.inputs["From Min"].default_value = 0.18
+    wet_fac.inputs["From Max"].default_value = 0.90
     wet_fac.inputs["To Min"].default_value = 0.0
     wet_fac.inputs["To Max"].default_value = 1.0
     links.new(mask, wet_fac.inputs["Value"])
@@ -723,16 +723,29 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         body.inputs["Metallic"].default_value = 0.0
     layer = nodes.new("ShaderNodeLayerWeight")
     layer.inputs["Blend"].default_value = 0.48
-    lpath = nodes.new("ShaderNodeLightPath")
-    # Camera-to-film distance. Close riverbank cameras can see the bed;
-    # crane / village cameras would otherwise transmit the sky through the
-    # thin plane and turn the creek into a pale ribbon again.
+    camdata = nodes.new("ShaderNodeCameraData")
+    # View Distance can be 0 if the socket is unused; treat that as far so
+    # crane cameras default dark instead of transmitting the sky.
+    tiny = nodes.new("ShaderNodeMath")
+    tiny.operation = "LESS_THAN"
+    tiny.inputs[1].default_value = 2.0
+    links.new(camdata.outputs["View Distance"], tiny.inputs[0])
+    boost = nodes.new("ShaderNodeMath")
+    boost.operation = "MULTIPLY"
+    boost.inputs[1].default_value = 48.0
+    links.new(tiny.outputs["Value"], boost.inputs[0])
+    safe_dist = nodes.new("ShaderNodeMath")
+    safe_dist.operation = "ADD"
+    links.new(camdata.outputs["View Distance"], safe_dist.inputs[0])
+    links.new(boost.outputs["Value"], safe_dist.inputs[1])
+    # Close riverbank cameras can see the bed; crane / village cameras
+    # would otherwise transmit the sky through the thin plane.
     dist_trans = nodes.new("ShaderNodeMapRange")
-    dist_trans.inputs["From Min"].default_value = 8.0
-    dist_trans.inputs["From Max"].default_value = 30.0
-    dist_trans.inputs["To Min"].default_value = 0.40
-    dist_trans.inputs["To Max"].default_value = 0.05
-    links.new(lpath.outputs["Ray Length"], dist_trans.inputs["Value"])
+    dist_trans.inputs["From Min"].default_value = 10.0
+    dist_trans.inputs["From Max"].default_value = 28.0
+    dist_trans.inputs["To Min"].default_value = 0.38
+    dist_trans.inputs["To Max"].default_value = 0.04
+    links.new(safe_dist.outputs["Value"], dist_trans.inputs["Value"])
     edge_trans = nodes.new("ShaderNodeMapRange")
     edge_trans.inputs["From Min"].default_value = 0.0
     edge_trans.inputs["From Max"].default_value = 1.0
@@ -795,11 +808,11 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Normal" in glossy.inputs:
         links.new(bump.outputs["Normal"], glossy.inputs["Normal"])
     dist_sheen = nodes.new("ShaderNodeMapRange")
-    dist_sheen.inputs["From Min"].default_value = 8.0
-    dist_sheen.inputs["From Max"].default_value = 30.0
-    dist_sheen.inputs["To Min"].default_value = 0.16
-    dist_sheen.inputs["To Max"].default_value = 0.035
-    links.new(lpath.outputs["Ray Length"], dist_sheen.inputs["Value"])
+    dist_sheen.inputs["From Min"].default_value = 10.0
+    dist_sheen.inputs["From Max"].default_value = 28.0
+    dist_sheen.inputs["To Min"].default_value = 0.15
+    dist_sheen.inputs["To Max"].default_value = 0.03
+    links.new(safe_dist.outputs["Value"], dist_sheen.inputs["Value"])
     sheen = nodes.new("ShaderNodeMath")
     sheen.operation = "MULTIPLY"
     links.new(layer.outputs["Fresnel"], sheen.inputs[0])
