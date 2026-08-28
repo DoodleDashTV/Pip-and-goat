@@ -67,7 +67,7 @@ BANK_HALF_WIDTH = 9.50
 BED_BELOW_WATER = 0.40
 BED_CENTER_Z = -1.62
 BED_SHOULDER_Z = -0.58
-BANK_CREST_Z = 0.62
+BANK_CREST_Z = 0.78
 WATER_WIDTH_SCALE = 0.30
 BED_WIDTH_SCALE = 0.86
 VILLAGE_X_HALF = 16.0
@@ -270,13 +270,12 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
         return shoulder_z + 0.20 * (t ** 1.35) + irreg
     t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
     shelf = shoulder_z + 0.20
-    # Jagged crest so the grass seam is not a knife-cut.
-    crest_z += 0.10 * math.sin(x * 1.17 + y * 0.83) + 0.06 * math.sin(along * 0.91)
-    if t < 0.48:
-        u = t / 0.48
-        return shelf + (crest_z - shelf) * (u ** 0.82)
-    u = (t - 0.48) / 0.52
-    return crest_z + (meadow_z - crest_z) * (u ** 1.05)
+    crest_z += 0.08 * math.sin(x * 1.17 + y * 0.83) + 0.05 * math.sin(along * 0.91)
+    if t < 0.38:
+        u = t / 0.38
+        return shelf + (crest_z - shelf) * (u ** 0.68)
+    u = (t - 0.38) / 0.62
+    return crest_z + (meadow_z - crest_z) * (u ** 1.15)
 
 
 def build_terrain(_files: list[Path]) -> bpy.types.Object:
