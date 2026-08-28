@@ -1,0 +1,28 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:58:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "d823d88",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev30",
+  "shots": {
+    "SHOT_01": "PARTIAL — stream is now in the terrain (laid into the valley, not a floating card). Still a dark rippled ribbon.",
+    "SHOT_02": "FAIL — hard shoreline cut remains. 1.4m fade on 0.7m cells still reads as a painted path.",
+    "SHOT_03": "PARTIAL — framed opening from earlier passes.",
+    "SHOT_04": "PARTIAL — street holds. Stream is a rippled band at the bottom.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "PARTIAL — street from earlier restore."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Embedding the stream removed the second-mesh lip, but the mask fade is still a hard cut. Widen the shoreline. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

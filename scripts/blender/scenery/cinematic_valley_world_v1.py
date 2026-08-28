@@ -206,11 +206,11 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             height += 0.16 * math.sin(x * 0.29 + y * 0.17)
         river_dist = dist_to_polyline(x, y)
         # Flat bed so SHOT_02 sees a horizontal stream, not V-trough walls.
-        if river_dist < 2.15:
-            height -= 0.46
+        if river_dist < 1.8:
+            height -= 0.42
         else:
-            rise = min(1.0, (river_dist - 2.15) / 3.4)
-            height -= 0.46 * (1.0 - rise * rise)
+            rise = min(1.0, (river_dist - 1.8) / 4.2)
+            height -= 0.42 * (1.0 - rise * rise)
         pad = 1.0
         if in_village(x, y):
             edge = min(
@@ -353,10 +353,11 @@ def paint_river_mask(ground: bpy.types.Object) -> None:
         return
     for index, vert in enumerate(mesh.vertices):
         dist = dist_to_polyline(vert.co.x, vert.co.y)
-        if dist < 2.15:
+        if dist < 1.8:
             value = 1.0
-        elif dist < 3.55:
-            value = 1.0 - (dist - 2.15) / 1.40
+        elif dist < 5.2:
+            t = (dist - 1.8) / 3.4
+            value = 1.0 - t * t * (3.0 - 2.0 * t)
         else:
             value = 0.0
         color.data[index].color = (value, value, value, 1.0)
