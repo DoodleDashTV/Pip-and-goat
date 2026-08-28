@@ -1,0 +1,36 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T20:05:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "diagnostic": {
+    "shot02": {
+      "samples": 48,
+      "denoise": true,
+      "path": "/tmp/o14-lookdev/cinematic-lookdev31-shot02-48/shot_02_.png",
+      "result": "FAIL — cleaner than 16-sample grain, still a blue rippled path with a sharp terrain edge. Grain was not the only problem."
+    }
+  },
+  "commit": "3c41ded",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev31",
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/street/ridge hold. Stream is in the terrain as a dark rippled band.",
+    "SHOT_02": "FAIL — along-channel. 16-sample and 48-sample denoise both read as a painted blue path, not water.",
+    "SHOT_03": "PARTIAL — framed forest opening holds.",
+    "SHOT_04": "PARTIAL — street holds (cabins, cart, fence, mountains). Stream is a small rippled patch at the bottom.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "PARTIAL — street/cart/fence hold. Stream is a bottom sliver."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Embedding the stream and raising SHOT_02 to 48 samples with denoise did not make water. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
