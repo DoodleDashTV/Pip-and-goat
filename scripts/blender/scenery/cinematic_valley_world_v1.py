@@ -429,7 +429,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    body_col = tint or (0.018, 0.032, 0.026, 1.0)
+    body_col = tint or (0.020, 0.040, 0.034, 1.0)
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
@@ -437,7 +437,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     foam = _mix_rgb(nodes)
     if "Color1" in foam.inputs:
         foam.inputs["Color1"].default_value = body_col
-        foam.inputs["Color2"].default_value = (0.18, 0.19, 0.16, 1.0)
+        foam.inputs["Color2"].default_value = (0.28, 0.30, 0.26, 1.0)
         links.new(attr.outputs["Color"], foam.inputs["Fac"])
         links.new(foam.outputs["Color"], body.inputs["Base Color"])
     elif "Base Color" in body.inputs:
@@ -486,7 +486,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         ripples.inputs["Roughness"].default_value = 0.55
     links.new(coord.outputs["Object"], ripples.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.14
+    bump.inputs["Strength"].default_value = 0.22
     links.new(ripples.outputs["Fac"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
@@ -513,7 +513,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(weight.outputs["Facing"], invert.inputs[1])
     cap = nodes.new("ShaderNodeMath")
     cap.operation = "MULTIPLY"
-    cap.inputs[1].default_value = 0.34
+    cap.inputs[1].default_value = 0.44
     links.new(invert.outputs["Value"], cap.inputs[0])
     mix_sh = nodes.new("ShaderNodeMixShader")
     links.new(cap.outputs["Value"], mix_sh.inputs["Fac"])

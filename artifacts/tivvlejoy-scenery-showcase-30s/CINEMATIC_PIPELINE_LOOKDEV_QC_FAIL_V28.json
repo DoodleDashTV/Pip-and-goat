@@ -1,0 +1,41 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T21:43:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "denoise": true,
+  "commit": "2f61ab4",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev33",
+  "measurements": {
+    "SHOT_01": {"meanLum": 108.7, "midBminusG": -8.0, "botBminusG": -20.5},
+    "SHOT_02": {"meanLum": 120.6, "midBminusG": 0.5, "botBminusG": -11.1},
+    "SHOT_03": {"meanLum": 89.3, "midBminusG": -0.2, "botBminusG": -16.2},
+    "SHOT_04": {"meanLum": 103.5, "midBminusG": -14.6, "botBminusG": -15.3},
+    "SHOT_05": {"meanLum": 122.4, "midBminusG": 2.3, "botBminusG": -11.9},
+    "SHOT_06": {"meanLum": 92.2, "midBminusG": -12.7, "botBminusG": -12.8}
+  },
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/street/ridge hold. Stream is a seated grey ribbon, not a painted floor band, and not unmistakably water.",
+    "SHOT_02": "FAIL — along-channel. Shallow dish removed the 24cm shelf. Surface still reads as a light path/ice more than a stream.",
+    "SHOT_03": "PARTIAL — framed forest opening holds.",
+    "SHOT_04": "PARTIAL — street/cart/fence/mountains hold. Foreground stream is a flat light-blue ribbon.",
+    "SHOT_05": "PARTIAL — compression holds.",
+    "SHOT_06": "PARTIAL — street/cart/fence hold."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape"
+  ],
+  "progressVsV27": {
+    "raised_shelf_lip": "reduced",
+    "grazing_ice_gloss": "reduced_and_overcorrected_toward_grey_path"
+  },
+  "nextCorrection": "Raise SHOT_02 to z=3.1 looking slightly down the channel. Restore mid fresnel 0.44, stronger foam and ripples, slightly more teal body.",
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Seating the ribbon fixed the floating slab; the surface still fails as water. Do not CREATE."
+}
