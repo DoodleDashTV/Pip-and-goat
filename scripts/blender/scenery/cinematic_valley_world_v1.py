@@ -503,19 +503,19 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(blotch_range.outputs["Result"] if "Result" in blotch_range.outputs else blotch_range.outputs[0], mask_mul.inputs[1])
     mask = mask_mul.outputs["Value"]
     links.new(incoming, damp.inputs["Color1"])
-    damp.inputs["Color2"].default_value = (0.078, 0.058, 0.028, 1.0)
+    damp.inputs["Color2"].default_value = (0.11, 0.082, 0.040, 1.0)
     damp_fac = nodes.new("ShaderNodeMapRange")
     damp_fac.inputs["From Min"].default_value = 0.0
-    damp_fac.inputs["From Max"].default_value = 0.48
+    damp_fac.inputs["From Max"].default_value = 0.58
     damp_fac.inputs["To Min"].default_value = 0.0
     damp_fac.inputs["To Max"].default_value = 1.0
     links.new(mask, damp_fac.inputs["Value"])
     links.new(damp_fac.outputs["Result"] if "Result" in damp_fac.outputs else damp_fac.outputs[0], damp.inputs["Fac"])
     links.new(damp.outputs["Color"], wet.inputs["Color1"])
-    wet.inputs["Color2"].default_value = (0.028, 0.024, 0.014, 1.0)
+    wet.inputs["Color2"].default_value = (0.036, 0.030, 0.016, 1.0)
     wet_fac = nodes.new("ShaderNodeMapRange")
-    wet_fac.inputs["From Min"].default_value = 0.22
-    wet_fac.inputs["From Max"].default_value = 0.92
+    wet_fac.inputs["From Min"].default_value = 0.34
+    wet_fac.inputs["From Max"].default_value = 0.96
     wet_fac.inputs["To Min"].default_value = 0.0
     wet_fac.inputs["To Max"].default_value = 1.0
     links.new(mask, wet_fac.inputs["Value"])
@@ -582,7 +582,20 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     links.new(noise.outputs["Fac"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
-    links.new(body.outputs["BSDF"], out.inputs["Surface"])
+    fade = nodes.new("ShaderNodeMapRange")
+    fade.inputs["From Min"].default_value = 0.62
+    fade.inputs["From Max"].default_value = 0.98
+    fade.inputs["To Min"].default_value = 0.0
+    fade.inputs["To Max"].default_value = 0.82
+    links.new(attr.outputs["Color"], fade.inputs["Value"])
+    trans = nodes.new("ShaderNodeBsdfTransparent")
+    if "Color" in trans.inputs:
+        trans.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+    mix_sh = nodes.new("ShaderNodeMixShader")
+    links.new(fade.outputs["Result"] if "Result" in fade.outputs else fade.outputs[0], mix_sh.inputs[0])
+    links.new(body.outputs["BSDF"], mix_sh.inputs[1])
+    links.new(trans.outputs["BSDF"], mix_sh.inputs[2])
+    links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
     return mat
 
 
@@ -591,9 +604,9 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
 
     A thin horizontal Principled with IOR + specular + transmission Fresnel
     reflects the purchased HDRI as a pale foil under AgX +0.30 exposure.
-    Kill that built-in specular, transmit only when looking down into the
-    bed, and add a dark-tinted glossy mix so grazing cameras see wet water
-    instead of a white ribbon.
+    Kill that built-in specular. Keep a modest constant transmission so the
+    bed can tint through from the 14deg riverbank cameras, and add a dark
+    rough glossy mix so grazing shots read wet instead of foil or ink.
     """
     mat = bpy.data.materials.new("TJ_CinematicRiver")
     mat.use_nodes = True
@@ -603,11 +616,11 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    deep = tint or (0.008, 0.016, 0.014, 1.0)
+    deep = tint or (0.014, 0.030, 0.026, 1.0)
     shallow = (
-        min(0.022, deep[0] + 0.006),
-        min(0.030, deep[1] + 0.008),
-        min(0.024, deep[2] + 0.006),
+        min(0.028, deep[0] + 0.008),
+        min(0.046, deep[1] + 0.012),
+        min(0.038, deep[2] + 0.008),
         1.0,
     )
     attr = nodes.new("ShaderNodeVertexColor")
@@ -626,8 +639,8 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     rough = nodes.new("ShaderNodeMapRange")
     rough.inputs["From Min"].default_value = 0.0
     rough.inputs["From Max"].default_value = 1.0
-    rough.inputs["To Min"].default_value = 0.34
-    rough.inputs["To Max"].default_value = 0.56
+    rough.inputs["To Min"].default_value = 0.28
+    rough.inputs["To Max"].default_value = 0.46
     links.new(attr.outputs["Color"], rough.inputs["Value"])
     river_mask = purchased_river_mask_image()
     rough_out = rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0]
@@ -660,23 +673,19 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     layer = nodes.new("ShaderNodeLayerWeight")
-    layer.inputs["Blend"].default_value = 0.42
-    facing_trans = nodes.new("ShaderNodeMath")
-    facing_trans.operation = "MULTIPLY"
-    facing_trans.inputs[1].default_value = 0.46
-    links.new(layer.outputs["Facing"], facing_trans.inputs[0])
+    layer.inputs["Blend"].default_value = 0.48
+    # SHOT_02 is only ~14deg off the water. Facing-gated transmission stayed
+    # near 0.11 and the film went dead-black. Use a modest constant
+    # transmission so the bed can tint through; IOR 1.0 / specular 0 keep
+    # that from becoming a sky window.
     edge_trans = nodes.new("ShaderNodeMapRange")
     edge_trans.inputs["From Min"].default_value = 0.0
     edge_trans.inputs["From Max"].default_value = 1.0
-    edge_trans.inputs["To Min"].default_value = 1.0
-    edge_trans.inputs["To Max"].default_value = 0.55
+    edge_trans.inputs["To Min"].default_value = 0.28
+    edge_trans.inputs["To Max"].default_value = 0.16
     links.new(attr.outputs["Color"], edge_trans.inputs["Value"])
-    trans_mul = nodes.new("ShaderNodeMath")
-    trans_mul.operation = "MULTIPLY"
-    links.new(facing_trans.outputs["Value"], trans_mul.inputs[0])
-    links.new(edge_trans.outputs["Result"] if "Result" in edge_trans.outputs else edge_trans.outputs[0], trans_mul.inputs[1])
     if "Transmission Weight" in body.inputs:
-        links.new(trans_mul.outputs["Value"], body.inputs["Transmission Weight"])
+        links.new(edge_trans.outputs["Result"] if "Result" in edge_trans.outputs else edge_trans.outputs[0], body.inputs["Transmission Weight"])
     if "Transmission Extra" in body.inputs:
         body.inputs["Transmission Extra"].default_value = 0.0
     swell = nodes.new("ShaderNodeTexNoise")
@@ -707,7 +716,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(swell_mul.outputs["Value"], combo.inputs[0])
     links.new(ripple_mul.outputs["Value"], combo.inputs[1])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.16
+    bump.inputs["Strength"].default_value = 0.26
     links.new(combo.outputs["Value"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
@@ -715,12 +724,12 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if hasattr(glossy, "distribution"):
         glossy.distribution = "GGX"
     if "Color" in glossy.inputs:
-        glossy.inputs["Color"].default_value = (0.055, 0.070, 0.064, 1.0)
+        glossy.inputs["Color"].default_value = (0.10, 0.13, 0.12, 1.0)
     gloss_rough = nodes.new("ShaderNodeMapRange")
     gloss_rough.inputs["From Min"].default_value = 0.0
     gloss_rough.inputs["From Max"].default_value = 1.0
-    gloss_rough.inputs["To Min"].default_value = 0.18
-    gloss_rough.inputs["To Max"].default_value = 0.36
+    gloss_rough.inputs["To Min"].default_value = 0.26
+    gloss_rough.inputs["To Max"].default_value = 0.48
     links.new(ripple.outputs["Fac"], gloss_rough.inputs["Value"])
     if "Roughness" in glossy.inputs:
         links.new(gloss_rough.outputs["Result"] if "Result" in gloss_rough.outputs else gloss_rough.outputs[0], glossy.inputs["Roughness"])
@@ -728,7 +737,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         links.new(bump.outputs["Normal"], glossy.inputs["Normal"])
     sheen = nodes.new("ShaderNodeMath")
     sheen.operation = "MULTIPLY"
-    sheen.inputs[1].default_value = 0.12
+    sheen.inputs[1].default_value = 0.09
     links.new(layer.outputs["Fresnel"], sheen.inputs[0])
     sheen_var = nodes.new("ShaderNodeMapRange")
     sheen_var.inputs["From Min"].default_value = 0.0
@@ -896,9 +905,9 @@ def spline_channel_mesh(
             z_jit = 0.0 if foam_edges else 0.05 * math.sin(i * 0.29 + col * 0.8)
             point.z = z_center + (z_edge - z_center) * edge + z_jit
             if foam_edges:
-                swell = 0.038 * math.sin(i * 0.21 + center.x * 0.33)
-                swell += 0.022 * math.sin(i * 0.47 + col * 1.1 + center.y * 0.28)
-                swell += 0.012 * math.sin(i * 0.89 + col * 2.3)
+                swell = 0.050 * math.sin(i * 0.21 + center.x * 0.33)
+                swell += 0.028 * math.sin(i * 0.47 + col * 1.1 + center.y * 0.28)
+                swell += 0.016 * math.sin(i * 0.89 + col * 2.3)
                 point.z += swell
             verts.append((point.x, point.y, point.z))
             if foam_edges:
