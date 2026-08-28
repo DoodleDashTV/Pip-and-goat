@@ -1,0 +1,27 @@
+{
+  "schema": "TIVVLEJOY_STALE_BRIDGE_RECONCILIATION_V1",
+  "executionId": "scenery-showcase-original14-30s-v1-20260828",
+  "reconciledAt": "2026-08-28T21:33:15.257Z",
+  "before": {
+    "startupResult": "RUNNING",
+    "startupStage": "BLENDER_RENDER",
+    "frame": 248,
+    "totalFrames": 900,
+    "at": "2026-08-28T15:29:20.189Z",
+    "status": null
+  },
+  "after": {
+    "startupResult": "STALE_RECONCILED",
+    "startupStage": "STALE_RECONCILED",
+    "terminalState": "CANCELLED",
+    "topLevelFrame": null,
+    "status": "CANCELLED",
+    "statusCode": "STALE_CABIN_ORBIT_RECONCILED_NO_LIVE_POD",
+    "downloadUrl": null
+  },
+  "historicalKey": "jobs/scenery-showcase-original14-30s-v1-20260828/startup-status.historical-killed-cabin-orbit-20260828T152920Z.json",
+  "historicalPreserved": true,
+  "genuineEvidenceRewritten": false,
+  "createPerformed": false,
+  "paidMutationPerformed": false
+}
