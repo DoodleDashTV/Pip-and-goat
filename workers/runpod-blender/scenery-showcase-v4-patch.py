@@ -1,3 +1,4 @@
+# Build-time only patch for the dry purchased-scenery proof. No runtime patching.
 from pathlib import Path
 
 worker = Path('/opt/ddp-worker/src/scenery-showcase.js')
