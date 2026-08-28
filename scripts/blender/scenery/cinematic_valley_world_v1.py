@@ -540,7 +540,7 @@ def dirt_bank_material() -> bpy.types.Material:
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
     centers = evaluated_centerline(guide, samples=80)
-    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=1.45, z_offset=0.02, width_wobble=0.28)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=2.15, z_offset=0.02, width_wobble=0.35)
     assigned = assign_purchased_water(river)
     banks = []
     bank_mat = dirt_bank_material()
