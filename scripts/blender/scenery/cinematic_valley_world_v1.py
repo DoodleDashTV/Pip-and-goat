@@ -98,6 +98,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--engine", default="")
     parser.add_argument("--profile", default="LOOKDEV_FAST")
     parser.add_argument("--hide-water", action="store_true")
+    parser.add_argument("--control-tests", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -430,7 +431,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
 
 
 def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
-    """Dark wet bed + lower-bank earth on the terrain itself. Visible with water hidden."""
+    """Grass -> mixed soil -> damp earth -> dark bed. Irregular, not a knife contour."""
     mesh = ground.data
     try:
         color = mesh.color_attributes.new(name="TJ_RiverMask", type="FLOAT_COLOR", domain="POINT")
@@ -439,22 +440,26 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
     if color is None:
         return
     for index, vert in enumerate(mesh.vertices):
-        dist, signed, along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
+        x, y = vert.co.x, vert.co.y
+        dist, signed, along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
-        bank = local_half + (2.6 if signed < 0.0 else 1.6) + 0.55 * math.sin(along * 0.37)
+        fade = local_half + (3.4 if signed < 0.0 else 2.2)
+        jag = 0.85 * math.sin(x * 1.73 + y * 0.91) + 0.55 * math.sin(along * 0.47 + signed * 2.4)
+        jag += 0.35 * math.sin(x * 0.61 + y * 1.27)
+        fade += jag
         if dist < bed:
-            value = 0.72 + 0.26 * (1.0 - min(1.0, dist / max(0.25, bed)))
-        elif dist < bank:
-            t = (dist - bed) / max(0.25, bank - bed)
-            value = 0.58 * (1.0 - t) ** 0.85 * (0.62 + 0.38 * math.sin(along * 0.41 + signed * 2.1))
+            value = 0.62 + 0.36 * (1.0 - min(1.0, dist / max(0.25, bed)))
+        elif dist < fade:
+            t = (dist - bed) / max(0.35, fade - bed)
+            value = 0.48 * ((1.0 - t) ** 1.15) * (0.55 + 0.45 * (0.5 + 0.5 * math.sin(along * 0.33 + x * 0.8)))
         else:
             value = 0.0
         color.data[index].color = (value, value, value, 1.0)
 
 
 def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
-    """Darken shoreline earth. Do not mix a water BSDF onto the meadow."""
+    """Grass -> damp mixed soil -> dark bed. No water BSDF on the meadow."""
     nodes = mat.node_tree.nodes
     links = mat.node_tree.links
     bsdf = next(node for node in nodes if node.type == "BSDF_PRINCIPLED")
@@ -465,15 +470,32 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     attr.name = "TJ_RiverMaskAttr"
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverMask"
+    mask = attr.outputs.get("Color") or attr.outputs[0]
+    damp = _mix_rgb(nodes)
     wet = _mix_rgb(nodes)
-    if "Color1" in wet.inputs:
-        links.new(incoming, wet.inputs["Color1"])
-        wet.inputs["Color2"].default_value = (0.016, 0.012, 0.007, 1.0)
-        mask = attr.outputs.get("Color") or attr.outputs[0]
-        links.new(mask, wet.inputs["Fac"])
-        for link in list(bsdf.inputs["Base Color"].links):
-            links.remove(link)
-        links.new(wet.outputs["Color"], bsdf.inputs["Base Color"])
+    if "Color1" not in damp.inputs or "Color1" not in wet.inputs:
+        return
+    links.new(incoming, damp.inputs["Color1"])
+    damp.inputs["Color2"].default_value = (0.048, 0.036, 0.018, 1.0)
+    damp_fac = nodes.new("ShaderNodeMapRange")
+    damp_fac.inputs["From Min"].default_value = 0.0
+    damp_fac.inputs["From Max"].default_value = 0.42
+    damp_fac.inputs["To Min"].default_value = 0.0
+    damp_fac.inputs["To Max"].default_value = 1.0
+    links.new(mask, damp_fac.inputs["Value"])
+    links.new(damp_fac.outputs["Result"] if "Result" in damp_fac.outputs else damp_fac.outputs[0], damp.inputs["Fac"])
+    links.new(damp.outputs["Color"], wet.inputs["Color1"])
+    wet.inputs["Color2"].default_value = (0.014, 0.011, 0.007, 1.0)
+    wet_fac = nodes.new("ShaderNodeMapRange")
+    wet_fac.inputs["From Min"].default_value = 0.28
+    wet_fac.inputs["From Max"].default_value = 0.95
+    wet_fac.inputs["To Min"].default_value = 0.0
+    wet_fac.inputs["To Max"].default_value = 1.0
+    links.new(mask, wet_fac.inputs["Value"])
+    links.new(wet_fac.outputs["Result"] if "Result" in wet_fac.outputs else wet_fac.outputs[0], wet.inputs["Fac"])
+    for link in list(bsdf.inputs["Base Color"].links):
+        links.remove(link)
+    links.new(wet.outputs["Color"], bsdf.inputs["Base Color"])
 
 
 def apply_stream_tint(tint) -> None:
@@ -525,7 +547,7 @@ def cinematic_riverbed_material() -> bpy.types.Material:
 
 
 def cinematic_river_material(tint=None) -> bpy.types.Material:
-    """Thin transmissive film over the bed. Water_Mat tint only. No metallic. No ice tiles."""
+    """Transmissive creek film. Bed + HDRI + restrained Fresnel. No extra glossy mix."""
     mat = bpy.data.materials.new("TJ_CinematicRiver")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -534,99 +556,102 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    body_col = tint or (0.012, 0.020, 0.018, 1.0)
+    deep = tint or (0.010, 0.016, 0.014, 1.0)
+    shallow = (
+        min(0.028, deep[0] + 0.008),
+        min(0.036, deep[1] + 0.010),
+        min(0.030, deep[2] + 0.008),
+        1.0,
+    )
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
     coord = nodes.new("ShaderNodeTexCoord")
-    foam = _mix_rgb(nodes)
-    if "Color1" in foam.inputs:
-        foam.inputs["Color1"].default_value = body_col
-        foam.inputs["Color2"].default_value = (0.16, 0.17, 0.14, 1.0)
-        links.new(attr.outputs["Color"], foam.inputs["Fac"])
-        links.new(foam.outputs["Color"], body.inputs["Base Color"])
+    depth = _mix_rgb(nodes)
+    if "Color1" in depth.inputs:
+        depth.inputs["Color1"].default_value = deep
+        depth.inputs["Color2"].default_value = shallow
+        links.new(attr.outputs["Color"], depth.inputs["Fac"])
+        links.new(depth.outputs["Color"], body.inputs["Base Color"])
     elif "Base Color" in body.inputs:
-        body.inputs["Base Color"].default_value = body_col
+        body.inputs["Base Color"].default_value = deep
     rough = nodes.new("ShaderNodeMapRange")
     rough.inputs["From Min"].default_value = 0.0
     rough.inputs["From Max"].default_value = 1.0
-    rough.inputs["To Min"].default_value = 0.18
-    rough.inputs["To Max"].default_value = 0.46
+    rough.inputs["To Min"].default_value = 0.20
+    rough.inputs["To Max"].default_value = 0.40
     links.new(attr.outputs["Color"], rough.inputs["Value"])
     river_mask = purchased_river_mask_image()
+    rough_out = rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0]
     if river_mask is not None:
         mask_tex = nodes.new("ShaderNodeTexImage")
         mask_tex.image = river_mask
         if mask_tex.image and mask_tex.image.colorspace_settings:
             mask_tex.image.colorspace_settings.name = "Non-Color"
         mapping = nodes.new("ShaderNodeMapping")
-        mapping.inputs["Scale"].default_value = (0.048, 0.048, 0.048)
+        mapping.inputs["Scale"].default_value = (0.062, 0.062, 0.062)
         links.new(coord.outputs["Object"], mapping.inputs["Vector"])
         links.new(mapping.outputs["Vector"], mask_tex.inputs["Vector"])
         mask_mul = nodes.new("ShaderNodeMath")
         mask_mul.operation = "MULTIPLY"
-        mask_mul.inputs[1].default_value = 0.16
+        mask_mul.inputs[1].default_value = 0.12
         links.new(mask_tex.outputs["Color"], mask_mul.inputs[0])
         rough_add = nodes.new("ShaderNodeMath")
         rough_add.operation = "ADD"
-        links.new(rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0], rough_add.inputs[0])
+        links.new(rough_out, rough_add.inputs[0])
         links.new(mask_mul.outputs["Value"], rough_add.inputs[1])
-        if "Roughness" in body.inputs:
-            links.new(rough_add.outputs["Value"], body.inputs["Roughness"])
-    elif "Roughness" in body.inputs:
-        links.new(rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0], body.inputs["Roughness"])
+        rough_out = rough_add.outputs["Value"]
+    if "Roughness" in body.inputs:
+        links.new(rough_out, body.inputs["Roughness"])
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.28
+        body.inputs["Specular IOR Level"].default_value = 0.34
     if "IOR" in body.inputs:
         body.inputs["IOR"].default_value = 1.333
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
+    trans = nodes.new("ShaderNodeMapRange")
+    trans.inputs["From Min"].default_value = 0.0
+    trans.inputs["From Max"].default_value = 1.0
+    trans.inputs["To Min"].default_value = 0.72
+    trans.inputs["To Max"].default_value = 0.38
+    links.new(attr.outputs["Color"], trans.inputs["Value"])
     if "Transmission Weight" in body.inputs:
-        body.inputs["Transmission Weight"].default_value = 0.32
+        links.new(trans.outputs["Result"] if "Result" in trans.outputs else trans.outputs[0], body.inputs["Transmission Weight"])
     if "Transmission Extra" in body.inputs:
         body.inputs["Transmission Extra"].default_value = 0.0
-    ripples = nodes.new("ShaderNodeTexNoise")
-    ripples.inputs["Scale"].default_value = 2.6
-    if "Detail" in ripples.inputs:
-        ripples.inputs["Detail"].default_value = 7.0
-    if "Roughness" in ripples.inputs:
-        ripples.inputs["Roughness"].default_value = 0.62
-    links.new(coord.outputs["Object"], ripples.inputs["Vector"])
+    swell = nodes.new("ShaderNodeTexNoise")
+    swell.inputs["Scale"].default_value = 0.42
+    if "Detail" in swell.inputs:
+        swell.inputs["Detail"].default_value = 3.0
+    if "Roughness" in swell.inputs:
+        swell.inputs["Roughness"].default_value = 0.35
+    links.new(coord.outputs["Object"], swell.inputs["Vector"])
+    ripple = nodes.new("ShaderNodeTexNoise")
+    ripple.inputs["Scale"].default_value = 7.4
+    if "Detail" in ripple.inputs:
+        ripple.inputs["Detail"].default_value = 5.0
+    if "Roughness" in ripple.inputs:
+        ripple.inputs["Roughness"].default_value = 0.48
+    links.new(coord.outputs["Object"], ripple.inputs["Vector"])
+    combo = nodes.new("ShaderNodeMath")
+    combo.operation = "ADD"
+    combo.inputs[1].default_value = 0.0
+    swell_mul = nodes.new("ShaderNodeMath")
+    swell_mul.operation = "MULTIPLY"
+    swell_mul.inputs[1].default_value = 0.55
+    links.new(swell.outputs["Fac"], swell_mul.inputs[0])
+    ripple_mul = nodes.new("ShaderNodeMath")
+    ripple_mul.operation = "MULTIPLY"
+    ripple_mul.inputs[1].default_value = 0.45
+    links.new(ripple.outputs["Fac"], ripple_mul.inputs[0])
+    links.new(swell_mul.outputs["Value"], combo.inputs[0])
+    links.new(ripple_mul.outputs["Value"], combo.inputs[1])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.16
-    links.new(ripples.outputs["Fac"], bump.inputs["Height"])
+    bump.inputs["Strength"].default_value = 0.11
+    links.new(combo.outputs["Value"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
-    try:
-        gloss = nodes.new("ShaderNodeBsdfGlossy")
-    except Exception:
-        gloss = nodes.new("ShaderNodeBsdfPrincipled")
-    if "Color" in gloss.inputs:
-        gloss.inputs["Color"].default_value = (0.16, 0.20, 0.18, 1.0)
-    elif "Base Color" in gloss.inputs:
-        gloss.inputs["Base Color"].default_value = (0.12, 0.16, 0.14, 1.0)
-        if "Metallic" in gloss.inputs:
-            gloss.inputs["Metallic"].default_value = 0.0
-    if "Roughness" in gloss.inputs:
-        gloss.inputs["Roughness"].default_value = 0.22
-    if "Normal" in gloss.inputs:
-        links.new(bump.outputs["Normal"], gloss.inputs["Normal"])
-    weight = nodes.new("ShaderNodeLayerWeight")
-    weight.inputs["Blend"].default_value = 0.24
-    invert = nodes.new("ShaderNodeMath")
-    invert.operation = "SUBTRACT"
-    invert.inputs[0].default_value = 1.0
-    links.new(weight.outputs["Facing"], invert.inputs[1])
-    cap = nodes.new("ShaderNodeMath")
-    cap.operation = "MULTIPLY"
-    cap.inputs[1].default_value = 0.10
-    links.new(invert.outputs["Value"], cap.inputs[0])
-    mix_sh = nodes.new("ShaderNodeMixShader")
-    links.new(cap.outputs["Value"], mix_sh.inputs["Fac"])
-    links.new(body.outputs["BSDF"], mix_sh.inputs[1])
-    gloss_out = gloss.outputs.get("BSDF") or gloss.outputs[0]
-    links.new(gloss_out, mix_sh.inputs[2])
-    links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
+    links.new(body.outputs["BSDF"], out.inputs["Surface"])
     return mat
 
 
@@ -640,9 +665,9 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
         if src and "Base Color" in src.inputs:
             src_col = src.inputs["Base Color"].default_value
             tint = (
-                max(0.010, min(0.024, float(src_col[0]) * 0.10)),
-                max(0.016, min(0.032, float(src_col[1]) * 0.09)),
-                max(0.014, min(0.026, float(src_col[2]) * 0.06)),
+                max(0.008, min(0.018, float(src_col[0]) * 0.07)),
+                max(0.012, min(0.024, float(src_col[1]) * 0.07)),
+                max(0.010, min(0.020, float(src_col[2]) * 0.05)),
                 1.0,
             )
     surface = cinematic_river_material(tint)
@@ -757,12 +782,20 @@ def spline_channel_mesh(
         left *= width_scale
         right *= width_scale
         along_depth = 0.55 + 0.45 * (0.5 + 0.5 * math.sin(i * 0.17))
-        pinch = 0.78 + 0.28 * math.sin(i * 0.13)
+        left_pinch = 0.80 + 0.28 * math.sin(i * 0.11) + (0.22 * math.sin(i * 0.31) if foam_edges else 0.0)
+        right_pinch = 0.76 + 0.26 * math.sin(i * 0.17 + 1.3) + (0.20 * math.cos(i * 0.23) if foam_edges else 0.0)
+        if foam_edges and i % 17 == 5:
+            left_pinch *= 0.42
+        if foam_edges and i % 19 == 11:
+            right_pinch *= 0.38
         for col, offset in enumerate(offsets):
+            pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
             edge_noise = 0.0
-            if abs(offset) > 0.72:
-                edge_noise = 0.22 * math.sin(i * 0.37 + col * 1.7) + 0.14 * math.sin(i * 0.19)
+            if abs(offset) > 0.68:
+                edge_noise = 0.28 * math.sin(i * 0.37 + col * 1.7) + 0.18 * math.sin(i * 0.19)
+                if foam_edges:
+                    edge_noise += 0.20 * math.sin(i * 0.53 + (1.0 if offset >= 0.0 else -1.0))
             lateral = half * abs(offset) + edge_noise
             point = center + side * (lateral * (1.0 if offset >= 0.0 else -1.0))
             edge = abs(offset)
@@ -877,7 +910,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
         width_scale=WATER_WIDTH_SCALE,
         z_center=WATER_SURFACE_Z,
         z_edge=WATER_SURFACE_Z + 0.003,
-        rows=5,
+        rows=7,
         foam_edges=True,
     )
     assigned = assign_purchased_water(river)
@@ -1010,17 +1043,20 @@ def place_bank_crest_trees(trees: list) -> list:
         return extras
     centers = evaluated_centerline(guide, samples=72)
     for i, center in enumerate(centers):
-        if i % 9 not in {2, 6}:
+        key = (i * 7 + 3) % 11
+        if key not in {1, 4, 8}:
             continue
         left, right = _channel_halves_for_index(centers, i)
         side = _side_from_centers(centers, i)
-        sign = -1.0 if (i // 9) % 2 == 0 else 1.0
+        sign = -1.0 if key == 4 else 1.0
+        if i % 5 == 0:
+            sign *= -1.0
         half = left if sign < 0.0 else right
-        offset = half + 1.25 + 0.55 * math.sin(i * 0.47)
+        offset = half + 1.05 + 0.85 * math.sin(i * 0.47 + key)
         loc = center + side * (offset * sign)
-        if in_village(loc.x, loc.y) or in_river_channel(loc.x, loc.y, margin=0.4):
+        if in_village(loc.x, loc.y) or in_river_channel(loc.x, loc.y, margin=0.35):
             continue
-        extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.24 + 0.16 * ((i * 3) % 4) / 3.0))
+        extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.20 + 0.22 * ((i * 3) % 5) / 4.0))
     return extras
 
 
@@ -1169,6 +1205,42 @@ def setup_six_cameras() -> list[str]:
     return names
 
 
+def setup_control_cameras() -> list[str]:
+    """Lookdev-only grazing and downward river cameras. Not part of the six-shot edit."""
+    scene = bpy.context.scene
+    specs = (
+        {
+            "name": "TJ_RIVER_GRAZE_CAM",
+            "location": (-20.4, -18.8, 2.15),
+            "look": (8.5, -13.2, -1.12),
+            "lens": 40.0,
+        },
+        {
+            "name": "TJ_RIVER_DOWN_CAM",
+            "location": (-6.4, -16.8, 7.4),
+            "look": (1.2, -12.2, -1.20),
+            "lens": 32.0,
+        },
+    )
+    names = []
+    for spec in specs:
+        bpy.ops.object.camera_add(location=spec["location"])
+        cam = bpy.context.object
+        cam.name = spec["name"]
+        cam.data.lens = spec["lens"]
+        cam.data.sensor_width = 32
+        cam.data.dof.use_dof = False
+        target = bpy.data.objects.new(spec["name"] + "_LOOK", None)
+        scene.collection.objects.link(target)
+        target.location = spec["look"]
+        constraint = cam.constraints.new(type="TRACK_TO")
+        constraint.target = target
+        constraint.track_axis = "TRACK_NEGATIVE_Z"
+        constraint.up_axis = "UP_Y"
+        names.append(cam.name)
+    return names
+
+
 def apply_profile(profile_name: str, args) -> dict:
     profile = normalize_profile(profile_name)
     defaults = profile_defaults(profile)
@@ -1200,6 +1272,10 @@ def apply_profile(profile_name: str, args) -> dict:
                 scene.cycles.device = "CPU"
             except Exception:
                 pass
+        if hasattr(scene.cycles, "transmission_bounces"):
+            scene.cycles.transmission_bounces = max(8, int(getattr(scene.cycles, "transmission_bounces", 8) or 8))
+        if hasattr(scene.cycles, "transparent_max_bounces"):
+            scene.cycles.transparent_max_bounces = max(8, int(getattr(scene.cycles, "transparent_max_bounces", 8) or 8))
     if hasattr(scene, "eevee"):
         if hasattr(scene.eevee, "taa_render_samples"):
             scene.eevee.taa_render_samples = int(samples)
@@ -1434,6 +1510,8 @@ def main() -> int:
     link_exclusive(stage, collections["WORLD_CHARACTER_STAGING"])
     setup_mist_and_compositor()
     cameras = setup_six_cameras()
+    control_cams = setup_control_cameras()
+    cameras.extend(control_cams)
     applied = apply_profile(args.profile, args)
 
     contributions = {
@@ -1516,6 +1594,17 @@ def main() -> int:
             bpy.context.scene.render.filepath = str(out / f"{shot['id'].lower()}_")
             write_progress("LOOKDEV_STILL", frame=frame, shot=shot["id"])
             bpy.ops.render.render(write_still=True)
+        if args.control_tests:
+            for name, label in (("TJ_RIVER_GRAZE_CAM", "control_graze"), ("TJ_RIVER_DOWN_CAM", "control_down")):
+                cam = bpy.data.objects.get(name)
+                if cam is None:
+                    continue
+                bpy.context.scene.camera = cam
+                bpy.context.scene.frame_set(210)
+                bpy.context.scene.render.filepath = str(out / f"{label}_")
+                write_progress("LOOKDEV_CONTROL", camera=name, label=label)
+                bpy.ops.render.render(write_still=True)
+                frames.append(210)
         write_progress("LOOKDEV_COMPLETE", frames=len(frames))
         return 0
 
