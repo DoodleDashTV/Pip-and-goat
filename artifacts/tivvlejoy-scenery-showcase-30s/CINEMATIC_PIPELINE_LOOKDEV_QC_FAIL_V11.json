@@ -1,0 +1,34 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:50:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "c16a719",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev16",
+  "shots": {
+    "SHOT_01": "FAIL — discovery pool reads as a white card / bulge. Village and Louis ridge remain.",
+    "SHOT_02": "FAIL — white oval water card in the foreground. Cabin composition is fine; the pool is not water.",
+    "SHOT_03": "PARTIAL — framed forest opening holds. Meadow still dark and noisy.",
+    "SHOT_04": "FAIL — street is clearer (cabins + cart + fence) but the pool is a white semicircle in the foreground.",
+    "SHOT_05": "PARTIAL — compression holds. Light strip at the bottom.",
+    "SHOT_06": "FAIL — white stripe across the bottom of an otherwise readable street."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "low_poly_asset_test_appearance",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "SHOT_04 street is no longer crowded by far-bank extras",
+    "SHOT_03 forest frame still holds"
+  ],
+  "regression": "NGON discovery pool plus metallic water blew out to a white card. Removed.",
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Green CI does not authorize CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

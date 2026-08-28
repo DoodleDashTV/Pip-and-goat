@@ -360,7 +360,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Specular IOR Level" in spec.inputs:
         spec.inputs["Specular IOR Level"].default_value = 0.95
     if "Metallic" in spec.inputs:
-        spec.inputs["Metallic"].default_value = 0.28
+        spec.inputs["Metallic"].default_value = 0.12
     weight = nodes.new("ShaderNodeLayerWeight")
     weight.inputs["Blend"].default_value = 0.22
     invert = nodes.new("ShaderNodeMath")
@@ -538,49 +538,18 @@ def dirt_bank_material() -> bpy.types.Material:
     return mat
 
 
-def displace_water(obj: bpy.types.Object, strength: float = 0.07) -> None:
-    tex = bpy.data.textures.new(obj.name + "_Waves", type="CLOUDS")
-    tex.noise_scale = 1.8
-    if hasattr(tex, "noise_depth"):
-        tex.noise_depth = 2
-    mod = obj.modifiers.new("TJ_RiverWaves", "DISPLACE")
-    mod.texture = tex
-    mod.strength = strength
-    mod.mid_level = 0.5
-
-
-def build_discovery_pool() -> bpy.types.Object:
-    bpy.ops.mesh.primitive_circle_add(vertices=28, radius=1.0, fill_type="NGON", location=(-6.0, -12.2, -0.62))
-    pool = bpy.context.object
-    pool.name = "TJ_River_DiscoveryPool"
-    pool.scale = (5.8, 3.2, 1.0)
-    try:
-        bpy.ops.object.transform_apply(scale=True)
-    except Exception:
-        pass
-    for vert in pool.data.vertices:
-        vert.co.z += 0.07 + 0.015 * math.sin(vert.co.x * 0.7 + vert.co.y * 0.4)
-    pool.data.update()
-    shade_smooth(pool)
-    if hasattr(pool, "visible_shadow"):
-        pool.visible_shadow = False
-    return pool
-
-
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
     centers = evaluated_centerline(guide, samples=80)
     river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=1.45, z_offset=0.02, width_wobble=0.28)
     assigned = assign_purchased_water(river)
-    pool = build_discovery_pool()
-    pool.data.materials.append(river.data.materials[0])
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
         bank = spline_edge_mesh(name, centers, inner_half=0.85, outer_half=5.2, z_inner=0.03, z_outer=0.20, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
-    return river, assigned, banks + [pool]
+    return river, assigned, banks
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0) -> None:
