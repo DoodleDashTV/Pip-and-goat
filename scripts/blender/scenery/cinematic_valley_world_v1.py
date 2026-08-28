@@ -55,10 +55,10 @@ RIVER_SPLINE = (
     (42.0, -19.0, -0.62),
 )
 # Horizontal water sits in a deeper bed. Do not paint water onto the meadow.
-WATER_SURFACE_Z = -0.16
-WATER_HALF_WIDTH = 1.48
-BANK_HALF_WIDTH = 3.55
-BED_BELOW_WATER = 0.24
+WATER_SURFACE_Z = -0.12
+WATER_HALF_WIDTH = 1.72
+BANK_HALF_WIDTH = 3.90
+BED_BELOW_WATER = 0.045
 VILLAGE_X_HALF = 16.0
 VILLAGE_Y_MIN = -8.0
 VILLAGE_Y_MAX = 22.0
@@ -220,14 +220,15 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         river_dist = dist_to_polyline(x, y)
         # Deeper flat bed under a separate horizontal water mesh.
         # V-trough walls read as a blue path from SHOT_02; painted masks read as tape.
-        bank_wobble = 0.38 * math.sin(x * 0.37 + y * 0.21)
-        bed_half = WATER_HALF_WIDTH + 0.22
+        bank_wobble = 0.42 * math.sin(x * 0.37 + y * 0.21)
+        lip = WATER_HALF_WIDTH + 0.10
         bank_half = BANK_HALF_WIDTH + bank_wobble
         bed_z = WATER_SURFACE_Z - BED_BELOW_WATER
-        if river_dist < bed_half:
+        if river_dist < lip:
+            # Just under the ribbon. A deeper shelf made the water read as a raised slab.
             height = bed_z
         else:
-            rise = min(1.0, (river_dist - bed_half) / max(0.35, bank_half - bed_half))
+            rise = min(1.0, (river_dist - lip) / max(0.40, bank_half - lip))
             smooth = rise * rise * (3.0 - 2.0 * rise)
             height = bed_z + (height - bed_z) * smooth
         pad = 1.0
@@ -428,7 +429,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    body_col = tint or (0.016, 0.034, 0.030, 1.0)
+    body_col = tint or (0.018, 0.032, 0.026, 1.0)
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
@@ -494,25 +495,25 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     except Exception:
         gloss = nodes.new("ShaderNodeBsdfPrincipled")
     if "Color" in gloss.inputs:
-        gloss.inputs["Color"].default_value = (0.62, 0.70, 0.76, 1.0)
+        gloss.inputs["Color"].default_value = (0.42, 0.46, 0.44, 1.0)
     elif "Base Color" in gloss.inputs:
-        gloss.inputs["Base Color"].default_value = (0.42, 0.50, 0.56, 1.0)
+        gloss.inputs["Base Color"].default_value = (0.30, 0.34, 0.32, 1.0)
         if "Metallic" in gloss.inputs:
             gloss.inputs["Metallic"].default_value = 0.0
     if "Roughness" in gloss.inputs:
-        gloss.inputs["Roughness"].default_value = 0.06
+        gloss.inputs["Roughness"].default_value = 0.16
     if "Normal" in gloss.inputs:
         links.new(bump.outputs["Normal"], gloss.inputs["Normal"])
     # Fresnel: more reflection at grazing (SHOT_02), less when facing (SHOT_01).
     weight = nodes.new("ShaderNodeLayerWeight")
-    weight.inputs["Blend"].default_value = 0.28
+    weight.inputs["Blend"].default_value = 0.22
     invert = nodes.new("ShaderNodeMath")
     invert.operation = "SUBTRACT"
     invert.inputs[0].default_value = 1.0
     links.new(weight.outputs["Facing"], invert.inputs[1])
     cap = nodes.new("ShaderNodeMath")
     cap.operation = "MULTIPLY"
-    cap.inputs[1].default_value = 0.58
+    cap.inputs[1].default_value = 0.34
     links.new(invert.outputs["Value"], cap.inputs[0])
     mix_sh = nodes.new("ShaderNodeMixShader")
     links.new(cap.outputs["Value"], mix_sh.inputs["Fac"])
@@ -533,9 +534,9 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
         if src and "Base Color" in src.inputs:
             src_col = src.inputs["Base Color"].default_value
             tint = (
-                max(0.012, min(0.040, float(src_col[0]) * 0.18)),
-                max(0.022, min(0.052, float(src_col[1]) * 0.16)),
-                max(0.024, min(0.058, float(src_col[2]) * 0.14)),
+                max(0.014, min(0.034, float(src_col[0]) * 0.14)),
+                max(0.024, min(0.046, float(src_col[1]) * 0.13)),
+                max(0.020, min(0.038, float(src_col[2]) * 0.08)),
                 1.0,
             )
     surface = cinematic_river_material(tint)
