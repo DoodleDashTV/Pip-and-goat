@@ -11,7 +11,12 @@ const POD_NAME = 'tivvlejoy-scenery-original14-30s-v1';
 const AUTHORIZATION = 'TIVVLEJOY_SCENERY_ORIGINAL14_30S_STANDING_AUTHORIZATION_V1';
 const TEMPLATE_ID = 'u4glgdj076';
 const TEMPLATE_NAME = 'TivvleJoy Scenery Original14 30s V1';
-const WORKER_IMAGE = 'ghcr.io/doodledashtv/ddp-runpod-blender@sha256:ffcb91e5ee9f2b04fc49f9148d68871d237dd80c6b3fc3980eca18c0c053326c';
+const WORKER_IMAGE_DIGEST = 'sha256:4d33c0b26d868dd5891dadb05c0a11f6504ae5554dbb663c5c834e8385d0d72f';
+const WORKER_IMAGE_PLACEHOLDER = `ghcr.io/<ghcr-owner>/ddp-runpod-blender@${WORKER_IMAGE_DIGEST}`;
+function imageMatchesPin(imageName: string) {
+  const image = clean(imageName);
+  return image.endsWith(`@${WORKER_IMAGE_DIGEST}`) || image.endsWith(WORKER_IMAGE_DIGEST);
+}
 const OUTPUT_KEY = `tivvlejoy-assets/showcases/${EXECUTION_ID}/tivvlejoy-scenery-original14-30s.mp4`;
 const STATUS_KEY = `jobs/${EXECUTION_ID}/status.json`;
 const STARTUP_KEY = `jobs/${EXECUTION_ID}/startup-status.json`;
@@ -67,8 +72,8 @@ async function verifyTemplate(key:string){
   const got=await runpodRest(key,'/v1/templates',{method:'GET'}); if(!got.ok) throw new Error(`RUNPOD_TEMPLATE_LIST_FAILED:${got.status}`);
   const items=Array.isArray(got.parsed)?got.parsed:Array.isArray(got.parsed?.templates)?got.parsed.templates:[];
   const exact=items.filter((x:any)=>clean(x?.id)===TEMPLATE_ID); if(exact.length!==1) throw new Error('ORIGINAL14_TEMPLATE_ID_NOT_UNIQUE');
-  const t=exact[0]; if(clean(t?.name)!==TEMPLATE_NAME) throw new Error('ORIGINAL14_TEMPLATE_NAME_MISMATCH'); if(clean(t?.imageName)!==WORKER_IMAGE) throw new Error('ORIGINAL14_TEMPLATE_IMAGE_MISMATCH');
-  return {templateId:TEMPLATE_ID,templateName:TEMPLATE_NAME,imageName:WORKER_IMAGE};
+  const t=exact[0]; if(clean(t?.name)!==TEMPLATE_NAME) throw new Error('ORIGINAL14_TEMPLATE_NAME_MISMATCH'); if(!imageMatchesPin(clean(t?.imageName))) throw new Error('ORIGINAL14_TEMPLATE_IMAGE_MISMATCH');
+  return {templateId:TEMPLATE_ID,templateName:TEMPLATE_NAME,imageName:clean(t.imageName),workerImageDigest:WORKER_IMAGE_DIGEST};
 }
 async function secure4090Preflight(key:string){
   const data=await runpodGraphql(key,'query { myself { id } gpuTypes { id displayName lowestPrice(input: { gpuCount: 1, secureCloud: true }) { uninterruptablePrice stockStatus } } }');
@@ -90,7 +95,7 @@ export async function GET(request:Request){
   try{
     const url=new URL(request.url); const [startup,status]=await Promise.all([readJson(STARTUP_KEY),readJson(STATUS_KEY)]); let downloadUrl:string|null=null;
     if(status?.status==='COMPLETE'&&url.searchParams.get('download')==='1'){ const r2=r2Config(); downloadUrl=await getSignedUrl(r2.client,new GetObjectCommand({Bucket:r2.bucket,Key:OUTPUT_KEY}),{expiresIn:900}); }
-    return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_BRIDGE_V1',executionId:EXECUTION_ID,podName:POD_NAME,templateId:TEMPLATE_ID,workerImage:WORKER_IMAGE,workerImagePinned:true,workerEntrypoint:'scenery-showcase-original14-entry.js',launchTransport:'RUNPOD_REST_TEMPLATE',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,collectionCount:4,internalResolution:'540x960',output:{resolution:'1080x1920',fps:30,frames:900,durationSeconds:30},samples:12,startupWatchdogMinutes:STARTUP_WATCHDOG_MINUTES,startup,status,downloadUrl,paidMutationPerformed:false});
+    return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_BRIDGE_V1',executionId:EXECUTION_ID,podName:POD_NAME,templateId:TEMPLATE_ID,workerImage:WORKER_IMAGE_PLACEHOLDER,workerImageDigest:WORKER_IMAGE_DIGEST,workerImagePinned:true,workerEntrypoint:'scenery-showcase-original14-entry.js',launchTransport:'RUNPOD_REST_TEMPLATE',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,collectionCount:4,internalResolution:'540x960',output:{resolution:'1080x1920',fps:30,frames:900,durationSeconds:30},samples:12,startupWatchdogMinutes:STARTUP_WATCHDOG_MINUTES,startup,status,downloadUrl,paidMutationPerformed:false});
   }catch(error){ return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_BRIDGE_V1',error:clean((error as Error).message).slice(0,240)||'STATUS_FAILED',paidMutationPerformed:false},{status:503}); }
 }
 
@@ -100,7 +105,7 @@ export async function POST(request:Request){
     const key=requireAuthorization(request); const body=await request.json().catch(()=>({})); const action=clean(body?.action||'preflight');
     if(action==='preflight'){
       const c=await preflightAll(request,key);
-      return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_PREFLIGHT_V1',ready:true,assets:c.assets,template:c.template,runpod:c.gpu,activePodCount:0,listedObjectCount:c.listedObjectCount,workerImage:WORKER_IMAGE,workerImagePinned:true,workerEntrypoint:'scenery-showcase-original14-entry.js',launchTransport:'RUNPOD_REST_TEMPLATE',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,collectionCount:4,internalResolution:'540x960',finalResolution:'1080x1920',samples:12,limits:{hardCostUsd:HARD_COST_USD,maxRuntimeMinutes:MAX_RUNTIME_MINUTES,maxHourlyUsd:MAX_HOURLY_USD,maxCreates:1,hardInputCapBytes:HARD_INPUT_CAP_BYTES},paidMutationPerformed:false});
+      return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_PREFLIGHT_V1',ready:true,assets:c.assets,template:c.template,runpod:c.gpu,activePodCount:0,listedObjectCount:c.listedObjectCount,workerImage:c.template.imageName,workerImageDigest:WORKER_IMAGE_DIGEST,workerImagePinned:true,workerEntrypoint:'scenery-showcase-original14-entry.js',launchTransport:'RUNPOD_REST_TEMPLATE',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,collectionCount:4,internalResolution:'540x960',finalResolution:'1080x1920',samples:12,limits:{hardCostUsd:HARD_COST_USD,maxRuntimeMinutes:MAX_RUNTIME_MINUTES,maxHourlyUsd:MAX_HOURLY_USD,maxCreates:1,hardInputCapBytes:HARD_INPUT_CAP_BYTES},paidMutationPerformed:false});
     }
     if(action==='pod-status'){
       const pods=await listPods(key); const exact=pods.filter((p:any)=>clean(p?.name)===POD_NAME&&podIsActive(p)); return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_POD_STATUS_V1',exactActiveCount:exact.length,exact:exact.map(sanitizePod),paidMutationPerformed:false});
@@ -123,6 +128,6 @@ export async function POST(request:Request){
     createEntered=true;
     const created=await runpodRest(key,'/v1/pods',{method:'POST',body:JSON.stringify({name:POD_NAME,cloudType:'SECURE',computeType:'GPU',gpuTypeIds:['NVIDIA GeForce RTX 4090'],gpuTypePriority:'custom',gpuCount:1,interruptible:false,locked:false,templateId:TEMPLATE_ID,ports:[],env})});
     if(!created.ok) throw new Error(`RUNPOD_REST_CREATE_FAILED:${created.status}`); const podId=clean(created.parsed?.id); if(!podId) throw new Error('RUNPOD_REST_CREATE_RETURNED_NO_ID');
-    return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_LAUNCH_V1',executionId:EXECUTION_ID,podId,podName:POD_NAME,createEntered:true,createRequests:1,retryCreate:false,templateId:TEMPLATE_ID,launchTransport:'RUNPOD_REST_TEMPLATE',runpod:{secureUsdPerHr:c.gpu.rate,stockStatus:c.gpu.stockStatus},workerImage:WORKER_IMAGE,workerEntrypoint:'scenery-showcase-original14-entry.js',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,internalResolution:'540x960',finalResolution:'1080x1920',samples:12,limits:{hardCostUsd:HARD_COST_USD,maxRuntimeMinutes:MAX_RUNTIME_MINUTES,maxHourlyUsd:MAX_HOURLY_USD,hardInputCapBytes:HARD_INPUT_CAP_BYTES}});
+    return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_LAUNCH_V1',executionId:EXECUTION_ID,podId,podName:POD_NAME,createEntered:true,createRequests:1,retryCreate:false,templateId:TEMPLATE_ID,launchTransport:'RUNPOD_REST_TEMPLATE',runpod:{secureUsdPerHr:c.gpu.rate,stockStatus:c.gpu.stockStatus},workerImage:c.template.imageName,workerImageDigest:WORKER_IMAGE_DIGEST,workerEntrypoint:'scenery-showcase-original14-entry.js',originalSourceCount:14,renderableSourceCount:11,unityPreservationOnlyCount:3,internalResolution:'540x960',finalResolution:'1080x1920',samples:12,limits:{hardCostUsd:HARD_COST_USD,maxRuntimeMinutes:MAX_RUNTIME_MINUTES,maxHourlyUsd:MAX_HOURLY_USD,hardInputCapBytes:HARD_INPUT_CAP_BYTES}});
   }catch(error){ return NextResponse.json({schema:'TIVVLEJOY_SCENERY_ORIGINAL14_30S_LAUNCH_V1',error:clean((error as Error).message).slice(0,280)||'ORIGINAL14_BRIDGE_FAILED',createEntered,retryCreate:false},{status:400}); }
 }
