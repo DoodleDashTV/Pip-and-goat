@@ -801,17 +801,17 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
     coord = nodes.new('ShaderNodeTexCoord')
     noise = nodes.new('ShaderNodeTexNoise')
-    noise.inputs['Scale'].default_value = 1.15 if meadow else 0.85
+    noise.inputs['Scale'].default_value = 14.0 if meadow else 8.0
     if 'Detail' in noise.inputs:
         noise.inputs['Detail'].default_value = 4.0
-    links.new(coord.outputs['Object'], noise.inputs['Vector'])
+    links.new(coord.outputs['Generated'], noise.inputs['Vector'])
     patch = _mix_color_node(
         nodes,
         fac=0.5,
-        color2=(0.40, 0.54, 0.18, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
+        color2=(0.46, 0.60, 0.20, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
     )
     c1, _c2, patch_out = _mix_color_sockets(patch)
-    c1.default_value = (0.16, 0.30, 0.08, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
+    c1.default_value = (0.10, 0.24, 0.06, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
     links.new(noise.outputs['Fac'], patch.inputs['Fac'] if 'Fac' in patch.inputs else patch.inputs[0])
     color_src = patch_out
     if img_path is not None:
@@ -986,11 +986,14 @@ def create_purchased_stream(center=(0.0, 16.0, -0.03), size=(8.0, 42.0)) -> int:
     except Exception:
         pass
     bpy.ops.object.mode_set(mode='OBJECT')
+    try:
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    except Exception:
+        pass
     for vert in stream.data.vertices:
-        vert.co.y += 0.42 * math.sin(vert.co.x * math.pi * 1.6)
-        vert.co.x += 0.06 * math.sin(vert.co.y * math.pi * 2.4)
-        # Taper the ends so the slab does not read as a canal.
-        vert.co.y *= 0.55 + 0.45 * math.cos(vert.co.x * math.pi * 0.9)
+        # Vertices are now in metres. Bend the ribbon so it is not a canal.
+        vert.co.y += 2.6 * math.sin(vert.co.x * 0.16)
+        vert.co.x += 0.55 * math.sin(vert.co.y * 0.9)
     stream.data.update()
     bpy.context.view_layer.update()
     stream.data.materials.clear()
@@ -1132,7 +1135,7 @@ def scatter_purchased_meshes(members: list[bpy.types.Object], origin: tuple, cop
     return extras
 
 
-def scatter_forest_line(members: list[bpy.types.Object], origin: tuple, copies: int, width: float, depth: float) -> list[bpy.types.Object]:
+def scatter_forest_line(members: list[bpy.types.Object], origin: tuple, copies: int, width: float, depth: float, scale: float = 1.0) -> list[bpy.types.Object]:
     """Place a tree wall across the valley, not a ring around the cabins."""
     extras: list[bpy.types.Object] = []
     live = [o for o in members if o and o.name in bpy.data.objects and o.type == 'MESH']
@@ -1148,6 +1151,8 @@ def scatter_forest_line(members: list[bpy.types.Object], origin: tuple, copies: 
             x = origin[0] + (t - 0.5) * width
             y = origin[1] + math.sin(i * 1.73) * depth
             dup.location = Vector((x, y, origin[2]))
+            if scale and scale != 1.0:
+                dup.scale = (dup.scale[0] * scale, dup.scale[1] * scale, dup.scale[2] * scale)
             extras.append(dup)
         except Exception as exc:
             print(json.dumps({'event': 'scatter_line_warning', 'error': str(exc)[:180]}), flush=True)
@@ -1366,7 +1371,7 @@ def kit_target_size(path: Path) -> float:
     if 'rock' in name:
         return 5.5
     if 'tree' in name:
-        return 10.0
+        return 16.0
     if 'fence' in name or 'gate' in name:
         return 6.5
     if 'cart' in name:
@@ -1691,7 +1696,12 @@ def main() -> int:
     for role in ('forest_nature', 'forest_ecokit'):
         files = expanded.get(role, [])
         if role == 'forest_ecokit':
-            files = [p for p in files if 'swarm' not in p.name.lower() and 'suzanne' not in p.name.lower()]
+            files = [
+                p for p in files
+                if 'swarm' not in p.name.lower()
+                and 'suzanne' not in p.name.lower()
+                and 'water' not in p.name.lower()
+            ]
         members, imported_files, placed = import_kit_groups(
             files,
             role,
@@ -1713,21 +1723,24 @@ def main() -> int:
                 if hasattr(obj, 'visible_shadow'):
                     obj.visible_shadow = False
                 bound += 1
+            roots = {obj.parent for obj in members if obj.parent}
+            for root in roots:
+                try:
+                    root.scale = (root.scale[0] * 2.3, root.scale[1] * 2.3, root.scale[2] * 2.3)
+                    root.location.y = village_center.y + 32.0
+                except Exception:
+                    pass
         else:
             live = [
                 o for o in members
-                if o.type == 'MESH' and 'swarm' not in o.name.lower()
+                if o.type == 'MESH' and 'swarm' not in o.name.lower() and 'water' not in o.name.lower()
             ]
             for obj in members:
-                if 'swarm' in obj.name.lower():
+                if 'swarm' in obj.name.lower() or 'water' in obj.name.lower():
                     obj.hide_render = True
                     obj.hide_viewport = True
-            extras = scatter_purchased_meshes(
-                live,
-                (village_center.x, village_center.y - 10.0, 0.0),
-                copies=5,
-                radius=14.0,
-            )
+            extras = scatter_forest_line(live, (village_center.x, village_center.y - 11.4, 0.0), 10, 34.0, 1.1, 0.85)
+            extras += scatter_forest_line(live, (village_center.x, village_center.y - 8.2, 0.0), 10, 34.0, 1.1, 0.85)
             members.extend(extras)
             # Keep authored rock materials. Only bind when a mesh has nothing.
             bound = bind_purchased_textures(live, files)
@@ -1786,8 +1799,8 @@ def main() -> int:
         and 'forest_' not in subject_parent_name(o).lower()
     ]
     grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 2.0, 0.0), copies=5, radius=8.0)
-    near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 24.0, 0.0), copies=12, width=40.0, depth=4.5)
-    far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 38.0, 0.0), copies=12, width=46.0, depth=5.0)
+    near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 22.0, 0.0), 16, 44.0, 4.0, 1.55)
+    far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 36.0, 0.0), 16, 50.0, 5.0, 1.85)
     forest_band = grove + near_band + far_band
     print(json.dumps({
         'event': 'purchased_image_remap',

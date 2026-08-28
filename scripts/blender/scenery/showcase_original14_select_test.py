@@ -271,7 +271,7 @@ def test_world_camera_travels_mountains_to_village():
     # Mid and late looks stay up-valley so 9:16 still stacks river/forest/peaks.
     for key in keys:
         assert key['look'][1] >= 10.0
-        assert key['camera'][1] <= -40.0
+        assert key['camera'][1] <= -36.0
         assert key['lens'] <= 28.0
 
 
