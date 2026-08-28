@@ -105,6 +105,14 @@ def test_six_shot_plan():
     assert min(lenses) <= 28.0
     assert max(lenses) >= 70.0
     assert len(set(lenses)) >= 5
+    shot05 = next(cam for cam in cameras if cam["id"] == "SHOT_05")
+    assert shot05["start"]["location"][2] >= 14.0
+    assert abs(shot05["start"]["location"][0]) >= 16.0
+    assert shot05["start"]["look"][1] >= 60.0
+    shot03 = next(cam for cam in cameras if cam["id"] == "SHOT_03")
+    assert shot03["start"]["location"][0] <= -20.0
+    shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
+    assert shot02["start"]["location"][2] <= 2.6
     assert len(lookdev_frames()) == 12
     payload = shot_standard_payload()
     assert payload["cutsNotInterpolated"] is True

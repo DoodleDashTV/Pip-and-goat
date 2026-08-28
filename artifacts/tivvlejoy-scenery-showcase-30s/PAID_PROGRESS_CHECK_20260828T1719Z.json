@@ -1,0 +1,35 @@
+{
+  "schema": "TIVVLEJOY_ORIGINAL14_PAID_PROGRESS_CHECK_V1",
+  "inspectedAt": "2026-08-28T17:19:40Z",
+  "exactNamePod": "tivvlejoy-scenery-original14-30s-v1",
+  "exactNameCount": 0,
+  "createPerformed": false,
+  "paidWorkflow": {
+    "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
+    "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+    "latestRuns": [
+      {"id": 33167259994, "conclusion": "failure", "at": "2026-08-28T11:28:05Z"},
+      {"id": 33167023638, "conclusion": "failure", "at": "2026-08-28T11:24:20Z"}
+    ],
+    "running": false
+  },
+  "bridge": {
+    "route": "/api/scenery/showcase-30s-original14-v1",
+    "status": null,
+    "startupResult": "RUNNING",
+    "startupStage": "BLENDER_RENDER",
+    "framesWritten": 248,
+    "startupAt": "2026-08-28T15:29:20.189Z",
+    "stale": true,
+    "note": "Killed cabin-orbit job. Not a live render."
+  },
+  "decision": "NO_CREATE",
+  "reasons": [
+    "zero_exact_name_pods",
+    "bridge_startup_is_stale_not_live",
+    "lookdev_visual_gate_FAIL",
+    "live_pin_is_rejected_cabin_orbit_image",
+    "no_VISUAL_APPROVAL_RECEIPT_RESULT_PASS",
+    "standing_auth_does_not_apply_to_cinematic_valley_world_v1_FINAL"
+  ]
+}

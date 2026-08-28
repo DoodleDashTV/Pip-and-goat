@@ -110,43 +110,49 @@ def hero_still_frames() -> dict[str, int]:
 
 
 def default_shot_cameras() -> list[dict]:
-    """Authored 9:16 valley cameras. Distinct purpose, lens, and composition."""
+    """Authored 9:16 valley cameras. Distinct purpose, lens, and composition.
+
+    World layout this path assumes:
+    - river spline through y≈-12, winding east
+    - village street on x≈0 from y≈-4 to y≈12
+    - forest clumps on the east/west flanks, mountain corridor |x|<8
+    """
     return [
         {
             "id": "SHOT_01",
             "camera": "TJ_SHOT_01_CAM",
-            "start": {"location": (18.0, -82.0, 28.0), "look": (0.0, 48.0, 14.0), "lens": 24.0},
-            "end": {"location": (10.0, -68.0, 22.0), "look": (0.0, 36.0, 10.0), "lens": 26.0},
+            "start": {"location": (22.0, -88.0, 30.0), "look": (0.0, 42.0, 12.0), "lens": 24.0},
+            "end": {"location": (14.0, -72.0, 24.0), "look": (0.0, 34.0, 9.0), "lens": 26.0},
         },
         {
             "id": "SHOT_02",
             "camera": "TJ_SHOT_02_CAM",
-            "start": {"location": (-16.0, -18.0, 2.4), "look": (8.0, -10.0, 0.6), "lens": 35.0},
-            "end": {"location": (-4.0, -16.0, 2.8), "look": (14.0, -8.0, 1.2), "lens": 38.0},
+            "start": {"location": (-22.0, -18.0, 2.1), "look": (6.0, -11.0, 0.35), "lens": 35.0},
+            "end": {"location": (-10.0, -16.5, 2.4), "look": (16.0, -9.0, 0.55), "lens": 38.0},
         },
         {
             "id": "SHOT_03",
             "camera": "TJ_SHOT_03_CAM",
-            "start": {"location": (-22.0, 16.0, 3.2), "look": (6.0, 22.0, 4.0), "lens": 48.0},
-            "end": {"location": (-12.0, 14.0, 3.6), "look": (4.0, 10.0, 3.2), "lens": 52.0},
+            "start": {"location": (-28.0, 22.0, 4.2), "look": (-4.0, 8.0, 3.0), "lens": 48.0},
+            "end": {"location": (-22.0, 16.0, 4.6), "look": (2.0, 4.0, 3.2), "lens": 52.0},
         },
         {
             "id": "SHOT_04",
             "camera": "TJ_SHOT_04_CAM",
-            "start": {"location": (2.0, -24.0, 3.8), "look": (0.5, 2.0, 2.8), "lens": 34.0},
-            "end": {"location": (4.0, -16.0, 4.4), "look": (1.0, 4.0, 3.2), "lens": 38.0},
+            "start": {"location": (6.0, -26.0, 6.2), "look": (0.0, 6.0, 3.1), "lens": 34.0},
+            "end": {"location": (5.0, -18.0, 6.8), "look": (1.0, 8.0, 3.4), "lens": 38.0},
         },
         {
             "id": "SHOT_05",
             "camera": "TJ_SHOT_05_CAM",
-            "start": {"location": (8.0, -36.0, 8.0), "look": (0.0, 58.0, 16.0), "lens": 70.0},
-            "end": {"location": (7.0, -34.0, 8.4), "look": (0.0, 62.0, 17.0), "lens": 78.0},
+            "start": {"location": (22.0, -54.0, 16.5), "look": (1.0, 72.0, 22.0), "lens": 70.0},
+            "end": {"location": (20.0, -50.0, 17.2), "look": (0.5, 78.0, 24.0), "lens": 78.0},
         },
         {
             "id": "SHOT_06",
             "camera": "TJ_SHOT_06_CAM",
-            "start": {"location": (12.0, -32.0, 7.2), "look": (0.0, 12.0, 4.0), "lens": 42.0},
-            "end": {"location": (10.0, -28.0, 6.6), "look": (0.0, 10.0, 3.6), "lens": 48.0},
+            "start": {"location": (16.0, -38.0, 9.4), "look": (0.0, 10.0, 4.2), "lens": 42.0},
+            "end": {"location": (13.0, -32.0, 8.6), "look": (0.0, 8.0, 3.8), "lens": 48.0},
         },
     ]
 
