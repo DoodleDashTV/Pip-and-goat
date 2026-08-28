@@ -1,0 +1,91 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_RIVER_FINISH_AND_WATER_READABILITY_RESULT_V32",
+  "startingSha": "ac72eac0cdc0e5587147384e91e49e9a561441ae",
+  "finalSha": "40411118e2e1f63f58838e56966a617876dcaa6a",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "v31GeometryPreserved": true,
+  "waterMaterialChanges": [
+    "Removed the extra glossy mix that turned the film pale",
+    "Single Principled film: dark tint from Water_Mat_1, metallic 0",
+    "Stylized IOR 1.22 / specular 0.28 so grazing cameras are less sky-white",
+    "Transmission 0.58 center / 0.28 edge so the bed can show through from steeper angles",
+    "Multi-scale swell + ripple bump, RiverMask roughness only"
+  ],
+  "reflectionChanges": [
+    "Moved sky fill off the river and set area lights visible_glossy=false so they do not glaze the film",
+    "SHOT_02 moved onto the near bank looking down into the trough",
+    "Remaining pale ribbon is still sky/HDRI Fresnel on a thin plane from SHOT_01/04/06"
+  ],
+  "waterEdgeBreakupChanges": [
+    "Independent left/right pinch, occasional one-sided pinch, stronger edge noise",
+    "Water mesh rows 5 -> 7",
+    "waterWidthScale remains 0.30"
+  ],
+  "grassBankSeamChanges": [
+    "Two-stage grass -> damp soil -> dark bed vertex mix",
+    "Bed mesh narrowed 0.86 -> 0.68 to leave a terrain shoulder",
+    "Upper-bank wet mask reduced so the crest is not painted solid rock",
+    "Crest still reads as a hard grass/rock cut from production cameras"
+  ],
+  "naturalDressingChanges": [
+    "Irregular crest-tree placement, not a continuous outline",
+    "No plank patches, no ico-sphere lumps"
+  ],
+  "waterHiddenShot02Regression": {
+    "result": "PASS",
+    "path": "/tmp/o14-lookdev/cinematic-lookdev43-geom/shot_02_.png"
+  },
+  "shot02Finished": {
+    "result": "PARTIAL",
+    "path": "/tmp/o14-lookdev/cinematic-lookdev43/shot_02_.png",
+    "note": "Trough, dark bed, cabin, trees in frame. Water is a bright sky-film in the deepest third, not liquid with bed-through depth."
+  },
+  "grazingAngleTest": {
+    "result": "FAIL",
+    "paths": [
+      "/tmp/o14-lookdev/cinematic-lookdev43/shot_01_.png",
+      "/tmp/o14-lookdev/cinematic-lookdev43/shot_06_.png",
+      "/tmp/o14-lookdev/cinematic-lookdev43/control_graze_.png"
+    ]
+  },
+  "downwardTest": {
+    "result": "PARTIAL",
+    "path": "/tmp/o14-lookdev/cinematic-lookdev43/control_down_.png"
+  },
+  "previewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev43/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev43/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev43/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev43/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev43/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev43/shot_06_.png"
+  },
+  "visualGatesAN": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "FAIL",
+    "G": "FAIL",
+    "H": "PARTIAL",
+    "I": "FAIL",
+    "J": "PARTIAL",
+    "K": "PARTIAL",
+    "L": "FAIL",
+    "M": "PASS",
+    "N": "PASS"
+  },
+  "purchasedAssetsAuthoritative": true,
+  "latestGate": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V32.json",
+  "latestGateResult": "FAIL",
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false
+}

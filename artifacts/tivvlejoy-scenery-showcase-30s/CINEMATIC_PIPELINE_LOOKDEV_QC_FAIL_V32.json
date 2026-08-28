@@ -1,0 +1,68 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T23:18:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "commit": "40411118e2e1f63f58838e56966a617876dcaa6a",
+  "geometryTestDir": "/tmp/o14-lookdev/cinematic-lookdev43-geom",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev43",
+  "v31GeometryPreserved": true,
+  "acceptanceAN": {
+    "A_water_hidden_shot02_is_creek": true,
+    "B_water_instantly_identifiable": false,
+    "C_water_only_part_of_channel": true,
+    "D_dark_wet_bed_visible": true,
+    "E_3d_bank_slope_depth": true,
+    "F_no_knife_edge_grass_seam": false,
+    "G_no_constant_width_ribbon": false,
+    "H_no_road_path_interpretation": "partial",
+    "I_reflections_support_water": false,
+    "J_natural_bank_breakup": "partial",
+    "K_shot02_cinematic": "partial",
+    "L_shot01_to_06_believable": false,
+    "M_purchased_scenery_authoritative": true,
+    "N_clean_enough_to_judge": true
+  },
+  "measurements": {
+    "SHOT_01": {"meanLum": 108.5, "midBminusG": -7.6, "botBminusG": -18.3},
+    "SHOT_02": {"meanLum": 80.1, "midBminusG": -1.4, "botBminusG": -11.1},
+    "SHOT_03": {"meanLum": 89.2, "midBminusG": 2.1, "botBminusG": -17.5},
+    "SHOT_04": {"meanLum": 96.0, "midBminusG": -15.2, "botBminusG": -7.7},
+    "SHOT_05": {"meanLum": 123.3, "midBminusG": 3.7, "botBminusG": -13.1},
+    "SHOT_06": {"meanLum": 77.2, "midBminusG": -11.9, "botBminusG": -12.6}
+  },
+  "shots": {
+    "SHOT_01": "FAIL water — high crane still sees a pale opaque ribbon in a correct trough.",
+    "SHOT_02": "PARTIAL — trough and dark bed hold; water is a bright sky-film ribbon, not liquid with bed-through depth.",
+    "SHOT_03": "PARTIAL — forest opening holds. River not the subject.",
+    "SHOT_04": "FAIL water — street holds; foreground film is a pale glossy strip.",
+    "SHOT_05": "PARTIAL — compression holds.",
+    "SHOT_06": "FAIL water — village holds; foreground film is a silvery ribbon."
+  },
+  "controlTests": {
+    "A_water_hidden_shot02": "PASS",
+    "B_shot02_water": "FAIL_still_sky_ribbon",
+    "C_grazing": "FAIL_pale_ribbon",
+    "D_downward": "PARTIAL_bed_visible_beside_water_not_through_it"
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape"
+  ],
+  "progressThisRepair": {
+    "v31ChannelPreserved": true,
+    "extraGlossyMixRemoved": true,
+    "shot02MovedOntoNearBank": true,
+    "areaLightsNoLongerGlossy": true,
+    "bedMeshNarrowedForSoilBand": true,
+    "waterStillPaleRibbonFromProductionAngles": true,
+    "knifeSeamStillReads": true
+  },
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "smallestNextAction": "Keep the V31 trough. Make the film dark-and-transmissive enough that SHOT_01/04/06 do not see a sky-white ribbon, and put a real grass/soil band on the crest. Do not CREATE.",
+  "honestConclusion": "V31 geometry still PASSes water-hidden SHOT_02. Water readability and the grass/bed crest still FAIL. Do not CREATE. Do not return FINAL_RESULT."
+}
