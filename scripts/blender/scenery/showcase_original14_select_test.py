@@ -89,6 +89,9 @@ def test_mesh_keep_rank_prefers_hero_over_flat_platform():
     hero = mesh_keep_rank('Pine_Tree_01', 'forest_nature', 4000, (3, 3, 8))
     slab = mesh_keep_rank('Staging_Platform', 'forest_nature', 20000, (40, 40, 0.2))
     assert hero < slab
+    mid = mesh_keep_rank('DebugPlane', 'village_blender', 800, (6, 6, 0.1))
+    cabin = mesh_keep_rank('Cabin_Hero', 'village_blender', 800, (4, 3, 3))
+    assert cabin < mid
 
 
 def test_ground_picker_prefers_grass_over_random_huge_atlas():

@@ -332,6 +332,29 @@ def image_material(name: str, image: Path | None, tile: float = 1.0):
     return mat
 
 
+def material_has_valid_image(mat) -> bool:
+    if not mat or not getattr(mat, 'use_nodes', False) or not getattr(mat, 'node_tree', None):
+        return False
+    for node in mat.node_tree.nodes:
+        if node.type != 'TEX_IMAGE':
+            continue
+        img = getattr(node, 'image', None)
+        if img is None:
+            continue
+        if getattr(img, 'packed_file', None):
+            return True
+        raw = str(getattr(img, 'filepath', '') or '')
+        if not raw:
+            continue
+        try:
+            abs_path = bpy.path.abspath(raw)
+        except Exception:
+            abs_path = raw
+        if Path(abs_path).is_file() and Path(abs_path).stat().st_size > 64:
+            return True
+    return False
+
+
 def mesh_needs_purchased_texture(obj) -> bool:
     if obj.type != 'MESH':
         return False
@@ -344,11 +367,9 @@ def mesh_needs_purchased_texture(obj) -> bool:
         color = getattr(mat, 'diffuse_color', None)
         if color is not None and len(color) >= 3 and color[0] > 0.8 and color[1] < 0.2 and color[2] > 0.8:
             return True
-        if mat.use_nodes:
-            for node in mat.node_tree.nodes:
-                if node.type == 'TEX_IMAGE' and getattr(node, 'image', None):
-                    return False
-    return True
+        if not material_has_valid_image(mat):
+            return True
+    return False
 
 
 def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) -> int:
@@ -445,7 +466,7 @@ def setup_world(files: list[Path]) -> str:
     env = nodes.new('ShaderNodeTexEnvironment')
     env.image = bpy.data.images.load(str(image), check_existing=True)
     bg = nodes.new('ShaderNodeBackground')
-    bg.inputs['Strength'].default_value = 0.5
+    bg.inputs['Strength'].default_value = 0.9
     out = nodes.new('ShaderNodeOutputWorld')
     links.new(env.outputs['Color'], bg.inputs['Color'])
     links.new(bg.outputs['Background'], out.inputs['Surface'])
@@ -642,6 +663,15 @@ def main() -> int:
 
     if set(contributions) != RENDERABLE_ROLES:
         raise RuntimeError('Not all 11 renderable Original-14 sources contributed to scene construction')
+
+    leftover_images = []
+    for role_files in expanded.values():
+        leftover_images.extend(role_files)
+    leftover = bind_purchased_textures(
+        [o for o in bpy.data.objects if o.type == 'MESH' and not str(o.name).startswith('TJ_Ground')],
+        leftover_images,
+    )
+    print(json.dumps({'event': 'leftover_texture_bind', 'bound': leftover}), flush=True)
 
     cap_scene_faces()
     write_progress('BUILD_SCENE', frame=0, framesWritten=0, totalFrames=args.end_frame)

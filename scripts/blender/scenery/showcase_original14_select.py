@@ -141,7 +141,7 @@ def mesh_keep_rank(name: str, role: str, face_count: int = 0, dimensions: tuple 
     if dimensions and len(dimensions) >= 3:
         mx = max(dimensions)
         mn = min(dimensions)
-        if mx > 8 and mn < 0.15 * max(mx, 0.001):
+        if mx > 3 and mn < 0.22 * max(mx, 0.001):
             flat = 1
     hero_miss = 0 if (not words or any(w in n for w in words)) else 1
     return (staging, flat, hero_miss, -int(face_count or 0), n)
