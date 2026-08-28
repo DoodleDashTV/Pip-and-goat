@@ -149,10 +149,10 @@ def channel_profile(x: float, y: float, points=RIVER_SPLINE) -> tuple[float, flo
             signed = dist if cross >= 0.0 else -dist
             along = acc + t * length
         acc += length
-    left = 1.48 + 0.72 * math.sin(along * 0.17) + 0.30 * math.sin(along * 0.43)
-    right = 1.36 + 0.80 * math.sin(along * 0.15 + 1.4) + 0.34 * math.cos(along * 0.39)
-    left = max(1.08, min(2.55, left))
-    right = max(1.08, min(2.55, right))
+    left = 1.20 + 0.95 * math.sin(along * 0.17) + 0.42 * math.sin(along * 0.43)
+    right = 1.08 + 1.08 * math.sin(along * 0.15 + 1.4) + 0.48 * math.cos(along * 0.39)
+    left = max(0.82, min(2.85, left))
+    right = max(0.82, min(2.85, right))
     return best, signed, along, left, right
 
 
@@ -496,7 +496,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    body_col = tint or (0.024, 0.038, 0.032, 1.0)
+    body_col = tint or (0.018, 0.030, 0.026, 1.0)
     attr = nodes.new("ShaderNodeVertexColor")
     if hasattr(attr, "layer_name"):
         attr.layer_name = "TJ_RiverDepth"
@@ -544,7 +544,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     if "Transmission Weight" in body.inputs:
-        body.inputs["Transmission Weight"].default_value = 0.58
+        body.inputs["Transmission Weight"].default_value = 0.18
     if "Transmission Extra" in body.inputs:
         body.inputs["Transmission Extra"].default_value = 0.0
     ripples = nodes.new("ShaderNodeTexNoise")
@@ -581,7 +581,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(weight.outputs["Facing"], invert.inputs[1])
     cap = nodes.new("ShaderNodeMath")
     cap.operation = "MULTIPLY"
-    cap.inputs[1].default_value = 0.32
+    cap.inputs[1].default_value = 0.22
     links.new(invert.outputs["Value"], cap.inputs[0])
     mix_sh = nodes.new("ShaderNodeMixShader")
     links.new(cap.outputs["Value"], mix_sh.inputs["Fac"])
@@ -817,7 +817,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     bed = spline_channel_mesh(
         "TJ_River_DarkBed",
         centers,
-        width_scale=1.12,
+        width_scale=1.30,
         z_center=WATER_SURFACE_Z - BED_BELOW_WATER,
         z_edge=WATER_SURFACE_Z - 0.06,
         rows=7,
@@ -830,20 +830,20 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     river = spline_channel_mesh(
         "TJ_River_PurchasedWater",
         centers,
-        width_scale=0.78,
+        width_scale=0.56,
         z_center=WATER_SURFACE_Z,
         z_edge=WATER_SURFACE_Z + 0.004,
         rows=5,
         foam_edges=True,
     )
     assigned = assign_purchased_water(river)
-    banks = build_broken_bank_patches(centers)
-    extras = [bed] + banks
+    # No continuous bank-outline mesh. Wet margins are the wider dark bed plus terrain.
+    extras = [bed]
     print(json.dumps({
         "event": "two_layer_channel_built",
         "bed": bed.name,
         "film": river.name,
-        "bankPatches": len(banks),
+        "bankPatches": 0,
         "centers": len(centers),
     }), flush=True)
     return river, assigned, extras
