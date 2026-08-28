@@ -25,26 +25,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          f='.github/workflows/tivvlejoy-scenery-showcase-paid-render-v3.yml'
-          auth='artifacts/tivvlejoy-scenery-showcase-30s/PAID_AUTHORIZATION_V3.json'
-          test -f "$f"
-          grep -F -- "$auth" "$f"
-          grep -F -- 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V3' "$f"
-          grep -F -- '6yz7wkmu34' "$f"
-          grep -F -- 'RUNPOD_REST_TEMPLATE' "$f"
-          grep -F -- 'One authorized REST template CREATE' "$f"
-          grep -F -- 'Always terminate exact V3 showcase pod' "$f"
-          grep -F -- 'createRequests' "$f"
-          grep -F -- "assert int(p.get('createRequests')) == 1" "$f"
-          grep -F -- "assert p.get('retryCreate') is False" "$f"
-          grep -F -- "assert int((p.get('limits') or {}).get('maxCreates')) == 1" "$f"
-          grep -F -- "assert p.get('commercialAssetsPublished') is False" "$f"
-          grep -F -- "assert p.get('billingCleanupConfirmed') is True" "$f"
-          grep -F -- "assert int(p.get('remainingActiveExactName') or 0) == 0" "$f"
-          test "$(grep -F -- '--data '\''{\"action\":\"launch\"}'\''' "$f" | wc -l | tr -d ' ')" = '1'
-          ! grep -E 'workflow_dispatch|schedule:' "$f"
-          if [ -e "$auth" ]; then
-            echo 'V3 authorization unexpectedly exists; refusing contract PASS.'
-            exit 1
-          fi
-          echo 'TIVVLEJOY_SCENERY_PAID_V3_CONTRACT_PASS: no paid mutation performed'
+          python3 - <<'PY'
+          from pathlib import Path
+          f=Path('.github/workflows/tivvlejoy-scenery-showcase-paid-render-v3.yml')
+          auth=Path('artifacts/tivvlejoy-scenery-showcase-30s/PAID_AUTHORIZATION_V3.json')
+          text=f.read_text()
+          required=[
+            str(auth),
+            'TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V3',
+            '6yz7wkmu34',
+            'RUNPOD_REST_TEMPLATE',
+            'One authorized REST template CREATE',
+            'Always terminate exact V3 showcase pod',
+            "assert int(p.get('createRequests')) == 1",
+            "assert p.get('retryCreate') is False",
+            "assert int((p.get('limits') or {}).get('maxCreates')) == 1",
+            "assert p.get('commercialAssetsPublished') is False",
+            "assert p.get('billingCleanupConfirmed') is True",
+            "assert int(p.get('remainingActiveExactName') or 0) == 0",
+          ]
+          for needle in required:
+              assert needle in text, needle
+          assert 'workflow_dispatch' not in text
+          assert 'schedule:' not in text
+          assert text.count('{"action":"launch"}') == 1, text.count('{"action":"launch"}')
+          start=text.index('- name: One authorized REST template CREATE')
+          end=text.index('- name: Watch RunPod provisioning and verified R2 render status')
+          launch=text[start:end]
+          assert '--retry' not in launch, 'Launch POST must never retry'
+          assert '--data \'{"action":"launch"}\'' in launch
+          assert not auth.exists(), 'V3 authorization unexpectedly exists'
+          print('TIVVLEJOY_SCENERY_PAID_V3_CONTRACT_PASS: no paid mutation performed')
+          PY
