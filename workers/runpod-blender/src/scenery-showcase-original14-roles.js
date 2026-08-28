@@ -20,7 +20,9 @@ const SOURCE_SPECS = [
 ];
 
 const REQUIRED_ROLES = SOURCE_SPECS.map((x) => x.role);
-const ORIGINAL_14_HARD_CAP = 1536 * 1024 * 1024;
+// Exact verified originals total ~3.00 GB. Keep a hard ceiling below the legacy
+// 5 GB showcase cap while allowing the complete purchased Original-14 set.
+const ORIGINAL_14_HARD_CAP = 4 * 1024 * 1024 * 1024;
 
 function norm(v) { return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, ''); }
 function base(key) { const p=String(key||'').split('/'); return p[p.length-1] || String(key||''); }
