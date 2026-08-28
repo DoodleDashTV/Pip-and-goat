@@ -2,15 +2,21 @@
 """Zero-cost ranking tests for the Original-14 scenery speed repair."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from showcase_original14_select import (
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
     is_box_mesh,
+    is_camera_hero_name,
     is_dominating_plane,
     is_dump_name,
+    is_foliage_card_name,
+    is_high_lod_name,
     is_primitive_name,
     is_staging_name,
+    is_water_or_ocean_name,
     mesh_keep_rank,
     pick_geometry_records,
     pick_ground_image_records,
@@ -76,8 +82,10 @@ def test_staging_names_are_rejected():
 def test_geometry_file_limits_allow_density_without_dump():
     assert geometry_file_limit('forest_nature') == 2
     assert geometry_file_limit('forest_ecokit') == 2
-    assert geometry_file_limit('village_blender') == 1
-    assert geometry_file_limit('village_fbx') == 2
+    assert geometry_file_limit('village_blender') == 8
+    assert geometry_file_limit('village_fbx') == 6
+    assert extract_role_limit('village_blender') == 40
+    assert extract_role_limit('village_fbx') == 40
 
 
 def test_geometry_picker_skips_staging_when_heroes_exist():
@@ -155,6 +163,53 @@ def test_primitive_boxes_rank_behind_hero_meshes():
     assert hero < cube
 
 
+def test_village_picker_prefers_cabin_a_over_interior_and_skips_none():
+    records = [
+        {'name': 'Book01.blend', 'ext': '.blend', 'size': 1_266_472},
+        {'name': 'Cabin04B.blend', 'ext': '.blend', 'size': 1_598_369},
+        {'name': 'Cabin04A.blend', 'ext': '.blend', 'size': 2_262_865},
+        {'name': 'Grass01.blend', 'ext': '.blend', 'size': 1_252_184},
+        {'name': 'Tree02.blend', 'ext': '.blend', 'size': 1_390_580},
+        {'name': 'Cabin01A.blend', 'ext': '.blend', 'size': 1_806_509},
+        {'name': 'Fence01.blend', 'ext': '.blend', 'size': 1_271_868},
+        {'name': 'Chair01.blend', 'ext': '.blend', 'size': 1_261_232},
+        {'name': 'Cabin02A.blend', 'ext': '.blend', 'size': 1_861_389},
+    ]
+    chosen = pick_geometry_records(records, 'village_blender', limit=8)
+    names = [c['name'] for c in chosen]
+    assert names[0] == 'Cabin04A.blend'
+    assert 'Cabin01A.blend' in names
+    assert 'Cabin02A.blend' in names
+    assert 'Tree02.blend' in names
+    assert 'Fence01.blend' in names
+    assert 'Book01.blend' not in names
+    assert 'Chair01.blend' not in names
+    assert 'Grass01.blend' not in names
+
+
+def test_village_extract_sort_keeps_large_cabin_a_first():
+    keys = [
+        ('Village (Blender 4.2.2)/Book01.blend', 1_266_472),
+        ('Village (Blender 4.2.2)/Cabin04A.blend', 2_262_865),
+        ('Village (Blender 4.2.2)/Grass01.blend', 1_252_184),
+        ('Village (Blender 4.2.2)/Cabin01A.blend', 1_806_509),
+    ]
+    ordered = sorted(keys, key=lambda item: extract_sort_key(item[0], item[1], 'village_blender'))
+    assert [Path(item[0]).name for item in ordered[:2]] == ['Cabin04A.blend', 'Cabin01A.blend']
+
+
+def test_camera_hero_rejects_lily_pad_and_water():
+    assert is_camera_hero_name('Building04_LOD0') is True
+    assert is_camera_hero_name('Roof04') is True
+    assert is_camera_hero_name('Cabin01') is True
+    assert is_foliage_card_name('LilyPad_Giant') is True
+    assert is_camera_hero_name('LilyPad_Giant') is False
+    assert is_water_or_ocean_name('Water_GN_Plane') is True
+    assert is_camera_hero_name('Water_GN_Plane') is False
+    assert is_high_lod_name('Building04_LOD2') is True
+    assert is_high_lod_name('Building04_LOD0') is False
+
+
 if __name__ == '__main__':
     test_dump_name_detects_combined_forest_kit()
     test_extract_skips_huge_obj_and_keeps_individual_assets()
@@ -173,4 +228,7 @@ if __name__ == '__main__':
     test_village_picker_prefers_authored_blend_over_tiny_fbx()
     test_dominating_plane_is_rejected_for_camera_bounds()
     test_primitive_boxes_rank_behind_hero_meshes()
+    test_village_picker_prefers_cabin_a_over_interior_and_skips_none()
+    test_village_extract_sort_keeps_large_cabin_a_first()
+    test_camera_hero_rejects_lily_pad_and_water()
     print('showcase_original14_select_test PASS')

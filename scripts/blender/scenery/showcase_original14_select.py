@@ -7,6 +7,7 @@ individual purchased assets and keep combined dumps as a last resort.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 GEOMETRY_EXTS = {'.blend', '.fbx', '.glb', '.gltf', '.obj'}
@@ -111,12 +112,73 @@ MAX_EXTRACT_BYTES = {
 }
 
 HERO_WORDS = {
-    'village_blender': ('house', 'cabin', 'building', 'tree', 'fence', 'gate', 'cart', 'village'),
-    'village_project': ('house', 'cabin', 'building', 'tree', 'fence', 'gate', 'cart', 'village'),
-    'village_fbx': ('house', 'cabin', 'building', 'tree', 'fence', 'gate', 'cart', 'village'),
+    'village_blender': ('house', 'cabin', 'building', 'roof', 'cottage', 'hut', 'tree', 'fence', 'gate', 'cart', 'village'),
+    'village_project': ('house', 'cabin', 'building', 'roof', 'tree', 'rock', 'flora', 'bush', 'village'),
+    'village_fbx': ('house', 'cabin', 'building', 'roof', 'cottage', 'hut', 'tree', 'fence', 'gate', 'cart', 'village'),
     'forest_nature': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump', 'pine'),
     'forest_ecokit': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump', 'pine'),
 }
+
+# Individual kit pieces from Village (Blender 4.2.2).zip / Village (FBX).zip.
+# Cabin*A files are the full LOD buildings; interiors are props, not the village.
+VILLAGE_OUTDOOR_WORDS = ('cabin', 'tree', 'fence', 'gate', 'cart', 'house', 'building', 'village', 'roof')
+VILLAGE_INTERIOR_WORDS = (
+    'bed', 'book', 'chair', 'candle', 'table', 'shelf', 'nightstand',
+    'crate', 'barrel', 'bucket', 'rack',
+)
+FOLIAGE_CARD_WORDS = (
+    'leaf', 'leaves', 'lily', 'lilypad', 'lily_pad', 'petal', 'umbrella',
+)
+WATER_WORDS = ('water', 'ocean', 'sea_', '_sea', 'lake', 'river')
+CAMERA_HERO_WORDS = (
+    'building', 'cabin', 'house', 'roof', 'cottage', 'hut',
+    'tree', 'rock', 'log', 'fence', 'gate', 'cart',
+)
+
+
+def is_high_lod_name(name: str) -> bool:
+    return bool(re.search(r'lod[1-3]\b', str(name or '').lower()))
+
+
+def is_cabin_a_name(name: str) -> bool:
+    return bool(re.search(r'cabin\d+a\b', str(name or '').lower()))
+
+
+def is_village_outdoor_name(name: str) -> bool:
+    n = str(name or '').lower()
+    return any(word in n for word in VILLAGE_OUTDOOR_WORDS)
+
+
+def is_village_interior_name(name: str) -> bool:
+    n = str(name or '').lower()
+    if is_cabin_a_name(n) or 'cabin' in n:
+        return False
+    return any(word in n for word in VILLAGE_INTERIOR_WORDS)
+
+
+def is_foliage_card_name(name: str) -> bool:
+    n = str(name or '').lower()
+    return any(word in n for word in FOLIAGE_CARD_WORDS)
+
+
+def is_water_or_ocean_name(name: str) -> bool:
+    n = str(name or '').lower()
+    return any(word in n for word in WATER_WORDS)
+
+
+def is_camera_hero_name(name: str) -> bool:
+    n = str(name or '').lower()
+    if is_foliage_card_name(n) or is_water_or_ocean_name(n):
+        return False
+    return any(word in n for word in CAMERA_HERO_WORDS)
+
+
+def village_file_rank(name: str) -> tuple:
+    n = str(name or '').lower()
+    cabin_a = 0 if is_cabin_a_name(n) else 1
+    outdoor = 0 if is_village_outdoor_name(n) else 1
+    interior = 1 if is_village_interior_name(n) else 0
+    return (cabin_a, outdoor, interior)
 
 
 def is_dump_name(name: str) -> bool:
@@ -136,22 +198,27 @@ def extract_role_limit(role: str) -> int:
         return 16
     if role in {'forest_nature', 'forest_ecokit'}:
         return 24
-    if role in {'village_fbx', 'village_blender', 'village_project'}:
-        return 28
+    if role in {'village_fbx', 'village_blender'}:
+        # Village (Blender 4.2.2).zip has 33 kit .blends. The previous 28-file
+        # cap dropped the five largest Cabin*A buildings.
+        return 40
+    if role == 'village_project':
+        return 4
     if role in {'sky_machine_v1', 'sky_machine_v2', 'sky_extra_update', 'world_shaders'}:
         return 12
     return 24
 
 
 def geometry_file_limit(role: str) -> int:
-    # Camera-framing COMPLETE finished in ~7 minutes at 540x960 / 12 samples,
-    # so one extra forest file and a third village file still fit the timeout
-    # while filling the empty platform look.
-    if role in {'forest_nature', 'forest_ecokit'}:
-        return 2
+    # Village zip is a kit of individual cabin/tree/fence files, not one scene.
+    # Import several Cabin*A buildings so the camera has a real village cluster.
     if role == 'village_blender':
+        return 8
+    if role == 'village_fbx':
+        return 6
+    if role == 'village_project':
         return 1
-    if role in {'village_project', 'village_fbx'}:
+    if role in {'forest_nature', 'forest_ecokit'}:
         return 2
     return 1
 
@@ -170,7 +237,7 @@ def should_extract_member(filename: str, file_size: int, role: str) -> bool:
     return True
 
 
-def extract_sort_key(filename: str, file_size: int) -> tuple:
+def extract_sort_key(filename: str, file_size: int, role: str = '') -> tuple:
     path = Path(str(filename).replace('\\', '/'))
     ext = path.suffix.lower()
     name = path.name.lower()
@@ -180,6 +247,10 @@ def extract_sort_key(filename: str, file_size: int) -> tuple:
     staging = 1 if is_staging_name(name) else 0
     albedo_miss = 0 if (ext not in IMAGE_EXTS or any(w in name for w in ALBEDO_WORDS + GROUND_WORDS)) else 1
     ext_rank = EXT_RANK.get(ext, 8)
+    if str(role).startswith('village') and ext in GEOMETRY_EXTS:
+        cabin_a, outdoor, interior = village_file_rank(name)
+        # Prefer the large Cabin*A buildings over tiny interior props.
+        return (geo, dump, staging, cabin_a, outdoor, interior, ext_rank, -int(file_size or 0), name)
     # Prefer smaller geometry so individual trees/houses win over combined dumps.
     return (geo, dump, staging, ext_rank, hdri, albedo_miss, int(file_size or 0), name)
 
@@ -188,6 +259,9 @@ def mesh_keep_rank(name: str, role: str, face_count: int = 0, dimensions: tuple 
     n = str(name or '').lower()
     words = HERO_WORDS.get(role, ())
     staging = 1 if is_staging_name(n) else 0
+    water = 1 if is_water_or_ocean_name(n) else 0
+    foliage = 1 if is_foliage_card_name(n) else 0
+    high_lod = 1 if is_high_lod_name(n) else 0
     primitive = 1 if is_primitive_name(n) or is_box_mesh(face_count, dimensions) or is_dominating_plane(face_count, dimensions) else 0
     flat = 0
     if dimensions and len(dimensions) >= 3:
@@ -196,7 +270,7 @@ def mesh_keep_rank(name: str, role: str, face_count: int = 0, dimensions: tuple 
         if mx > 3 and mn < 0.22 * max(mx, 0.001):
             flat = 1
     hero_miss = 0 if (not words or any(w in n for w in words)) else 1
-    return (staging, primitive, flat, hero_miss, -int(face_count or 0), n)
+    return (staging, water, foliage, high_lod, primitive, flat, hero_miss, -int(face_count or 0), n)
 
 
 def pick_ground_image_records(records: list[dict]) -> dict | None:
@@ -227,16 +301,56 @@ def pick_geometry_records(records: list[dict], role: str, limit: int = 1) -> lis
         word_miss = 0 if (not words or any(w in name for w in words)) else 1
         dump = 1 if is_dump_name(name) else 0
         staging = 1 if is_staging_name(name) else 0
+        if role in {'village_blender', 'village_fbx'}:
+            cabin_a, outdoor, interior = village_file_rank(name)
+            return (dump, staging, cabin_a, outdoor, interior, word_miss, -size, name)
         if str(role).startswith('village'):
+            water = 1 if is_water_or_ocean_name(name) else 0
             blend_miss = 0 if ext == '.blend' else 1
-            scene_miss = 0 if any(token in name for token in ('village', 'scene', 'full')) else 1
-            # Prefer the authored village .blend over the smallest leftover FBX.
-            return (dump, staging, blend_miss, scene_miss, word_miss, -size, name)
+            scene_miss = 0 if any(token in name for token in ('village', 'scene', 'full', 'project')) else 1
+            return (dump, staging, water, blend_miss, scene_miss, word_miss, -size, name)
         return (dump, staging, word_miss, EXT_RANK.get(ext, 9), size, name)
 
     geo.sort(key=rank)
     preferred = [r for r in geo if not is_dump_name(str(r.get('name') or '')) and not is_staging_name(str(r.get('name') or ''))]
+    if role in {'village_blender', 'village_fbx'}:
+        outdoor = [
+            r for r in preferred
+            if is_village_outdoor_name(str(r.get('name') or ''))
+            and not is_village_interior_name(str(r.get('name') or ''))
+        ]
+        if outdoor:
+            preferred = mix_village_kit_records(outdoor, limit)
     chosen = (preferred or [r for r in geo if not is_dump_name(str(r.get('name') or ''))] or geo)[: max(1, int(limit))]
+    return chosen
+
+
+def mix_village_kit_records(records: list[dict], limit: int) -> list[dict]:
+    """5 cabins + trees + fence/gate so the cluster is a village, not 8 stacked houses."""
+    def name_of(rec: dict) -> str:
+        return str(rec.get('name') or '').lower()
+
+    cabins_a = [r for r in records if is_cabin_a_name(name_of(r))]
+    cabins = [
+        r for r in records
+        if any(word in name_of(r) for word in ('cabin', 'house', 'building', 'village'))
+        and r not in cabins_a
+    ]
+    trees = [r for r in records if 'tree' in name_of(r)]
+    props = [r for r in records if any(word in name_of(r) for word in ('fence', 'gate', 'cart'))]
+    chosen: list[dict] = []
+
+    def take(pool: list[dict], count: int) -> None:
+        for rec in pool:
+            if rec not in chosen and len(chosen) < max(1, int(limit)) and count > 0:
+                chosen.append(rec)
+                count -= 1
+
+    take(cabins_a, 5)
+    take(cabins, max(0, 5 - len(chosen)))
+    take(trees, 2)
+    take(props, 1)
+    take(cabins_a + cabins + trees + props + records, max(1, int(limit)))
     return chosen
 
 

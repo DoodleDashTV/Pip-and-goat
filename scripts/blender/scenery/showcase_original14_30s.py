@@ -30,8 +30,12 @@ from showcase_original14_select import (  # noqa: E402
     extract_sort_key,
     geometry_file_limit,
     is_box_mesh,
+    is_camera_hero_name,
     is_dominating_plane,
+    is_foliage_card_name,
+    is_high_lod_name,
     is_primitive_name,
+    is_water_or_ocean_name,
     mesh_keep_rank,
     pick_geometry_paths,
     pick_ground_image_path,
@@ -108,7 +112,7 @@ def extract_selected(zip_path: Path, destination: Path, role: str, depth: int = 
                 and should_extract_member(i.filename, int(i.file_size or 0), role)
             ]
             # Prefer individual purchased geometry over combined dumps / huge images.
-            wanted.sort(key=lambda i: extract_sort_key(i.filename, int(i.file_size or 0)))
+            wanted.sort(key=lambda i: extract_sort_key(i.filename, int(i.file_size or 0), role))
             role_limit = extract_role_limit(role)
             for info in wanted[:role_limit]:
                 target = safe_member_path(destination, info.filename)
@@ -142,15 +146,22 @@ def expand_asset(asset: dict, root: Path) -> list[Path]:
 
 def select_blend_names(names: list[str], role: str, limit: int = 10) -> list[str]:
     words = {
-        'village_blender': ('house', 'cabin', 'building', 'tree', 'fence', 'gate', 'cart'),
-        'village_project': ('house', 'cabin', 'building', 'tree', 'fence', 'gate', 'cart'),
-        'village_fbx': ('house', 'cabin', 'building', 'tree', 'fence', 'gate', 'cart'),
+        'village_blender': ('house', 'cabin', 'building', 'roof', 'tree', 'fence', 'gate', 'cart'),
+        'village_project': ('house', 'cabin', 'building', 'roof', 'tree', 'rock', 'flora', 'bush'),
+        'village_fbx': ('house', 'cabin', 'building', 'roof', 'tree', 'fence', 'gate', 'cart'),
         'forest_nature': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump'),
         'forest_ecokit': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump'),
     }.get(role, ())
-    usable = [n for n in names if not is_primitive_name(n)]
+    usable = [
+        n for n in names
+        if n
+        and not is_primitive_name(n)
+        and not is_water_or_ocean_name(n)
+        and not is_foliage_card_name(n)
+        and not is_high_lod_name(n)
+    ]
     preferred = [n for n in usable if any(w in n.lower() for w in words)]
-    if role == 'village_blender':
+    if role in {'village_blender', 'village_fbx', 'village_project'}:
         ordered = preferred + [n for n in usable if n not in preferred]
         if ordered:
             return ordered[:limit]
@@ -167,13 +178,28 @@ def append_blend_geometry(path: Path, role: str) -> tuple[list[bpy.types.Object]
     loaded_support = 0
     try:
         with bpy.data.libraries.load(str(path), link=False) as (src, dst):
-            dst.objects = select_blend_names(list(src.objects), role, limit=MAX_OBJECTS_PER_BLEND)
+            src_names = list(src.objects or [])
+            dst.objects = select_blend_names(src_names, role, limit=MAX_OBJECTS_PER_BLEND)
+            if role == 'village_project':
+                cols = [
+                    name for name in list(src.collections or [])
+                    if name and not is_water_or_ocean_name(name)
+                ]
+                dst.collections = cols[:12]
             dst.materials = list(src.materials[:MAX_MATERIALS_PER_BLEND])
             dst.node_groups = list(src.node_groups[:8])
         for obj in dst.objects:
             if obj is not None and obj.name not in bpy.context.scene.collection.objects:
                 try:
                     bpy.context.scene.collection.objects.link(obj)
+                except RuntimeError:
+                    pass
+        if role == 'village_project':
+            for col in getattr(dst, 'collections', []) or []:
+                if col is None:
+                    continue
+                try:
+                    bpy.context.scene.collection.children.link(col)
                 except RuntimeError:
                     pass
         loaded_support = len([m for m in dst.materials if m]) + len([n for n in dst.node_groups if n])
@@ -616,10 +642,61 @@ def world_height(obj) -> float:
 def is_camera_hero_object(obj) -> bool:
     if not obj or obj.type != 'MESH' or str(obj.name).startswith('TJ_Ground'):
         return False
+    if is_foliage_card_name(obj.name) or is_water_or_ocean_name(obj.name):
+        return False
     dims = object_dimensions(obj)
     if is_primitive_name(obj.name) or is_box_mesh(mesh_face_count(obj), dims) or is_dominating_plane(mesh_face_count(obj), dims):
         return False
-    return world_height(obj) >= 1.2
+    if is_camera_hero_name(obj.name):
+        return world_height(obj) >= 0.6
+    return False
+
+
+def kit_target_size(path: Path) -> float:
+    name = path.name.lower()
+    if 'cabin' in name or 'house' in name or 'building' in name:
+        return 11.0
+    if 'tree' in name:
+        return 9.0
+    if 'fence' in name or 'gate' in name:
+        return 6.5
+    if 'cart' in name:
+        return 4.0
+    return 7.0
+
+
+def import_kit_groups(files: list[Path], role: str, slots: list[tuple], origin: Vector, mesh_limit: int) -> tuple[list, int, list]:
+    members: list[bpy.types.Object] = []
+    imported = 0
+    placed = []
+    for candidate in geometry_candidates(files, role):
+        objs = import_geometry(candidate, role)
+        if not objs:
+            continue
+        heroes = keep_hero_meshes(objs, role, mesh_limit)
+        if not heroes:
+            continue
+        for hero in heroes:
+            decimate_mesh(hero)
+        root = parent_group(heroes, f'TJ_{role}_{imported}_{candidate.stem}'[:60])
+        loc = slots[imported % len(slots)]
+        if root:
+            normalize_group(root, heroes, kit_target_size(candidate), (
+                origin.x + loc[0],
+                origin.y + loc[1],
+                loc[2],
+            ))
+        members.extend(heroes)
+        placed.append(candidate.name)
+        imported += 1
+        print(json.dumps({
+            'event': 'kit_piece_placed',
+            'role': role,
+            'file': candidate.name,
+            'objectCount': len(heroes),
+            'slot': list(loc),
+        }), flush=True)
+    return members, imported, placed
 
 
 def setup_camera(start: int, end: int):
@@ -629,6 +706,8 @@ def setup_camera(start: int, end: int):
             o for o in bpy.data.objects
             if o.type == 'MESH'
             and not str(o.name).startswith('TJ_Ground')
+            and not is_foliage_card_name(o.name)
+            and not is_water_or_ocean_name(o.name)
             and not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
         ]
     bounds = group_bounds(meshes)
@@ -641,8 +720,8 @@ def setup_camera(start: int, end: int):
         look = (center.x, center.y, look_z)
         # Stay inside the hero cluster for every keyframe. Wide orbits were
         # turning 5/6 shots into empty horizon even when assets existed.
-        cam_h = min(max(vert * 0.55, 3.0), 8.0)
-        dist = min(max(horiz * 0.55, 6.0), 14.0)
+        cam_h = min(max(vert * 0.5, 2.8), 7.0)
+        dist = min(max(horiz * 0.7, 8.0), 18.0)
         cams = [
             (center.x, center.y + dist, mins.z + cam_h),
             (center.x - dist * 0.72, center.y + dist * 0.62, mins.z + cam_h * 0.9),
@@ -734,64 +813,123 @@ def main() -> int:
         expanded[asset['role']] = expand_asset(asset, extract_root)
 
     contributions: dict[str, dict] = {}
-    placements = {
-        'village_blender': (0.0, (0.0, 0.0, 0.0)),
-        'village_project': (14.0, (-8.0, -4.0, 0.0)),
-        'village_fbx': (14.0, (8.0, -4.0, 0.0)),
-        'forest_nature': (12.0, (-8.0, 10.0, 0.0)),
-        'forest_ecokit': (12.0, (8.0, 9.0, 0.0)),
-    }
     village_center = Vector((0.0, 0.0, 0.0))
-    for role in ('village_blender', 'village_project', 'village_fbx', 'forest_nature', 'forest_ecokit'):
+    village_slots = [
+        (-9.0, -3.0, 0.0), (0.0, 5.0, 0.0), (9.0, -1.5, 0.0), (11.0, 7.0, 0.0),
+        (2.0, -9.0, 0.0), (-11.0, 8.0, 0.0), (6.0, 11.0, 0.0), (-6.0, -8.0, 0.0),
+    ]
+    fbx_slots = [
+        (-14.0, 1.0, 0.0), (14.0, 2.0, 0.0), (-4.0, 13.0, 0.0),
+        (4.0, -13.0, 0.0), (16.0, -8.0, 0.0), (-16.0, -6.0, 0.0),
+    ]
+    forest_slots = {
+        'forest_nature': [(-20.0, 16.0, 0.0), (20.0, 15.0, 0.0)],
+        'forest_ecokit': [(-18.0, -16.0, 0.0), (18.0, -14.0, 0.0)],
+    }
+
+    # Village zip is 33 kit pieces (Cabin01A.blend, Tree02.blend, ...), not one
+    # authored scene. The previous run imported a single leftover cabin and
+    # treated it as the village, then framed a giant forest leaf.
+    members, imported_files, placed = import_kit_groups(
+        expanded.get('village_blender', []),
+        'village_blender',
+        village_slots,
+        village_center,
+        6,
+    )
+    if not members:
+        raise RuntimeError('Purchased source village_blender contributed no importable geometry')
+    bound = bind_purchased_textures(members, expanded.get('village_textures', []) + expanded.get('village_blender', []))
+    contributions['village_blender'] = {
+        'type': 'visible_geometry',
+        'objectCount': len(members),
+        'importedFileCount': imported_files,
+        'purchasedTexturesBound': bound,
+        'scatteredPurchasedCopies': 0,
+        'authoredLayoutKept': False,
+        'kitFilesPlaced': placed,
+        'assembledAsVillageKit': True,
+    }
+
+    members, imported_files, placed = import_kit_groups(
+        expanded.get('village_fbx', []),
+        'village_fbx',
+        fbx_slots,
+        village_center,
+        5,
+    )
+    if not members:
+        raise RuntimeError('Purchased source village_fbx contributed no importable geometry')
+    bound = bind_purchased_textures(members, expanded.get('village_textures', []) + expanded.get('village_fbx', []))
+    contributions['village_fbx'] = {
+        'type': 'visible_geometry',
+        'objectCount': len(members),
+        'importedFileCount': imported_files,
+        'purchasedTexturesBound': bound,
+        'scatteredPurchasedCopies': 0,
+        'authoredLayoutKept': False,
+        'kitFilesPlaced': placed,
+        'assembledAsVillageKit': True,
+    }
+
+    # Project File.blend is a water/flora/terrain library, not the village.
+    # Keep flora as a distant backdrop; never let water set the camera center.
+    role = 'village_project'
+    files = expanded.get(role, [])
+    members = []
+    imported_files = 0
+    for candidate in geometry_candidates(files, role):
+        objs = import_geometry(candidate, role)
+        if objs:
+            heroes = keep_hero_meshes(objs, role, 16)
+            for hero in heroes:
+                decimate_mesh(hero)
+            members.extend(heroes)
+            imported_files += 1
+    if not members:
+        raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
+    extras: list[bpy.types.Object] = []
+    root = parent_group(members, 'TJ_village_project_PurchasedRoot')
+    if root:
+        normalize_group(root, members, 18.0, (village_center.x, village_center.y + 22.0, 0.0))
+    bound = bind_purchased_textures(members, expanded.get('village_textures', []) + files)
+    contributions[role] = {
+        'type': 'visible_geometry',
+        'objectCount': len(members),
+        'importedFileCount': imported_files,
+        'purchasedTexturesBound': bound,
+        'scatteredPurchasedCopies': len(extras),
+        'authoredLayoutKept': False,
+        'placedAsBackdrop': True,
+    }
+
+    for role in ('forest_nature', 'forest_ecokit'):
         files = expanded.get(role, [])
-        members: list[bpy.types.Object] = []
-        imported_files = 0
-        mesh_limit = MAX_MESHES_VILLAGE_BLEND if role == 'village_blender' else MAX_MESHES_PER_ROLE
-        for candidate in geometry_candidates(files, role):
-            objs = import_geometry(candidate, role)
-            if objs:
-                heroes = keep_hero_meshes(objs, role, mesh_limit)
-                for hero in heroes:
-                    decimate_mesh(hero)
-                members.extend(heroes); imported_files += 1
+        members, imported_files, placed = import_kit_groups(
+            files,
+            role,
+            forest_slots[role],
+            village_center,
+            MAX_MESHES_PER_ROLE,
+        )
         if not members:
             raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
-        size, loc = placements[role]
-        extras: list[bpy.types.Object] = []
-        root = parent_group(members, f'TJ_{role}_PurchasedRoot')
-        if role == 'village_blender':
-            # Keep the authored village layout. Shrinking it onto a giant ground
-            # plane is what made the last COMPLETE look like toys on a platform.
-            if root:
-                bpy.context.view_layer.update()
-                bounds = group_bounds(members)
-                if bounds:
-                    mins, maxs = bounds
-                    village_center = (mins + maxs) * 0.5
-                    village_center = Vector((village_center.x, village_center.y, 0.0))
-        else:
-            if root:
-                normalize_group(root, members, size, (
-                    village_center.x + loc[0],
-                    village_center.y + loc[1],
-                    loc[2],
-                ))
-            extras = scatter_purchased_meshes(
-                members,
-                (village_center.x + loc[0], village_center.y + loc[1], loc[2]),
-                copies=8 if role.startswith('forest') else 4,
-                radius=18.0 if role.startswith('forest') else 8.0,
-            )
-            members.extend(extras)
-        texture_files = expanded.get('village_textures', []) + expanded.get(role, [])
-        bound = bind_purchased_textures(members, texture_files)
+        extras = scatter_purchased_meshes(
+            members,
+            (village_center.x + forest_slots[role][0][0], village_center.y + forest_slots[role][0][1], 0.0),
+            copies=4,
+            radius=10.0,
+        )
+        members.extend(extras)
+        bound = bind_purchased_textures(members, expanded.get('village_textures', []) + files)
         contributions[role] = {
             'type': 'visible_geometry',
             'objectCount': len(members),
             'importedFileCount': imported_files,
             'purchasedTexturesBound': bound,
             'scatteredPurchasedCopies': len(extras),
-            'authoredLayoutKept': role == 'village_blender',
+            'authoredLayoutKept': False,
+            'kitFilesPlaced': placed,
         }
 
     scene_meshes = [o for o in bpy.data.objects if is_camera_hero_object(o)]
