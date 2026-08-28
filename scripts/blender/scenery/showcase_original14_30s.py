@@ -663,13 +663,17 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
         and 'foliage' not in p.name.lower()
         and 'leaf' not in p.name.lower()
     ]
-    img_path = pick_ground_image_path(candidates) if candidates else None
-    if img_path and is_grass_card_texture_name(img_path.name):
+    rock_only = [
+        p for p in candidates
+        if any(word in p.name.lower() for word in ('rock', 'dirt', 'soil', 'moss', 'ground', 'meadow', 'terrain'))
+    ]
+    img_path = pick_ground_image_path(rock_only or candidates) if (rock_only or candidates) else None
+    if img_path and (is_grass_card_texture_name(img_path.name) or 'leaf' in img_path.name.lower() or 'foliage' in img_path.name.lower()):
         img_path = None
     source = img_path.name if img_path else 'authored_meadow_grade'
     bpy.ops.mesh.primitive_plane_add(size=max(90.0, float(size)), location=center)
     ground = bpy.context.object
-    ground.name = 'TJ_ValleyFloor_PurchasedMeadow'
+    ground.name = 'TJ_Ground_ValleyFloor_PurchasedMeadow'
     bpy.ops.object.mode_set(mode='EDIT')
     try:
         bpy.ops.uv.smart_project(angle_limit=66.0, island_margin=0.02)
@@ -1506,7 +1510,7 @@ def main() -> int:
 
     dropped_boxes = 0
     for obj in list(bpy.data.objects):
-        if obj.type != 'MESH' or str(obj.name).startswith('TJ_Ground'):
+        if obj.type != 'MESH' or str(obj.name).startswith(('TJ_Ground', 'TJ_River', 'TJ_Atmosphere')):
             continue
         if is_water_or_ocean_name(obj.name) or is_mountain_camera_subject_name(obj.name, subject_parent_name(obj)):
             continue
