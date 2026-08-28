@@ -1,3 +1,4 @@
+# Registered second push; this workflow never contacts RunPod.
 name: TivvleJoy Scenery Image Pull Diagnostic
 
 on:
@@ -70,8 +71,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # The V2 child inherits this exact base. Pull it anonymously as a second access proof;
-          # most layers should already be cached locally from the child pull.
           start=$(date +%s)
           timeout 600 docker pull "$BASE_IMAGE" > artifacts/tivvlejoy-scenery-image-pull/base-pull.log 2>&1
           end=$(date +%s)
