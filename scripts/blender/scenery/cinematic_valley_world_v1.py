@@ -1043,8 +1043,8 @@ def main() -> int:
         )):
             loc = cam_xy + along * (t * span) + side * offset
             west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
-        for loc, scale in ((-11.0, -5.4, 0.0, 1.08), (-1.8, -4.6, 0.0, 1.02), (5.2, -6.2, 0.0, 0.96)):
-            west_fg.append(duplicate_mesh_in_world(trees[0], loc[:3], loc[3]))
+        for item in ((-11.0, -5.4, 0.0, 1.08), (-1.8, -4.6, 0.0, 1.02), (5.2, -6.2, 0.0, 0.96)):
+            west_fg.append(duplicate_mesh_in_world(trees[0], item[:3], item[3]))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
     east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
     foreground = west_fg + east_fg
