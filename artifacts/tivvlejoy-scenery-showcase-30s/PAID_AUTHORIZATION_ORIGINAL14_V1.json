@@ -3,7 +3,7 @@
   "authorized": true,
   "executionId": "scenery-showcase-original14-30s-v1-20260828",
   "templateId": "u4glgdj076",
-  "workerImage": "ghcr.io/doodledashtv/ddp-runpod-blender@sha256:ffcb91e5ee9f2b04fc49f9148d68871d237dd80c6b3fc3980eca18c0c053326c",
+  "workerImage": "ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:4d33c0b26d868dd5891dadb05c0a11f6504ae5554dbb663c5c834e8385d0d72f",
   "maxCreates": 1,
   "noBlindRetry": true,
   "secureGpuOnly": "NVIDIA GeForce RTX 4090",
@@ -21,5 +21,7 @@
   "frameCount": 900,
   "samples": 12,
   "purchasedSceneryOnly": true,
-  "commercialAssetsPublished": false
+  "commercialAssetsPublished": false,
+  "workerImageDigest": "sha256:4d33c0b26d868dd5891dadb05c0a11f6504ae5554dbb663c5c834e8385d0d72f",
+  "repair": "prefer-individual-purchased-geometry-after-forest-kit-timeout"
 }

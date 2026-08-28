@@ -20,8 +20,10 @@ jobs:
     timeout-minutes: 15
     env:
       RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
-      IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:ffcb91e5ee9f2b04fc49f9148d68871d237dd80c6b3fc3980eca18c0c053326c
+      IMAGE: ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:4d33c0b26d868dd5891dadb05c0a11f6504ae5554dbb663c5c834e8385d0d72f
+      IMAGE_DIGEST: sha256:4d33c0b26d868dd5891dadb05c0a11f6504ae5554dbb663c5c834e8385d0d72f
       TEMPLATE_NAME: TivvleJoy Scenery Original14 30s V1
+      TEMPLATE_ID: u4glgdj076
     steps:
       - name: Verify or create one Original14 template only
         shell: bash
@@ -33,16 +35,37 @@ jobs:
           python3 - <<'PY' > decision.json
           import json, os
           raw=json.load(open('before.json')); items=raw if isinstance(raw,list) else raw.get('templates',[]) if isinstance(raw,dict) else []
-          name=os.environ['TEMPLATE_NAME']; image=os.environ['IMAGE']
-          exact=[x for x in items if isinstance(x,dict) and x.get('name')==name and x.get('imageName')==image]
+          name=os.environ['TEMPLATE_NAME']; digest=os.environ['IMAGE_DIGEST']; tid=os.environ['TEMPLATE_ID']
+          def pinned(x):
+            image=str(x.get('imageName') or '')
+            return image.endswith('@'+digest) or image.endswith(digest)
           same=[x for x in items if isinstance(x,dict) and x.get('name')==name]
+          by_id=[x for x in items if isinstance(x,dict) and x.get('id')==tid]
+          exact=[x for x in same if pinned(x)]
           if len(exact)>1: raise SystemExit('AMBIGUOUS_EXACT_TEMPLATE')
-          if same and not exact: raise SystemExit('TEMPLATE_NAME_COLLISION')
-          print(json.dumps({'exactCount':len(exact),'templateId':exact[0].get('id') if exact else None}))
+          target=(by_id[0] if by_id else (same[0] if same else None))
+          print(json.dumps({'exactCount':len(exact),'sameCount':len(same),'templateId':(exact[0].get('id') if exact else (target.get('id') if target else None)),'needsPatch':bool(target and not pinned(target))}))
           PY
           exact_count=$(python3 -c "import json; print(json.load(open('decision.json'))['exactCount'])")
+          needs_patch=$(python3 -c "import json; print('yes' if json.load(open('decision.json')).get('needsPatch') else 'no')")
           post_count=0
-          if [ "$exact_count" = '0' ]; then
+          patch_count=0
+          if [ "$needs_patch" = 'yes' ]; then
+            tid=$(python3 -c "import json; print(json.load(open('decision.json'))['templateId'])")
+            python3 - <<'PY' > patch-body.json
+          import json, os
+          raw=json.load(open('before.json')); items=raw if isinstance(raw,list) else raw.get('templates',[]) if isinstance(raw,dict) else []
+          tid=os.environ['TEMPLATE_ID']; digest=os.environ['IMAGE_DIGEST']
+          t=next(x for x in items if isinstance(x,dict) and x.get('id')==tid)
+          current=str(t.get('imageName') or '')
+          prefix=current.rsplit('@',1)[0]
+          print(json.dumps({'imageName': prefix+'@'+digest}))
+          PY
+            code=$(curl --silent --show-error --max-time 90 -o patch-result.json -w '%{http_code}' -X PATCH "https://rest.runpod.io/v1/templates/${tid}" -H "Authorization: Bearer $RUNPOD_API_KEY" -H 'Content-Type: application/json' --data-binary @patch-body.json)
+            test "$code" = '200'
+            patch_count=1
+          fi
+          if [ "$exact_count" = '0' ] && [ "$needs_patch" != 'yes' ]; then
             python3 - <<'PY' > create-body.json
           import json, os
           print(json.dumps({
@@ -58,16 +81,16 @@ jobs:
             post_count=1
           fi
           curl --fail --silent --show-error --max-time 60 -H "Authorization: Bearer $RUNPOD_API_KEY" https://rest.runpod.io/v1/templates > after.json
-          POST_COUNT="$post_count" python3 - <<'PY'
+          POST_COUNT="$post_count" PATCH_COUNT="$patch_count" python3 - <<'PY'
           import json, os
           raw=json.load(open('after.json')); items=raw if isinstance(raw,list) else raw.get('templates',[]) if isinstance(raw,dict) else []
-          name=os.environ['TEMPLATE_NAME']; image=os.environ['IMAGE']
-          exact=[x for x in items if isinstance(x,dict) and x.get('name')==name and x.get('imageName')==image]
+          name=os.environ['TEMPLATE_NAME']; digest=os.environ['IMAGE_DIGEST']; expected_id=os.environ['TEMPLATE_ID']
+          exact=[x for x in items if isinstance(x,dict) and x.get('name')==name and str(x.get('imageName') or '').endswith(digest)]
           assert len(exact)==1, len(exact)
-          t=exact[0]; tid=t.get('id'); assert isinstance(tid,str) and tid
+          t=exact[0]; tid=t.get('id'); assert tid==expected_id
           result={
             'schema':'TIVVLEJOY_SCENERY_ORIGINAL14_TEMPLATE_V1','status':'TEMPLATE_READY','templateId':tid,
-            'name':name,'imageName':image,'templatePostCount':int(os.environ['POST_COUNT']),'podPostCount':0,
+            'name':name,'imageName':t.get('imageName'),'imageDigest':digest,'templatePostCount':int(os.environ['POST_COUNT']),'templatePatchCount':int(os.environ['PATCH_COUNT']),'podPostCount':0,
             'gpuLaunched':False,'paidComputeUsd':0,'runtimeEnvStoredInTemplate':False,
             'originalSourceCount':14,'renderableSourceCount':11,'unityPreservationOnlyCount':3,
             'internalResolution':'540x960','finalResolution':'1080x1920','samples':12,
