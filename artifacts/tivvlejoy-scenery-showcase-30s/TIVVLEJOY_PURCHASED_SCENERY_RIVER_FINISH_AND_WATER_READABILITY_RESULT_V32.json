@@ -1,7 +1,7 @@
 {
   "schema": "TIVVLEJOY_PURCHASED_SCENERY_RIVER_FINISH_AND_WATER_READABILITY_RESULT_V32",
   "startingSha": "ac72eac0cdc0e5587147384e91e49e9a561441ae",
-  "finalSha": "40411118e2e1f63f58838e56966a617876dcaa6a",
+  "finalSha": "be9febc027b13e0ed22e3d24ee0609dfe6029f4c",
   "pr169": {
     "state": "OPEN",
     "draft": true,
