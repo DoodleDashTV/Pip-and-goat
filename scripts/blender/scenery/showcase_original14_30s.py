@@ -808,10 +808,10 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
     patch = _mix_color_node(
         nodes,
         fac=0.5,
-        color2=(0.46, 0.60, 0.20, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
+        color2=(0.34, 0.48, 0.16, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
     )
     c1, _c2, patch_out = _mix_color_sockets(patch)
-    c1.default_value = (0.10, 0.24, 0.06, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
+    c1.default_value = (0.14, 0.22, 0.08, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
     links.new(noise.outputs['Fac'], patch.inputs['Fac'] if 'Fac' in patch.inputs else patch.inputs[0])
     color_src = patch_out
     if img_path is not None:
@@ -927,9 +927,9 @@ def _river_water_material() -> bpy.types.Material:
     if bsdf is None:
         return mat
     if 'Base Color' in bsdf.inputs:
-        bsdf.inputs['Base Color'].default_value = (0.08, 0.22, 0.28, 1.0)
+        bsdf.inputs['Base Color'].default_value = (0.04, 0.12, 0.16, 1.0)
     if 'Roughness' in bsdf.inputs:
-        bsdf.inputs['Roughness'].default_value = 0.16
+        bsdf.inputs['Roughness'].default_value = 0.28
     if 'Specular IOR Level' in bsdf.inputs:
         bsdf.inputs['Specular IOR Level'].default_value = 0.55
     if 'Transmission Weight' in bsdf.inputs:
@@ -947,8 +947,7 @@ def _river_water_material() -> bpy.types.Material:
         links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
     if water_mat is not None and water_mat.node_tree:
         src = next((n for n in water_mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
-        if src and 'Base Color' in src.inputs and not src.inputs['Base Color'].links:
-            bsdf.inputs['Base Color'].default_value = src.inputs['Base Color'].default_value
+        # Keep our darker river grade. EcoKit Water_Mat defaults read as tape-blue.
     return mat
 
 
@@ -1082,9 +1081,14 @@ def place_mountain_ridge(members: list[bpy.types.Object], origin: Vector) -> int
 
 def enable_foliage_alpha(objects: list[bpy.types.Object]) -> int:
     marked = 0
-    words = ('leaf', 'leaves', 'foliage', 'tree', 'bush', 'grass', 'fern', 'pine', 'plant')
+    # Do not clip tree/pine atlases. That punched neon tips and crushed canopies.
+    words = ('leaf', 'leaves', 'foliage', 'bush', 'grass', 'fern', 'plant')
+    skip = ('tree', 'pine', 'canopy', 'trunk')
     for obj in objects:
-        if not obj or obj.type != 'MESH' or not any(w in obj.name.lower() for w in words):
+        if not obj or obj.type != 'MESH':
+            continue
+        name = obj.name.lower()
+        if any(word in name for word in skip) or not any(w in name for w in words):
             continue
         for slot in obj.material_slots:
             mat = slot.material
@@ -1257,7 +1261,7 @@ def setup_lighting():
     bpy.ops.object.light_add(type='SUN', location=(8, -36, 70))
     sun = bpy.context.object
     sun.name = 'TJ_Sun'
-    sun.data.energy = 2.6
+    sun.data.energy = 2.2
     sun.data.angle = math.radians(8.0)
     sun.rotation_euler = (math.radians(46), math.radians(2), math.radians(4))
     if hasattr(sun.data, 'use_shadow'):
@@ -1756,8 +1760,11 @@ def main() -> int:
                 if 'swarm' in obj.name.lower() or 'water' in obj.name.lower():
                     obj.hide_render = True
                     obj.hide_viewport = True
-            extras = scatter_forest_line(live, (village_center.x, village_center.y - 11.4, 0.0), 10, 34.0, 1.1, 0.85)
-            extras += scatter_forest_line(live, (village_center.x, village_center.y - 8.2, 0.0), 10, 34.0, 1.1, 0.85)
+            extras = scatter_forest_line(live, (village_center.x, village_center.y - 11.4, 0.0), 10, 34.0, 1.1, 0.7)
+            extras += scatter_forest_line(live, (village_center.x, village_center.y - 8.2, 0.0), 10, 34.0, 1.1, 0.7)
+            for obj in extras:
+                if not any(material_has_valid_image(slot.material) for slot in obj.material_slots):
+                    paint_simple_color(obj, f'TJ_RiverRock_{obj.name}', (0.28, 0.22, 0.16), 0.86)
             members.extend(extras)
             # Keep authored rock materials. Only bind when a mesh has nothing.
             bound = bind_purchased_textures(live, files)
@@ -1820,6 +1827,9 @@ def main() -> int:
     near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 28.0, 0.0), 16, 44.0, 4.0, 1.55)
     far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 42.0, 0.0), 16, 50.0, 5.0, 1.85)
     forest_band = grove + near_band + far_band
+    for obj in forest_band:
+        if hasattr(obj, 'visible_shadow'):
+            obj.visible_shadow = False
     print(json.dumps({
         'event': 'purchased_image_remap',
         'remapped': remapped,
