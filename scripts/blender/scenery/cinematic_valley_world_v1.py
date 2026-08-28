@@ -599,20 +599,7 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     links.new(noise.outputs["Fac"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
-    fade = nodes.new("ShaderNodeMapRange")
-    fade.inputs["From Min"].default_value = 0.62
-    fade.inputs["From Max"].default_value = 0.98
-    fade.inputs["To Min"].default_value = 0.0
-    fade.inputs["To Max"].default_value = 0.82
-    links.new(attr.outputs["Color"], fade.inputs["Value"])
-    trans = nodes.new("ShaderNodeBsdfTransparent")
-    if "Color" in trans.inputs:
-        trans.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
-    mix_sh = nodes.new("ShaderNodeMixShader")
-    links.new(fade.outputs["Result"] if "Result" in fade.outputs else fade.outputs[0], mix_sh.inputs[0])
-    links.new(body.outputs["BSDF"], mix_sh.inputs[1])
-    links.new(trans.outputs["BSDF"], mix_sh.inputs[2])
-    links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
+    links.new(body.outputs["BSDF"], out.inputs["Surface"])
     return mat
 
 
