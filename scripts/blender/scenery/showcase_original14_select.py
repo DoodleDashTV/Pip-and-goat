@@ -45,6 +45,10 @@ GROUND_WORDS = (
 )
 
 ALBEDO_WORDS = ('albedo', 'diffuse', 'diff', 'basecolor', 'base_color', 'color', 'col_')
+NON_ALBEDO_WORDS = (
+    'normal', 'nrm', 'norm_', '_n.', 'rough', 'metal', 'spec', 'ao_', 'occlusion',
+    'height', 'bump', 'disp', 'emiss', 'mask', 'orm',
+)
 
 # Combined dump OBJs expand into multi-GB render scenes even when the file
 # itself is modest. Keep individual assets; allow larger .blend village files.
@@ -153,8 +157,10 @@ def pick_ground_image_records(records: list[dict]) -> dict | None:
     def rank(rec: dict) -> tuple:
         name = str(rec.get('name') or '').lower()
         size = int(rec.get('size') or 0)
-        word_miss = 0 if any(w in name for w in GROUND_WORDS + ALBEDO_WORDS) else 1
-        return (word_miss, -min(size, 6 * 1024 * 1024), name)
+        non_albedo = 1 if any(w in name for w in NON_ALBEDO_WORDS) else 0
+        ground_hit = 0 if any(w in name for w in GROUND_WORDS) else 1
+        albedo_miss = 0 if any(w in name for w in ALBEDO_WORDS + GROUND_WORDS) else 1
+        return (non_albedo, ground_hit, albedo_miss, -min(size, 6 * 1024 * 1024), name)
 
     images.sort(key=rank)
     return images[0] if images else None

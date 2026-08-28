@@ -103,6 +103,15 @@ def test_ground_picker_prefers_grass_over_random_huge_atlas():
     assert chosen['name'] == 'Village_Grass_Albedo.jpg'
 
 
+def test_ground_picker_skips_normal_maps():
+    records = [
+        {'name': 'Ground_Normal.png', 'ext': '.png', 'size': 4_000_000},
+        {'name': 'Forest_Dirt_Diffuse.jpg', 'ext': '.jpg', 'size': 1_500_000},
+    ]
+    chosen = pick_ground_image_records(records)
+    assert chosen['name'] == 'Forest_Dirt_Diffuse.jpg'
+
+
 if __name__ == '__main__':
     test_dump_name_detects_combined_forest_kit()
     test_extract_skips_huge_obj_and_keeps_individual_assets()
@@ -116,4 +125,5 @@ if __name__ == '__main__':
     test_geometry_picker_skips_staging_when_heroes_exist()
     test_mesh_keep_rank_prefers_hero_over_flat_platform()
     test_ground_picker_prefers_grass_over_random_huge_atlas()
+    test_ground_picker_skips_normal_maps()
     print('showcase_original14_select_test PASS')

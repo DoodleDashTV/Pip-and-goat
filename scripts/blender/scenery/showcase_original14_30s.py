@@ -395,7 +395,7 @@ def create_purchased_texture_ground(files: list[Path]) -> int:
     img = pick_ground_image_path(files) or largest_image(files)
     if not img:
         return 0
-    bpy.ops.mesh.primitive_plane_add(size=220, location=(0, 28, -0.15))
+    bpy.ops.mesh.primitive_plane_add(size=420, location=(0, 28, -0.15))
     ground = bpy.context.object
     ground.name = 'TJ_Ground_Using_Purchased_Village_Texture'
     bpy.ops.object.mode_set(mode='EDIT')
@@ -404,7 +404,7 @@ def create_purchased_texture_ground(files: list[Path]) -> int:
     except Exception:
         pass
     bpy.ops.object.mode_set(mode='OBJECT')
-    ground.data.materials.append(image_material('TJ_PurchasedVillageGround', img, tile=8.0))
+    ground.data.materials.append(image_material('TJ_PurchasedVillageGround', img, tile=18.0))
     return 1
 
 
@@ -477,7 +477,7 @@ def setup_lighting():
     bpy.ops.object.light_add(type='SUN', location=(25, -35, 80))
     sun = bpy.context.object
     sun.name = 'TJ_Sun'
-    sun.data.energy = 2.0
+    sun.data.energy = 6.0
     sun.data.angle = math.radians(5)
     sun.rotation_euler = (math.radians(28), math.radians(-18), math.radians(-32))
     bpy.ops.object.light_add(type='AREA', location=(-25, 5, 38))
@@ -511,29 +511,29 @@ def smooth(obj):
 
 
 def setup_camera(start: int, end: int):
-    meshes = [o for o in bpy.data.objects if o.type == 'MESH']
+    meshes = [o for o in bpy.data.objects if o.type == 'MESH' and not str(o.name).startswith('TJ_Ground')]
     bounds = group_bounds(meshes)
     if bounds:
         mins, maxs = bounds
         center = (mins + maxs) * 0.5
         span = max((maxs - mins).x, (maxs - mins).y, (maxs - mins).z, 8.0)
-        height = max(span * 0.28, 10.0)
-        look = (center.x, center.y, center.z + span * 0.08)
+        height = max(span * 0.18, 6.0)
+        look = (center.x, center.y, mins.z + span * 0.12)
         cams = [
-            (center.x, center.y + span * 1.15, center.z + height),
-            (center.x - span * 0.35, center.y + span * 0.72, center.z + height * 0.7),
-            (center.x + span * 0.28, center.y + span * 0.28, center.z + height * 0.45),
-            (center.x - span * 0.18, center.y - span * 0.08, center.z + height * 0.38),
-            (center.x + span * 0.22, center.y - span * 0.42, center.z + height * 0.55),
-            (center.x, center.y - span * 0.85, center.z + height * 1.05),
+            (center.x, center.y + span * 0.55, mins.z + height),
+            (center.x - span * 0.22, center.y + span * 0.32, mins.z + height * 0.7),
+            (center.x + span * 0.16, center.y + span * 0.08, mins.z + height * 0.42),
+            (center.x - span * 0.10, center.y - span * 0.12, mins.z + height * 0.36),
+            (center.x + span * 0.14, center.y - span * 0.28, mins.z + height * 0.48),
+            (center.x, center.y - span * 0.42, mins.z + height * 0.85),
         ]
         targets = [
-            (look[0], look[1] + span * 0.25, look[2]),
-            (look[0], look[1] + span * 0.08, look[2]),
+            (look[0], look[1] + span * 0.18, look[2]),
+            (look[0], look[1] + span * 0.06, look[2]),
             look,
-            (look[0], look[1] - span * 0.12, look[2]),
-            (look[0], look[1] - span * 0.05, look[2] + span * 0.04),
-            (look[0], look[1] + span * 0.05, look[2] + span * 0.06),
+            (look[0], look[1] - span * 0.08, look[2]),
+            (look[0], look[1] - span * 0.04, look[2] + span * 0.03),
+            (look[0], look[1] + span * 0.04, look[2] + span * 0.05),
         ]
     else:
         cams = [(0,145,42),(-24,105,24),(24,70,18),(-18,30,12),(20,-12,16),(0,-58,38)]
@@ -541,7 +541,7 @@ def setup_camera(start: int, end: int):
     bpy.ops.object.camera_add(location=cams[0])
     cam = bpy.context.object
     cam.name = 'TJ_Original14_Camera'
-    cam.data.lens = 36
+    cam.data.lens = 28
     bpy.context.scene.camera = cam
     target = bpy.data.objects.new('TJ_Original14_Target', None)
     bpy.context.scene.collection.objects.link(target)
