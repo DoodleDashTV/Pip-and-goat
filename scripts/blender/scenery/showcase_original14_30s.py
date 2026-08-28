@@ -692,6 +692,41 @@ def lift_purchased_shading() -> int:
     return lifted
 
 
+def lift_tree_object_shading(objects: list) -> int:
+    """Lift pine/tree meshes even when the material name is a generic atlas."""
+    lifted = 0
+    seen = set()
+    for obj in objects:
+        if not obj or obj.type != 'MESH':
+            continue
+        name = f'{obj.name} {subject_parent_name(obj)}'.lower()
+        if not any(word in name for word in ('tree', 'pine')):
+            continue
+        for slot in obj.material_slots:
+            mat = slot.material
+            if not mat or not mat.node_tree or id(mat) in seen:
+                continue
+            seen.add(id(mat))
+            bsdf = next((node for node in mat.node_tree.nodes if node.type == 'BSDF_PRINCIPLED'), None)
+            if bsdf is None or 'Base Color' not in bsdf.inputs:
+                continue
+            mix = _mix_color_node(mat.node_tree.nodes, fac=0.26, color2=(0.14, 0.26, 0.10, 1.0))
+            color1, _color2, color_out = _mix_color_sockets(mix)
+            links = list(bsdf.inputs['Base Color'].links)
+            if links:
+                src = links[0].from_socket
+                try:
+                    mat.node_tree.links.remove(links[0])
+                except Exception:
+                    pass
+                mat.node_tree.links.new(src, color1)
+            else:
+                color1.default_value = bsdf.inputs['Base Color'].default_value
+            mat.node_tree.links.new(color_out, bsdf.inputs['Base Color'])
+            lifted += 1
+    return lifted
+
+
 def paint_simple_color(obj, name: str, color: tuple, roughness: float = 0.8) -> None:
     if obj is None or obj.type != 'MESH':
         return
@@ -814,29 +849,41 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
         bsdf.inputs['Specular IOR Level'].default_value = 0.08
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
     coord = nodes.new('ShaderNodeTexCoord')
-    voronoi = nodes.new('ShaderNodeTexVoronoi')
-    voronoi.inputs['Scale'].default_value = 0.038 if meadow else 0.09
-    if 'Randomness' in voronoi.inputs:
-        voronoi.inputs['Randomness'].default_value = 0.92
-    links.new(coord.outputs['Object'], voronoi.inputs['Vector'])
-    to_bw = nodes.new('ShaderNodeRGBToBW')
-    voronoi_color = voronoi.outputs['Color'] if 'Color' in voronoi.outputs else voronoi.outputs[0]
-    links.new(voronoi_color, to_bw.inputs['Color'] if 'Color' in to_bw.inputs else to_bw.inputs[0])
-    # Hard steps so 20–30 m patches survive AgX and a 360 px south camera.
+    # Soft world-metre blobs. Constant Voronoi read as a tiled quilt from the
+    # south camera. Distorted noise keeps contrast without hard tile edges.
+    noise = nodes.new('ShaderNodeTexNoise')
+    noise.inputs['Scale'].default_value = 0.026 if meadow else 0.08
+    if 'Detail' in noise.inputs:
+        noise.inputs['Detail'].default_value = 2.0
+    if 'Roughness' in noise.inputs:
+        noise.inputs['Roughness'].default_value = 0.38
+    distort = nodes.new('ShaderNodeTexNoise')
+    distort.inputs['Scale'].default_value = 0.07
+    if 'Detail' in distort.inputs:
+        distort.inputs['Detail'].default_value = 1.0
+    mapping = nodes.new('ShaderNodeMapping')
+    nudge = nodes.new('ShaderNodeVectorMath')
+    nudge.operation = 'MULTIPLY'
+    nudge.inputs[1].default_value = (14.0, 14.0, 2.0)
+    links.new(coord.outputs['Object'], mapping.inputs['Vector'])
+    links.new(distort.outputs['Color'], nudge.inputs[0])
+    links.new(nudge.outputs['Vector'], mapping.inputs['Location'])
+    links.new(mapping.outputs['Vector'], noise.inputs['Vector'])
     ramp = nodes.new('ShaderNodeValToRGB')
-    ramp.color_ramp.interpolation = 'CONSTANT'
-    ramp.color_ramp.elements[0].position = 0.0
+    ramp.color_ramp.interpolation = 'EASE'
     if meadow:
-        ramp.color_ramp.elements[0].color = (0.07, 0.16, 0.05, 1.0)
-        ramp.color_ramp.elements[1].position = 0.38
-        ramp.color_ramp.elements[1].color = (0.22, 0.38, 0.10, 1.0)
-        extra = ramp.color_ramp.elements.new(0.68)
-        extra.color = (0.40, 0.56, 0.14, 1.0)
+        ramp.color_ramp.elements[0].position = 0.22
+        ramp.color_ramp.elements[0].color = (0.06, 0.15, 0.05, 1.0)
+        ramp.color_ramp.elements[1].position = 0.78
+        ramp.color_ramp.elements[1].color = (0.36, 0.50, 0.13, 1.0)
+        mid = ramp.color_ramp.elements.new(0.50)
+        mid.color = (0.18, 0.32, 0.09, 1.0)
     else:
-        ramp.color_ramp.elements[0].color = (0.28, 0.18, 0.10, 1.0)
-        ramp.color_ramp.elements[1].position = 0.55
+        ramp.color_ramp.elements[0].position = 0.25
+        ramp.color_ramp.elements[0].color = (0.26, 0.17, 0.09, 1.0)
+        ramp.color_ramp.elements[1].position = 0.80
         ramp.color_ramp.elements[1].color = (0.40, 0.28, 0.14, 1.0)
-    links.new(to_bw.outputs['Val'], ramp.inputs['Fac'])
+    links.new(noise.outputs['Fac'], ramp.inputs['Fac'])
     color_src = ramp.outputs['Color']
     if img_path is not None:
         tex = nodes.new('ShaderNodeTexImage')
@@ -993,11 +1040,11 @@ def _river_water_material() -> bpy.types.Material:
     if bsdf is None:
         return mat
     if 'Base Color' in bsdf.inputs:
-        bsdf.inputs['Base Color'].default_value = (0.05, 0.14, 0.17, 1.0)
+        bsdf.inputs['Base Color'].default_value = (0.04, 0.13, 0.16, 1.0)
     if 'Roughness' in bsdf.inputs:
-        bsdf.inputs['Roughness'].default_value = 0.16
+        bsdf.inputs['Roughness'].default_value = 0.38
     if 'Specular IOR Level' in bsdf.inputs:
-        bsdf.inputs['Specular IOR Level'].default_value = 0.62
+        bsdf.inputs['Specular IOR Level'].default_value = 0.22
     # Keep transmission low. Pale ground shining through reads as tape-blue.
     if 'Transmission Weight' in bsdf.inputs:
         bsdf.inputs['Transmission Weight'].default_value = 0.08
@@ -1910,11 +1957,13 @@ def main() -> int:
     for obj in forest_band:
         if hasattr(obj, 'visible_shadow'):
             obj.visible_shadow = False
+    tree_lifted = lift_tree_object_shading(village_trees + forest_band)
     print(json.dumps({
         'event': 'purchased_image_remap',
         'remapped': remapped,
         'forcedAlbedos': forced,
         'liftedShading': lifted,
+        'treeShadingLifted': tree_lifted,
     }), flush=True)
     print(json.dumps({
         'event': 'village_tree_forest_band',

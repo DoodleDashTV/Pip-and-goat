@@ -1,33 +1,32 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T16:59:40Z",
+  "inspectedAt": "2026-08-28T17:03:20Z",
   "engine": "CYCLES_CPU",
   "resolution": "360x640",
   "samples": 16,
-  "commit": "5914fe2",
-  "stillsDir": "/tmp/o14-lookdev/stills20",
+  "commit": "652bc24",
+  "stillsDir": "/tmp/o14-lookdev/stills21",
   "stills": {
-    "0001": "Wider establish: more sky, smaller village. River is a sky-mirror ribbon (132,167,185). Foreground is still one pale yellow-green (mean 125,151,100, std ~13).",
-    "0450": "Closer stacked beat. Red cart readable. Brown dirt votes rose (3065). Village larger. Forest still a near-black wall. Ground still a slab.",
-    "0900": "Closer still, river center is teal (63,93,104) not tape. Path brown is present. Still a kit layout, not a cinematic valley."
+    "0001": "Meadow contrast now reads, but as a rectangular Voronoi quilt (fg std 38). Establish river is still a sky strip (133,168,185). Forest still near-black.",
+    "0450": "Closer beat, cart and dirt visible. Foreground collapsed to one dark green patch (std 7). Still a kit layout.",
+    "0900": "River center teal (69,111,124). Neon pine tips noted. Cabins still sit on a plane."
   },
   "whatImprovedVersusRejectedCabinOrbit": [
-    "Frames 1 / 450 / 900 are now different beats, not one locked south view",
-    "Dirt lane exists in world metres and reads in the closer beats",
-    "Mint project-flora leftovers stay hidden",
-    "Pine copies, Cabin01 albedo, fence, cart, Louis mountains, sk2 sky remain"
+    "Camera beats 1 / 450 / 900 are distinct",
+    "Dirt lane reads in closer beats",
+    "Meadow shader now has measurable contrast (too hard / quilt-like)"
   ],
   "rejectionMatches": [
     "still reads as an asset test, not a finished cinematic shot",
-    "flat pale-green ground; meadow patches do not survive AgX from y≈-78",
+    "ground reads as tiled patches, not a valley meadow",
     "establish river is a sky-mirror ribbon",
     "forest reads as a near-black rectangular wall"
   ],
-  "honestConclusion": "Camera journey started. Ground and far river still fail. Green CI is not visual approval. Paid path idle (0 pods). Do not CREATE. Do not present as approval.",
+  "honestConclusion": "Hard Voronoi was the wrong fix. Soften the meadow, matte the river, lift tree objects. Paid path idle. Do not CREATE. Do not present as approval.",
   "paidRenderAuthorized": false,
   "paidProgressCheck": {
-    "checkedAt": "2026-08-28T16:59:40Z",
+    "checkedAt": "2026-08-28T17:03:20Z",
     "activeExactNamePods": 0,
     "billingCleanupConfirmed": true,
     "createPerformed": false,
