@@ -1,0 +1,28 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:35:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "8996ad6",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev25",
+  "shots": {
+    "SHOT_01": "PARTIAL — valley layers hold. River is a small curved pond/ribbon in the lower left.",
+    "SHOT_02": "FAIL — along-channel still reads as a sharp-edged blue path on a slab.",
+    "SHOT_03": "PARTIAL — framed forest opening holds.",
+    "SHOT_04": "PARTIAL — river carpet is gone. Became a fence-framed mountain vista; cart/street dropped out of the look.",
+    "SHOT_05": "PARTIAL — compression holds. Blue rectangle still clips the lower-left corner.",
+    "SHOT_06": "FAIL — camera sat against an east-cabin roof. Hero close became a thatch crop."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Moving 04/06 off the river removed the carpet but 04 lost the street and 06 hit a roof. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
