@@ -536,7 +536,10 @@ def main() -> int:
     village_center = Vector((0.0, 0.0, 0.0))
     village_files = expanded.get("village_blender", [])
     cabin_files = role_files(village_files, ("cabin",), ("interior",))
-    cabin_files = [path for path in cabin_files if path.name.lower().endswith("a.blend")]
+    cabin_files = sorted(
+        [path for path in cabin_files if path.name.lower().endswith("a.blend")],
+        key=lambda path: path.name.lower(),
+    )[:4]
     street_slots = [
         (-8.6, -1.6, 0.0),
         (8.8, 1.2, 0.0),
@@ -627,7 +630,6 @@ def main() -> int:
     mountain_files = expanded.get("background_mountains", [])
     mountain_members = []
     if mountain_files:
-        from showcase_original14_30s import geometry_candidates, import_geometry, keep_hero_meshes
         for candidate in geometry_candidates(mountain_files, "background_mountains"):
             objs = import_geometry(candidate, "background_mountains")
             if objs:
