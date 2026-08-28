@@ -99,7 +99,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          code=$(curl --retry 2 --retry-all-errors --retry-delay 2 --max-time 90 -sS -o launch.json -w '%{http_code}' \
+          # Intentionally NO curl retry here. A lost CREATE response is handled by cleanup,
+          # never by resending the paid POST.
+          code=$(curl --max-time 90 -sS -o launch.json -w '%{http_code}' \
             --request POST "$BRIDGE_URL" \
             --header 'content-type: application/json' \
             --header "x-tivvlejoy-scenery-authorization: $SCENERY_AUTHORIZATION" \
@@ -132,6 +134,7 @@ jobs:
         run: |
           set -euo pipefail
           terminal=''
+          pod_seen=0
           process_seen=0
           runtime_seen=0
           runtime_first_poll=0
@@ -198,8 +201,13 @@ jobs:
               exit 1
             fi
 
-            if [ "$exact_count" -eq 0 ]; then
+            if [ "$exact_count" -gt 0 ]; then
+              pod_seen=1
+            elif [ "$pod_seen" -eq 1 ]; then
               echo 'Exact-name RunPod disappeared before verified COMPLETE.'
+              exit 1
+            elif [ "$i" -ge 4 ]; then
+              echo 'Created Pod was not visible by exact name within the first minute.'
               exit 1
             fi
 
