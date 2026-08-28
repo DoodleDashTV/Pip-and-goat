@@ -372,15 +372,15 @@ def cinematic_world_camera_keys(
         # Wide establish: far south, high. Look past the village to the peaks.
         {'camera': (vx + 10.0, vy - 56.0, village_min_z + 28.0), 'look': (mx, my, mz), 'lens': 24.0},
         # Descend toward the forest and river corridor, still a valley shot.
-        {'camera': (vx + 8.0, vy - 38.0, village_min_z + 15.0), 'look': (fx, (fy + my) * 0.5, (fz + mz) * 0.45), 'lens': 26.0},
+        {'camera': (vx + 10.0, vy - 46.0, village_min_z + 18.0), 'look': (fx, (fy + my) * 0.5, (fz + mz) * 0.45), 'lens': 26.0},
         # Travel along the river; village and mountains stay in the same 9:16 frame.
-        {'camera': (vx + 6.0, vy - 36.0, village_min_z + 13.0), 'look': (vx, vy + 26.0, look_z + 5.0), 'lens': 26.0},
+        {'camera': (vx + 8.0, vy - 42.0, village_min_z + 16.0), 'look': (vx, vy + 28.0, look_z + 5.0), 'lens': 26.0},
         # Cross the river toward the village street, never a cabin portrait.
-        {'camera': (vx + 8.0, vy - 36.0, village_min_z + 12.5), 'look': (vx, vy + 22.0, look_z + 4.0), 'lens': 27.0},
+        {'camera': (vx + 10.0, vy - 42.0, village_min_z + 15.0), 'look': (vx, vy + 24.0, look_z + 4.0), 'lens': 27.0},
         # Village becomes the destination; forest and peaks remain stacked.
-        {'camera': (vx + 8.0, vy - 37.0, village_min_z + 12.0), 'look': (vx, vy + 20.0, look_z + 3.0), 'lens': 27.0},
+        {'camera': (vx + 10.0, vy - 44.0, village_min_z + 14.0), 'look': (vx, vy + 22.0, look_z + 3.2), 'lens': 27.0},
         # Composed village hero with the valley layers still readable.
-        {'camera': (vx + 10.0, vy - 38.0, village_min_z + 13.0), 'look': (vx, vy + 22.0, look_z + 3.5), 'lens': 26.0},
+        {'camera': (vx + 12.0, vy - 46.0, village_min_z + 15.0), 'look': (vx, vy + 24.0, look_z + 3.6), 'lens': 26.0},
     )
     keys: list[dict] = []
     for beat in beats:

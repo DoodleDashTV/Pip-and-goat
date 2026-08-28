@@ -1116,6 +1116,25 @@ def enable_foliage_alpha(objects: list[bpy.types.Object]) -> int:
     return marked
 
 
+def duplicate_mesh_in_world(src, location, scale: float = 1.0):
+    """Copy a parented kit mesh into world space. Blender keeps the parent on copy()."""
+    dup = src.copy()
+    dup.data = src.data
+    bpy.context.scene.collection.objects.link(dup)
+    rot = src.matrix_world.to_euler()
+    scl = src.matrix_world.to_scale()
+    dup.parent = None
+    try:
+        dup.matrix_parent_inverse.identity()
+    except Exception:
+        pass
+    dup.location = Vector(location)
+    dup.rotation_euler = rot
+    factor = float(scale)
+    dup.scale = (scl.x * factor, scl.y * factor, scl.z * factor)
+    return dup
+
+
 def scatter_purchased_meshes(members: list[bpy.types.Object], origin: tuple, copies: int = 4, radius: float = 16.0) -> list[bpy.types.Object]:
     extras: list[bpy.types.Object] = []
     live = [o for o in members if o and o.name in bpy.data.objects and o.type == 'MESH']
@@ -1124,12 +1143,13 @@ def scatter_purchased_meshes(members: list[bpy.types.Object], origin: tuple, cop
     for i in range(copies):
         src = live[i % len(live)]
         try:
-            dup = src.copy()
-            dup.data = src.data
-            bpy.context.scene.collection.objects.link(dup)
             ang = (i / max(copies, 1)) * math.tau
-            dup.location = Vector(origin) + Vector((math.cos(ang) * radius, math.sin(ang) * radius * 0.65, 0.0))
-            extras.append(dup)
+            loc = (
+                origin[0] + math.cos(ang) * radius,
+                origin[1] + math.sin(ang) * radius * 0.65,
+                origin[2],
+            )
+            extras.append(duplicate_mesh_in_world(src, loc, 1.0))
         except Exception as exc:
             print(json.dumps({'event': 'scatter_warning', 'error': str(exc)[:180]}), flush=True)
     return extras
@@ -1144,16 +1164,13 @@ def scatter_forest_line(members: list[bpy.types.Object], origin: tuple, copies: 
     for i in range(copies):
         src = live[i % len(live)]
         try:
-            dup = src.copy()
-            dup.data = src.data
-            bpy.context.scene.collection.objects.link(dup)
             t = (i + 0.37) / max(copies, 1)
-            x = origin[0] + (t - 0.5) * width
-            y = origin[1] + math.sin(i * 1.73) * depth
-            dup.location = Vector((x, y, origin[2]))
-            if scale and scale != 1.0:
-                dup.scale = (dup.scale[0] * scale, dup.scale[1] * scale, dup.scale[2] * scale)
-            extras.append(dup)
+            loc = (
+                origin[0] + (t - 0.5) * width,
+                origin[1] + math.sin(i * 1.73) * depth,
+                origin[2],
+            )
+            extras.append(duplicate_mesh_in_world(src, loc, scale))
         except Exception as exc:
             print(json.dumps({'event': 'scatter_line_warning', 'error': str(exc)[:180]}), flush=True)
     return extras
