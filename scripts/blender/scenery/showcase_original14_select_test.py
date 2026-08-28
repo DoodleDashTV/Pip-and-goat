@@ -19,6 +19,7 @@ from showcase_original14_select import (
     is_staging_name,
     is_water_or_ocean_name,
     is_authored_village_mesh_name,
+    is_cabin_texture_name,
     mesh_keep_rank,
     village_orbit_radius,
     pick_geometry_records,
@@ -205,6 +206,9 @@ def test_camera_stays_outside_village_cluster():
     assert is_authored_village_mesh_name('Building04_LOD0') is True
     assert is_authored_village_mesh_name('Roof04') is True
     assert is_authored_village_mesh_name('Pine_Tree_01') is False
+    assert is_cabin_texture_name('Cabin01_ALB.png') is True
+    assert is_cabin_texture_name('Wood_Log_Diffuse.jpg') is True
+    assert is_cabin_texture_name('Village_Grass_Albedo.jpg') is False
     tight = village_orbit_radius(6.0, 5.0)
     wide = village_orbit_radius(20.0, 18.0)
     assert tight >= 16.0

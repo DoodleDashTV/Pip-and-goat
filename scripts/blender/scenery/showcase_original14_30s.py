@@ -31,6 +31,7 @@ from showcase_original14_select import (  # noqa: E402
     geometry_file_limit,
     is_authored_village_mesh_name,
     is_box_mesh,
+    is_cabin_texture_name,
     is_camera_hero_name,
     is_dominating_plane,
     is_foliage_card_name,
@@ -435,10 +436,6 @@ def material_has_valid_image(mat) -> bool:
 def mesh_needs_purchased_texture(obj) -> bool:
     if obj.type != 'MESH':
         return False
-    # Cabin kit blends already ship Building/Roof albedos. Rebinding them
-    # produced neon-green log stripes on the village-kit COMPLETE.
-    if is_authored_village_mesh_name(obj.name) and obj.data.materials:
-        return False
     if not obj.data.materials:
         return True
     for slot in obj.material_slots:
@@ -460,18 +457,25 @@ def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) 
         and not any(word in p.name.lower() for word in NON_ALBEDO_WORDS)
     ]
     images.sort(key=lambda p: (-min(p.stat().st_size, 8 * 1024 * 1024), p.name.lower()))
+    cabin_images = [p for p in images if is_cabin_texture_name(p.name)]
     if not images:
         return 0
     bound = 0
     idx = 0
+    cabin_idx = 0
     for obj in objects:
         if not mesh_needs_purchased_texture(obj):
             continue
-        img = images[idx % len(images)]
+        pool = cabin_images if (is_authored_village_mesh_name(obj.name) and cabin_images) else images
+        chosen_idx = cabin_idx if pool is cabin_images else idx
+        img = pool[chosen_idx % len(pool)]
         mat = image_material(f'TJ_PurchasedTex_{obj.name}'[:60], img)
         obj.data.materials.clear()
         obj.data.materials.append(mat)
-        idx += 1
+        if pool is cabin_images:
+            cabin_idx += 1
+        else:
+            idx += 1
         bound += 1
     return bound
 

@@ -179,6 +179,14 @@ def is_authored_village_mesh_name(name: str) -> bool:
     return any(word in n for word in ('building', 'roof', 'cabin', 'house', 'cottage', 'hut'))
 
 
+CABIN_TEXTURE_WORDS = ('wood', 'log', 'cabin', 'roof', 'thatch', 'plank', 'bark', 'wall', 'shingle')
+
+
+def is_cabin_texture_name(name: str) -> bool:
+    n = str(name or '').lower()
+    return any(word in n for word in CABIN_TEXTURE_WORDS)
+
+
 def village_orbit_radius(rx: float, ry: float) -> float:
     """Keep every camera keyframe outside the village AABB."""
     half = math.hypot(max(rx, 4.0), max(ry, 4.0))
