@@ -1,42 +1,38 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T16:41:20Z",
+  "inspectedAt": "2026-08-28T16:47:10Z",
   "engine": "CYCLES_CPU",
   "resolution": "360x640",
   "samples": 16,
-  "commit": "579678b",
-  "stillsDir": "/tmp/o14-lookdev/stills16",
+  "commit": "35b1c85",
+  "stillsDir": "/tmp/o14-lookdev/stills17",
   "stills": {
-    "0001": "Village + pine wall + mountains + sky. River is still a bright blue strip with mint bush lumps. Ground is a pale green slab.",
-    "0450": "Same stacked kit. Forest wall is real. Cabin, fence, red cart readable. Water still tape-blue.",
-    "0900": "Same wide south view. Low-poly game layout, not a cinematic valley."
+    "0001": "Village + pine wall + mountains + sky. River is a dark ribbon that now reads as a path. Pale green slab. Pale bush lumps remain.",
+    "0450": "Same stacked kit. Dark grey foreground strip, not water. Forest wall is real.",
+    "0900": "Same wide south view. Still a low-poly layout, not a cinematic valley."
   },
   "whatImprovedVersusRejectedCabinOrbit": [
-    "Pine copies are a real forest wall behind the village (unparented into world space)",
-    "Foliage-alpha clip no longer punches neon tips on pine atlases",
+    "Pine copies are a real forest wall behind the village",
     "Cabin01 albedo, fence, and cart are visible",
-    "Village mix is 4 Cabin*A + trees + cart/gate/fence",
+    "River is no longer tape-blue; it is now too dark and reads as a path",
     "Louis mountains and daylight sk2 sky remain in frame"
   ],
   "rejectionMatches": [
     "still reads as an asset test, not a finished cinematic shot",
     "flat pale-green ground, not a valley meadow",
-    "river reads as a bright blue strip with mint bushes, not water with banks",
-    "forest is a dark rectangular wall, not a layered midground",
-    "every still is almost the same wide south view",
-    "weak atmospheric depth"
+    "river reads as a dark path, not water with banks",
+    "pale bush lumps still line the foreground",
+    "every still is almost the same wide south view"
   ],
-  "honestConclusion": "Forest wall is real. Stills still fail the cinematic gate. Green CI is not visual approval. Paid path idle (0 pods). Do not CREATE. Do not present as approval.",
+  "honestConclusion": "Forest wall is real. Stills still fail. Green CI is not visual approval. Paid path idle (0 pods). Do not CREATE. Do not present as approval.",
   "paidRenderAuthorized": false,
   "paidProgressCheck": {
     "checkedAt": "2026-08-28T16:39:20Z",
-    "paidWorkflowLatest": "failed 2026-08-28T11:28:31Z, none running",
-    "bridgeStartup": "stale RUNNING frame 248/900 at 2026-08-28T15:29:20Z",
     "activeExactNamePods": 0,
     "billingCleanupConfirmed": true,
     "createPerformed": false,
     "livePinnedDigest": "sha256:236664936427f47824472df3965e66f42ee061bf5e14fe29921d6d579a3cdf06",
-    "reasonNoCreate": "Look-dev FAIL; live pin is rejected cabin-orbit image; standing auth consumed/wrong identity; green CI is not paid authorization"
+    "reasonNoCreate": "Look-dev FAIL; live pin is rejected cabin-orbit image; green CI is not paid authorization"
   }
 }
