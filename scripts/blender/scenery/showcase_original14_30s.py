@@ -872,8 +872,8 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
 
 def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: float = 140.0) -> tuple[int, str]:
     """Meadow floor with a dirt path. Never Grass01 cards. Keep the TJ_Ground prefix."""
-    img_path = _dirt_or_rock_path(files)
-    source = f'meadow_noise+path+{img_path.name}' if img_path else 'meadow_noise+path'
+    img_path = None
+    source = 'meadow_noise+path'
     bpy.ops.mesh.primitive_plane_add(size=max(90.0, float(size)), location=center)
     ground = bpy.context.object
     ground.name = 'TJ_Ground_ValleyFloor_PurchasedMeadow'
@@ -927,9 +927,9 @@ def _river_water_material() -> bpy.types.Material:
     if bsdf is None:
         return mat
     if 'Base Color' in bsdf.inputs:
-        bsdf.inputs['Base Color'].default_value = (0.04, 0.12, 0.16, 1.0)
+        bsdf.inputs['Base Color'].default_value = (0.03, 0.07, 0.09, 1.0)
     if 'Roughness' in bsdf.inputs:
-        bsdf.inputs['Roughness'].default_value = 0.28
+        bsdf.inputs['Roughness'].default_value = 0.34
     if 'Specular IOR Level' in bsdf.inputs:
         bsdf.inputs['Specular IOR Level'].default_value = 0.55
     if 'Transmission Weight' in bsdf.inputs:
@@ -1688,11 +1688,12 @@ def main() -> int:
         for i, obj in enumerate(members[:len(bank_slots)]):
             root = parent_group([obj], f'TJ_riverbank_{i}_{obj.name}'[:55])
             if root:
-                normalize_group(root, [obj], 3.2, (
+                normalize_group(root, [obj], 2.4, (
                     village_center.x + bank_slots[i][0],
                     village_center.y + bank_slots[i][1],
                     bank_slots[i][2],
                 ))
+            paint_simple_color(obj, f'TJ_BankFlora_{obj.name}', (0.16, 0.24, 0.09), 0.88)
     # Put the stream south of the village so a north-looking 9:16 camera
     # sees water in front of the cabins instead of hidden behind them.
     river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.03), (40.0, 4.4))
@@ -1760,11 +1761,10 @@ def main() -> int:
                 if 'swarm' in obj.name.lower() or 'water' in obj.name.lower():
                     obj.hide_render = True
                     obj.hide_viewport = True
-            extras = scatter_forest_line(live, (village_center.x, village_center.y - 11.4, 0.0), 10, 34.0, 1.1, 0.7)
-            extras += scatter_forest_line(live, (village_center.x, village_center.y - 8.2, 0.0), 10, 34.0, 1.1, 0.7)
+            extras = scatter_forest_line(live, (village_center.x, village_center.y - 11.4, 0.0), 8, 32.0, 1.0, 0.55)
+            extras += scatter_forest_line(live, (village_center.x, village_center.y - 8.2, 0.0), 8, 32.0, 1.0, 0.55)
             for obj in extras:
-                if not any(material_has_valid_image(slot.material) for slot in obj.material_slots):
-                    paint_simple_color(obj, f'TJ_RiverRock_{obj.name}', (0.28, 0.22, 0.16), 0.86)
+                paint_simple_color(obj, f'TJ_RiverRock_{obj.name}', (0.26, 0.20, 0.14), 0.88)
             members.extend(extras)
             # Keep authored rock materials. Only bind when a mesh has nothing.
             bound = bind_purchased_textures(live, files)
