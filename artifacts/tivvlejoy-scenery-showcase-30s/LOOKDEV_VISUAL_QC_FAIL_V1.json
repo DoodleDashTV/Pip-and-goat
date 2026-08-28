@@ -32,9 +32,20 @@
   "honestConclusion": "Local look-dev stills still fail the visual gate. Green CI is not visual approval. Paid path is idle (0 pods). Do not CREATE. Do not present as approval.",
   "paidRenderAuthorized": false,
   "paidProgressCheck": {
+    "checkedAt": "2026-08-28T16:28:50Z",
+    "paidWorkflowLatest": "failed 2026-08-28T11:28:31Z, none running",
+    "bridgeStartup": "stale RUNNING frame 248/900 at 2026-08-28T15:29:20Z",
+    "bridgeStatus": null,
+    "downloadUrl": null,
     "activeExactNamePods": 0,
-    "billingCleanupConfirmed": true,
-    "createPerformed": false,
+    "restPodCount": 0,
+    "cleanup": {
+      "matchedBefore": 0,
+      "terminatedCount": 0,
+      "remainingActiveExactName": 0,
+      "billingCleanupConfirmed": true,
+      "createPerformed": false
+    },
     "livePinnedDigest": "sha256:236664936427f47824472df3965e66f42ee061bf5e14fe29921d6d579a3cdf06",
     "reasonNoCreate": "Look-dev FAIL; live pin is rejected cabin-orbit image; standing auth consumed/wrong identity; green CI is not paid authorization"
   }
