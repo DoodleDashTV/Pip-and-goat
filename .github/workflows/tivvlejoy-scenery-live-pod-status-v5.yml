@@ -1,3 +1,4 @@
+# Read-only V5 observation refresh 2. Never creates or terminates a Pod.
 name: TivvleJoy Scenery Live Pod Status V5
 
 on:
