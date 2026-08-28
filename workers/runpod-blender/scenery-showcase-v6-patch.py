@@ -5,7 +5,7 @@ from pathlib import Path
 # visible use of background/village-texture roles.
 
 roles = Path('/opt/ddp-worker/src/scenery-showcase-roles.js')
-roles.write_text(r'''\'use strict\';
+roles.write_text(r"""'use strict';
 
 // V6 purchased-scenery selector. Keep the V5 dry-proof contract at exactly
 // ten roles while preferring original private source packages over expanded
@@ -24,83 +24,52 @@ const REQUIRED_ROLES = [
 ];
 
 const ROLE_RULES = {
-  mountain_geometry: {
-    include: [/3dt.*mountain/i, /mountain.*pack/i, /mountains.*glb/i],
-    prefer: [/\\.glb$/i, /blender\\.zip$/i, /fbx.*textures\\.zip$/i],
-    exclude: [/ue5/i, /background/i],
-  },
-  background_mountains: {
-    include: [/louisbgmountains/i, /background.*mountain/i],
-    prefer: [/\\.zip$/i, /\\.blend$/i, /\\.fbx$/i],
-  },
-  forest_geometry: {
-    include: [/stylized.*forest/i, /stylised.*ecokit/i, /forest.*nature.*kit/i, /ecokit/i],
-    prefer: [/\\.zip$/i, /\\.blend$/i, /\\.fbx$/i, /\\.glb$/i],
-    exclude: [/4096|2048|1024/i],
-  },
-  forest_textures: {
-    include: [/4096/i, /forest.*texture/i, /rocks_[ab]/i, /foliage_0[12]/i],
-    prefer: [/4096.*\\.zip$/i, /\\.zip$/i],
-  },
-  village_geometry: {
-    include: [/village.*fbx/i, /village.*blender/i, /assembled.*project.*\\.blend/i, /source\\/village/i],
-    prefer: [/village.*fbx.*\\.zip$/i, /assembled.*\\.blend$/i, /blender.*\\.zip$/i],
-    exclude: [/texture/i, /unity/i],
-  },
-  village_textures: {
-    include: [/village.*texture/i],
-    prefer: [/\\.zip$/i],
-  },
-  tavern_geometry: {
-    include: [/stylized.*tavern.*interior.*\\.blend/i, /stylized.*tavern.*package.*\\.fbx/i, /tavern/i],
-    prefer: [/\\.blend$/i, /\\.fbx$/i, /\\.blend\\.zip$/i, /package\\.zip$/i],
-    exclude: [/texture/i],
-  },
-  sky_hdri: {
-    include: [/(^|\\/)sk1\\.zip$/i, /hdri.*jpg.*pack/i, /sky.*hdri/i, /\\.hdr$/i],
-    prefer: [/sk1\\.zip$/i, /\\.hdr$/i, /hdri.*\\.zip$/i],
-  },
-  sky_machine: {
-    include: [/skymachinev2/i, /sky.*machine.*v2/i],
-    prefer: [/skymachinev2\\.zip$/i, /\\.blend$/i],
-  },
-  world_shaders: {
-    include: [/world.*shaders/i, /giveaway.*world/i, /physical[_ -]?starlight[_ -]?atmosphere-1\\.9\\.4/i, /gaffer 3\\.2\\.10/i],
-    prefer: [/world.*shaders.*\\.zip$/i, /physical.*1\\.9\\.4.*\\.zip$/i, /gaffer 3\\.2\\.10.*\\.zip$/i],
-  },
+  mountain_geometry: { include: ['3dt', 'mountain'], any: ['mountain pack', 'mountains.glb'], exclude: ['ue5', 'background'] },
+  background_mountains: { any: ['louisbgmountains', 'background mountain', 'background_mountain', 'background-mountain'] },
+  forest_geometry: { any: ['stylized forest', 'stylized_forest', 'stylised ecokit', 'stylised_ecokit', 'forest nature kit', 'forest_nature_kit', 'ecokit'], exclude: ['4096', '2048', '1024'] },
+  forest_textures: { any: ['4096', 'forest texture', 'forest_texture', 'rocks_a', 'rocks_b', 'foliage_01', 'foliage_02'] },
+  village_geometry: { any: ['village (fbx)', 'village_fbx', 'village (blender', 'village_blender', 'assembled project', '/source/village'], exclude: ['texture', 'unity'] },
+  village_textures: { any: ['village (textures)', 'village texture', 'village_texture'] },
+  tavern_geometry: { any: ['stylized tavern', 'stylized_tavern', 'tavern'], exclude: ['texture'] },
+  sky_hdri: { any: ['/sk1.zip', 'sk1.zip', 'hdri_jpg_pack', 'hdri jpg pack', 'sky hdri', '.hdr'] },
+  sky_machine: { any: ['skymachinev2', 'sky machine v2', 'sky_machine_v2'] },
+  world_shaders: { any: ['world shaders', 'world_shaders', 'giveaway_world', 'giveaway world', 'physical starlight atmosphere', 'gaffer 3.2.10'] },
 };
 
+function lower(v) { return String(v || '').toLowerCase(); }
+
 function isCommercialSceneryCandidate(item) {
-  const k = String(item?.key || '').toLowerCase();
+  const k = lower(item && item.key);
   if (!k.startsWith('tivvlejoy-assets')) return false;
-  if (/\\/characters\\//.test(k)) return false;
-  if (/\\/executions\\//.test(k)) return false;
-  if (/\\/qa\\//.test(k)) return false;
-  if (/receipt\\.json$|status\\.json$|manifest\\.json$|\\.part\\b/.test(k)) return false;
+  if (k.includes('/characters/') || k.includes('/executions/') || k.includes('/qa/')) return false;
+  if (k.endsWith('receipt.json') || k.endsWith('status.json') || k.endsWith('manifest.json') || k.includes('.part')) return false;
+  return Number(item && item.size || 0) > 0;
+}
+
+function matchesRule(key, rule) {
+  const k = lower(key);
+  if ((rule.exclude || []).some((x) => k.includes(x))) return false;
+  if (rule.include && !rule.include.every((x) => k.includes(x))) {
+    if (!(rule.any || []).some((x) => k.includes(x))) return false;
+  }
+  if (!rule.include && !(rule.any || []).some((x) => k.includes(x))) return false;
   return true;
 }
 
-function roleMaxBytes(rule) {
-  return Number(rule.maxBytes || 1500 * 1024 * 1024);
-}
-
 function score(item, role, rule) {
-  const key = String(item.key || '');
-  if (rule.exclude && rule.exclude.some((rx) => rx.test(key))) return -Infinity;
-  if (!rule.include.some((rx) => rx.test(key))) return -Infinity;
-  if (Number(item.size || 0) > roleMaxBytes(rule)) return -Infinity;
+  const key = lower(item.key);
+  if (!matchesRule(key, rule)) return -Infinity;
+  const size = Number(item.size || 0);
+  if (size <= 0 || size > 1500 * 1024 * 1024) return -Infinity;
   let value = 100;
-  for (let i = 0; i < (rule.prefer || []).length; i += 1) {
-    if (rule.prefer[i].test(key)) value += 80 - i * 8;
-  }
-  if (/\\/source\\//i.test(key)) value += 180;
-  if (/showcase-compat|wrapper|backup|historical|ue5/i.test(key)) value -= 90;
-  if (/\\.blend$/i.test(key)) value += 32;
-  if (/\\.glb$/i.test(key)) value += 30;
-  if (/\\.fbx$/i.test(key)) value += 28;
-  if (/\\.zip$/i.test(key)) value += 16;
-  const sizeMb = Math.max(1, Number(item.size || 0) / (1024 * 1024));
-  value += Math.min(12, Math.log2(sizeMb));
+  // Prefer the original purchased source package over expanded/compat copies.
+  if (key.includes('/source/')) value += 180;
+  if (key.includes('showcase-compat') || key.includes('wrapper') || key.includes('backup') || key.includes('historical') || key.includes('ue5')) value -= 90;
+  if (key.endsWith('.blend')) value += 32;
+  if (key.endsWith('.glb')) value += 30;
+  if (key.endsWith('.fbx')) value += 28;
+  if (key.endsWith('.zip')) value += 16;
+  const sizeMb = Math.max(1, size / (1024 * 1024));
   value -= Math.min(110, Math.log2(sizeMb) * 8);
   return value;
 }
@@ -126,7 +95,7 @@ function selectAssets(items, options = {}) {
       });
     }
     usedKeys.add(inspection.choice.key);
-    const { score: _score, used: _used, ...choice } = inspection.choice;
+    const { score: ignoredScore, used: ignoredUsed, ...choice } = inspection.choice;
     selected.push({ role, ...choice });
   }
   const totalBytes = selected.reduce((sum, item) => sum + Number(item.size || 0), 0);
@@ -159,7 +128,7 @@ function trySelectAssets(items, options = {}) {
 }
 
 module.exports = { REQUIRED_ROLES, ROLE_RULES, isCommercialSceneryCandidate, inspectRole, selectAssets, trySelectAssets };
-''', encoding='utf-8')
+""", encoding='utf-8')
 
 worker = Path('/opt/ddp-worker/src/scenery-showcase.js')
 text = worker.read_text(encoding='utf-8')
