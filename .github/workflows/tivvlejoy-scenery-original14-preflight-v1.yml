@@ -31,12 +31,24 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$RUNPOD_API_KEY"
-          code=$(curl --retry 8 --retry-all-errors --retry-delay 3 --max-time 90 -sS -o preflight.json -w '%{http_code}' \
-            --request POST "$BRIDGE_URL" \
-            --header 'content-type: application/json' \
-            --header "x-tivvlejoy-scenery-authorization: $SCENERY_AUTHORIZATION" \
-            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
-            --data '{"action":"preflight"}')
+          code=""
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            code=$(curl --retry 4 --retry-all-errors --retry-delay 2 --max-time 90 -sS -o preflight.json -w '%{http_code}' \
+              --request POST "$BRIDGE_URL" \
+              --header 'content-type: application/json' \
+              --header "x-tivvlejoy-scenery-authorization: $SCENERY_AUTHORIZATION" \
+              --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+              --data '{"action":"preflight"}')
+            if [ "$code" = '200' ]; then
+              break
+            fi
+            err=$(python3 -c "import json; print(json.load(open('preflight.json')).get('error') or '')")
+            echo "preflight_attempt=${attempt} http=${code} error=${err}"
+            case "$err" in
+              ORIGINAL14_TEMPLATE_IMAGE_MISMATCH|ORIGINAL14_TEMPLATE_NAME_MISMATCH) sleep 8 ;;
+              *) break ;;
+            esac
+          done
           cat preflight.json
           test "$code" = '200'
           python3 - <<'PY'
