@@ -1,0 +1,28 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:12:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "66edbc1",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev22",
+  "shots": {
+    "SHOT_01": "FAIL — river is still a light-blue thread across the establish.",
+    "SHOT_02": "PARTIAL — along-river shot; channel looks slightly recessed with grain. Still a blue winding path, not water.",
+    "SHOT_03": "PARTIAL — forest frame from earlier passes.",
+    "SHOT_04": "PARTIAL — street holds.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "PARTIAL — street readable."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Darker ripples did not make SHOT_02 read as water. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
