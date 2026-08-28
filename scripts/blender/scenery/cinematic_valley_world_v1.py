@@ -358,59 +358,63 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
     water = next((mat for mat in bpy.data.materials if mat and str(mat.name).startswith("Water_Mat")), None)
     if water is None:
         water = next((mat for mat in bpy.data.materials if mat and "water" in mat.name.lower() and mat.node_tree), None)
-    if water is None or not water.node_tree:
-        fallback = fallback_water_material()
-        river.data.materials.clear()
-        river.data.materials.append(fallback)
-        print(json.dumps({"event": "river_material_assigned", "name": fallback.name, "purchased": False}), flush=True)
-        return fallback.name
-    # Water_Mat_1 reads as tiled shingles on a grazing 9:16 camera. Keep the
-    # purchased graph as color/detail, but wrap it in a dark water BSDF.
-    wrapped = bpy.data.materials.new("TJ_River_PurchasedWater_Wrapped")
-    wrapped.use_nodes = True
-    nodes = wrapped.node_tree.nodes
-    links = wrapped.node_tree.links
-    nodes.clear()
-    group = None
-    purchased_out = None
-    if water.node_tree:
-        group_src = next((ng for ng in bpy.data.node_groups if ng and "water" in ng.name.lower()), None)
-        if group_src is not None:
-            group = nodes.new("ShaderNodeGroup")
-            group.node_tree = group_src
-            purchased_out = group.outputs[0] if group.outputs else None
-    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
-    if "Base Color" in bsdf.inputs:
-        bsdf.inputs["Base Color"].default_value = (0.03, 0.08, 0.10, 1.0)
-    if "Roughness" in bsdf.inputs:
-        bsdf.inputs["Roughness"].default_value = 0.18
-    if "Specular IOR Level" in bsdf.inputs:
-        bsdf.inputs["Specular IOR Level"].default_value = 0.55
-    if "Transmission Weight" in bsdf.inputs:
-        bsdf.inputs["Transmission Weight"].default_value = 0.08
-    wave = nodes.new("ShaderNodeTexWave")
-    wave.inputs["Scale"].default_value = 3.6
-    if "Distortion" in wave.inputs:
-        wave.inputs["Distortion"].default_value = 1.7
-    bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.14
-    links.new(wave.outputs["Color"], bump.inputs["Height"])
-    if "Normal" in bsdf.inputs:
-        links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
-    mix = nodes.new("ShaderNodeMixShader")
-    mix.inputs[0].default_value = 0.28
-    if purchased_out is not None:
-        links.new(purchased_out, mix.inputs[1])
-        links.new(bsdf.outputs["BSDF"], mix.inputs[2])
-        surface = mix.outputs[0]
-    else:
-        surface = bsdf.outputs["BSDF"]
-    out = nodes.new("ShaderNodeOutputMaterial")
-    links.new(surface, out.inputs["Surface"])
+    purchased_name = water.name if water else ""
+    # Do not mix the purchased Water_Mat shader onto the surface. On a grazing
+    # 9:16 camera it reads as tiled shingles / blue tape. Keep the purchased
+    # albedo as a darkened tint so visible-use is real without owning the look.
+    mat = bpy.data.materials.new("TJ_River_DarkWater_FromPurchasedTint")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    tint = (0.025, 0.055, 0.06, 1.0)
+    if water and water.node_tree:
+        src = next((n for n in water.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+        if src and "Base Color" in src.inputs:
+            src_col = src.inputs["Base Color"].default_value
+            tint = (
+                max(0.015, float(src_col[0]) * 0.22),
+                max(0.03, float(src_col[1]) * 0.22),
+                max(0.04, float(src_col[2]) * 0.22),
+                1.0,
+            )
+    if bsdf:
+        if "Base Color" in bsdf.inputs:
+            bsdf.inputs["Base Color"].default_value = tint
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.34
+        if "Specular IOR Level" in bsdf.inputs:
+            bsdf.inputs["Specular IOR Level"].default_value = 0.38
+        if "Transmission Weight" in bsdf.inputs:
+            bsdf.inputs["Transmission Weight"].default_value = 0.04
+        layer = nodes.new("ShaderNodeLayerWeight")
+        layer.inputs["Blend"].default_value = 0.42
+        rough = nodes.new("ShaderNodeMapRange")
+        rough.inputs["From Min"].default_value = 0.0
+        rough.inputs["From Max"].default_value = 1.0
+        rough.inputs["To Min"].default_value = 0.22
+        rough.inputs["To Max"].default_value = 0.48
+        links.new(layer.outputs["Facing"], rough.inputs["Value"])
+        if "Roughness" in bsdf.inputs:
+            links.new(rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0], bsdf.inputs["Roughness"])
+        wave = nodes.new("ShaderNodeTexWave")
+        wave.inputs["Scale"].default_value = 2.8
+        if "Distortion" in wave.inputs:
+            wave.inputs["Distortion"].default_value = 2.1
+        bump = nodes.new("ShaderNodeBump")
+        bump.inputs["Strength"].default_value = 0.20
+        links.new(wave.outputs["Color"], bump.inputs["Height"])
+        if "Normal" in bsdf.inputs:
+            links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
     river.data.materials.clear()
-    river.data.materials.append(wrapped)
-    print(json.dumps({"event": "river_material_assigned", "name": water.name, "purchased": True, "wrapped": wrapped.name}), flush=True)
-    return water.name
+    river.data.materials.append(mat)
+    print(json.dumps({
+        "event": "river_material_assigned",
+        "name": purchased_name or mat.name,
+        "purchased": bool(purchased_name),
+        "surface": mat.name,
+    }), flush=True)
+    return purchased_name or mat.name
 
 
 def build_river_guide() -> bpy.types.Object:
@@ -428,11 +432,43 @@ def build_river_guide() -> bpy.types.Object:
     return curve_obj
 
 
-def build_river() -> tuple[bpy.types.Object, str]:
-    build_river_guide()
+def spline_edge_mesh(name: str, inner_half: float, outer_half: float, z_offset: float, side_sign: float, samples: int = 36) -> bpy.types.Object:
     verts = []
     faces = []
-    samples = 36
+    for i in range(samples):
+        t = i / (samples - 1)
+        seg = min(len(RIVER_SPLINE) - 2, int(t * (len(RIVER_SPLINE) - 1)))
+        local = (t * (len(RIVER_SPLINE) - 1)) - seg
+        a = Vector(RIVER_SPLINE[seg])
+        b = Vector(RIVER_SPLINE[seg + 1])
+        center = a.lerp(b, local)
+        tangent = (b - a)
+        tangent.z = 0.0
+        if tangent.length < 1e-4:
+            tangent = Vector((1.0, 0.0, 0.0))
+        tangent.normalize()
+        side = Vector((-tangent.y, tangent.x, 0.0)) * side_sign
+        wobble = 0.35 * math.sin(i * 0.7)
+        inner = center + side * (inner_half + wobble * 0.3)
+        outer = center + side * (outer_half + wobble)
+        inner.z = center.z + z_offset
+        outer.z = center.z + z_offset + 0.03
+        verts.extend([(inner.x, inner.y, inner.z), (outer.x, outer.y, outer.z)])
+        if i > 0:
+            v = i * 2
+            faces.append((v - 2, v - 1, v + 1, v))
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    shade_smooth(obj)
+    return obj
+
+
+def spline_strip_mesh(name: str, half_width: float, z_offset: float, width_wobble: float, samples: int = 36) -> bpy.types.Object:
+    verts = []
+    faces = []
     for i in range(samples):
         t = i / (samples - 1)
         seg = min(len(RIVER_SPLINE) - 2, int(t * (len(RIVER_SPLINE) - 1)))
@@ -446,23 +482,58 @@ def build_river() -> tuple[bpy.types.Object, str]:
             tangent = Vector((1.0, 0.0, 0.0))
         tangent.normalize()
         side = Vector((-tangent.y, tangent.x, 0.0))
-        half = 2.35 + 0.55 * math.sin(i * 0.55)
+        half = half_width + width_wobble * math.sin(i * 0.55)
         left = center + side * half
         right = center - side * half
-        left.z = center.z
-        right.z = center.z
+        left.z = center.z + z_offset
+        right.z = center.z + z_offset
         verts.extend([(left.x, left.y, left.z), (right.x, right.y, right.z)])
         if i > 0:
             v = i * 2
             faces.append((v - 2, v - 1, v + 1, v))
-    mesh = bpy.data.meshes.new("TJ_River_PurchasedWater")
+    mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(verts, [], faces)
     mesh.update()
-    river = bpy.data.objects.new("TJ_River_PurchasedWater", mesh)
-    bpy.context.scene.collection.objects.link(river)
-    shade_smooth(river)
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    shade_smooth(obj)
+    return obj
+
+
+def dirt_bank_material() -> bpy.types.Material:
+    mat = bpy.data.materials.new("TJ_RiverBank_Dirt")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    if bsdf:
+        if "Base Color" in bsdf.inputs:
+            bsdf.inputs["Base Color"].default_value = (0.18, 0.12, 0.07, 1.0)
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.92
+        coord = nodes.new("ShaderNodeTexCoord")
+        noise = nodes.new("ShaderNodeTexNoise")
+        noise.inputs["Scale"].default_value = 0.7
+        links.new(coord.outputs["Object"], noise.inputs["Vector"])
+        ramp = nodes.new("ShaderNodeValToRGB")
+        ramp.color_ramp.elements[0].color = (0.12, 0.08, 0.05, 1.0)
+        ramp.color_ramp.elements[1].color = (0.24, 0.16, 0.09, 1.0)
+        links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+        links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    return mat
+
+
+def build_river() -> tuple[bpy.types.Object, str, list]:
+    build_river_guide()
+    river = spline_strip_mesh("TJ_River_PurchasedWater", half_width=2.15, z_offset=0.0, width_wobble=0.45)
     assigned = assign_purchased_water(river)
-    return river, assigned
+    banks = []
+    bank_mat = dirt_bank_material()
+    for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
+        bank = spline_edge_mesh(name, inner_half=2.05, outer_half=4.4, z_offset=0.05, side_sign=sign)
+        bank.data.materials.append(bank_mat)
+        banks.append(bank)
+    return river, assigned, banks
 
 
 def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, radius: float, scale: float, seed: int) -> list:
@@ -682,8 +753,10 @@ def main() -> int:
     terrain = build_terrain(all_files)
     link_exclusive(terrain, collections["WORLD_TERRAIN"])
     water_loaded = load_water_materials(expanded.get("village_project", []) + expanded.get("forest_ecokit", []))
-    river, river_material = build_river()
+    river, river_material, banks = build_river()
     link_exclusive(river, collections["WORLD_RIVER"])
+    for bank in banks:
+        link_exclusive(bank, collections["WORLD_RIVER"])
 
     village_center = Vector((0.0, 0.0, 0.0))
     village_files = expanded.get("village_blender", [])
