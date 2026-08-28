@@ -1,17 +1,15 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T16:21:00Z",
+  "inspectedAt": "2026-08-28T16:22:30Z",
   "engine": "CYCLES_CPU",
   "resolution": "360x640",
   "samples": 16,
-  "commit": "971f7d4",
-  "stillsDir": "/tmp/o14-lookdev/stills11",
+  "commit": "ca11c93",
+  "stillsDir": "/tmp/o14-lookdev/stills12",
   "stills": {
-    "0001": "Sky + jagged mountains + cabin cluster + fence/cart. River is still a blue strip. Ground is a flat green plane. A few pines, not a forest wall.",
-    "0150": "Same stacked valley, still an asset layout. River rectangle and slab floor remain.",
-    "0450": "Cabin three-quarter with fence and red cart. No layered forest midground. Not a journey beat.",
-    "0750": "Same wide south view as the other frames. Trees sit on the slab; roofs still crush dark.",
+    "0001": "Sky + jagged mountains + cabin cluster + fence/cart. River is still a blue strip. Ground is a flat green plane. Pines exist behind the cabins but do not read as a forest wall.",
+    "0450": "Same stacked valley. A row of pines sits behind the cabin. River rectangle and slab floor remain.",
     "0900": "Village + mountains + sky in one 9:16 frame, but it still reads as a kit test."
   },
   "whatImprovedVersusRejectedCabinOrbit": [
