@@ -60,11 +60,16 @@ RIVER_SPLINE = (
     (34.0, -16.6, -0.64),
     (42.0, -19.0, -0.62),
 )
-# Two-layer channel: dark bed under a thin water film. Do not paint water onto the meadow.
-WATER_SURFACE_Z = -0.10
-WATER_HALF_WIDTH = 1.55
-BANK_HALF_WIDTH = 4.40
-BED_BELOW_WATER = 0.18
+# Camera-scale creek. Dark bed + 3D banks are the silhouette; water is a narrow film.
+WATER_SURFACE_Z = -1.15
+WATER_HALF_WIDTH = 5.40
+BANK_HALF_WIDTH = 9.50
+BED_BELOW_WATER = 0.40
+BED_CENTER_Z = -1.62
+BED_SHOULDER_Z = -0.58
+BANK_CREST_Z = 0.62
+WATER_WIDTH_SCALE = 0.30
+BED_WIDTH_SCALE = 0.86
 VILLAGE_X_HALF = 16.0
 VILLAGE_Y_MIN = -8.0
 VILLAGE_Y_MAX = 22.0
@@ -92,6 +97,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stills-frames", default="")
     parser.add_argument("--engine", default="")
     parser.add_argument("--profile", default="LOOKDEV_FAST")
+    parser.add_argument("--hide-water", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -149,11 +155,20 @@ def channel_profile(x: float, y: float, points=RIVER_SPLINE) -> tuple[float, flo
             signed = dist if cross >= 0.0 else -dist
             along = acc + t * length
         acc += length
-    left = 1.20 + 0.95 * math.sin(along * 0.17) + 0.42 * math.sin(along * 0.43)
-    right = 1.08 + 1.08 * math.sin(along * 0.15 + 1.4) + 0.48 * math.cos(along * 0.39)
-    left = max(0.82, min(2.85, left))
-    right = max(0.82, min(2.85, right))
+    # left=south (camera side, wide pools). right=north (village side, tighter).
+    pool = 0.55 + 0.45 * math.sin(along * 0.09)
+    pinch = 0.62 + 0.38 * math.sin(along * 0.21 + 0.7)
+    left = 5.4 + 2.2 * pool + 1.05 * math.sin(along * 0.29)
+    right = 2.7 + 1.15 * pinch + 0.45 * math.cos(along * 0.27)
+    left = max(4.0, min(8.2, left))
+    right = max(2.1, min(4.4, right))
     return best, signed, along, left, right
+
+
+def in_river_channel(x: float, y: float, margin: float = 0.0) -> bool:
+    dist, signed, _along, left, right = channel_profile(x, y)
+    local = left if signed < 0.0 else right
+    return dist < local + margin
 
 
 def channel_half_at(x: float, y: float) -> float:
@@ -230,8 +245,40 @@ def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, 
     return chosen
 
 
+def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
+    """Carved creek: deep trough, wide wet shelf, irregular 3D banks."""
+    dist, signed, along, left_half, right_half = channel_profile(x, y)
+    local = left_half if signed < 0.0 else right_half
+    south = signed < 0.0
+    crest_wobble = 0.18 * math.sin(along * 0.21 + x * 0.19) + 0.08 * math.sin(x * 0.73)
+    bank_run = (2.55 if south else 1.45) + 0.50 * math.sin(along * 0.33 + (0.0 if south else 1.4))
+    water_half = local * 0.34
+    bed_half = local * 0.90
+    bank_outer = local + bank_run
+    pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
+    center_z = BED_CENTER_Z - pool
+    shoulder_z = BED_SHOULDER_Z + 0.07 * math.sin(along * 0.23)
+    crest_z = BANK_CREST_Z + crest_wobble + (0.14 if south else 0.04)
+    if dist >= bank_outer:
+        return meadow_z
+    if dist < water_half:
+        t = dist / max(0.12, water_half)
+        return center_z + (shoulder_z - center_z) * (t ** 1.55)
+    if dist < bed_half:
+        t = (dist - water_half) / max(0.16, bed_half - water_half)
+        irreg = 0.08 * math.sin(x * 0.81 + y * 0.54) + 0.05 * math.sin(along * 0.67)
+        return shoulder_z + 0.20 * (t ** 1.35) + irreg
+    t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
+    shelf = shoulder_z + 0.20
+    if t < 0.40:
+        u = t / 0.40
+        return shelf + (crest_z - shelf) * (u ** 0.70)
+    u = (t - 0.40) / 0.60
+    return crest_z + (meadow_z - crest_z) * (u ** 1.20)
+
+
 def build_terrain(_files: list[Path]) -> bpy.types.Object:
-    bpy.ops.mesh.primitive_grid_add(x_subdivisions=260, y_subdivisions=260, size=180.0, location=(0.0, 8.0, 0.0))
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=320, y_subdivisions=320, size=180.0, location=(0.0, 8.0, 0.0))
     ground = bpy.context.object
     ground.name = "TJ_Ground_ValleyCarrier"
     try:
@@ -245,23 +292,13 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         if y < -6.0:
             height += 0.38 * math.sin(x * 0.075) * math.cos(y * 0.10)
             height += 0.16 * math.sin(x * 0.29 + y * 0.17)
-        river_dist, _signed, along, left_half, right_half = channel_profile(x, y)
+        if y < -20.0:
+            height += 0.20
+        river_dist, _signed, _along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if _signed < 0.0 else right_half
-        bank_wobble = 0.55 * math.sin(along * 0.29 + x * 0.11)
-        lip = local_half * 0.90
-        bank_half = local_half + 2.6 + bank_wobble
-        depth = 0.12 + 0.10 * (0.5 + 0.5 * math.sin(along * 0.13))
-        bed_z = WATER_SURFACE_Z - 0.08 - depth
-        if river_dist < lip:
-            # Deeper in the center so the film can show a dark bed, not a painted path.
-            center = 1.0 - min(1.0, river_dist / max(0.35, lip)) ** 1.35
-            height = bed_z - 0.06 * center
-        else:
-            rise = min(1.0, (river_dist - lip) / max(0.55, bank_half - lip))
-            smooth = rise * rise * (3.0 - 2.0 * rise)
-            height = bed_z + (height - bed_z) * smooth
-        pad = 1.0
-        if in_village(x, y) and river_dist > bank_half:
+        bank_outer = local_half + (2.55 if _signed < 0.0 else 1.45) + 0.50
+        height = sculpt_channel_height(x, y, height)
+        if in_village(x, y) and river_dist > bank_outer:
             edge = min(
                 (VILLAGE_X_HALF - abs(x)) / 4.0,
                 (y - VILLAGE_Y_MIN) / 3.0,
@@ -269,7 +306,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             )
             pad = max(0.68, 1.0 - max(0.0, min(1.0, edge)) * 0.32)
             height *= pad
-        vert.co.z = height
+        vert.co.z = max(BED_CENTER_Z - 0.28, min(2.8, height))
     paint_wet_bank_mask(ground)
     ground.data.update()
     shade_smooth(ground)
@@ -392,7 +429,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
 
 
 def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
-    """Wet-earth band on the shoreline only. Water itself is a separate mesh."""
+    """Dark wet bed + lower-bank earth on the terrain itself. Visible with water hidden."""
     mesh = ground.data
     try:
         color = mesh.color_attributes.new(name="TJ_RiverMask", type="FLOAT_COLOR", domain="POINT")
@@ -401,15 +438,15 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
     if color is None:
         return
     for index, vert in enumerate(mesh.vertices):
-        dist, _signed, _along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
-        local_half = left_half if _signed < 0.0 else right_half
-        inner = local_half * 0.88
-        outer = local_half + 2.4
-        if dist < inner:
-            value = 0.0
-        elif dist < outer:
-            t = (dist - inner) / max(0.4, outer - inner)
-            value = math.sin(min(1.0, max(0.0, t)) * math.pi) * 0.88
+        dist, signed, along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
+        local_half = left_half if signed < 0.0 else right_half
+        bed = local_half * 0.90
+        bank = local_half + (2.2 if signed < 0.0 else 1.3)
+        if dist < bed:
+            value = 0.72 + 0.26 * (1.0 - min(1.0, dist / max(0.25, bed)))
+        elif dist < bank:
+            t = (dist - bed) / max(0.25, bank - bed)
+            value = 0.62 * (1.0 - t) * (0.75 + 0.25 * math.sin(along * 0.41))
         else:
             value = 0.0
         color.data[index].color = (value, value, value, 1.0)
@@ -430,7 +467,7 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     wet = _mix_rgb(nodes)
     if "Color1" in wet.inputs:
         links.new(incoming, wet.inputs["Color1"])
-        wet.inputs["Color2"].default_value = (0.038, 0.030, 0.016, 1.0)
+        wet.inputs["Color2"].default_value = (0.016, 0.012, 0.007, 1.0)
         mask = attr.outputs.get("Color") or attr.outputs[0]
         links.new(mask, wet.inputs["Fac"])
         for link in list(bsdf.inputs["Base Color"].links):
@@ -462,8 +499,8 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     coord = nodes.new("ShaderNodeTexCoord")
     mix = _mix_rgb(nodes)
     if "Color1" in mix.inputs:
-        mix.inputs["Color1"].default_value = (0.016, 0.014, 0.010, 1.0)
-        mix.inputs["Color2"].default_value = (0.055, 0.042, 0.026, 1.0)
+        mix.inputs["Color1"].default_value = (0.007, 0.006, 0.004, 1.0)
+        mix.inputs["Color2"].default_value = (0.038, 0.028, 0.016, 1.0)
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     if "Roughness" in body.inputs:
@@ -719,16 +756,22 @@ def spline_channel_mesh(
         left *= width_scale
         right *= width_scale
         along_depth = 0.55 + 0.45 * (0.5 + 0.5 * math.sin(i * 0.17))
+        pinch = 0.78 + 0.28 * math.sin(i * 0.13)
         for col, offset in enumerate(offsets):
-            half = left if offset < 0.0 else right
-            point = center + side * (half * abs(offset) * (1.0 if offset >= 0.0 else -1.0))
+            half = (left if offset < 0.0 else right) * pinch
+            edge_noise = 0.0
+            if abs(offset) > 0.72:
+                edge_noise = 0.22 * math.sin(i * 0.37 + col * 1.7) + 0.14 * math.sin(i * 0.19)
+            lateral = half * abs(offset) + edge_noise
+            point = center + side * (lateral * (1.0 if offset >= 0.0 else -1.0))
             edge = abs(offset)
-            point.z = z_center + (z_edge - z_center) * edge
+            z_jit = 0.0 if foam_edges else 0.05 * math.sin(i * 0.29 + col * 0.8)
+            point.z = z_center + (z_edge - z_center) * edge + z_jit
             verts.append((point.x, point.y, point.z))
             if foam_edges:
                 depths.append(min(1.0, edge * edge * 1.15))
             else:
-                depths.append(min(1.0, (1.0 - along_depth * (1.0 - edge)) ))
+                depths.append(min(1.0, (1.0 - along_depth * (1.0 - edge))))
         if i > 0:
             v = i * rows
             prev = v - rows
@@ -799,10 +842,10 @@ def build_broken_bank_patches(centers: list[Vector]) -> list:
         bank = spline_edge_mesh(
             f"TJ_RiverBankPatch_{start}",
             chunk,
-            inner_half=local * 0.92,
-            outer_half=local * 0.92 + 0.85 + 0.25 * math.sin(start * 0.4),
-            z_inner=WATER_SURFACE_Z - 0.03,
-            z_outer=WATER_SURFACE_Z + 0.04,
+            inner_half=local * 0.88,
+            outer_half=local * 0.88 + 1.35 + 0.40 * math.sin(start * 0.4),
+            z_inner=BED_SHOULDER_Z + 0.06,
+            z_outer=BANK_CREST_Z - 0.04,
             side_sign=side_sign,
         )
         bank.data.materials.clear()
@@ -811,16 +854,40 @@ def build_broken_bank_patches(centers: list[Vector]) -> list:
     return patches
 
 
+def build_exposed_soil_lumps(centers: list[Vector]) -> list:
+    """Occasional dark soil/rock patches on the wet bed. Not a continuous outline."""
+    lumps = []
+    mat = dirt_bank_material()
+    for i, center in enumerate(centers):
+        if i % 14 not in {4, 9}:
+            continue
+        left, right = _channel_halves_for_index(centers, i)
+        side = _side_from_centers(centers, i)
+        sign = -1.0 if (i // 14) % 2 == 0 else 1.0
+        half = left if sign < 0.0 else right
+        offset = half * 0.55 * BED_WIDTH_SCALE
+        loc = center + side * (offset * sign)
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.42 + 0.12 * ((i // 7) % 3), location=(loc.x, loc.y, BED_SHOULDER_Z + 0.08))
+        lump = bpy.context.object
+        lump.name = f"TJ_RiverBedLump_{i}"
+        lump.scale = (1.6 + 0.3 * math.sin(i), 1.1, 0.28)
+        lump.data.materials.clear()
+        lump.data.materials.append(mat)
+        shade_smooth(lump)
+        lumps.append(lump)
+    return lumps
+
+
 def build_river() -> tuple[bpy.types.Object, str, list]:
     guide = build_river_guide()
-    centers = evaluated_centerline(guide, samples=160)
+    centers = evaluated_centerline(guide, samples=180)
     bed = spline_channel_mesh(
         "TJ_River_DarkBed",
         centers,
-        width_scale=1.30,
-        z_center=WATER_SURFACE_Z - BED_BELOW_WATER,
-        z_edge=WATER_SURFACE_Z - 0.06,
-        rows=7,
+        width_scale=BED_WIDTH_SCALE,
+        z_center=BED_CENTER_Z + 0.05,
+        z_edge=BED_SHOULDER_Z + 0.04,
+        rows=11,
         foam_edges=False,
     )
     bed.data.materials.clear()
@@ -830,20 +897,25 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     river = spline_channel_mesh(
         "TJ_River_PurchasedWater",
         centers,
-        width_scale=0.56,
+        width_scale=WATER_WIDTH_SCALE,
         z_center=WATER_SURFACE_Z,
-        z_edge=WATER_SURFACE_Z + 0.004,
+        z_edge=WATER_SURFACE_Z + 0.003,
         rows=5,
         foam_edges=True,
     )
     assigned = assign_purchased_water(river)
-    # No continuous bank-outline mesh. Wet margins are the wider dark bed plus terrain.
     extras = [bed]
+    extras.extend(build_broken_bank_patches(centers))
+    extras.extend(build_exposed_soil_lumps(centers))
     print(json.dumps({
-        "event": "two_layer_channel_built",
+        "event": "geometry_first_channel_built",
         "bed": bed.name,
         "film": river.name,
-        "bankPatches": 0,
+        "bedWidthScale": BED_WIDTH_SCALE,
+        "waterWidthScale": WATER_WIDTH_SCALE,
+        "bedCenterZ": BED_CENTER_Z,
+        "bankCrestZ": BANK_CREST_Z,
+        "bankPatches": len(extras) - 1,
         "centers": len(centers),
     }), flush=True)
     return river, assigned, extras
@@ -950,6 +1022,31 @@ def place_purchased_water_gn(files: list[Path], collection: bpy.types.Collection
     return donated
 
 
+def place_bank_crest_trees(trees: list) -> list:
+    """Irregular crest plantings. Never a continuous outline, never in the bed."""
+    extras = []
+    live = [obj for obj in trees if obj and obj.type == "MESH"]
+    if not live:
+        return extras
+    guide = bpy.data.objects.get("TJ_River_SplineGuide")
+    if guide is None:
+        return extras
+    centers = evaluated_centerline(guide, samples=72)
+    for i, center in enumerate(centers):
+        if i % 9 not in {2, 6}:
+            continue
+        left, right = _channel_halves_for_index(centers, i)
+        side = _side_from_centers(centers, i)
+        sign = -1.0 if (i // 9) % 2 == 0 else 1.0
+        half = left if sign < 0.0 else right
+        offset = half + 1.25 + 0.55 * math.sin(i * 0.47)
+        loc = center + side * (offset * sign)
+        if in_village(loc.x, loc.y) or in_river_channel(loc.x, loc.y, margin=0.4):
+            continue
+        extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.24 + 0.16 * ((i * 3) % 4) / 3.0))
+    return extras
+
+
 def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, radius: float, scale: float, seed: int) -> list:
     extras = []
     live = [obj for obj in sources if obj and obj.type == "MESH"]
@@ -971,7 +1068,7 @@ def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, ra
                 continue
             if in_mountain_corridor(loc[0], loc[1]):
                 continue
-            if dist_to_polyline(loc[0], loc[1]) < 6.0:
+            if in_river_channel(loc[0], loc[1], margin=1.6):
                 continue
             if in_shot03_corridor(loc[0], loc[1]):
                 continue
@@ -1184,6 +1281,10 @@ def main() -> int:
     link_exclusive(river, collections["WORLD_RIVER"])
     for bank in banks:
         link_exclusive(bank, collections["WORLD_RIVER"])
+    if args.hide_water:
+        river.hide_render = True
+        river.hide_viewport = True
+        print(json.dumps({"event": "water_hidden_geometry_test", "object": river.name}), flush=True)
     water_gn = place_purchased_water_gn(expanded.get("village_project", []), collections["WORLD_RIVER"])
 
     village_center = Vector((0.0, 0.0, 0.0))
@@ -1309,7 +1410,8 @@ def main() -> int:
         )):
             loc = cam_xy + along * (t * span) + side * offset
             west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
-        west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))
+        if not in_river_channel(-16.5, -7.2, margin=1.2):
+            west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))
         for item in (
             (-17.0, -21.5, 0.82),
             (12.5, -19.0, 0.74),
@@ -1319,12 +1421,15 @@ def main() -> int:
             (-3.5, -23.0, 0.26),
             (6.5, -21.6, 0.30),
             (16.5, -23.2, 0.34),
-            (-15.8, -16.4, 0.38),
-            (-6.2, -15.6, 0.30),
-            (2.4, -16.8, 0.34),
-            (9.6, -15.2, 0.28),
+            (-18.4, -19.6, 0.36),
+            (-4.8, -20.2, 0.28),
+            (3.8, -20.8, 0.32),
+            (11.2, -19.4, 0.26),
         ):
+            if in_river_channel(item[0], item[1], margin=0.8):
+                continue
             west_fg.append(duplicate_mesh_in_world(trees[int(abs(item[0])) % src_count], (item[0], item[1], 0.0), item[2]))
+        west_fg.extend(place_bank_crest_trees(trees))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
     east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
     foreground = west_fg + east_fg
@@ -1418,7 +1523,8 @@ def main() -> int:
         "cameraPath": "six_shot_markers",
         "lighting": "single_key_sun_plus_sky_fill_plus_restrained_bounce",
         "groundSource": "shaped_valley_carrier_purchased_meadow",
-        "riverSource": "two_layer_dark_bed_and_transmissive_film",
+        "riverSource": "geometry_first_carved_channel_dark_bed_narrow_film",
+        "hideWater": bool(args.hide_water),
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
