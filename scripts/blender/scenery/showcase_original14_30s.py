@@ -1132,6 +1132,28 @@ def scatter_purchased_meshes(members: list[bpy.types.Object], origin: tuple, cop
     return extras
 
 
+def scatter_forest_line(members: list[bpy.types.Object], origin: tuple, copies: int, width: float, depth: float) -> list[bpy.types.Object]:
+    """Place a tree wall across the valley, not a ring around the cabins."""
+    extras: list[bpy.types.Object] = []
+    live = [o for o in members if o and o.name in bpy.data.objects and o.type == 'MESH']
+    if not live or copies <= 0:
+        return extras
+    for i in range(copies):
+        src = live[i % len(live)]
+        try:
+            dup = src.copy()
+            dup.data = src.data
+            bpy.context.scene.collection.objects.link(dup)
+            t = (i + 0.37) / max(copies, 1)
+            x = origin[0] + (t - 0.5) * width
+            y = origin[1] + math.sin(i * 1.73) * depth
+            dup.location = Vector((x, y, origin[2]))
+            extras.append(dup)
+        except Exception as exc:
+            print(json.dumps({'event': 'scatter_line_warning', 'error': str(exc)[:180]}), flush=True)
+    return extras
+
+
 def load_support(files: list[Path], role: str) -> int:
     count = 0
     for p in [x for x in files if x.suffix.lower() == '.blend'][:2]:
@@ -1763,9 +1785,9 @@ def main() -> int:
         and 'fbx' not in subject_parent_name(o).lower()
         and 'forest_' not in subject_parent_name(o).lower()
     ]
-    grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 1.5, 0.0), copies=6, radius=9.0)
-    near_band = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 22.0, 0.0), copies=12, radius=17.0)
-    far_band = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 36.0, 0.0), copies=12, radius=16.0)
+    grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 2.0, 0.0), copies=5, radius=8.0)
+    near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 24.0, 0.0), copies=12, width=40.0, depth=4.5)
+    far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 38.0, 0.0), copies=12, width=46.0, depth=5.0)
     forest_band = grove + near_band + far_band
     print(json.dumps({
         'event': 'purchased_image_remap',
