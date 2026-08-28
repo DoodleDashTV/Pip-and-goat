@@ -1,3 +1,4 @@
+# Dormant until the exact V3 authorization artifact is added; no workflow_dispatch or schedule.
 name: TivvleJoy Real Scenery 30s Paid Render V3
 
 on:
@@ -214,8 +215,6 @@ jobs:
               process_seen=1
             fi
 
-            # Healthy container startup should write PROCESS_STARTED immediately. If runtime
-            # exists for ~5 minutes but R2 startup remains absent, fail rather than bill blindly.
             if [ "$runtime_seen" -eq 1 ] && [ "$process_seen" -eq 0 ]; then
               runtime_age_polls=$((i-runtime_first_poll))
               if [ "$runtime_age_polls" -ge 20 ]; then
@@ -224,7 +223,6 @@ jobs:
               fi
             fi
 
-            # 80 polls x 15s = 20 minutes. This is now a provisioning gate, not an image-pull guess.
             if [ "$i" -ge 80 ] && [ "$runtime_seen" -eq 0 ] && [ "$process_seen" -eq 0 ]; then
               echo 'STARTUP_PROVISIONING_WATCHDOG: RunPod never exposed container runtime within 20 minutes.'
               exit 1
