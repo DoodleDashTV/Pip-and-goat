@@ -1,15 +1,15 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T15:59:00Z",
+  "inspectedAt": "2026-08-28T16:03:00Z",
   "engine": "CYCLES_CPU",
   "resolution": "360x640",
   "samples": 16,
-  "commit": "20c7b6e",
+  "commit": "9172e2b",
   "stills": {
-    "0001": "Village cluster and Louis mountains now share one 9:16 frame over a green floor. Still an asset-test layout: tiled ground, crushed roof shadows, a red FBX cabin, white tree, no readable river or layered forest.",
-    "0450": "Close cabin three-quarter. Wood atlas is visible on logs. Roof still crushed-black. Ground is a green slab. No river corridor. A mountain/forest piece clips the upper frame.",
-    "0900": "Cabin hero with mountains behind. Green floor is present (no longer the HDRI void). Harsh shadows, missing river, forest not a midground band, neon tree tips, white tree."
+    "0001": "Village + mountains + sky + a blue stream slab in the foreground. Green tiled floor. White tree. Still an asset test.",
+    "0450": "Cabin close-up; stream barely visible; mountain clip; red FBX cabin remains. Not cinematic.",
+    "0900": "Cabin, stream slab, green floor, mountains. Water reads as a rectangle. Forest still missing as a band."
   },
   "whatImprovedVersusRejectedCabinOrbit": [
     "South-to-north camera puts village + mountains + sky in one frame",
@@ -27,6 +27,14 @@
     "incorrect/broken materials on at least one red cabin and one white tree",
     "weak atmospheric depth"
   ],
-  "honestConclusion": "Local look-dev stills still fail the visual gate. Do not present as approval. Do not start a 900-frame paid render from this composition.",
-  "paidRenderAuthorized": false
+  "honestConclusion": "Local look-dev stills still fail the visual gate. Paid path is idle (0 pods). Do not CREATE. Do not present as approval.",
+  "paidRenderAuthorized": false,
+  "paidProgressCheck": {
+    "activeExactNamePods": 0,
+    "billingCleanupConfirmed": true,
+    "createPerformed": false,
+    "bridgeStartup": "stale RUNNING frame 248 at 2026-08-28T15:29:20Z",
+    "livePinnedDigest": "sha256:236664936427f47824472df3965e66f42ee061bf5e14fe29921d6d579a3cdf06",
+    "reasonNoCreate": "Look-dev FAIL; live pin is rejected cabin-orbit image; standing auth consumed/wrong identity"
+  }
 }
