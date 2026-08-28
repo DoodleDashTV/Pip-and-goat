@@ -1,0 +1,48 @@
+name: TivvleJoy Scenery Live Pod Status V5
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-live-pod-status-v5.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BRIDGE_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s-v5
+      AUTH: TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V5
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - name: Read exact V5 pod status only
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl --max-time 60 -sS -o pod.json -w '%{http_code}' \
+            --request POST "$BRIDGE_URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $AUTH" \
+            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+            --data '{"action":"pod-status"}')
+          cat pod.json
+          test "$code" = '200'
+          python3 - <<'PY'
+          import json
+          p=json.load(open('pod.json'))
+          assert p.get('schema') == 'TIVVLEJOY_SCENERY_POD_STATUS_V5'
+          assert p.get('paidMutationPerformed') is False
+          safe={'exactActiveCount':p.get('exactActiveCount'),'exact':p.get('exact'),'paidMutationPerformed':False}
+          open('pod-safe.json','w').write(json.dumps(safe,indent=2)+'\n')
+          PY
+      - name: Upload sanitized status
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-live-pod-status-v5
+          path: pod-safe.json
+          if-no-files-found: error
+          retention-days: 3
