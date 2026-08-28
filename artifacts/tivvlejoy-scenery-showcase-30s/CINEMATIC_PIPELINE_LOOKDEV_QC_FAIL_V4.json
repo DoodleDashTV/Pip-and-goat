@@ -1,0 +1,46 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:13:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "ac3161b",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev8",
+  "contactSheet": "/opt/cursor/artifacts/tivvlejoy-cinematic-pipeline/CONTACT_SHEET_LOOKDEV_FAST_V4.png",
+  "paidInspect": {
+    "exactNameCount": 0,
+    "createPerformed": false,
+    "bridgeStartupAt": "2026-08-28T15:29:20.189Z",
+    "bridgeFramesWritten": 248,
+    "bridgeStale": true,
+    "livePinRejectedCabinOrbit": true
+  },
+  "architectureProgress": [
+    "Purchased Water_GN_Plane / Water_Mat_1 is now a visible river patch with ripples on SHOT_02",
+    "Project-file leftover flora was hidden after append",
+    "Geometry Nodes on that plane were disabled so SHOT_01 is not a green sheet",
+    "River still reads as a hard-edged water card, not a stream"
+  ],
+  "shots": {
+    "SHOT_01": "FAIL — valley stack is readable (banks, flanks, peaks, sky) but the meadow is still a pale quilt and the river is still a blue ribbon.",
+    "SHOT_02": "FAIL — purchased water ripples are visible; the patch is still a hard-edged floating card with a tape edge.",
+    "SHOT_03": "FAIL — crushed pine silhouette peeking at a cabin, not a forest passage.",
+    "SHOT_04": "FAIL — pad cluster with crushed shadows.",
+    "SHOT_05": "FAIL — peaks only; no village/forest compression.",
+    "SHOT_06": "FAIL — cabin-and-cart pad shot."
+  },
+  "automaticFailuresHit": [
+    "flat_lime_or_pale_green_ground",
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "low_poly_asset_test_appearance",
+    "excessive_noise"
+  ],
+  "eeveeVersusCycles": "EEVEE aborted on this host (missing libEGL). Cycles CPU used for LOOKDEV_FAST.",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "greenCiDoesNotAuthorizePaidCreate": true,
+  "honestConclusion": "Paid path is idle and must stay idle. Purchased water is now on camera, but the images still fail the cinematic visual gate. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
