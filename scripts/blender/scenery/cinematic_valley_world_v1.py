@@ -723,18 +723,28 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         body.inputs["Metallic"].default_value = 0.0
     layer = nodes.new("ShaderNodeLayerWeight")
     layer.inputs["Blend"].default_value = 0.48
-    # SHOT_02 is only ~14deg off the water. Facing-gated transmission stayed
-    # near 0.11 and the film went dead-black. Use a modest constant
-    # transmission so the bed can tint through; IOR 1.0 / specular 0 keep
-    # that from becoming a sky window.
+    lpath = nodes.new("ShaderNodeLightPath")
+    # Camera-to-film distance. Close riverbank cameras can see the bed;
+    # crane / village cameras would otherwise transmit the sky through the
+    # thin plane and turn the creek into a pale ribbon again.
+    dist_trans = nodes.new("ShaderNodeMapRange")
+    dist_trans.inputs["From Min"].default_value = 8.0
+    dist_trans.inputs["From Max"].default_value = 30.0
+    dist_trans.inputs["To Min"].default_value = 0.40
+    dist_trans.inputs["To Max"].default_value = 0.05
+    links.new(lpath.outputs["Ray Length"], dist_trans.inputs["Value"])
     edge_trans = nodes.new("ShaderNodeMapRange")
     edge_trans.inputs["From Min"].default_value = 0.0
     edge_trans.inputs["From Max"].default_value = 1.0
-    edge_trans.inputs["To Min"].default_value = 0.36
-    edge_trans.inputs["To Max"].default_value = 0.20
+    edge_trans.inputs["To Min"].default_value = 1.0
+    edge_trans.inputs["To Max"].default_value = 0.62
     links.new(attr.outputs["Color"], edge_trans.inputs["Value"])
+    trans_mul = nodes.new("ShaderNodeMath")
+    trans_mul.operation = "MULTIPLY"
+    links.new(dist_trans.outputs["Result"] if "Result" in dist_trans.outputs else dist_trans.outputs[0], trans_mul.inputs[0])
+    links.new(edge_trans.outputs["Result"] if "Result" in edge_trans.outputs else edge_trans.outputs[0], trans_mul.inputs[1])
     if "Transmission Weight" in body.inputs:
-        links.new(edge_trans.outputs["Result"] if "Result" in edge_trans.outputs else edge_trans.outputs[0], body.inputs["Transmission Weight"])
+        links.new(trans_mul.outputs["Value"], body.inputs["Transmission Weight"])
     if "Transmission Extra" in body.inputs:
         body.inputs["Transmission Extra"].default_value = 0.0
     swell = nodes.new("ShaderNodeTexNoise")
@@ -784,10 +794,16 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         links.new(gloss_rough.outputs["Result"] if "Result" in gloss_rough.outputs else gloss_rough.outputs[0], glossy.inputs["Roughness"])
     if "Normal" in glossy.inputs:
         links.new(bump.outputs["Normal"], glossy.inputs["Normal"])
+    dist_sheen = nodes.new("ShaderNodeMapRange")
+    dist_sheen.inputs["From Min"].default_value = 8.0
+    dist_sheen.inputs["From Max"].default_value = 30.0
+    dist_sheen.inputs["To Min"].default_value = 0.16
+    dist_sheen.inputs["To Max"].default_value = 0.035
+    links.new(lpath.outputs["Ray Length"], dist_sheen.inputs["Value"])
     sheen = nodes.new("ShaderNodeMath")
     sheen.operation = "MULTIPLY"
-    sheen.inputs[1].default_value = 0.15
     links.new(layer.outputs["Fresnel"], sheen.inputs[0])
+    links.new(dist_sheen.outputs["Result"] if "Result" in dist_sheen.outputs else dist_sheen.outputs[0], sheen.inputs[1])
     sheen_var = nodes.new("ShaderNodeMapRange")
     sheen_var.inputs["From Min"].default_value = 0.0
     sheen_var.inputs["From Max"].default_value = 1.0
