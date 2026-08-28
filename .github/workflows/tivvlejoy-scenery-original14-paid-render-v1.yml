@@ -22,8 +22,8 @@ jobs:
       BRIDGE_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s-original14-v1 # pragma: allowlist secret
       SCENERY_AUTHORIZATION: TIVVLEJOY_SCENERY_ORIGINAL14_30S_STANDING_AUTHORIZATION_V1
       EXPECTED_TEMPLATE_ID: u4glgdj076
-      EXPECTED_IMAGE: ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:a8017440d29b0e8529aa53b3cb8c7da1d9c11ad98c78a011d5dae009fe618bd9
-      EXPECTED_IMAGE_DIGEST: sha256:a8017440d29b0e8529aa53b3cb8c7da1d9c11ad98c78a011d5dae009fe618bd9
+      EXPECTED_IMAGE: ghcr.io/<ghcr-owner>/ddp-runpod-blender@sha256:32f718745ae7260f15ed4c500ebeab90e4f96aa276131bb4c996313ca9b045c1
+      EXPECTED_IMAGE_DIGEST: sha256:32f718745ae7260f15ed4c500ebeab90e4f96aa276131bb4c996313ca9b045c1
       EXPECTED_EXECUTION_ID: scenery-showcase-original14-30s-v1-20260828
       RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
     steps:
