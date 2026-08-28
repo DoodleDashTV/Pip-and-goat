@@ -1,0 +1,186 @@
+"""Six-shot TivvleJoy cinematic camera plan (no Blender import)."""
+from __future__ import annotations
+
+from cinematic_standards import SCHEMA_SHOT
+
+SHOTS = (
+    {
+        "id": "SHOT_01",
+        "name": "VALLEY_ESTABLISH",
+        "start": 1,
+        "end": 150,
+        "lensMin": 24.0,
+        "lensMax": 28.0,
+        "purpose": "valley shape, sky, layered mountains, forest, village destination",
+        "move": "high_crane_dolly_foreground_parallax",
+    },
+    {
+        "id": "SHOT_02",
+        "name": "RIVER_DISCOVERY",
+        "start": 151,
+        "end": 300,
+        "lensMin": 35.0,
+        "lensMax": 40.0,
+        "purpose": "unmistakable water, reflections, ripples, irregular banks, wet rocks, flora",
+        "move": "low_riverbank_dolly",
+    },
+    {
+        "id": "SHOT_03",
+        "name": "FOREST_PASSAGE",
+        "start": 301,
+        "end": 450,
+        "lensMin": 45.0,
+        "lensMax": 55.0,
+        "purpose": "species variation, foreground parallax, midground depth, opening to village",
+        "move": "forest_lateral_with_opening",
+    },
+    {
+        "id": "SHOT_04",
+        "name": "VILLAGE_REVEAL",
+        "start": 451,
+        "end": 600,
+        "lensMin": 32.0,
+        "lensMax": 40.0,
+        "purpose": "hero buildings, street/clearing, props, forest and mountain context",
+        "move": "path_lead_in_reveal",
+    },
+    {
+        "id": "SHOT_05",
+        "name": "MOUNTAIN_COMPRESSION",
+        "start": 601,
+        "end": 750,
+        "lensMin": 60.0,
+        "lensMax": 85.0,
+        "purpose": "long-lens compression of village/forest, 3DT hero, Louis ridges, atmosphere",
+        "move": "locked_long_lens_push",
+    },
+    {
+        "id": "SHOT_06",
+        "name": "TIVVLEJOY_HERO_CLOSE",
+        "start": 751,
+        "end": 900,
+        "lensMin": 40.0,
+        "lensMax": 55.0,
+        "purpose": "river, village, forest, mountains, sky, character staging; settle for title",
+        "move": "hero_settle",
+    },
+)
+
+
+def shot_by_id(shot_id: str) -> dict:
+    for shot in SHOTS:
+        if shot["id"] == shot_id:
+            return dict(shot)
+    raise KeyError(shot_id)
+
+
+def marker_frames() -> list[int]:
+    return [shot["start"] for shot in SHOTS]
+
+
+def frame_to_shot(frame: int) -> dict:
+    for shot in SHOTS:
+        if shot["start"] <= int(frame) <= shot["end"]:
+            return dict(shot)
+    raise ValueError(f"frame {frame} is outside the 1-900 edit")
+
+
+def camera_name(shot_id: str) -> str:
+    return f"TJ_{shot_id}_CAM"
+
+
+def lookdev_frames() -> list[int]:
+    """Two useful frames per shot for the contact sheet."""
+    frames: list[int] = []
+    for shot in SHOTS:
+        frames.append(shot["start"] + 12)
+        frames.append(shot["start"] + ((shot["end"] - shot["start"]) // 2))
+    return frames
+
+
+def hero_still_frames() -> dict[str, int]:
+    return {
+        "SHOT_01": 48,
+        "SHOT_02": 210,
+        "SHOT_03": 360,
+        "SHOT_04": 520,
+        "SHOT_05": 680,
+        "SHOT_06": 860,
+    }
+
+
+def default_shot_cameras() -> list[dict]:
+    """Authored 9:16 valley cameras. Distinct purpose, lens, and composition."""
+    return [
+        {
+            "id": "SHOT_01",
+            "camera": "TJ_SHOT_01_CAM",
+            "start": {"location": (18.0, -82.0, 28.0), "look": (0.0, 48.0, 14.0), "lens": 24.0},
+            "end": {"location": (10.0, -68.0, 22.0), "look": (0.0, 36.0, 10.0), "lens": 26.0},
+        },
+        {
+            "id": "SHOT_02",
+            "camera": "TJ_SHOT_02_CAM",
+            "start": {"location": (-16.0, -18.0, 2.4), "look": (8.0, -10.0, 0.6), "lens": 35.0},
+            "end": {"location": (-4.0, -16.0, 2.8), "look": (14.0, -8.0, 1.2), "lens": 38.0},
+        },
+        {
+            "id": "SHOT_03",
+            "camera": "TJ_SHOT_03_CAM",
+            "start": {"location": (-22.0, 16.0, 3.2), "look": (6.0, 22.0, 4.0), "lens": 48.0},
+            "end": {"location": (-12.0, 14.0, 3.6), "look": (4.0, 10.0, 3.2), "lens": 52.0},
+        },
+        {
+            "id": "SHOT_04",
+            "camera": "TJ_SHOT_04_CAM",
+            "start": {"location": (2.0, -24.0, 3.8), "look": (0.5, 2.0, 2.8), "lens": 34.0},
+            "end": {"location": (4.0, -16.0, 4.4), "look": (1.0, 4.0, 3.2), "lens": 38.0},
+        },
+        {
+            "id": "SHOT_05",
+            "camera": "TJ_SHOT_05_CAM",
+            "start": {"location": (8.0, -36.0, 8.0), "look": (0.0, 58.0, 16.0), "lens": 70.0},
+            "end": {"location": (7.0, -34.0, 8.4), "look": (0.0, 62.0, 17.0), "lens": 78.0},
+        },
+        {
+            "id": "SHOT_06",
+            "camera": "TJ_SHOT_06_CAM",
+            "start": {"location": (12.0, -32.0, 7.2), "look": (0.0, 12.0, 4.0), "lens": 42.0},
+            "end": {"location": (10.0, -28.0, 6.6), "look": (0.0, 10.0, 3.6), "lens": 48.0},
+        },
+    ]
+
+
+def assert_shot_plan(shots: tuple | list = SHOTS) -> None:
+    if len(shots) != 6:
+        raise ValueError("exactly six shots are required")
+    expected = [1, 151, 301, 451, 601, 751]
+    ends = [150, 300, 450, 600, 750, 900]
+    lenses: list[tuple[float, float]] = []
+    for i, shot in enumerate(shots):
+        if shot["start"] != expected[i] or shot["end"] != ends[i]:
+            raise ValueError(f"{shot['id']} has the wrong frame range")
+        if shot["lensMax"] <= shot["lensMin"]:
+            raise ValueError(f"{shot['id']} lens range is not distinct")
+        lenses.append((shot["lensMin"], shot["lensMax"]))
+        if shot["end"] < shot["start"]:
+            raise ValueError(f"{shot['id']} inverted range")
+    if shots[0]["lensMax"] >= 30.0:
+        raise ValueError("SHOT_01 must stay wide (24-28)")
+    if shots[4]["lensMin"] < 60.0:
+        raise ValueError("SHOT_05 must be a long-lens compression shot")
+    if len({tuple(item) for item in lenses}) < 5:
+        raise ValueError("shot lenses are not distinct enough")
+
+
+def shot_standard_payload() -> dict:
+    assert_shot_plan()
+    return {
+        "schema": SCHEMA_SHOT,
+        "shots": [dict(shot) for shot in SHOTS],
+        "cameras": default_shot_cameras(),
+        "markers": marker_frames(),
+        "lookdevFrames": lookdev_frames(),
+        "heroStillFrames": hero_still_frames(),
+        "cutsNotInterpolated": True,
+    }

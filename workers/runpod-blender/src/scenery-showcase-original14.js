@@ -14,6 +14,7 @@ const r2 = require('./r2-client');
 const core = require('./render-core');
 const { resolveHeadlessGlConfig, applyHeadlessGlEnv } = require('./headless-gl');
 const { REQUIRED_ROLES, selectAssets, selectExtraAssets } = require('./scenery-showcase-original14-roles');
+const { resolveProfile, ffmpegEncodeArgs, ffmpegHasUpscale } = require('./scenery-render-profiles');
 
 function strip(v) { return String(v || '').replace(/[\r\n]+/g, '').trim(); }
 function log(event, detail = {}) { console.log(JSON.stringify({ ts:new Date().toISOString(), event, ...detail })); }
@@ -78,12 +79,16 @@ function runBlender({env,args,timeoutMs,logPath,onTick}) {
     });
   });
 }
-function runFfmpeg({inputDir,fps,outputPath}) {
-  const args=[
-    '-y','-framerate',String(fps),'-i',path.join(inputDir,'frame_%04d.png'),
-    '-vf','scale=1080:1920:flags=lanczos','-c:v','libx264','-preset','medium','-crf','17',
-    '-pix_fmt','yuv420p','-movflags','+faststart',outputPath,
-  ];
+function runFfmpeg({inputDir,fps,outputPath,profile}) {
+  const args=ffmpegEncodeArgs({
+    fps,
+    inputPattern:path.join(inputDir,'frame_%04d.png'),
+    outputPath,
+    profile,
+  });
+  if (profile && profile.id === 'FINAL' && ffmpegHasUpscale(args)) {
+    throw Object.assign(new Error('FINAL encode must not Lanczos-upscale'),{code:'FINAL_UPSCALE_FORBIDDEN'});
+  }
   return spawnSync('ffmpeg',args,{encoding:'utf8',maxBuffer:8*1024*1024});
 }
 
@@ -160,17 +165,24 @@ async function main() {
     const renderable=localAssets.filter((a)=>!a.unityPreservationOnly);
 
     stage='BUILD_SCENE';
-    const internalResolution=strip(env.SCENERY_SHOWCASE_INTERNAL_RESOLUTION||'540x960');
-    const samples=Math.max(1,Number(env.SCENERY_SHOWCASE_EEVEE_SAMPLES||12));
+    const profile=resolveProfile(env);
+    if (profile.id !== 'FINAL') {
+      throw Object.assign(new Error('paid Original-14 worker encodes FINAL only; LOOKDEV/BLOCKOUT/HERO_STILL are local or stills profiles'),{code:'LOOKDEV_CANNOT_LABEL_FINAL'});
+    }
+    if (strip(env.VISUAL_APPROVAL_RECEIPT_RESULT).toUpperCase() !== 'PASS') {
+      throw Object.assign(new Error('visual approval receipt is required before paid FINAL'),{code:'VISUAL_APPROVAL_REQUIRED'});
+    }
+    const internalResolution=profile.resolution;
+    const samples=Math.max(1,Number(env.SCENERY_SHOWCASE_EEVEE_SAMPLES||profile.samples));
     const blenderMinutes=Math.max(20,Number(env.SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES||55));
-    const script=strip(env.SCENERY_SHOWCASE_BLENDER_SCRIPT||'/opt/ddp-worker/blender/scenery/showcase_original14_30s.py');
+    const script=strip(env.SCENERY_SHOWCASE_BLENDER_SCRIPT||'/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py');
     const progressPath=path.join(outputDir,'render-progress.json');
     await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,internalResolution,samples,frame:0,framesWritten:0,totalFrames:900,at:new Date().toISOString()});
     const gl=resolveHeadlessGlConfig({env}); const renderEnv=applyHeadlessGlEnv(env,gl);
     const blenderArgs=['--background','--factory-startup','--python-exit-code','1','--python',script,'--',
       '--assets-json',JSON.stringify(renderable),'--output-dir',outputDir,'--resolution',internalResolution,
       '--fps','30','--start-frame','1','--end-frame','900','--samples',String(samples),'--proof-path',proofPath,
-      '--progress-path',progressPath];
+      '--progress-path',progressPath,'--profile',profile.id];
     log('original14_blender_launch',{glMode:gl.mode,renderableSourceCount:renderable.length,internalResolution,samples,timeoutMinutes:blenderMinutes});
     let lastProgressSig='';
     const publishProgress=async()=>{
@@ -194,10 +206,10 @@ async function main() {
     const frames=await core.verifyFrames({manifest:internalManifest,outputDir});
     if(frames.length<900) throw Object.assign(new Error(`Expected 900 frames, found ${frames.length}`),{code:'FRAME_COUNT_MISMATCH'});
 
-    stage='ENCODE_UPSCALE_1080X1920';
-    await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,at:new Date().toISOString()});
+    stage='ENCODE_NATIVE_1080X1920';
+    await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,profile:profile.id,at:new Date().toISOString()});
     const mp4Path=path.join(outputDir,'tivvlejoy-scenery-original14-30s.mp4');
-    const enc=runFfmpeg({inputDir:outputDir,fps:30,outputPath:mp4Path});
+    const enc=runFfmpeg({inputDir:outputDir,fps:30,outputPath:mp4Path,profile});
     if(enc.status!==0) throw Object.assign(new Error(`ffmpeg failed ${enc.status}: ${(enc.stderr||'').slice(-3000)}`),{code:'FFMPEG_FAILED'});
     const finalManifest={frameRange:{start:1,end:900},resolution:'1080x1920',fps:30};
     const info=await core.validateOutput({manifest:finalManifest,mp4Path});

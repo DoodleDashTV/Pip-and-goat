@@ -2,8 +2,8 @@
 
 Consumes only locally materialized purchased source packages. The RunPod worker
 handles R2 access, hashing, final 1080x1920 encoding, upload, and readback.
-This script assembles a lightweight 540x960 EEVEE scene so the proof finishes
-reliably instead of repeating the prior 1080p/48-sample timeout.
+This script is the retired proof-quality assembler. FINAL / HERO_STILL must
+use cinematic_valley_world_v1.py. A 540x960 Lanczos upscale is not FINAL.
 """
 from __future__ import annotations
 
@@ -83,6 +83,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument('--stills-only', action='store_true')
     p.add_argument('--stills-frames', default='1,150,300,450,600,750,900')
     p.add_argument('--engine', default='BLENDER_EEVEE_NEXT')
+    p.add_argument('--profile', default='BLOCKOUT')
     return p.parse_args(argv)
 
 
@@ -1688,6 +1689,9 @@ def install_frame_handlers(end_frame: int) -> None:
 def main() -> int:
     global PROGRESS_PATH
     args = parse_args()
+    profile = str(getattr(args, 'profile', 'BLOCKOUT') or 'BLOCKOUT').upper()
+    if profile in {'FINAL', 'HERO_STILL'}:
+        raise RuntimeError('showcase_original14_30s.py is the retired proof assembler; use cinematic_valley_world_v1.py for FINAL/HERO_STILL')
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
     if args.progress_path:

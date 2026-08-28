@@ -13,6 +13,12 @@ on:
       - 'scripts/blender/scenery/showcase_original14_30s.py'
       - 'scripts/blender/scenery/showcase_original14_select.py'
       - 'scripts/blender/scenery/showcase_original14_select_test.py'
+      - 'scripts/blender/scenery/cinematic_standards.py'
+      - 'scripts/blender/scenery/cinematic_shots.py'
+      - 'scripts/blender/scenery/cinematic_standards_test.py'
+      - 'scripts/blender/scenery/cinematic_valley_world_v1.py'
+      - 'workers/runpod-blender/src/scenery-render-profiles.js'
+      - 'workers/runpod-blender/test/scenery-render-profiles.test.js'
       - '.github/workflows/tivvlejoy-scenery-showcase-worker-image-original14-v1.yml'
 
 concurrency:
@@ -50,13 +56,19 @@ jobs:
           node --check workers/runpod-blender/src/scenery-showcase-original14.js
           node --check workers/runpod-blender/src/scenery-showcase-original14-entry.js
           node --test workers/runpod-blender/test/scenery-showcase-original14-roles.test.js
-          python3 -m py_compile scripts/blender/scenery/showcase_original14_select.py scripts/blender/scenery/showcase_original14_30s.py
+          node --test workers/runpod-blender/test/scenery-render-profiles.test.js
+          python3 -m py_compile scripts/blender/scenery/showcase_original14_select.py scripts/blender/scenery/showcase_original14_30s.py scripts/blender/scenery/cinematic_standards.py scripts/blender/scenery/cinematic_shots.py scripts/blender/scenery/cinematic_valley_world_v1.py
           (cd scripts/blender/scenery && python3 showcase_original14_select_test.py)
+          (cd scripts/blender/scenery && python3 cinematic_standards_test.py)
           grep -F "FROM ghcr.io/doodledashtv/ddp-runpod-blender@${EXPECTED_PARENT_DIGEST}" workers/runpod-blender/Dockerfile.scenery-showcase-original14
           grep -F 'tivvlejoy.scenery.original.source.count="14"' workers/runpod-blender/Dockerfile.scenery-showcase-original14
           grep -F 'tivvlejoy.scenery.renderable.source.count="11"' workers/runpod-blender/Dockerfile.scenery-showcase-original14
           grep -F 'SCENERY_SHOWCASE_INTERNAL_RESOLUTION=540x960' workers/runpod-blender/Dockerfile.scenery-showcase-original14
+          grep -F 'SCENERY_SHOWCASE_RENDER_PROFILE=LOOKDEV_FAST' workers/runpod-blender/Dockerfile.scenery-showcase-original14
+          grep -F 'SCENERY_SHOWCASE_FINAL_NATIVE_RESOLUTION=1080x1920' workers/runpod-blender/Dockerfile.scenery-showcase-original14
+          grep -F 'SCENERY_SHOWCASE_ALLOW_UPSCALE=false' workers/runpod-blender/Dockerfile.scenery-showcase-original14
           grep -F 'SCENERY_SHOWCASE_EEVEE_SAMPLES=12' workers/runpod-blender/Dockerfile.scenery-showcase-original14
+          ! grep -n 'scale=1080:1920:flags=lanczos' workers/runpod-blender/src/scenery-showcase-original14.js
           ! grep -R -nE 'RUNPOD_API_KEY\s*=|R2_SECRET_ACCESS_KEY\s*=|OBJECT_STORAGE_SECRET_ACCESS_KEY\s*=' workers/runpod-blender/Dockerfile.scenery-showcase-original14 workers/runpod-blender/src/scenery-showcase-original14*.js scripts/blender/scenery/showcase_original14_30s.py
       - name: Resolve image repository
         shell: bash
