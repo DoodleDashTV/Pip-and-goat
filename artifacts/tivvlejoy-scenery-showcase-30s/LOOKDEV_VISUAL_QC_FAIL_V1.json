@@ -1,16 +1,16 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T16:34:20Z",
+  "inspectedAt": "2026-08-28T16:35:40Z",
   "engine": "CYCLES_CPU",
   "resolution": "360x640",
   "samples": 16,
-  "commit": "def3139",
-  "stillsDir": "/tmp/o14-lookdev/stills14",
+  "commit": "3cdc807",
+  "stillsDir": "/tmp/o14-lookdev/stills15",
   "stills": {
-    "0001": "Forest wall is now visible behind the cabins. River is still a blue strip with mint rock lumps. Ground is a pale green slab.",
-    "0450": "Dense pine wall behind the village. At least one tree clips through a cabin roof. Ribbon river and slab floor remain.",
-    "0900": "Village + forest wall + mountains + sky stack in 9:16. Still a kit test: neon needle tips, crushed forest shadows, lime floor."
+    "0001": "Forest wall sits behind the cabins, not through the roofs. River is still a blue strip with mint rock lumps. Ground is a pale green slab.",
+    "0450": "Dense pine wall + village + mountains + sky. Cabin is dark. Ribbon river and slab floor remain.",
+    "0900": "Same stacked kit. Neon needle tips, crushed canopy shadows, lime floor. Not cinematic."
   },
   "whatImprovedVersusRejectedCabinOrbit": [
     "Unparenting copies put a real pine wall behind the village instead of a cabin-local cluster",
@@ -24,7 +24,6 @@
     "still reads as an asset test, not a finished cinematic shot",
     "flat pale-green ground, not a valley meadow",
     "river reads as a blue strip, not water with banks",
-    "trees clip through at least one cabin roof",
     "forest is a dark rectangular block, not a layered midground",
     "neon needle tips and crushed-black canopy shadows",
     "weak atmospheric depth"
