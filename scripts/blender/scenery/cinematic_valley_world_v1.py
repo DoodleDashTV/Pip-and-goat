@@ -741,7 +741,7 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="AREA", location=(0.0, -12.0, 48.0))
     sky = bpy.context.object
     sky.name = "TJ_SkyFill"
-    sky.data.energy = 140
+    sky.data.energy = 200
     sky.data.size = 80
     sky.rotation_euler = (math.radians(0), 0.0, 0.0)
     if hasattr(sky.data, "color"):
@@ -749,7 +749,7 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="AREA", location=(0.0, 4.0, 1.6))
     bounce = bpy.context.object
     bounce.name = "TJ_GroundBounce"
-    bounce.data.energy = 70
+    bounce.data.energy = 130
     bounce.data.size = 32
     bounce.rotation_euler = (math.radians(90), 0.0, 0.0)
     if hasattr(bounce.data, "color"):
