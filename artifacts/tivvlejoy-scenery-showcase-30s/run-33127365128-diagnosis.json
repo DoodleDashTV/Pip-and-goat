@@ -1,0 +1,33 @@
+{
+  "schema": "TIVVLEJOY_REAL_SCENERY_30S_V2_FAILURE_REPORT",
+  "authorization": "TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V2",
+  "workflowRunId": 33127365128,
+  "workflow": "TivvleJoy Real Scenery 30s Paid Render V2",
+  "headSha": "2d9b3ef698c51e07e712d4eb20d36290ff3f5876",
+  "exactFailingStage": "STARTUP_WATCHDOG",
+  "createEntered": true,
+  "createRequests": 1,
+  "retryCreate": false,
+  "podId": "oh4r9ltgb9mxh9",
+  "podName": "tivvlejoy-scenery-showcase-30s-v1",
+  "workerDigest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+  "workerEntrypoint": "scenery-showcase-entry-v2.js",
+  "runtimeDockerArgsRequired": false,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "rateUsdPerHr": 0.74,
+  "processStarted": false,
+  "startupStatusJsonWritten": false,
+  "blenderStarted": false,
+  "framesProduced": 0,
+  "mp4Present": false,
+  "watchdogFiredAt": "2026-08-28T00:15:55Z",
+  "cleanup": {
+    "matchedBefore": 1,
+    "terminatedCount": 1,
+    "remainingActiveExactName": 0,
+    "billingCleanupConfirmed": true
+  },
+  "anotherRetryAllowed": false,
+  "pr169": "OPEN_DRAFT_UNMERGED_NOT_READY"
+}
