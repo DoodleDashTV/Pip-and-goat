@@ -335,7 +335,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
 
 
 def cinematic_river_material(tint=None) -> bpy.types.Material:
-    """Fresnel body + gloss. No transmission: that reads as ice at 16 samples."""
+    """Single dark Principled. Metallic/mix-gloss blew out to a white road."""
     mat = bpy.data.materials.new("TJ_CinematicRiver")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -343,58 +343,37 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     nodes.clear()
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
-    spec = nodes.new("ShaderNodeBsdfPrincipled")
-    body_col = tint or (0.012, 0.040, 0.044, 1.0)
+    body_col = tint or (0.016, 0.048, 0.052, 1.0)
     if "Base Color" in body.inputs:
         body.inputs["Base Color"].default_value = body_col
     if "Roughness" in body.inputs:
-        body.inputs["Roughness"].default_value = 0.38
+        body.inputs["Roughness"].default_value = 0.22
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.35
+        body.inputs["Specular IOR Level"].default_value = 0.55
+    if "Metallic" in body.inputs:
+        body.inputs["Metallic"].default_value = 0.0
     if "Transmission Weight" in body.inputs:
         body.inputs["Transmission Weight"].default_value = 0.0
-    if "Base Color" in spec.inputs:
-        spec.inputs["Base Color"].default_value = (0.72, 0.80, 0.84, 1.0)
-    if "Roughness" in spec.inputs:
-        spec.inputs["Roughness"].default_value = 0.045
-    if "Specular IOR Level" in spec.inputs:
-        spec.inputs["Specular IOR Level"].default_value = 0.95
-    if "Metallic" in spec.inputs:
-        spec.inputs["Metallic"].default_value = 0.12
-    weight = nodes.new("ShaderNodeLayerWeight")
-    weight.inputs["Blend"].default_value = 0.22
-    invert = nodes.new("ShaderNodeMath")
-    invert.operation = "SUBTRACT"
-    invert.inputs[0].default_value = 1.0
-    links.new(weight.outputs["Facing"], invert.inputs[1])
-    mix = nodes.new("ShaderNodeMixShader")
-    links.new(invert.outputs["Value"], mix.inputs["Fac"])
-    links.new(body.outputs["BSDF"], mix.inputs[1])
-    links.new(spec.outputs["BSDF"], mix.inputs[2])
     coord = nodes.new("ShaderNodeTexCoord")
     mapping = nodes.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (1.15, 0.28, 1.0)
+    mapping.inputs["Scale"].default_value = (1.4, 0.22, 1.0)
     links.new(coord.outputs["Object"], mapping.inputs["Vector"])
     wave = nodes.new("ShaderNodeTexWave")
     wave.wave_type = "BANDS"
-    wave.inputs["Scale"].default_value = 7.5
+    wave.inputs["Scale"].default_value = 6.0
     if "Distortion" in wave.inputs:
-        wave.inputs["Distortion"].default_value = 5.2
+        wave.inputs["Distortion"].default_value = 3.2
     if "Detail" in wave.inputs:
-        wave.inputs["Detail"].default_value = 4.0
+        wave.inputs["Detail"].default_value = 2.0
     links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.18
+    bump.inputs["Strength"].default_value = 0.22
     if "Distance" in bump.inputs:
-        bump.inputs["Distance"].default_value = 0.10
+        bump.inputs["Distance"].default_value = 0.08
     links.new(wave.outputs["Color"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
-    if "Normal" in spec.inputs:
-        links.new(bump.outputs["Normal"], spec.inputs["Normal"])
-    if "Normal" in weight.inputs:
-        links.new(bump.outputs["Normal"], weight.inputs["Normal"])
-    links.new(mix.outputs["Shader"], out.inputs["Surface"])
+    links.new(body.outputs["BSDF"], out.inputs["Surface"])
     return mat
 
 
