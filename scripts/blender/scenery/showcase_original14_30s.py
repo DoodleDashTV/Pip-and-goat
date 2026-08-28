@@ -558,6 +558,31 @@ def ensure_purchased_albedos(files: list[Path]) -> int:
                 node.image = chosen
                 bound += 1
     sanitize_purchased_materials()
+    if cabin is not None:
+        for obj in bpy.data.objects:
+            if obj.type != 'MESH' or not is_authored_village_mesh_name(obj.name):
+                continue
+            needs = False
+            if not obj.data.materials:
+                needs = True
+            for slot in obj.material_slots:
+                mat = slot.material
+                if mat is None:
+                    needs = True
+                    continue
+                blob = f'{mat.name} {obj.name}'.lower()
+                if 'wood01' in blob or not mat.node_tree:
+                    needs = True
+            if not needs:
+                continue
+            mat = image_material(f'TJ_CabinAtlas_{obj.name}'[:55], Path(cabin.filepath) if cabin.filepath else None)
+            if mat.node_tree:
+                tex = next((n for n in mat.node_tree.nodes if n.type == 'TEX_IMAGE'), None)
+                if tex is not None:
+                    tex.image = cabin
+            obj.data.materials.clear()
+            obj.data.materials.append(mat)
+            bound += 1
     return bound
 
 
@@ -703,7 +728,7 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
             tex.image.colorspace_settings.name = 'sRGB'
         coord = nodes.new('ShaderNodeTexCoord')
         mapping = nodes.new('ShaderNodeMapping')
-        mapping.inputs['Scale'].default_value = (3.2, 3.2, 3.2)
+        mapping.inputs['Scale'].default_value = (1.15, 1.15, 1.15)
         links.new(coord.outputs['UV'], mapping.inputs['Vector'])
         links.new(mapping.outputs['Vector'], tex.inputs['Vector'])
         try:
@@ -716,7 +741,7 @@ def create_valley_ground(files: list[Path], center=(0.0, 16.0, -0.08), size: flo
         if 'Fac' in mix.inputs:
             mix.inputs['Fac'].default_value = 1.0
         if 'Color2' in mix.inputs:
-            mix.inputs['Color2'].default_value = (0.32, 0.52, 0.18, 1.0)
+            mix.inputs['Color2'].default_value = (0.22, 0.42, 0.12, 1.0)
         links.new(tex.outputs['Color'], mix.inputs['Color1'] if 'Color1' in mix.inputs else mix.inputs[6])
         color_src = mix.outputs['Color'] if 'Color' in mix.outputs else mix.outputs[2]
     if color_src is not None:
@@ -1004,7 +1029,7 @@ def setup_lighting():
     bpy.ops.object.light_add(type='AREA', location=(0.0, -22.0, 15.0))
     key = bpy.context.object
     key.name = 'TJ_VillageKey'
-    key.data.energy = 5200
+    key.data.energy = 2800
     key.data.shape = 'RECTANGLE'
     key.data.size = 28
     if hasattr(key.data, 'size_y'):
@@ -1372,8 +1397,8 @@ def main() -> int:
             imported_files += 1
     if members:
         bank_slots = [
-            (-6.0, 14.5, 0.0), (6.0, 17.5, 0.0), (-3.0, 18.0, 0.0),
-            (4.0, 13.5, 0.0), (0.0, 20.0, 0.0), (9.0, 15.0, 0.0),
+            (-8.0, -12.0, 0.0), (8.0, -8.5, 0.0), (-3.0, -13.5, 0.0),
+            (4.0, -7.0, 0.0), (0.0, -15.0, 0.0), (10.0, -11.0, 0.0),
         ]
         for i, obj in enumerate(members[:len(bank_slots)]):
             root = parent_group([obj], f'TJ_riverbank_{i}_{obj.name}'[:55])
@@ -1383,7 +1408,9 @@ def main() -> int:
                     village_center.y + bank_slots[i][1],
                     bank_slots[i][2],
                 ))
-    river_count = create_purchased_stream((village_center.x, village_center.y + 16.0, -0.03), (7.5, 40.0))
+    # Put the stream south of the village so a north-looking 9:16 camera
+    # sees water in front of the cabins instead of hidden behind them.
+    river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.02), (36.0, 7.0))
     if not members and river_count <= 0:
         raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
     remapped_project = remap_missing_images(expanded.get('village_textures', []) + files)
