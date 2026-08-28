@@ -205,10 +205,12 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             height += 0.38 * math.sin(x * 0.075) * math.cos(y * 0.10)
             height += 0.16 * math.sin(x * 0.29 + y * 0.17)
         river_dist = dist_to_polyline(x, y)
-        trench = math.exp(-(river_dist ** 2) / 32.0)
-        height -= 0.82 * trench
-        if 4.4 < river_dist < 10.0:
-            height += 0.14 * math.exp(-((river_dist - 6.6) ** 2) / 5.0)
+        # Flat bed so SHOT_02 sees a horizontal stream, not V-trough walls.
+        if river_dist < 2.15:
+            height -= 0.46
+        else:
+            rise = min(1.0, (river_dist - 2.15) / 3.4)
+            height -= 0.46 * (1.0 - rise * rise)
         pad = 1.0
         if in_village(x, y):
             edge = min(
@@ -219,6 +221,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             pad = max(0.68, 1.0 - max(0.0, min(1.0, edge)) * 0.32)
         height *= pad
         vert.co.z = height
+    paint_river_mask(ground)
     ground.data.update()
     shade_smooth(ground)
     img = purchased_meadow_image()
@@ -334,27 +337,111 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         dirt.inputs["Color2"].default_value = (0.14, 0.09, 0.05, 1.0)
         links.new(path_fac.outputs["Value"], dirt.inputs["Fac"])
         color = dirt.outputs["Color"]
-    bank_y = nodes.new("ShaderNodeMath")
-    bank_y.operation = "SUBTRACT"
-    bank_y.inputs[1].default_value = -12.0
-    links.new(sep.outputs["Y"], bank_y.inputs[0])
-    bank_abs = nodes.new("ShaderNodeMath")
-    bank_abs.operation = "ABSOLUTE"
-    links.new(bank_y.outputs["Value"], bank_abs.inputs[0])
-    bank_w = nodes.new("ShaderNodeMapRange")
-    bank_w.inputs["From Min"].default_value = 3.6
-    bank_w.inputs["From Max"].default_value = 7.2
-    bank_w.inputs["To Min"].default_value = 0.28
-    bank_w.inputs["To Max"].default_value = 0.0
-    links.new(bank_abs.outputs["Value"], bank_w.inputs["Value"])
-    bank = _mix_rgb(nodes)
-    if "Color1" in bank.inputs:
-        links.new(color, bank.inputs["Color1"])
-        bank.inputs["Color2"].default_value = (0.10, 0.07, 0.04, 1.0)
-        links.new(bank_w.outputs["Result"] if "Result" in bank_w.outputs else bank_w.outputs[0], bank.inputs["Fac"])
-        color = bank.outputs["Color"]
     links.new(color, bsdf.inputs["Base Color"])
+    embed_stream_on_floor(mat)
     return mat
+
+
+def paint_river_mask(ground: bpy.types.Object) -> None:
+    """Vertex mask on the valley floor. Shoreline is terrain, not a second mesh lip."""
+    mesh = ground.data
+    try:
+        color = mesh.color_attributes.new(name="TJ_RiverMask", type="FLOAT_COLOR", domain="POINT")
+    except Exception:
+        color = mesh.color_attributes.get("TJ_RiverMask")
+    if color is None:
+        return
+    for index, vert in enumerate(mesh.vertices):
+        dist = dist_to_polyline(vert.co.x, vert.co.y)
+        if dist < 2.15:
+            value = 1.0
+        elif dist < 3.55:
+            value = 1.0 - (dist - 2.15) / 1.40
+        else:
+            value = 0.0
+        color.data[index].color = (value, value, value, 1.0)
+
+
+def embed_stream_on_floor(mat: bpy.types.Material, tint=None) -> None:
+    """Mix a dark stream into the meadow using TJ_RiverMask. No separate ribbon."""
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    out = next(node for node in nodes if node.type == "OUTPUT_MATERIAL")
+    meadow = next(node for node in nodes if node.type == "BSDF_PRINCIPLED")
+    for link in list(out.inputs["Surface"].links):
+        links.remove(link)
+    body = nodes.new("ShaderNodeBsdfPrincipled")
+    body.name = "TJ_StreamBody"
+    body_col = tint or (0.007, 0.016, 0.022, 1.0)
+    if "Base Color" in body.inputs:
+        body.inputs["Base Color"].default_value = body_col
+    if "Roughness" in body.inputs:
+        body.inputs["Roughness"].default_value = 0.30
+    if "Metallic" in body.inputs:
+        body.inputs["Metallic"].default_value = 0.0
+    if "Transmission Weight" in body.inputs:
+        body.inputs["Transmission Weight"].default_value = 0.0
+    if "Specular IOR Level" in body.inputs:
+        body.inputs["Specular IOR Level"].default_value = 0.40
+    coord = next((node for node in nodes if node.type == "TEX_COORD"), None) or nodes.new("ShaderNodeTexCoord")
+    ripples = nodes.new("ShaderNodeTexNoise")
+    ripples.inputs["Scale"].default_value = 3.2
+    if "Detail" in ripples.inputs:
+        ripples.inputs["Detail"].default_value = 5.0
+    links.new(coord.outputs["Object"], ripples.inputs["Vector"])
+    bump = nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.22
+    links.new(ripples.outputs["Fac"], bump.inputs["Height"])
+    if "Normal" in body.inputs:
+        links.new(bump.outputs["Normal"], body.inputs["Normal"])
+    try:
+        gloss = nodes.new("ShaderNodeBsdfGlossy")
+    except Exception:
+        gloss = nodes.new("ShaderNodeBsdfPrincipled")
+    if "Color" in gloss.inputs:
+        gloss.inputs["Color"].default_value = (0.28, 0.36, 0.42, 1.0)
+    elif "Base Color" in gloss.inputs:
+        gloss.inputs["Base Color"].default_value = (0.18, 0.26, 0.30, 1.0)
+        if "Metallic" in gloss.inputs:
+            gloss.inputs["Metallic"].default_value = 0.0
+    if "Roughness" in gloss.inputs:
+        gloss.inputs["Roughness"].default_value = 0.12
+    if "Normal" in gloss.inputs:
+        links.new(bump.outputs["Normal"], gloss.inputs["Normal"])
+    weight = nodes.new("ShaderNodeLayerWeight")
+    weight.inputs["Blend"].default_value = 0.12
+    invert = nodes.new("ShaderNodeMath")
+    invert.operation = "SUBTRACT"
+    invert.inputs[0].default_value = 1.0
+    links.new(weight.outputs["Facing"], invert.inputs[1])
+    cap = nodes.new("ShaderNodeMath")
+    cap.operation = "MULTIPLY"
+    cap.inputs[1].default_value = 0.34
+    links.new(invert.outputs["Value"], cap.inputs[0])
+    water_mix = nodes.new("ShaderNodeMixShader")
+    links.new(cap.outputs["Value"], water_mix.inputs["Fac"])
+    links.new(body.outputs["BSDF"], water_mix.inputs[1])
+    gloss_out = gloss.outputs.get("BSDF") or gloss.outputs[0]
+    links.new(gloss_out, water_mix.inputs[2])
+    attr = nodes.new("ShaderNodeVertexColor")
+    attr.name = "TJ_RiverMaskAttr"
+    if hasattr(attr, "layer_name"):
+        attr.layer_name = "TJ_RiverMask"
+    floor_mix = nodes.new("ShaderNodeMixShader")
+    mask_val = attr.outputs.get("Color") or attr.outputs[0]
+    links.new(mask_val, floor_mix.inputs["Fac"])
+    links.new(meadow.outputs["BSDF"], floor_mix.inputs[1])
+    links.new(water_mix.outputs["Shader"], floor_mix.inputs[2])
+    links.new(floor_mix.outputs["Shader"], out.inputs["Surface"])
+
+
+def apply_stream_tint(tint) -> None:
+    if not tint:
+        return
+    for mat in bpy.data.materials:
+        node = mat.node_tree.nodes.get("TJ_StreamBody") if mat and mat.node_tree else None
+        if node and "Base Color" in node.inputs:
+            node.inputs["Base Color"].default_value = tint
 
 
 def cinematic_river_material(tint=None) -> bpy.types.Material:
@@ -455,8 +542,11 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
     surface = cinematic_river_material(tint)
     river.data.materials.clear()
     river.data.materials.append(surface)
+    river.hide_render = True
+    river.hide_viewport = True
     if hasattr(river, "visible_shadow"):
         river.visible_shadow = False
+    apply_stream_tint(tint)
     print(json.dumps({
         "event": "river_material_assigned",
         "name": water.name if water else surface.name,
@@ -862,7 +952,7 @@ def apply_profile(profile_name: str, args) -> dict:
     if engine == "CYCLES" and hasattr(scene, "cycles"):
         scene.cycles.samples = int(samples)
         if hasattr(scene.cycles, "use_denoising"):
-            scene.cycles.use_denoising = bool(defaults.get("denoise"))
+            scene.cycles.use_denoising = bool(defaults.get("denoise")) or int(samples) >= 32
         if defaults.get("cyclesDevice") == "GPU" and not bool(getattr(args, "force_cpu", False)):
             try:
                 scene.cycles.device = "GPU"
@@ -1162,7 +1252,7 @@ def main() -> int:
         "cameraPath": "six_shot_markers",
         "lighting": "single_key_sun_plus_sky_fill_plus_restrained_bounce",
         "groundSource": "shaped_valley_carrier_purchased_meadow",
-        "riverSource": "dark_slate_irregular_noise_no_wave_bands",
+        "riverSource": "terrain_embedded_stream_no_ribbon_lip",
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
