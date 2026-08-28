@@ -1,25 +1,27 @@
 {
   "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
   "result": "FAIL",
-  "inspectedAt": "2026-08-28T23:18:00Z",
+  "inspectedAt": "2026-08-28T23:54:00Z",
   "profile": "LOOKDEV_FAST",
   "engine": "CYCLES_CPU",
   "resolution": "540x960",
   "samples": 32,
-  "commit": "40411118e2e1f63f58838e56966a617876dcaa6a",
-  "geometryTestDir": "/tmp/o14-lookdev/cinematic-lookdev43-geom",
-  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev43",
+  "startingSha": "deed17b045fbcd1af954082e2d788dedb4860d75",
+  "commit": "3e75df7ec15cad4c9cd5eeee91a85fed31b67e0d",
+  "geometryTestDir": "/tmp/o14-lookdev/cinematic-lookdev53-geom",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev52",
+  "latestWaterOn01And02": "/tmp/o14-lookdev/cinematic-lookdev53",
   "v31GeometryPreserved": true,
   "acceptanceAN": {
     "A_water_hidden_shot02_is_creek": true,
     "B_water_instantly_identifiable": false,
     "C_water_only_part_of_channel": true,
-    "D_dark_wet_bed_visible": true,
+    "D_dark_wet_bed_visible": "partial",
     "E_3d_bank_slope_depth": true,
     "F_no_knife_edge_grass_seam": false,
-    "G_no_constant_width_ribbon": false,
+    "G_no_constant_width_ribbon": "partial",
     "H_no_road_path_interpretation": "partial",
-    "I_reflections_support_water": false,
+    "I_reflections_support_water": "partial",
     "J_natural_bank_breakup": "partial",
     "K_shot02_cinematic": "partial",
     "L_shot01_to_06_believable": false,
@@ -27,42 +29,55 @@
     "N_clean_enough_to_judge": true
   },
   "measurements": {
-    "SHOT_01": {"meanLum": 108.5, "midBminusG": -7.6, "botBminusG": -18.3},
-    "SHOT_02": {"meanLum": 80.1, "midBminusG": -1.4, "botBminusG": -11.1},
-    "SHOT_03": {"meanLum": 89.2, "midBminusG": 2.1, "botBminusG": -17.5},
-    "SHOT_04": {"meanLum": 96.0, "midBminusG": -15.2, "botBminusG": -7.7},
-    "SHOT_05": {"meanLum": 123.3, "midBminusG": 3.7, "botBminusG": -13.1},
-    "SHOT_06": {"meanLum": 77.2, "midBminusG": -11.9, "botBminusG": -12.6}
+    "SHOT_01": {"meanLum": 109.8, "midBminusG": -11.2, "botBminusG": -21.9},
+    "SHOT_02": {"meanLum": 82.2, "midBminusG": -8.1, "botBminusG": -13.9},
+    "SHOT_03": {"meanLum": 89.2, "midBminusG": -0.9, "botBminusG": -16.5},
+    "SHOT_04": {"meanLum": 99.6, "midBminusG": -16.4, "botBminusG": -16.1},
+    "SHOT_05": {"meanLum": 123.9, "midBminusG": -0.4, "botBminusG": -15.0},
+    "SHOT_06": {"meanLum": 80.1, "midBminusG": -13.9, "botBminusG": -19.6}
   },
   "shots": {
-    "SHOT_01": "FAIL water — high crane still sees a pale opaque ribbon in a correct trough.",
-    "SHOT_02": "PARTIAL — trough and dark bed hold; water is a bright sky-film ribbon, not liquid with bed-through depth.",
-    "SHOT_03": "PARTIAL — forest opening holds. River not the subject.",
-    "SHOT_04": "FAIL water — street holds; foreground film is a pale glossy strip.",
-    "SHOT_05": "PARTIAL — compression holds.",
-    "SHOT_06": "FAIL water — village holds; foreground film is a silvery ribbon."
+    "SHOT_01": "PARTIAL — crane no longer sees a sky-white foil; the creek is a dark teal strip in a carved trough. Still a strip, not liquid with bed-through. Banks still a hard lip.",
+    "SHOT_02": "PARTIAL — trough, cabin, trees hold. Water is a dark teal film with dim glints, not pale foil, not yet a readable creek with exposed bed and wet banks.",
+    "SHOT_03": "PARTIAL — forest opening holds. River is not the subject.",
+    "SHOT_04": "PARTIAL — street and cabins hold. Foreground water is a dark teal rippled strip; still a knife at the bank and a bright village path.",
+    "SHOT_05": "PARTIAL — long-lens compression holds.",
+    "SHOT_06": "FAIL water — village holds; the foreground channel can still be misread, and the mid meadow can be mistaken for a pale sheet."
   },
   "controlTests": {
-    "A_water_hidden_shot02": "PASS",
-    "B_shot02_water": "FAIL_still_sky_ribbon",
-    "C_grazing": "FAIL_pale_ribbon",
-    "D_downward": "PARTIAL_bed_visible_beside_water_not_through_it"
+    "A_water_hidden_shot02": "PASS_carved_trough_preserved",
+    "B_shot02_water": "PARTIAL_dark_teal_film_not_liquid",
+    "C_grazing": "PARTIAL_not_sky_white_still_a_strip",
+    "D_downward": "PARTIAL_channel_reads_film_still_opaque"
   },
   "automaticFailuresHit": [
     "river_reads_as_road_path_or_blue_tape"
   ],
+  "diagnosedPaleCauses": [
+    "Thin horizontal Principled with IOR/specular/transmission Fresnel mirrored the purchased HDRI under AgX +0.30",
+    "SHOT_02 is only ~14deg down, so facing-gated transmission stayed near 11% and the film went ink-black",
+    "assign_purchased_water crushed Water_Mat_1 tint to ~0.02",
+    "The 2m trough put the film in shadow",
+    "Constant transmission from the crane looked through the film at the sky",
+    "A too-light damp-band color (0.16, 0.11, 0.05) lit up as a tan sand ribbon beside the water"
+  ],
   "progressThisRepair": {
     "v31ChannelPreserved": true,
-    "extraGlossyMixRemoved": true,
-    "shot02MovedOntoNearBank": true,
-    "areaLightsNoLongerGlossy": true,
-    "bedMeshNarrowedForSoilBand": true,
-    "waterStillPaleRibbonFromProductionAngles": true,
-    "knifeSeamStillReads": true
+    "principledSpecularKilled": true,
+    "iorSetTo1": true,
+    "distanceGatedTransmissionAndSheen": true,
+    "purchasedTintNoLongerCrushed": true,
+    "geometricSwellOnFilm": true,
+    "nonGlossyCreekFill": true,
+    "southBankWaterlineDressing": true,
+    "shot02NoLongerPaleFoil": true,
+    "shot01NoLongerSkyWhiteFoil": true,
+    "knifeSeamStillReads": true,
+    "bedThroughStillWeak": true
   },
   "paidRenderAuthorized": false,
   "createPerformed": false,
   "finishedVideoExists": false,
-  "smallestNextAction": "Keep the V31 trough. Make the film dark-and-transmissive enough that SHOT_01/04/06 do not see a sky-white ribbon, and put a real grass/soil band on the crest. Do not CREATE.",
-  "honestConclusion": "V31 geometry still PASSes water-hidden SHOT_02. Water readability and the grass/bed crest still FAIL. Do not CREATE. Do not return FINAL_RESULT."
+  "smallestNextAction": "Keep the V31 trough. Make the dark teal film read as liquid from SHOT_02 (bed-through, irregular wet lip) without letting SHOT_01/06 go pale again. Do not CREATE.",
+  "honestConclusion": "V31 geometry still PASSes water-hidden SHOT_02. The pale-foil film is gone from SHOT_02 and the crane. Water still fails as unmistakable liquid. Knife seam remains. Do not CREATE. Do not return FINAL_RESULT."
 }
