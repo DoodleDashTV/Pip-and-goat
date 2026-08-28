@@ -73,6 +73,15 @@ def is_primitive_name(name: str) -> bool:
     return any(marker in n for marker in PRIMITIVE_MARKERS)
 
 
+def is_dominating_plane(face_count: int = 0, dimensions: tuple | None = None) -> bool:
+    """Huge authored water/ground slabs steal camera bounds and empty the shot."""
+    if not dimensions or len(dimensions) < 3:
+        return False
+    vals = sorted(abs(float(x)) for x in dimensions[:3])
+    mn, _mid, mx = vals
+    return mx >= 40.0 and mn <= max(0.8, 0.08 * mx)
+
+
 def is_box_mesh(face_count: int = 0, dimensions: tuple | None = None) -> bool:
     faces = int(face_count or 0)
     if faces > 14:
@@ -179,7 +188,7 @@ def mesh_keep_rank(name: str, role: str, face_count: int = 0, dimensions: tuple 
     n = str(name or '').lower()
     words = HERO_WORDS.get(role, ())
     staging = 1 if is_staging_name(n) else 0
-    primitive = 1 if is_primitive_name(n) or is_box_mesh(face_count, dimensions) else 0
+    primitive = 1 if is_primitive_name(n) or is_box_mesh(face_count, dimensions) or is_dominating_plane(face_count, dimensions) else 0
     flat = 0
     if dimensions and len(dimensions) >= 3:
         mx = max(dimensions)

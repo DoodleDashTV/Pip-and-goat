@@ -7,6 +7,7 @@ from showcase_original14_select import (
     extract_sort_key,
     geometry_file_limit,
     is_box_mesh,
+    is_dominating_plane,
     is_dump_name,
     is_primitive_name,
     is_staging_name,
@@ -134,6 +135,14 @@ def test_village_picker_prefers_authored_blend_over_tiny_fbx():
     assert chosen[0]['name'] == 'Village.blend'
 
 
+def test_dominating_plane_is_rejected_for_camera_bounds():
+    assert is_dominating_plane(8, (400.0, 400.0, 0.2)) is True
+    assert is_dominating_plane(4000, (3.0, 3.0, 8.0)) is False
+    hero = mesh_keep_rank('Cabin_Hero', 'village_blender', 1800, (4, 3, 3))
+    water = mesh_keep_rank('Ocean', 'village_blender', 8, (400, 400, 0.2))
+    assert hero < water
+
+
 def test_primitive_boxes_rank_behind_hero_meshes():
     assert is_primitive_name('Cube') is True
     assert is_primitive_name('Cube.001') is True
@@ -161,5 +170,6 @@ if __name__ == '__main__':
     test_ground_picker_skips_normal_maps()
     test_ground_picker_skips_high_contrast_leaf_tiles()
     test_village_picker_prefers_authored_blend_over_tiny_fbx()
+    test_dominating_plane_is_rejected_for_camera_bounds()
     test_primitive_boxes_rank_behind_hero_meshes()
     print('showcase_original14_select_test PASS')

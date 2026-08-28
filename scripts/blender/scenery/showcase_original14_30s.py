@@ -30,6 +30,7 @@ from showcase_original14_select import (  # noqa: E402
     extract_sort_key,
     geometry_file_limit,
     is_box_mesh,
+    is_dominating_plane,
     is_primitive_name,
     mesh_keep_rank,
     pick_geometry_paths,
@@ -246,9 +247,14 @@ def keep_hero_meshes(objects: list[bpy.types.Object], role: str, limit: int = MA
     meshes.sort(key=lambda o: mesh_keep_rank(o.name, role, mesh_face_count(o), object_dimensions(o)))
     heroes = [
         o for o in meshes
-        if not is_primitive_name(o.name) and not is_box_mesh(mesh_face_count(o), object_dimensions(o))
+        if not is_primitive_name(o.name)
+        and not is_box_mesh(mesh_face_count(o), object_dimensions(o))
+        and not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
     ]
-    pool = heroes or meshes
+    pool = heroes or [
+        o for o in meshes
+        if not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
+    ] or meshes
     keep = pool[: max(1, int(limit))] if pool else []
     keep_set = set(keep)
     for obj in meshes + extras:
@@ -600,7 +606,12 @@ def smooth(obj):
 
 
 def setup_camera(start: int, end: int):
-    meshes = [o for o in bpy.data.objects if o.type == 'MESH' and not str(o.name).startswith('TJ_Ground')]
+    meshes = [
+        o for o in bpy.data.objects
+        if o.type == 'MESH'
+        and not str(o.name).startswith('TJ_Ground')
+        and not is_dominating_plane(mesh_face_count(o), object_dimensions(o))
+    ]
     bounds = group_bounds(meshes)
     if bounds:
         mins, maxs = bounds
@@ -609,8 +620,8 @@ def setup_camera(start: int, end: int):
         vert = max((maxs - mins).z, 4.0)
         look_z = mins.z + min(vert * 0.42, 8.0)
         look = (center.x, center.y, look_z)
-        cam_h = max(vert * 0.55, 4.5)
-        dist = max(horiz * 0.38, 12.0)
+        cam_h = max(vert * 0.45, 3.5)
+        dist = max(horiz * 0.22, 8.0)
         cams = [
             (center.x, center.y + dist * 0.95, mins.z + cam_h),
             (center.x - dist * 0.35, center.y + dist * 0.62, mins.z + cam_h * 0.85),
@@ -810,7 +821,11 @@ def main() -> int:
     for obj in list(bpy.data.objects):
         if obj.type != 'MESH' or str(obj.name).startswith('TJ_Ground'):
             continue
-        if not (is_primitive_name(obj.name) or is_box_mesh(mesh_face_count(obj), object_dimensions(obj))):
+        if not (
+            is_primitive_name(obj.name)
+            or is_box_mesh(mesh_face_count(obj), object_dimensions(obj))
+            or is_dominating_plane(mesh_face_count(obj), object_dimensions(obj))
+        ):
             continue
         try:
             bpy.data.objects.remove(obj, do_unlink=True)
