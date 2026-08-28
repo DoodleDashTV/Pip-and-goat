@@ -1,7 +1,7 @@
 {
   "schema": "TIVVLEJOY_PURCHASED_SCENERY_WATER_CHANNEL_REPAIR_RESULT_V30",
   "startingSha": "8ef309eb892ec22929c1e7699e1dc2c44e993d8d",
-  "finalSha": "pending",
+  "finalSha": "5825861076d16f1bf535a692e267759fa4569704",
   "pr169": {
     "state": "OPEN",
     "draft": true,
