@@ -6,7 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const fs = require('node:fs');
 const fsp = require('node:fs/promises');
-const { spawnSync } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
 const { ListObjectsV2Command } = require('@aws-sdk/client-s3');
 
@@ -40,10 +40,43 @@ function readTail(filePath, bytes=8000) {
   try { const stat=fs.statSync(filePath); const start=Math.max(0,stat.size-bytes); const fd=fs.openSync(filePath,'r'); const b=Buffer.alloc(stat.size-start); fs.readSync(fd,b,0,b.length,start); fs.closeSync(fd); return b.toString('utf8'); }
   catch { return ''; }
 }
-function runBlender({env,args,timeoutMs,logPath}) {
-  const fd=fs.openSync(logPath,'a');
-  try { return spawnSync(env.BLENDER_BIN||'blender',args,{timeout:timeoutMs,env,stdio:['ignore',fd,fd]}); }
-  finally { fs.closeSync(fd); }
+function countPngFrames(outputDir) {
+  try { return fs.readdirSync(outputDir).filter((name)=>/^frame_\d+\.png$/i.test(name)).length; }
+  catch { return 0; }
+}
+function readProgressFile(progressPath) {
+  try { return JSON.parse(fs.readFileSync(progressPath,'utf8')); }
+  catch { return null; }
+}
+function runBlender({env,args,timeoutMs,logPath,onTick}) {
+  return new Promise((resolve)=>{
+    const fd=fs.openSync(logPath,'a');
+    const child=spawn(env.BLENDER_BIN||'blender',args,{env,stdio:['ignore',fd,fd]});
+    let settled=false;
+    const safeTick=()=>{ Promise.resolve(onTick && onTick()).catch((error)=>log('blender_progress_tick_error',{message:String(error.message||error).slice(0,200)})); };
+    safeTick();
+    const tick=setInterval(safeTick,15000);
+    const killer=setTimeout(()=>{
+      try { child.kill('SIGTERM'); } catch {}
+      setTimeout(()=>{ try { child.kill('SIGKILL'); } catch {} },8000);
+    },timeoutMs);
+    const finish=(result)=>{
+      if(settled) return;
+      settled=true;
+      clearInterval(tick);
+      clearTimeout(killer);
+      try { fs.closeSync(fd); } catch {}
+      resolve(result);
+    };
+    child.on('error',(error)=>finish({status:null,error}));
+    child.on('close',(status,signal)=>{
+      if(signal==='SIGTERM'||signal==='SIGKILL') {
+        finish({status,error:Object.assign(new Error('blender ETIMEDOUT'),{code:'ETIMEDOUT'})});
+        return;
+      }
+      finish({status,error:null});
+    });
+  });
 }
 function runFfmpeg({inputDir,fps,outputPath}) {
   const args=[
@@ -112,18 +145,34 @@ async function main() {
     const renderable=localAssets.filter((a)=>!a.unityPreservationOnly);
     if(renderable.length!==11) throw Object.assign(new Error('Renderable Original-14 count != 11'),{code:'ORIGINAL_14_RENDERABLE_COUNT_FAILED'});
 
-    stage='BLENDER_RENDER_FAST_INTERNAL';
-    await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,internalResolution:strip(env.SCENERY_SHOWCASE_INTERNAL_RESOLUTION||'540x960'),samples:Number(env.SCENERY_SHOWCASE_EEVEE_SAMPLES||12),at:new Date().toISOString()});
+    stage='BUILD_SCENE';
     const internalResolution=strip(env.SCENERY_SHOWCASE_INTERNAL_RESOLUTION||'540x960');
     const samples=Math.max(1,Number(env.SCENERY_SHOWCASE_EEVEE_SAMPLES||12));
     const blenderMinutes=Math.max(20,Number(env.SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES||55));
     const script=strip(env.SCENERY_SHOWCASE_BLENDER_SCRIPT||'/opt/ddp-worker/blender/scenery/showcase_original14_30s.py');
+    const progressPath=path.join(outputDir,'render-progress.json');
+    await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,internalResolution,samples,frame:0,framesWritten:0,totalFrames:900,at:new Date().toISOString()});
     const gl=resolveHeadlessGlConfig({env}); const renderEnv=applyHeadlessGlEnv(env,gl);
     const blenderArgs=['--background','--factory-startup','--python-exit-code','1','--python',script,'--',
       '--assets-json',JSON.stringify(renderable),'--output-dir',outputDir,'--resolution',internalResolution,
-      '--fps','30','--start-frame','1','--end-frame','900','--samples',String(samples),'--proof-path',proofPath];
+      '--fps','30','--start-frame','1','--end-frame','900','--samples',String(samples),'--proof-path',proofPath,
+      '--progress-path',progressPath];
     log('original14_blender_launch',{glMode:gl.mode,renderableSourceCount:renderable.length,internalResolution,samples,timeoutMinutes:blenderMinutes});
-    const render=runBlender({env:renderEnv,args:blenderArgs,timeoutMs:blenderMinutes*60_000,logPath:blenderLog});
+    let lastProgressSig='';
+    const publishProgress=async()=>{
+      const framesWritten=countPngFrames(outputDir);
+      const progress=readProgressFile(progressPath)||{};
+      const nextStage=framesWritten>0?'BLENDER_RENDER':(progress.stage||'BLENDER_STARTED');
+      stage=nextStage;
+      const payload={schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage:nextStage,internalResolution,samples,frame:Number(progress.frame||framesWritten||0),framesWritten,totalFrames:900,at:new Date().toISOString()};
+      const sig=`${payload.stage}:${payload.framesWritten}:${payload.frame}`;
+      if(sig===lastProgressSig) return;
+      lastProgressSig=sig;
+      await writeJson(startupKey,payload);
+      log('original14_blender_progress',{stage:payload.stage,frame:payload.frame,framesWritten});
+    };
+    const render=await runBlender({env:renderEnv,args:blenderArgs,timeoutMs:blenderMinutes*60_000,logPath:blenderLog,onTick:publishProgress});
+    await publishProgress();
     if(render.error) throw Object.assign(new Error(`${render.error.message}: ${readTail(blenderLog)}`.slice(-7000)),{code:render.error.code==='ETIMEDOUT'?'TIMEOUT':'BLENDER_SPAWN_FAILED'});
     if(render.status!==0) throw Object.assign(new Error(`Blender exited ${render.status}: ${readTail(blenderLog)}`.slice(-7000)),{code:'BLENDER_FAILED'});
 

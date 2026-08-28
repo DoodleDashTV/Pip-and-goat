@@ -9,7 +9,10 @@ on:
       - 'workers/runpod-blender/src/scenery-showcase-original14-roles.js'
       - 'workers/runpod-blender/src/scenery-showcase-original14.js'
       - 'workers/runpod-blender/src/scenery-showcase-original14-entry.js'
+      - 'workers/runpod-blender/test/scenery-showcase-original14-roles.test.js'
       - 'scripts/blender/scenery/showcase_original14_30s.py'
+      - 'scripts/blender/scenery/showcase_original14_select.py'
+      - 'scripts/blender/scenery/showcase_original14_select_test.py'
       - '.github/workflows/tivvlejoy-scenery-showcase-worker-image-original14-v1.yml'
 
 concurrency:
@@ -46,7 +49,9 @@ jobs:
           node --check workers/runpod-blender/src/scenery-showcase-original14-roles.js
           node --check workers/runpod-blender/src/scenery-showcase-original14.js
           node --check workers/runpod-blender/src/scenery-showcase-original14-entry.js
-          python3 -m py_compile scripts/blender/scenery/showcase_original14_30s.py
+          node --test workers/runpod-blender/test/scenery-showcase-original14-roles.test.js
+          python3 -m py_compile scripts/blender/scenery/showcase_original14_select.py scripts/blender/scenery/showcase_original14_30s.py
+          (cd scripts/blender/scenery && python3 showcase_original14_select_test.py)
           grep -F "FROM ghcr.io/doodledashtv/ddp-runpod-blender@${EXPECTED_PARENT_DIGEST}" workers/runpod-blender/Dockerfile.scenery-showcase-original14
           grep -F 'tivvlejoy.scenery.original.source.count="14"' workers/runpod-blender/Dockerfile.scenery-showcase-original14
           grep -F 'tivvlejoy.scenery.renderable.source.count="11"' workers/runpod-blender/Dockerfile.scenery-showcase-original14
