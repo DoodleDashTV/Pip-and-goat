@@ -1815,9 +1815,10 @@ def main() -> int:
         and 'fbx' not in subject_parent_name(o).lower()
         and 'forest_' not in subject_parent_name(o).lower()
     ]
-    grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 2.0, 0.0), copies=5, radius=8.0)
-    near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 22.0, 0.0), 16, 44.0, 4.0, 1.55)
-    far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 36.0, 0.0), 16, 50.0, 5.0, 1.85)
+    # Keep grove copies north of the cabins so they do not stab through roofs.
+    grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 12.0, 0.0), copies=4, radius=5.0)
+    near_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 28.0, 0.0), 16, 44.0, 4.0, 1.55)
+    far_band = scatter_forest_line(village_trees, (village_center.x, village_center.y + 42.0, 0.0), 16, 50.0, 5.0, 1.85)
     forest_band = grove + near_band + far_band
     print(json.dumps({
         'event': 'purchased_image_remap',
