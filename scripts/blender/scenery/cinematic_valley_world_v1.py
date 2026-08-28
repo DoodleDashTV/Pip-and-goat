@@ -26,19 +26,20 @@ from cinematic_standards import (  # noqa: E402
     profile_defaults,
     visible_use_record,
 )
+from mathutils.geometry import interpolate_bezier  # noqa: E402
 from showcase_original14_30s import (  # noqa: E402
     append_named_objects,
     duplicate_mesh_in_world,
     ensure_purchased_albedos,
     expand_asset,
     geometry_candidates,
+    group_bounds,
     import_geometry,
     import_kit_groups,
     keep_hero_meshes,
     lift_purchased_shading,
     load_water_materials,
     paint_simple_color,
-    place_mountain_ridge,
     remap_missing_images,
     setup_world,
 )
@@ -53,10 +54,12 @@ RIVER_SPLINE = (
     (26.0, -13.5, -0.66),
     (42.0, -19.0, -0.62),
 )
-VILLAGE_X_HALF = 16.0
-VILLAGE_Y_MIN = -6.0
-VILLAGE_Y_MAX = 14.0
+VILLAGE_X_HALF = 18.0
+VILLAGE_Y_MIN = -8.0
+VILLAGE_Y_MAX = 22.0
 MOUNTAIN_CORRIDOR_X = 8.0
+LOUIS_LP_MEADOW = ("LP_MeadowRange1", "LP_MeadowRange2", "LP_MeadowRange3")
+LOUIS_LP_PEAKS = ("LP_GrassyMountain1", "LP_GrassyMountain2", "LP_GrassyMountain3")
 
 PROGRESS_PATH: Path | None = None
 
@@ -132,28 +135,17 @@ def shade_smooth(obj: bpy.types.Object) -> None:
         poly.use_smooth = True
 
 
-def purchased_ground_image(files: list[Path]) -> Path | None:
-    banned = ("leaf", "leaves", "foliage", "needles", "grass01", "cutout", "opacity", "trunk", "wood01")
-    words = ("rock", "dirt", "soil", "moss", "ground", "meadow", "terrain")
-    images = []
-    for path in files:
-        if not path.is_file() or path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".tga", ".tif", ".tiff"}:
+def purchased_meadow_image():
+    """Louis Meadow/Grassy albedos only. Rocks_A reads as sand from the south camera."""
+    for mat in bpy.data.materials:
+        if not mat or not mat.node_tree:
             continue
-        name = path.name.lower()
-        if any(word in name for word in banned):
+        if not any(token in mat.name.lower() for token in ("meadow", "grassy")):
             continue
-        if any(token in name for token in ("nrm", "normal", "spec", "rough", "opacity", "_ao.")):
-            continue
-        if any(word in name for word in words):
-            images.append(path)
-    preferred = [
-        path for path in images
-        if "rocks_a" in path.name.lower() and "basecolor" in path.name.lower().replace("_", "")
-    ]
-    if preferred:
-        return preferred[0]
-    albedo = [path for path in images if "basecolor" in path.name.lower().replace("_", "") or "alb" in path.name.lower()]
-    return albedo[0] if albedo else (images[0] if images else None)
+        for node in mat.node_tree.nodes:
+            if node.type == "TEX_IMAGE" and getattr(node, "image", None):
+                return node.image
+    return None
 
 
 def in_village(x: float, y: float) -> bool:
@@ -173,8 +165,8 @@ def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, 
     return chosen
 
 
-def build_terrain(files: list[Path]) -> bpy.types.Object:
-    bpy.ops.mesh.primitive_grid_add(x_subdivisions=120, y_subdivisions=120, size=180.0, location=(0.0, 8.0, 0.0))
+def build_terrain(_files: list[Path]) -> bpy.types.Object:
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=140, y_subdivisions=140, size=180.0, location=(0.0, 8.0, 0.0))
     ground = bpy.context.object
     ground.name = "TJ_Ground_ValleyCarrier"
     try:
@@ -183,13 +175,13 @@ def build_terrain(files: list[Path]) -> bpy.types.Object:
         pass
     for vert in ground.data.vertices:
         x, y = vert.co.x, vert.co.y
-        height = 1.15 * math.sin(x * 0.028) * math.cos(y * 0.022)
-        height += 0.55 * math.sin((x * 0.6 + y) * 0.04)
+        height = 0.55 * math.sin(x * 0.022) * math.cos(y * 0.018)
+        height += 0.28 * math.sin((x * 0.45 + y) * 0.035)
         river_dist = dist_to_polyline(x, y)
-        trench = math.exp(-(river_dist ** 2) / 10.5)
-        height -= 0.95 * trench
-        if 2.6 < river_dist < 6.4:
-            height += 0.22 * math.exp(-((river_dist - 4.2) ** 2) / 2.8)
+        trench = math.exp(-(river_dist ** 2) / 18.0)
+        height -= 1.05 * trench
+        if 3.4 < river_dist < 8.2:
+            height += 0.16 * math.exp(-((river_dist - 5.4) ** 2) / 3.6)
         pad = 1.0
         if in_village(x, y):
             edge = min(
@@ -197,21 +189,29 @@ def build_terrain(files: list[Path]) -> bpy.types.Object:
                 (y - VILLAGE_Y_MIN) / 3.0,
                 (VILLAGE_Y_MAX - y) / 3.0,
             )
-            pad = max(0.12, 1.0 - max(0.0, min(1.0, edge)) * 0.88)
+            pad = max(0.10, 1.0 - max(0.0, min(1.0, edge)) * 0.90)
         height *= pad
-        if y > 46.0:
-            height += min(3.2, (y - 46.0) * 0.05)
         vert.co.z = height
     ground.data.update()
     shade_smooth(ground)
-    img = purchased_ground_image(files)
+    img = purchased_meadow_image()
     ground.data.materials.append(cinematic_meadow_material(img))
     print(json.dumps({"event": "terrain_ground_image", "path": img.name if img else None}), flush=True)
     return ground
 
 
-def cinematic_meadow_material(img_path: Path | None) -> bpy.types.Material:
-    """Darker south-camera meadow. The retired helper graded toward lime."""
+def _mix_rgb(nodes):
+    try:
+        mix = nodes.new("ShaderNodeMixRGB")
+    except Exception:
+        mix = nodes.new("ShaderNodeMix")
+        if hasattr(mix, "data_type"):
+            mix.data_type = "RGBA"
+    return mix
+
+
+def cinematic_meadow_material(image) -> bpy.types.Material:
+    """Dark meadow + packed-earth street. No Rocks_A sand mix."""
     mat = bpy.data.materials.new("TJ_CinematicValleyMeadow")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -221,41 +221,35 @@ def cinematic_meadow_material(img_path: Path | None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
     if "Roughness" in bsdf.inputs:
-        bsdf.inputs["Roughness"].default_value = 0.94
+        bsdf.inputs["Roughness"].default_value = 0.96
     coord = nodes.new("ShaderNodeTexCoord")
     noise = nodes.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 0.018
+    noise.inputs["Scale"].default_value = 0.014
     if "Detail" in noise.inputs:
-        noise.inputs["Detail"].default_value = 2.0
+        noise.inputs["Detail"].default_value = 3.0
     links.new(coord.outputs["Object"], noise.inputs["Vector"])
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE"
-    ramp.color_ramp.elements[0].position = 0.18
-    ramp.color_ramp.elements[0].color = (0.05, 0.07, 0.04, 1.0)
-    ramp.color_ramp.elements[1].position = 0.82
-    ramp.color_ramp.elements[1].color = (0.10, 0.13, 0.06, 1.0)
+    ramp.color_ramp.elements[0].position = 0.16
+    ramp.color_ramp.elements[0].color = (0.028, 0.045, 0.022, 1.0)
+    ramp.color_ramp.elements[1].position = 0.84
+    ramp.color_ramp.elements[1].color = (0.055, 0.080, 0.032, 1.0)
     mid = ramp.color_ramp.elements.new(0.50)
-    mid.color = (0.07, 0.10, 0.05, 1.0)
+    mid.color = (0.040, 0.062, 0.028, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
     color = ramp.outputs["Color"]
-    if img_path is not None:
+    if image is not None:
         tex = nodes.new("ShaderNodeTexImage")
-        tex.image = bpy.data.images.load(str(img_path), check_existing=True)
+        tex.image = image
         if tex.image and tex.image.colorspace_settings:
             tex.image.colorspace_settings.name = "sRGB"
         mapping = nodes.new("ShaderNodeMapping")
-        mapping.inputs["Scale"].default_value = (0.018, 0.018, 0.018)
+        mapping.inputs["Scale"].default_value = (0.008, 0.008, 0.008)
         links.new(coord.outputs["Object"], mapping.inputs["Vector"])
         links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
-        mix = nodes.new("ShaderNodeMixRGB") if "ShaderNodeMixRGB" in dir(bpy.types) else nodes.new("ShaderNodeMix")
-        try:
-            mix = nodes.new("ShaderNodeMixRGB")
-        except Exception:
-            mix = nodes.new("ShaderNodeMix")
-            if hasattr(mix, "data_type"):
-                mix.data_type = "RGBA"
+        mix = _mix_rgb(nodes)
         if "Color1" in mix.inputs:
-            mix.inputs["Fac"].default_value = 0.32
+            mix.inputs["Fac"].default_value = 0.22
             links.new(ramp.outputs["Color"], mix.inputs["Color1"])
             links.new(tex.outputs["Color"], mix.inputs["Color2"])
             color = mix.outputs["Color"]
@@ -265,21 +259,21 @@ def cinematic_meadow_material(img_path: Path | None) -> bpy.types.Material:
     abs_x.operation = "ABSOLUTE"
     links.new(sep.outputs["X"], abs_x.inputs[0])
     path_w = nodes.new("ShaderNodeMapRange")
-    path_w.inputs["From Min"].default_value = 0.9
-    path_w.inputs["From Max"].default_value = 4.8
+    path_w.inputs["From Min"].default_value = 0.6
+    path_w.inputs["From Max"].default_value = 3.6
     path_w.inputs["To Min"].default_value = 1.0
     path_w.inputs["To Max"].default_value = 0.0
     links.new(abs_x.outputs["Value"], path_w.inputs["Value"])
     y_center = nodes.new("ShaderNodeMath")
     y_center.operation = "SUBTRACT"
-    y_center.inputs[1].default_value = 2.0
+    y_center.inputs[1].default_value = 6.0
     links.new(sep.outputs["Y"], y_center.inputs[0])
     y_abs = nodes.new("ShaderNodeMath")
     y_abs.operation = "ABSOLUTE"
     links.new(y_center.outputs["Value"], y_abs.inputs[0])
     y_fade = nodes.new("ShaderNodeMapRange")
-    y_fade.inputs["From Min"].default_value = 6.0
-    y_fade.inputs["From Max"].default_value = 14.0
+    y_fade.inputs["From Min"].default_value = 8.0
+    y_fade.inputs["From Max"].default_value = 18.0
     y_fade.inputs["To Min"].default_value = 1.0
     y_fade.inputs["To Max"].default_value = 0.0
     links.new(y_abs.outputs["Value"], y_fade.inputs["Value"])
@@ -287,16 +281,10 @@ def cinematic_meadow_material(img_path: Path | None) -> bpy.types.Material:
     path_fac.operation = "MULTIPLY"
     links.new(path_w.outputs["Result"] if "Result" in path_w.outputs else path_w.outputs[0], path_fac.inputs[0])
     links.new(y_fade.outputs["Result"] if "Result" in y_fade.outputs else y_fade.outputs[0], path_fac.inputs[1])
-    dirt = nodes.new("ShaderNodeMixRGB") if True else None
-    try:
-        dirt = nodes.new("ShaderNodeMixRGB")
-    except Exception:
-        dirt = nodes.new("ShaderNodeMix")
-        if hasattr(dirt, "data_type"):
-            dirt.data_type = "RGBA"
+    dirt = _mix_rgb(nodes)
     if "Color1" in dirt.inputs:
         links.new(color, dirt.inputs["Color1"])
-        dirt.inputs["Color2"].default_value = (0.28, 0.18, 0.09, 1.0)
+        dirt.inputs["Color2"].default_value = (0.14, 0.09, 0.05, 1.0)
         links.new(path_fac.outputs["Value"], dirt.inputs["Fac"])
         color = dirt.outputs["Color"]
     bank_y = nodes.new("ShaderNodeMath")
@@ -307,51 +295,78 @@ def cinematic_meadow_material(img_path: Path | None) -> bpy.types.Material:
     bank_abs.operation = "ABSOLUTE"
     links.new(bank_y.outputs["Value"], bank_abs.inputs[0])
     bank_w = nodes.new("ShaderNodeMapRange")
-    bank_w.inputs["From Min"].default_value = 2.4
-    bank_w.inputs["From Max"].default_value = 7.0
-    bank_w.inputs["To Min"].default_value = 0.55
+    bank_w.inputs["From Min"].default_value = 3.0
+    bank_w.inputs["From Max"].default_value = 8.5
+    bank_w.inputs["To Min"].default_value = 0.62
     bank_w.inputs["To Max"].default_value = 0.0
     links.new(bank_abs.outputs["Value"], bank_w.inputs["Value"])
-    bank = nodes.new("ShaderNodeMixRGB")
-    try:
-        bank = nodes.new("ShaderNodeMixRGB")
-    except Exception:
-        bank = nodes.new("ShaderNodeMix")
-        if hasattr(bank, "data_type"):
-            bank.data_type = "RGBA"
+    bank = _mix_rgb(nodes)
     if "Color1" in bank.inputs:
         links.new(color, bank.inputs["Color1"])
-        bank.inputs["Color2"].default_value = (0.16, 0.12, 0.07, 1.0)
+        bank.inputs["Color2"].default_value = (0.10, 0.07, 0.04, 1.0)
         links.new(bank_w.outputs["Result"] if "Result" in bank_w.outputs else bank_w.outputs[0], bank.inputs["Fac"])
         color = bank.outputs["Color"]
     links.new(color, bsdf.inputs["Base Color"])
     return mat
 
 
-def fallback_water_material() -> bpy.types.Material:
-    mat = bpy.data.materials.new("TJ_River_FallbackFromPurchasedLook")
+def cinematic_river_material(tint=None) -> bpy.types.Material:
+    """Fresnel body + gloss. No transmission: that reads as ice at 16 samples."""
+    mat = bpy.data.materials.new("TJ_CinematicRiver")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
     links = mat.node_tree.links
-    bsdf = nodes.get("Principled BSDF")
-    if bsdf:
-        if "Base Color" in bsdf.inputs:
-            bsdf.inputs["Base Color"].default_value = (0.035, 0.09, 0.11, 1.0)
-        if "Roughness" in bsdf.inputs:
-            bsdf.inputs["Roughness"].default_value = 0.22
-        if "Specular IOR Level" in bsdf.inputs:
-            bsdf.inputs["Specular IOR Level"].default_value = 0.45
-        if "Transmission Weight" in bsdf.inputs:
-            bsdf.inputs["Transmission Weight"].default_value = 0.08
-        wave = nodes.new("ShaderNodeTexWave")
-        wave.inputs["Scale"].default_value = 4.2
-        if "Distortion" in wave.inputs:
-            wave.inputs["Distortion"].default_value = 1.8
-        bump = nodes.new("ShaderNodeBump")
-        bump.inputs["Strength"].default_value = 0.16
-        links.new(wave.outputs["Color"], bump.inputs["Height"])
-        if "Normal" in bsdf.inputs:
-            links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    nodes.clear()
+    out = nodes.new("ShaderNodeOutputMaterial")
+    body = nodes.new("ShaderNodeBsdfPrincipled")
+    spec = nodes.new("ShaderNodeBsdfPrincipled")
+    body_col = tint or (0.018, 0.055, 0.062, 1.0)
+    if "Base Color" in body.inputs:
+        body.inputs["Base Color"].default_value = body_col
+    if "Roughness" in body.inputs:
+        body.inputs["Roughness"].default_value = 0.32
+    if "Specular IOR Level" in body.inputs:
+        body.inputs["Specular IOR Level"].default_value = 0.42
+    if "Transmission Weight" in body.inputs:
+        body.inputs["Transmission Weight"].default_value = 0.0
+    if "Base Color" in spec.inputs:
+        spec.inputs["Base Color"].default_value = (0.16, 0.26, 0.30, 1.0)
+    if "Roughness" in spec.inputs:
+        spec.inputs["Roughness"].default_value = 0.06
+    if "Specular IOR Level" in spec.inputs:
+        spec.inputs["Specular IOR Level"].default_value = 0.88
+    if "Metallic" in spec.inputs:
+        spec.inputs["Metallic"].default_value = 0.12
+    fresnel = nodes.new("ShaderNodeFresnel")
+    fresnel.inputs["IOR"].default_value = 1.333
+    mix = nodes.new("ShaderNodeMixShader")
+    links.new(fresnel.outputs["Fac"], mix.inputs["Fac"])
+    links.new(body.outputs["BSDF"], mix.inputs[1])
+    links.new(spec.outputs["BSDF"], mix.inputs[2])
+    coord = nodes.new("ShaderNodeTexCoord")
+    mapping = nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (1.15, 0.28, 1.0)
+    links.new(coord.outputs["Object"], mapping.inputs["Vector"])
+    wave = nodes.new("ShaderNodeTexWave")
+    wave.wave_type = "BANDS"
+    wave.inputs["Scale"].default_value = 7.5
+    if "Distortion" in wave.inputs:
+        wave.inputs["Distortion"].default_value = 5.2
+    if "Detail" in wave.inputs:
+        wave.inputs["Detail"].default_value = 4.0
+    links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
+    bump = nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.42
+    if "Distance" in bump.inputs:
+        bump.inputs["Distance"].default_value = 0.10
+    links.new(wave.outputs["Color"], bump.inputs["Height"])
+    if "Normal" in body.inputs:
+        links.new(bump.outputs["Normal"], body.inputs["Normal"])
+    if "Normal" in spec.inputs:
+        links.new(bump.outputs["Normal"], spec.inputs["Normal"])
+    if "Normal" in fresnel.inputs:
+        links.new(bump.outputs["Normal"], fresnel.inputs["Normal"])
+    links.new(mix.outputs["Shader"], out.inputs["Surface"])
     return mat
 
 
@@ -359,21 +374,18 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
     water = next((mat for mat in bpy.data.materials if mat and str(mat.name).startswith("Water_Mat")), None)
     if water is None:
         water = next((mat for mat in bpy.data.materials if mat and "water" in mat.name.lower() and mat.node_tree), None)
-    surface = fallback_water_material()
-    purchased = water is not None
-    # Water_Mat_1 reads as cracked ice / tiles on a 9:16 river camera.
-    # Keep it loaded for visible-use tint, but the spline surface must read as water.
-    if water is not None and water.node_tree and surface.node_tree:
+    tint = None
+    if water is not None and water.node_tree:
         src = next((n for n in water.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
-        dst = surface.node_tree.nodes.get("Principled BSDF")
-        if src and dst and "Base Color" in src.inputs and "Base Color" in dst.inputs:
+        if src and "Base Color" in src.inputs:
             src_col = src.inputs["Base Color"].default_value
-            dst.inputs["Base Color"].default_value = (
-                max(0.02, float(src_col[0]) * 0.18),
-                max(0.04, float(src_col[1]) * 0.20),
-                max(0.05, float(src_col[2]) * 0.22),
+            tint = (
+                max(0.012, float(src_col[0]) * 0.12),
+                max(0.030, float(src_col[1]) * 0.16),
+                max(0.038, float(src_col[2]) * 0.18),
                 1.0,
             )
+    surface = cinematic_river_material(tint)
     river.data.materials.clear()
     river.data.materials.append(surface)
     if hasattr(river, "visible_shadow"):
@@ -381,11 +393,11 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
     print(json.dumps({
         "event": "river_material_assigned",
         "name": water.name if water else surface.name,
-        "purchased": purchased,
+        "purchased": water is not None,
         "surface": surface.name,
-        "shape": "spline_strip",
+        "shape": "bezier_ribbon",
     }), flush=True)
-    return (water.name if water else surface.name)
+    return water.name if water else surface.name
 
 
 def build_river_guide() -> bpy.types.Object:
@@ -403,27 +415,42 @@ def build_river_guide() -> bpy.types.Object:
     return curve_obj
 
 
-def spline_edge_mesh(name: str, inner_half: float, outer_half: float, z_offset: float, side_sign: float, samples: int = 36) -> bpy.types.Object:
+def evaluated_centerline(curve_obj: bpy.types.Object, samples: int = 72) -> list[Vector]:
+    spline = curve_obj.data.splines[0]
+    points = spline.bezier_points
+    segs = len(points) - 1
+    per = max(4, samples // segs)
+    out: list[Vector] = []
+    for i in range(segs):
+        chunk = interpolate_bezier(points[i].co, points[i].handle_right, points[i + 1].handle_left, points[i + 1].co, per)
+        if i < segs - 1:
+            chunk = chunk[:-1]
+        out.extend(Vector(item) for item in chunk)
+    return out
+
+
+def _side_from_centers(centers: list[Vector], index: int) -> Vector:
+    if index < len(centers) - 1:
+        tangent = centers[index + 1] - centers[index]
+    else:
+        tangent = centers[index] - centers[index - 1]
+    tangent.z = 0.0
+    if tangent.length < 1e-4:
+        tangent = Vector((1.0, 0.0, 0.0))
+    tangent.normalize()
+    return Vector((-tangent.y, tangent.x, 0.0))
+
+
+def spline_edge_mesh(name: str, centers: list[Vector], inner_half: float, outer_half: float, z_inner: float, z_outer: float, side_sign: float) -> bpy.types.Object:
     verts = []
     faces = []
-    for i in range(samples):
-        t = i / (samples - 1)
-        seg = min(len(RIVER_SPLINE) - 2, int(t * (len(RIVER_SPLINE) - 1)))
-        local = (t * (len(RIVER_SPLINE) - 1)) - seg
-        a = Vector(RIVER_SPLINE[seg])
-        b = Vector(RIVER_SPLINE[seg + 1])
-        center = a.lerp(b, local)
-        tangent = (b - a)
-        tangent.z = 0.0
-        if tangent.length < 1e-4:
-            tangent = Vector((1.0, 0.0, 0.0))
-        tangent.normalize()
-        side = Vector((-tangent.y, tangent.x, 0.0)) * side_sign
-        wobble = 0.35 * math.sin(i * 0.7)
-        inner = center + side * (inner_half + wobble * 0.3)
+    for i, center in enumerate(centers):
+        side = _side_from_centers(centers, i) * side_sign
+        wobble = 0.12 * math.sin(i * 0.28)
+        inner = center + side * (inner_half + wobble * 0.2)
         outer = center + side * (outer_half + wobble)
-        inner.z = center.z + z_offset
-        outer.z = center.z + z_offset + 0.03
+        inner.z = center.z + z_inner
+        outer.z = center.z + z_outer
         verts.extend([(inner.x, inner.y, inner.z), (outer.x, outer.y, outer.z)])
         if i > 0:
             v = i * 2
@@ -437,23 +464,12 @@ def spline_edge_mesh(name: str, inner_half: float, outer_half: float, z_offset: 
     return obj
 
 
-def spline_strip_mesh(name: str, half_width: float, z_offset: float, width_wobble: float, samples: int = 36) -> bpy.types.Object:
+def spline_strip_mesh(name: str, centers: list[Vector], half_width: float, z_offset: float, width_wobble: float) -> bpy.types.Object:
     verts = []
     faces = []
-    for i in range(samples):
-        t = i / (samples - 1)
-        seg = min(len(RIVER_SPLINE) - 2, int(t * (len(RIVER_SPLINE) - 1)))
-        local = (t * (len(RIVER_SPLINE) - 1)) - seg
-        a = Vector(RIVER_SPLINE[seg])
-        b = Vector(RIVER_SPLINE[seg + 1])
-        center = a.lerp(b, local)
-        tangent = (b - a)
-        tangent.z = 0.0
-        if tangent.length < 1e-4:
-            tangent = Vector((1.0, 0.0, 0.0))
-        tangent.normalize()
-        side = Vector((-tangent.y, tangent.x, 0.0))
-        half = half_width + width_wobble * math.sin(i * 0.55)
+    for i, center in enumerate(centers):
+        side = _side_from_centers(centers, i)
+        half = half_width + width_wobble * math.sin(i * 0.22)
         left = center + side * half
         right = center - side * half
         left.z = center.z + z_offset
@@ -495,16 +511,79 @@ def dirt_bank_material() -> bpy.types.Material:
 
 
 def build_river() -> tuple[bpy.types.Object, str, list]:
-    build_river_guide()
-    river = spline_strip_mesh("TJ_River_PurchasedWater", half_width=2.05, z_offset=0.04, width_wobble=0.55)
+    guide = build_river_guide()
+    centers = evaluated_centerline(guide, samples=80)
+    river = spline_strip_mesh("TJ_River_PurchasedWater", centers, half_width=3.35, z_offset=0.08, width_wobble=0.22)
     assigned = assign_purchased_water(river)
     banks = []
     bank_mat = dirt_bank_material()
     for name, sign in (("TJ_RiverBank_Left", 1.0), ("TJ_RiverBank_Right", -1.0)):
-        bank = spline_edge_mesh(name, inner_half=1.55, outer_half=5.2, z_offset=0.10, side_sign=sign)
+        bank = spline_edge_mesh(name, centers, inner_half=3.05, outer_half=6.8, z_inner=0.06, z_outer=0.22, side_sign=sign)
         bank.data.materials.append(bank_mat)
         banks.append(bank)
     return river, assigned, banks
+
+
+def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0) -> None:
+    obj.parent = None
+    try:
+        obj.matrix_parent_inverse.identity()
+    except Exception:
+        pass
+    obj.rotation_euler = (0.0, 0.0, 0.0)
+    obj.scale = (scale, scale, scale)
+    obj.location = (0.0, 0.0, 0.0)
+    bpy.context.view_layer.update()
+    bounds = group_bounds([obj])
+    if not bounds:
+        obj.location = (center_x, south_y, z_lift)
+        return
+    mins, maxs = bounds
+    obj.location = (
+        center_x - (mins.x + maxs.x) * 0.5,
+        south_y - mins.y,
+        z_lift - mins.z,
+    )
+    if hasattr(obj, "visible_shadow"):
+        obj.visible_shadow = False
+
+
+def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) -> list:
+    """Use authored LP Meadow/Grassy ranges. Do not smash HP tiles to 70x34."""
+    meadow = next((path for path in files if path.name.lower() == "meadow.blend"), None)
+    grassy = next((path for path in files if path.name.lower() == "grassy.blend"), None)
+    members = []
+    if meadow is not None:
+        members.extend(append_named_objects(meadow, list(LOUIS_LP_MEADOW)))
+    if grassy is not None:
+        members.extend(append_named_objects(grassy, list(LOUIS_LP_PEAKS)))
+    for obj in list(bpy.data.objects):
+        if obj.name.startswith("HP_"):
+            obj.hide_render = True
+            obj.hide_viewport = True
+            try:
+                bpy.data.objects.remove(obj, do_unlink=True)
+            except Exception:
+                pass
+    foothill_slots = ((-38.0, 26.0, 0.18), (8.0, 28.0, 0.17), (48.0, 30.0, 0.16))
+    peak_slots = ((-42.0, 68.0, 0.30), (6.0, 74.0, 0.32), (46.0, 70.0, 0.28))
+    placed = []
+    foothills = [obj for obj in members if obj and "meadowrange" in obj.name.lower()]
+    peaks = [obj for obj in members if obj and "grassymountain" in obj.name.lower()]
+    for obj, (cx, south, scale) in zip(foothills, foothill_slots):
+        sit_louis_piece(obj, cx, south, scale)
+        link_exclusive(obj, collection)
+        placed.append(obj)
+    for obj, (cx, south, scale) in zip(peaks, peak_slots):
+        sit_louis_piece(obj, cx, south, scale)
+        link_exclusive(obj, collection)
+        placed.append(obj)
+    print(json.dumps({
+        "event": "louis_lp_ridge_placed",
+        "count": len(placed),
+        "names": [obj.name for obj in placed],
+    }), flush=True)
+    return placed
 
 
 def place_purchased_water_gn(files: list[Path], collection: bpy.types.Collection) -> str | None:
@@ -577,35 +656,43 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="SUN", location=(18.0, -48.0, 70.0))
     sun = bpy.context.object
     sun.name = "TJ_KeySun"
-    sun.data.energy = 4.6
-    sun.data.angle = math.radians(5.0)
-    sun.rotation_euler = (math.radians(52), math.radians(6), math.radians(18))
+    sun.data.energy = 4.2
+    sun.data.angle = math.radians(6.0)
+    sun.rotation_euler = (math.radians(48), math.radians(8), math.radians(22))
     if hasattr(sun.data, "color"):
-        sun.data.color = (1.0, 0.93, 0.78)
+        sun.data.color = (1.0, 0.90, 0.74)
     bpy.ops.object.light_add(type="AREA", location=(0.0, -12.0, 48.0))
     sky = bpy.context.object
     sky.name = "TJ_SkyFill"
-    sky.data.energy = 220
-    sky.data.size = 72
+    sky.data.energy = 260
+    sky.data.size = 80
     sky.rotation_euler = (math.radians(0), 0.0, 0.0)
     if hasattr(sky.data, "color"):
-        sky.data.color = (0.72, 0.82, 1.0)
+        sky.data.color = (0.74, 0.84, 1.0)
     bpy.ops.object.light_add(type="AREA", location=(0.0, 4.0, 1.6))
     bounce = bpy.context.object
     bounce.name = "TJ_GroundBounce"
-    bounce.data.energy = 120
-    bounce.data.size = 28
+    bounce.data.energy = 150
+    bounce.data.size = 32
     bounce.rotation_euler = (math.radians(90), 0.0, 0.0)
     if hasattr(bounce.data, "color"):
-        bounce.data.color = (1.0, 0.84, 0.60)
+        bounce.data.color = (1.0, 0.86, 0.62)
+    bpy.ops.object.light_add(type="AREA", location=(-28.0, 22.0, 9.0))
+    forest = bpy.context.object
+    forest.name = "TJ_ForestFill"
+    forest.data.energy = 180
+    forest.data.size = 20
+    forest.rotation_euler = (math.radians(58), 0.0, math.radians(18))
+    if hasattr(forest.data, "color"):
+        forest.data.color = (1.0, 0.88, 0.70)
 
 
 def setup_mist_and_compositor() -> None:
     scene = bpy.context.scene
     if hasattr(scene.world, "mist_settings"):
         scene.world.mist_settings.use_mist = True
-        scene.world.mist_settings.start = 55.0
-        scene.world.mist_settings.depth = 160.0
+        scene.world.mist_settings.start = 42.0
+        scene.world.mist_settings.depth = 150.0
         scene.world.mist_settings.falloff = "QUADRATIC"
     view = scene.view_layers[0]
     if hasattr(view, "use_pass_mist"):
@@ -628,7 +715,7 @@ def setup_mist_and_compositor() -> None:
     if "Mist" in render.outputs:
         scale = nodes.new("CompositorNodeMath")
         scale.operation = "MULTIPLY"
-        scale.inputs[1].default_value = 0.16
+        scale.inputs[1].default_value = 0.20
         links.new(render.outputs["Mist"], scale.inputs[0])
         links.new(scale.outputs["Value"], fac)
     links.new(render.outputs["Image"], color1)
@@ -722,7 +809,7 @@ def apply_profile(profile_name: str, args) -> dict:
     if hasattr(scene, "view_settings"):
         scene.view_settings.view_transform = "AgX"
         scene.view_settings.look = "AgX - Medium High Contrast"
-        scene.view_settings.exposure = 0.38
+        scene.view_settings.exposure = 0.46
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGB"
     scene.render.image_settings.color_depth = "16" if defaults.get("masterBitDepth") == "16" and profile in {"HERO_STILL", "FINAL"} else "8"
@@ -760,6 +847,7 @@ def main() -> int:
         expanded[asset["role"]] = expand_asset(asset, extract_root)
 
     all_files = [path for files in expanded.values() for path in files]
+    mountain_members = place_louis_lp_ridge(expanded.get("background_mountains", []), collections["WORLD_MOUNTAINS_BACKGROUND"])
     terrain = build_terrain(all_files)
     link_exclusive(terrain, collections["WORLD_TERRAIN"])
     water_loaded = load_water_materials(expanded.get("village_project", []) + expanded.get("forest_ecokit", []))
@@ -773,14 +861,18 @@ def main() -> int:
     village_files = expanded.get("village_blender", [])
     cabin_files = role_files(village_files, ("cabin",), ("interior",))
     cabin_files = sorted(
-        [path for path in cabin_files if path.name.lower().endswith("a.blend")],
+        [path for path in cabin_files if path.name.lower().endswith(".blend")],
         key=lambda path: path.name.lower(),
-    )[:4]
+    )[:8]
     street_slots = [
-        (-8.6, -1.6, 0.0),
-        (8.8, 1.2, 0.0),
-        (-9.4, 7.8, 0.0),
-        (9.6, 10.2, 0.0),
+        (-9.2, -2.0, 0.0),
+        (9.4, -0.2, 0.0),
+        (-9.8, 5.0, 0.0),
+        (9.8, 6.6, 0.0),
+        (-10.2, 11.6, 0.0),
+        (10.0, 13.0, 0.0),
+        (-9.4, 17.8, 0.0),
+        (10.4, 19.2, 0.0),
     ]
     members, imported, placed = import_kit_groups(
         cabin_files,
@@ -791,11 +883,19 @@ def main() -> int:
     )
     for obj in members:
         link_exclusive(obj, collections["WORLD_VILLAGE"])
-    prop_files = role_files(village_files, ("cart", "fence", "gate", "barrel", "crate"), ("grass01",))
+    prop_files = role_files(village_files, ("cart", "fence", "gate", "barrel", "crate", "firewood", "bucket"), ("grass01",))
     prop_members, prop_imported, prop_placed = import_kit_groups(
         prop_files,
         "village_blender",
-        [(1.8, -5.2, 0.0), (-3.2, 3.4, 0.0), (0.2, 13.6, 0.0), (3.6, 6.4, 0.0)],
+        [
+            (1.6, -5.4, 0.0),
+            (-2.8, 2.2, 0.0),
+            (0.2, 8.4, 0.0),
+            (2.4, 14.6, 0.0),
+            (-4.6, 6.0, 0.0),
+            (4.8, 10.2, 0.0),
+            (0.0, 18.4, 0.0),
+        ],
         village_center,
         5,
     )
@@ -805,7 +905,16 @@ def main() -> int:
     street_tree_members, street_tree_imported, street_tree_placed = import_kit_groups(
         tree_files,
         "village_blender",
-        [(-13.8, -2.4, 0.0), (14.2, 3.8, 0.0), (-14.6, 11.2, 0.0), (14.8, 16.4, 0.0)],
+        [
+            (-14.2, -1.2, 0.0),
+            (14.6, 1.6, 0.0),
+            (-14.8, 6.8, 0.0),
+            (15.0, 8.8, 0.0),
+            (-15.0, 13.6, 0.0),
+            (15.2, 15.8, 0.0),
+            (-14.4, 19.6, 0.0),
+            (15.4, 21.4, 0.0),
+        ],
         village_center,
         6,
     )
@@ -862,20 +971,6 @@ def main() -> int:
         link_exclusive(obj, collections["WORLD_FOREST_MIDGROUND"])
     for obj in background:
         link_exclusive(obj, collections["WORLD_FOREST_BACKGROUND"])
-
-    mountain_files = expanded.get("background_mountains", [])
-    mountain_members = []
-    if mountain_files:
-        for candidate in geometry_candidates(mountain_files, "background_mountains"):
-            objs = import_geometry(candidate, "background_mountains")
-            if objs:
-                mountain_members.extend(keep_hero_meshes(objs, "background_mountains", 5))
-        if mountain_members:
-            place_mountain_ridge(mountain_members, village_center + Vector((0.0, 22.0, 0.0)))
-            for obj in mountain_members:
-                link_exclusive(obj, collections["WORLD_MOUNTAINS_BACKGROUND"])
-                if hasattr(obj, "visible_shadow"):
-                    obj.visible_shadow = False
 
     sky_name = setup_world(expanded.get("sky_hdri", []), expanded.get("world_shaders", []))
     setup_lighting_hierarchy()
@@ -958,8 +1053,9 @@ def main() -> int:
         "cameraPath": "six_shot_markers",
         "lighting": "single_key_sun_plus_sky_fill_plus_restrained_bounce",
         "groundSource": "shaped_valley_carrier_purchased_meadow",
-        "riverSource": "spline_strip_purchased_water_mat",
+        "riverSource": "bezier_ribbon_fresnel_water",
         "forestLayout": "flank_clumps_mountain_corridor",
+        "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
     Path(args.proof_path).write_text(json.dumps(proof, indent=2) + "\n", encoding="utf-8")
     write_progress("CINEMATIC_WORLD_BUILT", cameras=len(cameras), forestCopies=proof["forestCopies"])
