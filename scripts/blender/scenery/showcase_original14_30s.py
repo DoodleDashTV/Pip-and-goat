@@ -1693,8 +1693,9 @@ def main() -> int:
                     village_center.y + bank_slots[i][1],
                     bank_slots[i][2],
                 ))
-            # Project flora reads as mint lumps in 9:16. Keep them loaded
-            # for the usage proof, but do not put them in the hero strip.
+        # Project flora reads as mint lumps in 9:16, including leftovers
+        # left at the origin. Keep them loaded for the usage proof.
+        for obj in members:
             obj.hide_render = True
             obj.hide_viewport = True
     # Put the stream south of the village so a north-looking 9:16 camera
@@ -1764,11 +1765,7 @@ def main() -> int:
                 if 'swarm' in obj.name.lower() or 'water' in obj.name.lower():
                     obj.hide_render = True
                     obj.hide_viewport = True
-            extras = scatter_forest_line(live, (village_center.x, village_center.y - 11.4, 0.0), 8, 32.0, 1.0, 0.55)
-            extras += scatter_forest_line(live, (village_center.x, village_center.y - 8.2, 0.0), 8, 32.0, 1.0, 0.55)
-            for obj in extras:
-                paint_simple_color(obj, f'TJ_RiverRock_{obj.name}', (0.26, 0.20, 0.14), 0.88)
-            members.extend(extras)
+            extras = []
             # Keep authored rock materials. Only bind when a mesh has nothing.
             bound = bind_purchased_textures(live, files)
         contributions[role] = {
