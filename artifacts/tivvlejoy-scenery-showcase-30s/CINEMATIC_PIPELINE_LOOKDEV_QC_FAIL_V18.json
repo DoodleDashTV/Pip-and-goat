@@ -1,0 +1,34 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:22:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "7f501db",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev23",
+  "shots": {
+    "SHOT_01": "PARTIAL — valley layers and foreground trees hold. River is no longer cyan tape (sampled olive, B-G -20) but matches meadow luma and still reads as a ribbon.",
+    "SHOT_02": "FAIL — along-channel framing holds; water and ground are the same brightness (lum ~92-93). Surface is noisy silver-olive, not a stream. Hard grey bank outline.",
+    "SHOT_03": "PARTIAL — framed forest opening still clear.",
+    "SHOT_04": "PARTIAL — street/cart/fence hold. Foreground river is an olive band, not water.",
+    "SHOT_05": "PARTIAL — village-against-ridge compression holds.",
+    "SHOT_06": "PARTIAL — street readable. River barely in frame as dark gravel."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "measured": {
+    "shot01_river_ll_rgb": [66.3, 73.8, 54.0],
+    "shot01_lower_third_rgb": [63.1, 73.0, 53.7],
+    "shot02_water_mid_lum": 92.4,
+    "shot02_ground_right_lum": 93.5
+  },
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Flattening removed the V-trough path walls, but the stream still matches the meadow and the bank strips outline it like a road. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}
