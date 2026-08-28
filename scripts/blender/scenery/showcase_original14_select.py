@@ -41,7 +41,7 @@ STAGING_MARKERS = (
     'debug_floor',
 )
 
-ALBEDO_WORDS = ('albedo', 'diffuse', 'diff', 'basecolor', 'base_color', 'color', 'col_')
+ALBEDO_WORDS = ('albedo', 'diffuse', 'diff', 'basecolor', 'base_color', 'color', 'col_', '_alb', 'alb.')
 NON_ALBEDO_WORDS = (
     'normal', 'nrm', 'norm_', '_n.', 'rough', 'metal', 'spec', 'ao_', 'occlusion',
     'height', 'bump', 'disp', 'emiss', 'mask', 'orm',
@@ -55,7 +55,7 @@ GROUND_WORDS = PREFERRED_GROUND_WORDS + (
 )
 PENALTY_GROUND_WORDS = (
     'leaf', 'bark', 'pattern', 'stencil', 'checker', 'tile_test', 'debug',
-    'noise', 'alpha', 'opacity', 'detail',
+    'noise', 'alpha', 'opacity', 'detail', 'grass01', 'mask', 'cutout',
 )
 
 PRIMITIVE_MARKERS = (
@@ -129,8 +129,9 @@ VILLAGE_INTERIOR_WORDS = (
     'crate', 'barrel', 'bucket', 'rack',
 )
 FOLIAGE_CARD_WORDS = (
-    'leaf', 'leaves', 'lily', 'lilypad', 'lily_pad', 'petal', 'umbrella',
+    'lily', 'lilypad', 'lily_pad', 'lotus', 'petal', 'umbrella',
 )
+BANK_FLORA_WORDS = ('floral', 'flora', 'leaf blade', 'fallen leaf', 'branch', 'bush')
 WATER_WORDS = ('water', 'ocean', 'sea_', '_sea', 'lake', 'river')
 CAMERA_HERO_WORDS = (
     'building', 'cabin', 'house', 'roof', 'cottage', 'hut',
@@ -162,6 +163,18 @@ def is_village_interior_name(name: str) -> bool:
 def is_foliage_card_name(name: str) -> bool:
     n = str(name or '').lower()
     return any(word in n for word in FOLIAGE_CARD_WORDS)
+
+
+def is_bank_flora_name(name: str) -> bool:
+    n = str(name or '').lower()
+    if is_foliage_card_name(n):
+        return False
+    return any(word in n for word in BANK_FLORA_WORDS)
+
+
+def is_grass_card_texture_name(name: str) -> bool:
+    n = str(name or '').lower()
+    return any(word in n for word in ('grass01', 'cutout', 'stencil', 'mask'))
 
 
 def is_water_or_ocean_name(name: str) -> bool:
@@ -351,19 +364,21 @@ def cinematic_world_camera_keys(
     my = fy + 48.0 if mountain_y is None else float(mountain_y)
     mz = village_min_z + 18.0 if mountain_z is None else float(mountain_z)
 
+    # 9:16 stacks layers vertically. Stand south of the village and look north
+    # so village / river / forest / mountains / sky stay in one frame.
     beats = (
-        # Wide establish from the valley side: mountains ahead, sky above, land below.
-        {'camera': (vx + 22.0, fy + 18.0, village_min_z + 32.0), 'look': (mx, my, mz), 'lens': 24.0},
+        # Wide establish: far south, high. Look past the village to the peaks.
+        {'camera': (vx + 10.0, vy - 52.0, village_min_z + 26.0), 'look': (mx, my, mz), 'lens': 24.0},
         # Descend toward the forest and river corridor.
-        {'camera': (vx + 14.0, fy + 6.0, village_min_z + 15.0), 'look': (fx, fy + 10.0, fz + 1.0), 'lens': 28.0},
-        # Through trees along the river.
-        {'camera': (vx + 10.0, fy - 4.0, village_min_z + 8.5), 'look': (fx, (fy + vy) * 0.55, fz), 'lens': 32.0},
-        # River travel toward the village.
-        {'camera': (vx + 11.0, (fy + vy) * 0.45, village_min_z + 7.8), 'look': (vx, vy + 6.0, look_z), 'lens': 34.0},
-        # Village appears as the destination.
-        {'camera': (vx + 16.0, vy + 20.0, village_min_z + 9.0), 'look': (vx, vy + 1.0, look_z), 'lens': 36.0},
-        # Composed 3/4 village hero, forest/mountains behind, not a roof-top.
-        {'camera': (vx + 22.0, vy - 26.0, village_min_z + 7.2), 'look': (vx, vy + 2.0, look_z), 'lens': 34.0},
+        {'camera': (vx + 12.0, vy - 34.0, village_min_z + 16.0), 'look': (fx, (fy + my) * 0.5, (fz + mz) * 0.45), 'lens': 28.0},
+        # Travel along the river with vegetation and depth.
+        {'camera': (vx + 16.0, vy - 20.0, village_min_z + 9.2), 'look': (fx, fy, fz), 'lens': 32.0},
+        # Cross the river toward the village street.
+        {'camera': (vx + 18.0, vy - 22.0, village_min_z + 8.2), 'look': (vx, vy + 8.0, look_z), 'lens': 34.0},
+        # Village becomes the destination.
+        {'camera': (vx + 20.0, vy - 24.0, village_min_z + 7.6), 'look': (vx, vy + 1.5, look_z), 'lens': 36.0},
+        # Composed 3/4 village hero, forest and mountains behind.
+        {'camera': (vx + 22.0, vy - 28.0, village_min_z + 7.2), 'look': (vx, vy + 2.0, look_z), 'lens': 34.0},
     )
     keys: list[dict] = []
     for beat in beats:
@@ -379,9 +394,10 @@ def cinematic_world_camera_keys(
 
 def extract_role_limit(role: str) -> int:
     if role == 'sky_hdri':
-        return 8
+        return 12
     if role == 'village_textures':
-        return 16
+        # Cabin01_ALB is 4.6 MiB and was previously dropped for Grass01 cards.
+        return 40
     if role in {'forest_nature', 'forest_ecokit'}:
         return 24
     if role in {'village_fbx', 'village_blender'}:
@@ -443,6 +459,22 @@ def extract_sort_key(filename: str, file_size: int, role: str = '') -> tuple:
     staging = 1 if is_staging_name(name) else 0
     albedo_miss = 0 if (ext not in IMAGE_EXTS or any(w in name for w in ALBEDO_WORDS + GROUND_WORDS)) else 1
     ext_rank = EXT_RANK.get(ext, 8)
+    if role == 'sky_hdri':
+        # Largest HDR was a dusk/gray-bottom map. Prefer a named daylight sk2 plate.
+        daylight_miss = 0 if ('sk2' in name and '0001' in name) else 1
+        dusk = 1 if any(word in name for word in ('sk4', 'sunset', 'dusk', 'night')) else 0
+        return (geo, dump, staging, daylight_miss, dusk, hdri, int(file_size or 0), name)
+    if role == 'village_textures':
+        non_alb = 1 if any(word in name for word in NON_ALBEDO_WORDS) else 0
+        grass_card = 1 if any(word in name for word in ('grass01', 'cutout', 'mask')) else 0
+        cabin_alb_miss = 0 if ('cabin' in name and any(word in name for word in ('_alb', 'alb.'))) else 1
+        straw_miss = 0 if ('straw' in name and any(word in name for word in ('_alb', 'alb.'))) else 1
+        wood_miss = 0 if (any(word in name for word in ('wood', 'trunk', 'leaf')) and any(w in name for w in ('_alb', 'alb.'))) else 1
+        colored_miss = 0 if 'colored' in name else 1
+        return (geo, dump, staging, non_alb, grass_card, cabin_alb_miss, straw_miss, wood_miss, colored_miss, -int(file_size or 0), name)
+    if role == 'forest_ecokit':
+        water_miss = 0 if 'water' in name and ext == '.blend' else 1
+        return (geo, dump, staging, water_miss, ext_rank, hdri, albedo_miss, int(file_size or 0), name)
     if role == 'background_mountains':
         snowy = 1 if 'snow' in name else 0
         grassy_miss = 0 if any(word in name for word in ('grass', 'meadow')) else 1
@@ -550,10 +582,10 @@ def mix_village_kit_records(records: list[dict], limit: int) -> list[dict]:
                 chosen.append(rec)
                 count -= 1
 
-    take(cabins_a, 5)
-    take(cabins, max(0, 5 - len(chosen)))
+    take(cabins_a, 4)
+    take(cabins, max(0, 4 - len(chosen)))
     take(trees, 2)
-    take(props, 1)
+    take(props, 2)
     take(cabins_a + cabins + trees + props + records, max(1, int(limit)))
     return chosen
 
@@ -568,6 +600,39 @@ def pick_geometry_paths(paths: list[Path], role: str, limit: int = 1) -> list[Pa
             continue
         records.append({'path': path, 'name': path.name, 'ext': ext, 'size': path.stat().st_size})
     return [rec['path'] for rec in pick_geometry_records(records, role, limit)]
+
+
+def pick_daylight_sky_path(paths: list[Path]) -> Path | None:
+    images = [p for p in paths if getattr(p, 'is_file', lambda: False)() and p.suffix.lower() in IMAGE_EXTS]
+
+    def rank(path: Path) -> tuple:
+        name = str(path).lower()
+        daylight_miss = 0 if ('sk2' in name and '0001' in name) else 1
+        dusk = 1 if any(word in name for word in ('sk4', 'sunset', 'dusk', 'night')) else 0
+        how_to = 1 if 'how to use' in name or 'howto' in name else 0
+        return (how_to, daylight_miss, dusk, -min(path.stat().st_size, 72 * 1024 * 1024), name)
+
+    images.sort(key=rank)
+    return images[0] if images else None
+
+
+def pick_cabin_albedo_path(paths: list[Path]) -> Path | None:
+    images = [
+        p for p in paths
+        if getattr(p, 'is_file', lambda: False)()
+        and p.suffix.lower() in IMAGE_EXTS
+        and 'cabin' in p.name.lower()
+        and any(word in p.name.lower() for word in ('_alb', 'alb.'))
+        and not is_grass_card_texture_name(p.name)
+    ]
+
+    def rank(path: Path) -> tuple:
+        name = str(path).lower()
+        colored_miss = 0 if 'colored' in name else 1
+        return (colored_miss, -min(path.stat().st_size, 8 * 1024 * 1024), name)
+
+    images.sort(key=rank)
+    return images[0] if images else None
 
 
 def pick_ground_image_path(paths: list[Path]) -> Path | None:

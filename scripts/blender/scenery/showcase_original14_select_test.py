@@ -11,12 +11,14 @@ from showcase_original14_select import (
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
+    is_bank_flora_name,
     is_box_mesh,
     is_camera_hero_name,
     is_dominating_plane,
     is_dump_name,
     is_foliage_card_name,
     is_forest_camera_subject_name,
+    is_grass_card_texture_name,
     is_high_lod_name,
     is_primitive_name,
     is_staging_name,
@@ -27,6 +29,8 @@ from showcase_original14_select import (
     mesh_keep_rank,
     point_outside_aabb,
     village_orbit_radius,
+    pick_cabin_albedo_path,
+    pick_daylight_sky_path,
     pick_geometry_records,
     pick_ground_image_records,
     should_extract_member,
@@ -73,8 +77,8 @@ def test_extract_sort_puts_individual_blend_before_dump_obj():
 
 
 def test_hdri_extract_limit_is_small():
-    assert extract_role_limit('sky_hdri') == 8
-    assert extract_role_limit('village_textures') == 16
+    assert extract_role_limit('sky_hdri') == 12
+    assert extract_role_limit('village_textures') == 40
     assert extract_role_limit('forest_nature') == 24
 
 
@@ -302,6 +306,80 @@ def test_village_and_forest_camera_subjects_split():
     assert is_village_camera_subject_name('Bush_03', 'TJ_village_project_PurchasedRoot') is False
 
 
+def test_village_texture_extract_prefers_cabin_albedo_over_grass_cards():
+    keys = [
+        ('Village (Textures)/Grass01_ALB.png', 649_218),
+        ('Village (Textures)/Book01_ALB.png', 25_537),
+        ('Village (Textures)/Colored/Cabin01_ALB.png', 4_691_305),
+        ('Village (Textures)/Cabin01_NRM.png', 12_124_981),
+        ('Village (Textures)/Cabin01_ALB.png', 4_692_016),
+    ]
+    ordered = sorted(keys, key=lambda item: extract_sort_key(item[0], item[1], 'village_textures'))
+    assert Path(ordered[0][0]).name == 'Cabin01_ALB.png'
+    assert 'Cabin01_ALB.png' in Path(ordered[1][0]).name
+    assert Path(ordered[-1][0]).name == 'Cabin01_NRM.png'
+
+
+def test_ground_picker_rejects_grass01_cards():
+    records = [
+        {'name': 'Grass01_ALB.png', 'ext': '.png', 'size': 649_218},
+        {'name': 'Colored/Grass01_ALB.png', 'ext': '.png', 'size': 364_320},
+        {'name': 'Village_Dirt_Albedo.jpg', 'ext': '.jpg', 'size': 1_500_000},
+    ]
+    chosen = pick_ground_image_records(records)
+    assert chosen['name'] == 'Village_Dirt_Albedo.jpg'
+    assert is_grass_card_texture_name('Grass01_ALB.png') is True
+    assert is_grass_card_texture_name('Cabin01_ALB.png') is False
+
+
+def test_daylight_sky_picker_prefers_sk2_plate():
+    class Fake(Path):
+        def is_file(self):
+            return True
+        def stat(self):
+            class S:
+                st_size = 2_000_000
+            return S()
+
+    paths = [
+        Fake('/tmp/sk4/0001.hdr'),
+        Fake('/tmp/HDRi_JPG_Pack/sk2/Image0001.jpg'),
+        Fake('/tmp/sk1/Image0003.jpg'),
+    ]
+    chosen = pick_daylight_sky_path(paths)
+    assert chosen is not None
+    assert 'sk2' in str(chosen) and '0001' in str(chosen)
+
+
+def test_bank_flora_keeps_flowers_and_drops_lotus():
+    assert is_foliage_card_name('Lotus Leaf_1_011') is True
+    assert is_bank_flora_name('Floral_2_024') is True
+    assert is_bank_flora_name('Lotus Leaf_1_011') is False
+    assert is_bank_flora_name('Fallen Leaf_1_014') is True
+
+
+def test_cabin_albedo_picker_prefers_colored_atlas():
+    class Fake(Path):
+        def __init__(self, value, size):
+            super().__init__(value)
+            self._size = size
+        def is_file(self):
+            return True
+        def stat(self):
+            class S:
+                def __init__(self, size):
+                    self.st_size = size
+            return S(self._size)
+
+    chosen = pick_cabin_albedo_path([
+        Fake('/tmp/Village (Textures)/Grass01_ALB.png', 649_218),
+        Fake('/tmp/Village (Textures)/Cabin01_ALB.png', 4_692_016),
+        Fake('/tmp/Village (Textures)/Colored/Cabin01_ALB.png', 4_691_305),
+    ])
+    assert chosen is not None
+    assert 'Colored' in str(chosen)
+
+
 def test_camera_hero_rejects_lily_pad_and_water():
     assert is_camera_hero_name('Building04_LOD0') is True
     assert is_camera_hero_name('Roof04') is True
@@ -341,4 +419,9 @@ if __name__ == '__main__':
     test_point_outside_aabb_pushes_interior_cameras()
     test_village_and_forest_camera_subjects_split()
     test_camera_hero_rejects_lily_pad_and_water()
+    test_village_texture_extract_prefers_cabin_albedo_over_grass_cards()
+    test_ground_picker_rejects_grass01_cards()
+    test_daylight_sky_picker_prefers_sk2_plate()
+    test_bank_flora_keeps_flowers_and_drops_lotus()
+    test_cabin_albedo_picker_prefers_colored_atlas()
     print('showcase_original14_select_test PASS')
