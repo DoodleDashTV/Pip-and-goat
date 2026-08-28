@@ -1,0 +1,85 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_RIVER_GEOMETRY_REPAIR_RESULT_V31",
+  "startingSha": "ae1ede06c3bda64814d61cfe24c9b77843f33444",
+  "continuedFromTipWithoutReset": "df8482f3056f873dc3bb59eb24efdc631592f629",
+  "finalSha": "042dbdc6cf252b5b50f183b8846bec7a425f06cc",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "geometryChanges": [
+    "Replaced the 18cm V30 dish with a multi-zone carved channel: deep trough, wide wet shelf, irregular 3D banks",
+    "South (camera) half-width 4.0–8.2m with pools; north (village) half-width 2.1–4.4m so the street is not eaten",
+    "Village flatten skips the channel",
+    "Terrain grid 320²; wet-earth vertex mask paints the bed and lower bank, not a thin shoreline ring",
+    "Scatter and river-adjacent trees skip the bed; sparse crest trees only",
+    "Dropped ico-sphere bed lumps (manhole covers) and rectangular bank patches (planks/bridges)"
+  ],
+  "channelWidthDepthChanges": {
+    "waterSurfaceZ": -1.15,
+    "bedCenterZ": -1.62,
+    "bedShoulderZ": -0.58,
+    "bankCrestZ": 0.78,
+    "effectivePerceivedDepthM": 2.4,
+    "bedWidthScale": 0.86,
+    "waterWidthScale": 0.30,
+    "targetProportions": "bank-to-bank 100%; exposed bed ~60-75%; water ~25-40%"
+  },
+  "bankConstruction": "Asymmetric sloped faces: south longer/gentler run, north tighter/steeper. Irregular crest wobble. No continuous V trench, no knife vertical cut. Crest trees only, not a decorative outline.",
+  "bedConstruction": "TJ_River_DarkBed: 11-row variable-width strip with pinch/pool edge noise, darker center, damp shoulders, non-uniform elevation. Dominant silhouette with water hidden.",
+  "waterFilmConstruction": "TJ_River_PurchasedWater: width_scale 0.30 in the deepest third. Water_Mat_1 tint donor only, IOR 1.333, metallic 0, Fresnel cap 0.10, RiverMask roughness breakup. Still reads pale/glossy from production cameras.",
+  "waterHiddenShot02Test": {
+    "result": "PASS",
+    "path": "/tmp/o14-lookdev/cinematic-lookdev39-geom/shot_02_.png",
+    "earlierConfirmingPath": "/tmp/o14-lookdev/cinematic-lookdev37-geom/shot_02_.png",
+    "readsAs": "carved creek channel with descending banks, wide dark bed, visible depth, changing width",
+    "notMistakenFor": "road, trail, painted stripe, or flat depression"
+  },
+  "previewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev39/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev39/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev39/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev39/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev39/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev39/shot_06_.png"
+  },
+  "shot02FinalAssessment": "Camera looks across/down into a real trough. Near bank, wide dark bed, opposite bank, cabin, and trees are in frame. Water occupies only the deepest third but is still a pale glossy film, not instantly water.",
+  "visualGatesAN": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "FAIL",
+    "G": "PARTIAL",
+    "H": "PARTIAL",
+    "I": "FAIL",
+    "J": "PARTIAL",
+    "K": "PARTIAL",
+    "L": "FAIL",
+    "M": "PASS",
+    "N": "PASS"
+  },
+  "purchasedAssetsAuthoritative": true,
+  "purchasedAssetsUsed": [
+    "Cabin01A-04B",
+    "Cart01",
+    "Gate01",
+    "Fence01",
+    "Tree01-03",
+    "Village textures",
+    "Water_Mat_1 tint",
+    "Forest model package",
+    "Sky HDRI",
+    "Louis meadow / grassy peaks",
+    "RiverMask roughness breakup"
+  ],
+  "latestGate": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V31.json",
+  "latestGateResult": "FAIL",
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false
+}
