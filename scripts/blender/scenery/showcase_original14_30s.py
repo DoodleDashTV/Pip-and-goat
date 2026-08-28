@@ -1521,21 +1521,7 @@ def main() -> int:
         all_extracted.extend(role_files)
     remapped = remap_missing_images(all_extracted)
     forced = ensure_purchased_albedos(all_extracted)
-    leaf_img = _load_named_albedo(all_extracted, 'colored', 'leaf', 'alb') or _load_named_albedo(all_extracted, 'leaf', 'alb')
-    tree_leaves = 0
-    if leaf_img is not None:
-        leaf_path = Path(bpy.path.abspath(leaf_img.filepath)) if leaf_img.filepath else None
-        for obj in bpy.data.objects:
-            if obj.type != 'MESH' or 'tree' not in obj.name.lower():
-                continue
-            mat = image_material(f'TJ_TreeLeaf_{obj.name}'[:55], leaf_path if leaf_path and leaf_path.is_file() else None)
-            tex = next((n for n in mat.node_tree.nodes if n.type == 'TEX_IMAGE'), None) if mat.node_tree else None
-            if tex is not None:
-                tex.image = leaf_img
-            obj.data.materials.clear()
-            obj.data.materials.append(mat)
-            tree_leaves += 1
-    print(json.dumps({'event': 'purchased_image_remap', 'remapped': remapped, 'forcedAlbedos': forced, 'treeLeafBinds': tree_leaves}), flush=True)
+    print(json.dumps({'event': 'purchased_image_remap', 'remapped': remapped, 'forcedAlbedos': forced}), flush=True)
 
     ground_count, ground_source = create_valley_ground(
         expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []) + mountain_files,
