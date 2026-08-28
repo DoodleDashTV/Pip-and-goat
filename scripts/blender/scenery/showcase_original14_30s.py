@@ -26,7 +26,7 @@ from showcase_original14_select import (  # noqa: E402
     IMAGE_EXTS,
     NON_ALBEDO_WORDS,
     SUPPORT_EXTS,
-    cinematic_camera_keys,
+    cinematic_world_camera_keys,
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
@@ -37,6 +37,7 @@ from showcase_original14_select import (  # noqa: E402
     is_dominating_plane,
     is_foliage_card_name,
     is_forest_camera_subject_name,
+    is_mountain_camera_subject_name,
     is_high_lod_name,
     is_primitive_name,
     is_village_camera_subject_name,
@@ -149,19 +150,20 @@ def expand_asset(asset: dict, root: Path) -> list[Path]:
     return extract_selected(p, root / re.sub(r'[^A-Za-z0-9_-]+', '_', asset['role']), asset['role'])
 
 
-def select_blend_names(names: list[str], role: str, limit: int = 10) -> list[str]:
+def select_blend_names(names: list[str], role: str, limit: int = 10, allow_water: bool = False) -> list[str]:
     words = {
         'village_blender': ('house', 'cabin', 'building', 'roof', 'tree', 'fence', 'gate', 'cart'),
-        'village_project': ('house', 'cabin', 'building', 'roof', 'tree', 'rock', 'flora', 'bush'),
+        'village_project': ('house', 'cabin', 'building', 'roof', 'tree', 'rock', 'flora', 'bush', 'water', 'terrain'),
         'village_fbx': ('house', 'cabin', 'building', 'roof', 'tree', 'fence', 'gate', 'cart'),
         'forest_nature': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump'),
         'forest_ecokit': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump'),
+        'background_mountains': ('mountain', 'range', 'peak', 'ridge', 'cliff', 'grass', 'meadow'),
     }.get(role, ())
     usable = [
         n for n in names
         if n
         and not is_primitive_name(n)
-        and not is_water_or_ocean_name(n)
+        and (allow_water or not is_water_or_ocean_name(n))
         and not is_foliage_card_name(n)
         and not is_high_lod_name(n)
     ]
@@ -178,13 +180,16 @@ def select_blend_names(names: list[str], role: str, limit: int = 10) -> list[str
     return names[:min(limit, len(names))]
 
 
-def append_blend_geometry(path: Path, role: str) -> tuple[list[bpy.types.Object], int]:
+def append_blend_geometry(path: Path, role: str, allow_water: bool = False) -> tuple[list[bpy.types.Object], int]:
     before = set(bpy.data.objects.keys())
     loaded_support = 0
     try:
         with bpy.data.libraries.load(str(path), link=False) as (src, dst):
             src_names = list(src.objects or [])
-            dst.objects = select_blend_names(src_names, role, limit=MAX_OBJECTS_PER_BLEND)
+            if allow_water and role == 'village_project':
+                dst.objects = [n for n in src_names if n and is_water_or_ocean_name(n)][:MAX_OBJECTS_PER_BLEND]
+            else:
+                dst.objects = select_blend_names(src_names, role, limit=MAX_OBJECTS_PER_BLEND, allow_water=allow_water)
             if role == 'village_project':
                 cols = [
                     name for name in list(src.collections or [])
@@ -599,7 +604,7 @@ def setup_world(files: list[Path]) -> str:
     env = nodes.new('ShaderNodeTexEnvironment')
     env.image = bpy.data.images.load(str(image), check_existing=True)
     bg = nodes.new('ShaderNodeBackground')
-    bg.inputs['Strength'].default_value = 0.38
+    bg.inputs['Strength'].default_value = 1.15
     out = nodes.new('ShaderNodeOutputWorld')
     links.new(env.outputs['Color'], bg.inputs['Color'])
     links.new(bg.outputs['Background'], out.inputs['Surface'])
@@ -607,32 +612,26 @@ def setup_world(files: list[Path]) -> str:
 
 
 def setup_lighting():
-    # Golden-hour key: low sun so purchased cabins get long shadows and rim.
-    bpy.ops.object.light_add(type='SUN', location=(40, -55, 28))
+    # Bright warm daylight: readable cabin detail, not crushed dusk.
+    bpy.ops.object.light_add(type='SUN', location=(36, -48, 70))
     sun = bpy.context.object
     sun.name = 'TJ_Sun'
-    sun.data.energy = 9.5
-    sun.data.angle = math.radians(2.8)
-    sun.rotation_euler = (math.radians(72), math.radians(6), math.radians(-48))
+    sun.data.energy = 5.4
+    sun.data.angle = math.radians(3.6)
+    sun.rotation_euler = (math.radians(48), math.radians(4), math.radians(-38))
     if hasattr(sun.data, 'use_shadow'):
         sun.data.use_shadow = True
-    bpy.ops.object.light_add(type='SUN', location=(-50, 30, 22))
-    rim = bpy.context.object
-    rim.name = 'TJ_WarmRim'
-    rim.data.energy = 3.2
-    rim.data.angle = math.radians(4.5)
-    rim.rotation_euler = (math.radians(78), math.radians(-4), math.radians(128))
-    if hasattr(rim.data, 'use_shadow'):
-        rim.data.use_shadow = False
-    bpy.ops.object.light_add(type='AREA', location=(-18, 8, 26))
+    if hasattr(sun.data, 'color'):
+        sun.data.color = (1.0, 0.94, 0.82)
+    bpy.ops.object.light_add(type='AREA', location=(-22, 12, 32))
     fill = bpy.context.object
-    fill.name = 'TJ_SoftFill'
-    fill.data.energy = 220
+    fill.name = 'TJ_SkyFill'
+    fill.data.energy = 380
     fill.data.shape = 'DISK'
-    fill.data.size = 36
-    fill.rotation_euler = (math.radians(35), 0.0, math.radians(20))
+    fill.data.size = 42
+    fill.rotation_euler = (math.radians(28), 0.0, math.radians(18))
     if hasattr(fill.data, 'color'):
-        fill.data.color = (1.0, 0.86, 0.68)
+        fill.data.color = (0.78, 0.88, 1.0)
 
 
 def setup_atmosphere():
@@ -647,7 +646,7 @@ def setup_atmosphere():
     nodes.clear()
     volume = nodes.new('ShaderNodeVolumePrincipled')
     if 'Density' in volume.inputs:
-        volume.inputs['Density'].default_value = 0.0022
+        volume.inputs['Density'].default_value = 0.0011
     if 'Anisotropy' in volume.inputs:
         volume.inputs['Anisotropy'].default_value = 0.22
     if 'Color' in volume.inputs:
@@ -706,6 +705,8 @@ def kit_target_size(path: Path) -> float:
     name = path.name.lower()
     if 'cabin' in name or 'house' in name or 'building' in name:
         return 11.0
+    if 'mountain' in name or 'grassy' in name or 'meadow' in name:
+        return 90.0
     if 'tree' in name:
         return 9.0
     if 'fence' in name or 'gate' in name:
@@ -783,15 +784,28 @@ def setup_camera(start: int, end: int):
             fmin, fmax = forest_bounds
             fcenter = (fmin + fmax) * 0.5
             forest_look = (fcenter.x, fcenter.y, fmin.z + min((fmax - fmin).z * 0.55, 8.0))
-        keys = cinematic_camera_keys(
+        mountain = [
+            o for o in heroes
+            if is_mountain_camera_subject_name(o.name, subject_parent_name(o))
+        ]
+        mountain_bounds = group_bounds(mountain)
+        mountain_look = None
+        if mountain_bounds:
+            mmin, mmax = mountain_bounds
+            mcenter = (mmin + mmax) * 0.5
+            mountain_look = (mcenter.x, mcenter.y, mmin.z + min((mmax - mmin).z * 0.45, 22.0))
+        keys = cinematic_world_camera_keys(
             float(mins.x), float(mins.y), float(maxs.x), float(maxs.y),
             float(mins.z), float(max((maxs - mins).z, 3.0)),
             forest_x=None if forest_look is None else forest_look[0],
             forest_y=None if forest_look is None else forest_look[1],
             forest_z=None if forest_look is None else forest_look[2],
+            mountain_x=None if mountain_look is None else mountain_look[0],
+            mountain_y=None if mountain_look is None else mountain_look[1],
+            mountain_z=None if mountain_look is None else mountain_look[2],
         )
     else:
-        keys = cinematic_camera_keys(-12.0, -10.0, 12.0, 10.0, 0.0, 8.0)
+        keys = cinematic_world_camera_keys(-12.0, -10.0, 12.0, 10.0, 0.0, 8.0)
     bpy.ops.object.camera_add(location=keys[0]['camera'])
     cam = bpy.context.object
     cam.name = 'TJ_Original14_Camera'
@@ -907,8 +921,8 @@ def main() -> int:
         (4.0, -13.0, 0.0), (16.0, -8.0, 0.0), (-16.0, -6.0, 0.0),
     ]
     forest_slots = {
-        'forest_nature': [(-20.0, 16.0, 0.0), (20.0, 15.0, 0.0)],
-        'forest_ecokit': [(-18.0, -16.0, 0.0), (18.0, -14.0, 0.0)],
+        'forest_nature': [(-12.0, 34.0, 0.0), (12.0, 40.0, 0.0), (-8.0, 50.0, 0.0)],
+        'forest_ecokit': [(10.0, 28.0, 0.0), (-14.0, 44.0, 0.0), (8.0, 54.0, 0.0)],
     }
 
     # Village zip is 33 kit pieces (Cabin01A.blend, Tree02.blend, ...), not one
@@ -956,35 +970,53 @@ def main() -> int:
         'assembledAsVillageKit': True,
     }
 
-    # Project File.blend is a water/flora/terrain library, not the village.
-    # Keep flora as a distant backdrop; never let water set the camera center.
+    # Project File.blend is a water/flora/terrain library. Use water as a river
+    # corridor and flora as banks; never let water set the camera center.
     role = 'village_project'
     files = expanded.get(role, [])
     members = []
+    river_members: list[bpy.types.Object] = []
     imported_files = 0
     for candidate in geometry_candidates(files, role):
         objs = import_geometry(candidate, role)
+        water_objs = []
+        if candidate.suffix.lower() == '.blend':
+            water_objs = append_blend_geometry(candidate, role, allow_water=True)[0]
+            water_objs = [o for o in water_objs if o and is_water_or_ocean_name(o.name)]
         if objs:
             heroes = keep_hero_meshes(objs, role, 16)
             for hero in heroes:
                 decimate_mesh(hero)
             members.extend(heroes)
             imported_files += 1
-    if not members:
+        if water_objs:
+            river_members.extend(water_objs)
+    if not members and not river_members:
         raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
     extras: list[bpy.types.Object] = []
     root = parent_group(members, 'TJ_village_project_PurchasedRoot')
     if root:
-        normalize_group(root, members, 18.0, (village_center.x, village_center.y + 22.0, 0.0))
-    bound = bind_purchased_textures(members, expanded.get('village_textures', []) + files)
+        normalize_group(root, members, 18.0, (village_center.x, village_center.y + 20.0, 0.0))
+    if river_members:
+        river_root = parent_group(river_members, 'TJ_River_From_Purchased_Project')
+        if river_root:
+            normalize_group(river_root, river_members, 36.0, (village_center.x, village_center.y + 24.0, -0.05))
+            river_root.scale = (
+                river_root.scale[0] * 0.22,
+                river_root.scale[1] * 1.35,
+                max(river_root.scale[2], 0.15),
+            )
+    bound = bind_purchased_textures(members + river_members, expanded.get('village_textures', []) + files)
     contributions[role] = {
         'type': 'visible_geometry',
-        'objectCount': len(members),
+        'objectCount': len(members) + len(river_members),
         'importedFileCount': imported_files,
         'purchasedTexturesBound': bound,
         'scatteredPurchasedCopies': len(extras),
         'authoredLayoutKept': False,
         'placedAsBackdrop': True,
+        'riverObjectCount': len(river_members),
+        'visibleAsRiver': bool(river_members),
     }
 
     for role in ('forest_nature', 'forest_ecokit'):
@@ -1000,9 +1032,9 @@ def main() -> int:
             raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
         extras = scatter_purchased_meshes(
             members,
-            (village_center.x + forest_slots[role][0][0], village_center.y + forest_slots[role][0][1], 0.0),
-            copies=4,
-            radius=10.0,
+            (village_center.x + forest_slots[role][0][0], village_center.y + 38.0, 0.0),
+            copies=8,
+            radius=14.0,
         )
         members.extend(extras)
         bound = bind_purchased_textures(members, expanded.get('village_textures', []) + files)
@@ -1015,6 +1047,30 @@ def main() -> int:
             'authoredLayoutKept': False,
             'kitFilesPlaced': placed,
         }
+
+    mountain_role = 'background_mountains'
+    mountain_files = expanded.get(mountain_role, [])
+    if mountain_files:
+        members, imported_files, placed = import_kit_groups(
+            mountain_files,
+            mountain_role,
+            [(0.0, 0.0, 0.0)],
+            village_center,
+            8,
+        )
+        if members:
+            root = parent_group(members, 'TJ_background_mountains_PurchasedRoot')
+            if root:
+                normalize_group(root, members, 120.0, (village_center.x, village_center.y + 96.0, 0.0))
+            bound = bind_purchased_textures(members, mountain_files)
+            contributions[mountain_role] = {
+                'type': 'visible_geometry',
+                'objectCount': len(members),
+                'importedFileCount': imported_files,
+                'purchasedTexturesBound': bound,
+                'kitFilesPlaced': placed,
+                'placedAsBackgroundMountains': True,
+            }
 
     scene_meshes = [o for o in bpy.data.objects if is_camera_hero_object(o)]
     bounds = group_bounds(scene_meshes)
@@ -1057,6 +1113,8 @@ def main() -> int:
     for obj in list(bpy.data.objects):
         if obj.type != 'MESH' or str(obj.name).startswith('TJ_Ground'):
             continue
+        if is_water_or_ocean_name(obj.name) or is_mountain_camera_subject_name(obj.name, subject_parent_name(obj)):
+            continue
         if not (
             is_primitive_name(obj.name)
             or is_box_mesh(mesh_face_count(obj), object_dimensions(obj))
@@ -1095,8 +1153,8 @@ def main() -> int:
         'purchasedSkyImageLoaded':bool(sky_name),
         'randomOrGeneratedStockAssetCount':0,
         'commercialAssetPathsEmitted':False,
-        'cameraPath':'village_establish_street_forest_sky',
-        'lighting':'golden_hour_shadows_gtao',
+        'cameraPath':'mountains_forest_river_village',
+        'lighting':'bright_daylight_shadows_gtao',
     }
     Path(args.proof_path).write_text(json.dumps(proof,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({'event':'tivvlejoy_original14_render_start','frames':proof['frameCount'],'resolution':args.resolution,'samples':args.samples}), flush=True)

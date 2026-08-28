@@ -1,0 +1,175 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_USAGE_MANIFEST_V1",
+  "inspectedAt": "2026-08-28T15:32:00Z",
+  "privateObjectCount": 193,
+  "notes": "A package is used only if it is loaded and visible. Unity packages cannot be rendered in Blender. Full botaniq and 3DT mountain archives exceed the 4 GiB materialize cap.",
+  "packages": [
+    {
+      "sourceId": "SRC_VILLAGE_BLEND_ZIP",
+      "filename": "Village (Blender 4.2.2).zip",
+      "blenderCompatible": true,
+      "intendedRole": "hero village architecture",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "frames 540-900 village reveal"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_FBX_ZIP",
+      "filename": "Village (FBX).zip",
+      "blenderCompatible": true,
+      "intendedRole": "village dressing",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "frames 540-900"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_TEXTURES_ZIP",
+      "filename": "Village (Textures).zip",
+      "blenderCompatible": true,
+      "intendedRole": "cabin/ground albedos",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "all frames with ground or cabins"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_PROJECT_ZIP",
+      "filename": "Project File.zip",
+      "blenderCompatible": true,
+      "intendedRole": "river + flora + terrain",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "frames 180-720 river/forest corridor"
+    },
+    {
+      "sourceId": "SRC_FOREST_MODEL_PACKAGE",
+      "filename": "Stylized_Forest_Nature_Kit.zip",
+      "blenderCompatible": true,
+      "intendedRole": "layered forest midground",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "frames 180-540"
+    },
+    {
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "filename": "Stylised EcoKit.zip",
+      "blenderCompatible": true,
+      "intendedRole": "forest variation",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "frames 180-540"
+    },
+    {
+      "sourceId": "SRC_SKY_HDRI_JPG_PACK",
+      "filename": "HDRi_JPG_Pack.zip",
+      "blenderCompatible": true,
+      "intendedRole": "daylight sky",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "all frames"
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V1_ZIP",
+      "filename": "SkyMachineV1.zip",
+      "blenderCompatible": true,
+      "intendedRole": "sky support datablocks",
+      "loaded": true,
+      "visiblyUsed": false,
+      "blockedReason": "factory-startup cannot enable the Sky Machine add-on; HDRI world is the visible sky"
+    },
+    {
+      "sourceId": "SRC_SKY_MACHINE_V2_ZIP",
+      "filename": "SkyMachineV2.zip",
+      "blenderCompatible": true,
+      "intendedRole": "sky support datablocks",
+      "loaded": true,
+      "visiblyUsed": false,
+      "blockedReason": "factory-startup cannot enable the Sky Machine add-on; HDRI world is the visible sky"
+    },
+    {
+      "sourceId": "SRC_SKY_EXTRA_UPDATE_ZIP",
+      "filename": "Extra Update 1.zip",
+      "blenderCompatible": true,
+      "intendedRole": "additional sky images",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "sky if selected as largest usable image"
+    },
+    {
+      "sourceId": "SRC_SKY_WORLD_SHADERS_GIVEAWAY",
+      "filename": "Giveaway_World Shaders.zip",
+      "blenderCompatible": true,
+      "intendedRole": "Sky_World.blend worlds",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "world/atmosphere support"
+    },
+    {
+      "sourceId": "SRC_LOUIS_BG_MOUNTAINS_V1",
+      "filename": "LouisBGMountainsV1.zip",
+      "blenderCompatible": true,
+      "intendedRole": "background mountains",
+      "loaded": true,
+      "visiblyUsed": true,
+      "visibleIn": "frames 1-300 establish"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_BUILTIN",
+      "blenderCompatible": false,
+      "intendedRole": "Unity preservation only",
+      "loaded": false,
+      "visiblyUsed": false,
+      "blockedReason": "Blender cannot import .unitypackage binaries"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_URP",
+      "blenderCompatible": false,
+      "intendedRole": "Unity preservation only",
+      "loaded": false,
+      "visiblyUsed": false,
+      "blockedReason": "Blender cannot import .unitypackage binaries"
+    },
+    {
+      "sourceId": "SRC_VILLAGE_UNITY_HDRP",
+      "blenderCompatible": false,
+      "intendedRole": "Unity preservation only",
+      "loaded": false,
+      "visiblyUsed": false,
+      "blockedReason": "Blender cannot import .unitypackage binaries"
+    },
+    {
+      "sourceId": "SRC_3DT_MOUNTAIN_PACK_GLB",
+      "blenderCompatible": true,
+      "intendedRole": "hero mountains",
+      "loaded": false,
+      "visiblyUsed": false,
+      "blockedReason": "1476.7 MiB plus Original-14 (3002 MiB) exceeds the 4 GiB materialize cap; Louis grassy mountains are the visible mountain pack that fits"
+    },
+    {
+      "sourceId": "SRC_BOTANIQ_FULL_7_2_0",
+      "blenderCompatible": true,
+      "requiredAddOn": "botaniq 7.2.0",
+      "intendedRole": "vegetation scatter",
+      "loaded": false,
+      "visiblyUsed": false,
+      "blockedReason": "4915.1 MiB exceeds the 4 GiB cap; village Project File flora + forest kits are the visible vegetation"
+    },
+    {
+      "sourceId": "SRC_PHYSICAL_STARLIGHT_1_9_4",
+      "blenderCompatible": true,
+      "requiredAddOn": "Physical Starlight Atmosphere 1.9.4",
+      "intendedRole": "atmosphere",
+      "loaded": false,
+      "visiblyUsed": false,
+      "blockedReason": "headless --factory-startup cannot enable the add-on; purchased HDRI + EEVEE volume haze used instead"
+    },
+    {
+      "sourceId": "SRC_GAFFER_3_2_10",
+      "blenderCompatible": true,
+      "requiredAddOn": "Gaffer 3.2.10",
+      "intendedRole": "lighting rig",
+      "loaded": false,
+      "visiblyUsed": false,
+      "blockedReason": "headless --factory-startup cannot enable the add-on; explicit daylight sun+sky fill used instead"
+    }
+  ]
+}

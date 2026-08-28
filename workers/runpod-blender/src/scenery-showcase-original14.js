@@ -13,7 +13,7 @@ const { ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const r2 = require('./r2-client');
 const core = require('./render-core');
 const { resolveHeadlessGlConfig, applyHeadlessGlEnv } = require('./headless-gl');
-const { REQUIRED_ROLES, selectAssets } = require('./scenery-showcase-original14-roles');
+const { REQUIRED_ROLES, selectAssets, selectExtraAssets } = require('./scenery-showcase-original14-roles');
 
 function strip(v) { return String(v || '').replace(/[\r\n]+/g, '').trim(); }
 function log(event, detail = {}) { console.log(JSON.stringify({ ts:new Date().toISOString(), event, ...detail })); }
@@ -142,8 +142,22 @@ async function main() {
     }
     await writeJson(selectionKey,privateProof);
 
+    stage='MATERIALIZE_PURCHASED_EXTRAS';
+    const extras=selectExtraAssets(listed,new Set(selection.selected.map((x)=>x.key)),{alreadyBytes:selection.totalBytes,maxInputBytes:maxInput});
+    for (const [i,asset] of extras.selected.entries()) {
+      await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,index:i+1,total:extras.extraSourceCount,sourceId:asset.sourceId,at:new Date().toISOString()});
+      const dest=path.join(assetsDir,safeName(asset.sourceId,14+i,asset.key));
+      await r2.downloadToFile(ctx,asset.key,dest);
+      const observed=fs.statSync(dest).size;
+      if(observed!==Number(asset.size)) throw Object.assign(new Error(`Downloaded size mismatch: ${asset.sourceId}`),{code:'ORIGINAL_14_SIZE_MISMATCH'});
+      const digest=sha256File(dest);
+      localAssets.push({role:asset.role,sourceId:asset.sourceId,collection:asset.collection,unityPreservationOnly:false,extra:true,localPath:dest,sha256:digest,byteSize:observed});
+      log('original14_extra_materialized',{sourceId:asset.sourceId,byteSize:observed,sha256:digest});
+    }
+
+    const originalRenderable=localAssets.filter((a)=>!a.unityPreservationOnly && !a.extra);
+    if(originalRenderable.length!==11) throw Object.assign(new Error('Renderable Original-14 count != 11'),{code:'ORIGINAL_14_RENDERABLE_COUNT_FAILED'});
     const renderable=localAssets.filter((a)=>!a.unityPreservationOnly);
-    if(renderable.length!==11) throw Object.assign(new Error('Renderable Original-14 count != 11'),{code:'ORIGINAL_14_RENDERABLE_COUNT_FAILED'});
 
     stage='BUILD_SCENE';
     const internalResolution=strip(env.SCENERY_SHOWCASE_INTERNAL_RESOLUTION||'540x960');

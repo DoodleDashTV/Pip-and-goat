@@ -118,6 +118,7 @@ HERO_WORDS = {
     'village_fbx': ('house', 'cabin', 'building', 'roof', 'cottage', 'hut', 'tree', 'fence', 'gate', 'cart', 'village'),
     'forest_nature': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump', 'pine'),
     'forest_ecokit': ('tree', 'rock', 'bush', 'grass', 'fern', 'log', 'stump', 'pine'),
+    'background_mountains': ('mountain', 'range', 'peak', 'ridge', 'cliff', 'grassy', 'meadow'),
 }
 
 # Individual kit pieces from Village (Blender 4.2.2).zip / Village (FBX).zip.
@@ -134,6 +135,7 @@ WATER_WORDS = ('water', 'ocean', 'sea_', '_sea', 'lake', 'river')
 CAMERA_HERO_WORDS = (
     'building', 'cabin', 'house', 'roof', 'cottage', 'hut',
     'tree', 'rock', 'log', 'fence', 'gate', 'cart',
+    'mountain', 'range', 'peak', 'ridge',
 )
 
 
@@ -210,6 +212,11 @@ def is_village_camera_subject_name(name: str, parent_name: str = '') -> bool:
 def is_forest_camera_subject_name(name: str, parent_name: str = '') -> bool:
     blob = f'{parent_name} {name}'.lower()
     return 'forest_' in blob or 'ecokit' in blob
+
+
+def is_mountain_camera_subject_name(name: str, parent_name: str = '') -> bool:
+    blob = f'{parent_name} {name}'.lower()
+    return 'mountain' in blob or 'background_mountains' in blob
 
 
 def point_outside_aabb(
@@ -315,6 +322,61 @@ def is_staging_name(name: str) -> bool:
     return any(marker in n for marker in STAGING_MARKERS)
 
 
+def cinematic_world_camera_keys(
+    village_min_x: float,
+    village_min_y: float,
+    village_max_x: float,
+    village_max_y: float,
+    village_min_z: float,
+    village_vert: float,
+    forest_x: float | None = None,
+    forest_y: float | None = None,
+    forest_z: float | None = None,
+    mountain_x: float | None = None,
+    mountain_y: float | None = None,
+    mountain_z: float | None = None,
+) -> list[dict]:
+    """Mountains/sky establish → forest/river → village reveal.
+
+    Camera XY stays outside the village AABB. This is a valley journey, not a
+    product orbit of the cabin cluster.
+    """
+    vx = (village_min_x + village_max_x) * 0.5
+    vy = (village_min_y + village_max_y) * 0.5
+    look_z = village_min_z + min(max(village_vert * 0.36, 2.2), 5.0)
+    fx = vx if forest_x is None else float(forest_x)
+    fy = vy + 36.0 if forest_y is None else float(forest_y)
+    fz = village_min_z + 5.0 if forest_z is None else float(forest_z)
+    mx = vx if mountain_x is None else float(mountain_x)
+    my = fy + 48.0 if mountain_y is None else float(mountain_y)
+    mz = village_min_z + 18.0 if mountain_z is None else float(mountain_z)
+
+    beats = (
+        # Wide valley establish: far past the forest, high, lots of sky + peaks.
+        {'camera': (mx + 10.0, my + 28.0, village_min_z + 34.0), 'look': (mx, my, mz), 'lens': 24.0},
+        # Descend toward forest and river.
+        {'camera': (fx + 8.0, (my + fy) * 0.5, village_min_z + 16.0), 'look': (fx, fy + 8.0, fz + 2.0), 'lens': 28.0},
+        # Through trees along the river corridor.
+        {'camera': (fx + 7.0, fy + 4.0, village_min_z + 8.5), 'look': (fx, fy - 6.0, fz), 'lens': 32.0},
+        # River travel toward the village.
+        {'camera': (vx + 9.0, (fy + vy) * 0.5, village_min_z + 7.5), 'look': (vx, (fy + vy) * 0.35, look_z), 'lens': 34.0},
+        # Village appears as the destination.
+        {'camera': (vx + 14.0, vy + 22.0, village_min_z + 9.0), 'look': (vx, vy + 1.0, look_z), 'lens': 36.0},
+        # Composed village hero with forest/mountains behind.
+        {'camera': (vx + 18.0, vy - 24.0, village_min_z + 13.0), 'look': (vx, vy + 2.0, look_z + 1.0), 'lens': 32.0},
+    )
+    keys: list[dict] = []
+    for beat in beats:
+        x, y, z = beat['camera']
+        x, y = point_outside_aabb(x, y, village_min_x, village_min_y, village_max_x, village_max_y, pad=6.0)
+        keys.append({
+            'camera': (float(x), float(y), float(z)),
+            'look': tuple(float(v) for v in beat['look']),
+            'lens': float(beat['lens']),
+        })
+    return keys
+
+
 def extract_role_limit(role: str) -> int:
     if role == 'sky_hdri':
         return 8
@@ -326,6 +388,9 @@ def extract_role_limit(role: str) -> int:
         # Village (Blender 4.2.2).zip has 33 kit .blends. The previous 28-file
         # cap dropped the five largest Cabin*A buildings.
         return 40
+    if role == 'background_mountains':
+        # Louis pack is three huge .blends. Extract only the grassy hero.
+        return 2
     if role == 'village_project':
         return 4
     if role in {'sky_machine_v1', 'sky_machine_v2', 'sky_extra_update', 'world_shaders'}:
@@ -343,7 +408,9 @@ def geometry_file_limit(role: str) -> int:
     if role == 'village_project':
         return 1
     if role in {'forest_nature', 'forest_ecokit'}:
-        return 2
+        return 3
+    if role == 'background_mountains':
+        return 1
     return 1
 
 
@@ -353,6 +420,8 @@ def should_extract_member(filename: str, file_size: int, role: str) -> bool:
         return False
     size = int(file_size or 0)
     cap = MAX_EXTRACT_BYTES.get(ext)
+    if role == 'background_mountains' and ext == '.blend':
+        cap = 600 * 1024 * 1024
     if cap is not None and size > cap:
         # Last-resort: still extract one modest dump OBJ if it is the only geometry.
         if ext == '.obj' and is_dump_name(filename) and size <= 80 * 1024 * 1024:
@@ -371,6 +440,10 @@ def extract_sort_key(filename: str, file_size: int, role: str = '') -> tuple:
     staging = 1 if is_staging_name(name) else 0
     albedo_miss = 0 if (ext not in IMAGE_EXTS or any(w in name for w in ALBEDO_WORDS + GROUND_WORDS)) else 1
     ext_rank = EXT_RANK.get(ext, 8)
+    if role == 'background_mountains':
+        snowy = 1 if 'snow' in name else 0
+        grassy_miss = 0 if any(word in name for word in ('grass', 'meadow')) else 1
+        return (geo, dump, staging, snowy, grassy_miss, ext_rank, -int(file_size or 0), name)
     if str(role).startswith('village') and ext in GEOMETRY_EXTS:
         cabin_a, outdoor, interior = village_file_rank(name)
         # Prefer the large Cabin*A buildings over tiny interior props.
@@ -433,6 +506,10 @@ def pick_geometry_records(records: list[dict], role: str, limit: int = 1) -> lis
             blend_miss = 0 if ext == '.blend' else 1
             scene_miss = 0 if any(token in name for token in ('village', 'scene', 'full', 'project')) else 1
             return (dump, staging, water, blend_miss, scene_miss, word_miss, -size, name)
+        if role == 'background_mountains':
+            snowy = 1 if 'snow' in name else 0
+            grassy_miss = 0 if any(word in name for word in ('grass', 'meadow', 'mountain', 'range')) else 1
+            return (dump, staging, snowy, grassy_miss, word_miss, -size, name)
         return (dump, staging, word_miss, EXT_RANK.get(ext, 9), size, name)
 
     geo.sort(key=rank)

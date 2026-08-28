@@ -19,6 +19,10 @@ const SOURCE_SPECS = [
   { role:'world_shaders', sourceId:'SRC_SKY_WORLD_SHADERS_GIVEAWAY', filename:'Giveaway_World Shaders.zip', collection:'World Shaders', unityPreservationOnly:false },
 ];
 
+const EXTRA_SOURCE_SPECS = [
+  { role:'background_mountains', sourceId:'SRC_LOUIS_BG_MOUNTAINS_V1', filename:'LouisBGMountainsV1.zip', collection:'Mountains', unityPreservationOnly:false, extra:true },
+];
+
 const REQUIRED_ROLES = SOURCE_SPECS.map((x) => x.role);
 // Exact verified originals total ~3.00 GB. Keep a hard ceiling below the legacy
 // 5 GB showcase cap while allowing the complete purchased Original-14 set.
@@ -51,8 +55,11 @@ function score(item, spec) {
   value-=Math.min(100, Math.log2(Math.max(1, Number(item.size||0)/(1024*1024)))*3);
   return value;
 }
+function specFor(role) {
+  return SOURCE_SPECS.find((x)=>x.role===role) || EXTRA_SOURCE_SPECS.find((x)=>x.role===role) || null;
+}
 function inspectRole(items, role, usedKeys=new Set()) {
-  const spec=SOURCE_SPECS.find((x)=>x.role===role);
+  const spec=specFor(role);
   if (!spec) return { role, choice:null, ranked:[] };
   const ranked=items.map((item)=>({ ...item, score:score(item,spec), used:usedKeys.has(item.key) }))
     .filter((x)=>Number.isFinite(x.score)).sort((a,b)=>b.score-a.score || Number(a.size||0)-Number(b.size||0));
@@ -87,5 +94,22 @@ function trySelectAssets(items, options={}) {
   try { return { ok:true, missingRole:null, ...selectAssets(items,options) }; }
   catch (error) { return { ok:false, missingRole:error.role||null, code:error.code||'ORIGINAL_14_SELECT_FAILED', message:String(error.message||error), selected:error.selected||[], totalBytes:(error.selected||[]).reduce((s,x)=>s+Number(x.size||0),0) }; }
 }
+function selectExtraAssets(items, usedKeys=new Set(), options={}) {
+  const selected=[];
+  const used=new Set(usedKeys);
+  for (const spec of EXTRA_SOURCE_SPECS) {
+    const inspection=inspectRole(items,spec.role,used);
+    if (!inspection.choice) throw Object.assign(new Error(`Purchased extra scenery source missing: ${spec.sourceId}`), { code:'ORIGINAL_14_EXTRA_SOURCE_MISSING', role:spec.role, sourceId:spec.sourceId, selected });
+    used.add(inspection.choice.key);
+    const { score:_score, used:_used, ...choice }=inspection.choice;
+    selected.push({ role:spec.role, sourceId:spec.sourceId, collection:spec.collection, unityPreservationOnly:false, extra:true, ...choice });
+  }
+  const extraBytes=selected.reduce((sum,x)=>sum+Number(x.size||0),0);
+  const already=Number(options.alreadyBytes||0);
+  const envCap=Number(options.maxInputBytes || process.env.SCENERY_SHOWCASE_MAX_INPUT_BYTES || ORIGINAL_14_HARD_CAP);
+  const cap=Math.min(envCap, ORIGINAL_14_HARD_CAP);
+  if (already+extraBytes>cap) throw Object.assign(new Error(`Original-14 plus extras ${already+extraBytes} exceeds ${cap}`), { code:'ORIGINAL_14_EXTRA_INPUT_CAP', totalBytes:already+extraBytes, hardMaterializeCap:cap, selected });
+  return { selected, extraBytes, extraSourceCount:selected.length };
+}
 
-module.exports={ REQUIRED_ROLES, SOURCE_SPECS, ORIGINAL_14_HARD_CAP, inspectRole, selectAssets, trySelectAssets };
+module.exports={ REQUIRED_ROLES, SOURCE_SPECS, EXTRA_SOURCE_SPECS, ORIGINAL_14_HARD_CAP, inspectRole, selectAssets, trySelectAssets, selectExtraAssets };

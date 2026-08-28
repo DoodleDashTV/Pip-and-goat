@@ -7,6 +7,7 @@ from pathlib import Path
 
 from showcase_original14_select import (
     cinematic_camera_keys,
+    cinematic_world_camera_keys,
     extract_role_limit,
     extract_sort_key,
     geometry_file_limit,
@@ -88,8 +89,9 @@ def test_staging_names_are_rejected():
 
 
 def test_geometry_file_limits_allow_density_without_dump():
-    assert geometry_file_limit('forest_nature') == 2
-    assert geometry_file_limit('forest_ecokit') == 2
+    assert geometry_file_limit('forest_nature') == 3
+    assert geometry_file_limit('forest_ecokit') == 3
+    assert geometry_file_limit('background_mountains') == 1
     assert geometry_file_limit('village_blender') == 8
     assert geometry_file_limit('village_fbx') == 6
     assert extract_role_limit('village_blender') == 40
@@ -222,6 +224,39 @@ def test_camera_stays_outside_village_cluster():
     assert tight > math.hypot(6.0, 5.0)
 
 
+def test_world_camera_travels_mountains_to_village():
+    keys = cinematic_world_camera_keys(
+        -12.0, -10.0, 12.0, 10.0, 0.0, 8.0,
+        forest_x=0.0, forest_y=38.0, forest_z=5.0,
+        mountain_x=0.0, mountain_y=96.0, mountain_z=18.0,
+    )
+    assert len(keys) == 6
+    pad = 6.0
+    for key in keys:
+        x, y, _z = key['camera']
+        inside = (-12.0 - pad) <= x <= (12.0 + pad) and (-10.0 - pad) <= y <= (10.0 + pad)
+        assert inside is False
+    # Establish looks at the mountains; the finish looks at the village.
+    assert keys[0]['look'][1] > keys[5]['look'][1] + 40.0
+    assert keys[0]['camera'][1] > keys[5]['camera'][1]
+    assert keys[0]['camera'][2] > keys[4]['camera'][2]
+    looks = [tuple(key['look']) for key in keys]
+    assert len(set(looks)) >= 5
+    assert keys[0]['lens'] < keys[4]['lens']
+
+
+def test_mountain_extract_keeps_grassy_and_allows_large_blend():
+    assert should_extract_member('Grassy.blend', 545_850_634, 'background_mountains') is True
+    assert should_extract_member('SnowyMountains.blend', 545_850_634, 'village_blender') is False
+    records = [
+        {'name': 'SnowyMountains.blend', 'ext': '.blend', 'size': 543_122_262},
+        {'name': 'Grassy.blend', 'ext': '.blend', 'size': 545_850_634},
+        {'name': 'Meadow.blend', 'ext': '.blend', 'size': 543_810_762},
+    ]
+    chosen = pick_geometry_records(records, 'background_mountains', limit=1)
+    assert chosen[0]['name'] == 'Grassy.blend'
+
+
 def test_cinematic_camera_is_a_journey_not_an_orbit():
     keys = cinematic_camera_keys(
         -12.0, -10.0, 12.0, 10.0, 0.0, 8.0,
@@ -301,6 +336,8 @@ if __name__ == '__main__':
     test_village_picker_prefers_cabin_a_over_interior_and_skips_none()
     test_village_extract_sort_keeps_large_cabin_a_first()
     test_camera_stays_outside_village_cluster()
+    test_world_camera_travels_mountains_to_village()
+    test_mountain_extract_keeps_grassy_and_allows_large_blend()
     test_cinematic_camera_is_a_journey_not_an_orbit()
     test_point_outside_aabb_pushes_interior_cameras()
     test_village_and_forest_camera_subjects_split()
