@@ -27,7 +27,10 @@ from showcase_original14_select import (  # noqa: E402
     SUPPORT_EXTS,
     extract_role_limit,
     extract_sort_key,
+    geometry_file_limit,
+    mesh_keep_rank,
     pick_geometry_paths,
+    pick_ground_image_path,
     should_extract_member,
 )
 
@@ -37,11 +40,11 @@ VISIBLE_GEOMETRY_ROLES = {
 }
 SUPPORT_ROLES = {'sky_machine_v1', 'sky_machine_v2', 'sky_extra_update', 'world_shaders'}
 RENDERABLE_ROLES = VISIBLE_GEOMETRY_ROLES | {'village_textures', 'sky_hdri'} | SUPPORT_ROLES
-MAX_OBJECTS_PER_BLEND = 8
-MAX_MATERIALS_PER_BLEND = 16
-MAX_MESHES_PER_ROLE = 8
-TARGET_FACES_PER_MESH = 12000
-TARGET_FACES_SCENE = 180000
+MAX_OBJECTS_PER_BLEND = 6
+MAX_MATERIALS_PER_BLEND = 12
+MAX_MESHES_PER_ROLE = 5
+TARGET_FACES_PER_MESH = 8000
+TARGET_FACES_SCENE = 80000
 PROGRESS_PATH: Path | None = None
 
 
@@ -188,7 +191,7 @@ def import_geometry(path: Path, role: str) -> list[bpy.types.Object]:
 
 
 def geometry_candidates(files: list[Path], role: str) -> list[Path]:
-    return pick_geometry_paths(files, role, limit=3)
+    return pick_geometry_paths(files, role, limit=geometry_file_limit(role))
 
 
 def mesh_face_count(obj) -> int:
@@ -216,10 +219,18 @@ def decimate_mesh(obj, target_faces: int = TARGET_FACES_PER_MESH) -> None:
         print(json.dumps({'event': 'decimate_warning', 'object': obj.name, 'error': str(exc)[:180]}), flush=True)
 
 
-def keep_hero_meshes(objects: list[bpy.types.Object], limit: int = MAX_MESHES_PER_ROLE) -> list[bpy.types.Object]:
+def object_dimensions(obj) -> tuple:
+    try:
+        d = obj.dimensions
+        return (float(d.x), float(d.y), float(d.z))
+    except Exception:
+        return (0.0, 0.0, 0.0)
+
+
+def keep_hero_meshes(objects: list[bpy.types.Object], role: str, limit: int = MAX_MESHES_PER_ROLE) -> list[bpy.types.Object]:
     meshes = [o for o in objects if o and o.name in bpy.data.objects and o.type == 'MESH']
     extras = [o for o in objects if o and o.name in bpy.data.objects and o.type in {'CAMERA', 'LIGHT', 'CURVE', 'FONT', 'EMPTY'}]
-    meshes.sort(key=lambda o: (-mesh_face_count(o), o.name))
+    meshes.sort(key=lambda o: mesh_keep_rank(o.name, role, mesh_face_count(o), object_dimensions(o)))
     keep = meshes[: max(1, int(limit))] if meshes else []
     keep_set = set(keep)
     for obj in meshes + extras:
@@ -295,17 +306,27 @@ def largest_image(files: list[Path]) -> Path | None:
     return images[0] if images else None
 
 
-def image_material(name: str, image: Path | None):
+def image_material(name: str, image: Path | None, tile: float = 1.0):
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
-    bsdf = mat.node_tree.nodes.get('Principled BSDF')
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = nodes.get('Principled BSDF')
     if bsdf:
         bsdf.inputs['Roughness'].default_value = 0.82
     if image and bsdf:
         try:
-            tex = mat.node_tree.nodes.new('ShaderNodeTexImage')
+            tex = nodes.new('ShaderNodeTexImage')
             tex.image = bpy.data.images.load(str(image), check_existing=True)
-            mat.node_tree.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
+            if tex.image:
+                tex.image.colorspace_settings.name = 'sRGB'
+            if tile and tile != 1.0:
+                coord = nodes.new('ShaderNodeTexCoord')
+                mapping = nodes.new('ShaderNodeMapping')
+                mapping.inputs['Scale'].default_value = (tile, tile, tile)
+                links.new(coord.outputs['UV'], mapping.inputs['Vector'])
+                links.new(mapping.outputs['Vector'], tex.inputs['Vector'])
+            links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
         except Exception:
             pass
     return mat
@@ -350,14 +371,39 @@ def bind_purchased_textures(objects: list[bpy.types.Object], files: list[Path]) 
 
 
 def create_purchased_texture_ground(files: list[Path]) -> int:
-    img = largest_image(files)
+    img = pick_ground_image_path(files) or largest_image(files)
     if not img:
         return 0
-    bpy.ops.mesh.primitive_plane_add(size=260, location=(0, 35, -0.2))
+    bpy.ops.mesh.primitive_plane_add(size=220, location=(0, 28, -0.15))
     ground = bpy.context.object
     ground.name = 'TJ_Ground_Using_Purchased_Village_Texture'
-    ground.data.materials.append(image_material('TJ_PurchasedVillageGround', img))
+    bpy.ops.object.mode_set(mode='EDIT')
+    try:
+        bpy.ops.uv.smart_project(angle_limit=66.0, island_margin=0.02)
+    except Exception:
+        pass
+    bpy.ops.object.mode_set(mode='OBJECT')
+    ground.data.materials.append(image_material('TJ_PurchasedVillageGround', img, tile=8.0))
     return 1
+
+
+def scatter_purchased_meshes(members: list[bpy.types.Object], origin: tuple, copies: int = 4, radius: float = 16.0) -> list[bpy.types.Object]:
+    extras: list[bpy.types.Object] = []
+    live = [o for o in members if o and o.name in bpy.data.objects and o.type == 'MESH']
+    if not live or copies <= 0:
+        return extras
+    for i in range(copies):
+        src = live[i % len(live)]
+        try:
+            dup = src.copy()
+            dup.data = src.data
+            bpy.context.scene.collection.objects.link(dup)
+            ang = (i / max(copies, 1)) * math.tau
+            dup.location = Vector(origin) + Vector((math.cos(ang) * radius, math.sin(ang) * radius * 0.65, 0.0))
+            extras.append(dup)
+        except Exception as exc:
+            print(json.dumps({'event': 'scatter_warning', 'error': str(exc)[:180]}), flush=True)
+    return extras
 
 
 def load_support(files: list[Path], role: str) -> int:
@@ -564,19 +610,21 @@ def main() -> int:
         for candidate in geometry_candidates(files, role):
             objs = import_geometry(candidate, role)
             if objs:
-                heroes = keep_hero_meshes(objs, MAX_MESHES_PER_ROLE)
+                heroes = keep_hero_meshes(objs, role, MAX_MESHES_PER_ROLE)
                 for hero in heroes:
                     decimate_mesh(hero)
                 members.extend(heroes); imported_files += 1
         if not members:
             raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
+        size, loc = placements[role]
         root = parent_group(members, f'TJ_{role}_PurchasedRoot')
         if root:
-            size, loc = placements[role]
             normalize_group(root, members, size, loc)
+        extras = scatter_purchased_meshes(members, loc, copies=4 if role.startswith('forest') else 3, radius=14.0 if role.startswith('forest') else 11.0)
+        members.extend(extras)
         texture_files = expanded.get('village_textures', []) + expanded.get(role, [])
         bound = bind_purchased_textures(members, texture_files)
-        contributions[role] = {'type':'visible_geometry','objectCount':len(members),'importedFileCount':imported_files,'purchasedTexturesBound':bound}
+        contributions[role] = {'type':'visible_geometry','objectCount':len(members),'importedFileCount':imported_files,'purchasedTexturesBound':bound,'scatteredPurchasedCopies':len(extras)}
 
     ground_count = create_purchased_texture_ground(expanded.get('village_textures', []))
     if not ground_count:
