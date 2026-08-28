@@ -503,7 +503,7 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(blotch_range.outputs["Result"] if "Result" in blotch_range.outputs else blotch_range.outputs[0], mask_mul.inputs[1])
     mask = mask_mul.outputs["Value"]
     links.new(incoming, damp.inputs["Color1"])
-    damp.inputs["Color2"].default_value = (0.11, 0.082, 0.040, 1.0)
+    damp.inputs["Color2"].default_value = (0.16, 0.11, 0.050, 1.0)
     damp_fac = nodes.new("ShaderNodeMapRange")
     damp_fac.inputs["From Min"].default_value = 0.0
     damp_fac.inputs["From Max"].default_value = 0.58
@@ -773,12 +773,12 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if hasattr(glossy, "distribution"):
         glossy.distribution = "GGX"
     if "Color" in glossy.inputs:
-        glossy.inputs["Color"].default_value = (0.18, 0.22, 0.20, 1.0)
+        glossy.inputs["Color"].default_value = (0.14, 0.17, 0.16, 1.0)
     gloss_rough = nodes.new("ShaderNodeMapRange")
     gloss_rough.inputs["From Min"].default_value = 0.0
     gloss_rough.inputs["From Max"].default_value = 1.0
-    gloss_rough.inputs["To Min"].default_value = 0.30
-    gloss_rough.inputs["To Max"].default_value = 0.50
+    gloss_rough.inputs["To Min"].default_value = 0.38
+    gloss_rough.inputs["To Max"].default_value = 0.58
     links.new(ripple.outputs["Fac"], gloss_rough.inputs["Value"])
     if "Roughness" in glossy.inputs:
         links.new(gloss_rough.outputs["Result"] if "Result" in gloss_rough.outputs else gloss_rough.outputs[0], glossy.inputs["Roughness"])
@@ -786,7 +786,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         links.new(bump.outputs["Normal"], glossy.inputs["Normal"])
     sheen = nodes.new("ShaderNodeMath")
     sheen.operation = "MULTIPLY"
-    sheen.inputs[1].default_value = 0.22
+    sheen.inputs[1].default_value = 0.15
     links.new(layer.outputs["Fresnel"], sheen.inputs[0])
     sheen_var = nodes.new("ShaderNodeMapRange")
     sheen_var.inputs["From Min"].default_value = 0.0
@@ -1217,6 +1217,31 @@ def place_bank_crest_trees(trees: list) -> list:
     return extras
 
 
+def place_waterline_dressing(trees: list) -> list:
+    """Small south-bank plantings that break the grass-to-water knife."""
+    extras = []
+    live = [obj for obj in trees if obj and obj.type == "MESH"]
+    if not live:
+        return extras
+    guide = bpy.data.objects.get("TJ_River_SplineGuide")
+    if guide is None:
+        return extras
+    centers = evaluated_centerline(guide, samples=80)
+    for i, center in enumerate(centers):
+        key = (i * 5 + 2) % 9
+        if key not in {1, 3, 6}:
+            continue
+        left, _right = _channel_halves_for_index(centers, i)
+        side = _side_from_centers(centers, i)
+        offset = left * 0.94 + 0.28 * math.sin(i * 0.61 + key)
+        loc = center + side * (-offset)
+        dist, _signed, _along, _left, _right = channel_profile(loc.x, loc.y)
+        if in_village(loc.x, loc.y) or dist < left * 0.40:
+            continue
+        extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.14 + 0.10 * ((i * 3) % 5) / 4.0))
+    return extras
+
+
 def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, radius: float, scale: float, seed: int) -> list:
     extras = []
     live = [obj for obj in sources if obj and obj.type == "MESH"]
@@ -1290,7 +1315,7 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="AREA", location=(2.0, -12.0, 5.5))
     creek = bpy.context.object
     creek.name = "TJ_CreekFill"
-    creek.data.energy = 70
+    creek.data.energy = 55
     creek.data.size = 28
     creek.rotation_euler = (0.0, 0.0, 0.0)
     if hasattr(creek.data, "color"):
@@ -1659,6 +1684,7 @@ def main() -> int:
                 continue
             west_fg.append(duplicate_mesh_in_world(trees[int(abs(item[0])) % src_count], (item[0], item[1], 0.0), item[2]))
         west_fg.extend(place_bank_crest_trees(trees))
+        west_fg.extend(place_waterline_dressing(trees))
     west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
     east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
     foreground = west_fg + east_fg
