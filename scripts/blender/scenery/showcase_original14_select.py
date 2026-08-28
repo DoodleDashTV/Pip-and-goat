@@ -320,9 +320,11 @@ def cinematic_camera_keys(
 def village_file_rank(name: str) -> tuple:
     n = str(name or '').lower()
     cabin_a = 0 if is_cabin_a_name(n) else 1
+    cabin_b = 1 if re.search(r'cabin\d+b\b', n) else 0
+    dressing = 0 if any(word in n for word in ('tree', 'fence', 'gate', 'cart')) else 1
     outdoor = 0 if is_village_outdoor_name(n) else 1
     interior = 1 if is_village_interior_name(n) else 0
-    return (cabin_a, outdoor, interior)
+    return (cabin_a, cabin_b, dressing, outdoor, interior)
 
 
 def is_dump_name(name: str) -> bool:
@@ -481,9 +483,8 @@ def extract_sort_key(filename: str, file_size: int, role: str = '') -> tuple:
         grassy_miss = 0 if any(word in name for word in ('grass', 'meadow')) else 1
         return (geo, dump, staging, snowy, grassy_miss, ext_rank, -int(file_size or 0), name)
     if str(role).startswith('village') and ext in GEOMETRY_EXTS:
-        cabin_a, outdoor, interior = village_file_rank(name)
-        # Prefer the large Cabin*A buildings over tiny interior props.
-        return (geo, dump, staging, cabin_a, outdoor, interior, ext_rank, -int(file_size or 0), name)
+        # Prefer Cabin*A, then trees/fence, never interior props or Cabin*B fillers.
+        return (geo, dump, staging, *village_file_rank(name), ext_rank, -int(file_size or 0), name)
     # Prefer smaller geometry so individual trees/houses win over combined dumps.
     return (geo, dump, staging, ext_rank, hdri, albedo_miss, int(file_size or 0), name)
 
@@ -535,8 +536,7 @@ def pick_geometry_records(records: list[dict], role: str, limit: int = 1) -> lis
         dump = 1 if is_dump_name(name) else 0
         staging = 1 if is_staging_name(name) else 0
         if role in {'village_blender', 'village_fbx'}:
-            cabin_a, outdoor, interior = village_file_rank(name)
-            return (dump, staging, cabin_a, outdoor, interior, word_miss, -size, name)
+            return (dump, staging, *village_file_rank(name), word_miss, -size, name)
         if str(role).startswith('village'):
             water = 1 if is_water_or_ocean_name(name) else 0
             blend_miss = 0 if ext == '.blend' else 1
@@ -585,9 +585,10 @@ def mix_village_kit_records(records: list[dict], limit: int) -> list[dict]:
 
     take(cabins_a, 4)
     take(cabins, max(0, 4 - len(chosen)))
-    take(trees, 2)
-    take(props, 2)
-    take(cabins_a + cabins + trees + props + records, max(1, int(limit)))
+    take(trees, 3)
+    take(props, 3)
+    take(cabins_a + trees + props, max(1, int(limit)))
+    take(cabins, max(1, int(limit)))
     return chosen
 
 

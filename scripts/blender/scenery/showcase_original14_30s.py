@@ -770,22 +770,18 @@ def packed_meadow_image():
 
 
 def _dirt_or_rock_path(files: list[Path]) -> Path | None:
+    banned = ('leaf', 'leaves', 'foliage', 'needles', 'grass01', 'cutout')
     candidates = [
         p for p in files
         if p.is_file()
         and p.suffix.lower() in IMAGE_EXTS
         and not is_grass_card_texture_name(p.name)
-        and any(word in p.name.lower() for word in ('dirt', 'soil', 'moss', 'ground', 'rock', 'meadow', 'terrain', 'basecolor'))
+        and any(word in p.name.lower() for word in ('dirt', 'soil', 'moss', 'ground', 'meadow', 'terrain'))
         and not any(word in p.name.lower() for word in NON_ALBEDO_WORDS)
-        and 'foliage' not in p.name.lower()
-        and 'leaf' not in p.name.lower()
+        and not any(word in p.name.lower() for word in banned)
     ]
-    rock_only = [
-        p for p in candidates
-        if any(word in p.name.lower() for word in ('dirt', 'soil', 'moss', 'ground', 'meadow', 'terrain'))
-    ]
-    img_path = pick_ground_image_path(rock_only or candidates) if (rock_only or candidates) else None
-    if img_path and (is_grass_card_texture_name(img_path.name) or 'leaf' in img_path.name.lower() or 'foliage' in img_path.name.lower()):
+    img_path = pick_ground_image_path(candidates) if candidates else None
+    if img_path and any(word in img_path.name.lower() for word in banned):
         return None
     return img_path
 
@@ -805,17 +801,17 @@ def _meadow_or_dirt_material(name: str, img_path: Path | None, meadow: bool) -> 
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
     coord = nodes.new('ShaderNodeTexCoord')
     noise = nodes.new('ShaderNodeTexNoise')
-    noise.inputs['Scale'].default_value = 0.28 if meadow else 0.55
+    noise.inputs['Scale'].default_value = 1.15 if meadow else 0.85
     if 'Detail' in noise.inputs:
         noise.inputs['Detail'].default_value = 4.0
     links.new(coord.outputs['Object'], noise.inputs['Vector'])
     patch = _mix_color_node(
         nodes,
         fac=0.5,
-        color2=(0.34, 0.48, 0.16, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
+        color2=(0.40, 0.54, 0.18, 1.0) if meadow else (0.28, 0.20, 0.12, 1.0),
     )
     c1, _c2, patch_out = _mix_color_sockets(patch)
-    c1.default_value = (0.22, 0.38, 0.12, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
+    c1.default_value = (0.16, 0.30, 0.08, 1.0) if meadow else (0.40, 0.28, 0.15, 1.0)
     links.new(noise.outputs['Fac'], patch.inputs['Fac'] if 'Fac' in patch.inputs else patch.inputs[0])
     color_src = patch_out
     if img_path is not None:
@@ -986,13 +982,15 @@ def create_purchased_stream(center=(0.0, 16.0, -0.03), size=(8.0, 42.0)) -> int:
     stream.scale = (max(size[0], 8.0), max(size[1], 3.0), 1.0)
     bpy.ops.object.mode_set(mode='EDIT')
     try:
-        bpy.ops.mesh.subdivide(number_cuts=10)
+        bpy.ops.mesh.subdivide(number_cuts=14)
     except Exception:
         pass
     bpy.ops.object.mode_set(mode='OBJECT')
     for vert in stream.data.vertices:
-        vert.co.y += 0.14 * math.sin(vert.co.x * math.pi * 2.2)
-        vert.co.x += 0.03 * math.sin(vert.co.y * math.pi * 3.0)
+        vert.co.y += 0.42 * math.sin(vert.co.x * math.pi * 1.6)
+        vert.co.x += 0.06 * math.sin(vert.co.y * math.pi * 2.4)
+        # Taper the ends so the slab does not read as a canal.
+        vert.co.y *= 0.55 + 0.45 * math.cos(vert.co.x * math.pi * 0.9)
     stream.data.update()
     bpy.context.view_layer.update()
     stream.data.materials.clear()
@@ -1606,37 +1604,7 @@ def main() -> int:
         'assembledAsVillageKit': True,
     }
 
-    village_trees = [
-        o for o in bpy.data.objects
-        if o.type == 'MESH' and 'tree' in o.name.lower()
-        and not is_forest_camera_subject_name(o.name, subject_parent_name(o))
-        and 'fbx' not in subject_parent_name(o).lower()
-        and any(material_has_valid_image(slot.material) for slot in o.material_slots)
-    ]
-    grove = scatter_purchased_meshes(
-        village_trees,
-        (village_center.x, village_center.y + 1.5, 0.0),
-        copies=6,
-        radius=9.0,
-    )
-    near_band = scatter_purchased_meshes(
-        village_trees,
-        (village_center.x, village_center.y + 22.0, 0.0),
-        copies=10,
-        radius=16.0,
-    )
-    far_band = scatter_purchased_meshes(
-        village_trees,
-        (village_center.x, village_center.y + 36.0, 0.0),
-        copies=10,
-        radius=15.0,
-    )
-    forest_band = grove + near_band + far_band
-    print(json.dumps({
-        'event': 'village_tree_forest_band',
-        'copies': len(forest_band),
-        'sourceTrees': len(village_trees),
-    }), flush=True)
+    # Tree scatter waits until after albedo remap so authored pines are live.
 
     # Project File.blend is a water/flora/terrain library. Terrain_003 is an
     # empty 12 m plane — do not scale it into another slab. Use packed flora
@@ -1679,11 +1647,8 @@ def main() -> int:
                 ))
     # Put the stream south of the village so a north-looking 9:16 camera
     # sees water in front of the cabins instead of hidden behind them.
-    river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.03), (44.0, 6.2))
-    bank_count = create_river_banks(
-        (village_center.x, village_center.y - 10.0, -0.02),
-        expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []),
-    )
+    river_count = create_purchased_stream((village_center.x, village_center.y - 10.0, -0.03), (40.0, 4.4))
+    bank_count = 0
     if not members and river_count <= 0:
         raise RuntimeError(f'Purchased source {role} contributed no importable geometry')
     remapped_project = remap_missing_images(expanded.get('village_textures', []) + files)
@@ -1703,6 +1668,8 @@ def main() -> int:
 
     for role in ('forest_nature', 'forest_ecokit'):
         files = expanded.get(role, [])
+        if role == 'forest_ecokit':
+            files = [p for p in files if 'swarm' not in p.name.lower() and 'suzanne' not in p.name.lower()]
         members, imported_files, placed = import_kit_groups(
             files,
             role,
@@ -1789,12 +1756,30 @@ def main() -> int:
     remapped = remap_missing_images(all_extracted)
     forced = ensure_purchased_albedos(all_extracted)
     lifted = lift_purchased_shading()
+    village_trees = [
+        o for o in bpy.data.objects
+        if o.type == 'MESH' and 'tree' in o.name.lower()
+        and not is_forest_camera_subject_name(o.name, subject_parent_name(o))
+        and 'fbx' not in subject_parent_name(o).lower()
+        and 'forest_' not in subject_parent_name(o).lower()
+    ]
+    grove = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 1.5, 0.0), copies=6, radius=9.0)
+    near_band = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 22.0, 0.0), copies=12, radius=17.0)
+    far_band = scatter_purchased_meshes(village_trees, (village_center.x, village_center.y + 36.0, 0.0), copies=12, radius=16.0)
+    forest_band = grove + near_band + far_band
     print(json.dumps({
         'event': 'purchased_image_remap',
         'remapped': remapped,
         'forcedAlbedos': forced,
         'liftedShading': lifted,
     }), flush=True)
+    print(json.dumps({
+        'event': 'village_tree_forest_band',
+        'copies': len(forest_band),
+        'sourceTrees': len(village_trees),
+    }), flush=True)
+    if 'village_blender' in contributions:
+        contributions['village_blender']['scatteredPurchasedCopies'] = len(forest_band)
 
     ground_files = expanded.get('forest_nature', []) + expanded.get('forest_ecokit', []) + mountain_files
     ground_count, ground_source = create_valley_ground(
@@ -1802,11 +1787,7 @@ def main() -> int:
         (village_center.x, village_center.y + 18.0, -0.08),
         150.0,
     )
-    path_count = create_dirt_path(
-        (village_center.x, village_center.y - 1.0, -0.045),
-        (4.6, 26.0),
-        ground_files,
-    )
+    path_count = 0
     if not ground_count:
         raise RuntimeError('Valley floor could not be created from purchased meadow/dirt sources')
     contributions['village_textures'] = {
@@ -1856,6 +1837,14 @@ def main() -> int:
 
     broken_trees = hide_or_paint_broken_trees()
     print(json.dumps({'event': 'broken_tree_fallback', 'count': broken_trees}), flush=True)
+    hidden_props = 0
+    for obj in list(bpy.data.objects):
+        blob = f'{obj.name} {subject_parent_name(obj)}'.lower()
+        if any(word in blob for word in ('suzanne', 'monkey', 'butterfly', 'swarm')):
+            obj.hide_render = True
+            obj.hide_viewport = True
+            hidden_props += 1
+    print(json.dumps({'event': 'hidden_ecokit_props', 'count': hidden_props}), flush=True)
 
     foliage_alpha = enable_foliage_alpha(
         [o for o in bpy.data.objects if o.type == 'MESH' and not str(o.name).startswith('TJ_Ground')]

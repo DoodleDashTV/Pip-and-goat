@@ -201,6 +201,28 @@ def test_village_picker_prefers_cabin_a_over_interior_and_skips_none():
     assert 'Grass01.blend' not in names
 
 
+def test_village_mix_prefers_trees_and_fence_over_cabin_b():
+    records = [
+        {'name': 'Cabin04A.blend', 'ext': '.blend', 'size': 2_262_865},
+        {'name': 'Cabin03A.blend', 'ext': '.blend', 'size': 2_100_000},
+        {'name': 'Cabin02A.blend', 'ext': '.blend', 'size': 1_861_389},
+        {'name': 'Cabin01A.blend', 'ext': '.blend', 'size': 1_806_509},
+        {'name': 'Cabin04B.blend', 'ext': '.blend', 'size': 1_598_369},
+        {'name': 'Tree03.blend', 'ext': '.blend', 'size': 1_400_000},
+        {'name': 'Tree02.blend', 'ext': '.blend', 'size': 1_390_580},
+        {'name': 'Tree01.blend', 'ext': '.blend', 'size': 1_350_000},
+        {'name': 'Fence01.blend', 'ext': '.blend', 'size': 1_271_868},
+        {'name': 'Gate01.blend', 'ext': '.blend', 'size': 1_260_000},
+        {'name': 'Cart01.blend', 'ext': '.blend', 'size': 1_250_000},
+    ]
+    names = [c['name'] for c in pick_geometry_records(records, 'village_blender', limit=10)]
+    assert 'Cabin04A.blend' in names
+    assert 'Tree03.blend' in names
+    assert 'Fence01.blend' in names
+    assert 'Gate01.blend' in names
+    assert 'Cabin04B.blend' not in names
+
+
 def test_village_extract_sort_keeps_large_cabin_a_first():
     keys = [
         ('Village (Blender 4.2.2)/Book01.blend', 1_266_472),
@@ -416,6 +438,7 @@ if __name__ == '__main__':
     test_dominating_plane_is_rejected_for_camera_bounds()
     test_primitive_boxes_rank_behind_hero_meshes()
     test_village_picker_prefers_cabin_a_over_interior_and_skips_none()
+    test_village_mix_prefers_trees_and_fence_over_cabin_b()
     test_village_extract_sort_keeps_large_cabin_a_first()
     test_camera_stays_outside_village_cluster()
     test_world_camera_travels_mountains_to_village()
