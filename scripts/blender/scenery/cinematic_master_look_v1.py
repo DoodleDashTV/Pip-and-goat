@@ -187,8 +187,15 @@ def apply_hdri_cinematic_balance() -> dict:
         (node for node in nodes if node.type == "TEX_ENVIRONMENT" and not str(node.name).startswith("TJ_HDRI_")),
         None,
     )
-    # Do not rotate the camera HDRI. A 1.05 rad spin pointed SHOT_02 at the
-    # gray horizon band and killed the purchased painted clouds.
+    if env is not None and "Vector" in env.inputs and not env.inputs["Vector"].links:
+        tex = nodes.new("ShaderNodeTexCoord")
+        tex.name = "TJ_ATMO_CamCoord"
+        mapping = nodes.new("ShaderNodeMapping")
+        mapping.name = "TJ_ATMO_CamMap"
+        # Opposite of the failed +1.05 spin, which hit the gray horizon band.
+        mapping.inputs["Rotation"].default_value = (0.0, 0.0, -0.65)
+        links.new(tex.outputs["Generated"], mapping.inputs["Vector"])
+        links.new(mapping.outputs["Vector"], env.inputs["Vector"])
     bg = next(
         (node for node in nodes if node.type == "BACKGROUND" and not str(node.name).startswith("TJ_HDRI_")),
         None,
@@ -207,8 +214,8 @@ def apply_hdri_cinematic_balance() -> dict:
     refl_map = nodes.get("TJ_HDRI_ReflMap")
     if refl_map is not None and "Rotation" in refl_map.inputs:
         refl_map.inputs["Rotation"].default_value = (0.0, 0.0, 0.48)
-    _log("cinematic_hdri_balance", cameraRotationZ=0.0, reflectionRotationZ=0.48, strength=1.18)
-    return {"cameraRotationZ": 0.0, "reflectionRotationZ": 0.48, "strength": 1.18}
+    _log("cinematic_hdri_balance", cameraRotationZ=-0.65, reflectionRotationZ=0.48, strength=1.18)
+    return {"cameraRotationZ": -0.65, "reflectionRotationZ": 0.48, "strength": 1.18}
 
 
 def apply_compositor_finish() -> None:
@@ -238,7 +245,7 @@ def apply_compositor_finish() -> None:
         links.new(sky_gate.outputs["Value"], gated.inputs[1])
         scale = nodes.new("CompositorNodeMath")
         scale.operation = "MULTIPLY"
-        scale.inputs[1].default_value = 0.40
+        scale.inputs[1].default_value = 0.50
         links.new(gated.outputs["Value"], scale.inputs[0])
         links.new(scale.outputs["Value"], fac)
     else:
@@ -246,7 +253,7 @@ def apply_compositor_finish() -> None:
     links.new(render.outputs["Image"], color1)
     out_sock = mix.outputs.get("Color") or mix.outputs.get("Result") or mix.outputs[0]
     links.new(out_sock, composite.inputs["Image"])
-    _log("cinematic_compositor_applied", haze=True, hazeScale=0.40, skyHoldout=True, glare=False, vignette=False, grain=False, shadowLift=False)
+    _log("cinematic_compositor_applied", haze=True, hazeScale=0.50, skyHoldout=True, glare=False, vignette=False, grain=False, shadowLift=False)
 
 
 def apply_color_management() -> dict:
