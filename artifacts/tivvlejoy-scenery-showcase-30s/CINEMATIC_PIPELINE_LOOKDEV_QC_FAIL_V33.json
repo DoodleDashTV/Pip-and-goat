@@ -1,0 +1,43 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-29T00:22:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "startingSha": "43a33d0bf997577b8faabd1e269433ca19b26cef",
+  "commit": "c67a88fe5e185ad396b10f9b6a588c82efcba193",
+  "geometryTestDir": "/tmp/o14-lookdev/cinematic-lookdev59-geom",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev59",
+  "abDir": "/tmp/o14-lookdev/cinematic-lookdev-ab",
+  "v31GeometryPreserved": true,
+  "acceptanceAP": {
+    "A_water_hidden_shot02_is_creek": true,
+    "B_water_instantly_identifiable": false,
+    "C_water_only_part_of_channel": true,
+    "D_dark_wet_bed_visible": "partial",
+    "E_3d_bank_slope_depth": true,
+    "F_no_knife_edge_grass_seam": false,
+    "G_no_constant_width_ribbon": "partial",
+    "H_no_road_path_interpretation": "partial",
+    "I_reflections_support_water": "partial",
+    "J_natural_bank_breakup": "partial",
+    "K_shot02_cinematic": false,
+    "L_shot01_to_06_believable": false,
+    "M_purchased_scenery_authoritative": true,
+    "N_clean_enough_to_judge": true,
+    "O_water_coherent_across_cameras": "partial",
+    "P_water_improves_beauty": false
+  },
+  "shots": {
+    "SHOT_02": "FAIL liquid — trough and purchased cabin/trees hold. Water is a darker teal film with some sheen, not pale foil, not yet a readable creek with exposed bed, irregular lip, and useful reflections."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "knife_edge_grass_lip"
+  ],
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false
+}

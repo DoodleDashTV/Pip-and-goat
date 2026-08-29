@@ -1,0 +1,194 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_LIQUID_READABILITY_AND_BANK_FINISH_RESULT_V33",
+  "startingSha": "43a33d0bf997577b8faabd1e269433ca19b26cef",
+  "finalSha": "c67a88fe5e185ad396b10f9b6a588c82efcba193",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "urlNote": "PR #169 remains OPEN / DRAFT / UNMERGED / NOT READY"
+  },
+  "renderEngine": "CYCLES_CPU",
+  "blender": "4.2.2 LTS",
+  "eeveeUnavailableReason": "no NVIDIA / no libEGL.so.1 — EEVEE Next aborts; production look-dev stays Cycles CPU",
+  "v31v32GeometryPreservation": {
+    "confirmed": true,
+    "locked": [
+      "WATER_SURFACE_Z=-1.15",
+      "BED_CENTER_Z=-1.62",
+      "BED_SHOULDER_Z=-0.58",
+      "BANK_CREST_Z=0.78",
+      "WATER_WIDTH_SCALE=0.30",
+      "BED_WIDTH_SCALE=0.68",
+      "asymmetric south/north channel halves",
+      "overall river spline location"
+    ],
+    "crestOnlyRefinements": [
+      "slower lip rise (t**1.65 over 72% of bank run)",
+      "south bank_run lengthened 2.55m -> 4.40m (outer crest only)",
+      "5-pass neighbor soften on crest verts only",
+      "inner shelf climb 0.20m -> 0.62m so the terrace above water is not a knife",
+      "z=-1.15 contour wobble for an irregular waterline",
+      "erosion bays + half-sunk stones + crest grass tufts"
+    ],
+    "didNot": [
+      "rebuild the carved trough",
+      "move the river",
+      "destroy asymmetric banks",
+      "widen water back to the full channel",
+      "fill the 2.4m trough with a giant volume"
+    ]
+  },
+  "reasonV32WaterFailed": [
+    "Thin horizontal Principled with IOR 1.22 / specular 0.28 Fresnel-mirrored the purchased HDRI into a white ribbon under AgX +0.30",
+    "Killing specular (0) and IOR (1.0) removed the foil and also removed liquid cues — matte plastic teal",
+    "SHOT_02 is only ~14deg down; facing-gated transmission stayed ~11% and went ink-black",
+    "Camera View Distance gating made different substances per shot",
+    "The 2m shadowed trough plus a millimetre film could not show bed and sheen at once"
+  ],
+  "abWaterCandidates": {
+    "dir": "/tmp/o14-lookdev/cinematic-lookdev-ab",
+    "A": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-ab/variant_a_shot_02_.png",
+      "intent": "V32 baseline: specular 0, IOR 1.0, distance-gated",
+      "humanRead": "Matte plastic teal ribbon. No bed-through, no useful reflections."
+    },
+    "B": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-ab/variant_b_shot_02_.png",
+      "intent": "Transmission + IOR 1.22, specular 0.18",
+      "humanRead": "White/silver foil. 14deg grazing + IOR 1.22 = sky Fresnel. Rejected."
+    },
+    "C": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-ab/variant_c_shot_02_.png",
+      "intent": "Rough reflection-dominant, IOR 1.15, trans ~0.16-0.22",
+      "humanRead": "Least-wrong of the four. Dark teal + some sheen. Still a strip, not liquid. Winner for further work."
+    },
+    "D_firstPass": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-ab/variant_d_shot_02_.png",
+      "intent": "Hybrid IOR 1.18, trans 0.40-0.62, brighter glossy",
+      "humanRead": "White center specular strip. Rejected."
+    },
+    "winner": "C as base, evolved into production D",
+    "winnerWhy": "Human readability, not luma/B-G. C was the only candidate that did not immediately foil or go matte-dead."
+  },
+  "winningWaterSolution": {
+    "label": "D",
+    "defaultFlag": "--water-variant D",
+    "approach": "Not Principled transmission. Closed 18cm slab. Transparent BSDF (light Water_Mat teal filter) mixed with 14% visible teal body + remapped dark glossy + tiny glints + Volume Absorption 0.16. Principled IOR/specular remain 1.0/0.0 so the HDRI ribbon cannot return through Fresnel.",
+    "finalIorSpecularTransmissionRoughness": {
+      "principledIor": 1.0,
+      "principledSpecular": 0.0,
+      "principledTransmission": 0.0,
+      "surface": "Transparent + 14% teal Principled body (Emission Strength 0.07) + Glossy mix 0.28-0.42 by remapped Facing",
+      "glossyColor": [0.24, 0.30, 0.28],
+      "glossRoughness": [0.28, 0.48],
+      "volumeAbsorption": {"color": [0.06, 0.13, 0.10], "density": 0.16},
+      "bump": "swell + ripple + stretched anisotropic noise (no Wave bands)",
+      "metallic": 0.0
+    },
+    "cameraDistanceGating": "REMOVED for production D. Variant A still has it for the A/B harness only."
+  },
+  "waterThicknessVolumeTest": {
+    "thicknessM": 0.18,
+    "filledFullTrough": false,
+    "result": "KEEP the shallow closed prism. It gives Cycles a real transmission path without a 2.4m glass block.",
+    "volumeDensity32": "TOO DARK at 14deg (path ~0.74m). Rejected.",
+    "refractionIor105": "BLACK on the closed slab in lookdev56. Reverted to Transparent.",
+    "transparentPlusLightVolume": "Near-field lookdev55 showed bed-through. Distant trough still dies to shade unless a small teal body remains."
+  },
+  "bedThroughWaterTest": {
+    "result": "PARTIAL",
+    "evidence": "lookdev55 near crop showed tan/dark bed under the film. lookdev59 still shows some dark bed shapes under/beside water, but the hero read is still an opaque teal ribbon, not depth in the same body."
+  },
+  "knifeLipGeometryCorrection": {
+    "result": "FAIL_still_visible",
+    "attempted": [
+      "crest-only neighbor soften (5 passes)",
+      "longer south bank run 4.40m",
+      "inner shelf climb (remove terrace knife)",
+      "patchy Mix Shader: meadow grass BSDF stays green, earth is a separate BSDF",
+      "crest grass tufts",
+      "south waterline trees"
+    ],
+    "remaining": "SHOT_02 still sees a hard grass-to-bank silhouette. The knife is a 2m trough wall seen at 14deg, not only a color contour."
+  },
+  "irregularWaterlineSolution": {
+    "result": "PARTIAL",
+    "attempted": [
+      "one-sided erosion bays",
+      "z=-1.15 terrain contour wobble",
+      "water-edge Z swell",
+      "half-sunk elongated stones (not ico-spheres)"
+    ],
+    "remaining": "Hero camera still reads a fairly straight water/bank cut."
+  },
+  "reflectionSolution": {
+    "result": "PARTIAL",
+    "method": "Remapped dark glossy (never full-mirror Facing) plus small glints. HDRI world lighting unchanged. Area lights visible_glossy=false. TJ_CreekFill energy 170, glossy off, lowered into the trough.",
+    "avoided": "white HDRI ribbon, IOR 1.22 foil, specular 0 matte-only",
+    "remaining": "SHOT_02 does not yet show darker reflected vegetation + sky + broken highlights as a liquid pattern."
+  },
+  "shot02BeforeAfter": {
+    "beforeV32": "/tmp/o14-lookdev/cinematic-lookdev54/shot_02_.png",
+    "beforeHideWater": "/tmp/o14-lookdev/cinematic-lookdev54-geom/shot_02_.png",
+    "after": "/tmp/o14-lookdev/cinematic-lookdev59/shot_02_.png",
+    "afterHideWater": "/tmp/o14-lookdev/cinematic-lookdev59-geom/shot_02_.png",
+    "assessment": "BEFORE: grey-green matte ribbon / possible path. AFTER: darker teal film with some sheen and a still-carved trough. Not yet unmistakably liquid. Knife lip remains."
+  },
+  "shot02Acceptance": "FAIL — do not proceed to six-shot validation as a pass. Six cameras were not re-rendered this turn.",
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "NOT_RENDERED_V33_shot02_hero_gate_failed",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev59/shot_02_.png",
+    "SHOT_03": "NOT_RENDERED_V33_shot02_hero_gate_failed",
+    "SHOT_04": "NOT_RENDERED_V33_shot02_hero_gate_failed",
+    "SHOT_05": "NOT_RENDERED_V33_shot02_hero_gate_failed",
+    "SHOT_06": "NOT_RENDERED_V33_shot02_hero_gate_failed",
+    "mostGrazing": "SHOT_02 (~14deg) — identified, not passed",
+    "mostOverhead": "not re-tested",
+    "brightestReflection": "not re-tested",
+    "darkestCreek": "SHOT_02 trough shade — identified"
+  },
+  "gatesAP": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PARTIAL",
+    "E": "PASS",
+    "F": "FAIL",
+    "G": "PARTIAL",
+    "H": "PARTIAL",
+    "I": "PARTIAL",
+    "J": "PARTIAL",
+    "K": "FAIL",
+    "L": "FAIL",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PARTIAL",
+    "P": "FAIL"
+  },
+  "gateNotes": {
+    "A": "Hide-water lookdev59-geom still shows the carved creek. Do not rebuild.",
+    "B": "Teal is more water-colored than V32 plastic, but not instantly liquid.",
+    "C": "Water still ~30% of channel.",
+    "D": "Bed exists and sometimes reads through near water; hero view still mostly opaque.",
+    "E": "3D banks remain.",
+    "F": "Knife grass lip still obvious from SHOT_02.",
+    "G": "Bays/stones exist; still reads as a strip from the hero camera.",
+    "H": "Trough helps; dark bed can still be a path if water fails.",
+    "I": "Remapped glossy is present; not enough environment storytelling.",
+    "J": "Patchy Mix Shader + tufts started; not natural enough.",
+    "K": "SHOT_02 is not yet cinematic.",
+    "L": "Six-shot skipped because the hero gate failed.",
+    "M": "Purchased scenery remains authoritative.",
+    "N": "Clean enough to judge.",
+    "O": "One D material, no distance gate; only SHOT_02 stressed.",
+    "P": "Water does not yet improve the frame."
+  },
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "latestGate": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V33.json",
+  "nextLocalRepair": "Keep locked V31 trough. The remaining knife is a 2m wall seen at 14deg — needs more physical crest breakup (not another IOR tweak). Water must show bed-through AND wet sheen in the same SHOT_02 body without restoring the HDRI ribbon. Do not CREATE a paid pod."
+}
