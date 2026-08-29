@@ -30,6 +30,11 @@ from cinematic_standards import (
     require_visual_approval_before_paid_final,
     visible_use_record,
 )
+from cinematic_hero_rebuild_v3_test import (  # noqa: E402
+    test_authored_bank_is_a_profile_not_noise,
+    test_channel_has_a_creek,
+    test_negative_space_path_exists,
+)
 from cinematic_creek_profile import (
     hero_grass_lip,
     hero_north_notch_depth,
@@ -263,4 +268,7 @@ if __name__ == "__main__":
     test_visible_use_requires_rendered_pixels()
     test_visual_approval_required_before_paid_final()
     test_master_collections_and_gate_list()
+    test_channel_has_a_creek()
+    test_authored_bank_is_a_profile_not_noise()
+    test_negative_space_path_exists()
     print("cinematic_standards_test PASS")
