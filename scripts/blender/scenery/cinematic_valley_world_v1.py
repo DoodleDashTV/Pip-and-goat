@@ -274,7 +274,8 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     if dist < bed_half:
         t = (dist - water_half) / max(0.16, bed_half - water_half)
         irreg = 0.08 * math.sin(x * 0.81 + y * 0.54) + 0.05 * math.sin(along * 0.67)
-        height = shoulder_z + 0.20 * (t ** 1.35) + irreg
+        # Climb off the old terrace so the inner shelf is not a knife above the water.
+        height = shoulder_z + 0.62 * (t ** 1.12) + irreg
         return _waterline_wobble(height, x, y, along)
     t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
     shelf = shoulder_z + 0.20
@@ -785,9 +786,9 @@ def _water_variant_cfg(variant: str, tint) -> dict:
         "rough_lo": 0.20,
         "rough_hi": 0.38,
         "extra_glossy": False,
-        "glossy_color": (0.16, 0.20, 0.19, 1.0),
-        "gloss_rough_lo": 0.30,
-        "gloss_rough_hi": 0.50,
+        "glossy_color": (0.24, 0.30, 0.28, 1.0),
+        "gloss_rough_lo": 0.28,
+        "gloss_rough_hi": 0.48,
         "bump": 0.20,
         "deep": deep,
     }
@@ -1051,8 +1052,8 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         face_amt = nodes.new("ShaderNodeMapRange")
         face_amt.inputs["From Min"].default_value = 0.0
         face_amt.inputs["From Max"].default_value = 1.0
-        face_amt.inputs["To Min"].default_value = 0.20
-        face_amt.inputs["To Max"].default_value = 0.30
+        face_amt.inputs["To Min"].default_value = 0.28
+        face_amt.inputs["To Max"].default_value = 0.42
         links.new(layer.outputs["Facing"], face_amt.inputs["Value"])
         face_var = nodes.new("ShaderNodeMapRange")
         face_var.inputs["From Min"].default_value = 0.0
@@ -1083,9 +1084,9 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         if "Emission Color" in body_teal.inputs:
             body_teal.inputs["Emission Color"].default_value = (0.020, 0.048, 0.038, 1.0)
         if "Emission Strength" in body_teal.inputs:
-            body_teal.inputs["Emission Strength"].default_value = 0.16
+            body_teal.inputs["Emission Strength"].default_value = 0.07
         mix_body = nodes.new("ShaderNodeMixShader")
-        mix_body.inputs[0].default_value = 0.30
+        mix_body.inputs[0].default_value = 0.14
         links.new(trans.outputs["BSDF"], mix_body.inputs[1])
         links.new(body_teal.outputs["BSDF"], mix_body.inputs[2])
         mix_liq = nodes.new("ShaderNodeMixShader")
