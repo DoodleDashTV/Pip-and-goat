@@ -2317,30 +2317,39 @@ def plant_purchased_tree(src, loc, scale: float):
 
 
 def place_cabin_interior_voids() -> list:
-    """Dark occupancy so window holes cannot punch through to the HDRI sky."""
+    """Dark occupancy seated in each Building mesh so openings cannot show sky."""
     extras = []
     mat = bpy.data.materials.get("TJ_CabinDaylightGlass") or _dark_cabin_glass()
-    slots = (
-        (-9.2, -2.0),
-        (9.4, -0.2),
-        (-9.8, 5.0),
-        (9.8, 6.6),
-        (-10.2, 11.6),
-        (10.0, 13.0),
-        (-9.4, 17.8),
-        (10.4, 19.2),
-    )
-    for i, (x, y) in enumerate(slots):
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x, y + 1.35, 1.55))
+    buildings = [
+        obj for obj in bpy.data.objects
+        if obj.type == "MESH" and obj.name.lower().startswith("building") and "_lod" not in obj.name.lower()
+    ]
+    for i, obj in enumerate(buildings):
+        bounds = group_bounds([obj])
+        if not bounds:
+            continue
+        mins, maxs = bounds
+        cx = (mins.x + maxs.x) * 0.5
+        cy = (mins.y + maxs.y) * 0.5
+        cz = mins.z + (maxs.z - mins.z) * 0.42
+        sx = max(0.35, (maxs.x - mins.x) * 0.28)
+        sy = max(0.28, (maxs.y - mins.y) * 0.28)
+        sz = max(0.22, (maxs.z - mins.z) * 0.28)
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, cy, cz))
         box = bpy.context.object
         box.name = f"TJ_CabinInteriorVoid_{i}"
-        box.scale = (0.80, 0.62, 0.52)
+        box.scale = (sx, sy, sz)
         box.data.materials.clear()
         box.data.materials.append(mat)
         if hasattr(box, "visible_shadow"):
             box.visible_shadow = False
         extras.append(box)
-        print(json.dumps({"event": "cabin_interior_void", "name": box.name, "xy": [x, y]}), flush=True)
+        print(json.dumps({
+            "event": "cabin_interior_void",
+            "name": box.name,
+            "host": obj.name,
+            "center": [round(cx, 2), round(cy, 2), round(cz, 2)],
+        }), flush=True)
     return extras
 
 
