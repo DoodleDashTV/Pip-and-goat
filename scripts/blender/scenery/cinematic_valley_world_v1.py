@@ -486,7 +486,7 @@ def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
     height += 0.12 * math.sin(along * 0.73 + x * 1.1)
     height += 0.07 * math.sin(x * 3.4 + along * 1.9)
     # Small contour move only. Deep bites become black overhangs at 540 px.
-    height -= 0.07 * bite
+    height -= 0.04 * bite
     return height
 
 
@@ -556,15 +556,42 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
     return ground
 
 
+def _add_eco_disk(name: str, loc: Vector, sx: float, sy: float, color: tuple, yaw: float) -> bpy.types.Object:
+    """Flat elongated ecological bed. Lumpy rocks read as blobs at 540 px."""
+    verts = []
+    faces = []
+    rings = 5
+    for i in range(rings):
+        ang = (i / rings) * math.tau
+        jitter = 0.78 + 0.22 * math.sin(ang * 2.0 + yaw)
+        verts.append((math.cos(ang) * sx * jitter, math.sin(ang) * sy * jitter, 0.0))
+    verts.append((0.0, 0.0, 0.012))
+    for i in range(rings):
+        faces.append((i, (i + 1) % rings, rings))
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = (loc.x, loc.y, loc.z)
+    obj.rotation_euler = (0.0, 0.0, yaw)
+    shade_smooth(obj)
+    mat = dirt_bank_material()
+    if mat.node_tree:
+        body = next((node for node in mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+        if body and "Base Color" in body.inputs:
+            body.inputs["Base Color"].default_value = (color[0], color[1], color[2], 1.0)
+    obj.data.materials.append(mat)
+    if hasattr(obj, "visible_shadow"):
+        obj.visible_shadow = False
+    return obj
+
+
 def place_meadow_ecology() -> list:
     """Low needle beds and earth patches that read at 540 px on SHOT_01/02."""
     extras = []
-    dirt = dirt_bank_material()
-    needle = dirt_bank_material()
-    if needle.node_tree:
-        body = next((node for node in needle.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
-        if body and "Base Color" in body.inputs:
-            body.inputs["Base Color"].default_value = (0.038, 0.048, 0.022, 1.0)
+    dirt_col = (0.142, 0.092, 0.046)
+    needle_col = (0.036, 0.048, 0.020)
     patches = (
         # Far SHOT_01 floor: several-metre elongated beds, not dots.
         (-6.5, 8.5, 4.8, 0.08, True),
@@ -592,10 +619,17 @@ def place_meadow_ecology() -> list:
     for i, (x, y, size, thick, is_needle) in enumerate(patches):
         if in_river_channel(x, y, margin=1.2):
             continue
-        loc = Vector((x, y, 0.05))
-        bed = _add_lumpy_rock(f"TJ_MeadowEco_{i}", loc, size, needle if is_needle else dirt, i * 0.41)
-        bed.scale = (2.35, 0.82, thick)
-        extras.append(bed)
+        loc = Vector((x, y, 0.04))
+        sx = size * 1.15
+        sy = size * 0.48
+        extras.append(_add_eco_disk(
+            f"TJ_MeadowEco_{i}",
+            loc,
+            sx,
+            sy,
+            needle_col if is_needle else dirt_col,
+            i * 0.41,
+        ))
     return extras
 
 
@@ -731,30 +765,37 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     links.new(land.outputs["Fac"], land_ramp.inputs["Fac"])
     land_mix = _mix_rgb(nodes)
     if "Color1" in land_mix.inputs:
-        land_mix.inputs["Fac"].default_value = 0.48
+        land_mix.inputs["Fac"].default_value = 0.58
         links.new(color, land_mix.inputs["Color1"])
         links.new(land_ramp.outputs["Color"], land_mix.inputs["Color2"])
         color = land_mix.outputs["Color"]
     # Authored metre-scale regions (vertex color). R=weight, G=kind.
-    eco_attr = nodes.new("ShaderNodeVertexColor")
-    if hasattr(eco_attr, "layer_name"):
-        eco_attr.layer_name = "TJ_EcoMask"
+    eco_attr = nodes.new("ShaderNodeAttribute")
+    eco_attr.attribute_name = "TJ_EcoMask"
+    if hasattr(eco_attr, "attribute_type"):
+        eco_attr.attribute_type = "GEOMETRY"
     kind_ramp = nodes.new("ShaderNodeValToRGB")
     kind_ramp.color_ramp.interpolation = "EASE"
     kind_ramp.color_ramp.elements[0].position = 0.0
-    kind_ramp.color_ramp.elements[0].color = (0.132, 0.088, 0.038, 1.0)
+    kind_ramp.color_ramp.elements[0].color = (0.155, 0.095, 0.040, 1.0)
     kind_ramp.color_ramp.elements[1].position = 1.0
-    kind_ramp.color_ramp.elements[1].color = (0.034, 0.046, 0.020, 1.0)
+    kind_ramp.color_ramp.elements[1].color = (0.030, 0.042, 0.018, 1.0)
     mid_earth = kind_ramp.color_ramp.elements.new(0.55)
-    mid_earth.color = (0.160, 0.100, 0.050, 1.0)
+    mid_earth.color = (0.175, 0.108, 0.052, 1.0)
     sep_eco = nodes.new("ShaderNodeSeparateXYZ")
     links.new(eco_attr.outputs.get("Color") or eco_attr.outputs[0], sep_eco.inputs["Vector"])
     links.new(sep_eco.outputs["Y"], kind_ramp.inputs["Fac"])
+    weight_boost = nodes.new("ShaderNodeMapRange")
+    weight_boost.inputs["From Min"].default_value = 0.05
+    weight_boost.inputs["From Max"].default_value = 0.70
+    weight_boost.inputs["To Min"].default_value = 0.0
+    weight_boost.inputs["To Max"].default_value = 0.92
+    links.new(sep_eco.outputs["X"], weight_boost.inputs["Value"])
     region_mix = _mix_rgb(nodes)
     if "Color1" in region_mix.inputs:
         links.new(color, region_mix.inputs["Color1"])
         links.new(kind_ramp.outputs["Color"], region_mix.inputs["Color2"])
-        links.new(sep_eco.outputs["X"], region_mix.inputs["Fac"])
+        links.new(weight_boost.outputs["Result"] if "Result" in weight_boost.outputs else weight_boost.outputs[0], region_mix.inputs["Fac"])
         color = region_mix.outputs["Color"]
     detail = nodes.new("ShaderNodeTexNoise")
     detail.inputs["Scale"].default_value = 1.4
@@ -2162,11 +2203,11 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     grassy1 = next((obj for obj in peaks if "grassymountain1" in obj.name.lower()), None)
     grassy2 = next((obj for obj in peaks if "grassymountain2" in obj.name.lower()), None)
     grassy3 = next((obj for obj in peaks if "grassymountain3" in obj.name.lower()), None)
-    # MeadowRange1's authored peak already sits on the south face. Put that
-    # sunlit peak on camera C's sky-gap ray (t≈42, s≈8). Do not AABB-south-sit
-    # a 500 m tile — that parked the peak outside the 32 mm frustum.
+    # Camera C looks down (~-14°). A 23 m peak at 40 m sits above the 32 mm
+    # frame; only a roof sliver remains. Keep the sunlit south face at ~12 m
+    # on the right-of-cabin sky gap (s≈11, elev≈14°).
     if meadow1 is not None:
-        sit_louis_peak(meadow1, -8.2, 22.0, scale=0.34, rot_z=0.40, z_lift=1.8)
+        sit_louis_peak(meadow1, -5.0, 17.5, scale=0.18, rot_z=0.42, z_lift=0.0)
         link_exclusive(meadow1, collection)
         placed.append(meadow1)
     if meadow2 is not None:
@@ -2174,12 +2215,12 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
         link_exclusive(meadow2, collection)
         placed.append(meadow2)
     if meadow3 is not None:
-        sit_louis_peak(meadow3, -22.0, 52.0, scale=0.20, rot_z=0.22, z_lift=2.4)
+        sit_louis_peak(meadow3, -16.0, 44.0, scale=0.14, rot_z=0.28, z_lift=0.4)
         link_exclusive(meadow3, collection)
         placed.append(meadow3)
     if grassy1 is not None:
-        extract_louis_height_cap(grassy1, 0.60)
-        sit_louis_peak(grassy1, -18.0, 48.0, scale=0.48, rot_z=0.36, z_lift=1.2)
+        extract_louis_height_cap(grassy1, 0.68)
+        sit_louis_peak(grassy1, -12.0, 36.0, scale=0.36, rot_z=0.38, z_lift=0.2)
         link_exclusive(grassy1, collection)
         placed.append(grassy1)
     # SHOT_05 hero peak is locked. Do not move or restyle it.
@@ -2457,14 +2498,14 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
             inward = 0.28 + 0.34 * ((len(used_hero) * 3) % 5) / 4.0
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
             loc.z = WATER_SURFACE_Z + 0.05
-            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 2.6 + 0.45 * (len(used_hero) % 3), mat, i * 0.71))
+            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 2.05 + 0.30 * (len(used_hero) % 3), mat, i * 0.71))
         for cx in cut_xs:
             if cx in used_cut or abs(center.x - cx) > 1.05:
                 continue
             used_cut.add(cx)
             loc = center + side * (-left * BED_WIDTH_SCALE * (0.92 + 0.08 * math.sin(i)))
             loc.z = BED_SHOULDER_Z + 0.16
-            extras.append(_add_lumpy_rock(f"TJ_IsolineRock_{i}", loc, 1.6 + 0.35 * (len(used_cut) % 2), mat, i * 0.53 + 0.8))
+            extras.append(_add_lumpy_rock(f"TJ_IsolineRock_{i}", loc, 1.15 + 0.20 * (len(used_cut) % 2), mat, i * 0.53 + 0.8))
         for ix in island_xs:
             if ix in used_island or abs(center.x - ix) > 1.05:
                 continue
@@ -2504,7 +2545,7 @@ def place_hero_creek_interactions(centers: list[Vector], mat: bpy.types.Material
             inward = 0.20 + 0.40 * (len(used) % 3) / 2.0
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
             loc.z = WATER_SURFACE_Z + (0.08 if len(used) % 2 else -0.02)
-            extras.append(_add_lumpy_rock(f"TJ_HeroStone_{i}", loc, 2.2 + 0.35 * (len(used) % 3), mat, i * 0.47))
+            extras.append(_add_lumpy_rock(f"TJ_HeroStone_{i}", loc, 1.85 + 0.25 * (len(used) % 3), mat, i * 0.47))
             if len(used) in {2, 4}:
                 nloc = center + side * (left * WATER_WIDTH_SCALE * 0.55)
                 nloc.z = WATER_SURFACE_Z + 0.04
@@ -2513,29 +2554,8 @@ def place_hero_creek_interactions(centers: list[Vector], mat: bpy.types.Material
 
 
 def place_hero_soil_scars(centers: list[Vector]) -> list:
-    """Irregular dirt shelves that thin grass on the camera-visible south bank."""
+    """Wet-bank breakup without the slab overlays that read as black caves."""
     extras = []
-    mat = dirt_bank_material()
-    step = 5
-    for i in range(4, max(5, len(centers) - 4), step):
-        center = centers[i]
-        if not (-18.0 <= center.x <= 14.0):
-            continue
-        if (i // step) % 3 == 0:
-            continue
-        side = _side_from_centers(centers, i)
-        left, _right = _channel_halves_for_index(centers, i)
-        t = 0.55 + 0.35 * math.sin(i * 0.71)
-        loc = center + side * (-left * t)
-        loc.z = BED_SHOULDER_Z + 0.12 + 0.16 * math.sin(i)
-        scar = _add_lumpy_rock(f"TJ_HeroSoil_{i}", loc, 3.6 + 0.6 * (i % 2), mat, i * 0.29)
-        scar.scale = (2.15, 1.20, 0.26)
-        extras.append(scar)
-        nloc = center + side * (left * (0.62 + 0.28 * math.sin(i * 0.53)))
-        nloc.z = BED_SHOULDER_Z + 0.16 + 0.14 * math.cos(i)
-        north = _add_lumpy_rock(f"TJ_HeroSoilN_{i}", nloc, 3.0 + 0.5 * ((i + 1) % 2), mat, i * 0.41 + 0.7)
-        north.scale = (1.90, 1.10, 0.22)
-        extras.append(north)
     extras.extend(place_hero_damp_shelves(centers))
     return extras
 
@@ -2560,17 +2580,18 @@ def place_hero_damp_shelves(centers: list[Vector]) -> list:
             if px in used or abs(center.x - px) > 0.95:
                 continue
             used.add(px)
-            inward = 0.22 + 0.40 * ((len(used) * 2) % 3) / 2.0
-            loc = center + side * (-left * WATER_WIDTH_SCALE * (0.35 + 0.95 * inward))
-            loc.z = WATER_SURFACE_Z + 0.035
-            shelf = _add_lumpy_rock(f"TJ_DampShelf_{i}", loc, 2.8 + 0.45 * (len(used) % 2), mat, i * 0.33)
-            shelf.scale = (2.15, 0.95, 0.07)
+            # Sit on the bank, not in a water cavity. Thin mid-tone dirt only.
+            inward = 0.85 + 0.45 * ((len(used) * 2) % 3) / 2.0
+            loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
+            loc.z = WATER_SURFACE_Z + 0.06
+            shelf = _add_lumpy_rock(f"TJ_DampShelf_{i}", loc, 2.0 + 0.25 * (len(used) % 2), mat, i * 0.33)
+            shelf.scale = (1.85, 0.88, 0.05)
             extras.append(shelf)
-            if len(used) in {1, 3, 5}:
-                over = center + side * (-left * WATER_WIDTH_SCALE * (0.12 + 0.20 * inward))
-                over.z = WATER_SURFACE_Z + 0.05
-                hang = _add_lumpy_rock(f"TJ_GrassOver_{i}", over, 1.8, grass, i * 0.51 + 0.4)
-                hang.scale = (1.55, 0.70, 0.06)
+            if len(used) in {2, 5}:
+                over = center + side * (-left * WATER_WIDTH_SCALE * (inward + 0.35))
+                over.z = WATER_SURFACE_Z + 0.08
+                hang = _add_lumpy_rock(f"TJ_GrassOver_{i}", over, 1.4, grass, i * 0.51 + 0.4)
+                hang.scale = (1.25, 0.62, 0.045)
                 extras.append(hang)
     return extras
 
