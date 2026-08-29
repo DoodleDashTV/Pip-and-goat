@@ -112,14 +112,14 @@ HERO_MACRO_EVENTS = (
     (5.6, 0.85, "cut", 1.60, 3.50),
 )
 
-# (x, edge, scale, bury). edge 1 = terrain∩water, <1 in water, >1 on bank.
+# (x, south_of_intersection_m, scale, bury). Positive = toward Camera C, on the bank.
 HERO_MACRO_ROCKS = (
-    (-10.05, 0.96, 3.35, 0.22),
-    (-8.55, 1.04, 2.85, 0.20),
-    (-6.80, 0.90, 2.55, 0.24),
-    (-3.55, 0.94, 3.05, 0.20),
-    (-0.40, 1.02, 3.20, 0.22),
-    (2.60, 0.92, 2.45, 0.18),
+    (-10.15, 1.65, 3.45, 0.16),
+    (-8.25, 1.40, 3.05, 0.15),
+    (-6.45, 1.85, 2.75, 0.14),
+    (-3.35, 1.30, 3.15, 0.15),
+    (-0.25, 1.50, 3.25, 0.15),
+    (2.75, 1.25, 2.55, 0.13),
 )
 
 
@@ -192,13 +192,18 @@ def hero_rock_collar(x: float, y: float) -> float:
 
 
 def hero_rock_wrap(x: float, dist: float, emerge: float) -> float:
-    """Positive metres. Soil rises around each rock. A dip opened the V44-a cavity."""
+    """Positive metres. Soil pad around each camera-side rock. No under-rock dip."""
     wrap = 0.0
-    for px, edge, scale, _bury in HERO_MACRO_ROCKS:
-        rock_dist = emerge * edge
-        w = _gaussian(x, px, 0.70 + 0.10 * scale)
-        w *= _gaussian(dist, rock_dist, 0.62 + 0.08 * scale)
-        wrap = max(wrap, w * 0.30)
+    for px, south, scale, _bury in HERO_MACRO_ROCKS:
+        rock_dist = emerge + south
+        w = _gaussian(x, px, 0.95 + 0.12 * scale)
+        w *= _gaussian(dist, rock_dist, 1.05 + 0.10 * scale)
+        wrap = max(wrap, w * 0.58)
+    # Left screen mass: one soil body in front of the waterline so the
+    # isoline is occluded, not merely wiggled.
+    if -11.4 <= x <= -6.0:
+        ridge = _gaussian(x, -8.6, 2.15) * _gaussian(dist, emerge + 1.55, 1.20)
+        wrap = max(wrap, ridge * 0.72)
     return wrap
 
 

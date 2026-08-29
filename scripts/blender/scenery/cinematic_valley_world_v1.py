@@ -832,11 +832,16 @@ def place_hero_shore_grass(grass_src) -> list:
         return extras
     centers = evaluated_centerline(guide, samples=80)
     planted = 0
-    # Left SHOT_02 only. A grass line along the whole bank would recreate F.
+    # Left occluders + upper-bank clumps. Nothing planted as a waterline row.
     tufts = (
-        (-10.15, 1.12, 1.70),
-        (-8.50, 1.20, 1.90),
-        (-6.75, 1.28, 1.55),
+        (-10.20, 1.70, 1.65),
+        (-8.30, 1.55, 1.85),
+        (-6.40, 2.05, 1.50),
+        (-9.40, 3.40, 1.45),
+        (-7.10, 3.80, 1.70),
+        (-4.20, 3.20, 1.55),
+        (-1.10, 3.60, 1.40),
+        (1.80, 3.30, 1.60),
     )
     used = set()
     for i, center in enumerate(centers):
@@ -849,8 +854,8 @@ def place_hero_shore_grass(grass_src) -> list:
             if px in used or abs(center.x - px) > 0.70:
                 continue
             used.add(px)
-            loc = center + side * (-emerge * edge)
-            loc.z = WATER_SURFACE_Z + 0.16
+            loc = center + side * (-(emerge + edge))
+            loc.z = WATER_SURFACE_Z + 0.28
             extras.append(_plant_grass(grass_src, (loc.x, loc.y, loc.z), scale, 0.41 * planted))
             planted += 1
     print(json.dumps({"event": "hero_shore_grass", "tufts": planted, "leftOnly": True}), flush=True)
@@ -2885,21 +2890,42 @@ def place_hero_macro_rocks(centers: list[Vector]) -> list:
         left, _right = _channel_halves_for_index(centers, i)
         film = left * WATER_WIDTH_SCALE
         emerge = hero_south_emerge(center.x, film)
-        for px, edge, scale, bury in HERO_MACRO_ROCKS:
+        for px, south, scale, bury in HERO_MACRO_ROCKS:
             if px in used or abs(center.x - px) > 0.65:
                 continue
             used.add(px)
-            loc = center + side * (-emerge * edge)
-            loc.z = WATER_SURFACE_Z - scale * bury * 0.14
+            loc = center + side * (-(emerge + south))
+            loc.z = WATER_SURFACE_Z + 0.22 - scale * bury * 0.35
             extras.append(_add_hero_shore_rock(f"TJ_HeroMacroRock_{i}", loc, scale, mat, 0.61 * i + px))
             placed.append({
                 "x": round(loc.x, 2),
                 "y": round(loc.y, 2),
                 "z": round(loc.z, 2),
                 "scale": scale,
-                "edge": edge,
+                "south": south,
                 "bury": bury,
             })
+    gravels = (
+        (-9.35, 0.28, 0.95),
+        (-7.70, 0.18, 0.78),
+        (-5.10, 0.40, 1.05),
+        (0.85, 0.22, 0.88),
+        (3.10, 0.32, 0.72),
+    )
+    used_g = set()
+    for i, center in enumerate(centers):
+        if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+            continue
+        side = _side_from_centers(centers, i)
+        left, _right = _channel_halves_for_index(centers, i)
+        emerge = hero_south_emerge(center.x, left * WATER_WIDTH_SCALE)
+        for px, south, scale in gravels:
+            if px in used_g or abs(center.x - px) > 0.65:
+                continue
+            used_g.add(px)
+            loc = center + side * (-(emerge + south))
+            loc.z = WATER_SURFACE_Z - 0.04
+            extras.append(_add_hero_shore_rock(f"TJ_HeroGravel_{i}", loc, scale, mat, 1.17 * i + px))
     print(json.dumps({
         "event": "hero_macro_rocks_placed",
         "retiredSolid": "TJ_HeroBankSolid",
