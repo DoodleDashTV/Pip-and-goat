@@ -388,7 +388,7 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     water_half = local * 0.34 + max(0.0, bite) * 0.22
     if south and HERO_X_MIN <= x <= HERO_X_MAX:
         # Carve wider than the film so Camera C cannot see an under-water hole.
-        water_half = local * WATER_WIDTH_SCALE * hero_south_water_factor(x) + 0.28
+        water_half = local * WATER_WIDTH_SCALE * hero_south_water_factor(x) + 0.45
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
@@ -429,7 +429,7 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
             height = mid + (upper - mid) * (u ** 1.35)
             height += 0.11 * math.sin(x * 1.6 + y * 1.1)
             if (0.5 + 0.5 * math.sin(x * 1.15 + along * 0.37)) > 0.70:
-                height -= 0.22 * (1.0 - abs(u - 0.45))
+                height -= 0.08 * (1.0 - abs(u - 0.45))
         else:
             u = (t - 0.68) / 0.32
             lip = 0.09 * math.sin(x * 2.05 + along * 0.44)
@@ -446,17 +446,11 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
             if lobe > 0.80:
                 height += 0.12 * ((lobe - 0.80) / 0.20)
         if HERO_X_MIN <= x <= HERO_X_MAX:
-            # Shallow pockets only. Deep cuts render as black caves at 540 px.
-            pocket = (0.5 + 0.5 * math.sin(x * 0.51 + along * 0.22))
-            pocket *= (0.5 + 0.5 * math.sin(x * 1.27 + y * 0.61 + 0.9))
+            # No pocket undercuts. Those read as black caves from Camera C.
             slump = (0.5 + 0.5 * math.cos(x * 0.33 + along * 0.47))
             slump *= (0.5 + 0.5 * math.sin(x * 0.88 + 1.3))
-            if pocket > 0.70:
-                height -= 0.16 * ((pocket - 0.70) / 0.30)
             if slump > 0.78:
-                height += 0.14 * ((slump - 0.78) / 0.22)
-            if 0.42 < t < 0.78 and (0.5 + 0.5 * math.sin(x * 2.05 + along)) > 0.82:
-                height -= 0.07
+                height += 0.10 * ((slump - 0.78) / 0.22)
         return height
     if t < 0.72:
         u = t / 0.72
@@ -1985,8 +1979,10 @@ def build_river_guide() -> bpy.types.Object:
     for index, (x, y, z) in enumerate(RIVER_SPLINE):
         point = spline.bezier_points[index]
         point.co = (x, y, z)
-        point.handle_left_type = "AUTO"
-        point.handle_right_type = "AUTO"
+        # VECTOR so the film follows the same polyline the terrain carves.
+        # AUTO handles drifted off the cut and opened the SHOT_02 right void.
+        point.handle_left_type = "VECTOR"
+        point.handle_right_type = "VECTOR"
     curve_obj = bpy.data.objects.new("TJ_River_SplineGuide", curve_data)
     bpy.context.scene.collection.objects.link(curve_obj)
     return curve_obj
@@ -2748,13 +2744,13 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 # Camera-visible shoreline rocks. edge=1 sits on the water film edge.
 # Irregular clusters, not an even march. Some in water, some on bank.
 HERO_EDGE_ROCKS = (
-    (-10.4, 3.45, 0.82, 0.22),
-    (-8.6, 2.05, 1.28, 0.18),
-    (-7.2, 3.80, 0.96, 0.16),
-    (-4.4, 3.25, 1.12, 0.20),
-    (-3.2, 1.85, 0.68, 0.28),
-    (-1.2, 2.70, 1.35, 0.18),
-    (0.6, 3.55, 0.90, 0.20),
+    (-10.4, 3.45, 0.70, 0.22),
+    (-8.6, 2.15, 1.18, 0.18),
+    (-7.2, 3.90, 0.78, 0.16),
+    (-5.0, 2.55, 1.32, 0.20),
+    (-3.6, 3.40, 0.62, 0.24),
+    (-1.4, 2.85, 1.08, 0.18),
+    (0.4, 3.70, 0.74, 0.16),
 )
 
 
@@ -2850,7 +2846,7 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     hero = [c for c in centers if HERO_X_MIN <= c.x <= HERO_X_MAX]
     if len(hero) < 6:
         return extras
-    rows = 7
+    rows = 4
     top = []
     kinds = []
     for i, center in enumerate(hero):
@@ -2859,39 +2855,27 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         event = hero_shore_event(center.x)
         water_edge = left * WATER_WIDTH_SCALE * hero_south_water_factor(center.x)
         swell = 0.0
-        wrap = 0.0
         for px, scale, _edge, _bury in HERO_EDGE_ROCKS:
             w = math.exp(-((center.x - px) / 0.90) ** 2)
-            swell = max(swell, w * scale * 0.10)
-            wrap = max(wrap, w)
+            swell = max(swell, w * scale * 0.06)
         kind = event["kind"]
-        wet_run, damp_run, soil_run, grass_run = _hero_bank_runs(kind, event)
-        if wrap > 0.35:
-            grass_run *= max(0.08, 1.0 - wrap)
-            wet_run = max(wet_run, 0.18)
-            soil_run = max(soil_run, wet_run + 0.28)
-        # Wet shelf only. A rising apron toward Camera C became the V43-c slab.
-        wet_cap = min(0.42, wet_run)
+        wet_run, _damp_run, _soil_run, _grass_run = _hero_bank_runs(kind, event)
+        wet_cap = min(0.32, max(0.12, wet_run))
+        # Under the film and a short wet lip. Nothing rises toward Camera C.
         lats = [
-            water_edge * 0.08,
-            water_edge * 0.40,
-            water_edge * 0.78,
-            water_edge * 0.96,
+            water_edge * 0.06,
+            water_edge * 0.55,
+            water_edge * 0.94,
             water_edge + wet_cap,
-            water_edge + wet_cap + 0.22,
-            water_edge + wet_cap + 0.38,
         ]
         zs = [
-            BED_CENTER_Z + 0.04,
-            BED_CENTER_Z + 0.12,
-            WATER_SURFACE_Z - 0.06,
-            WATER_SURFACE_Z - 0.01,
-            WATER_SURFACE_Z + 0.02 + swell * 0.04,
-            -0.72,
-            -0.42,
+            BED_CENTER_Z + 0.05,
+            BED_CENTER_Z + 0.14,
+            WATER_SURFACE_Z - 0.03,
+            WATER_SURFACE_Z + 0.015 + swell * 0.03,
         ]
         for row in range(1, rows):
-            lats[row] = max(lats[row], lats[row - 1] + 0.10)
+            lats[row] = max(lats[row], lats[row - 1] + 0.08)
         for row in range(rows):
             point = center + side * (-lats[row])
             point.z = zs[row]
@@ -2923,12 +2907,12 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     for poly, row in zip(obj.data.polygons, face_rows):
         sample = min(samples - 1, poly.vertices[0] // rows)
         kind = kinds[min(len(kinds) - 1, sample * rows)] if kinds else "blend"
-        if row <= 2:
+        if row == 0:
             poly.material_index = 0
-        elif row <= 4:
+        elif row == 1:
             poly.material_index = 4 if kind == "gravel" else 1
         else:
-            poly.material_index = 2
+            poly.material_index = 2 if kind != "gravel" else 4
     if hasattr(obj, "visible_shadow"):
         obj.visible_shadow = False
     extras.append(obj)
