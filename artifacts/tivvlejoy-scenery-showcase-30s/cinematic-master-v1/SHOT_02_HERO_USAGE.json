@@ -1,0 +1,392 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_WORLD_RECIPE_V1",
+  "profile": {
+    "schema": "TIVVLEJOY_CINEMATIC_RENDER_STANDARD_V1",
+    "profile": "HERO_STILL",
+    "resolution": "1080x1920",
+    "engine": "CYCLES",
+    "samples": 192,
+    "denoise": true,
+    "motionBlur": false,
+    "depthOfField": true,
+    "rayTracing": true,
+    "canLabelFinal": false,
+    "allowUpscale": false,
+    "imageSequenceRequired": true,
+    "masterBitDepth": "16",
+    "cyclesDevice": "GPU",
+    "noiseThreshold": 0.02
+  },
+  "collections": [
+    "WORLD_TERRAIN",
+    "WORLD_RIVER",
+    "WORLD_VILLAGE",
+    "WORLD_FOREST_FOREGROUND",
+    "WORLD_FOREST_MIDGROUND",
+    "WORLD_FOREST_BACKGROUND",
+    "WORLD_MOUNTAINS_HERO",
+    "WORLD_MOUNTAINS_BACKGROUND",
+    "WORLD_SKY_ATMOSPHERE",
+    "WORLD_LIGHTING",
+    "WORLD_PROPS",
+    "WORLD_CHARACTER_STAGING",
+    "WORLD_CAMERAS",
+    "WORLD_RENDER_SUPPORT"
+  ],
+  "cameras": [
+    "TJ_SHOT_01_CAM",
+    "TJ_SHOT_02_CAM",
+    "TJ_SHOT_03_CAM",
+    "TJ_SHOT_04_CAM",
+    "TJ_SHOT_05_CAM",
+    "TJ_SHOT_06_CAM",
+    "TJ_RIVER_GRAZE_CAM",
+    "TJ_RIVER_DOWN_CAM"
+  ],
+  "markers": [
+    1,
+    151,
+    301,
+    451,
+    601,
+    751
+  ],
+  "kitFilesPlaced": [
+    "Cabin04A.blend",
+    "Cabin03A.blend",
+    "Cabin02A.blend",
+    "Cabin01A.blend",
+    "Cabin04B.blend",
+    "Cabin03B.blend",
+    "Cabin02B.blend",
+    "Cabin01B.blend",
+    "Cart01.blend",
+    "Gate01.blend",
+    "Fence01.blend",
+    "Tree03.blend",
+    "Tree02.blend",
+    "Tree01.blend"
+  ],
+  "fbxFilesPlaced": [],
+  "forestCopies": 182,
+  "streetTreeFiles": [
+    "Tree03.blend",
+    "Tree02.blend",
+    "Tree01.blend"
+  ],
+  "riverMaterial": "Water_Mat_1",
+  "purchasedWaterGn": "Water_Mat_1",
+  "waterMaterialsLoaded": 18,
+  "remapped": 56,
+  "forcedAlbedos": 14,
+  "liftedShading": 12,
+  "cabinPlaceholderRepairs": [
+    {
+      "name": "Building01",
+      "slot": 0,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Cabin01.007"
+    },
+    {
+      "name": "Building01",
+      "slot": 1,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Window01.003"
+    },
+    {
+      "name": "Building01",
+      "slot": 1,
+      "material": "Window01.003",
+      "action": "assign_daylight_glass",
+      "color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+      ]
+    },
+    {
+      "name": "Building01_LOD0",
+      "action": "hide_interior_or_lod"
+    },
+    {
+      "name": "Building02",
+      "slot": 0,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Cabin01.006"
+    },
+    {
+      "name": "Building02",
+      "slot": 1,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Window01.002"
+    },
+    {
+      "name": "Building02",
+      "slot": 1,
+      "material": "Window01.002",
+      "action": "assign_daylight_glass",
+      "color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+      ]
+    },
+    {
+      "name": "Building02_LOD0",
+      "action": "hide_interior_or_lod"
+    },
+    {
+      "name": "Building03",
+      "slot": 0,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Cabin01.005"
+    },
+    {
+      "name": "Building03",
+      "slot": 1,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Window01.001"
+    },
+    {
+      "name": "Building03",
+      "slot": 1,
+      "material": "Window01.001",
+      "action": "assign_daylight_glass",
+      "color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+      ]
+    },
+    {
+      "name": "Building03_LOD0",
+      "action": "hide_interior_or_lod"
+    },
+    {
+      "name": "Building04",
+      "slot": 0,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Cabin01.004"
+    },
+    {
+      "name": "Building04",
+      "slot": 1,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Window01"
+    },
+    {
+      "name": "Building04",
+      "slot": 1,
+      "material": "Window01",
+      "action": "assign_daylight_glass",
+      "color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+      ]
+    },
+    {
+      "name": "Building04_LOD0",
+      "action": "hide_interior_or_lod"
+    },
+    {
+      "name": "Door01_LOD0",
+      "slot": 0,
+      "action": "zero_emission",
+      "count": 1,
+      "material": "Gate01"
+    },
+    {
+      "name": "Window01",
+      "action": "remap_window_or_emi_to_glass"
+    },
+    {
+      "name": "Window01.001",
+      "action": "remap_window_or_emi_to_glass"
+    },
+    {
+      "name": "Window01.002",
+      "action": "remap_window_or_emi_to_glass"
+    },
+    {
+      "name": "Window01.003",
+      "action": "remap_window_or_emi_to_glass"
+    }
+  ],
+  "atmosphereExecuted": true,
+  "atmosphereMethod": "mist_plus_compositor",
+  "contributions": {
+    "village_blender": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "village_blender",
+      "downloaded": true,
+      "extracted": true,
+      "datablockLoaded": true,
+      "renderedPixels": true,
+      "visiblyUsed": true,
+      "shotIds": [
+        "SHOT_04",
+        "SHOT_06"
+      ],
+      "evidence": "collection:WORLD_VILLAGE"
+    },
+    "village_fbx": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "village_fbx",
+      "downloaded": true,
+      "extracted": true,
+      "datablockLoaded": false,
+      "renderedPixels": false,
+      "visiblyUsed": false,
+      "shotIds": [
+        "SHOT_04"
+      ],
+      "evidence": "collection:WORLD_PROPS"
+    },
+    "village_project": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "village_project",
+      "downloaded": true,
+      "extracted": true,
+      "datablockLoaded": true,
+      "renderedPixels": true,
+      "visiblyUsed": true,
+      "shotIds": [
+        "SHOT_02"
+      ],
+      "evidence": "spline_strip:Water_Mat_1"
+    },
+    "forest_nature": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "forest_nature",
+      "downloaded": true,
+      "extracted": true,
+      "datablockLoaded": true,
+      "renderedPixels": true,
+      "visiblyUsed": true,
+      "shotIds": [
+        "SHOT_01",
+        "SHOT_03"
+      ],
+      "evidence": "collection:WORLD_FOREST_MIDGROUND"
+    },
+    "forest_ecokit": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "forest_ecokit",
+      "downloaded": true,
+      "extracted": true,
+      "datablockLoaded": true,
+      "renderedPixels": false,
+      "visiblyUsed": false,
+      "shotIds": [],
+      "evidence": "water_materials_loaded_not_rocks"
+    },
+    "background_mountains": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "background_mountains",
+      "downloaded": true,
+      "extracted": true,
+      "datablockLoaded": true,
+      "renderedPixels": true,
+      "visiblyUsed": true,
+      "shotIds": [
+        "SHOT_01",
+        "SHOT_05"
+      ],
+      "evidence": "collection:WORLD_MOUNTAINS_BACKGROUND"
+    },
+    "sky_hdri": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "sky_hdri",
+      "downloaded": true,
+      "extracted": true,
+      "datablockLoaded": true,
+      "renderedPixels": true,
+      "visiblyUsed": true,
+      "shotIds": [
+        "SHOT_01"
+      ],
+      "evidence": "world:Image0001.jpg"
+    },
+    "mountains_3dt": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "mountains_3dt",
+      "downloaded": false,
+      "extracted": false,
+      "datablockLoaded": false,
+      "renderedPixels": false,
+      "visiblyUsed": false,
+      "shotIds": [],
+      "evidence": ""
+    },
+    "botaniq_full": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "botaniq_full",
+      "downloaded": false,
+      "extracted": false,
+      "datablockLoaded": false,
+      "renderedPixels": false,
+      "visiblyUsed": false,
+      "shotIds": [],
+      "evidence": ""
+    },
+    "physical_starlight": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "physical_starlight",
+      "downloaded": false,
+      "extracted": false,
+      "datablockLoaded": false,
+      "renderedPixels": false,
+      "visiblyUsed": false,
+      "shotIds": [],
+      "evidence": ""
+    },
+    "gaffer": {
+      "schema": "TIVVLEJOY_PURCHASED_ASSET_VISIBLE_USE_V1",
+      "packageId": "gaffer",
+      "downloaded": false,
+      "extracted": false,
+      "datablockLoaded": false,
+      "renderedPixels": false,
+      "visiblyUsed": false,
+      "shotIds": [],
+      "evidence": ""
+    }
+  },
+  "randomOrGeneratedStockAssetCount": 0,
+  "commercialAssetPathsEmitted": false,
+  "renderableSourceCount": 12,
+  "stillsOnly": true,
+  "engine": "CYCLES",
+  "cameraPath": "six_shot_markers",
+  "lighting": "cinematic_master_daylight_v1",
+  "groundSource": "shaped_valley_carrier_purchased_meadow",
+  "riverSource": "geometry_first_carved_channel_dark_bed_narrow_film",
+  "hideWater": false,
+  "waterVariant": "D",
+  "hdriReflectionControl": true,
+  "hdriLightPath": [
+    "Is Glossy Ray",
+    "Is Reflection Ray"
+  ],
+  "hdriCameraRotation": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "hdriReflectionRotationZ": 0.48,
+  "southBankRun": 12.0,
+  "northBankRun": 2.2,
+  "waterArchitecture": "v34_candidate_d",
+  "cameraDistanceShaderGate": false,
+  "forestLayout": "dense_west_grove_shot03_no_village_alley",
+  "mountainLayout": "louis_close_peak_shot05_and_shot02_saddle"
+}
