@@ -1,0 +1,91 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_FINAL_VISUAL_GATE_CLOSURE_V43_RESULT",
+  "inspectedAt": "2026-08-29T17:45:00Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "42ffd2de9ba638b1d557754fc8d1962639b40c07",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "finalSha": "11fa95f0acf9705999ce777af7eb898e5cc4723e",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "number": 169,
+    "base": "cursor/tivvlejoy-ep001-animation-worker-payload-v1-73f1"
+  },
+  "lockVerification": {
+    "cameraC": {"position": [2.2, -21.4, 3.4], "look": [-3.4, -10.2, 1.75], "focalLengthMm": 32.0},
+    "cameraCChanged": false,
+    "louisMountainChanged": false,
+    "shot05HeroMountainChanged": false
+  },
+  "v34WaterLockVerification": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.8,
+    "metallic": 0.0,
+    "specular": 0.5,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "WATER_WIDTH_SCALE": 0.3,
+    "BED_WIDTH_SCALE": 0.68,
+    "lightPathHdriReflectionControl": true,
+    "hdriReflectionRotationZ": 0.48,
+    "cameraDistanceShaderGating": false,
+    "riverIdentity": "v34_candidate_d / Water_Mat_1"
+  },
+  "cavityRootCause": {
+    "exactCause": "The visible SHOT_02 south waterline was a ~0.6 m shoulder terrace (terrain at BED_SHOULDER_Z while the film sat at -1.15), so Camera C saw a dark vertical face and a hollow under the lip. AUTO bezier handles also drifted the water film off the polyline carve at the (-2,-12) bend.",
+    "exactFix": "VECTOR handles so film follows the polyline; shared hero_south_water_factor; TJ_HeroBankSolid reduced to an under-film wet lip; hero south bank rebuilt as a continuous ramp that meets the film at water height. Pixels still show at least one leftover void.",
+    "visibleCavityCountAfterRepair": 1
+  },
+  "shotAssessments": {
+    "SHOT_01": "Valley establish preserved. Large tilted Grass01 cards are gone. Meadow still reads as one displaced green plane; earth patches and upright tufts do not survive 540 px from the high camera.",
+    "SHOT_02": "Camera C creek-first and Louis sky preserved. Hero rocks are now visible as foreground masses, but the grass/water isoline is still followable and at least one dark waterline cavity remains.",
+    "SHOT_03": "West-grove forest passage preserved. Cabin absent.",
+    "SHOT_04": "Village/path reveal preserved. Openings dark.",
+    "SHOT_05": "120 mm pines-against-Louis preserved. Hero peak placement unchanged.",
+    "SHOT_06": "Tree-framed scenic payoff preserved. Distinct from 03 and 05."
+  },
+  "gates": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "FAIL",
+    "F": "FAIL",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "FAIL",
+    "K": "PASS",
+    "L": "PASS",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "T": "PASS",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "total": "19/22 PASS",
+  "final540PxPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev-v43-final/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev-v43-final/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev-v43-final/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev-v43-final/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev-v43-final/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev-v43-final/shot_06_.png"
+  },
+  "paidCompute": {
+    "livePods": [],
+    "paidWorkflow": "not launched",
+    "paidCreateCount": 0,
+    "actualRunPodSpend": 0,
+    "workerImageState": "unchanged"
+  },
+  "verdict": "LOCAL_VISUAL_ACCEPTANCE_INCOMPLETE"
+}

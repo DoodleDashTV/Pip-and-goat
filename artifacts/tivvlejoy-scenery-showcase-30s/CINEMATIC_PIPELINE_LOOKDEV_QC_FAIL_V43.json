@@ -1,0 +1,7 @@
+{
+  "schema": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V43",
+  "reason": "E, F, and J still fail at 540 px. SHOT_01 meadow remains one displaced plane. SHOT_02 waterline remains followable and at least one cavity remains visible. T and Camera C preserved. No paid CREATE.",
+  "passCount": 19,
+  "failGates": ["E", "F", "J"],
+  "pr169": {"state": "OPEN", "draft": true, "merged": false, "ready": false}
+}
