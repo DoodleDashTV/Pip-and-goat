@@ -283,6 +283,5 @@
   "paidRenderReadyAwaitingAuthorization": false,
   "finalResultReturned": false,
   "readiness": "NOT_PAID_RENDER_READY",
-  "remainingBlocker": "Mandatory visual gates E/F/J/L/T are PARTIAL. SHOT_02 still lacks a readable mountain/sky background; SHOT_03 is a thin cabin peek rather than a dense forest passage; SHOT_05 is not a distinct long-lens compression; a white placeholder remains in a cabin opening on SHOT_01/05. Human visual readability is not complete. Do not CREATE.",
-  "receiptShaBeforePin": "404d2c73119fbe1a6fda0c1483de557465fde4c5"
+  "remainingBlocker": "Mandatory visual gates E/F/J/L/T are PARTIAL. SHOT_02 still lacks a readable mountain/sky background; SHOT_03 is a thin cabin peek rather than a dense forest passage; SHOT_05 is not a distinct long-lens compression; a white placeholder remains in a cabin opening on SHOT_01/05. Human visual readability is not complete. Do not CREATE."
 }
