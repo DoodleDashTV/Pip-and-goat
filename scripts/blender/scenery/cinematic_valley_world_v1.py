@@ -2689,14 +2689,26 @@ def main() -> int:
 
     frames = [int(part) for part in (args.stills_frames or ",".join(str(item) for item in lookdev_frames())).split(",") if part.strip()]
     if args.hero_search:
-        bpy.context.scene.frame_set(210)
+        scene = bpy.context.scene
+        scene.render.use_persistent_data = False
+        for marker in scene.timeline_markers:
+            marker.camera = None
+        scene.frame_set(1)
         for spec in hero_search_cameras():
             cam = bpy.data.objects.get(f"TJ_HERO_{spec['id']}_CAM")
             if cam is None:
                 continue
-            bpy.context.scene.camera = cam
-            bpy.context.scene.render.filepath = str(out / f"hero_{spec['id'].lower()}_{spec['name']}_")
-            write_progress("LOOKDEV_HERO_SEARCH", id=spec["id"], name=spec["name"], lens=spec["lens"])
+            scene.camera = cam
+            bpy.context.view_layer.update()
+            scene.render.filepath = str(out / f"hero_{spec['id'].lower()}_{spec['name']}_")
+            write_progress(
+                "LOOKDEV_HERO_SEARCH",
+                id=spec["id"],
+                name=spec["name"],
+                lens=spec["lens"],
+                camera=cam.name,
+                location=[round(v, 3) for v in cam.location],
+            )
             bpy.ops.render.render(write_still=True)
         write_progress("LOOKDEV_COMPLETE", frames=len(hero_search_cameras()), heroSearch=True)
         return 0
