@@ -1,7 +1,8 @@
 {
   "schema": "TIVVLEJOY_PURCHASED_SCENERY_LIQUID_READABILITY_AND_BANK_FINISH_RESULT_V33",
   "startingSha": "43a33d0bf997577b8faabd1e269433ca19b26cef",
-  "finalSha": "c67a88fe5e185ad396b10f9b6a588c82efcba193",
+  "visualWorkSha": "c67a88fe5e185ad396b10f9b6a588c82efcba193",
+  "finalSha": "c6bfa46546c6a5bf7e555438d766921bbdb907f6",
   "pr169": {
     "state": "OPEN",
     "draft": true,
