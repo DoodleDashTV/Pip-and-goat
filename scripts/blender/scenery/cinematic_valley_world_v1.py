@@ -102,7 +102,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--profile", default="LOOKDEV_FAST")
     parser.add_argument("--hide-water", action="store_true")
     parser.add_argument("--control-tests", action="store_true")
-    parser.add_argument("--water-variant", default="D", help="A=V32 baseline, B=transmission, C=rough reflection, D=hybrid")
+    parser.add_argument("--water-variant", default="D", help="A=V33 baseline, B=real IOR+open HDRI, C=real IOR+HDRI control, D=tuned C")
     parser.add_argument("--ab-water", action="store_true", help="Render SHOT_02 once per water variant A-D")
     return parser.parse_args(argv)
 
@@ -187,6 +187,85 @@ def shade_smooth(obj: bpy.types.Object) -> None:
         return
     for poly in obj.data.polygons:
         poly.use_smooth = True
+
+
+def apply_hdri_reflection_control(enabled: bool) -> dict:
+    """Same purchased HDRI. Camera/diffuse keep it. Glossy rays get compressed highlights."""
+    world = bpy.context.scene.world
+    if world is None or world.node_tree is None:
+        return {"mode": "missing_world"}
+    nodes = world.node_tree.nodes
+    links = world.node_tree.links
+    for node in list(nodes):
+        if str(node.name).startswith("TJ_HDRI_"):
+            nodes.remove(node)
+    out = next((node for node in nodes if node.type == "OUTPUT_WORLD"), None)
+    bg = next((node for node in nodes if node.type == "BACKGROUND" and not str(node.name).startswith("TJ_HDRI_")), None)
+    if out is None or bg is None:
+        return {"mode": "missing_background"}
+    for link in list(out.inputs["Surface"].links):
+        links.remove(link)
+    if not enabled:
+        links.new(bg.outputs["Background"], out.inputs["Surface"])
+        print(json.dumps({"event": "hdri_reflection_control", "mode": "unrestricted"}), flush=True)
+        return {"mode": "unrestricted", "lightPath": None}
+    color_in = bg.inputs["Color"].links[0].from_socket if bg.inputs["Color"].links else None
+    path = nodes.new("ShaderNodeLightPath")
+    path.name = "TJ_HDRI_LightPath"
+    glossy = path.outputs.get("Is Glossy Ray") or path.outputs[4]
+    reflect = path.outputs.get("Is Reflection Ray")
+    if reflect is not None:
+        ray = nodes.new("ShaderNodeMath")
+        ray.name = "TJ_HDRI_RayOr"
+        ray.operation = "MAXIMUM"
+        links.new(glossy, ray.inputs[0])
+        links.new(reflect, ray.inputs[1])
+        ray_out = ray.outputs["Value"]
+        used = ["Is Glossy Ray", "Is Reflection Ray"]
+    else:
+        ray_out = glossy
+        used = ["Is Glossy Ray"]
+    gamma = nodes.new("ShaderNodeGamma")
+    gamma.name = "TJ_HDRI_Gamma"
+    gamma.inputs["Gamma"].default_value = 1.60
+    if color_in is not None:
+        links.new(color_in, gamma.inputs["Color"])
+    dim = _mix_rgb(nodes)
+    dim.name = "TJ_HDRI_Dim"
+    if "Color1" in dim.inputs:
+        links.new(gamma.outputs["Color"], dim.inputs["Color1"])
+        dim.inputs["Color2"].default_value = (0.26, 0.36, 0.42, 1.0)
+        dim.inputs["Fac"].default_value = 0.32
+        refl_color = dim.outputs["Color"]
+    else:
+        refl_color = gamma.outputs["Color"]
+    mul = _mix_rgb(nodes)
+    mul.name = "TJ_HDRI_Mul"
+    if hasattr(mul, "blend_type"):
+        mul.blend_type = "MULTIPLY"
+    if "Color1" in mul.inputs:
+        links.new(refl_color, mul.inputs["Color1"])
+        mul.inputs["Color2"].default_value = (0.58, 0.64, 0.62, 1.0)
+        mul.inputs["Fac"].default_value = 1.0
+        refl_color = mul.outputs["Color"]
+    bg_refl = nodes.new("ShaderNodeBackground")
+    bg_refl.name = "TJ_HDRI_ReflectionBg"
+    bg_refl.inputs["Strength"].default_value = 0.62
+    links.new(refl_color, bg_refl.inputs["Color"])
+    mix = nodes.new("ShaderNodeMixShader")
+    mix.name = "TJ_HDRI_RayMix"
+    links.new(ray_out, mix.inputs[0])
+    links.new(bg.outputs["Background"], mix.inputs[1])
+    links.new(bg_refl.outputs["Background"], mix.inputs[2])
+    links.new(mix.outputs["Shader"], out.inputs["Surface"])
+    print(json.dumps({
+        "event": "hdri_reflection_control",
+        "mode": "controlled",
+        "lightPath": used,
+        "gamma": 1.60,
+        "reflectionStrength": 0.62,
+    }), flush=True)
+    return {"mode": "controlled", "lightPath": used}
 
 
 def _walk_image_nodes(nodes):
@@ -285,10 +364,19 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     # Round the camera-facing lip. Do not change trough depths or water/bed halves.
     if t < 0.72:
         u = t / 0.72
-        return shelf + (crest_z - shelf) * (u ** 1.65)
-    u = (t - 0.72) / 0.28
-    lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
-    return (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
+        height = shelf + (crest_z - shelf) * (u ** 1.65)
+    else:
+        u = (t - 0.72) / 0.28
+        lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
+        height = (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
+    if south:
+        # Localized erosion notches on the camera-facing crest only.
+        notch = 0.5 + 0.5 * math.sin(x * 1.9 + along * 0.55)
+        if notch > 0.72:
+            cut = 0.20 * ((notch - 0.72) / 0.28) * (1.0 - abs(t - 0.55) * 1.4)
+            height -= max(0.0, cut)
+        height += 0.08 * math.sin(x * 4.2 + y * 2.1) * (0.35 + 0.65 * t)
+    return height
 
 
 def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
@@ -302,7 +390,7 @@ def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
 
 
 def build_terrain(_files: list[Path]) -> bpy.types.Object:
-    bpy.ops.mesh.primitive_grid_add(x_subdivisions=320, y_subdivisions=320, size=180.0, location=(0.0, 8.0, 0.0))
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=400, y_subdivisions=400, size=180.0, location=(0.0, 8.0, 0.0))
     ground = bpy.context.object
     ground.name = "TJ_Ground_ValleyCarrier"
     try:
@@ -710,93 +798,186 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     return mat
 
 
+def variant_uses_hdri_control(variant: str) -> bool:
+    return (variant or "").upper() in {"C", "D"}
+
+
 def _water_variant_cfg(variant: str, tint) -> dict:
     deep = tint or (0.018, 0.042, 0.036, 1.0)
     name = (variant or "A").upper()
     if name == "A":
         return {
             "label": "A",
+            "mode": "v33",
+            "hdri_control": False,
             "specular": 0.0,
             "ior": 1.0,
-            "distance_gate": True,
-            "trans_center": 0.38,
-            "trans_edge": 0.24,
-            "trans_far": 0.04,
-            "sheen": 0.15,
-            "sheen_far": 0.03,
-            "rough_lo": 0.28,
-            "rough_hi": 0.46,
-            "extra_glossy": True,
-            "glossy_color": (0.14, 0.17, 0.16, 1.0),
-            "gloss_rough_lo": 0.38,
-            "gloss_rough_hi": 0.58,
-            "bump": 0.34,
-            "deep": deep,
-        }
-    if name == "B":
-        return {
-            "label": "B",
-            "specular": 0.18,
-            "ior": 1.22,
             "distance_gate": False,
-            "trans_center": 0.56,
-            "trans_edge": 0.74,
-            "trans_far": 0.56,
+            "trans_center": 0.0,
+            "trans_edge": 0.0,
+            "trans_far": 0.0,
             "sheen": 0.0,
             "sheen_far": 0.0,
-            "rough_lo": 0.12,
-            "rough_hi": 0.26,
+            "rough_lo": 0.20,
+            "rough_hi": 0.38,
             "extra_glossy": False,
-            "glossy_color": (0.12, 0.15, 0.14, 1.0),
-            "gloss_rough_lo": 0.22,
-            "gloss_rough_hi": 0.40,
-            "bump": 0.22,
-            "deep": (max(0.008, deep[0] * 0.70), max(0.014, deep[1] * 0.72), max(0.012, deep[2] * 0.68), 1.0),
-        }
-    if name == "C":
-        return {
-            "label": "C",
-            "specular": 0.22,
-            "ior": 1.15,
-            "distance_gate": False,
-            "trans_center": 0.16,
-            "trans_edge": 0.22,
-            "trans_far": 0.16,
-            "sheen": 0.22,
-            "sheen_far": 0.22,
-            "rough_lo": 0.32,
-            "rough_hi": 0.50,
-            "extra_glossy": True,
-            "glossy_color": (0.18, 0.22, 0.20, 1.0),
+            "glossy_color": (0.24, 0.30, 0.28, 1.0),
             "gloss_rough_lo": 0.28,
             "gloss_rough_hi": 0.48,
-            "bump": 0.40,
+            "bump": 0.20,
             "deep": deep,
         }
-    return {
-        "label": "D",
-        "specular": 0.0,
-        "ior": 1.0,
+    liquid = {
+        "mode": "cycles_liquid",
         "distance_gate": False,
-        "trans_center": 0.0,
-        "trans_edge": 0.0,
-        "trans_far": 0.0,
-        "sheen": 0.0,
-        "sheen_far": 0.0,
-        "rough_lo": 0.20,
-        "rough_hi": 0.38,
-        "extra_glossy": False,
-        "glossy_color": (0.24, 0.30, 0.28, 1.0),
-        "gloss_rough_lo": 0.28,
-        "gloss_rough_hi": 0.48,
-        "bump": 0.20,
+        "ior": 1.33,
+        "specular": 0.50,
+        "trans": 0.86,
+        "rough_lo": 0.08,
+        "rough_hi": 0.20,
+        "bump_lo": 0.18,
+        "bump_hi": 0.10,
+        "volume_density": 0.28,
+        "volume_color": (0.07, 0.15, 0.12, 1.0),
         "deep": deep,
+    }
+    if name == "B":
+        return {**liquid, "label": "B", "hdri_control": False}
+    if name == "C":
+        return {**liquid, "label": "C", "hdri_control": True, "rough_lo": 0.09, "rough_hi": 0.22}
+    return {
+        **liquid,
+        "label": "D",
+        "hdri_control": True,
+        "trans": 0.80,
+        "rough_lo": 0.11,
+        "rough_hi": 0.24,
+        "bump_lo": 0.20,
+        "bump_hi": 0.12,
+        "volume_density": 0.20,
     }
 
 
+def _build_cycles_liquid(cfg: dict) -> bpy.types.Material:
+    """Genuine Cycles water. IOR/transmission stay physical; HDRI foil is a World problem."""
+    deep = cfg["deep"]
+    mat = bpy.data.materials.new(f"TJ_CinematicRiver_{cfg['label']}")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    nodes.clear()
+    out = nodes.new("ShaderNodeOutputMaterial")
+    body = nodes.new("ShaderNodeBsdfPrincipled")
+    body.name = "TJ_StreamBody"
+    attr = nodes.new("ShaderNodeVertexColor")
+    if hasattr(attr, "layer_name"):
+        attr.layer_name = "TJ_RiverDepth"
+    coord = nodes.new("ShaderNodeTexCoord")
+    tint = _mix_rgb(nodes)
+    tint.name = "TJ_StreamTintMix"
+    shallow = (
+        min(0.055, deep[0] + 0.022),
+        min(0.088, deep[1] + 0.032),
+        min(0.068, deep[2] + 0.022),
+        1.0,
+    )
+    if "Color1" in tint.inputs:
+        tint.inputs["Color1"].default_value = deep
+        tint.inputs["Color2"].default_value = shallow
+        links.new(attr.outputs["Color"], tint.inputs["Fac"])
+        links.new(tint.outputs["Color"], body.inputs["Base Color"])
+    elif "Base Color" in body.inputs:
+        body.inputs["Base Color"].default_value = deep
+    if "Metallic" in body.inputs:
+        body.inputs["Metallic"].default_value = 0.0
+    if "Specular IOR Level" in body.inputs:
+        body.inputs["Specular IOR Level"].default_value = cfg["specular"]
+    if "IOR" in body.inputs:
+        body.inputs["IOR"].default_value = cfg["ior"]
+    if "Transmission Weight" in body.inputs:
+        body.inputs["Transmission Weight"].default_value = cfg["trans"]
+    if "Transmission Extra" in body.inputs:
+        body.inputs["Transmission Extra"].default_value = 0.0
+    if "Emission Strength" in body.inputs:
+        body.inputs["Emission Strength"].default_value = 0.0
+    rough = nodes.new("ShaderNodeMapRange")
+    rough.inputs["From Min"].default_value = 0.0
+    rough.inputs["From Max"].default_value = 1.0
+    rough.inputs["To Min"].default_value = cfg["rough_lo"]
+    rough.inputs["To Max"].default_value = cfg["rough_hi"]
+    links.new(attr.outputs["Color"], rough.inputs["Value"])
+    if "Roughness" in body.inputs:
+        links.new(rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0], body.inputs["Roughness"])
+    swell = nodes.new("ShaderNodeTexNoise")
+    swell.inputs["Scale"].default_value = 0.36
+    if "Detail" in swell.inputs:
+        swell.inputs["Detail"].default_value = 3.0
+    if "Roughness" in swell.inputs:
+        swell.inputs["Roughness"].default_value = 0.32
+    links.new(coord.outputs["Object"], swell.inputs["Vector"])
+    ripple = nodes.new("ShaderNodeTexNoise")
+    ripple.inputs["Scale"].default_value = 7.4
+    if "Detail" in ripple.inputs:
+        ripple.inputs["Detail"].default_value = 5.0
+    if "Roughness" in ripple.inputs:
+        ripple.inputs["Roughness"].default_value = 0.46
+    links.new(coord.outputs["Object"], ripple.inputs["Vector"])
+    stretch = nodes.new("ShaderNodeMapping")
+    stretch.inputs["Scale"].default_value = (0.42, 3.1, 1.0)
+    links.new(coord.outputs["Object"], stretch.inputs["Vector"])
+    flow = nodes.new("ShaderNodeTexNoise")
+    flow.inputs["Scale"].default_value = 2.0
+    if "Detail" in flow.inputs:
+        flow.inputs["Detail"].default_value = 3.5
+    if "Roughness" in flow.inputs:
+        flow.inputs["Roughness"].default_value = 0.40
+    links.new(stretch.outputs["Vector"], flow.inputs["Vector"])
+    lo = nodes.new("ShaderNodeMath")
+    lo.operation = "MULTIPLY"
+    lo.inputs[1].default_value = 0.58
+    links.new(swell.outputs["Fac"], lo.inputs[0])
+    hi = nodes.new("ShaderNodeMath")
+    hi.operation = "MULTIPLY"
+    hi.inputs[1].default_value = 0.28
+    links.new(ripple.outputs["Fac"], hi.inputs[0])
+    fl = nodes.new("ShaderNodeMath")
+    fl.operation = "MULTIPLY"
+    fl.inputs[1].default_value = 0.22
+    links.new(flow.outputs["Fac"], fl.inputs[0])
+    combo = nodes.new("ShaderNodeMath")
+    combo.operation = "ADD"
+    links.new(lo.outputs["Value"], combo.inputs[0])
+    links.new(hi.outputs["Value"], combo.inputs[1])
+    combo2 = nodes.new("ShaderNodeMath")
+    combo2.operation = "ADD"
+    links.new(combo.outputs["Value"], combo2.inputs[0])
+    links.new(fl.outputs["Value"], combo2.inputs[1])
+    bump = nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = cfg["bump_lo"]
+    links.new(combo2.outputs["Value"], bump.inputs["Height"])
+    if "Normal" in body.inputs:
+        links.new(bump.outputs["Normal"], body.inputs["Normal"])
+    links.new(body.outputs["BSDF"], out.inputs["Surface"])
+    if cfg.get("volume_density", 0.0) > 0.001:
+        absorb = nodes.new("ShaderNodeVolumeAbsorption")
+        if "Color" in absorb.inputs:
+            absorb.inputs["Color"].default_value = cfg["volume_color"]
+        if "Density" in absorb.inputs:
+            absorb.inputs["Density"].default_value = cfg["volume_density"]
+        links.new(absorb.outputs["Volume"], out.inputs["Volume"])
+    if hasattr(mat, "cycles"):
+        try:
+            mat.cycles.use_transparent_shadow = True
+        except Exception:
+            pass
+    return mat
+
+
 def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types.Material:
-    """Stylized creek film. Variant A is the V32 baseline; B/C/D restore water cues."""
+    """V34: A is the V33 fake-water baseline. B/C/D are real Cycles liquid."""
     cfg = _water_variant_cfg(variant or WATER_VARIANT, tint)
+    if cfg.get("mode") == "cycles_liquid":
+        return _build_cycles_liquid(cfg)
     deep = cfg["deep"]
     mat = bpy.data.materials.new(f"TJ_CinematicRiver_{cfg['label']}")
     mat.use_nodes = True
@@ -1012,7 +1193,7 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
     else:
         links.new(body.outputs["BSDF"], out.inputs["Surface"])
-    if cfg["label"] == "D":
+    if cfg.get("mode") == "v33":
         # Principled transmission at 14° is either white Fresnel foil (B) or
         # ~60% opaque teal paint (lookdev54). Transparent + remapped glossy
         # keeps bed-through and liquid sheen without an HDRI ribbon.
@@ -1432,6 +1613,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     extras = [bed]
     extras.extend(place_waterline_interruptions(centers))
     extras.extend(place_crest_grass_tufts(centers))
+    extras.extend(build_south_crest_shelves(centers))
     # Rectangular bank patches read as planks/bridges. Terrain wet-mask,
     # dark bed, crest trees, and a few half-sunk stones carry the breakup.
     print(json.dumps({
@@ -1575,6 +1757,55 @@ def place_bank_crest_trees(trees: list) -> list:
         if in_village(loc.x, loc.y) or in_river_channel(loc.x, loc.y, margin=0.35):
             continue
         extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.20 + 0.22 * ((i * 3) % 5) / 4.0))
+    return extras
+
+
+def build_south_crest_shelves(centers: list[Vector]) -> list:
+    """Camera-facing south crest: extra soil shelves so SHOT_02 cannot see one knife line."""
+    extras = []
+    mat = dirt_bank_material()
+    rows = 8
+    chunk = 6
+    i = 4
+    while i < len(centers) - 8:
+        if (i // chunk) % 4 == 0:
+            i += chunk
+            continue
+        verts: list[tuple[float, float, float]] = []
+        faces: list[tuple[int, int, int, int]] = []
+        span = centers[i:i + chunk]
+        if len(span) < 4:
+            break
+        for si, center in enumerate(span):
+            side = _side_from_centers(centers, i + si)
+            left, _right = _channel_halves_for_index(centers, i + si)
+            inner = left * 0.92
+            outer = left + 3.6 + 0.45 * math.sin((i + si) * 0.31)
+            for col in range(rows):
+                t = col / float(rows - 1)
+                jag = 0.10 * math.sin((i + si) * 0.73 + col * 1.4)
+                half = inner + (outer - inner) * min(1.0, max(0.0, t + jag))
+                point = center + side * (-half)
+                z = -0.28 + 1.05 * (t ** 1.35)
+                z += 0.10 * math.sin((i + si) * 0.61 + col * 2.0)
+                if ((i + si) % 19) in {5, 6, 7} and 0.25 < t < 0.75:
+                    z -= 0.16
+                verts.append((point.x, point.y, z))
+            if si > 0:
+                v = si * rows
+                prev = v - rows
+                for col in range(rows - 1):
+                    faces.append((prev + col, prev + col + 1, v + col + 1, v + col))
+        mesh = bpy.data.meshes.new(f"TJ_SouthCrest_{i}")
+        mesh.from_pydata(verts, [], faces)
+        mesh.update()
+        obj = bpy.data.objects.new(f"TJ_SouthCrest_{i}", mesh)
+        bpy.context.scene.collection.objects.link(obj)
+        shade_smooth(obj)
+        obj.data.materials.clear()
+        obj.data.materials.append(mat)
+        extras.append(obj)
+        i += chunk
     return extras
 
 
@@ -2155,6 +2386,7 @@ def main() -> int:
         link_exclusive(obj, collections["WORLD_FOREST_BACKGROUND"])
 
     sky_name = setup_world(expanded.get("sky_hdri", []), expanded.get("world_shaders", []))
+    apply_hdri_reflection_control(variant_uses_hdri_control(WATER_VARIANT))
     setup_lighting_hierarchy()
     for obj in bpy.data.objects:
         if obj.type == "LIGHT":
@@ -2239,6 +2471,9 @@ def main() -> int:
         "groundSource": "shaped_valley_carrier_purchased_meadow",
         "riverSource": "geometry_first_carved_channel_dark_bed_narrow_film",
         "hideWater": bool(args.hide_water),
+        "waterVariant": WATER_VARIANT,
+        "hdriReflectionControl": variant_uses_hdri_control(WATER_VARIANT),
+        "hdriLightPath": ["Is Glossy Ray", "Is Reflection Ray"] if variant_uses_hdri_control(WATER_VARIANT) else [],
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
@@ -2250,12 +2485,13 @@ def main() -> int:
         river_obj = bpy.data.objects.get("TJ_River_PurchasedWater")
         set_active_camera_for_frame(210)
         for label in ("A", "B", "C", "D"):
+            apply_hdri_reflection_control(variant_uses_hdri_control(label))
             if river_obj is not None:
                 mat = cinematic_river_material(WATER_TINT, label)
                 river_obj.data.materials.clear()
                 river_obj.data.materials.append(mat)
             bpy.context.scene.render.filepath = str(out / f"variant_{label.lower()}_shot_02_")
-            write_progress("LOOKDEV_WATER_AB", variant=label, frame=210)
+            write_progress("LOOKDEV_WATER_AB", variant=label, frame=210, hdriControl=variant_uses_hdri_control(label))
             bpy.ops.render.render(write_still=True)
         write_progress("LOOKDEV_COMPLETE", frames=4, waterAb=True)
         return 0
