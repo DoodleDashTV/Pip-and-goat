@@ -115,7 +115,7 @@ def test_six_shot_plan():
     assert shot03["start"]["location"][0] <= -28.0
     assert shot03["start"]["look"][0] <= -12.0
     shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
-    assert 3.4 <= shot02["start"]["location"][2] <= 6.4
+    assert 3.8 <= shot02["start"]["location"][2] <= 5.2
     assert shot02["start"]["look"][2] < 0.0
     assert shot02["start"]["look"][1] > shot02["start"]["location"][1]
     assert len(lookdev_frames()) == 12

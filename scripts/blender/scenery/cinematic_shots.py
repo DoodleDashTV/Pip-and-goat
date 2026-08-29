@@ -19,8 +19,8 @@ SHOTS = (
         "name": "RIVER_DISCOVERY",
         "start": 151,
         "end": 300,
-        "lensMin": 30.0,
-        "lensMax": 36.0,
+        "lensMin": 38.0,
+        "lensMax": 44.0,
         "purpose": "unmistakable water, reflections, ripples, irregular banks, wet rocks, flora",
         "move": "low_riverbank_dolly",
     },
@@ -127,8 +127,8 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_02",
             "camera": "TJ_SHOT_02_CAM",
-            "start": {"location": (-9.2, -26.4, 5.55), "look": (5.4, -11.2, -0.92), "lens": 32.0},
-            "end": {"location": (-2.4, -24.8, 5.35), "look": (13.0, -10.6, -0.78), "lens": 34.0},
+            "start": {"location": (-10.4, -21.0, 4.35), "look": (6.8, -11.6, -1.12), "lens": 40.0},
+            "end": {"location": (-4.0, -20.2, 4.20), "look": (13.5, -11.0, -0.98), "lens": 42.0},
         },
         {
             "id": "SHOT_03",

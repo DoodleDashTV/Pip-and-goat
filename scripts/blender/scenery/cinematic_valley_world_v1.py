@@ -1649,7 +1649,8 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     extras = [bed]
     extras.extend(place_waterline_interruptions(centers))
     extras.extend(place_crest_grass_tufts(centers))
-    extras.extend(build_south_crest_shelves(centers))
+    # Hanging-grass cards read as blocky slabs from the new SHOT_02. The
+    # 12m three-stage south bank is the silhouette fix.
     # Rectangular bank patches read as planks/bridges. Terrain wet-mask,
     # dark bed, crest trees, and a few half-sunk stones carry the breakup.
     print(json.dumps({
