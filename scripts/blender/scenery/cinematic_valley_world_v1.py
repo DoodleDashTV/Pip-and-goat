@@ -2989,8 +2989,9 @@ def main() -> int:
     forced = ensure_purchased_albedos(all_files)
     lifted = lift_purchased_shading()
     cabin_repairs = repair_cabin_placeholders()
-    for void in place_cabin_interior_voids():
-        link_exclusive(void, collections["WORLD_VILLAGE"])
+    # lookdev87 seated AABB voids still leaked as tan roof/wall cards and
+    # did not kill the cyan window punch. Leave them off until a hole-fill
+    # can be proven from pixels.
 
     nature_members = []
     nature_files = expanded.get("forest_nature", [])
