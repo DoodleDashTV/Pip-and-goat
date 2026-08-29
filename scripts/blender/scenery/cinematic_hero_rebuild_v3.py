@@ -178,12 +178,18 @@ def _append_objects(blend: Path, names: tuple[str, ...]) -> list:
         obj.parent = None
         obj.matrix_parent_inverse.identity()
         obj.matrix_world = world
+        obj.location = (0.0, -800.0, -80.0)
         obj.hide_render = True
         obj.hide_viewport = True
         obj["tj_v3_lib"] = 1
         loaded.append(obj)
     _log("v3_appended", blend=blend.name, count=len(loaded), names=[o.name for o in loaded])
     return loaded
+
+
+def _fit_scale(src, target: float, requested: float) -> float:
+    dim = max(float(src.dimensions.x), float(src.dimensions.y), float(src.dimensions.z), 0.01)
+    return (target * requested) / dim
 
 
 def _base_offset(obj) -> float:
@@ -378,7 +384,8 @@ def plant_rocks(rocks: list, col: bpy.types.Collection) -> dict:
             break
         src = rocks[idx % len(rocks)]
         z, biome = authored_height(loc[0], loc[1])
-        obj = _dup(src, (loc[0], loc[1], z), scale, yaw, bury=bury)
+        fitted = _fit_scale(src, 1.65, scale)
+        obj = _dup(src, (loc[0], loc[1], z), fitted, yaw, bury=bury)
         if obj is None:
             continue
         obj.name = f"TJ_V3_Rock_{i}"
