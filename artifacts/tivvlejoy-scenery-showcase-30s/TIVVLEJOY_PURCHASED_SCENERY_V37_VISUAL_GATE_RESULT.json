@@ -8,9 +8,10 @@
     "cf30de059fde0609c739076276806789e078cdc2",
     "869d4ec8124328c822581cb6e81faa9fe2f26554",
     "fc104dededa4f5779c697e7045ff57ccae4a1753",
-    "c75a124165e194eb4fcafeea28a58c75afdd1ece"
+    "c75a124165e194eb4fcafeea28a58c75afdd1ece",
+    "404d2c73119fbe1a6fda0c1483de557465fde4c5"
   ],
-  "finalSha": "c75a124165e194eb4fcafeea28a58c75afdd1ece",
+  "finalSha": "404d2c73119fbe1a6fda0c1483de557465fde4c5",
   "ancestorContainsRequiredCheckpoint": true,
   "pr169": {
     "number": 169,
@@ -18,7 +19,7 @@
     "draft": true,
     "merged": false,
     "ready": false,
-    "title": "TivvleJoy cinematic scenery pipeline — look-dev still FAIL, no paid CREATE"
+    "title": "TivvleJoy cinematic scenery pipeline \u2014 look-dev still FAIL, no paid CREATE"
   },
   "livePodProof": {
     "endpoint": "https://rest.runpod.io/v1/pods",
@@ -29,22 +30,82 @@
     "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
     "inProgress": false,
     "latestRuns": [
-      {"createdAt": "2026-08-28T11:28:05Z", "status": "completed", "conclusion": "failure"},
-      {"createdAt": "2026-08-28T11:24:20Z", "status": "completed", "conclusion": "failure"},
-      {"createdAt": "2026-08-28T10:08:34Z", "status": "completed", "conclusion": "failure"}
+      {
+        "createdAt": "2026-08-28T11:28:05Z",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "createdAt": "2026-08-28T11:24:20Z",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "createdAt": "2026-08-28T10:08:34Z",
+        "status": "completed",
+        "conclusion": "failure"
+      }
     ],
     "authorizationFilePresent": false
   },
   "v37PublishedCameraVerification": {
     "publishedCheckpointCameraC": {
-      "start": {"location": [0.2, -23.2, 3.05], "look": [-5.8, -5.2, 0.20], "lens": 34.0},
-      "end": {"location": [1.8, -22.0, 3.15], "look": [-3.8, -3.8, 0.35], "lens": 36.0},
+      "start": {
+        "location": [
+          0.2,
+          -23.2,
+          3.05
+        ],
+        "look": [
+          -5.8,
+          -5.2,
+          0.2
+        ],
+        "lens": 34.0
+      },
+      "end": {
+        "location": [
+          1.8,
+          -22.0,
+          3.15
+        ],
+        "look": [
+          -3.8,
+          -3.8,
+          0.35
+        ],
+        "lens": 36.0
+      },
       "renderedAs": "/tmp/o14-lookdev/cinematic-lookdev73/shot_02_.png",
-      "verdict": "FAIL — cabin still first; creek is a bottom-right sliver"
+      "verdict": "FAIL \u2014 cabin still first; creek is a bottom-right sliver"
     },
     "activeAuthoredCameraC": {
-      "start": {"location": [1.4, -19.8, 2.72], "look": [-3.6, -10.4, -0.52], "lens": 32.0},
-      "end": {"location": [2.8, -18.8, 2.82], "look": [-1.8, -9.2, -0.32], "lens": 34.0},
+      "start": {
+        "location": [
+          1.4,
+          -19.8,
+          2.72
+        ],
+        "look": [
+          -3.6,
+          -10.4,
+          -0.52
+        ],
+        "lens": 32.0
+      },
+      "end": {
+        "location": [
+          2.8,
+          -18.8,
+          2.82
+        ],
+        "look": [
+          -1.8,
+          -9.2,
+          -0.32
+        ],
+        "lens": 34.0
+      },
       "whyChanged": "Published V37 C kept the cabin as the first read. Pitching into the creek made water lead. A later 0.4 m look-z lift tried to keep a horizon without returning to lookdev73."
     },
     "cabinOffAxis": true,
@@ -58,15 +119,15 @@
   "v34WaterLockVerification": {
     "engine": "CYCLES",
     "ior": 1.33,
-    "transmission": 0.80,
+    "transmission": 0.8,
     "metallic": 0.0,
-    "specular": 0.50,
+    "specular": 0.5,
     "waterThicknessM": 0.18,
     "volumeAbsorption": 0.18,
     "dualScaleRippleNormals": true,
     "purchasedHdriKept": true,
     "lightPathHdriReflectionControl": true,
-    "WATER_WIDTH_SCALE": 0.30,
+    "WATER_WIDTH_SCALE": 0.3,
     "BED_WIDTH_SCALE": 0.68,
     "v31ChannelPreserved": true,
     "waterOnlyInDeepestChannel": true,
@@ -77,8 +138,15 @@
       "riverMaterial": "Water_Mat_1",
       "surface": "TJ_CinematicRiver_D",
       "hdriReflectionControl": true,
-      "hdriLightPath": ["Is Glossy Ray", "Is Reflection Ray"],
-      "hdriCameraRotation": [0.0, 0.0, 0.0],
+      "hdriLightPath": [
+        "Is Glossy Ray",
+        "Is Reflection Ray"
+      ],
+      "hdriCameraRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
       "hdriReflectionRotationZ": 0.48,
       "waterArchitecture": "v34_candidate_d",
       "cameraDistanceShaderGate": false
@@ -94,11 +162,11 @@
   "shot02IterationPaths": {
     "lookdev73_publishedV37C": {
       "path": "/tmp/o14-lookdev/cinematic-lookdev73/shot_02_.png",
-      "verdict": "FAIL — cabin dominates; creek is a thin lower-right band"
+      "verdict": "FAIL \u2014 cabin dominates; creek is a thin lower-right band"
     },
     "lookdev74_pitchedC": {
       "path": "/tmp/o14-lookdev/cinematic-lookdev74/shot_02_.png",
-      "verdict": "HERO PASS — creek-first diagonal liquid; rocks pierce; cabin off-axis; mountains weak"
+      "verdict": "HERO PASS \u2014 creek-first diagonal liquid; rocks pierce; cabin off-axis; mountains weak"
     },
     "lookdev76_horizonLift": {
       "path": "/tmp/o14-lookdev/cinematic-lookdev76/shot_02_.png",
@@ -162,7 +230,7 @@
     "J": "Rocks, soil tongues, and saplings break the bank; a clean grass contour can still be traced in places.",
     "K": "SHOT_02 is a cinematic creek-hero frame with cabin as destination.",
     "L": "Six stills exist and are locally clean, but SHOT_03 is thin, SHOT_05 is not a distinct compression, and a white cabin placeholder remains.",
-    "M": "Visible purchased scenery: Cabin01A–04B, Cart01, Gate01, Fence01, Tree01–03, Louis LP mountains, Sky HDRI, Water_Mat_1 donor, meadow Texture.png.",
+    "M": "Visible purchased scenery: Cabin01A\u201304B, Cart01, Gate01, Fence01, Tree01\u201303, Louis LP mountains, Sky HDRI, Water_Mat_1 donor, meadow Texture.png.",
     "N": "Free local 540x960 32-sample denoised Cycles CPU stills. No 900-frame render.",
     "O": "Same V34 D material on every shot. No per-camera water hacks.",
     "P": "Water now leads the hero instead of sitting under the cabin.",
@@ -174,7 +242,7 @@
     "V": "Clearly better than the V35 grazing stripe and the V36 cabin-first C frame."
   },
   "purchasedAssetsVisiblyUsed": [
-    "village_blender Cabin01A–04B",
+    "village_blender Cabin01A\u201304B",
     "village_blender Cart01 Gate01 Fence01",
     "village_blender Tree01 Tree02 Tree03",
     "village_project Water_Mat_1 tint donor",
@@ -190,7 +258,10 @@
     "resolution": "540x960",
     "samples": 32,
     "denoiseRuntime": "enabled_when_samples_gte_32",
-    "frameRange": [1, 900],
+    "frameRange": [
+      1,
+      900
+    ],
     "fps": 30,
     "heroStillFrames": {
       "SHOT_01": 48,
@@ -212,5 +283,6 @@
   "paidRenderReadyAwaitingAuthorization": false,
   "finalResultReturned": false,
   "readiness": "NOT_PAID_RENDER_READY",
-  "remainingBlocker": "Mandatory visual gates E/F/J/L/T are PARTIAL. SHOT_02 still lacks a readable mountain/sky background; SHOT_03 is a thin cabin peek rather than a dense forest passage; SHOT_05 is not a distinct long-lens compression; a white placeholder remains in a cabin opening on SHOT_01/05. Human visual readability is not complete. Do not CREATE."
+  "remainingBlocker": "Mandatory visual gates E/F/J/L/T are PARTIAL. SHOT_02 still lacks a readable mountain/sky background; SHOT_03 is a thin cabin peek rather than a dense forest passage; SHOT_05 is not a distinct long-lens compression; a white placeholder remains in a cabin opening on SHOT_01/05. Human visual readability is not complete. Do not CREATE.",
+  "receiptShaBeforePin": "404d2c73119fbe1a6fda0c1483de557465fde4c5"
 }
