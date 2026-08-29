@@ -589,8 +589,8 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
-        inner = bed * 0.48
-        shelf = local_half * 1.05
+        inner = bed * 0.42
+        shelf = local_half * 0.72
         blotch = 0.5 + 0.5 * math.sin(x * 2.15 + y * 1.64) * math.sin(along * 0.83 + x * 0.41)
         if dist < inner:
             value = 0.62 + 0.16 * math.sin(along * 0.41 + x * 0.7)
