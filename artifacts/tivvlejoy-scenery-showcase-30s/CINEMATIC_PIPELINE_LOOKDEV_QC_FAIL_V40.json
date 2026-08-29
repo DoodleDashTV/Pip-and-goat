@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-29T13:26:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "startingSha": "0666606ff6cfa166b8268845ad9b8f234f996e1f",
+  "commit": "PENDING_RESULT_COMMIT",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev-v40-final",
+  "heroStill": "/tmp/o14-lookdev/cinematic-lookdev-v40-final/shot_02_.png",
+  "heroGate": "PASS",
+  "sixShotGate": "FAIL",
+  "v34WaterArchitecturePreserved": true,
+  "cameraDistanceShaderGate": false,
+  "humanApproved": false,
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "whyNotReady": "L window cards are gone. E/F/J still fail image-scale meadow/bank naturalization. T still fails a clear SHOT_02 Louis layer. Do not CREATE."
+}
