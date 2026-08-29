@@ -135,7 +135,7 @@ def hero_search_cameras() -> list[dict]:
             "id": "C",
             "name": "across_creek_opposite_bank",
             "location": (1.4, -19.8, 2.72),
-            "look": (-3.6, -10.4, -0.22),
+            "look": (-3.6, -10.4, 0.00),
             "lens": 32.0,
             "why": "V37 hero: creek-first diagonal with a thin horizon so mountains stay readable behind the off-axis cabin.",
         },
@@ -180,8 +180,8 @@ def default_shot_cameras() -> list[dict]:
             # wider lens so the creek leads before the off-axis cabin resolves.
             "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
             "publishedV37": {"location": (0.2, -23.2, 3.05), "look": (-5.8, -5.2, 0.20), "lens": 34.0},
-            "start": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, -0.22), "lens": 32.0},
-            "end": {"location": (2.8, -18.8, 2.82), "look": (-1.8, -9.2, -0.08), "lens": 34.0},
+            "start": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, 0.00), "lens": 32.0},
+            "end": {"location": (2.8, -18.8, 2.82), "look": (-1.8, -9.2, 0.10), "lens": 34.0},
         },
         {
             "id": "SHOT_03",

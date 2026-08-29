@@ -614,10 +614,10 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     links.new(soil.outputs["Fac"], soil_mul.inputs[0])
     links.new(soil2.outputs["Fac"], soil_mul.inputs[1])
     soil_fac = nodes.new("ShaderNodeMapRange")
-    soil_fac.inputs["From Min"].default_value = 0.06
-    soil_fac.inputs["From Max"].default_value = 0.28
+    soil_fac.inputs["From Min"].default_value = 0.22
+    soil_fac.inputs["From Max"].default_value = 0.40
     soil_fac.inputs["To Min"].default_value = 0.0
-    soil_fac.inputs["To Max"].default_value = 1.0
+    soil_fac.inputs["To Max"].default_value = 0.80
     links.new(soil_mul.outputs["Value"], soil_fac.inputs["Value"])
     soil_mix = _mix_rgb(nodes)
     if "Color1" in soil_mix.inputs:
@@ -1915,7 +1915,7 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     # First peak sits in the SHOT_02 sky-gap right of Cabin01.
     # Second peak stays the SHOT_05 telephoto hero. Do not move it west.
     peak_slots = (
-        (4.5, 19.0, 0.52, 0.12),
+        (-16.0, 22.0, 0.56, 0.20),
         (28.0, 16.0, 0.48, 0.42),
         (46.0, 52.0, 0.30, -0.16),
     )
@@ -2465,6 +2465,57 @@ def install_recessed_window_cassettes() -> list:
                     "host": building.name,
                     "center": [round(v, 3) for v in loc],
                 }), flush=True)
+    return extras
+
+
+def cover_camera_facing_openings() -> list:
+    """Thin dark plates just inside south/east walls of every cabin.
+
+    lookdev89 proved Window01 faces live on the north cabins. The SHOT_01/02
+    hero openings are holes on the creek-side walls. Wall-flush AABB cubes
+    leaked; these plates sit 38 cm inside and cannot breach the roof.
+    """
+    extras = []
+    mat = _opaque_window_void()
+    hosts = [
+        obj for obj in bpy.data.objects
+        if obj.type == "MESH"
+        and any(token in obj.name.lower() for token in ("building", "cabin", "frame"))
+        and "_lod" not in obj.name.lower()
+        and "tree" not in obj.name.lower()
+    ]
+    for obj in hosts:
+        bounds = group_bounds([obj])
+        if not bounds:
+            continue
+        mins, maxs = bounds
+        width = maxs.x - mins.x
+        depth = maxs.y - mins.y
+        height = maxs.z - mins.z
+        if width < 1.2 or depth < 1.2 or height < 1.4:
+            continue
+        plates = (
+            ((maxs.x - 0.38, (mins.y + maxs.y) * 0.5, mins.z + min(1.65, height * 0.42)), (0.04, max(1.1, depth * 0.55), 0.95), "east"),
+            (((mins.x + maxs.x) * 0.5, mins.y + 0.38, mins.z + min(1.65, height * 0.42)), (max(1.1, width * 0.55), 0.04, 0.95), "south"),
+        )
+        for (lx, ly, lz), (sx, sy, sz), tag in plates:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, ly, lz))
+            plate = bpy.context.object
+            plate.name = f"TJ_WallVoid_{obj.name}_{tag}"
+            plate.scale = (sx, sy, sz)
+            plate.data.materials.clear()
+            plate.data.materials.append(mat)
+            if hasattr(plate, "visible_shadow"):
+                plate.visible_shadow = False
+            if hasattr(plate, "visible_glossy"):
+                plate.visible_glossy = False
+            extras.append(plate)
+            print(json.dumps({
+                "event": "cabin_wall_void",
+                "host": obj.name,
+                "tag": tag,
+                "center": [round(lx, 3), round(ly, 3), round(lz, 3)],
+            }), flush=True)
     return extras
 
 
@@ -3105,6 +3156,8 @@ def main() -> int:
     lifted = lift_purchased_shading()
     cabin_repairs = repair_cabin_placeholders()
     for plate in install_recessed_window_cassettes():
+        link_exclusive(plate, collections["WORLD_VILLAGE"])
+    for plate in cover_camera_facing_openings():
         link_exclusive(plate, collections["WORLD_VILLAGE"])
 
     nature_members = []
