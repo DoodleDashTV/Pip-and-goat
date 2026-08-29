@@ -2358,10 +2358,10 @@ def sit_louis_peak(obj: bpy.types.Object, peak_x: float, peak_y: float, scale: f
 
 
 def _shot02_ts(x: float, y: float) -> list[float]:
-    """Camera C V42 start: (2.4, -21.8) look (-2.8, -3.5)."""
+    """Camera C V42 start: (2.4, -22.0) look (-3.2, -10.0)."""
     dx = x - 2.4
-    dy = y + 21.8
-    return [round(dx * -0.273 + dy * 0.962, 2), round(dx * 0.962 + dy * 0.273, 2)]
+    dy = y + 22.0
+    return [round(dx * -0.423 + dy * 0.906, 2), round(dx * 0.906 + dy * 0.423, 2)]
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0, rot_z: float = 0.0) -> None:
@@ -2726,10 +2726,11 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     if len(hero) < 6:
         return extras
     layers = (
-        ("TJ_HeroWetShelf", wet_mat, "wet", WATER_SURFACE_Z + 0.02, WATER_SURFACE_Z + 0.06),
-        ("TJ_HeroDampShelf", soil_mat, "damp", WATER_SURFACE_Z + 0.07, -0.28),
-        ("TJ_HeroSoilShelf", soil_mat, "soil", -0.22, 0.08),
-        ("TJ_HeroGrassLip", grass_mat, "grass", 0.04, 0.18),
+        ("TJ_HeroWetShelf", wet_mat, "wet", WATER_SURFACE_Z - 0.04, WATER_SURFACE_Z + 0.05),
+        ("TJ_HeroDampShelf", soil_mat, "damp", WATER_SURFACE_Z + 0.03, -0.18),
+        ("TJ_HeroSoilShelf", soil_mat, "soil", -0.16, 0.10),
+        ("TJ_HeroGrassLip", grass_mat, "grass", 0.02, 0.16),
+        ("TJ_HeroMeadowBlend", grass_mat, "blend", 0.08, 0.14),
     )
     for name, mat, key, z_in, z_out in layers:
         verts = []
@@ -2747,6 +2748,9 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
                 inner, outer = water_edge * 0.10, water_edge + event["damp"]
             elif key == "soil":
                 inner, outer = water_edge * 0.28, water_edge + event["soil"]
+            elif key == "blend":
+                inner = water_edge + event["soil"] * 0.70
+                outer = water_edge + event["soil"] + 2.40 + event["grass"]
             else:
                 inner = water_edge + event["soil"] * 0.20
                 outer = water_edge + event["soil"] + 0.85 + event["grass"]

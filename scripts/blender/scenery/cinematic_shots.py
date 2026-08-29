@@ -134,10 +134,10 @@ def hero_search_cameras() -> list[dict]:
         {
             "id": "C",
             "name": "across_creek_opposite_bank",
-            "location": (2.4, -21.8, 3.55),
-            "look": (-2.8, -3.5, 0.80),
-            "lens": 33.0,
-            "why": "V42 hero: creek-first diagonal, cabin off-axis left, Louis face in the right-of-cabin sky.",
+            "location": (2.4, -22.0, 4.10),
+            "look": (-3.2, -10.0, 2.35),
+            "lens": 32.0,
+            "why": "V42 hero: look stays on the creek; a slight pitch-up opens the right-of-cabin Louis face.",
         },
         {
             "id": "D",
@@ -184,8 +184,9 @@ def default_shot_cameras() -> list[dict]:
             "publishedV37": {"location": (0.2, -23.2, 3.05), "look": (-5.8, -5.2, 0.20), "lens": 34.0},
             "retiredV41": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, 0.00), "lens": 32.0},
             "retiredV42a": {"location": (1.5, -20.2, 3.10), "look": (-3.5, 0.8, 1.10), "lens": 32.0},
-            "start": {"location": (2.4, -21.8, 3.55), "look": (-2.8, -3.5, 0.80), "lens": 33.0},
-            "end": {"location": (3.2, -20.6, 3.68), "look": (-1.4, -2.2, 0.95), "lens": 34.0},
+            "retiredV42b": {"location": (2.4, -21.8, 3.55), "look": (-2.8, -3.5, 0.80), "lens": 33.0},
+            "start": {"location": (2.4, -22.0, 4.10), "look": (-3.2, -10.0, 2.35), "lens": 32.0},
+            "end": {"location": (3.1, -21.0, 4.22), "look": (-2.2, -8.8, 2.45), "lens": 33.0},
         },
         {
             "id": "SHOT_03",

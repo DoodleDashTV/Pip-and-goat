@@ -135,7 +135,7 @@ def test_six_shot_plan():
     assert shot02["start"]["location"][1] < -16.0
     assert shot02["start"]["look"][1] > shot02["start"]["location"][1]
     assert shot02["start"]["location"][2] < 6.0
-    assert shot02["start"]["look"][2] <= 1.6
+    assert shot02["start"]["look"][2] <= 2.8
     assert 30.0 <= shot02["start"]["lens"] <= 36.0
     direction = tuple(
         shot02["start"]["look"][i] - shot02["start"]["location"][i]
@@ -143,10 +143,11 @@ def test_six_shot_plan():
     )
     horizontal = math.hypot(direction[0], direction[1])
     pitch = math.degrees(math.atan2(direction[2], horizontal))
-    assert pitch <= -4.5
-    assert pitch >= -12.0
-    # Look farther than the near bank so distant Louis can enter the frame.
-    assert shot02["start"]["look"][1] >= -4.0
+    assert pitch <= -6.0
+    assert pitch >= -14.0
+    # Stay on the creek. Looking past y=-4 turns SHOT_02 into a cabin shot.
+    assert shot02["start"]["look"][1] <= -8.0
+    assert shot02["start"]["look"][1] >= -12.5
     # Cabin01 is near x=-9.2; it must stay a destination, not the frame center.
     assert abs(shot02["start"]["look"][0] - (-9.2)) >= 3.0
     assert len(lookdev_frames()) == 12
