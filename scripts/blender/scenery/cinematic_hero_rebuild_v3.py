@@ -11,7 +11,7 @@ from pathlib import Path
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 from cinematic_hero_v3_land import authored_height
 from cinematic_master_look_v1 import apply_cinematic_daylight, apply_compositor_finish
@@ -174,6 +174,10 @@ def _append_objects(blend: Path, names: tuple[str, ...]) -> list:
         obj = bpy.data.objects.get(name)
         if obj is None:
             continue
+        world = obj.matrix_world.copy()
+        obj.parent = None
+        obj.matrix_parent_inverse.identity()
+        obj.matrix_world = world
         obj.hide_render = True
         obj.hide_viewport = True
         obj["tj_v3_lib"] = 1
@@ -192,9 +196,12 @@ def _dup(src, loc, scale: float, yaw: float, bury: float = 0.0):
         return None
     obj = src.copy()
     obj.data = src.data
+    obj.parent = None
+    obj.matrix_parent_inverse.identity()
     bpy.context.scene.collection.objects.link(obj)
     obj.hide_render = False
     obj.hide_viewport = False
+    obj.matrix_world = Matrix.Identity(4)
     obj.scale = (scale, scale, scale)
     obj.rotation_euler = (0.0, 0.0, yaw)
     obj.location = (0.0, 0.0, 0.0)
@@ -449,18 +456,9 @@ def retune_cabin_with_source_maps() -> dict:
 
 
 def install_real_hdri() -> str:
-    if not HDRI_HDR.exists():
-        return "missing"
-    world = bpy.context.scene.world
-    if world is None or world.node_tree is None:
-        return "no_world"
-    img = bpy.data.images.load(str(HDRI_HDR), check_existing=True)
-    for node in world.node_tree.nodes:
-        if node.type == "TEX_ENVIRONMENT":
-            node.image = img
-            _log("v3_hdri_installed", image=HDRI_HDR.name)
-            return HDRI_HDR.name
-    return "no_env_node"
+    """Keep the proven sk2 JPG. The 70MB HDR built a 7GB importance map and crushed the frame."""
+    _log("v3_hdri_kept_jpg", reason="hdr_importance_map_crushed_preview")
+    return "sk2_jpg_kept"
 
 
 def setup_comp_cameras() -> list[str]:
