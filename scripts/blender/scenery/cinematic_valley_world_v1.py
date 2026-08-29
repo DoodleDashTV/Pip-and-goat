@@ -257,7 +257,7 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     local = left_half if signed < 0.0 else right_half
     south = signed < 0.0
     crest_wobble = 0.18 * math.sin(along * 0.21 + x * 0.19) + 0.08 * math.sin(x * 0.73)
-    bank_run = (2.55 if south else 1.45) + 0.50 * math.sin(along * 0.33 + (0.0 if south else 1.4))
+    bank_run = (4.40 if south else 2.20) + 0.55 * math.sin(along * 0.33 + (0.0 if south else 1.4))
     water_half = local * 0.34
     bed_half = local * 0.90
     bank_outer = local + bank_run
@@ -319,7 +319,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             height += 0.20
         river_dist, _signed, _along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if _signed < 0.0 else right_half
-        bank_outer = local_half + (2.55 if _signed < 0.0 else 1.45) + 0.50
+        bank_outer = local_half + (4.40 if _signed < 0.0 else 2.20) + 0.55
         height = sculpt_channel_height(x, y, height)
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
@@ -466,7 +466,7 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         dist, signed, along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
-        fade = local_half + (7.2 if signed < 0.0 else 4.4)
+        fade = local_half + (8.6 if signed < 0.0 else 5.2)
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
@@ -505,7 +505,7 @@ def soften_channel_crest(ground: bpy.types.Object) -> None:
             dist, signed, _along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
             local = left_half if signed < 0.0 else right_half
             bed_half = local * 0.90
-            bank_outer = local + (2.55 if signed < 0.0 else 1.45) + 0.50
+            bank_outer = local + (4.40 if signed < 0.0 else 2.20) + 0.55
             if dist < bed_half or dist > bank_outer or not neighbors[index]:
                 continue
             avg = sum(zs[j] for j in neighbors[index]) / float(len(neighbors[index]))
@@ -1064,9 +1064,33 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         face_mul.operation = "MULTIPLY"
         links.new(face_amt.outputs["Result"] if "Result" in face_amt.outputs else face_amt.outputs[0], face_mul.inputs[0])
         links.new(face_var.outputs["Result"] if "Result" in face_var.outputs else face_var.outputs[0], face_mul.inputs[1])
+        body_teal = nodes.new("ShaderNodeBsdfPrincipled")
+        if "Base Color" in body_teal.inputs:
+            body_teal.inputs["Base Color"].default_value = (
+                min(0.055, max(0.028, deep[0] * 1.8)),
+                min(0.110, max(0.062, deep[1] * 2.1)),
+                min(0.095, max(0.050, deep[2] * 1.9)),
+                1.0,
+            )
+        if "Roughness" in body_teal.inputs:
+            body_teal.inputs["Roughness"].default_value = 0.38
+        if "Metallic" in body_teal.inputs:
+            body_teal.inputs["Metallic"].default_value = 0.0
+        if "Specular IOR Level" in body_teal.inputs:
+            body_teal.inputs["Specular IOR Level"].default_value = 0.0
+        if "IOR" in body_teal.inputs:
+            body_teal.inputs["IOR"].default_value = 1.0
+        if "Emission Color" in body_teal.inputs:
+            body_teal.inputs["Emission Color"].default_value = (0.020, 0.048, 0.038, 1.0)
+        if "Emission Strength" in body_teal.inputs:
+            body_teal.inputs["Emission Strength"].default_value = 0.16
+        mix_body = nodes.new("ShaderNodeMixShader")
+        mix_body.inputs[0].default_value = 0.30
+        links.new(trans.outputs["BSDF"], mix_body.inputs[1])
+        links.new(body_teal.outputs["BSDF"], mix_body.inputs[2])
         mix_liq = nodes.new("ShaderNodeMixShader")
         links.new(face_mul.outputs["Value"], mix_liq.inputs[0])
-        links.new(trans.outputs["BSDF"], mix_liq.inputs[1])
+        links.new(mix_body.outputs["Shader"], mix_liq.inputs[1])
         links.new(glossy.outputs["BSDF"], mix_liq.inputs[2])
         glint = nodes.new("ShaderNodeBsdfGlossy")
         if hasattr(glint, "distribution"):
@@ -1092,7 +1116,7 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         if "Color" in absorb.inputs:
             absorb.inputs["Color"].default_value = (0.06, 0.13, 0.10, 1.0)
         if "Density" in absorb.inputs:
-            absorb.inputs["Density"].default_value = 0.32
+            absorb.inputs["Density"].default_value = 0.16
         links.new(absorb.outputs["Volume"], out.inputs["Volume"])
         if hasattr(mat, "cycles"):
             try:
@@ -1406,6 +1430,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     assigned = assign_purchased_water(river)
     extras = [bed]
     extras.extend(place_waterline_interruptions(centers))
+    extras.extend(place_crest_grass_tufts(centers))
     # Rectangular bank patches read as planks/bridges. Terrain wet-mask,
     # dark bed, crest trees, and a few half-sunk stones carry the breakup.
     print(json.dumps({
@@ -1549,6 +1574,50 @@ def place_bank_crest_trees(trees: list) -> list:
         if in_village(loc.x, loc.y) or in_river_channel(loc.x, loc.y, margin=0.35):
             continue
         extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.20 + 0.22 * ((i * 3) % 5) / 4.0))
+    return extras
+
+
+def place_crest_grass_tufts(centers: list[Vector]) -> list:
+    """Short green cards that break the camera-facing grass lip. Not a fence."""
+    extras = []
+    mat = bpy.data.materials.new("TJ_CrestGrassTuft")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
+    if bsdf and "Base Color" in bsdf.inputs:
+        bsdf.inputs["Base Color"].default_value = (0.040, 0.078, 0.028, 1.0)
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.94
+        if "Specular IOR Level" in bsdf.inputs:
+            bsdf.inputs["Specular IOR Level"].default_value = 0.04
+    step = 4
+    for i in range(3, max(4, len(centers) - 3), step):
+        if (i // step) % 5 == 0:
+            continue
+        center = centers[i]
+        side = _side_from_centers(centers, i)
+        left, right = _channel_halves_for_index(centers, i)
+        sign = -1.0 if (i // step) % 2 == 0 else 1.0
+        half = (left if sign < 0.0 else right) + 0.35 + 0.55 * math.sin(i * 0.41)
+        loc = center + side * (half * sign)
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(loc.x, loc.y, 0.42 + 0.10 * math.sin(i)))
+        tuft = bpy.context.object
+        tuft.name = f"TJ_CrestGrass_{i}"
+        tuft.scale = (
+            0.42 + 0.22 * ((i * 3) % 4) / 3.0,
+            0.22 + 0.10 * (i % 3) / 2.0,
+            0.07 + 0.04 * ((i * 2) % 3) / 2.0,
+        )
+        tuft.rotation_euler = (0.55 * sign, 0.28 * math.sin(i), i * 0.91)
+        try:
+            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+        except Exception:
+            pass
+        shade_smooth(tuft)
+        tuft.data.materials.clear()
+        tuft.data.materials.append(mat)
+        extras.append(tuft)
     return extras
 
 
@@ -1699,11 +1768,12 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="AREA", location=(2.0, -12.0, 5.5))
     creek = bpy.context.object
     creek.name = "TJ_CreekFill"
-    creek.data.energy = 55
-    creek.data.size = 28
+    creek.data.energy = 170
+    creek.data.size = 36
+    creek.location = (2.0, -12.0, 1.2)
     creek.rotation_euler = (0.0, 0.0, 0.0)
     if hasattr(creek.data, "color"):
-        creek.data.color = (0.72, 0.86, 0.80)
+        creek.data.color = (0.62, 0.82, 0.74)
     if hasattr(creek, "visible_glossy"):
         creek.visible_glossy = False
     for lamp in (sky, bounce, forest, creek):
