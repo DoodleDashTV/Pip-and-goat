@@ -30,44 +30,44 @@ def apply_cinematic_daylight() -> dict:
     changed = {}
     sun = bpy.data.objects.get("TJ_KeySun")
     if sun and sun.type == "LIGHT":
-        sun.data.energy = 4.15
-        sun.data.angle = math.radians(5.4)
-        sun.rotation_euler = (math.radians(47.0), math.radians(9.0), math.radians(36.0))
+        sun.data.energy = 3.55
+        sun.data.angle = math.radians(7.2)
+        sun.rotation_euler = (math.radians(44.0), math.radians(12.0), math.radians(42.0))
         if hasattr(sun.data, "color"):
-            sun.data.color = (1.0, 0.92, 0.78)
-        changed["sun"] = {"energy": 4.15, "angleDeg": 5.4, "eulerDeg": [47.0, 9.0, 36.0]}
+            sun.data.color = (1.0, 0.94, 0.80)
+        changed["sun"] = {"energy": 3.55, "angleDeg": 7.2, "eulerDeg": [44.0, 12.0, 42.0]}
     sky = bpy.data.objects.get("TJ_SkyFill")
     if sky and sky.type == "LIGHT":
-        sky.data.energy = 340.0
-        sky.data.size = 110.0
+        sky.data.energy = 520.0
+        sky.data.size = 120.0
         sky.location = (2.0, -8.0, 62.0)
         if hasattr(sky.data, "color"):
-            sky.data.color = (0.80, 0.87, 0.97)
-        changed["skyFill"] = 340.0
+            sky.data.color = (0.86, 0.90, 0.98)
+        changed["skyFill"] = 520.0
     bounce = bpy.data.objects.get("TJ_GroundBounce")
     if bounce and bounce.type == "LIGHT":
-        bounce.data.energy = 380.0
-        bounce.data.size = 48.0
+        bounce.data.energy = 520.0
+        bounce.data.size = 52.0
         bounce.location = (1.0, -6.0, 1.15)
         if hasattr(bounce.data, "color"):
-            bounce.data.color = (1.0, 0.82, 0.58)
-        changed["groundBounce"] = 380.0
+            bounce.data.color = (1.0, 0.84, 0.60)
+        changed["groundBounce"] = 520.0
     forest = bpy.data.objects.get("TJ_ForestFill")
     if forest and forest.type == "LIGHT":
-        forest.data.energy = 150.0
-        forest.data.size = 42.0
+        forest.data.energy = 240.0
+        forest.data.size = 46.0
         if hasattr(forest.data, "color"):
             forest.data.color = (0.96, 0.88, 0.72)
-        changed["forestFill"] = 150.0
+        changed["forestFill"] = 240.0
     creek = bpy.data.objects.get("TJ_CreekFill")
     if creek and creek.type == "LIGHT":
-        # Keep a soft creek bounce. Do not teal-wash the locked water.
-        creek.data.energy = 70.0
-        creek.data.size = 28.0
+        # Soft warm bank bounce. Do not teal-wash the locked water.
+        creek.data.energy = 90.0
+        creek.data.size = 30.0
         creek.location = (0.4, -12.2, 1.05)
         if hasattr(creek.data, "color"):
-            creek.data.color = (0.78, 0.80, 0.76)
-        changed["creekFill"] = 70.0
+            creek.data.color = (0.82, 0.80, 0.72)
+        changed["creekFill"] = 90.0
     louis = bpy.data.objects.get(LOUIS_FILL_NAME)
     if louis and louis.type == "LIGHT":
         louis.data.energy = LOUIS_FILL_LOCK["energy"]
@@ -98,13 +98,15 @@ def apply_world_atmosphere() -> dict:
             links.remove(link)
     if hasattr(world, "mist_settings"):
         world.mist_settings.use_mist = True
-        world.mist_settings.start = 14.0
-        world.mist_settings.depth = 78.0
+        # Louis sits ~45 m from Camera C. A 78 m depth left the range
+        # almost clear. Start after the creek, finish across the peaks.
+        world.mist_settings.start = 12.0
+        world.mist_settings.depth = 38.0
         world.mist_settings.falloff = "QUADRATIC"
     view = bpy.context.scene.view_layers[0]
     if hasattr(view, "use_pass_mist"):
         view.use_pass_mist = True
-    _log("cinematic_atmosphere_applied", density=0.0, mistStart=14.0, mistDepth=78.0)
+    _log("cinematic_atmosphere_applied", density=0.0, mistStart=12.0, mistDepth=38.0)
     return {"mode": "mist_only", "density": 0.0}
 
 
@@ -174,8 +176,62 @@ def apply_material_cohesion() -> dict:
     return notes
 
 
+def apply_hdri_cinematic_balance() -> dict:
+    """Keep the water lock. Put painted clouds in the SHOT_02 sky and de-teal reflections."""
+    world = bpy.context.scene.world
+    if world is None or world.node_tree is None:
+        return {"mode": "missing_world"}
+    nodes = world.node_tree.nodes
+    links = world.node_tree.links
+    env = next(
+        (node for node in nodes if node.type == "TEX_ENVIRONMENT" and not str(node.name).startswith("TJ_HDRI_")),
+        None,
+    )
+    if env is not None and "Vector" in env.inputs and not env.inputs["Vector"].links:
+        tex = nodes.new("ShaderNodeTexCoord")
+        tex.name = "TJ_ATMO_CamCoord"
+        mapping = nodes.new("ShaderNodeMapping")
+        mapping.name = "TJ_ATMO_CamMap"
+        mapping.inputs["Rotation"].default_value = (0.0, 0.0, 1.05)
+        links.new(tex.outputs["Generated"], mapping.inputs["Vector"])
+        links.new(mapping.outputs["Vector"], env.inputs["Vector"])
+    bg = next(
+        (node for node in nodes if node.type == "BACKGROUND" and not str(node.name).startswith("TJ_HDRI_")),
+        None,
+    )
+    if bg is not None and "Strength" in bg.inputs:
+        bg.inputs["Strength"].default_value = 1.28
+    dim = nodes.get("TJ_HDRI_Dim")
+    if dim is not None:
+        if "Color2" in dim.inputs:
+            dim.inputs["Color2"].default_value = (0.30, 0.30, 0.28, 1.0)
+        if "Fac" in dim.inputs:
+            dim.inputs["Fac"].default_value = 0.18
+    mul = nodes.get("TJ_HDRI_Mul")
+    if mul is not None and "Color2" in mul.inputs:
+        mul.inputs["Color2"].default_value = (0.62, 0.58, 0.50, 1.0)
+    refl_map = nodes.get("TJ_HDRI_ReflMap")
+    if refl_map is not None and "Rotation" in refl_map.inputs:
+        refl_map.inputs["Rotation"].default_value = (0.0, 0.0, 0.48)
+    _log("cinematic_hdri_balance", cameraRotationZ=1.05, reflectionRotationZ=0.48, strength=1.28)
+    return {"cameraRotationZ": 1.05, "reflectionRotationZ": 0.48, "strength": 1.28}
+
+
+def _lift_shadow_curve(curves_node) -> bool:
+    mapping = getattr(curves_node, "mapping", None)
+    if mapping is None or not getattr(mapping, "curves", None):
+        return False
+    combined = mapping.curves[0]
+    combined.points[0].location = (0.0, 0.05)
+    combined.points[-1].location = (1.0, 0.98)
+    if len(combined.points) < 3:
+        combined.points.new(0.42, 0.46)
+    mapping.update()
+    return True
+
+
 def apply_compositor_finish() -> None:
-    """V44-safe mist mix. Stronger far haze, beauty always in Color1."""
+    """V44-safe mist mix, then a tiny shadow lift. Beauty always stays in Color1."""
     scene = bpy.context.scene
     scene.use_nodes = True
     nodes = scene.node_tree.nodes
@@ -188,19 +244,26 @@ def apply_compositor_finish() -> None:
     fac = mix.inputs.get("Fac") or mix.inputs[0]
     color1 = mix.inputs.get("Color1") or mix.inputs.get("A") or mix.inputs[1]
     color2 = mix.inputs.get("Color2") or mix.inputs.get("B") or mix.inputs[2]
-    color2.default_value = (0.70, 0.77, 0.86, 1.0)
+    color2.default_value = (0.76, 0.82, 0.90, 1.0)
     if "Mist" in render.outputs:
         scale = nodes.new("CompositorNodeMath")
         scale.operation = "MULTIPLY"
-        scale.inputs[1].default_value = 0.28
+        scale.inputs[1].default_value = 0.48
         links.new(render.outputs["Mist"], scale.inputs[0])
         links.new(scale.outputs["Value"], fac)
     else:
         fac.default_value = 0.08
     links.new(render.outputs["Image"], color1)
     out_sock = mix.outputs.get("Color") or mix.outputs.get("Result") or mix.outputs[0]
-    links.new(out_sock, composite.inputs["Image"])
-    _log("cinematic_compositor_applied", haze=True, glare=False, vignette=False, grain=False)
+    finish = out_sock
+    curves = nodes.new("CompositorNodeCurveRGB")
+    if _lift_shadow_curve(curves):
+        image_in = curves.inputs.get("Image") or curves.inputs[1]
+        image_out = curves.outputs.get("Image") or curves.outputs[0]
+        links.new(out_sock, image_in)
+        finish = image_out
+    links.new(finish, composite.inputs["Image"])
+    _log("cinematic_compositor_applied", haze=True, hazeScale=0.48, glare=False, vignette=False, grain=False, shadowLift=True)
 
 
 def apply_color_management() -> dict:
@@ -210,10 +273,10 @@ def apply_color_management() -> dict:
         return {"mode": "missing"}
     scene.view_settings.view_transform = "AgX"
     scene.view_settings.look = "AgX - Base Contrast"
-    scene.view_settings.exposure = 0.34
+    scene.view_settings.exposure = 0.40
     scene.view_settings.gamma = 1.0
-    _log("cinematic_color_management", viewTransform="AgX", look="AgX - Base Contrast", exposure=0.34)
-    return {"viewTransform": "AgX", "look": "AgX - Base Contrast", "exposure": 0.34}
+    _log("cinematic_color_management", viewTransform="AgX", look="AgX - Base Contrast", exposure=0.40)
+    return {"viewTransform": "AgX", "look": "AgX - Base Contrast", "exposure": 0.40}
 
 
 def apply_cycles_hero_quality() -> dict:
@@ -270,12 +333,15 @@ def install_camera_rig_empties() -> list[str]:
 def apply_cinematic_master_pre_profile() -> dict:
     daylight = apply_cinematic_daylight()
     atmo = apply_world_atmosphere()
+    hdri = apply_hdri_cinematic_balance()
+    cohesion = apply_material_cohesion()
     apply_compositor_finish()
     return {
         "daylight": daylight,
         "atmosphere": atmo,
+        "hdri": hdri,
         "foliageMaterials": 0,
-        "cohesion": {},
+        "cohesion": cohesion,
     }
 
 

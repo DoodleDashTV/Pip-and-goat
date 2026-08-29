@@ -4208,7 +4208,7 @@ def main() -> int:
         "liftedShading": lifted,
         "cabinPlaceholderRepairs": cabin_repairs,
         "atmosphereExecuted": True,
-        "atmosphereMethod": "volume_scatter_plus_mist_plus_compositor",
+        "atmosphereMethod": "mist_plus_compositor",
         "contributions": contributions,
         "randomOrGeneratedStockAssetCount": 0,
         "commercialAssetPathsEmitted": False,
