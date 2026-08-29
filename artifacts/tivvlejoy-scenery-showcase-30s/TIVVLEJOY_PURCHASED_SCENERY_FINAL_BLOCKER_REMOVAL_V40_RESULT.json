@@ -4,7 +4,7 @@
   "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
   "startingSha": "0666606ff6cfa166b8268845ad9b8f234f996e1f",
   "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
-  "finalSha": "PENDING_RESULT_COMMIT",
+  "finalSha": "e86be5ec60082eb862870f8d2d46ce5b2ae1794a",
   "pr169": {
     "state": "OPEN",
     "draft": true,
