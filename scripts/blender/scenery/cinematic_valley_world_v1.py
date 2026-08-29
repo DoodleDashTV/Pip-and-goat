@@ -70,6 +70,7 @@ BED_SHOULDER_Z = -0.58
 BANK_CREST_Z = 0.78
 WATER_WIDTH_SCALE = 0.30
 BED_WIDTH_SCALE = 0.68
+WATER_THICKNESS = 0.18
 VILLAGE_X_HALF = 16.0
 VILLAGE_Y_MIN = -8.0
 VILLAGE_Y_MAX = 22.0
@@ -101,7 +102,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--profile", default="LOOKDEV_FAST")
     parser.add_argument("--hide-water", action="store_true")
     parser.add_argument("--control-tests", action="store_true")
-    parser.add_argument("--water-variant", default="A", help="A=V32 baseline, B=transmission, C=rough reflection, D=hybrid")
+    parser.add_argument("--water-variant", default="D", help="A=V32 baseline, B=transmission, C=rough reflection, D=hybrid")
     parser.add_argument("--ab-water", action="store_true", help="Render SHOT_02 once per water variant A-D")
     return parser.parse_args(argv)
 
@@ -275,12 +276,15 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
         return shoulder_z + 0.20 * (t ** 1.35) + irreg
     t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
     shelf = shoulder_z + 0.20
-    crest_z += 0.08 * math.sin(x * 1.17 + y * 0.83) + 0.05 * math.sin(along * 0.91)
-    if t < 0.38:
-        u = t / 0.38
-        return shelf + (crest_z - shelf) * (u ** 0.68)
-    u = (t - 0.38) / 0.62
-    return crest_z + (meadow_z - crest_z) * (u ** 1.15)
+    crest_z += 0.10 * math.sin(x * 1.17 + y * 0.83) + 0.07 * math.sin(along * 0.91)
+    crest_z += 0.06 * math.sin(x * 2.4 + y * 1.8)
+    # Round the camera-facing lip. Do not change trough depths or water/bed halves.
+    if t < 0.58:
+        u = t / 0.58
+        return shelf + (crest_z - shelf) * (u ** 1.55)
+    u = (t - 0.58) / 0.42
+    lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
+    return (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
 
 
 def build_terrain(_files: list[Path]) -> bpy.types.Object:
@@ -426,7 +430,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     dirt = _mix_rgb(nodes)
     if "Color1" in dirt.inputs:
         links.new(color, dirt.inputs["Color1"])
-        dirt.inputs["Color2"].default_value = (0.14, 0.09, 0.05, 1.0)
+        dirt.inputs["Color2"].default_value = (0.10, 0.068, 0.038, 1.0)
         links.new(path_fac.outputs["Value"], dirt.inputs["Fac"])
         color = dirt.outputs["Color"]
     links.new(color, bsdf.inputs["Base Color"])
@@ -462,8 +466,10 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
             value = 0.70 - 0.40 * t
         elif dist < fade:
             t = (dist - shelf) / max(0.55, fade - shelf)
-            jag_t = t + 0.18 * math.sin(along * 0.33 + x * 0.8)
-            value = max(0.0, 0.34 * ((1.0 - min(1.0, jag_t)) ** 1.55))
+            jag_t = t + 0.22 * math.sin(along * 0.33 + x * 0.8)
+            value = max(0.0, 0.26 * ((1.0 - min(1.0, jag_t)) ** 1.75))
+            if t > 0.32 and blotch < 0.45:
+                value *= 0.22
         else:
             value = 0.0
         value *= 0.80 + 0.20 * max(0.0, blotch)
@@ -672,21 +678,21 @@ def _water_variant_cfg(variant: str, tint) -> dict:
         }
     return {
         "label": "D",
-        "specular": 0.16,
-        "ior": 1.18,
+        "specular": 0.12,
+        "ior": 1.10,
         "distance_gate": False,
-        "trans_center": 0.40,
-        "trans_edge": 0.62,
-        "trans_far": 0.40,
-        "sheen": 0.14,
-        "sheen_far": 0.14,
-        "rough_lo": 0.16,
-        "rough_hi": 0.34,
+        "trans_center": 0.38,
+        "trans_edge": 0.58,
+        "trans_far": 0.38,
+        "sheen": 0.12,
+        "sheen_far": 0.12,
+        "rough_lo": 0.22,
+        "rough_hi": 0.40,
         "extra_glossy": True,
-        "glossy_color": (0.20, 0.24, 0.22, 1.0),
-        "gloss_rough_lo": 0.22,
-        "gloss_rough_hi": 0.42,
-        "bump": 0.28,
+        "glossy_color": (0.11, 0.14, 0.13, 1.0),
+        "gloss_rough_lo": 0.26,
+        "gloss_rough_hi": 0.46,
+        "bump": 0.30,
         "deep": deep,
     }
 
@@ -1027,6 +1033,7 @@ def spline_channel_mesh(
     z_edge: float,
     rows: int,
     foam_edges: bool,
+    thickness: float = 0.0,
 ) -> bpy.types.Object:
     """Variable-width strip. Left and right halves are independent."""
     verts = []
@@ -1043,10 +1050,17 @@ def spline_channel_mesh(
         along_depth = 0.55 + 0.45 * (0.5 + 0.5 * math.sin(i * 0.17))
         left_pinch = 0.80 + 0.28 * math.sin(i * 0.11) + (0.22 * math.sin(i * 0.31) if foam_edges else 0.0)
         right_pinch = 0.76 + 0.26 * math.sin(i * 0.17 + 1.3) + (0.20 * math.cos(i * 0.23) if foam_edges else 0.0)
-        if foam_edges and i % 17 == 5:
-            left_pinch *= 0.42
-        if foam_edges and i % 19 == 11:
-            right_pinch *= 0.38
+        if foam_edges:
+            south_bay = (i % 23)
+            north_bay = (i % 29)
+            if 8 <= south_bay <= 12:
+                left_pinch *= 0.52 + 0.08 * math.sin(i * 0.9)
+            if 15 <= north_bay <= 18:
+                right_pinch *= 0.48 + 0.10 * math.cos(i * 0.7)
+            if south_bay == 3:
+                left_pinch *= 0.70
+            if north_bay == 6:
+                right_pinch *= 0.66
         for col, offset in enumerate(offsets):
             pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
@@ -1062,9 +1076,9 @@ def spline_channel_mesh(
             z_jit = 0.0 if foam_edges else 0.05 * math.sin(i * 0.29 + col * 0.8)
             point.z = z_center + (z_edge - z_center) * edge + z_jit
             if foam_edges:
-                swell = 0.050 * math.sin(i * 0.21 + center.x * 0.33)
-                swell += 0.028 * math.sin(i * 0.47 + col * 1.1 + center.y * 0.28)
-                swell += 0.016 * math.sin(i * 0.89 + col * 2.3)
+                swell = 0.070 * math.sin(i * 0.19 + center.x * 0.31)
+                swell += 0.040 * math.sin(i * 0.41 + col * 1.05 + center.y * 0.26)
+                swell += 0.022 * math.sin(i * 0.77 + col * 2.0)
                 point.z += swell
             verts.append((point.x, point.y, point.z))
             if foam_edges:
@@ -1076,6 +1090,25 @@ def spline_channel_mesh(
             prev = v - rows
             for col in range(rows - 1):
                 faces.append((prev + col, prev + col + 1, v + col + 1, v + col))
+    if foam_edges and thickness > 0.002:
+        top_count = len(verts)
+        samples = top_count // rows
+        for x, y, z in list(verts):
+            verts.append((x, y, z - thickness))
+        depths.extend(depths)
+        for face in list(faces):
+            faces.append(tuple(idx + top_count for idx in reversed(face)))
+        for i in range(samples - 1):
+            a = i * rows
+            b = (i + 1) * rows
+            faces.append((a, b, b + top_count, a + top_count))
+            a = i * rows + (rows - 1)
+            b = (i + 1) * rows + (rows - 1)
+            faces.append((a + top_count, b + top_count, b, a))
+        for col in range(rows - 1):
+            faces.append((col + 1, col, col + top_count, col + 1 + top_count))
+            a = (samples - 1) * rows + col
+            faces.append((a, a + 1, a + 1 + top_count, a + top_count))
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(verts, [], faces)
     color = mesh.color_attributes.new(name="TJ_RiverDepth", type="FLOAT_COLOR", domain="POINT")
@@ -1177,6 +1210,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
         z_edge=WATER_SURFACE_Z + 0.032,
         rows=9,
         foam_edges=True,
+        thickness=WATER_THICKNESS,
     )
     assigned = assign_purchased_water(river)
     extras = [bed]
@@ -1188,6 +1222,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
         "film": river.name,
         "bedWidthScale": BED_WIDTH_SCALE,
         "waterWidthScale": WATER_WIDTH_SCALE,
+        "waterThickness": WATER_THICKNESS,
         "bedCenterZ": BED_CENTER_Z,
         "bankCrestZ": BANK_CREST_Z,
         "bankPatches": 0,
