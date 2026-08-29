@@ -439,10 +439,22 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
         return height
     if t < 0.72:
         u = t / 0.72
-        return shelf + (crest_z - shelf) * (u ** 1.65)
-    u = (t - 0.72) / 0.28
-    lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
-    return (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
+        height = shelf + (crest_z - shelf) * (u ** 1.65)
+    else:
+        u = (t - 0.72) / 0.28
+        lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
+        height = (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
+    if HERO_X_MIN <= x <= HERO_X_MAX:
+        # Hero C looks at this north lip. Break the continuous grass shelf.
+        notch = (0.5 + 0.5 * math.sin(x * 0.73 + along * 0.31))
+        notch *= (0.5 + 0.5 * math.sin(x * 1.55 + 0.4))
+        bulge = (0.5 + 0.5 * math.cos(x * 0.41 + along * 0.52))
+        if notch > 0.68:
+            height -= 0.42 * ((notch - 0.68) / 0.32)
+        if bulge > 0.80:
+            height += 0.18 * ((bulge - 0.80) / 0.20)
+        height += 0.10 * math.sin(x * 2.2 + y * 1.4)
+    return height
 
 
 def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
@@ -680,6 +692,8 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                     value *= 0.22
             else:
                 value = 0.0
+            if HERO_X_MIN <= x <= HERO_X_MAX and dist < local_half + 2.4:
+                value = max(value, 0.40 + 0.20 * blotch)
         value *= 0.80 + 0.20 * max(0.0, blotch)
         color.data[index].color = (value, value, value, 1.0)
 
@@ -2122,6 +2136,10 @@ def place_hero_creek_interactions(centers: list[Vector], mat: bpy.types.Material
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
             loc.z = WATER_SURFACE_Z + (0.08 if len(used) % 2 else -0.02)
             extras.append(_add_lumpy_rock(f"TJ_HeroStone_{i}", loc, 2.8 + 0.5 * (len(used) % 3), mat, i * 0.47))
+            if len(used) in {2, 4}:
+                nloc = center + side * (left * WATER_WIDTH_SCALE * 0.55)
+                nloc.z = WATER_SURFACE_Z + 0.04
+                extras.append(_add_lumpy_rock(f"TJ_HeroStoneN_{i}", nloc, 2.1, mat, i * 0.61 + 0.4))
     return extras
 
 
