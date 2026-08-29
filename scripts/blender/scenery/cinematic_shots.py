@@ -134,10 +134,10 @@ def hero_search_cameras() -> list[dict]:
         {
             "id": "C",
             "name": "across_creek_opposite_bank",
-            "location": (1.4, -19.8, 2.72),
-            "look": (-3.6, -10.4, 0.00),
+            "location": (1.5, -20.2, 3.10),
+            "look": (-3.5, 0.8, 1.10),
             "lens": 32.0,
-            "why": "V37 hero: creek-first diagonal with a thin horizon so mountains stay readable behind the off-axis cabin.",
+            "why": "V42 hero: creek-first diagonal with a slightly longer look so a Louis face can read above the off-axis cabin.",
         },
         {
             "id": "D",
@@ -176,12 +176,15 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_02",
             "camera": "TJ_SHOT_02_CAM",
-            # V37: camera C remains authoritative, with a lower sightline and
-            # wider lens so the creek leads before the off-axis cabin resolves.
+            # V42: keep camera C's creek-first identity, but look a little
+            # farther/higher so a purchased Louis face can occupy the sky
+            # beside the off-axis cabin. V41 proved the old -14° pitch left
+            # only an 8° wedge — a mountain sliver, not a range.
             "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
             "publishedV37": {"location": (0.2, -23.2, 3.05), "look": (-5.8, -5.2, 0.20), "lens": 34.0},
-            "start": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, 0.00), "lens": 32.0},
-            "end": {"location": (2.8, -18.8, 2.82), "look": (-1.8, -9.2, 0.10), "lens": 34.0},
+            "retiredV41": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, 0.00), "lens": 32.0},
+            "start": {"location": (1.5, -20.2, 3.10), "look": (-3.5, 0.8, 1.10), "lens": 32.0},
+            "end": {"location": (2.6, -19.2, 3.22), "look": (-1.6, 2.4, 1.30), "lens": 34.0},
         },
         {
             "id": "SHOT_03",

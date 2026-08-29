@@ -101,6 +101,55 @@ def hero_grass_lip(x: float, along: float) -> float:
     return max(-0.70, min(1.00, sum(lips) + wobble))
 
 
+def hero_shore_event(x: float) -> dict:
+    """Blend 8 irregular SHOT_02 south-bank events. Distances are metres.
+
+    Keys:
+    soil/damp/wet: outward run from the water film edge
+    water: signed water-edge offset (+ into bank, - grass overhang)
+    grass: extra grass run past the soil
+    """
+    empty = {"kind": "none", "soil": 1.7, "damp": 1.05, "wet": 0.55, "water": 0.0, "grass": 0.12}
+    if x < HERO_X_MIN or x > HERO_X_MAX:
+        return empty
+    events = (
+        (-10.4, 1.20, "retreat", 2.35, 1.55, 0.82, 0.32, 0.04),
+        (-7.8, 1.05, "inlet", 1.15, 0.62, 0.28, 0.58, 0.02),
+        (-5.6, 0.88, "rock", 1.55, 0.95, 0.68, 0.08, 0.10),
+        (-3.2, 1.25, "bay", 2.55, 1.75, 1.08, 0.42, 0.00),
+        (-0.6, 0.92, "overhang", 1.05, 0.55, 0.26, -0.18, 0.38),
+        (1.8, 1.00, "gravel", 1.95, 1.35, 0.92, 0.22, 0.05),
+        (4.2, 1.18, "shelf", 2.75, 1.95, 1.22, 0.18, 0.06),
+        (6.6, 0.98, "cut", 1.35, 0.78, 0.42, 0.48, 0.03),
+    )
+    weight_sum = 0.0
+    soil = damp = wet = water = grass = 0.0
+    best_kind = "blend"
+    best_w = 0.0
+    for cx, radius, kind, s, d, w, wat, g in events:
+        ww = _gaussian(x, cx, radius)
+        soil += s * ww
+        damp += d * ww
+        wet += w * ww
+        water += wat * ww
+        grass += g * ww
+        weight_sum += ww
+        if ww > best_w:
+            best_w = ww
+            best_kind = kind
+    if weight_sum < 0.08:
+        return empty
+    inv = 1.0 / weight_sum
+    return {
+        "kind": best_kind,
+        "soil": max(0.85, soil * inv),
+        "damp": max(0.40, damp * inv),
+        "wet": max(0.18, wet * inv),
+        "water": max(-0.22, min(0.70, water * inv)),
+        "grass": max(0.0, grass * inv),
+    }
+
+
 def hero_south_wet_tongue(x: float, y: float, along: float) -> float:
     """Discontinuous soil on the camera-side bank so grass cannot hold one lip."""
     if x < HERO_X_MIN or x > HERO_X_MAX:

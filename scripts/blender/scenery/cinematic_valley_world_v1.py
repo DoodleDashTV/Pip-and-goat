@@ -24,6 +24,7 @@ from cinematic_creek_profile import (  # noqa: E402
     hero_grass_lip,
     hero_north_notch_depth,
     hero_north_wet_tongue,
+    hero_shore_event,
     hero_south_wet_tongue,
     hero_waterline_bite,
 )
@@ -38,6 +39,7 @@ from mathutils.geometry import interpolate_bezier  # noqa: E402
 from showcase_original14_30s import (  # noqa: E402
     append_named_objects,
     duplicate_mesh_in_world,
+    enable_foliage_alpha,
     ensure_purchased_albedos,
     expand_asset,
     geometry_candidates,
@@ -383,6 +385,10 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     bank_run = (SOUTH_BANK_RUN if south else NORTH_BANK_RUN) + 0.70 * math.sin(along * 0.33 + (0.0 if south else 1.4))
     bite = hero_grass_lip(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
     water_half = local * 0.34 + max(0.0, bite) * 0.22
+    if south and HERO_X_MIN <= x <= HERO_X_MAX:
+        # Terrain must follow the same erosion events as the hero bank mesh.
+        ev = hero_shore_event(x)
+        water_half = local * WATER_WIDTH_SCALE * max(0.55, min(1.50, 1.0 + 0.70 * ev["water"]))
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
@@ -632,6 +638,156 @@ def place_meadow_ecology() -> list:
             needle_col if is_needle else dirt_col,
             i * 0.41,
         ))
+    return extras
+
+
+def load_purchased_grass(files: list[Path]):
+    """Load Grass01_LOD0 as real vegetation, not a ground albedo card."""
+    path = next((item for item in files if item.name.lower() == "grass01.blend"), None)
+    if path is None:
+        return None
+    wanted = ["Grass01_LOD0", "Grass01", "Grass01_LOD1"]
+    members = append_named_objects(path, wanted)
+    src = None
+    for obj in members:
+        name = obj.name.lower()
+        if obj.type != "MESH":
+            obj.hide_render = True
+            obj.hide_viewport = True
+            continue
+        if "lod2" in name or "lod1" in name or "grid" in name:
+            obj.hide_render = True
+            obj.hide_viewport = True
+            continue
+        if src is None:
+            src = obj
+    if src is None:
+        live = [obj for obj in members if obj.type == "MESH"]
+        src = live[0] if live else None
+    if src is None:
+        return None
+    src.hide_render = True
+    src.hide_viewport = True
+    src.location = (0.0, -420.0, -90.0)
+    enable_foliage_alpha([src])
+    print(json.dumps({"event": "purchased_grass_loaded", "name": src.name}), flush=True)
+    return src
+
+
+def _plant_grass(src, loc, scale: float, yaw: float):
+    sap = duplicate_mesh_in_world(src, loc, scale)
+    sap.hide_render = False
+    sap.hide_viewport = False
+    sap.rotation_euler.z += yaw
+    sap.location.z = 0.02
+    if hasattr(sap, "visible_shadow"):
+        sap.visible_shadow = False
+    return sap
+
+
+def place_structural_meadow_zones(grass_src, trees: list) -> list:
+    """SHOT_01/02 ecological zones via density, height, and real objects.
+
+    Shader continents stay as support. These plants/stones/litter are the
+    structural difference that stops the meadow reading as one masked plane.
+    """
+    extras = []
+    dirt = (0.160, 0.096, 0.046)
+    needle = (0.030, 0.042, 0.016)
+    live_trees = [obj for obj in trees if obj and obj.type == "MESH"]
+    # (x, y, scale, yaw) — irregular, no grid.
+    dense_healthy = (
+        (-6.4, 7.2, 2.8, 0.20), (-4.8, 9.6, 3.1, 1.10), (-2.2, 8.0, 2.6, 2.40),
+        (-5.6, 12.4, 3.4, 0.70), (-1.4, 11.2, 2.9, 3.80), (-7.8, 10.8, 2.4, 5.10),
+        (-3.6, 14.8, 3.2, 1.90), (0.4, 9.4, 2.7, 4.20), (-8.8, 7.6, 2.5, 0.40),
+        (-0.8, 13.6, 3.0, 2.80), (-4.0, 6.2, 2.3, 1.50), (-6.8, 15.2, 2.8, 3.30),
+    )
+    short_earth = (
+        (6.2, 18.4, 1.15, 0.30), (8.8, 21.0, 0.95, 2.10), (4.6, 22.8, 1.25, 4.00),
+        (7.4, 16.2, 0.85, 1.20), (10.2, 19.6, 1.05, 3.50), (5.4, 26.4, 0.90, 5.40),
+        (9.6, 24.8, 1.20, 0.80),
+    )
+    needle_zone = (
+        (-16.4, 14.2, 1.6, 0.50), (-14.2, 18.6, 1.4, 2.20), (-17.8, 20.4, 1.8, 4.10),
+        (-13.0, 12.8, 1.3, 1.70), (-15.6, 23.2, 1.5, 3.90),
+    )
+    tall_wild = (
+        (-2.8, -3.4, 4.2, 0.25), (1.6, -5.2, 3.8, 1.80), (-5.2, -1.2, 4.6, 3.40),
+        (0.2, -1.8, 3.6, 5.00), (3.4, 1.2, 4.0, 2.10), (-1.2, 2.4, 4.4, 0.90),
+        (2.2, -7.0, 3.4, 4.60), (-4.4, 3.8, 3.9, 1.40),
+    )
+    worn_strip = (
+        (-3.8, -6.8, 0.72, 0.10), (-1.6, -4.6, 0.64, 2.40), (0.4, -2.2, 0.80, 4.20),
+        (-2.4, 0.6, 0.58, 1.10), (1.2, 3.2, 0.70, 3.30),
+    )
+    rocky_sparse = (
+        (7.8, 8.4, 1.10, 0.60), (10.4, 12.2, 0.88, 2.90), (6.6, 13.6, 1.00, 4.80),
+    )
+    cabin_edge = (
+        (-8.4, 2.2, 1.8, 0.40), (-11.2, 6.4, 1.5, 2.20), (8.2, 4.8, 1.6, 3.70),
+        (-7.2, 8.8, 2.0, 1.10),
+    )
+    groups = (
+        ("A_dense", dense_healthy),
+        ("B_earth", short_earth),
+        ("C_needle", needle_zone),
+        ("D_wild", tall_wild),
+        ("E_worn", worn_strip),
+        ("F_rocky", rocky_sparse),
+        ("G_cabin", cabin_edge),
+    )
+    planted = 0
+    if grass_src is not None:
+        for tag, plants in groups:
+            for i, (x, y, scale, yaw) in enumerate(plants):
+                if in_river_channel(x, y, margin=1.35):
+                    continue
+                if abs(x) < 3.2 and -4.0 < y < 18.0:
+                    continue
+                extras.append(_plant_grass(grass_src, (x, y, 0.0), scale, yaw + 0.17 * i))
+                planted += 1
+    # Macro dressings: bare openings, needle beds, stone groups — few and intentional.
+    macros = (
+        (7.2, 20.6, 3.8, 1.6, dirt, 0.22),
+        (9.4, 17.8, 2.6, 1.2, dirt, 1.10),
+        (5.8, 24.2, 3.2, 1.4, dirt, 2.40),
+        (-15.2, 16.8, 4.4, 2.2, needle, 0.55),
+        (-17.0, 21.6, 3.6, 1.8, needle, 1.80),
+        (-2.0, -5.8, 2.8, 1.1, dirt, 0.90),
+        (0.8, 1.4, 2.2, 0.9, dirt, 2.10),
+        (8.6, 10.8, 2.4, 1.0, dirt, 3.20),
+    )
+    for i, (x, y, sx, sy, color, yaw) in enumerate(macros):
+        if in_river_channel(x, y, margin=1.2):
+            continue
+        extras.append(_add_eco_disk(f"TJ_ZoneBed_{i}", Vector((x, y, 0.08)), sx, sy, color, yaw))
+    stone_mat = dirt_bank_material()
+    if stone_mat.node_tree:
+        body = next((node for node in stone_mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+        if body and "Base Color" in body.inputs:
+            body.inputs["Base Color"].default_value = (0.22, 0.18, 0.14, 1.0)
+    rocks = (
+        (8.2, 11.6, 0.85), (9.4, 10.4, 0.62), (7.4, 10.2, 0.48),
+        (6.6, 21.4, 0.70), (-1.4, -6.6, 0.55),
+    )
+    for i, (x, y, scale) in enumerate(rocks):
+        if in_river_channel(x, y, margin=1.0):
+            continue
+        extras.append(_add_lumpy_rock(f"TJ_MeadowStone_{i}", Vector((x, y, 0.06)), scale, stone_mat, i * 0.73))
+    if live_trees:
+        saplings = ((-15.8, 15.4, 0.16), (-14.4, 20.8, 0.13), (-17.2, 18.2, 0.18))
+        for i, (x, y, scale) in enumerate(saplings):
+            if in_river_channel(x, y, margin=0.8):
+                continue
+            if abs(x) < 3.2 and -4.0 < y < 18.0:
+                continue
+            extras.append(plant_purchased_tree(live_trees[i % len(live_trees)], (x, y, 0.0), scale))
+    print(json.dumps({
+        "event": "structural_meadow_zones",
+        "grassPlants": planted,
+        "zones": 7,
+        "macros": len(macros),
+    }), flush=True)
     return extras
 
 
@@ -1888,13 +2044,9 @@ def spline_channel_mesh(
             if south_bay == 19:
                 left_pinch *= 0.62
             if HERO_X_MIN <= center.x <= HERO_X_MAX:
-                if south_bay in {1, 2, 7, 14, 20}:
-                    left_pinch *= 0.48 + 0.16 * math.sin(i * 1.3)
-                if south_bay in {5, 16}:
-                    left_pinch *= 1.22
-                bite = hero_waterline_bite(center.x, float(i) * 0.85)
-                left_pinch *= max(0.38, min(1.65, 1.0 + 0.70 * bite))
-                right_pinch *= max(0.52, min(1.40, 1.0 + 0.34 * bite))
+                event = hero_shore_event(center.x)
+                left_pinch *= max(0.40, min(1.55, 1.0 + 0.85 * event["water"]))
+                right_pinch *= max(0.58, min(1.28, 1.0 + 0.22 * event["water"]))
         for col, offset in enumerate(offsets):
             pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
@@ -2062,6 +2214,7 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     assigned = assign_purchased_water(river)
     extras = [bed]
     extras.extend(place_waterline_interruptions(centers))
+    extras.extend(build_hero_bank_support(centers))
     # Crest-grass cubes read as mint slabs from SHOT_02. Waterline stones
     # and the irregular wet-mask now break the isoline instead.
     # Hanging-grass cards and rectangular bank patches stay off.
@@ -2109,6 +2262,66 @@ def extract_louis_height_cap(src: bpy.types.Object, z_frac: float) -> bpy.types.
     return src
 
 
+def clip_louis_world_apron(obj: bpy.types.Object, south_y: float) -> int:
+    """Remove only the valley-flooding foot. The purchased face stays in camera."""
+    if obj.type != "MESH" or obj.data is None:
+        return 0
+    if obj.data.users > 1:
+        obj.data = obj.data.copy()
+    bpy.context.view_layer.update()
+    mw = obj.matrix_world
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    dead = [vert for vert in bm.verts if (mw @ vert.co).y < south_y]
+    removed = len(dead)
+    if dead:
+        bmesh.ops.delete(bm, geom=dead, context="VERTS")
+    bm.to_mesh(obj.data)
+    bm.free()
+    obj.data.update()
+    print(json.dumps({
+        "event": "louis_apron_clipped",
+        "name": obj.name,
+        "southY": south_y,
+        "removed": removed,
+    }), flush=True)
+    return removed
+
+
+def lift_louis_face_shading(obj: bpy.types.Object) -> None:
+    """Give the SHOT_02 Louis face value separation without changing SHOT_05."""
+    for slot in obj.material_slots:
+        mat = slot.material
+        if mat is None or not mat.node_tree:
+            continue
+        if mat.users > 1:
+            mat = mat.copy()
+            slot.material = mat
+        bsdf = next((node for node in mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+        if bsdf is None or "Base Color" not in bsdf.inputs:
+            continue
+        mix = _mix_rgb(mat.node_tree.nodes)
+        if "Color1" not in mix.inputs:
+            continue
+        mix.inputs["Fac"].default_value = 0.24
+        mix.inputs["Color2"].default_value = (0.42, 0.38, 0.28, 1.0)
+        links = list(bsdf.inputs["Base Color"].links)
+        if links:
+            src = links[0].from_socket
+            try:
+                mat.node_tree.links.remove(links[0])
+            except Exception:
+                pass
+            mat.node_tree.links.new(src, mix.inputs["Color1"])
+        else:
+            mix.inputs["Color1"].default_value = bsdf.inputs["Base Color"].default_value
+        mat.node_tree.links.new(mix.outputs["Color"], bsdf.inputs["Base Color"])
+        if "Roughness" in bsdf.inputs and not bsdf.inputs["Roughness"].links:
+            bsdf.inputs["Roughness"].default_value = 0.78
+        if "Specular IOR Level" in bsdf.inputs:
+            bsdf.inputs["Specular IOR Level"].default_value = 0.12
+
+
 def sit_louis_peak(obj: bpy.types.Object, peak_x: float, peak_y: float, scale: float, rot_z: float = 0.0, z_lift: float = 0.0) -> None:
     """Place the tallest purchased vertex on camera C's sky-gap ray."""
     obj.parent = None
@@ -2145,10 +2358,10 @@ def sit_louis_peak(obj: bpy.types.Object, peak_x: float, peak_y: float, scale: f
 
 
 def _shot02_ts(x: float, y: float) -> list[float]:
-    """Camera C start: (1.4, -19.8) look (-3.6, -10.4)."""
-    dx = x - 1.4
-    dy = y + 19.8
-    return [round(dx * -0.470 + dy * 0.884, 2), round(dx * 0.884 + dy * 0.470, 2)]
+    """Camera C V42 start: (1.5, -20.2) look (-3.5, 0.8)."""
+    dx = x - 1.5
+    dy = y + 20.2
+    return [round(dx * -0.232 + dy * 0.973, 2), round(dx * 0.973 + dy * 0.232, 2)]
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0, rot_z: float = 0.0) -> None:
@@ -2205,10 +2418,13 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     grassy1 = next((obj for obj in peaks if "grassymountain1" in obj.name.lower()), None)
     grassy2 = next((obj for obj in peaks if "grassymountain2" in obj.name.lower()), None)
     grassy3 = next((obj for obj in peaks if "grassymountain3" in obj.name.lower()), None)
-    # Camera C has only ~8° of sky above the cabin. A readable Louis range
-    # must be a WIDE face in that band (s≈8.5, elev 9–14°), not a tall sliver.
+    # V42 Camera C looks farther, so a FULL purchased Louis mass can sit in
+    # the right-of-look corridor. Do not crop to a 20% cap — that was a sliver.
     if meadow1 is not None:
-        sit_louis_peak(meadow1, -10.0, 24.0, scale=0.16, rot_z=0.40, z_lift=0.0)
+        # Foothill in front of the SHOT_02 Louis face. Keep most of the mass.
+        extract_louis_height_cap(meadow1, 0.22)
+        sit_louis_peak(meadow1, -7.2, 30.0, scale=0.16, rot_z=0.36, z_lift=0.0)
+        clip_louis_world_apron(meadow1, south_y=15.5)
         link_exclusive(meadow1, collection)
         placed.append(meadow1)
     if meadow2 is not None:
@@ -2216,12 +2432,17 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
         link_exclusive(meadow2, collection)
         placed.append(meadow2)
     if meadow3 is not None:
-        sit_louis_peak(meadow3, -20.0, 56.0, scale=0.12, rot_z=0.24, z_lift=0.3)
+        sit_louis_peak(meadow3, -6.0, 50.0, scale=0.17, rot_z=0.26, z_lift=0.2)
+        clip_louis_world_apron(meadow3, south_y=18.0)
         link_exclusive(meadow3, collection)
         placed.append(meadow3)
     if grassy1 is not None:
-        extract_louis_height_cap(grassy1, 0.80)
-        sit_louis_peak(grassy1, -18.5, 36.0, scale=0.78, rot_z=0.42, z_lift=0.0)
+        # Keep the purchased FACE (slope + shoulder + ridge), not a 20% cap.
+        # Clip only the 500 m apron that would flood the creek/village.
+        extract_louis_height_cap(grassy1, 0.30)
+        sit_louis_peak(grassy1, -1.6, 38.0, scale=0.28, rot_z=0.34, z_lift=0.15)
+        clip_louis_world_apron(grassy1, south_y=16.0)
+        lift_louis_face_shading(grassy1)
         link_exclusive(grassy1, collection)
         placed.append(grassy1)
     # SHOT_05 hero peak is locked. Do not move or restyle it.
@@ -2479,13 +2700,143 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
     return obj
 
 
+def build_hero_bank_support(centers: list[Vector]) -> list:
+    """One continuous SHOT_02 south-bank stack: wet → damp → soil → grass.
+
+    Limited to the camera-visible hero corridor. Fills under hero rocks so
+    the shoreline is an erosion surface, not stacked overlays with holes.
+    """
+    extras = []
+    soil_mat = dirt_bank_material()
+    wet_mat = dirt_bank_material()
+    if wet_mat.node_tree:
+        body = next((node for node in wet_mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+        if body and "Base Color" in body.inputs:
+            body.inputs["Base Color"].default_value = (0.070, 0.050, 0.028, 1.0)
+        if body and "Roughness" in body.inputs:
+            body.inputs["Roughness"].default_value = 0.62
+        if body and "Specular IOR Level" in body.inputs:
+            body.inputs["Specular IOR Level"].default_value = 0.28
+    grass_mat = dirt_bank_material()
+    if grass_mat.node_tree:
+        body = next((node for node in grass_mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+        if body and "Base Color" in body.inputs:
+            body.inputs["Base Color"].default_value = (0.046, 0.082, 0.028, 1.0)
+    hero = [c for c in centers if HERO_X_MIN <= c.x <= HERO_X_MAX]
+    if len(hero) < 6:
+        return extras
+    layers = (
+        ("TJ_HeroWetShelf", wet_mat, "wet", WATER_SURFACE_Z + 0.02, WATER_SURFACE_Z + 0.06),
+        ("TJ_HeroDampShelf", soil_mat, "damp", WATER_SURFACE_Z + 0.07, -0.28),
+        ("TJ_HeroSoilShelf", soil_mat, "soil", -0.22, 0.08),
+        ("TJ_HeroGrassLip", grass_mat, "grass", 0.04, 0.18),
+    )
+    for name, mat, key, z_in, z_out in layers:
+        verts = []
+        faces = []
+        rows = 4
+        usable = 0
+        for i, center in enumerate(hero):
+            side = _side_from_centers(hero, i)
+            left, _right = _channel_halves_for_index(centers, _nearest_center_index(centers, center))
+            event = hero_shore_event(center.x)
+            water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.55 * event["water"])
+            if key == "wet":
+                inner, outer = water_edge * 0.15, water_edge + event["wet"]
+            elif key == "damp":
+                inner, outer = water_edge * 0.35, water_edge + event["damp"]
+            elif key == "soil":
+                inner, outer = water_edge * 0.55, water_edge + event["soil"]
+            else:
+                inner = water_edge + event["soil"] * 0.35
+                outer = water_edge + event["soil"] + 0.85 + event["grass"]
+            for row in range(rows):
+                t = row / float(rows - 1)
+                lat = inner + (outer - inner) * t
+                point = center + side * (-lat)
+                point.z = z_in + (z_out - z_in) * (t ** 1.15)
+                point.z += 0.03 * math.sin(center.x * 1.7 + row * 0.8)
+                verts.append((point.x, point.y, point.z))
+            usable += 1
+            if usable > 1:
+                v = (usable - 1) * rows
+                prev = v - rows
+                for row in range(rows - 1):
+                    faces.append((prev + row, prev + row + 1, v + row + 1, v + row))
+        mesh = bpy.data.meshes.new(name)
+        mesh.from_pydata(verts, [], faces)
+        mesh.update()
+        obj = bpy.data.objects.new(name, mesh)
+        bpy.context.scene.collection.objects.link(obj)
+        shade_smooth(obj)
+        obj.data.materials.append(mat)
+        if hasattr(obj, "visible_shadow"):
+            obj.visible_shadow = False
+        extras.append(obj)
+    extras.extend(place_hero_embedded_rocks(centers, soil_mat))
+    print(json.dumps({"event": "hero_bank_support_built", "layers": 4, "heroSamples": len(hero)}), flush=True)
+    return extras
+
+
+def _nearest_center_index(centers: list[Vector], point: Vector) -> int:
+    best = 0
+    best_d = 1e9
+    for i, center in enumerate(centers):
+        d = (center - point).length_squared
+        if d < best_d:
+            best_d = d
+            best = i
+    return best
+
+
+def place_hero_embedded_rocks(centers: list[Vector], soil_mat: bpy.types.Material) -> list:
+    """Partially bury hero rocks in the support surface. No floating gaps."""
+    extras = []
+    mat = wet_stone_material()
+    picks = (
+        (-9.6, 1.55, 0.22, 0.55),
+        (-7.4, 2.05, 0.38, 0.62),
+        (-5.5, 1.85, 0.18, 0.48),
+        (-3.1, 2.35, 0.42, 0.70),
+        (-0.4, 1.65, 0.28, 0.50),
+        (1.9, 1.95, 0.34, 0.58),
+        (4.4, 1.75, 0.20, 0.46),
+        (6.4, 1.60, 0.30, 0.52),
+    )
+    used = set()
+    for i, center in enumerate(centers):
+        if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+            continue
+        side = _side_from_centers(centers, i)
+        left, _right = _channel_halves_for_index(centers, i)
+        for px, scale, inward, bury in picks:
+            if px in used or abs(center.x - px) > 0.85:
+                continue
+            used.add(px)
+            loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
+            loc.z = WATER_SURFACE_Z - bury * 0.30
+            rock = _add_lumpy_rock(f"TJ_HeroEmbed_{i}", loc, scale, mat, i * 0.47)
+            extras.append(rock)
+            mound = _add_lumpy_rock(f"TJ_HeroEmbedSoil_{i}", loc, scale * 1.25, soil_mat, i * 0.31)
+            mound.scale = (1.55, 1.22, 0.34)
+            mound.location.z = WATER_SURFACE_Z - 0.05
+            extras.append(mound)
+            collar = _add_lumpy_rock(f"TJ_HeroCollar_{i}", loc, scale * 1.55, soil_mat, i * 0.19)
+            collar.scale = (1.95, 1.55, 0.16)
+            collar.location.z = WATER_SURFACE_Z - 0.03
+            extras.append(collar)
+    return extras
+
+
 def place_waterline_interruptions(centers: list[Vector]) -> list:
     """Hero-scale stones that visibly enter the water in the SHOT_02 frustum."""
     extras = []
     mat = wet_stone_material()
-    hero_xs = (-9.4, -5.8, -2.0, 2.2, 6.6, 10.8)
-    cut_xs = (-8.0, -3.4, 1.6, 7.2, 11.4)
-    island_xs = (-1.4, 5.8)
+    # Hero-corridor overlay stones created the V41 triangular voids.
+    # Embedded rocks in build_hero_bank_support own that section now.
+    hero_xs = (10.8, 14.6)
+    cut_xs = (11.4, 15.2)
+    island_xs = (16.2,)
     used_hero = set()
     used_cut = set()
     used_island = set()
@@ -2498,8 +2849,8 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
             used_hero.add(hx)
             inward = 0.28 + 0.34 * ((len(used_hero) * 3) % 5) / 4.0
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
-            loc.z = WATER_SURFACE_Z + 0.05
-            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 2.05 + 0.30 * (len(used_hero) % 3), mat, i * 0.71))
+            loc.z = WATER_SURFACE_Z - 0.08
+            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 1.55 + 0.22 * (len(used_hero) % 3), mat, i * 0.71))
         for cx in cut_xs:
             if cx in used_cut or abs(center.x - cx) > 1.05:
                 continue
@@ -2519,13 +2870,11 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
     # Near-camera boulder so SHOT_02 has a foreground waterline cue.
     extras.append(_add_lumpy_rock(
         "TJ_FgBankRock",
-        Vector((-12.4, -16.2, WATER_SURFACE_Z + 0.04)),
-        1.9,
+        Vector((-12.4, -16.2, WATER_SURFACE_Z - 0.10)),
+        1.55,
         mat,
         1.15,
     ))
-    extras.extend(place_hero_creek_interactions(centers, mat))
-    extras.extend(place_hero_soil_scars(centers))
     return extras
 
 
@@ -2910,7 +3259,7 @@ def cover_camera_facing_openings() -> list:
 
 
 def open_shot02_mountain_gap() -> int:
-    """Hide trees sitting in camera C's right-of-cabin sky corridor."""
+    """Hide only trees in the right-of-cabin distance corridor. Do not gut the forest."""
     hidden = 0
     for obj in list(bpy.data.objects):
         if obj.type != "MESH" or "tree" not in obj.name.lower():
@@ -2918,9 +3267,7 @@ def open_shot02_mountain_gap() -> int:
         if obj.name.lower().startswith("tj_shot05") or obj.name.lower().startswith("tj_shot03"):
             continue
         loc = obj.matrix_world.translation
-        if -30.0 <= loc.x <= 6.0 and 8.0 <= loc.y <= 72.0:
-            if loc.x >= 14.0:
-                continue
+        if -3.5 <= loc.x <= 11.0 and 10.0 <= loc.y <= 46.0:
             obj.hide_render = True
             obj.hide_viewport = True
             hidden += 1
@@ -3253,7 +3600,17 @@ def setup_lighting_hierarchy() -> None:
         creek.data.color = (0.62, 0.82, 0.74)
     if hasattr(creek, "visible_glossy"):
         creek.visible_glossy = False
-    for lamp in (sky, bounce, forest, creek):
+    bpy.ops.object.light_add(type="AREA", location=(6.0, 26.0, 20.0))
+    louis = bpy.context.object
+    louis.name = "TJ_LouisFaceFill"
+    louis.data.energy = 150
+    louis.data.size = 56
+    louis.rotation_euler = (math.radians(64), math.radians(-12), math.radians(22))
+    if hasattr(louis.data, "color"):
+        louis.data.color = (1.0, 0.90, 0.78)
+    if hasattr(louis, "visible_glossy"):
+        louis.visible_glossy = False
+    for lamp in (sky, bounce, forest, creek, louis):
         if hasattr(lamp.data, "use_shadow"):
             lamp.data.use_shadow = False
 
@@ -3637,6 +3994,9 @@ def main() -> int:
     west_bg = scatter_clumps(trees, (-38.0, 58.0, 0.0), 2, 2, 9.0, 1.6, 13)
     east_bg = scatter_clumps(trees, (30.0, 58.0, 0.0), 2, 2, 9.0, 1.65, 17)
     open_shot02_mountain_gap()
+    grass_src = load_purchased_grass(village_files)
+    for prop in place_structural_meadow_zones(grass_src, trees):
+        link_exclusive(prop, collections["WORLD_TERRAIN"])
     foreground = west_fg + east_fg
     midground = west_mg + east_mg
     background = west_bg + east_bg

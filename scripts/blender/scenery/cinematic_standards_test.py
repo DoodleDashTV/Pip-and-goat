@@ -34,6 +34,7 @@ from cinematic_creek_profile import (
     hero_grass_lip,
     hero_north_notch_depth,
     hero_north_wet_tongue,
+    hero_shore_event,
     hero_south_wet_tongue,
     hero_waterline_bite,
 )
@@ -129,18 +130,23 @@ def test_six_shot_plan():
     assert shot03["start"]["location"][2] <= 6.0
     assert shot03["start"]["location"][1] <= -12.0
     shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
-    # V37 keeps camera C, but pitches below the cabin so the creek owns more frame.
+    # V42 still keeps camera C creek-first and off-axis, but allows a micro
+    # pitch-up so a Louis face can occupy the sky beside the cabin.
     assert shot02["start"]["location"][1] < -16.0
     assert shot02["start"]["look"][1] > shot02["start"]["location"][1]
     assert shot02["start"]["location"][2] < 6.0
-    assert shot02["start"]["look"][2] <= 0.0
-    assert shot02["start"]["lens"] <= 34.0
+    assert shot02["start"]["look"][2] <= 1.6
+    assert 30.0 <= shot02["start"]["lens"] <= 36.0
     direction = tuple(
         shot02["start"]["look"][i] - shot02["start"]["location"][i]
         for i in range(3)
     )
     horizontal = math.hypot(direction[0], direction[1])
-    assert math.degrees(math.atan2(direction[2], horizontal)) <= -7.5
+    pitch = math.degrees(math.atan2(direction[2], horizontal))
+    assert pitch <= -4.5
+    assert pitch >= -12.0
+    # Look farther than the near bank so distant Louis can enter the frame.
+    assert shot02["start"]["look"][1] >= -4.0
     # Cabin01 is near x=-9.2; it must stay a destination, not the frame center.
     assert abs(shot02["start"]["look"][0] - (-9.2)) >= 3.0
     assert len(lookdev_frames()) == 12
@@ -185,6 +191,10 @@ def test_v37_north_bank_breakup_is_broad_and_discontinuous():
     assert hero_grass_lip(-14.0, 0.0) == 0.0
     # Grass and water must not share one isoline.
     assert abs(hero_grass_lip(-7.6, 0.0) - hero_waterline_bite(-7.6, 0.0)) >= 0.20
+    kinds = {hero_shore_event(x)["kind"] for x in (-10.4, -7.8, -5.6, -3.2, -0.6, 1.8, 4.2, 6.6)}
+    assert len(kinds) >= 6
+    assert hero_shore_event(-7.8)["water"] > hero_shore_event(-0.6)["water"]
+    assert hero_shore_event(-14.0)["kind"] == "none"
 
 
 def test_visible_use_requires_rendered_pixels():
