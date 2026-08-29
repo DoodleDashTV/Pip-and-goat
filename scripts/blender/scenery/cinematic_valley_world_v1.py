@@ -377,6 +377,52 @@ def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, 
     return chosen
 
 
+def _hero_south_ramp(x: float, y: float, dist: float, along: float, local: float, meadow_z: float, center_z: float) -> float:
+    """Continuous wet-to-dry south bank. No cliff at the film, no cave pockets."""
+    film = local * WATER_WIDTH_SCALE * hero_south_water_factor(x)
+    if dist > local + SOUTH_BANK_RUN + 0.40:
+        return meadow_z
+    if dist < film:
+        t = dist / max(0.10, film)
+        return center_z + (WATER_SURFACE_Z - 0.03 - center_z) * (t ** 1.18)
+    event = hero_shore_event(x)
+    kind = event["kind"]
+    rise = {
+        "overhang": 2.55,
+        "inlet": 4.60,
+        "shelf": 6.40,
+        "retreat": 5.20,
+        "rock": 2.90,
+        "gravel": 4.80,
+        "bay": 5.60,
+        "cut": 3.20,
+    }.get(kind, 4.20)
+    u = min(1.0, max(0.0, (dist - film) / max(0.70, rise)))
+    if kind == "overhang":
+        # Grass comes close to the film.
+        if u < 0.28:
+            height = WATER_SURFACE_Z + 0.04 + 0.22 * (u / 0.28)
+        else:
+            height = WATER_SURFACE_Z + 0.26 + (meadow_z - WATER_SURFACE_Z - 0.26) * ((u - 0.28) / 0.72)
+    elif kind in {"shelf", "bay", "gravel"}:
+        if u < 0.22:
+            height = WATER_SURFACE_Z + 0.03 + 0.16 * (u / 0.22)
+        elif u < 0.55:
+            height = WATER_SURFACE_Z + 0.19 + 0.42 * ((u - 0.22) / 0.33)
+        else:
+            height = WATER_SURFACE_Z + 0.61 + (meadow_z - WATER_SURFACE_Z - 0.61) * ((u - 0.55) / 0.45)
+    else:
+        if u < 0.18:
+            height = WATER_SURFACE_Z + 0.03 + 0.20 * (u / 0.18)
+        elif u < 0.48:
+            height = WATER_SURFACE_Z + 0.23 + 0.40 * ((u - 0.18) / 0.30)
+        else:
+            height = WATER_SURFACE_Z + 0.63 + (meadow_z - WATER_SURFACE_Z - 0.63) * ((u - 0.48) / 0.52)
+    height += 0.05 * math.sin(x * 1.05 + along * 0.37)
+    height += 0.04 * math.sin(y * 0.71 + x * 0.52)
+    return max(WATER_SURFACE_Z - 0.02, min(meadow_z + 0.12, height))
+
+
 def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     """Carved creek: deep trough, wide wet shelf, irregular 3D banks."""
     dist, signed, along, left_half, right_half = channel_profile(x, y)
@@ -386,13 +432,12 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     bank_run = (SOUTH_BANK_RUN if south else NORTH_BANK_RUN) + 0.70 * math.sin(along * 0.33 + (0.0 if south else 1.4))
     bite = hero_grass_lip(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
     water_half = local * 0.34 + max(0.0, bite) * 0.22
-    if south and HERO_X_MIN <= x <= HERO_X_MAX:
-        # Carve wider than the film so Camera C cannot see an under-water hole.
-        water_half = local * WATER_WIDTH_SCALE * hero_south_water_factor(x) + 0.45
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
     center_z = BED_CENTER_Z - pool
+    if south and HERO_X_MIN <= x <= HERO_X_MAX:
+        return _hero_south_ramp(x, y, dist, along, local, meadow_z, center_z)
     shoulder_z = BED_SHOULDER_Z + 0.07 * math.sin(along * 0.23)
     crest_z = BANK_CREST_Z + crest_wobble + (0.14 if south else 0.04)
     if dist >= bank_outer:
