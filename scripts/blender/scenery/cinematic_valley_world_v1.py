@@ -712,9 +712,9 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
         (-13.0, 12.8, 1.3, 1.70), (-15.6, 23.2, 1.5, 3.90),
     )
     tall_wild = (
-        (-2.8, -3.4, 4.2, 0.25), (1.6, -5.2, 3.8, 1.80), (-5.2, -1.2, 4.6, 3.40),
-        (0.2, -1.8, 3.6, 5.00), (3.4, 1.2, 4.0, 2.10), (-1.2, 2.4, 4.4, 0.90),
-        (2.2, -7.0, 3.4, 4.60), (-4.4, 3.8, 3.9, 1.40),
+        (-2.8, -3.4, 3.4, 0.25), (1.6, -5.2, 3.1, 1.80), (-5.2, -1.2, 3.6, 3.40),
+        (0.2, -1.8, 2.8, 5.00), (-6.4, -4.8, 3.2, 2.10), (2.2, -7.0, 2.9, 4.60),
+        (-4.4, -6.2, 3.0, 1.40), (-1.8, -8.4, 2.6, 0.70),
     )
     worn_strip = (
         (-3.8, -6.8, 0.72, 0.10), (-1.6, -4.6, 0.64, 2.40), (0.4, -2.2, 0.80, 4.20),
@@ -2358,10 +2358,10 @@ def sit_louis_peak(obj: bpy.types.Object, peak_x: float, peak_y: float, scale: f
 
 
 def _shot02_ts(x: float, y: float) -> list[float]:
-    """Camera C V42 start: (1.5, -20.2) look (-3.5, 0.8)."""
-    dx = x - 1.5
-    dy = y + 20.2
-    return [round(dx * -0.232 + dy * 0.973, 2), round(dx * 0.973 + dy * 0.232, 2)]
+    """Camera C V42 start: (2.4, -21.8) look (-2.8, -3.5)."""
+    dx = x - 2.4
+    dy = y + 21.8
+    return [round(dx * -0.273 + dy * 0.962, 2), round(dx * 0.962 + dy * 0.273, 2)]
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0, rot_z: float = 0.0) -> None:
@@ -2734,7 +2734,7 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     for name, mat, key, z_in, z_out in layers:
         verts = []
         faces = []
-        rows = 4
+        rows = 6
         usable = 0
         for i, center in enumerate(hero):
             side = _side_from_centers(hero, i)
@@ -2742,13 +2742,13 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
             event = hero_shore_event(center.x)
             water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.55 * event["water"])
             if key == "wet":
-                inner, outer = water_edge * 0.15, water_edge + event["wet"]
+                inner, outer = -0.08, water_edge + event["wet"]
             elif key == "damp":
-                inner, outer = water_edge * 0.35, water_edge + event["damp"]
+                inner, outer = water_edge * 0.10, water_edge + event["damp"]
             elif key == "soil":
-                inner, outer = water_edge * 0.55, water_edge + event["soil"]
+                inner, outer = water_edge * 0.28, water_edge + event["soil"]
             else:
-                inner = water_edge + event["soil"] * 0.35
+                inner = water_edge + event["soil"] * 0.20
                 outer = water_edge + event["soil"] + 0.85 + event["grass"]
             for row in range(rows):
                 t = row / float(rows - 1)
