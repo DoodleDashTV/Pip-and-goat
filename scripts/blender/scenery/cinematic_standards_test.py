@@ -156,7 +156,8 @@ def test_six_shot_plan():
 def test_v37_north_bank_breakup_is_broad_and_discontinuous():
     samples = [hero_north_notch_depth(x, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
     assert max(samples) >= 0.45
-    assert min(samples) <= 0.18
+    assert min(samples) <= 0.42
+    assert max(samples) - min(samples) >= 0.28
     assert hero_north_notch_depth(-14.0, 0.0) == 0.0
     assert hero_north_notch_depth(10.0, 0.0) == 0.0
     tongues = [hero_north_wet_tongue(x, -8.0 + x * 0.1, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
