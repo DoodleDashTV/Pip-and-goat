@@ -381,7 +381,7 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     crest_wobble = 0.18 * math.sin(along * 0.21 + x * 0.19) + 0.08 * math.sin(x * 0.73)
     bank_run = (SOUTH_BANK_RUN if south else NORTH_BANK_RUN) + 0.70 * math.sin(along * 0.33 + (0.0 if south else 1.4))
     bite = hero_waterline_bite(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
-    water_half = local * 0.34 + max(0.0, bite) * 0.62
+    water_half = local * 0.34 + max(0.0, bite) * 0.32
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
@@ -485,7 +485,7 @@ def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
     height += 0.12 * math.sin(along * 0.73 + x * 1.1)
     height += 0.07 * math.sin(x * 3.4 + along * 1.9)
     # +bite lowers the bank into the water (a bay). -bite lifts a soil tongue.
-    height -= 0.30 * bite
+    height -= 0.14 * bite
     return height
 
 
@@ -516,10 +516,10 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             height -= 0.55 * max(0.0, 1.0 - abs(x - 4.5) / 6.0)
         # Open the SHOT_02 right-of-cabin corridor toward the sunlit peak
         # at x≈-3, y≈30. Trough widths stay locked.
-        if -10.0 <= x <= 8.0 and 10.0 <= y <= 44.0 and river_dist > bank_outer:
-            gx = math.exp(-((x + 3.0) / 9.0) ** 2)
-            gy = math.exp(-((y - 30.0) / 13.0) ** 2)
-            height -= 1.60 * gx * gy
+        if -8.0 <= x <= 12.0 and 12.0 <= y <= 40.0 and river_dist > bank_outer:
+            gx = math.exp(-((x - 2.0) / 9.0) ** 2)
+            gy = math.exp(-((y - 22.0) / 12.0) ** 2)
+            height -= 1.45 * gx * gy
         # Large ecological mounds / flats so SHOT_01 meadow is not a plane.
         if river_dist > bank_outer + 1.2:
             eco = 0.5 + 0.5 * math.sin(x * 0.13 + 0.4) * math.sin(y * 0.10 + 0.8)
@@ -1994,7 +1994,7 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     # First peak sits just north of Building04 so its sunlit south face
     # clears the cabin roof in camera C. Do not move the SHOT_05 hero.
     peak_slots = (
-        (2.0, 17.5, 0.52, 0.30),
+        (-8.5, 15.0, 0.30, 0.28),
         (28.0, 16.0, 0.48, 0.42),
         (46.0, 52.0, 0.30, -0.16),
     )
@@ -2008,7 +2008,7 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     for i, (obj, (cx, south, scale, rot_z)) in enumerate(zip(peaks, peak_slots)):
         sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
         if i == 0:
-            obj.location.z += 1.2
+            obj.location.z += 3.6
         link_exclusive(obj, collection)
         placed.append(obj)
     print(json.dumps({
