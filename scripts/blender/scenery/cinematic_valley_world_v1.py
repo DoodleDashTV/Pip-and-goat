@@ -78,6 +78,8 @@ LOUIS_LP_MEADOW = ("LP_MeadowRange1", "LP_MeadowRange2", "LP_MeadowRange3")
 LOUIS_LP_PEAKS = ("LP_GrassyMountain1", "LP_GrassyMountain2", "LP_GrassyMountain3")
 
 PROGRESS_PATH: Path | None = None
+WATER_TINT = None
+WATER_VARIANT = "A"
 
 
 def parse_args() -> argparse.Namespace:
@@ -99,6 +101,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--profile", default="LOOKDEV_FAST")
     parser.add_argument("--hide-water", action="store_true")
     parser.add_argument("--control-tests", action="store_true")
+    parser.add_argument("--water-variant", default="A", help="A=V32 baseline, B=transmission, C=rough reflection, D=hybrid")
+    parser.add_argument("--ab-water", action="store_true", help="Render SHOT_02 once per water variant A-D")
     return parser.parse_args(argv)
 
 
@@ -603,16 +607,95 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     return mat
 
 
-def cinematic_river_material(tint=None) -> bpy.types.Material:
-    """Dark creek film with a dim wet sheen. Not a Principled sky-mirror.
+def _water_variant_cfg(variant: str, tint) -> dict:
+    deep = tint or (0.018, 0.042, 0.036, 1.0)
+    name = (variant or "A").upper()
+    if name == "A":
+        return {
+            "label": "A",
+            "specular": 0.0,
+            "ior": 1.0,
+            "distance_gate": True,
+            "trans_center": 0.38,
+            "trans_edge": 0.24,
+            "trans_far": 0.04,
+            "sheen": 0.15,
+            "sheen_far": 0.03,
+            "rough_lo": 0.28,
+            "rough_hi": 0.46,
+            "extra_glossy": True,
+            "glossy_color": (0.14, 0.17, 0.16, 1.0),
+            "gloss_rough_lo": 0.38,
+            "gloss_rough_hi": 0.58,
+            "bump": 0.34,
+            "deep": deep,
+        }
+    if name == "B":
+        return {
+            "label": "B",
+            "specular": 0.18,
+            "ior": 1.22,
+            "distance_gate": False,
+            "trans_center": 0.56,
+            "trans_edge": 0.74,
+            "trans_far": 0.56,
+            "sheen": 0.0,
+            "sheen_far": 0.0,
+            "rough_lo": 0.12,
+            "rough_hi": 0.26,
+            "extra_glossy": False,
+            "glossy_color": (0.12, 0.15, 0.14, 1.0),
+            "gloss_rough_lo": 0.22,
+            "gloss_rough_hi": 0.40,
+            "bump": 0.22,
+            "deep": (max(0.008, deep[0] * 0.70), max(0.014, deep[1] * 0.72), max(0.012, deep[2] * 0.68), 1.0),
+        }
+    if name == "C":
+        return {
+            "label": "C",
+            "specular": 0.22,
+            "ior": 1.15,
+            "distance_gate": False,
+            "trans_center": 0.16,
+            "trans_edge": 0.22,
+            "trans_far": 0.16,
+            "sheen": 0.22,
+            "sheen_far": 0.22,
+            "rough_lo": 0.32,
+            "rough_hi": 0.50,
+            "extra_glossy": True,
+            "glossy_color": (0.18, 0.22, 0.20, 1.0),
+            "gloss_rough_lo": 0.28,
+            "gloss_rough_hi": 0.48,
+            "bump": 0.40,
+            "deep": deep,
+        }
+    return {
+        "label": "D",
+        "specular": 0.16,
+        "ior": 1.18,
+        "distance_gate": False,
+        "trans_center": 0.40,
+        "trans_edge": 0.62,
+        "trans_far": 0.40,
+        "sheen": 0.14,
+        "sheen_far": 0.14,
+        "rough_lo": 0.16,
+        "rough_hi": 0.34,
+        "extra_glossy": True,
+        "glossy_color": (0.20, 0.24, 0.22, 1.0),
+        "gloss_rough_lo": 0.22,
+        "gloss_rough_hi": 0.42,
+        "bump": 0.28,
+        "deep": deep,
+    }
 
-    A thin horizontal Principled with IOR + specular + transmission Fresnel
-    reflects the purchased HDRI as a pale foil under AgX +0.30 exposure.
-    Kill that built-in specular. Keep a modest constant transmission so the
-    bed can tint through from the 14deg riverbank cameras, and add a dark
-    rough glossy mix so grazing shots read wet instead of foil or ink.
-    """
-    mat = bpy.data.materials.new("TJ_CinematicRiver")
+
+def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types.Material:
+    """Stylized creek film. Variant A is the V32 baseline; B/C/D restore water cues."""
+    cfg = _water_variant_cfg(variant or WATER_VARIANT, tint)
+    deep = cfg["deep"]
+    mat = bpy.data.materials.new(f"TJ_CinematicRiver_{cfg['label']}")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
     links = mat.node_tree.links
@@ -620,7 +703,6 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     body = nodes.new("ShaderNodeBsdfPrincipled")
     body.name = "TJ_StreamBody"
-    deep = tint or (0.018, 0.042, 0.036, 1.0)
     shallow = (
         min(0.048, deep[0] + 0.018),
         min(0.078, deep[1] + 0.028),
@@ -675,8 +757,8 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     rough = nodes.new("ShaderNodeMapRange")
     rough.inputs["From Min"].default_value = 0.0
     rough.inputs["From Max"].default_value = 1.0
-    rough.inputs["To Min"].default_value = 0.28
-    rough.inputs["To Max"].default_value = 0.46
+    rough.inputs["To Min"].default_value = cfg["rough_lo"]
+    rough.inputs["To Max"].default_value = cfg["rough_hi"]
     links.new(attr.outputs["Color"], rough.inputs["Value"])
     river_mask = purchased_river_mask_image()
     rough_out = rough.outputs["Result"] if "Result" in rough.outputs else rough.outputs[0]
@@ -700,51 +782,50 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
         rough_out = rough_add.outputs["Value"]
     if "Roughness" in body.inputs:
         links.new(rough_out, body.inputs["Roughness"])
-    # Kill dielectric Fresnel. IOR 1.0 so transmission is a facing mix, not a
-    # second sky-mirror interface on a millimetre-thin film.
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.0
+        body.inputs["Specular IOR Level"].default_value = cfg["specular"]
     if "IOR" in body.inputs:
-        body.inputs["IOR"].default_value = 1.0
+        body.inputs["IOR"].default_value = cfg["ior"]
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     layer = nodes.new("ShaderNodeLayerWeight")
-    layer.inputs["Blend"].default_value = 0.48
-    camdata = nodes.new("ShaderNodeCameraData")
-    # View Distance can be 0 if the socket is unused; treat that as far so
-    # crane cameras default dark instead of transmitting the sky.
-    tiny = nodes.new("ShaderNodeMath")
-    tiny.operation = "LESS_THAN"
-    tiny.inputs[1].default_value = 2.0
-    links.new(camdata.outputs["View Distance"], tiny.inputs[0])
-    boost = nodes.new("ShaderNodeMath")
-    boost.operation = "MULTIPLY"
-    boost.inputs[1].default_value = 48.0
-    links.new(tiny.outputs["Value"], boost.inputs[0])
-    safe_dist = nodes.new("ShaderNodeMath")
-    safe_dist.operation = "ADD"
-    links.new(camdata.outputs["View Distance"], safe_dist.inputs[0])
-    links.new(boost.outputs["Value"], safe_dist.inputs[1])
-    # Close riverbank cameras can see the bed; crane / village cameras
-    # would otherwise transmit the sky through the thin plane.
-    dist_trans = nodes.new("ShaderNodeMapRange")
-    dist_trans.inputs["From Min"].default_value = 10.0
-    dist_trans.inputs["From Max"].default_value = 28.0
-    dist_trans.inputs["To Min"].default_value = 0.38
-    dist_trans.inputs["To Max"].default_value = 0.04
-    links.new(safe_dist.outputs["Value"], dist_trans.inputs["Value"])
+    layer.inputs["Blend"].default_value = 0.42
     edge_trans = nodes.new("ShaderNodeMapRange")
     edge_trans.inputs["From Min"].default_value = 0.0
     edge_trans.inputs["From Max"].default_value = 1.0
-    edge_trans.inputs["To Min"].default_value = 1.0
-    edge_trans.inputs["To Max"].default_value = 0.62
+    edge_trans.inputs["To Min"].default_value = cfg["trans_center"]
+    edge_trans.inputs["To Max"].default_value = cfg["trans_edge"]
     links.new(attr.outputs["Color"], edge_trans.inputs["Value"])
-    trans_mul = nodes.new("ShaderNodeMath")
-    trans_mul.operation = "MULTIPLY"
-    links.new(dist_trans.outputs["Result"] if "Result" in dist_trans.outputs else dist_trans.outputs[0], trans_mul.inputs[0])
-    links.new(edge_trans.outputs["Result"] if "Result" in edge_trans.outputs else edge_trans.outputs[0], trans_mul.inputs[1])
+    trans_src = edge_trans.outputs["Result"] if "Result" in edge_trans.outputs else edge_trans.outputs[0]
+    if cfg["distance_gate"]:
+        camdata = nodes.new("ShaderNodeCameraData")
+        tiny = nodes.new("ShaderNodeMath")
+        tiny.operation = "LESS_THAN"
+        tiny.inputs[1].default_value = 2.0
+        links.new(camdata.outputs["View Distance"], tiny.inputs[0])
+        boost = nodes.new("ShaderNodeMath")
+        boost.operation = "MULTIPLY"
+        boost.inputs[1].default_value = 48.0
+        links.new(tiny.outputs["Value"], boost.inputs[0])
+        safe_dist = nodes.new("ShaderNodeMath")
+        safe_dist.operation = "ADD"
+        links.new(camdata.outputs["View Distance"], safe_dist.inputs[0])
+        links.new(boost.outputs["Value"], safe_dist.inputs[1])
+        dist_trans = nodes.new("ShaderNodeMapRange")
+        dist_trans.inputs["From Min"].default_value = 10.0
+        dist_trans.inputs["From Max"].default_value = 28.0
+        dist_trans.inputs["To Min"].default_value = 1.0
+        dist_trans.inputs["To Max"].default_value = cfg["trans_far"] / max(0.01, cfg["trans_center"])
+        links.new(safe_dist.outputs["Value"], dist_trans.inputs["Value"])
+        trans_mul = nodes.new("ShaderNodeMath")
+        trans_mul.operation = "MULTIPLY"
+        links.new(trans_src, trans_mul.inputs[0])
+        links.new(dist_trans.outputs["Result"] if "Result" in dist_trans.outputs else dist_trans.outputs[0], trans_mul.inputs[1])
+        trans_src = trans_mul.outputs["Value"]
+    else:
+        safe_dist = None
     if "Transmission Weight" in body.inputs:
-        links.new(trans_mul.outputs["Value"], body.inputs["Transmission Weight"])
+        links.new(trans_src, body.inputs["Transmission Weight"])
     if "Transmission Extra" in body.inputs:
         body.inputs["Transmission Extra"].default_value = 0.0
     swell = nodes.new("ShaderNodeTexNoise")
@@ -775,7 +856,7 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     links.new(swell_mul.outputs["Value"], combo.inputs[0])
     links.new(ripple_mul.outputs["Value"], combo.inputs[1])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.34
+    bump.inputs["Strength"].default_value = cfg["bump"]
     links.new(combo.outputs["Value"], bump.inputs["Height"])
     if "Normal" in body.inputs:
         links.new(bump.outputs["Normal"], body.inputs["Normal"])
@@ -783,27 +864,33 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     if hasattr(glossy, "distribution"):
         glossy.distribution = "GGX"
     if "Color" in glossy.inputs:
-        glossy.inputs["Color"].default_value = (0.14, 0.17, 0.16, 1.0)
+        glossy.inputs["Color"].default_value = cfg["glossy_color"]
     gloss_rough = nodes.new("ShaderNodeMapRange")
     gloss_rough.inputs["From Min"].default_value = 0.0
     gloss_rough.inputs["From Max"].default_value = 1.0
-    gloss_rough.inputs["To Min"].default_value = 0.38
-    gloss_rough.inputs["To Max"].default_value = 0.58
+    gloss_rough.inputs["To Min"].default_value = cfg["gloss_rough_lo"]
+    gloss_rough.inputs["To Max"].default_value = cfg["gloss_rough_hi"]
     links.new(ripple.outputs["Fac"], gloss_rough.inputs["Value"])
     if "Roughness" in glossy.inputs:
         links.new(gloss_rough.outputs["Result"] if "Result" in gloss_rough.outputs else gloss_rough.outputs[0], glossy.inputs["Roughness"])
     if "Normal" in glossy.inputs:
         links.new(bump.outputs["Normal"], glossy.inputs["Normal"])
-    dist_sheen = nodes.new("ShaderNodeMapRange")
-    dist_sheen.inputs["From Min"].default_value = 10.0
-    dist_sheen.inputs["From Max"].default_value = 28.0
-    dist_sheen.inputs["To Min"].default_value = 0.15
-    dist_sheen.inputs["To Max"].default_value = 0.03
-    links.new(safe_dist.outputs["Value"], dist_sheen.inputs["Value"])
     sheen = nodes.new("ShaderNodeMath")
     sheen.operation = "MULTIPLY"
+    sheen.inputs[1].default_value = cfg["sheen"]
     links.new(layer.outputs["Fresnel"], sheen.inputs[0])
-    links.new(dist_sheen.outputs["Result"] if "Result" in dist_sheen.outputs else dist_sheen.outputs[0], sheen.inputs[1])
+    if cfg["distance_gate"] and safe_dist is not None:
+        dist_sheen = nodes.new("ShaderNodeMapRange")
+        dist_sheen.inputs["From Min"].default_value = 10.0
+        dist_sheen.inputs["From Max"].default_value = 28.0
+        dist_sheen.inputs["To Min"].default_value = cfg["sheen"]
+        dist_sheen.inputs["To Max"].default_value = cfg["sheen_far"]
+        links.new(safe_dist.outputs["Value"], dist_sheen.inputs["Value"])
+        sheen_scale = nodes.new("ShaderNodeMath")
+        sheen_scale.operation = "MULTIPLY"
+        links.new(layer.outputs["Fresnel"], sheen_scale.inputs[0])
+        links.new(dist_sheen.outputs["Result"] if "Result" in dist_sheen.outputs else dist_sheen.outputs[0], sheen_scale.inputs[1])
+        sheen = sheen_scale
     sheen_var = nodes.new("ShaderNodeMapRange")
     sheen_var.inputs["From Min"].default_value = 0.0
     sheen_var.inputs["From Max"].default_value = 1.0
@@ -814,11 +901,14 @@ def cinematic_river_material(tint=None) -> bpy.types.Material:
     sheen_mul.operation = "MULTIPLY"
     links.new(sheen.outputs["Value"], sheen_mul.inputs[0])
     links.new(sheen_var.outputs["Result"] if "Result" in sheen_var.outputs else sheen_var.outputs[0], sheen_mul.inputs[1])
-    mix_sh = nodes.new("ShaderNodeMixShader")
-    links.new(sheen_mul.outputs["Value"], mix_sh.inputs[0])
-    links.new(body.outputs["BSDF"], mix_sh.inputs[1])
-    links.new(glossy.outputs["BSDF"], mix_sh.inputs[2])
-    links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
+    if cfg["extra_glossy"] and cfg["sheen"] > 0.001:
+        mix_sh = nodes.new("ShaderNodeMixShader")
+        links.new(sheen_mul.outputs["Value"], mix_sh.inputs[0])
+        links.new(body.outputs["BSDF"], mix_sh.inputs[1])
+        links.new(glossy.outputs["BSDF"], mix_sh.inputs[2])
+        links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
+    else:
+        links.new(body.outputs["BSDF"], out.inputs["Surface"])
     return mat
 
 
@@ -837,7 +927,9 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
                 max(0.018, min(0.040, float(src_col[2]) * 0.10)),
                 1.0,
             )
-    surface = cinematic_river_material(tint)
+    global WATER_TINT
+    WATER_TINT = tint
+    surface = cinematic_river_material(tint, WATER_VARIANT)
     river.data.materials.clear()
     river.data.materials.append(surface)
     river.hide_render = False
@@ -850,7 +942,7 @@ def assign_purchased_water(river: bpy.types.Object) -> str:
         "name": water.name if water else surface.name,
         "purchased": water is not None,
         "surface": surface.name,
-        "shape": "dark_body_dim_sheen_facing_transmission",
+        "variant": WATER_VARIANT,
         "visible": True,
         "riverMask": bool(purchased_river_mask_image()),
     }), flush=True)
@@ -1531,7 +1623,9 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     if args.progress_path:
         PROGRESS_PATH = Path(args.progress_path)
-    write_progress("CINEMATIC_WORLD_START", profile=args.profile)
+    global WATER_VARIANT
+    WATER_VARIANT = (args.water_variant or "A").upper()
+    write_progress("CINEMATIC_WORLD_START", profile=args.profile, waterVariant=WATER_VARIANT)
     assets = json.loads(args.assets_json)
     if isinstance(assets, dict):
         assets = assets.get("assets") or assets.get("selected") or []
@@ -1805,6 +1899,19 @@ def main() -> int:
     write_progress("CINEMATIC_WORLD_BUILT", cameras=len(cameras), forestCopies=proof["forestCopies"])
 
     frames = [int(part) for part in (args.stills_frames or ",".join(str(item) for item in lookdev_frames())).split(",") if part.strip()]
+    if args.ab_water:
+        river_obj = bpy.data.objects.get("TJ_River_PurchasedWater")
+        set_active_camera_for_frame(210)
+        for label in ("A", "B", "C", "D"):
+            if river_obj is not None:
+                mat = cinematic_river_material(WATER_TINT, label)
+                river_obj.data.materials.clear()
+                river_obj.data.materials.append(mat)
+            bpy.context.scene.render.filepath = str(out / f"variant_{label.lower()}_shot_02_")
+            write_progress("LOOKDEV_WATER_AB", variant=label, frame=210)
+            bpy.ops.render.render(write_still=True)
+        write_progress("LOOKDEV_COMPLETE", frames=4, waterAb=True)
+        return 0
     if args.stills_only or normalize_profile(args.profile) in {"BLOCKOUT", "LOOKDEV_FAST", "HERO_STILL"}:
         for frame in frames:
             set_active_camera_for_frame(frame)
