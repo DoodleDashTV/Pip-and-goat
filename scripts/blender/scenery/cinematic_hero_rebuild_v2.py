@@ -296,11 +296,14 @@ def plant_nature_tree(library: dict, index: str, loc, scale: float, yaw: float) 
         home_c = Vector(canopy.get("tj_home", (0.0, 0.0, 0.0)))
         home_t = Vector(trunk.get("tj_home", (0.0, 0.0, 0.0))) if trunk is not None else Vector((0.0, 0.0, 0.0))
         offset = home_c - home_t
-        cloc = (loc[0] + offset.x * factor, loc[1] + offset.y * factor, loc[2] + offset.z * factor)
-        crown = _dup(canopy, cloc, factor, yaw)
-        if crown is not None:
-            crown.name = f"TJ_V2_Canopy_{index}_{int(abs(loc[0]*10))}"
-            extras.append(crown)
+        if offset.length > 2.4:
+            offset = Vector((0.0, 0.0, 0.0))
+        for extra_yaw, extra_scale in ((0.0, 1.0), (1.05, 0.92), (2.15, 0.84)):
+            cloc = (loc[0] + offset.x * factor, loc[1] + offset.y * factor, loc[2] + offset.z * factor)
+            crown = _dup(canopy, cloc, factor * extra_scale, yaw + extra_yaw)
+            if crown is not None:
+                crown.name = f"TJ_V2_Canopy_{index}_{int(abs(loc[0]*10))}_{int(extra_yaw*10)}"
+                extras.append(crown)
     return extras
 
 
@@ -314,8 +317,9 @@ def hide_cheap_shot02_clutter() -> dict:
         if name.startswith("TJ_V2_"):
             continue
         loc = obj.location
-        in_frustum = -28.0 <= loc.x <= 26.0 and -32.0 <= loc.y <= 8.0
-        if in_frustum and "tree" in low and "louis" not in low and not name.startswith("TJ_V2_"):
+        in_frustum = -40.0 <= loc.x <= 32.0 and -36.0 <= loc.y <= 18.0
+        village_tree = ("tree" in low or "pine" in low) and "louis" not in low and not name.startswith("TJ_V2_")
+        if in_frustum and village_tree:
             obj.hide_render = True
             obj.hide_viewport = True
             hidden["trees"] += 1
@@ -344,6 +348,8 @@ def dress_shot02(library: dict) -> dict:
         ("04", (-18.4, -15.8, 0.0), 0.62, 0.85),
         ("05", (9.6, -7.4, 0.0), 0.80, -0.55),
         ("06", (-8.4, -16.8, 0.0), 0.48, 1.70),
+        ("02", (-7.2, -19.4, 0.0), 0.38, 0.22),
+        ("01", (6.4, -11.2, 0.0), 0.58, -1.10),
     )
     for index, loc, scale, yaw in tree_plan:
         extras.extend(plant_nature_tree(library, index, loc, scale, yaw))
@@ -448,6 +454,8 @@ def retune_cabin_materials() -> dict:
         if mat is None or not mat.use_nodes:
             continue
         name = (mat.name or "").lower()
+        if any(word in name for word in ("glass", "void", "plug", "window", "emi")):
+            continue
         roof = any(word in name for word in ("straw", "roof", "thatch"))
         cabin = any(word in name for word in ("cabin", "building", "wood", "log")) and not roof
         if not roof and not cabin:
@@ -489,6 +497,8 @@ def retune_cabin_materials() -> dict:
 
 def setup_comp_cameras() -> list[str]:
     scene = bpy.context.scene
+    for marker in scene.timeline_markers:
+        marker.camera = None
     names = []
     for spec in COMP_CAMERAS.values():
         existing = bpy.data.objects.get(spec["name"])

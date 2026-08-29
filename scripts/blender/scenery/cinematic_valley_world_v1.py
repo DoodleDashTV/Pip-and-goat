@@ -4238,11 +4238,14 @@ def main() -> int:
         scene = bpy.context.scene
         scene.render.use_persistent_data = False
         scene.frame_set(210)
+        for marker in scene.timeline_markers:
+            marker.camera = None
         for key, spec in COMP_CAMERAS.items():
             cam = bpy.data.objects.get(spec["name"])
             if cam is None:
                 continue
             scene.camera = cam
+            bpy.context.view_layer.update()
             scene.render.filepath = str(out / f"v2_comp_{key.lower()}_")
             write_progress("V2_COMP", id=key, camera=cam.name, lens=spec["lens"])
             bpy.ops.render.render(write_still=True)
