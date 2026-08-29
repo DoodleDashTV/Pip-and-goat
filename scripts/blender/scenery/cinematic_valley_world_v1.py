@@ -19,6 +19,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from cinematic_shots import SHOTS, camera_name, default_shot_cameras, hero_search_cameras, lookdev_frames, marker_frames  # noqa: E402
+from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue  # noqa: E402
 from cinematic_standards import (  # noqa: E402
     MASTER_COLLECTIONS,
     assert_final_contract,
@@ -454,6 +455,11 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
         if bulge > 0.80:
             height += 0.18 * ((bulge - 0.80) / 0.20)
         height += 0.10 * math.sin(x * 2.2 + y * 1.4)
+        # V37: broad overlapping slumps survive at image scale. The earlier
+        # high-frequency notches became one smooth isoline after crest beveling.
+        breakup = hero_north_notch_depth(x, along)
+        crest_band = 0.35 + 0.65 * (math.sin(math.pi * max(0.0, min(1.0, t))) ** 0.7)
+        height -= breakup * crest_band
     return height
 
 
@@ -692,8 +698,15 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                     value *= 0.22
             else:
                 value = 0.0
-            if HERO_X_MIN <= x <= HERO_X_MAX and dist < local_half + 2.4:
-                value = max(value, 0.40 + 0.20 * blotch)
+            if HERO_X_MIN <= x <= HERO_X_MAX:
+                # V37: irregular soil tongues cross the visible grass crest.
+                # Do not reinforce one continuous wet strip along the bank.
+                tongue = hero_north_wet_tongue(x, y, along)
+                reach = local_half + 0.55 + 3.10 * tongue
+                if dist < reach:
+                    value = max(value, 0.18 + 0.54 * tongue)
+                if dist > local_half + 0.45 and tongue < 0.28:
+                    value *= 0.16
         value *= 0.80 + 0.20 * max(0.0, blotch)
         color.data[index].color = (value, value, value, 1.0)
 
@@ -719,6 +732,10 @@ def soften_channel_crest(ground: bpy.types.Object) -> None:
             avg = sum(zs[j] for j in neighbors[index]) / float(len(neighbors[index]))
             t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
             amt = 0.48 + 0.30 * min(1.0, max(0.0, t))
+            if signed > 0.0 and HERO_X_MIN <= vert.co.x <= HERO_X_MAX:
+                # Preserve the broad V37 far-bank slumps through the bevel pass.
+                breakup = hero_north_notch_depth(vert.co.x, _along)
+                amt *= max(0.24, 1.0 - 0.88 * (breakup / 0.72))
             nxt[index] = zs[index] * (1.0 - amt) + avg * amt
         zs = nxt
     for index, vert in enumerate(mesh.vertices):

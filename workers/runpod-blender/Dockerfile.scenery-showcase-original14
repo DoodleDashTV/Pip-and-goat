@@ -11,6 +11,7 @@ COPY scripts/blender/scenery/showcase_original14_select.py ./blender/scenery/sho
 COPY scripts/blender/scenery/showcase_original14_30s.py ./blender/scenery/showcase_original14_30s.py
 COPY scripts/blender/scenery/cinematic_standards.py ./blender/scenery/cinematic_standards.py
 COPY scripts/blender/scenery/cinematic_shots.py ./blender/scenery/cinematic_shots.py
+COPY scripts/blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_creek_profile.py
 COPY scripts/blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/cinematic_valley_world_v1.py
 COPY workers/runpod-blender/src/scenery-render-profiles.js ./src/scenery-render-profiles.js
 
@@ -49,7 +50,7 @@ RUN node --check ./src/scenery-showcase-original14-roles.js && \
     node --check ./src/scenery-showcase-original14.js && \
     node --check ./src/scenery-showcase-original14-entry.js && \
     node --check ./src/scenery-render-profiles.js && \
-    python3 -m py_compile ./blender/scenery/showcase_original14_select.py ./blender/scenery/showcase_original14_30s.py ./blender/scenery/cinematic_standards.py ./blender/scenery/cinematic_shots.py ./blender/scenery/cinematic_valley_world_v1.py && \
+    python3 -m py_compile ./blender/scenery/showcase_original14_select.py ./blender/scenery/showcase_original14_30s.py ./blender/scenery/cinematic_standards.py ./blender/scenery/cinematic_shots.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_valley_world_v1.py && \
     blender --version | head -n 1 | grep -F 'Blender 4.2.2'
 
 CMD ["node", "./src/scenery-showcase-original14-entry.js"]

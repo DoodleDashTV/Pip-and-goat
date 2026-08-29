@@ -1,0 +1,60 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_CREEK_COMPOSITION_REPAIR_CHECKPOINT_V37",
+  "startingSha": "4325bd91f2c40756b2ed4f4eaa92a5a85fdd52aa",
+  "codeContentBasedOnSha": "4325bd91f2c40756b2ed4f4eaa92a5a85fdd52aa",
+  "pr169RequiredState": "OPEN_DRAFT_UNMERGED_NOT_READY",
+  "v34WaterArchitecturePreserved": true,
+  "v36CameraCIdentityPreserved": true,
+  "corrections": {
+    "cameraComposition": {
+      "startLocationBefore": [0.5, -24.0, 3.4],
+      "startLookBefore": [-6.0, -2.0, 1.2],
+      "startLensBeforeMm": 36.0,
+      "startLocationAfter": [0.2, -23.2, 3.05],
+      "startLookAfter": [-5.8, -5.2, 0.2],
+      "startLensAfterMm": 34.0,
+      "intent": "Pitch camera C below the cabin and widen slightly so the diagonal creek owns more vertical frame while Cabin01 remains an off-axis destination."
+    },
+    "northBankGeometry": {
+      "method": "three broad overlapping metre-scale slumps in the V36 hero corridor",
+      "maxDepthM": 0.72,
+      "troughDepthChanged": false,
+      "waterWidthChanged": false,
+      "bedWidthChanged": false,
+      "smoothing": "crest bevel is attenuated only where broad slumps must survive"
+    },
+    "grassSoilTransition": {
+      "continuousHeroWetBandRemoved": true,
+      "replacement": "three discontinuous soil tongues with irregular reach and grass gaps",
+      "cameraDistanceShaderGate": false,
+      "genericHeroAssetAdded": false
+    },
+    "workerPackaging": {
+      "newPureModuleCopiedIntoImage": true,
+      "workflowPathTriggerUpdated": true,
+      "containerPyCompileUpdated": true
+    }
+  },
+  "verification": {
+    "pythonCompile": "PASS",
+    "cinematicStandardsTest": "PASS",
+    "original14SelectorTest": "PASS",
+    "nodeRenderProfileAndRoleTests": "6_PASS_0_FAIL",
+    "diffCheck": "PASS",
+    "blenderVisualGate": "NOT_RUN_RUNTIME_UNAVAILABLE",
+    "sixShotGate": "NOT_RUN_HERO_VISUAL_GATE_REQUIRED_FIRST"
+  },
+  "runtimeBlocker": {
+    "blenderBinaryPresent": false,
+    "conditionedPurchasedAssetCachePresent": false,
+    "v36TmpFramesPresent": false,
+    "runpodOrR2CredentialsPresent": false,
+    "smallestNextAction": "In the authorized conditioned-asset look-dev environment, render only SHOT_02 at 32 samples and judge creek-first read plus broken grass isoline. Render all six previews only if that hero gate passes."
+  },
+  "workerImageBuildTriggered": false,
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "finalResultReturned": false
+}

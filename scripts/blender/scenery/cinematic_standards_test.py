@@ -2,6 +2,8 @@
 """Deterministic cinematic pipeline contract tests."""
 from __future__ import annotations
 
+import math
+
 from cinematic_shots import (
     SHOTS,
     assert_shot_plan,
@@ -28,6 +30,7 @@ from cinematic_standards import (
     require_visual_approval_before_paid_final,
     visible_use_record,
 )
+from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue
 
 
 def test_profiles_are_separated():
@@ -116,10 +119,20 @@ def test_six_shot_plan():
     assert shot03["start"]["location"][0] <= -28.0
     assert shot03["start"]["look"][0] <= -12.0
     shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
-    # V36 retired the V35 height lock. Hero must look north across the creek.
+    # V37 keeps camera C, but pitches below the cabin so the creek owns more frame.
     assert shot02["start"]["location"][1] < -16.0
     assert shot02["start"]["look"][1] > shot02["start"]["location"][1]
     assert shot02["start"]["location"][2] < 6.0
+    assert shot02["start"]["look"][2] <= 0.5
+    assert shot02["start"]["lens"] <= 34.0
+    direction = tuple(
+        shot02["start"]["look"][i] - shot02["start"]["location"][i]
+        for i in range(3)
+    )
+    horizontal = math.hypot(direction[0], direction[1])
+    assert math.degrees(math.atan2(direction[2], horizontal)) <= -7.5
+    # Cabin01 is near x=-9.2; it must stay a destination, not the frame center.
+    assert abs(shot02["start"]["look"][0] - (-9.2)) >= 3.0
     assert len(lookdev_frames()) == 12
     payload = shot_standard_payload()
     assert payload["cutsNotInterpolated"] is True
@@ -130,6 +143,21 @@ def test_six_shot_plan():
     assert max(zs) - min(zs) >= 6.0
     xs = [item["location"][0] for item in heroes]
     assert max(xs) - min(xs) >= 20.0
+    hero_c = next(item for item in heroes if item["id"] == "C")
+    assert hero_c["location"] == shot02["start"]["location"]
+    assert hero_c["look"] == shot02["start"]["look"]
+    assert hero_c["lens"] == shot02["start"]["lens"]
+
+
+def test_v37_north_bank_breakup_is_broad_and_discontinuous():
+    samples = [hero_north_notch_depth(x, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(samples) >= 0.45
+    assert min(samples) <= 0.18
+    assert hero_north_notch_depth(-14.0, 0.0) == 0.0
+    assert hero_north_notch_depth(10.0, 0.0) == 0.0
+    tongues = [hero_north_wet_tongue(x, -8.0 + x * 0.1, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(tongues) - min(tongues) >= 0.35
+    assert all(0.0 <= value <= 1.0 for value in tongues)
 
 
 def test_visible_use_requires_rendered_pixels():
@@ -182,6 +210,7 @@ if __name__ == "__main__":
     test_cycles_cpu_force_fails_final()
     test_proof_quality_flags_fail_final()
     test_six_shot_plan()
+    test_v37_north_bank_breakup_is_broad_and_discontinuous()
     test_visible_use_requires_rendered_pixels()
     test_visual_approval_required_before_paid_final()
     test_master_collections_and_gate_list()

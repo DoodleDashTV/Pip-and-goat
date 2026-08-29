@@ -134,10 +134,10 @@ def hero_search_cameras() -> list[dict]:
         {
             "id": "C",
             "name": "across_creek_opposite_bank",
-            "location": (0.5, -24.0, 3.40),
-            "look": (-6.0, -2.0, 1.20),
-            "lens": 36.0,
-            "why": "Across-creek view: south bank, water, opposite bank, cabin beyond.",
+            "location": (0.2, -23.2, 3.05),
+            "look": (-5.8, -5.2, 0.20),
+            "lens": 34.0,
+            "why": "V37 across-creek view: lower pitch gives water more frame while the cabin remains an off-axis destination.",
         },
         {
             "id": "D",
@@ -176,11 +176,11 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_02",
             "camera": "TJ_SHOT_02_CAM",
-            # V36: V35 grazing stripe is retired. Authoritative hero is search
-            # candidate C — across-creek, diagonal water, cabin destination.
+            # V37: camera C remains authoritative, with a lower sightline and
+            # wider lens so the creek leads before the off-axis cabin resolves.
             "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
-            "start": {"location": (0.5, -24.0, 3.40), "look": (-6.0, -2.0, 1.20), "lens": 36.0},
-            "end": {"location": (2.2, -22.8, 3.50), "look": (-3.8, -0.6, 1.35), "lens": 38.0},
+            "start": {"location": (0.2, -23.2, 3.05), "look": (-5.8, -5.2, 0.20), "lens": 34.0},
+            "end": {"location": (1.8, -22.0, 3.15), "look": (-3.8, -3.8, 0.35), "lens": 36.0},
         },
         {
             "id": "SHOT_03",
