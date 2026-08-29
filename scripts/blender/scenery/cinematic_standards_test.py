@@ -123,7 +123,7 @@ def test_six_shot_plan():
     assert shot02["start"]["location"][1] < -16.0
     assert shot02["start"]["look"][1] > shot02["start"]["location"][1]
     assert shot02["start"]["location"][2] < 6.0
-    assert shot02["start"]["look"][2] <= 0.5
+    assert shot02["start"]["look"][2] <= 0.0
     assert shot02["start"]["lens"] <= 34.0
     direction = tuple(
         shot02["start"]["look"][i] - shot02["start"]["location"][i]

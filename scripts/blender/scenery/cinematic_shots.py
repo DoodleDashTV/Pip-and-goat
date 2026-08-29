@@ -19,8 +19,8 @@ SHOTS = (
         "name": "RIVER_DISCOVERY",
         "start": 151,
         "end": 300,
-        "lensMin": 34.0,
-        "lensMax": 40.0,
+        "lensMin": 30.0,
+        "lensMax": 36.0,
         "purpose": "unmistakable water, reflections, ripples, irregular banks, wet rocks, flora",
         "move": "low_riverbank_dolly",
     },
@@ -134,10 +134,10 @@ def hero_search_cameras() -> list[dict]:
         {
             "id": "C",
             "name": "across_creek_opposite_bank",
-            "location": (0.2, -23.2, 3.05),
-            "look": (-5.8, -5.2, 0.20),
-            "lens": 34.0,
-            "why": "V37 across-creek view: lower pitch gives water more frame while the cabin remains an off-axis destination.",
+            "location": (1.4, -19.8, 2.60),
+            "look": (-3.6, -10.6, -0.95),
+            "lens": 32.0,
+            "why": "V37 hero repair: closer/lower into the creek so water leads; cabin stays off-axis up-left.",
         },
         {
             "id": "D",
@@ -179,8 +179,8 @@ def default_shot_cameras() -> list[dict]:
             # V37: camera C remains authoritative, with a lower sightline and
             # wider lens so the creek leads before the off-axis cabin resolves.
             "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
-            "start": {"location": (0.2, -23.2, 3.05), "look": (-5.8, -5.2, 0.20), "lens": 34.0},
-            "end": {"location": (1.8, -22.0, 3.15), "look": (-3.8, -3.8, 0.35), "lens": 36.0},
+            "start": {"location": (1.4, -19.8, 2.60), "look": (-3.6, -10.6, -0.95), "lens": 32.0},
+            "end": {"location": (2.8, -18.8, 2.70), "look": (-1.8, -9.4, -0.75), "lens": 34.0},
         },
         {
             "id": "SHOT_03",
