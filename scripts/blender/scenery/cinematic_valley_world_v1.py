@@ -697,10 +697,12 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
     live_trees = [obj for obj in trees if obj and obj.type == "MESH"]
     # (x, y, scale, yaw) — irregular, no grid.
     dense_healthy = (
-        (-6.4, 7.2, 2.8, 0.20), (-4.8, 9.6, 3.1, 1.10), (-2.2, 8.0, 2.6, 2.40),
-        (-5.6, 12.4, 3.4, 0.70), (-1.4, 11.2, 2.9, 3.80), (-7.8, 10.8, 2.4, 5.10),
-        (-3.6, 14.8, 3.2, 1.90), (0.4, 9.4, 2.7, 4.20), (-8.8, 7.6, 2.5, 0.40),
-        (-0.8, 13.6, 3.0, 2.80), (-4.0, 6.2, 2.3, 1.50), (-6.8, 15.2, 2.8, 3.30),
+        (-6.4, 7.2, 3.4, 0.20), (-4.8, 9.6, 3.8, 1.10), (-2.2, 8.0, 3.2, 2.40),
+        (-5.6, 12.4, 4.2, 0.70), (-1.4, 11.2, 3.6, 3.80), (-7.8, 10.8, 3.0, 5.10),
+        (-3.6, 14.8, 4.0, 1.90), (0.4, 9.4, 3.3, 4.20), (-8.8, 7.6, 3.1, 0.40),
+        (-0.8, 13.6, 3.7, 2.80), (-4.0, 6.2, 2.9, 1.50), (-6.8, 15.2, 3.5, 3.30),
+        (-5.2, 19.4, 4.4, 0.60), (1.8, 16.8, 3.9, 2.20), (-2.6, 21.6, 4.1, 4.50),
+        (-7.4, 24.8, 3.6, 1.30), (3.2, 19.0, 4.0, 3.10),
     )
     short_earth = (
         (6.2, 18.4, 1.15, 0.30), (8.8, 21.0, 0.95, 2.10), (4.6, 22.8, 1.25, 4.00),
@@ -2303,8 +2305,8 @@ def lift_louis_face_shading(obj: bpy.types.Object) -> None:
         mix = _mix_rgb(mat.node_tree.nodes)
         if "Color1" not in mix.inputs:
             continue
-        mix.inputs["Fac"].default_value = 0.24
-        mix.inputs["Color2"].default_value = (0.42, 0.38, 0.28, 1.0)
+        mix.inputs["Fac"].default_value = 0.38
+        mix.inputs["Color2"].default_value = (0.56, 0.52, 0.38, 1.0)
         links = list(bsdf.inputs["Base Color"].links)
         if links:
             src = links[0].from_socket
@@ -2358,10 +2360,10 @@ def sit_louis_peak(obj: bpy.types.Object, peak_x: float, peak_y: float, scale: f
 
 
 def _shot02_ts(x: float, y: float) -> list[float]:
-    """Camera C V42 start: (2.4, -22.0) look (-3.2, -10.0)."""
-    dx = x - 2.4
-    dy = y + 22.0
-    return [round(dx * -0.423 + dy * 0.906, 2), round(dx * 0.906 + dy * 0.423, 2)]
+    """Camera C V42 start: (2.2, -21.4) look (-3.4, -10.2)."""
+    dx = x - 2.2
+    dy = y + 21.4
+    return [round(dx * -0.447 + dy * 0.895, 2), round(dx * 0.895 + dy * 0.447, 2)]
 
 
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0, rot_z: float = 0.0) -> None:
@@ -2437,11 +2439,10 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
         link_exclusive(meadow3, collection)
         placed.append(meadow3)
     if grassy1 is not None:
-        # Keep the purchased FACE (slope + shoulder + ridge), not a 20% cap.
-        # Clip only the 500 m apron that would flood the creek/village.
-        extract_louis_height_cap(grassy1, 0.30)
-        sit_louis_peak(grassy1, -1.6, 38.0, scale=0.28, rot_z=0.34, z_lift=0.15)
-        clip_louis_world_apron(grassy1, south_y=16.0)
+        # Full purchased mass. Height-capping left only a dark rocky peak.
+        # Clip the valley-flooding apron; keep the south-facing grassy slope.
+        sit_louis_peak(grassy1, -1.2, 40.0, scale=0.26, rot_z=0.12, z_lift=0.05)
+        clip_louis_world_apron(grassy1, south_y=15.0)
         lift_louis_face_shading(grassy1)
         link_exclusive(grassy1, collection)
         placed.append(grassy1)
@@ -2725,60 +2726,59 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     hero = [c for c in centers if HERO_X_MIN <= c.x <= HERO_X_MAX]
     if len(hero) < 6:
         return extras
-    layers = (
-        ("TJ_HeroWetShelf", wet_mat, "wet", WATER_SURFACE_Z - 0.04, WATER_SURFACE_Z + 0.05),
-        ("TJ_HeroDampShelf", soil_mat, "damp", WATER_SURFACE_Z + 0.03, -0.18),
-        ("TJ_HeroSoilShelf", soil_mat, "soil", -0.16, 0.10),
-        ("TJ_HeroGrassLip", grass_mat, "grass", 0.02, 0.16),
-        ("TJ_HeroMeadowBlend", grass_mat, "blend", 0.08, 0.14),
-    )
-    for name, mat, key, z_in, z_out in layers:
-        verts = []
-        faces = []
-        rows = 6
-        usable = 0
-        for i, center in enumerate(hero):
-            side = _side_from_centers(hero, i)
-            left, _right = _channel_halves_for_index(centers, _nearest_center_index(centers, center))
-            event = hero_shore_event(center.x)
-            water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.55 * event["water"])
-            if key == "wet":
-                inner, outer = -0.08, water_edge + event["wet"]
-            elif key == "damp":
-                inner, outer = water_edge * 0.10, water_edge + event["damp"]
-            elif key == "soil":
-                inner, outer = water_edge * 0.28, water_edge + event["soil"]
-            elif key == "blend":
-                inner = water_edge + event["soil"] * 0.70
-                outer = water_edge + event["soil"] + 2.40 + event["grass"]
-            else:
-                inner = water_edge + event["soil"] * 0.20
-                outer = water_edge + event["soil"] + 0.85 + event["grass"]
-            for row in range(rows):
-                t = row / float(rows - 1)
-                lat = inner + (outer - inner) * t
-                point = center + side * (-lat)
-                point.z = z_in + (z_out - z_in) * (t ** 1.15)
-                point.z += 0.03 * math.sin(center.x * 1.7 + row * 0.8)
-                verts.append((point.x, point.y, point.z))
-            usable += 1
-            if usable > 1:
-                v = (usable - 1) * rows
-                prev = v - rows
-                for row in range(rows - 1):
-                    faces.append((prev + row, prev + row + 1, v + row + 1, v + row))
-        mesh = bpy.data.meshes.new(name)
-        mesh.from_pydata(verts, [], faces)
-        mesh.update()
-        obj = bpy.data.objects.new(name, mesh)
-        bpy.context.scene.collection.objects.link(obj)
-        shade_smooth(obj)
-        obj.data.materials.append(mat)
-        if hasattr(obj, "visible_shadow"):
-            obj.visible_shadow = False
-        extras.append(obj)
+    # One closed bank solid. Thin stacked shelves left the V41 triangular voids.
+    rows = 8
+    top = []
+    for i, center in enumerate(hero):
+        side = _side_from_centers(hero, i)
+        left, _right = _channel_halves_for_index(centers, _nearest_center_index(centers, center))
+        event = hero_shore_event(center.x)
+        water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.55 * event["water"])
+        stations = (
+            (-0.18, BED_CENTER_Z + 0.22),
+            (water_edge * 0.15, WATER_SURFACE_Z - 0.06),
+            (water_edge + event["wet"] * 0.35, WATER_SURFACE_Z + 0.01),
+            (water_edge + event["wet"], WATER_SURFACE_Z + 0.05),
+            (water_edge + event["damp"], -0.35),
+            (water_edge + event["soil"] * 0.70, -0.08),
+            (water_edge + event["soil"] + event["grass"], 0.08),
+            (water_edge + event["soil"] + 2.20 + event["grass"], 0.13),
+        )
+        for row, (lat, z) in enumerate(stations):
+            point = center + side * (-lat)
+            point.z = z + 0.025 * math.sin(center.x * 1.55 + row * 0.7)
+            top.append((point.x, point.y, point.z))
+    verts = list(top)
+    for x, y, z in top:
+        verts.append((x, y, z - 0.28))
+    faces = []
+    samples = len(hero)
+    for i in range(samples - 1):
+        for row in range(rows - 1):
+            a = i * rows + row
+            b = a + 1
+            c = (i + 1) * rows + row + 1
+            d = (i + 1) * rows + row
+            faces.append((a, b, c, d))
+            faces.append((a + samples * rows, d + samples * rows, c + samples * rows, b + samples * rows))
+        inner_a = i * rows
+        inner_b = (i + 1) * rows
+        faces.append((inner_a, inner_b, inner_b + samples * rows, inner_a + samples * rows))
+        outer_a = i * rows + (rows - 1)
+        outer_b = (i + 1) * rows + (rows - 1)
+        faces.append((outer_a, outer_a + samples * rows, outer_b + samples * rows, outer_b))
+    mesh = bpy.data.meshes.new("TJ_HeroBankSolid")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new("TJ_HeroBankSolid", mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    shade_smooth(obj)
+    obj.data.materials.append(wet_mat)
+    if hasattr(obj, "visible_shadow"):
+        obj.visible_shadow = False
+    extras.append(obj)
     extras.extend(place_hero_embedded_rocks(centers, soil_mat))
-    print(json.dumps({"event": "hero_bank_support_built", "layers": 4, "heroSamples": len(hero)}), flush=True)
+    print(json.dumps({"event": "hero_bank_support_built", "layers": 1, "solid": True, "heroSamples": len(hero)}), flush=True)
     return extras
 
 
@@ -2818,7 +2818,7 @@ def place_hero_embedded_rocks(centers: list[Vector], soil_mat: bpy.types.Materia
                 continue
             used.add(px)
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
-            loc.z = WATER_SURFACE_Z - bury * 0.30
+            loc.z = WATER_SURFACE_Z - bury * 0.42
             rock = _add_lumpy_rock(f"TJ_HeroEmbed_{i}", loc, scale, mat, i * 0.47)
             extras.append(rock)
             mound = _add_lumpy_rock(f"TJ_HeroEmbedSoil_{i}", loc, scale * 1.25, soil_mat, i * 0.31)
@@ -3607,9 +3607,10 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="AREA", location=(6.0, 26.0, 20.0))
     louis = bpy.context.object
     louis.name = "TJ_LouisFaceFill"
-    louis.data.energy = 150
-    louis.data.size = 56
-    louis.rotation_euler = (math.radians(64), math.radians(-12), math.radians(22))
+    louis.data.energy = 260
+    louis.data.size = 64
+    louis.location = (1.0, 24.0, 15.0)
+    louis.rotation_euler = (math.radians(78), math.radians(-6), math.radians(8))
     if hasattr(louis.data, "color"):
         louis.data.color = (1.0, 0.90, 0.78)
     if hasattr(louis, "visible_glossy"):
