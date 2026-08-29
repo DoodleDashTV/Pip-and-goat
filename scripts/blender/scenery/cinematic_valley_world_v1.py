@@ -832,16 +832,15 @@ def place_hero_shore_grass(grass_src) -> list:
         return extras
     centers = evaluated_centerline(guide, samples=80)
     planted = 0
-    # Left occluders + upper-bank clumps. Nothing planted as a waterline row.
+    # Clumps beside the left rocks and higher on the bank. Not a waterline row.
     tufts = (
-        (-10.20, 1.70, 1.65),
-        (-8.30, 1.55, 1.85),
-        (-6.40, 2.05, 1.50),
-        (-9.40, 3.40, 1.45),
-        (-7.10, 3.80, 1.70),
-        (-4.20, 3.20, 1.55),
-        (-1.10, 3.60, 1.40),
-        (1.80, 3.30, 1.60),
+        (-10.55, 0.85, 1.55),
+        (-8.55, 0.95, 1.70),
+        (-6.55, 0.80, 1.45),
+        (-9.20, 2.80, 1.40),
+        (-7.00, 3.20, 1.55),
+        (-4.10, 2.60, 1.35),
+        (1.60, 2.90, 1.45),
     )
     used = set()
     for i, center in enumerate(centers):
@@ -2727,7 +2726,7 @@ def wet_stone_material() -> bpy.types.Material:
     bsdf = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
     if bsdf:
         if "Base Color" in bsdf.inputs:
-            bsdf.inputs["Base Color"].default_value = (0.075, 0.066, 0.055, 1.0)
+            bsdf.inputs["Base Color"].default_value = (0.155, 0.138, 0.118, 1.0)
         if "Roughness" in bsdf.inputs:
             bsdf.inputs["Roughness"].default_value = 0.48
         if "Specular IOR Level" in bsdf.inputs:
@@ -2781,29 +2780,27 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 
 
 def _add_hero_shore_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Material, yaw: float) -> bpy.types.Object:
-    """Embedded shoreline mass. Wide buried base so Camera C cannot see an underside."""
-    sx, sy, sz = 0.95 * scale, 0.88 * scale, 0.82 * scale
-    verts = [
-        (-0.78 * sx, -0.55 * sy, -0.48 * sz),
-        (0.70 * sx, -0.62 * sy, -0.44 * sz),
-        (0.82 * sx, 0.28 * sy, -0.40 * sz),
-        (0.10 * sx, 0.68 * sy, -0.42 * sz),
-        (-0.64 * sx, 0.46 * sy, -0.46 * sz),
-        (-0.20 * sx, -0.10 * sy, 0.56 * sz),
-        (0.30 * sx, 0.18 * sy, 0.50 * sz),
-        (0.04 * sx, 0.02 * sy, -0.62 * sz),
-    ]
-    faces = [
-        (0, 1, 6, 5), (1, 2, 6), (2, 3, 6), (3, 4, 5, 6), (4, 0, 5),
-        (0, 7, 1), (1, 7, 2), (2, 7, 3), (3, 7, 4), (4, 7, 0),
-    ]
+    """Closed convex stone, elongated along the shore. No camera-facing underside."""
+    bm = bmesh.new()
+    bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.52 * scale)
+    for vert in bm.verts:
+        vert.co.x *= 1.55
+        vert.co.y *= 0.68
+        vert.co.z *= 0.72
+        jitter = 0.07 * scale
+        vert.co.x += jitter * math.sin(vert.co.y * 3.1 + yaw)
+        vert.co.y += jitter * math.cos(vert.co.x * 2.7 + yaw * 1.3)
+        vert.co.z += 0.04 * scale * math.sin(vert.co.x * 2.2 + vert.co.y * 1.8)
+        if vert.co.z < 0.0:
+            vert.co.z *= 1.15
     mesh = bpy.data.meshes.new(name)
-    mesh.from_pydata(verts, [], faces)
+    bm.to_mesh(mesh)
+    bm.free()
     mesh.update()
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.location = (loc.x, loc.y, loc.z)
-    obj.rotation_euler = (0.18 * math.sin(yaw), 0.14 * math.cos(yaw * 0.7), yaw)
+    obj.rotation_euler = (0.10 * math.sin(yaw), 0.08 * math.cos(yaw * 0.7), yaw * 0.35)
     shade_smooth(obj)
     obj.data.materials.append(mat)
     return obj
@@ -2895,7 +2892,7 @@ def place_hero_macro_rocks(centers: list[Vector]) -> list:
                 continue
             used.add(px)
             loc = center + side * (-(emerge + south))
-            loc.z = WATER_SURFACE_Z + 0.22 - scale * bury * 0.35
+            loc.z = WATER_SURFACE_Z - 0.16
             extras.append(_add_hero_shore_rock(f"TJ_HeroMacroRock_{i}", loc, scale, mat, 0.61 * i + px))
             placed.append({
                 "x": round(loc.x, 2),
