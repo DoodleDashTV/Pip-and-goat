@@ -487,7 +487,7 @@ def soften_channel_crest(ground: bpy.types.Object) -> None:
         neighbors[a].append(b)
         neighbors[b].append(a)
     zs = [vert.co.z for vert in mesh.vertices]
-    for _pass in range(3):
+    for _pass in range(5):
         nxt = zs[:]
         for index, vert in enumerate(mesh.vertices):
             dist, signed, _along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
@@ -498,7 +498,7 @@ def soften_channel_crest(ground: bpy.types.Object) -> None:
                 continue
             avg = sum(zs[j] for j in neighbors[index]) / float(len(neighbors[index]))
             t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
-            amt = 0.38 + 0.32 * min(1.0, max(0.0, t))
+            amt = 0.48 + 0.30 * min(1.0, max(0.0, t))
             nxt[index] = zs[index] * (1.0 - amt) + avg * amt
         zs = nxt
     for index, vert in enumerate(mesh.vertices):
@@ -542,7 +542,7 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(blotch_range.outputs["Result"] if "Result" in blotch_range.outputs else blotch_range.outputs[0], mask_mul.inputs[1])
     mask = mask_mul.outputs["Value"]
     links.new(incoming, damp.inputs["Color1"])
-    damp.inputs["Color2"].default_value = (0.078, 0.062, 0.032, 1.0)
+    damp.inputs["Color2"].default_value = (0.048, 0.038, 0.020, 1.0)
     damp_fac = nodes.new("ShaderNodeMapRange")
     damp_fac.inputs["From Min"].default_value = 0.0
     damp_fac.inputs["From Max"].default_value = 0.72
@@ -551,7 +551,7 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(mask, damp_fac.inputs["Value"])
     links.new(damp_fac.outputs["Result"] if "Result" in damp_fac.outputs else damp_fac.outputs[0], damp.inputs["Fac"])
     links.new(damp.outputs["Color"], wet.inputs["Color1"])
-    wet.inputs["Color2"].default_value = (0.042, 0.034, 0.018, 1.0)
+    wet.inputs["Color2"].default_value = (0.030, 0.024, 0.012, 1.0)
     wet_fac = nodes.new("ShaderNodeMapRange")
     wet_fac.inputs["From Min"].default_value = 0.18
     wet_fac.inputs["From Max"].default_value = 0.90
@@ -593,19 +593,19 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(hole_avg.outputs["Value"], hole_half.inputs[0])
     thresh_span = nodes.new("ShaderNodeMath")
     thresh_span.operation = "MULTIPLY"
-    thresh_span.inputs[1].default_value = 0.40
+    thresh_span.inputs[1].default_value = 0.48
     links.new(hole_half.outputs["Value"], thresh_span.inputs[0])
     thresh = nodes.new("ShaderNodeMath")
     thresh.operation = "ADD"
-    thresh.inputs[1].default_value = 0.07
+    thresh.inputs[1].default_value = 0.16
     links.new(thresh_span.outputs["Value"], thresh.inputs[0])
     delta = nodes.new("ShaderNodeMath")
     delta.operation = "SUBTRACT"
     links.new(mask, delta.inputs[0])
     links.new(thresh.outputs["Value"], delta.inputs[1])
     patch = nodes.new("ShaderNodeMapRange")
-    patch.inputs["From Min"].default_value = -0.07
-    patch.inputs["From Max"].default_value = 0.11
+    patch.inputs["From Min"].default_value = -0.16
+    patch.inputs["From Max"].default_value = 0.20
     patch.inputs["To Min"].default_value = 0.0
     patch.inputs["To Max"].default_value = 1.0
     links.new(delta.outputs["Value"], patch.inputs["Value"])
@@ -673,8 +673,8 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     coord = nodes.new("ShaderNodeTexCoord")
     mix = _mix_rgb(nodes)
     if "Color1" in mix.inputs:
-        mix.inputs["Color1"].default_value = (0.008, 0.007, 0.004, 1.0)
-        mix.inputs["Color2"].default_value = (0.026, 0.020, 0.012, 1.0)
+        mix.inputs["Color1"].default_value = (0.014, 0.011, 0.007, 1.0)
+        mix.inputs["Color2"].default_value = (0.038, 0.030, 0.018, 1.0)
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     if "Roughness" in body.inputs:
@@ -773,10 +773,10 @@ def _water_variant_cfg(variant: str, tint) -> dict:
         "rough_lo": 0.20,
         "rough_hi": 0.38,
         "extra_glossy": False,
-        "glossy_color": (0.22, 0.28, 0.26, 1.0),
-        "gloss_rough_lo": 0.18,
-        "gloss_rough_hi": 0.36,
-        "bump": 0.34,
+        "glossy_color": (0.16, 0.20, 0.19, 1.0),
+        "gloss_rough_lo": 0.30,
+        "gloss_rough_hi": 0.50,
+        "bump": 0.20,
         "deep": deep,
     }
 
@@ -1005,33 +1005,50 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         # keeps bed-through and liquid sheen without an HDRI ribbon.
         for link in list(out.inputs["Surface"].links):
             links.remove(link)
-        wave_mul = nodes.new("ShaderNodeMath")
-        wave_mul.operation = "MULTIPLY"
-        wave_mul.inputs[1].default_value = 0.26
-        wave_src = wave.outputs["Fac"] if "Fac" in wave.outputs else wave.outputs[0]
-        links.new(wave_src, wave_mul.inputs[0])
+        stretch = nodes.new("ShaderNodeMapping")
+        stretch.inputs["Scale"].default_value = (3.4, 0.55, 1.0)
+        links.new(coord.outputs["Object"], stretch.inputs["Vector"])
+        flow_n = nodes.new("ShaderNodeTexNoise")
+        flow_n.inputs["Scale"].default_value = 1.8
+        if "Detail" in flow_n.inputs:
+            flow_n.inputs["Detail"].default_value = 4.0
+        if "Roughness" in flow_n.inputs:
+            flow_n.inputs["Roughness"].default_value = 0.42
+        links.new(stretch.outputs["Vector"], flow_n.inputs["Vector"])
+        flow_mul = nodes.new("ShaderNodeMath")
+        flow_mul.operation = "MULTIPLY"
+        flow_mul.inputs[1].default_value = 0.22
+        links.new(flow_n.outputs["Fac"], flow_mul.inputs[0])
         flow = nodes.new("ShaderNodeMath")
         flow.operation = "ADD"
         links.new(combo.outputs["Value"], flow.inputs[0])
-        links.new(wave_mul.outputs["Value"], flow.inputs[1])
+        links.new(flow_mul.outputs["Value"], flow.inputs[1])
         for link in list(bump.inputs["Height"].links):
             links.remove(link)
         links.new(flow.outputs["Value"], bump.inputs["Height"])
-        trans = nodes.new("ShaderNodeBsdfTransparent")
+        trans = nodes.new("ShaderNodeBsdfRefraction")
+        if hasattr(trans, "distribution"):
+            trans.distribution = "GGX"
         if "Color" in trans.inputs:
             trans.inputs["Color"].default_value = (
-                min(0.46, max(0.22, deep[0] * 10.0 + 0.18)),
-                min(0.64, max(0.34, deep[1] * 10.0 + 0.26)),
-                min(0.56, max(0.28, deep[2] * 10.0 + 0.22)),
+                min(0.78, max(0.58, deep[0] * 14.0 + 0.52)),
+                min(0.88, max(0.70, deep[1] * 14.0 + 0.64)),
+                min(0.82, max(0.64, deep[2] * 14.0 + 0.58)),
                 1.0,
             )
+        if "IOR" in trans.inputs:
+            trans.inputs["IOR"].default_value = 1.05
+        if "Roughness" in trans.inputs:
+            trans.inputs["Roughness"].default_value = 0.10
+        if "Normal" in trans.inputs:
+            links.new(bump.outputs["Normal"], trans.inputs["Normal"])
         if "Color" in glossy.inputs:
             glossy.inputs["Color"].default_value = cfg["glossy_color"]
         face_amt = nodes.new("ShaderNodeMapRange")
         face_amt.inputs["From Min"].default_value = 0.0
         face_amt.inputs["From Max"].default_value = 1.0
-        face_amt.inputs["To Min"].default_value = 0.17
-        face_amt.inputs["To Max"].default_value = 0.33
+        face_amt.inputs["To Min"].default_value = 0.20
+        face_amt.inputs["To Max"].default_value = 0.30
         links.new(layer.outputs["Facing"], face_amt.inputs["Value"])
         face_var = nodes.new("ShaderNodeMapRange")
         face_var.inputs["From Min"].default_value = 0.0
@@ -1071,7 +1088,7 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         if "Color" in absorb.inputs:
             absorb.inputs["Color"].default_value = (0.06, 0.13, 0.10, 1.0)
         if "Density" in absorb.inputs:
-            absorb.inputs["Density"].default_value = 0.85
+            absorb.inputs["Density"].default_value = 0.32
         links.new(absorb.outputs["Volume"], out.inputs["Volume"])
         if hasattr(mat, "cycles"):
             try:
@@ -1217,13 +1234,15 @@ def spline_channel_mesh(
             south_bay = (i % 23)
             north_bay = (i % 29)
             if 8 <= south_bay <= 12:
-                left_pinch *= 0.52 + 0.08 * math.sin(i * 0.9)
+                left_pinch *= 0.42 + 0.10 * math.sin(i * 0.9)
             if 15 <= north_bay <= 18:
-                right_pinch *= 0.48 + 0.10 * math.cos(i * 0.7)
+                right_pinch *= 0.40 + 0.12 * math.cos(i * 0.7)
             if south_bay == 3:
-                left_pinch *= 0.70
+                left_pinch *= 0.58
             if north_bay == 6:
-                right_pinch *= 0.66
+                right_pinch *= 0.55
+            if south_bay == 19:
+                left_pinch *= 0.62
         for col, offset in enumerate(offsets):
             pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
@@ -1240,9 +1259,10 @@ def spline_channel_mesh(
             z_jit = 0.0 if foam_edges else 0.05 * math.sin(i * 0.29 + col * 0.8)
             point.z = z_center + (z_edge - z_center) * edge + z_jit
             if foam_edges:
-                swell = 0.070 * math.sin(i * 0.19 + center.x * 0.31)
-                swell += 0.040 * math.sin(i * 0.41 + col * 1.05 + center.y * 0.26)
-                swell += 0.022 * math.sin(i * 0.77 + col * 2.0)
+                swell = 0.095 * math.sin(i * 0.19 + center.x * 0.31)
+                swell += 0.055 * math.sin(i * 0.41 + col * 1.05 + center.y * 0.26)
+                swell += 0.038 * math.sin(i * 0.77 + col * 2.0)
+                swell += 0.024 * math.sin(i * 1.13 + col * 1.6 + center.x * 0.5)
                 point.z += swell
             verts.append((point.x, point.y, point.z))
             if foam_edges:
@@ -1542,9 +1562,9 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
         rock = bpy.context.object
         rock.name = f"TJ_WaterlineStone_{i}"
         rock.scale = (
-            0.30 + 0.14 * ((i * 3) % 5) / 4.0,
-            0.16 + 0.08 * ((i * 2) % 4) / 3.0,
-            0.07 + 0.03 * (i % 3) / 2.0,
+            0.55 + 0.22 * ((i * 3) % 5) / 4.0,
+            0.28 + 0.14 * ((i * 2) % 4) / 3.0,
+            0.12 + 0.05 * (i % 3) / 2.0,
         )
         rock.rotation_euler = (0.18 * math.sin(i * 0.7), 0.14 * math.cos(i * 0.5), i * 0.63)
         try:
