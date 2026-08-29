@@ -25,6 +25,7 @@ from cinematic_creek_profile import (  # noqa: E402
     hero_north_notch_depth,
     hero_north_wet_tongue,
     hero_shore_event,
+    hero_south_water_factor,
     hero_south_wet_tongue,
     hero_waterline_bite,
 )
@@ -386,9 +387,8 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     bite = hero_grass_lip(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
     water_half = local * 0.34 + max(0.0, bite) * 0.22
     if south and HERO_X_MIN <= x <= HERO_X_MAX:
-        # Terrain must follow the same erosion events as the hero bank mesh.
-        ev = hero_shore_event(x)
-        water_half = local * WATER_WIDTH_SCALE * max(0.55, min(1.50, 1.0 + 0.70 * ev["water"]))
+        # Terrain, water film, and bank solid share one south-edge factor.
+        water_half = local * WATER_WIDTH_SCALE * hero_south_water_factor(x)
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
@@ -542,6 +542,11 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             # SHOT_02 midground (creek to cabin) needs glancing-angle relief.
             if -10.0 <= y <= 12.0 and -10.0 <= x <= 8.0:
                 height += amt * 0.14 * (mid - 0.5)
+            # Very low-frequency meadow rolls. Wavelength ~25 m, not noise lumps.
+            roll = 0.18 * math.sin(x * 0.25 + 0.40) * math.cos(y * 0.21 + 0.70)
+            if in_village(x, y):
+                roll *= 0.12
+            height += amt * roll
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
                 (VILLAGE_X_HALF - abs(x)) / 4.0,
@@ -677,109 +682,103 @@ def _plant_grass(src, loc, scale: float, yaw: float):
     sap = duplicate_mesh_in_world(src, loc, scale)
     sap.hide_render = False
     sap.hide_viewport = False
-    # Tilt toward the high SHOT_01 camera so the purchased clump has area, not an edge.
-    sap.rotation_euler.x = 0.42
-    sap.rotation_euler.z += yaw
-    sap.location.z = 0.04
+    # Upright purchased tufts. The V42 0.42 x-tilt made Grass01 a green card.
+    sap.rotation_euler.x = 0.0
+    sap.rotation_euler.y = 0.0
+    sap.rotation_euler.z = yaw
+    sap.location.z = loc[2] if len(loc) > 2 else 0.02
     if hasattr(sap, "visible_shadow"):
         sap.visible_shadow = False
     return sap
 
 
-def place_structural_meadow_zones(grass_src, trees: list) -> list:
-    """SHOT_01/02 ecological zones via density, height, and real objects.
+def _meadow_zone_points(cx: float, cy: float, rx: float, ry: float, count: int, seed: float):
+    """Irregular disk samples. Not a grid, not a duplicated patch."""
+    points = []
+    for i in range(count):
+        ang = i * 2.399963 + seed
+        radius = math.sqrt((i + 0.31) / max(1, count))
+        radius *= 0.82 + 0.18 * math.sin(i * 1.73 + seed)
+        x = cx + radius * rx * math.cos(ang) + 0.22 * rx * math.sin(i * 2.11 + seed)
+        y = cy + radius * ry * math.sin(ang) + 0.20 * ry * math.cos(i * 1.67 + seed * 1.4)
+        points.append((x, y))
+    return points
 
-    Shader continents stay as support. These plants/stones/litter are the
-    structural difference that stops the meadow reading as one masked plane.
+
+def _meadow_keep(x: float, y: float) -> bool:
+    if in_river_channel(x, y, margin=1.45):
+        return False
+    if abs(x) < 3.0 and -4.0 < y < 18.0:
+        return False
+    return True
+
+
+def place_structural_meadow_zones(grass_src, trees: list) -> list:
+    """Physical meadow structure for SHOT_01: density, height, and empty ground.
+
+    Large tilted Grass01 copies are gone. Zones differ by plant count, scale,
+    and actual bare earth — not by another shader mask.
     """
     extras = []
     dirt = (0.160, 0.096, 0.046)
     needle = (0.030, 0.042, 0.016)
     live_trees = [obj for obj in trees if obj and obj.type == "MESH"]
-    # (x, y, scale, yaw) — irregular, no grid.
-    dense_healthy = (
-        (-6.4, 7.2, 9.5, 0.20), (-4.8, 9.6, 11.0, 1.10), (-2.2, 8.0, 8.8, 2.40),
-        (-5.6, 12.4, 12.2, 0.70), (-1.4, 11.2, 10.4, 3.80), (-7.8, 10.8, 8.2, 5.10),
-        (-3.6, 14.8, 11.6, 1.90), (0.4, 9.4, 9.0, 4.20), (-8.8, 7.6, 8.6, 0.40),
-        (-0.8, 13.6, 10.8, 2.80), (-4.0, 6.2, 7.8, 1.50), (-6.8, 15.2, 10.2, 3.30),
-        (-5.2, 19.4, 12.8, 0.60), (1.8, 16.8, 11.2, 2.20), (-2.6, 21.6, 12.0, 4.50),
-        (-7.4, 24.8, 10.6, 1.30), (3.2, 19.0, 11.4, 3.10),
-        (4.8, 28.6, 13.0, 0.90), (-9.6, 30.2, 12.4, 2.70), (2.4, 33.4, 11.8, 4.10),
-    )
-    short_earth = (
-        (6.2, 18.4, 1.15, 0.30), (8.8, 21.0, 0.95, 2.10), (4.6, 22.8, 1.25, 4.00),
-        (7.4, 16.2, 0.85, 1.20), (10.2, 19.6, 1.05, 3.50), (5.4, 26.4, 0.90, 5.40),
-        (9.6, 24.8, 1.20, 0.80),
-    )
-    needle_zone = (
-        (-16.4, 14.2, 1.6, 0.50), (-14.2, 18.6, 1.4, 2.20), (-17.8, 20.4, 1.8, 4.10),
-        (-13.0, 12.8, 1.3, 1.70), (-15.6, 23.2, 1.5, 3.90),
-    )
-    tall_wild = (
-        (-2.8, -3.4, 7.2, 0.25), (1.6, -5.2, 6.4, 1.80), (-5.2, -1.2, 7.8, 3.40),
-        (0.2, -1.8, 5.8, 5.00), (-6.4, -4.8, 6.8, 2.10), (2.2, -7.0, 6.2, 4.60),
-        (-4.4, -6.2, 6.6, 1.40), (-1.8, -8.4, 5.4, 0.70),
-    )
-    worn_strip = (
-        (-3.8, -6.8, 0.72, 0.10), (-1.6, -4.6, 0.64, 2.40), (0.4, -2.2, 0.80, 4.20),
-        (-2.4, 0.6, 0.58, 1.10), (1.2, 3.2, 0.70, 3.30),
-    )
-    rocky_sparse = (
-        (7.8, 8.4, 1.10, 0.60), (10.4, 12.2, 0.88, 2.90), (6.6, 13.6, 1.00, 4.80),
-    )
-    cabin_edge = (
-        (-8.4, 2.2, 1.8, 0.40), (-11.2, 6.4, 1.5, 2.20), (8.2, 4.8, 1.6, 3.70),
-        (-7.2, 8.8, 2.0, 1.10),
-    )
-    groups = (
-        ("A_dense", dense_healthy),
-        ("B_earth", short_earth),
-        ("C_needle", needle_zone),
-        ("D_wild", tall_wild),
-        ("E_worn", worn_strip),
-        ("F_rocky", rocky_sparse),
-        ("G_cabin", cabin_edge),
-    )
     planted = 0
+    # (tag, cx, cy, rx, ry, count, scale_lo, scale_hi, seed)
+    # Natural Grass01 is ~1 x 1 x 0.22 m. Usable tuft scale is 1.0–2.8 upright.
+    zones = (
+        ("dense_medium", -5.2, 10.8, 6.4, 5.2, 42, 1.35, 2.15, 0.40),
+        ("short_sparse", 8.4, 20.2, 5.8, 4.6, 9, 0.85, 1.25, 1.10),
+        ("needle_litter", -15.6, 17.4, 4.2, 5.0, 6, 0.90, 1.35, 2.20),
+        ("tall_wild", -2.4, -4.8, 4.8, 3.2, 16, 2.15, 2.75, 3.05),
+        ("rocky_sparse", 8.6, 11.0, 3.4, 2.8, 5, 1.00, 1.45, 4.40),
+        ("worn_open", -1.2, -1.6, 3.6, 5.8, 7, 0.62, 0.95, 5.15),
+        ("cabin_edge", -9.4, 5.2, 2.6, 3.4, 8, 1.20, 1.80, 0.85),
+    )
     if grass_src is not None:
-        for tag, plants in groups:
-            for i, (x, y, scale, yaw) in enumerate(plants):
-                if in_river_channel(x, y, margin=1.35):
+        for tag, cx, cy, rx, ry, count, slo, shi, seed in zones:
+            for i, (x, y) in enumerate(_meadow_zone_points(cx, cy, rx, ry, count, seed)):
+                if not _meadow_keep(x, y):
                     continue
-                if abs(x) < 3.2 and -4.0 < y < 18.0:
-                    continue
-                extras.append(_plant_grass(grass_src, (x, y, 0.0), scale, yaw + 0.17 * i))
+                t = (i % 7) / 6.0
+                scale = slo + (shi - slo) * t
+                extras.append(_plant_grass(grass_src, (x, y, 0.02), scale, seed + 0.37 * i))
                 planted += 1
-    # Macro dressings: bare openings, needle beds, stone groups — few and intentional.
+    extras.extend(place_hero_shore_grass(grass_src))
+    # Bare earth is a first-class zone: no grass, visible ground + stones.
     macros = (
-        (7.2, 20.6, 3.8, 1.6, dirt, 0.22),
-        (9.4, 17.8, 2.6, 1.2, dirt, 1.10),
-        (5.8, 24.2, 3.2, 1.4, dirt, 2.40),
-        (-15.2, 16.8, 4.4, 2.2, needle, 0.55),
-        (-17.0, 21.6, 3.6, 1.8, needle, 1.80),
-        (-2.0, -5.8, 2.8, 1.1, dirt, 0.90),
-        (0.8, 1.4, 2.2, 0.9, dirt, 2.10),
-        (8.6, 10.8, 2.4, 1.0, dirt, 3.20),
+        (8.2, 20.4, 4.6, 2.2, dirt, 0.28),
+        (10.4, 17.2, 3.4, 1.6, dirt, 1.20),
+        (6.4, 24.8, 3.8, 1.8, dirt, 2.55),
+        (7.6, 15.6, 2.8, 1.4, dirt, 0.70),
+        (-15.4, 16.4, 5.0, 2.4, needle, 0.55),
+        (-17.2, 21.8, 4.2, 2.0, needle, 1.80),
+        (-14.6, 12.6, 3.2, 1.6, needle, 2.90),
+        (-2.2, -6.2, 3.4, 1.4, dirt, 0.90),
+        (1.0, 1.8, 2.6, 1.1, dirt, 2.10),
+        (8.8, 10.4, 2.8, 1.3, dirt, 3.20),
+        (0.2, -3.4, 2.2, 4.4, dirt, 0.18),
     )
     for i, (x, y, sx, sy, color, yaw) in enumerate(macros):
         if in_river_channel(x, y, margin=1.2):
             continue
-        extras.append(_add_eco_disk(f"TJ_ZoneBed_{i}", Vector((x, y, 0.08)), sx, sy, color, yaw))
+        extras.append(_add_eco_disk(f"TJ_ZoneBed_{i}", Vector((x, y, 0.07)), sx, sy, color, yaw))
     stone_mat = dirt_bank_material()
     if stone_mat.node_tree:
         body = next((node for node in stone_mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
         if body and "Base Color" in body.inputs:
             body.inputs["Base Color"].default_value = (0.22, 0.18, 0.14, 1.0)
     rocks = (
-        (8.2, 11.6, 0.85), (9.4, 10.4, 0.62), (7.4, 10.2, 0.48),
-        (6.6, 21.4, 0.70), (-1.4, -6.6, 0.55),
+        (8.4, 11.4, 0.95), (9.6, 10.2, 0.68), (7.2, 10.0, 0.52),
+        (6.8, 21.8, 0.78), (10.8, 19.2, 0.60), (-1.6, -6.8, 0.58),
+        (8.0, 13.2, 0.42), (-16.2, 15.0, 0.48),
     )
     for i, (x, y, scale) in enumerate(rocks):
         if in_river_channel(x, y, margin=1.0):
             continue
-        extras.append(_add_lumpy_rock(f"TJ_MeadowStone_{i}", Vector((x, y, 0.06)), scale, stone_mat, i * 0.73))
+        extras.append(_add_lumpy_rock(f"TJ_MeadowStone_{i}", Vector((x, y, 0.05)), scale, stone_mat, i * 0.73))
     if live_trees:
-        saplings = ((-15.8, 15.4, 0.16), (-14.4, 20.8, 0.13), (-17.2, 18.2, 0.18))
+        saplings = ((-15.8, 15.4, 0.16), (-14.4, 20.8, 0.13), (-17.2, 18.2, 0.18), (-16.6, 12.8, 0.12))
         for i, (x, y, scale) in enumerate(saplings):
             if in_river_channel(x, y, margin=0.8):
                 continue
@@ -791,7 +790,46 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
         "grassPlants": planted,
         "zones": 7,
         "macros": len(macros),
+        "cardLikeRemoved": True,
+        "uprightTufts": True,
     }), flush=True)
+    return extras
+
+
+def place_hero_shore_grass(grass_src) -> list:
+    """Naturally sized tufts that hide sections of the SHOT_02 waterline."""
+    extras = []
+    if grass_src is None:
+        return extras
+    guide = bpy.data.objects.get("TJ_River_SplineGuide")
+    if guide is None:
+        return extras
+    centers = evaluated_centerline(guide, samples=80)
+    planted = 0
+    # (x, edge, scale) edge 1 = film lip, <1 over water, >1 on bank
+    tufts = (
+        (-10.2, 1.18, 1.85), (-9.2, 0.92, 2.15), (-8.0, 1.35, 1.55),
+        (-6.6, 1.08, 2.05), (-5.4, 1.42, 1.70), (-4.2, 0.88, 2.25),
+        (-2.6, 1.22, 1.90), (-1.4, 1.55, 1.45), (0.2, 0.95, 2.10),
+        (1.6, 1.28, 1.65), (3.0, 1.48, 1.80), (4.4, 1.02, 2.20),
+        (5.6, 1.32, 1.50), (6.8, 0.90, 1.95),
+    )
+    used = set()
+    for i, center in enumerate(centers):
+        if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+            continue
+        side = _side_from_centers(centers, i)
+        left, _right = _channel_halves_for_index(centers, i)
+        water_edge = left * WATER_WIDTH_SCALE * hero_south_water_factor(center.x)
+        for px, edge, scale in tufts:
+            if px in used or abs(center.x - px) > 0.70:
+                continue
+            used.add(px)
+            loc = center + side * (-water_edge * edge)
+            loc.z = 0.03 if edge >= 1.0 else WATER_SURFACE_Z + 0.10
+            extras.append(_plant_grass(grass_src, (loc.x, loc.y, loc.z), scale, 0.41 * planted))
+            planted += 1
+    print(json.dumps({"event": "hero_shore_grass", "tufts": planted}), flush=True)
     return extras
 
 
@@ -2035,29 +2073,33 @@ def spline_channel_mesh(
         left_pinch = 0.80 + 0.28 * math.sin(i * 0.11) + (0.22 * math.sin(i * 0.31) if foam_edges else 0.0)
         right_pinch = 0.76 + 0.26 * math.sin(i * 0.17 + 1.3) + (0.20 * math.cos(i * 0.23) if foam_edges else 0.0)
         if foam_edges:
-            south_bay = (i % 23)
-            north_bay = (i % 29)
-            if 8 <= south_bay <= 12:
-                left_pinch *= 0.42 + 0.10 * math.sin(i * 0.9)
-            if 15 <= north_bay <= 18:
-                right_pinch *= 0.40 + 0.12 * math.cos(i * 0.7)
-            if south_bay == 3:
-                left_pinch *= 0.58
-            if north_bay == 6:
-                right_pinch *= 0.55
-            if south_bay == 19:
-                left_pinch *= 0.62
             if HERO_X_MIN <= center.x <= HERO_X_MAX:
                 event = hero_shore_event(center.x)
-                left_pinch *= max(0.36, min(1.75, 1.0 + 0.95 * event["water"]))
+                left_pinch = hero_south_water_factor(center.x)
                 right_pinch *= max(0.58, min(1.28, 1.0 + 0.22 * event["water"]))
+            else:
+                south_bay = (i % 23)
+                north_bay = (i % 29)
+                if 8 <= south_bay <= 12:
+                    left_pinch *= 0.42 + 0.10 * math.sin(i * 0.9)
+                if 15 <= north_bay <= 18:
+                    right_pinch *= 0.40 + 0.12 * math.cos(i * 0.7)
+                if south_bay == 3:
+                    left_pinch *= 0.58
+                if north_bay == 6:
+                    right_pinch *= 0.55
+                if south_bay == 19:
+                    left_pinch *= 0.62
         for col, offset in enumerate(offsets):
             pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
             edge_noise = 0.0
             if abs(offset) > 0.62:
                 edge_noise = 0.34 * math.sin(i * 0.37 + col * 1.7) + 0.22 * math.sin(i * 0.19)
-                if foam_edges:
+                if foam_edges and HERO_X_MIN <= center.x <= HERO_X_MAX and offset < 0.0:
+                    # Keep the hero south seal. Lateral noise here opened the V42 void.
+                    edge_noise = 0.05 * math.sin(i * 0.37)
+                elif foam_edges:
                     edge_noise += 0.34 * math.sin(i * 0.53 + (1.0 if offset >= 0.0 else -1.0))
                     edge_noise += 0.20 * math.sin(i * 0.91 + col * 2.1)
                     edge_noise += 0.12 * math.sin(i * 1.37 + along_depth * 4.0)
@@ -2704,25 +2746,55 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 
 
 # Camera-visible shoreline rocks. edge=1 sits on the water film edge.
+# Irregular clusters, not an even march. Some in water, some on bank.
 HERO_EDGE_ROCKS = (
-    (-9.8, 2.40, 0.95, 0.34),
-    (-7.1, 3.10, 1.12, 0.28),
-    (-4.6, 2.05, 0.82, 0.40),
-    (-2.0, 3.35, 1.18, 0.30),
-    (0.8, 2.25, 0.90, 0.36),
-    (3.6, 2.85, 1.25, 0.26),
-    (6.0, 1.85, 0.72, 0.44),
+    (-10.6, 2.55, 0.78, 0.38),
+    (-8.5, 1.65, 1.20, 0.32),
+    (-7.4, 3.15, 0.94, 0.26),
+    (-3.9, 2.85, 1.06, 0.40),
+    (-3.0, 1.55, 0.70, 0.46),
+    (1.3, 2.45, 1.22, 0.30),
+    (4.7, 3.05, 0.88, 0.34),
 )
+
+
+def _add_hero_shore_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Material, yaw: float) -> bpy.types.Object:
+    """Taller shoreline mass so Camera C sees a silhouette, not a pebble."""
+    sx, sy, sz = 0.92 * scale, 0.74 * scale, 0.88 * scale
+    verts = [
+        (-0.70 * sx, -0.42 * sy, -0.22 * sz),
+        (0.62 * sx, -0.50 * sy, -0.16 * sz),
+        (0.78 * sx, 0.22 * sy, -0.10 * sz),
+        (0.12 * sx, 0.60 * sy, -0.14 * sz),
+        (-0.58 * sx, 0.38 * sy, -0.18 * sz),
+        (-0.18 * sx, -0.08 * sy, 0.58 * sz),
+        (0.28 * sx, 0.16 * sy, 0.50 * sz),
+        (0.04 * sx, 0.02 * sy, -0.34 * sz),
+    ]
+    faces = [
+        (0, 1, 6, 5), (1, 2, 6), (2, 3, 6), (3, 4, 5, 6), (4, 0, 5),
+        (0, 7, 1), (1, 7, 2), (2, 7, 3), (3, 7, 4), (4, 7, 0),
+    ]
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = (loc.x, loc.y, loc.z)
+    obj.rotation_euler = (0.18 * math.sin(yaw), 0.14 * math.cos(yaw * 0.7), yaw)
+    shade_smooth(obj)
+    obj.data.materials.append(mat)
+    return obj
 
 
 def _hero_zone_material(kind: str) -> bpy.types.Material:
     mat = dirt_bank_material()
     colors = {
-        "wet": ((0.068, 0.048, 0.026), 0.58, 0.30),
-        "damp": ((0.118, 0.078, 0.040), 0.78, 0.16),
-        "soil": ((0.168, 0.108, 0.052), 0.92, 0.08),
-        "grass": ((0.048, 0.086, 0.030), 0.96, 0.04),
-        "gravel": ((0.145, 0.125, 0.095), 0.70, 0.18),
+        "wet": ((0.058, 0.042, 0.024), 0.82, 0.10),
+        "damp": ((0.108, 0.072, 0.038), 0.92, 0.05),
+        "soil": ((0.155, 0.100, 0.050), 0.96, 0.04),
+        "grass": ((0.044, 0.078, 0.028), 0.98, 0.03),
+        "gravel": ((0.138, 0.118, 0.090), 0.86, 0.08),
     }
     col, rough, spec = colors.get(kind, colors["soil"])
     if mat.node_tree:
@@ -2736,11 +2808,38 @@ def _hero_zone_material(kind: str) -> bpy.types.Material:
     return mat
 
 
-def build_hero_bank_support(centers: list[Vector]) -> list:
-    """Closed south-bank volume that fills the carved trough under the water.
+def _hero_bank_runs(kind: str, event: dict) -> tuple[float, float, float, float]:
+    """Wet / damp / soil / grass runs from the shared water edge, in metres."""
+    if kind == "overhang":
+        return 0.08, 0.16, 0.34, 0.52
+    if kind == "inlet":
+        return 0.10, 0.20, 0.48, 0.04
+    if kind == "shelf":
+        return 1.20, 1.95, 2.45, 0.06
+    if kind == "retreat":
+        return 0.20, 1.35, 1.95, 0.05
+    if kind == "rock":
+        return 0.14, 0.36, 0.62, 0.08
+    if kind == "gravel":
+        return 0.72, 1.20, 1.65, 0.03
+    if kind == "bay":
+        return 1.05, 1.65, 2.10, 0.03
+    if kind == "cut":
+        return 0.10, 0.28, 0.62, 0.06
+    return (
+        max(0.08, event.get("wet", 0.20)),
+        max(0.16, event.get("damp", 0.45)),
+        max(0.34, event.get("soil", 0.80)),
+        max(0.03, event.get("grass", 0.10)),
+    )
 
-    V42 cavity: the solid sat beside a carved channel, so Camera C looked
-    into the empty bed. This volume reaches the bed under the film.
+
+def build_hero_bank_support(centers: list[Vector]) -> list:
+    """Narrow south-bank fillet from bed to grass. No camera-facing apron.
+
+    V43-b cavity: a 4.2 m outer station became a brown slab, and downward
+    face winding read as black voids. This mesh stays under the film, meets
+    the shared water edge, and stops as soon as it can merge into terrain.
     """
     extras = []
     wet_mat = _hero_zone_material("wet")
@@ -2751,50 +2850,51 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     hero = [c for c in centers if HERO_X_MIN <= c.x <= HERO_X_MAX]
     if len(hero) < 6:
         return extras
-    rows = 8
+    rows = 7
     top = []
     kinds = []
     for i, center in enumerate(hero):
         side = _side_from_centers(hero, i)
         left, _right = _channel_halves_for_index(centers, _nearest_center_index(centers, center))
         event = hero_shore_event(center.x)
-        water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.90 * event["water"])
+        water_edge = left * WATER_WIDTH_SCALE * hero_south_water_factor(center.x)
         swell = 0.0
-        notch = 0.0
+        wrap = 0.0
         for px, scale, _edge, _bury in HERO_EDGE_ROCKS:
-            w = math.exp(-((center.x - px) / 1.05) ** 2)
-            swell = max(swell, w * scale * 0.20)
-            notch = max(notch, w * 0.55)
-        water_edge *= max(0.55, 1.0 - notch)
-        wet_run = event["wet"]
-        damp_run = event["damp"]
-        soil_run = event["soil"]
-        grass_run = event["grass"]
-        if event["kind"] == "overhang":
-            wet_run, damp_run, soil_run, grass_run = 0.10, 0.22, 0.48, 0.90
-        elif event["kind"] == "inlet":
-            wet_run, damp_run, soil_run, grass_run = 0.12, 0.28, 0.70, 0.02
-        elif event["kind"] == "shelf":
-            wet_run, damp_run, soil_run, grass_run = 1.65, 2.75, 3.70, 0.05
-        elif event["kind"] == "retreat":
-            wet_run, damp_run, soil_run, grass_run = 0.28, 2.10, 3.05, 0.02
-        stations = (
-            (0.10, BED_CENTER_Z + 0.05),
-            (max(0.22, water_edge * 0.42), BED_CENTER_Z + 0.16),
-            (max(0.40, water_edge * 0.84), WATER_SURFACE_Z - 0.03),
-            (water_edge + wet_run, WATER_SURFACE_Z + 0.02 + swell * 0.12),
-            (water_edge + damp_run, -0.50 + swell * 0.10),
-            (water_edge + soil_run, -0.10 + swell * 0.14),
-            (water_edge + soil_run + grass_run, 0.05 + swell * 0.08),
-            (water_edge + soil_run + 4.20 + grass_run, 0.10),
-        )
+            w = math.exp(-((center.x - px) / 0.90) ** 2)
+            swell = max(swell, w * scale * 0.10)
+            wrap = max(wrap, w)
         kind = event["kind"]
-        for row, (lat, z) in enumerate(stations):
-            point = center + side * (-lat)
-            point.z = z
+        wet_run, damp_run, soil_run, grass_run = _hero_bank_runs(kind, event)
+        if wrap > 0.35:
+            grass_run *= max(0.08, 1.0 - wrap)
+            wet_run = max(wet_run, 0.18)
+            soil_run = max(soil_run, wet_run + 0.28)
+        lats = [
+            water_edge * 0.10,
+            water_edge * 0.48,
+            water_edge * 0.92,
+            water_edge + wet_run,
+            water_edge + damp_run,
+            water_edge + soil_run,
+            water_edge + soil_run + grass_run + 0.45,
+        ]
+        zs = [
+            BED_CENTER_Z + 0.04,
+            BED_CENTER_Z + 0.14,
+            WATER_SURFACE_Z - 0.02,
+            WATER_SURFACE_Z + 0.012 + swell * 0.06,
+            -0.52 + swell * 0.08,
+            -0.14 + swell * 0.10,
+            0.03,
+        ]
+        for row in range(1, rows):
+            lats[row] = max(lats[row], lats[row - 1] + 0.10)
+        for row in range(rows):
+            point = center + side * (-lats[row])
+            point.z = zs[row]
             top.append((point.x, point.y, point.z))
             kinds.append(kind)
-    # Surface only. A closed underside/end-cap faced Camera C as a brown slab.
     verts = list(top)
     faces = []
     face_rows = []
@@ -2805,15 +2905,11 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
             b = a + 1
             c = (i + 1) * rows + row + 1
             d = (i + 1) * rows + row
-            faces.append((a, b, c, d))
+            # Counter-clockwise from +Z so Camera C sees the outside, not a void.
+            faces.append((a, d, c, b))
             face_rows.append(row)
     mesh = bpy.data.meshes.new("TJ_HeroBankSolid")
     mesh.from_pydata(verts, [], faces)
-    bm = bmesh.new()
-    bm.from_mesh(mesh)
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bm.to_mesh(mesh)
-    bm.free()
     mesh.update()
     obj = bpy.data.objects.new("TJ_HeroBankSolid", mesh)
     bpy.context.scene.collection.objects.link(obj)
@@ -2827,10 +2923,10 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         kind = kinds[min(len(kinds) - 1, sample * rows)] if kinds else "blend"
         if row <= 1:
             poly.material_index = 0
-        elif row <= 3:
+        elif row == 2:
             poly.material_index = 4 if kind == "gravel" else 1
-        elif row <= 5:
-            poly.material_index = 2
+        elif row <= 4:
+            poly.material_index = 2 if kind != "gravel" else 4
         else:
             poly.material_index = 3
     if hasattr(obj, "visible_shadow"):
@@ -2843,7 +2939,10 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         "solid": True,
         "filledToBed": True,
         "surfaceOnly": True,
+        "apronM": 0.45,
         "endCaps": False,
+        "upwardFaces": True,
+        "sharedWaterEdge": True,
         "heroSamples": len(hero),
         "edgeRocks": len(HERO_EDGE_ROCKS),
     }), flush=True)
@@ -2862,24 +2961,33 @@ def _nearest_center_index(centers: list[Vector], point: Vector) -> int:
 
 
 def place_hero_embedded_rocks(centers: list[Vector], soil_mat: bpy.types.Material) -> list:
-    """Seat shoreline rocks ON the water edge, buried into the filled solid."""
+    """Seat shoreline rocks on the shared water edge. Water or soil wraps each one."""
     extras = []
     mat = wet_stone_material()
     used = set()
+    placed = []
     for i, center in enumerate(centers):
         if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
             continue
         side = _side_from_centers(centers, i)
         left, _right = _channel_halves_for_index(centers, i)
-        event = hero_shore_event(center.x)
-        water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.90 * event["water"])
+        water_edge = left * WATER_WIDTH_SCALE * hero_south_water_factor(center.x)
         for px, scale, edge, bury in HERO_EDGE_ROCKS:
-            if px in used or abs(center.x - px) > 0.85:
+            if px in used or abs(center.x - px) > 0.70:
                 continue
             used.add(px)
-            loc = center + side * (-(water_edge * edge + 0.45))
-            loc.z = WATER_SURFACE_Z + scale * 0.08
-            extras.append(_add_lumpy_rock(f"TJ_HeroEmbed_{i}", loc, scale, mat, i * 0.47))
+            loc = center + side * (-water_edge * edge)
+            loc.z = WATER_SURFACE_Z - scale * bury * 0.22
+            extras.append(_add_hero_shore_rock(f"TJ_HeroEmbed_{i}", loc, scale, mat, i * 0.47 + px))
+            placed.append({
+                "x": round(loc.x, 2),
+                "y": round(loc.y, 2),
+                "z": round(loc.z, 2),
+                "scale": scale,
+                "edge": edge,
+                "bury": bury,
+            })
+    print(json.dumps({"event": "hero_edge_rocks_placed", "rocks": placed}), flush=True)
     return extras
 
 

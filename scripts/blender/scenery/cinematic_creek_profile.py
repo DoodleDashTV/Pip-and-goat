@@ -101,6 +101,18 @@ def hero_grass_lip(x: float, along: float) -> float:
     return max(-0.70, min(1.00, sum(lips) + wobble))
 
 
+def hero_south_water_factor(x: float) -> float:
+    """Shared south-film scale so terrain, water, and bank stay sealed.
+
+    1.0 is WATER_WIDTH_SCALE. Values above 1 open an inlet; below 1 overhangs.
+    The global water width is not changed — only the hero south lip moves.
+    """
+    if x < HERO_X_MIN or x > HERO_X_MAX:
+        return 1.0
+    event = hero_shore_event(x)
+    return max(0.55, min(1.60, 1.0 + 0.88 * event["water"]))
+
+
 def hero_shore_event(x: float) -> dict:
     """Blend 8 irregular SHOT_02 south-bank events. Distances are metres.
 
