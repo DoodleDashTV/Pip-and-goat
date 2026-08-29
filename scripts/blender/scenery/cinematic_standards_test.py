@@ -115,7 +115,9 @@ def test_six_shot_plan():
     assert shot03["start"]["location"][0] <= -28.0
     assert shot03["start"]["look"][0] <= -12.0
     shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
-    assert 1.6 <= shot02["start"]["location"][2] <= 3.2
+    assert 3.4 <= shot02["start"]["location"][2] <= 6.4
+    assert shot02["start"]["look"][2] < 0.0
+    assert shot02["start"]["look"][1] > shot02["start"]["location"][1]
     assert len(lookdev_frames()) == 12
     payload = shot_standard_payload()
     assert payload["cutsNotInterpolated"] is True

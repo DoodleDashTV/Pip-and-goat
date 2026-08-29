@@ -69,6 +69,10 @@ BED_CENTER_Z = -1.62
 BED_SHOULDER_Z = -0.58
 BANK_CREST_Z = 0.78
 WATER_WIDTH_SCALE = 0.30
+SOUTH_BANK_RUN = 12.0
+NORTH_BANK_RUN = 2.20
+HDRI_CAMERA_ROTATION = (0.0, 0.0, 0.0)
+HDRI_REFLECTION_ROTATION_Z = 0.48
 BED_WIDTH_SCALE = 0.68
 WATER_THICKNESS = 0.18
 VILLAGE_X_HALF = 16.0
@@ -209,7 +213,20 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         links.new(bg.outputs["Background"], out.inputs["Surface"])
         print(json.dumps({"event": "hdri_reflection_control", "mode": "unrestricted"}), flush=True)
         return {"mode": "unrestricted", "lightPath": None}
+    env = next((node for node in nodes if node.type == "TEX_ENVIRONMENT"), None)
     color_in = bg.inputs["Color"].links[0].from_socket if bg.inputs["Color"].links else None
+    if env is not None and getattr(env, "image", None) is not None:
+        tex = nodes.new("ShaderNodeTexCoord")
+        tex.name = "TJ_HDRI_ReflCoord"
+        mapping = nodes.new("ShaderNodeMapping")
+        mapping.name = "TJ_HDRI_ReflMap"
+        mapping.inputs["Rotation"].default_value = (0.0, 0.0, HDRI_REFLECTION_ROTATION_Z)
+        links.new(tex.outputs["Generated"], mapping.inputs["Vector"])
+        env_refl = nodes.new("ShaderNodeTexEnvironment")
+        env_refl.name = "TJ_HDRI_ReflEnv"
+        env_refl.image = env.image
+        links.new(mapping.outputs["Vector"], env_refl.inputs["Vector"])
+        color_in = env_refl.outputs["Color"]
     path = nodes.new("ShaderNodeLightPath")
     path.name = "TJ_HDRI_LightPath"
     glossy = path.outputs.get("Is Glossy Ray") or path.outputs[4]
@@ -264,8 +281,10 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         "lightPath": used,
         "gamma": 1.85,
         "reflectionStrength": 0.50,
+        "cameraRotation": list(HDRI_CAMERA_ROTATION),
+        "reflectionRotationZ": HDRI_REFLECTION_ROTATION_Z,
     }), flush=True)
-    return {"mode": "controlled", "lightPath": used}
+    return {"mode": "controlled", "lightPath": used, "reflectionRotationZ": HDRI_REFLECTION_ROTATION_Z}
 
 
 def _walk_image_nodes(nodes):
@@ -336,7 +355,7 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     local = left_half if signed < 0.0 else right_half
     south = signed < 0.0
     crest_wobble = 0.18 * math.sin(along * 0.21 + x * 0.19) + 0.08 * math.sin(x * 0.73)
-    bank_run = (4.40 if south else 2.20) + 0.55 * math.sin(along * 0.33 + (0.0 if south else 1.4))
+    bank_run = (SOUTH_BANK_RUN if south else NORTH_BANK_RUN) + 0.70 * math.sin(along * 0.33 + (0.0 if south else 1.4))
     water_half = local * 0.34
     bed_half = local * 0.90
     bank_outer = local + bank_run
@@ -361,22 +380,33 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     crest_z += 0.10 * math.sin(x * 1.17 + y * 0.83) + 0.07 * math.sin(along * 0.91)
     crest_z += 0.06 * math.sin(x * 2.4 + y * 1.8)
     crest_z += 0.09 * math.sin(x * 3.1 + along * 1.7)
-    # Round the camera-facing lip. Do not change trough depths or water/bed halves.
+    if south:
+        # Three camera-visible stages. Do not change trough depths or water/bed halves.
+        lower = shelf
+        mid = shelf + 0.55 + 0.10 * math.sin(along * 0.41 + x)
+        upper = crest_z
+        if t < 0.30:
+            u = t / 0.30
+            height = lower + (mid - lower) * (u ** 1.25)
+            height += 0.07 * math.sin(x * 2.2 + along * 0.9)
+        elif t < 0.68:
+            u = (t - 0.30) / 0.38
+            height = mid + (upper - mid) * (u ** 1.35)
+            height += 0.11 * math.sin(x * 1.6 + y * 1.1)
+            if (0.5 + 0.5 * math.sin(x * 1.15 + along * 0.37)) > 0.70:
+                height -= 0.18 * (1.0 - abs(u - 0.45))
+        else:
+            u = (t - 0.68) / 0.32
+            lip = 0.09 * math.sin(x * 2.05 + along * 0.44)
+            height = (upper + lip) + (meadow_z - upper - lip) * (u ** 1.12)
+            height += 0.08 * math.sin(x * 3.4 + y * 1.7)
+        return height
     if t < 0.72:
         u = t / 0.72
-        height = shelf + (crest_z - shelf) * (u ** 1.65)
-    else:
-        u = (t - 0.72) / 0.28
-        lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
-        height = (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
-    if south:
-        # Localized erosion notches on the camera-facing crest only.
-        notch = 0.5 + 0.5 * math.sin(x * 1.9 + along * 0.55)
-        if notch > 0.62:
-            cut = 0.28 * ((notch - 0.62) / 0.38) * (1.0 - abs(t - 0.48) * 1.2)
-            height -= max(0.0, cut)
-        height += 0.10 * math.sin(x * 4.2 + y * 2.1) * (0.35 + 0.65 * t)
-    return height
+        return shelf + (crest_z - shelf) * (u ** 1.65)
+    u = (t - 0.72) / 0.28
+    lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
+    return (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
 
 
 def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
@@ -408,7 +438,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             height += 0.20
         river_dist, _signed, _along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if _signed < 0.0 else right_half
-        bank_outer = local_half + (4.40 if _signed < 0.0 else 2.20) + 0.55
+        bank_outer = local_half + (SOUTH_BANK_RUN if _signed < 0.0 else NORTH_BANK_RUN) + 0.70
         height = sculpt_channel_height(x, y, height)
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
@@ -555,7 +585,7 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         dist, signed, along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
-        fade = local_half + (8.6 if signed < 0.0 else 5.2)
+        fade = local_half + ((SOUTH_BANK_RUN + 1.2) if signed < 0.0 else 5.2)
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
@@ -594,7 +624,7 @@ def soften_channel_crest(ground: bpy.types.Object) -> None:
             dist, signed, _along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
             local = left_half if signed < 0.0 else right_half
             bed_half = local * 0.90
-            bank_outer = local + (4.40 if signed < 0.0 else 2.20) + 0.55
+            bank_outer = local + (SOUTH_BANK_RUN if signed < 0.0 else NORTH_BANK_RUN) + 0.70
             if dist < bed_half or dist > bank_outer or not neighbors[index]:
                 continue
             avg = sum(zs[j] for j in neighbors[index]) / float(len(neighbors[index]))
@@ -895,7 +925,13 @@ def _build_cycles_liquid(cfg: dict) -> bpy.types.Material:
     if "IOR" in body.inputs:
         body.inputs["IOR"].default_value = cfg["ior"]
     if "Transmission Weight" in body.inputs:
-        body.inputs["Transmission Weight"].default_value = cfg["trans"]
+        trans = nodes.new("ShaderNodeMapRange")
+        trans.inputs["From Min"].default_value = 0.0
+        trans.inputs["From Max"].default_value = 1.0
+        trans.inputs["To Min"].default_value = max(0.58, cfg["trans"] - 0.12)
+        trans.inputs["To Max"].default_value = min(0.94, cfg["trans"] + 0.12)
+        links.new(attr.outputs["Color"], trans.inputs["Value"])
+        links.new(trans.outputs["Result"] if "Result" in trans.outputs else trans.outputs[0], body.inputs["Transmission Weight"])
     if "Transmission Extra" in body.inputs:
         body.inputs["Transmission Extra"].default_value = 0.0
     if "Emission Strength" in body.inputs:
@@ -1883,13 +1919,13 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
         left, right = _channel_halves_for_index(centers, i)
         half = left * WATER_WIDTH_SCALE * (0.90 + 0.12 * math.sin(i * 0.61))
         loc = center + side * (-half)
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(loc.x, loc.y, WATER_SURFACE_Z - 0.04))
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(loc.x, loc.y, WATER_SURFACE_Z + 0.02))
         rock = bpy.context.object
         rock.name = f"TJ_WaterlineStone_{i}"
         rock.scale = (
-            0.55 + 0.22 * ((i * 3) % 5) / 4.0,
-            0.28 + 0.14 * ((i * 2) % 4) / 3.0,
-            0.12 + 0.05 * (i % 3) / 2.0,
+            0.62 + 0.28 * ((i * 3) % 5) / 4.0,
+            0.34 + 0.16 * ((i * 2) % 4) / 3.0,
+            0.22 + 0.08 * (i % 3) / 2.0,
         )
         rock.rotation_euler = (0.18 * math.sin(i * 0.7), 0.14 * math.cos(i * 0.5), i * 0.63)
         try:
@@ -1916,6 +1952,21 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
             rock_n.data.materials.clear()
             rock_n.data.materials.append(mat)
             extras.append(rock_n)
+        if (i // step) % 4 == 1:
+            island = center + side * (-left * WATER_WIDTH_SCALE * 0.35)
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(island.x, island.y, WATER_SURFACE_Z + 0.01))
+            bed = bpy.context.object
+            bed.name = f"TJ_WetIsland_{i}"
+            bed.scale = (0.70 + 0.20 * math.sin(i), 0.36, 0.10)
+            bed.rotation_euler = (0.05, 0.08, i * 0.51)
+            try:
+                bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+            except Exception:
+                pass
+            shade_smooth(bed)
+            bed.data.materials.clear()
+            bed.data.materials.append(mat)
+            extras.append(bed)
     return extras
 
 
@@ -2384,6 +2435,9 @@ def main() -> int:
             (-4.8, -20.2, 0.28),
             (3.8, -20.8, 0.32),
             (11.2, -19.4, 0.26),
+            (-13.2, -27.4, 0.88),
+            (-5.4, -28.0, 0.42),
+            (1.8, -26.8, 0.36),
         ):
             if in_river_channel(item[0], item[1], margin=0.8):
                 continue
@@ -2491,6 +2545,10 @@ def main() -> int:
         "waterVariant": WATER_VARIANT,
         "hdriReflectionControl": variant_uses_hdri_control(WATER_VARIANT),
         "hdriLightPath": ["Is Glossy Ray", "Is Reflection Ray"] if variant_uses_hdri_control(WATER_VARIANT) else [],
+        "hdriCameraRotation": list(HDRI_CAMERA_ROTATION),
+        "hdriReflectionRotationZ": HDRI_REFLECTION_ROTATION_Z,
+        "southBankRun": SOUTH_BANK_RUN,
+        "northBankRun": NORTH_BANK_RUN,
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
