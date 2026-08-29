@@ -1,0 +1,144 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_FINAL_LOCAL_FINISH_RESULT_V38",
+  "inspectedAt": "2026-08-29T11:10:00Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "6ca347b6258d5fa908be3876dbc6b3b909eb7eae",
+  "requiredAncestor": "6265235adc2ab901e9aa69c20b2558fb574d5446",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "codeSha": "115cc6c316c5744ef3427f88e8b69d18bca2c7a8",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "livePodProof": {
+    "endpoint": "https://rest.runpod.io/v1/pods",
+    "response": [],
+    "relevantPodAlive": false
+  },
+  "paidWorkflowState": {
+    "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
+    "inProgress": false,
+    "authorizationFilePresent": false,
+    "createPerformed": false
+  },
+  "lockedCameraC": {
+    "requestedStart": {"location": [1.4, -19.8, 2.72], "look": [-3.6, -10.4, -0.52], "lens": 32.0},
+    "activeStart": {"location": [1.4, -19.8, 2.72], "look": [-3.6, -10.4, -0.22], "lens": 32.0},
+    "whyLookZChanged": "lookdev81/82 proved scene placement alone could not put Louis peaks above the cabin. A 0.30 m look-z lift was the smallest evidence-based attempt. lookdev83 still shows only a sky sliver.",
+    "creekFirstPreserved": true
+  },
+  "v34WaterLockVerification": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.80,
+    "metallic": 0.0,
+    "specular": 0.50,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "WATER_WIDTH_SCALE": 0.30,
+    "BED_WIDTH_SCALE": 0.68,
+    "lightPathHdriReflectionControl": true,
+    "hdriReflectionRotationZ": 0.48,
+    "cameraDistanceShaderGating": false,
+    "lookdev83Proof": "v34_candidate_d / TJ_CinematicRiver_D / Water_Mat_1"
+  },
+  "efjCorrections": [
+    "Added extra north slumps and south/north wet tongues in cinematic_creek_profile.py",
+    "Extended discontinuous soil reach on both hero banks",
+    "Added north-bank soil scars and irregular saplings at mixed scales",
+    "Did not change water IOR, width, trough, or HDRI rotation"
+  ],
+  "shot03BeforeAfter": {
+    "before": "/tmp/o14-lookdev/cinematic-lookdev80/shot_03_.png",
+    "after": "/tmp/o14-lookdev/cinematic-lookdev83/shot_03_.png",
+    "verdict": "Still a cabin peek with a pine frame, not a dense forest passage"
+  },
+  "shot05BeforeAfter": {
+    "before": "/tmp/o14-lookdev/cinematic-lookdev80/shot_05_.png",
+    "after": "/tmp/o14-lookdev/cinematic-lookdev83/shot_05_.png",
+    "verdict": "78 mm and closer look put mountains larger, but the frame still reads as another village establish, not unmistakable long-lens compression"
+  },
+  "whitePlaceholder": {
+    "rootCause": "Purchased Window01 materials on Building01–04 slot 1 are untextured default grey (0.8,0.8,0.8) with no image. Cabin01 also carries emission strength 1.0.",
+    "correction": "Darkened those slots to TJ_CabinInteriorVoid and remapped every Window* material without a valid image. Clamped cabin emission to 0.28.",
+    "lookdev83Status": "A bright window/opening card is still visible on SHOT_01, SHOT_05 and SHOT_03. Remaining glow is Cabin01 emission / EMI, not a separate Cube.",
+    "exactNames": ["Window01", "Window01.001", "Window01.002", "Window01.003", "Building01–04 slot 1", "Cabin01 emission"]
+  },
+  "shot02DepthCorrection": {
+    "movedLouisPeak": [12.0, 52.0, 0.40],
+    "openedSaddleRightOfCabin": true,
+    "removedNearLeftHeroTree": true,
+    "tinyLookZLift": 0.30,
+    "result": "lookdev83 SHOT_02 still has only a thin sky sliver; mountains remain unread behind the cabin"
+  },
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev83/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev83/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev83/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev83/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev83/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev83/shot_06_.png"
+  },
+  "gatesEFLJT": {
+    "E": "PARTIAL",
+    "F": "PARTIAL",
+    "J": "PARTIAL",
+    "L": "FAIL",
+    "T": "PARTIAL"
+  },
+  "gateNotesEFLJT": {
+    "E": "lookdev83 SHOT_02 still has a uniform far-grass mound. Code slumps exist; they do not yet read as organic breaks at image scale.",
+    "F": "Several grass-to-water contacts remain sharp, especially the far bank behind the hero rocks.",
+    "J": "Rocks still meet water, but soil/vegetation overlap is not yet a natural grass-soil-shelf-rock-water chain.",
+    "L": "SHOT_03 is still a cabin close-up. SHOT_05 is still a village establish with larger mountains. SHOT_04 and SHOT_06 remain similar village frames. White window cards remain.",
+    "T": "SHOT_01/04/06 have FG/MG/BG. SHOT_02 background mountains are still not readable."
+  },
+  "regressionPreviouslyPassed": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "K": "PASS",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "purchasedAssetsVisiblyUsed": [
+    "Cabin01A–04B",
+    "Cart01 Gate01 Fence01",
+    "Tree01 Tree02 Tree03",
+    "Water_Mat_1 donor",
+    "Louis LP Meadow/Grassy",
+    "Sky HDRI",
+    "meadow Texture.png"
+  ],
+  "sceneIdentity": {
+    "proofPath": "/tmp/o14-lookdev/cinematic-usage83.json",
+    "profile": "LOOKDEV_FAST",
+    "engine": "CYCLES",
+    "resolution": "540x960",
+    "samples": 32,
+    "waterVariant": "D",
+    "frameRange": [1, 900]
+  },
+  "workerImageBuildStatus": "NOT_BUILT_VISUAL_GATE_FAILED",
+  "workerImageDigest": null,
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "finalResultReturned": false,
+  "readiness": "NOT_PAID_RENDER_READY",
+  "remainingBlocker": "E/F/J remain PARTIAL on the hero banks. L FAILs because SHOT_03 is not a dense forest passage, SHOT_05 is not unmistakable long-lens compression, and Window01/Cabin01 emission cards still read as white openings. T remains PARTIAL because locked/near-locked camera C still cannot show Louis mountains behind the cabin. Do not CREATE. Do not pin a worker image."
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-29T11:10:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "startingSha": "6ca347b6258d5fa908be3876dbc6b3b909eb7eae",
+  "commit": "115cc6c",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev83",
+  "heroStill": "/tmp/o14-lookdev/cinematic-lookdev83/shot_02_.png",
+  "heroGate": "PASS",
+  "sixShotGate": "FAIL",
+  "v34WaterArchitecturePreserved": true,
+  "cameraDistanceShaderGate": false,
+  "humanApproved": false,
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "whyNotReady": "SHOT_02 remains a creek-first hero. E/F/J/L/T are not visual PASS. Window01/Cabin01 emission cards remain. Do not CREATE."
+}
