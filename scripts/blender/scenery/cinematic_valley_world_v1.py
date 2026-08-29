@@ -452,7 +452,7 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         dist, signed, along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
-        fade = local_half + (5.6 if signed < 0.0 else 3.0)
+        fade = local_half + (7.2 if signed < 0.0 else 4.4)
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
@@ -513,10 +513,10 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(blotch_range.outputs["Result"] if "Result" in blotch_range.outputs else blotch_range.outputs[0], mask_mul.inputs[1])
     mask = mask_mul.outputs["Value"]
     links.new(incoming, damp.inputs["Color1"])
-    damp.inputs["Color2"].default_value = (0.068, 0.052, 0.028, 1.0)
+    damp.inputs["Color2"].default_value = (0.078, 0.062, 0.032, 1.0)
     damp_fac = nodes.new("ShaderNodeMapRange")
     damp_fac.inputs["From Min"].default_value = 0.0
-    damp_fac.inputs["From Max"].default_value = 0.58
+    damp_fac.inputs["From Max"].default_value = 0.72
     damp_fac.inputs["To Min"].default_value = 0.0
     damp_fac.inputs["To Max"].default_value = 1.0
     links.new(mask, damp_fac.inputs["Value"])
@@ -915,6 +915,13 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
     else:
         links.new(body.outputs["BSDF"], out.inputs["Surface"])
+    if cfg["label"] == "D":
+        absorb = nodes.new("ShaderNodeVolumeAbsorption")
+        if "Color" in absorb.inputs:
+            absorb.inputs["Color"].default_value = (0.04, 0.09, 0.07, 1.0)
+        if "Density" in absorb.inputs:
+            absorb.inputs["Density"].default_value = 3.2
+        links.new(absorb.outputs["Volume"], out.inputs["Volume"])
     return mat
 
 
