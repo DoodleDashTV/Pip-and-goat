@@ -2,7 +2,7 @@
   "schema": "TIVVLEJOY_PURCHASED_SCENERY_CREEK_HERO_FINISH_RESULT_V35",
   "startingSha": "ea11651498083666651a04231ad0edd4e8fc2da2",
   "visualWorkSha": "efd9ef0396b5337386e55c3e0f5e3846fe56f04a",
-  "finalSha": "PENDING_RECEIPT_COMMIT",
+  "finalSha": "85f9b3327ff74f70c5003c3abda97c182b7cb646",
   "pr169": {
     "state": "OPEN",
     "draft": true,
