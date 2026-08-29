@@ -203,14 +203,14 @@ def default_shot_cameras() -> list[dict]:
             "id": "SHOT_05",
             "camera": "TJ_SHOT_05_CAM",
             # 120 mm from far SE, aimed at a close Louis peak — not the street.
-            "start": {"location": (38.0, -122.0, 16.0), "look": (26.0, 24.0, 9.5), "lens": 120.0},
-            "end": {"location": (36.0, -116.0, 16.4), "look": (26.4, 26.0, 10.2), "lens": 128.0},
+            "start": {"location": (38.0, -122.0, 16.0), "look": (26.0, 24.0, 12.5), "lens": 120.0},
+            "end": {"location": (36.0, -116.0, 16.4), "look": (26.4, 26.0, 13.2), "lens": 128.0},
         },
         {
             "id": "SHOT_06",
             "camera": "TJ_SHOT_06_CAM",
-            "start": {"location": (14.0, -18.0, 4.40), "look": (24.0, 26.0, 12.0), "lens": 44.0},
-            "end": {"location": (13.2, -15.5, 4.55), "look": (25.0, 28.0, 12.8), "lens": 48.0},
+            "start": {"location": (20.0, -28.0, 6.40), "look": (28.0, 18.0, 11.0), "lens": 42.0},
+            "end": {"location": (18.8, -24.5, 6.60), "look": (29.0, 20.0, 11.6), "lens": 46.0},
         },
     ]
 

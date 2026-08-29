@@ -613,10 +613,10 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     links.new(soil.outputs["Fac"], soil_mul.inputs[0])
     links.new(soil2.outputs["Fac"], soil_mul.inputs[1])
     soil_fac = nodes.new("ShaderNodeMapRange")
-    soil_fac.inputs["From Min"].default_value = 0.18
-    soil_fac.inputs["From Max"].default_value = 0.42
+    soil_fac.inputs["From Min"].default_value = 0.12
+    soil_fac.inputs["From Max"].default_value = 0.38
     soil_fac.inputs["To Min"].default_value = 0.0
-    soil_fac.inputs["To Max"].default_value = 0.72
+    soil_fac.inputs["To Max"].default_value = 0.88
     links.new(soil_mul.outputs["Value"], soil_fac.inputs["Value"])
     soil_mix = _mix_rgb(nodes)
     if "Color1" in soil_mix.inputs:
@@ -2331,10 +2331,10 @@ def place_cabin_interior_voids() -> list:
         (10.4, 19.2),
     )
     for i, (x, y) in enumerate(slots):
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x, y, 1.35))
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x, y + 1.35, 1.55))
         box = bpy.context.object
         box.name = f"TJ_CabinInteriorVoid_{i}"
-        box.scale = (2.35, 1.95, 1.25)
+        box.scale = (0.80, 0.62, 0.52)
         box.data.materials.clear()
         box.data.materials.append(mat)
         if hasattr(box, "visible_shadow"):
@@ -2494,9 +2494,9 @@ def _dark_cabin_glass() -> bpy.types.Material:
     out = nodes.new("ShaderNodeOutputMaterial")
     links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
     if "Base Color" in bsdf.inputs:
-        bsdf.inputs["Base Color"].default_value = (0.028, 0.018, 0.012, 1.0)
+        bsdf.inputs["Base Color"].default_value = (0.012, 0.008, 0.006, 1.0)
     if "Roughness" in bsdf.inputs:
-        bsdf.inputs["Roughness"].default_value = 0.88
+        bsdf.inputs["Roughness"].default_value = 0.96
     if "Metallic" in bsdf.inputs:
         bsdf.inputs["Metallic"].default_value = 0.0
     if "Specular IOR Level" in bsdf.inputs:
@@ -2527,14 +2527,14 @@ def repair_cabin_placeholders() -> list[dict]:
         village = any(token in blob for token in ("village", "cabin", "building", "door", "frame", "window"))
         if not village:
             continue
-        # Never hide purchased trees. lookdev84 hid Tree*_LOD0, and every
-        # forest copy inherited hide_render, leaving SHOT_03 as empty meadow.
-        if "tree" in name:
+        # Never hide purchased trees or roofs. lookdev84 hid Tree*_LOD0
+        # (empty forest). lookdev85 hid Roof*_LOD0 (missing cabin roofs).
+        if any(token in name for token in ("tree", "pine", "roof", "straw", "thatch")):
             obj.hide_render = False
             obj.hide_viewport = False
             continue
-        lod_ok = "_lod" in name and not any(token in name for token in ("tree", "pine"))
-        if any(token in name for token in hide_tokens) or lod_ok:
+        building_lod = name.startswith("building") and "_lod" in name
+        if any(token in name for token in hide_tokens) or building_lod:
             obj.hide_render = True
             obj.hide_viewport = True
             reports.append({"name": obj.name, "action": "hide_interior_or_lod"})
@@ -2647,8 +2647,8 @@ def setup_lighting_hierarchy() -> None:
     bpy.ops.object.light_add(type="AREA", location=(-56.0, -10.0, 10.0))
     forest = bpy.context.object
     forest.name = "TJ_ForestFill"
-    forest.data.energy = 160
-    forest.data.size = 28
+    forest.data.energy = 220
+    forest.data.size = 36
     forest.rotation_euler = (math.radians(58), 0.0, math.radians(18))
     if hasattr(forest.data, "color"):
         forest.data.color = (1.0, 0.88, 0.70)
