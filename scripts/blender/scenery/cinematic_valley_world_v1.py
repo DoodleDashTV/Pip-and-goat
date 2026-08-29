@@ -856,11 +856,11 @@ def cinematic_riverbed_material() -> bpy.types.Material:
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     if "Roughness" in body.inputs:
-        body.inputs["Roughness"].default_value = 0.96
+        body.inputs["Roughness"].default_value = 0.72
     if "Metallic" in body.inputs:
         body.inputs["Metallic"].default_value = 0.0
     if "Specular IOR Level" in body.inputs:
-        body.inputs["Specular IOR Level"].default_value = 0.05
+        body.inputs["Specular IOR Level"].default_value = 0.14
     noise = nodes.new("ShaderNodeTexNoise")
     noise.inputs["Scale"].default_value = 3.6
     if "Detail" in noise.inputs:
@@ -1846,6 +1846,8 @@ def place_bank_crest_trees(trees: list) -> list:
         loc = center + side * (offset * sign)
         if in_village(loc.x, loc.y) or in_river_channel(loc.x, loc.y, margin=0.35):
             continue
+        if sign < 0.0 and -12.5 <= loc.x <= 13.0:
+            continue
         extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.20 + 0.22 * ((i * 3) % 5) / 4.0))
     return extras
 
@@ -2532,8 +2534,8 @@ def main() -> int:
             (-3.8, -24.6, 0.22),
             (16.5, -23.2, 0.34),
             (-18.4, -19.6, 0.36),
-            (-13.2, -27.4, 0.88),
-            (-6.2, -27.2, 0.34),
+            (-14.8, -27.8, 0.38),
+            (-6.2, -27.2, 0.22),
         ):
             if in_river_channel(item[0], item[1], margin=0.8):
                 continue
