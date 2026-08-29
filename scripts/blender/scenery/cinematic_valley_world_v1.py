@@ -258,8 +258,8 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
     dim.name = "TJ_HDRI_Dim"
     if "Color1" in dim.inputs:
         links.new(gamma.outputs["Color"], dim.inputs["Color1"])
-        dim.inputs["Color2"].default_value = (0.18, 0.26, 0.30, 1.0)
-        dim.inputs["Fac"].default_value = 0.26
+        dim.inputs["Color2"].default_value = (0.22, 0.32, 0.40, 1.0)
+        dim.inputs["Fac"].default_value = 0.32
         refl_color = dim.outputs["Color"]
     else:
         refl_color = gamma.outputs["Color"]
@@ -269,12 +269,12 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         mul.blend_type = "MULTIPLY"
     if "Color1" in mul.inputs:
         links.new(refl_color, mul.inputs["Color1"])
-        mul.inputs["Color2"].default_value = (0.44, 0.50, 0.46, 1.0)
+        mul.inputs["Color2"].default_value = (0.50, 0.58, 0.56, 1.0)
         mul.inputs["Fac"].default_value = 1.0
         refl_color = mul.outputs["Color"]
     bg_refl = nodes.new("ShaderNodeBackground")
     bg_refl.name = "TJ_HDRI_ReflectionBg"
-    bg_refl.inputs["Strength"].default_value = 0.52
+    bg_refl.inputs["Strength"].default_value = 0.50
     links.new(refl_color, bg_refl.inputs["Color"])
     mix = nodes.new("ShaderNodeMixShader")
     mix.name = "TJ_HDRI_RayMix"
@@ -287,7 +287,7 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         "mode": "controlled",
         "lightPath": used,
         "gamma": 1.85,
-        "reflectionStrength": 0.52,
+        "reflectionStrength": 0.50,
         "cameraRotation": list(HDRI_CAMERA_ROTATION),
         "reflectionRotationZ": HDRI_REFLECTION_ROTATION_Z,
     }), flush=True)
@@ -782,8 +782,8 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(mask, delta.inputs[0])
     links.new(thresh.outputs["Value"], delta.inputs[1])
     patch = nodes.new("ShaderNodeMapRange")
-    patch.inputs["From Min"].default_value = -0.06
-    patch.inputs["From Max"].default_value = 0.14
+    patch.inputs["From Min"].default_value = -0.28
+    patch.inputs["From Max"].default_value = 0.36
     patch.inputs["To Min"].default_value = 0.0
     patch.inputs["To Max"].default_value = 1.0
     links.new(delta.outputs["Value"], patch.inputs["Value"])
@@ -851,8 +851,8 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     coord = nodes.new("ShaderNodeTexCoord")
     mix = _mix_rgb(nodes)
     if "Color1" in mix.inputs:
-        mix.inputs["Color1"].default_value = (0.014, 0.011, 0.007, 1.0)
-        mix.inputs["Color2"].default_value = (0.038, 0.030, 0.018, 1.0)
+        mix.inputs["Color1"].default_value = (0.028, 0.022, 0.014, 1.0)
+        mix.inputs["Color2"].default_value = (0.070, 0.052, 0.032, 1.0)
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     if "Roughness" in body.inputs:
@@ -926,12 +926,12 @@ def _water_variant_cfg(variant: str, tint) -> dict:
         **liquid,
         "label": "D",
         "hdri_control": True,
-        "trans": 0.84,
+        "trans": 0.80,
         "rough_lo": 0.14,
         "rough_hi": 0.28,
         "bump_lo": 0.16,
         "bump_hi": 0.07,
-        "volume_density": 0.14,
+        "volume_density": 0.18,
     }
 
 
