@@ -568,13 +568,16 @@ def place_meadow_ecology() -> list:
         (3.2, 28.5, 4.4, 0.10, False),
         (-8.8, 32.0, 3.5, 0.08, True),
         (11.2, 20.4, 3.0, 0.08, False),
+        (1.6, 7.2, 3.4, 0.09, True),
+        (-4.8, 5.4, 2.8, 0.08, False),
+        (4.2, 9.8, 3.1, 0.08, True),
     )
     for i, (x, y, size, thick, is_needle) in enumerate(patches):
         if in_river_channel(x, y, margin=1.2):
             continue
         loc = Vector((x, y, 0.06))
         bed = _add_lumpy_rock(f"TJ_MeadowEco_{i}", loc, size, needle if is_needle else dirt, i * 0.41)
-        bed.scale = (1.55, 1.10, thick)
+        bed.scale = (2.05, 0.78, thick)
         extras.append(bed)
     return extras
 
@@ -641,7 +644,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     links.new(coord.outputs["Object"], cells.inputs["Vector"])
     cell_fac = cells.outputs["Distance"] if "Distance" in cells.outputs else cells.outputs[0]
     eco_ramp = nodes.new("ShaderNodeValToRGB")
-    eco_ramp.color_ramp.interpolation = "CONSTANT"
+    eco_ramp.color_ramp.interpolation = "EASE"
     eco_ramp.color_ramp.elements[0].position = 0.0
     eco_ramp.color_ramp.elements[0].color = (0.058, 0.102, 0.034, 1.0)
     eco_ramp.color_ramp.elements[1].position = 1.0
@@ -653,7 +656,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     links.new(cell_fac, eco_ramp.inputs["Fac"])
     eco_mix = _mix_rgb(nodes)
     if "Color1" in eco_mix.inputs:
-        eco_mix.inputs["Fac"].default_value = 0.78
+        eco_mix.inputs["Fac"].default_value = 0.86
         links.new(color, eco_mix.inputs["Color1"])
         links.new(eco_ramp.outputs["Color"], eco_mix.inputs["Color2"])
         color = eco_mix.outputs["Color"]
@@ -1749,6 +1752,9 @@ def spline_channel_mesh(
                     left_pinch *= 0.48 + 0.16 * math.sin(i * 1.3)
                 if south_bay in {5, 16}:
                     left_pinch *= 1.22
+                bite = hero_waterline_bite(center.x, float(i) * 0.85)
+                left_pinch *= max(0.42, min(1.55, 1.0 + 0.52 * bite))
+                right_pinch *= max(0.55, min(1.35, 1.0 + 0.28 * bite))
         for col, offset in enumerate(offsets):
             pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
@@ -1982,14 +1988,13 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     # (center_x, south_y, scale, rot_z). Closer masses for SHOT_02 depth and
     # SHOT_05 telephoto compression. Do not smash into the cabin street.
     foothill_slots = (
-        (-5.0, 26.0, 0.24, 0.28),
+        (-1.0, 21.0, 0.22, 0.24),
         (36.0, 28.0, 0.18, -0.22),
     )
-    # First peak: sunlit south face in camera C's right-of-cabin gap.
-    # rot_z=2.65 showed the shadowed back and read as a black ridge.
-    # Do not move the SHOT_05 telephoto hero at (28, 16).
+    # First peak sits just north of Building04 so its sunlit south face
+    # clears the cabin roof in camera C. Do not move the SHOT_05 hero.
     peak_slots = (
-        (-3.0, 30.0, 0.42, 0.34),
+        (2.0, 17.5, 0.52, 0.30),
         (28.0, 16.0, 0.48, 0.42),
         (46.0, 52.0, 0.30, -0.16),
     )
@@ -2000,8 +2005,10 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
         sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
         link_exclusive(obj, collection)
         placed.append(obj)
-    for obj, (cx, south, scale, rot_z) in zip(peaks, peak_slots):
+    for i, (obj, (cx, south, scale, rot_z)) in enumerate(zip(peaks, peak_slots)):
         sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
+        if i == 0:
+            obj.location.z += 1.2
         link_exclusive(obj, collection)
         placed.append(obj)
     print(json.dumps({
