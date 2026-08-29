@@ -227,15 +227,15 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         used = ["Is Glossy Ray"]
     gamma = nodes.new("ShaderNodeGamma")
     gamma.name = "TJ_HDRI_Gamma"
-    gamma.inputs["Gamma"].default_value = 1.60
+    gamma.inputs["Gamma"].default_value = 1.85
     if color_in is not None:
         links.new(color_in, gamma.inputs["Color"])
     dim = _mix_rgb(nodes)
     dim.name = "TJ_HDRI_Dim"
     if "Color1" in dim.inputs:
         links.new(gamma.outputs["Color"], dim.inputs["Color1"])
-        dim.inputs["Color2"].default_value = (0.26, 0.36, 0.42, 1.0)
-        dim.inputs["Fac"].default_value = 0.32
+        dim.inputs["Color2"].default_value = (0.22, 0.32, 0.40, 1.0)
+        dim.inputs["Fac"].default_value = 0.40
         refl_color = dim.outputs["Color"]
     else:
         refl_color = gamma.outputs["Color"]
@@ -245,12 +245,12 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         mul.blend_type = "MULTIPLY"
     if "Color1" in mul.inputs:
         links.new(refl_color, mul.inputs["Color1"])
-        mul.inputs["Color2"].default_value = (0.58, 0.64, 0.62, 1.0)
+        mul.inputs["Color2"].default_value = (0.50, 0.58, 0.56, 1.0)
         mul.inputs["Fac"].default_value = 1.0
         refl_color = mul.outputs["Color"]
     bg_refl = nodes.new("ShaderNodeBackground")
     bg_refl.name = "TJ_HDRI_ReflectionBg"
-    bg_refl.inputs["Strength"].default_value = 0.62
+    bg_refl.inputs["Strength"].default_value = 0.50
     links.new(refl_color, bg_refl.inputs["Color"])
     mix = nodes.new("ShaderNodeMixShader")
     mix.name = "TJ_HDRI_RayMix"
@@ -262,8 +262,8 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         "event": "hdri_reflection_control",
         "mode": "controlled",
         "lightPath": used,
-        "gamma": 1.60,
-        "reflectionStrength": 0.62,
+        "gamma": 1.85,
+        "reflectionStrength": 0.50,
     }), flush=True)
     return {"mode": "controlled", "lightPath": used}
 
@@ -372,10 +372,10 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     if south:
         # Localized erosion notches on the camera-facing crest only.
         notch = 0.5 + 0.5 * math.sin(x * 1.9 + along * 0.55)
-        if notch > 0.72:
-            cut = 0.20 * ((notch - 0.72) / 0.28) * (1.0 - abs(t - 0.55) * 1.4)
+        if notch > 0.62:
+            cut = 0.28 * ((notch - 0.62) / 0.38) * (1.0 - abs(t - 0.48) * 1.2)
             height -= max(0.0, cut)
-        height += 0.08 * math.sin(x * 4.2 + y * 2.1) * (0.35 + 0.65 * t)
+        height += 0.10 * math.sin(x * 4.2 + y * 2.1) * (0.35 + 0.65 * t)
     return height
 
 
@@ -850,11 +850,11 @@ def _water_variant_cfg(variant: str, tint) -> dict:
         "label": "D",
         "hdri_control": True,
         "trans": 0.80,
-        "rough_lo": 0.11,
-        "rough_hi": 0.24,
-        "bump_lo": 0.20,
-        "bump_hi": 0.12,
-        "volume_density": 0.20,
+        "rough_lo": 0.14,
+        "rough_hi": 0.28,
+        "bump_lo": 0.16,
+        "bump_hi": 0.07,
+        "volume_density": 0.18,
     }
 
 
@@ -938,7 +938,7 @@ def _build_cycles_liquid(cfg: dict) -> bpy.types.Material:
     links.new(swell.outputs["Fac"], lo.inputs[0])
     hi = nodes.new("ShaderNodeMath")
     hi.operation = "MULTIPLY"
-    hi.inputs[1].default_value = 0.28
+    hi.inputs[1].default_value = min(0.34, max(0.08, float(cfg.get("bump_hi", 0.28))))
     links.new(ripple.outputs["Fac"], hi.inputs[0])
     fl = nodes.new("ShaderNodeMath")
     fl.operation = "MULTIPLY"
@@ -1761,14 +1761,31 @@ def place_bank_crest_trees(trees: list) -> list:
 
 
 def build_south_crest_shelves(centers: list[Vector]) -> list:
-    """Camera-facing south crest: extra soil shelves so SHOT_02 cannot see one knife line."""
+    """Hang irregular grass/soil over the south crest so the knife silhouette breaks."""
     extras = []
-    mat = dirt_bank_material()
-    rows = 8
-    chunk = 6
-    i = 4
-    while i < len(centers) - 8:
-        if (i // chunk) % 4 == 0:
+    mat = bpy.data.materials.new("TJ_CrestHang")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
+    if bsdf and "Base Color" in bsdf.inputs:
+        coord = nodes.new("ShaderNodeTexCoord")
+        noise = nodes.new("ShaderNodeTexNoise")
+        noise.inputs["Scale"].default_value = 2.4
+        links.new(coord.outputs["Object"], noise.inputs["Vector"])
+        mix = _mix_rgb(nodes)
+        if "Color1" in mix.inputs:
+            mix.inputs["Color1"].default_value = (0.042, 0.072, 0.028, 1.0)
+            mix.inputs["Color2"].default_value = (0.055, 0.040, 0.022, 1.0)
+            links.new(noise.outputs["Fac"], mix.inputs["Fac"])
+            links.new(mix.outputs["Color"], bsdf.inputs["Base Color"])
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.95
+    rows = 7
+    chunk = 5
+    i = 3
+    while i < len(centers) - 7:
+        if (i // chunk) % 3 == 0:
             i += chunk
             continue
         verts: list[tuple[float, float, float]] = []
@@ -1779,17 +1796,17 @@ def build_south_crest_shelves(centers: list[Vector]) -> list:
         for si, center in enumerate(span):
             side = _side_from_centers(centers, i + si)
             left, _right = _channel_halves_for_index(centers, i + si)
-            inner = left * 0.92
-            outer = left + 3.6 + 0.45 * math.sin((i + si) * 0.31)
+            inner = left * 0.70 + 0.35 * math.sin((i + si) * 0.9)
+            outer = left + 2.4 + 0.70 * math.sin((i + si) * 0.37)
             for col in range(rows):
                 t = col / float(rows - 1)
-                jag = 0.10 * math.sin((i + si) * 0.73 + col * 1.4)
+                jag = 0.16 * math.sin((i + si) * 0.81 + col * 1.7)
                 half = inner + (outer - inner) * min(1.0, max(0.0, t + jag))
                 point = center + side * (-half)
-                z = -0.28 + 1.05 * (t ** 1.35)
-                z += 0.10 * math.sin((i + si) * 0.61 + col * 2.0)
-                if ((i + si) % 19) in {5, 6, 7} and 0.25 < t < 0.75:
-                    z -= 0.16
+                z = 0.08 + 0.78 * (t ** 1.15)
+                z += 0.12 * math.sin((i + si) * 0.53 + col * 1.8)
+                if ((i + si) % 13) in {3, 4} and t < 0.55:
+                    z -= 0.14
                 verts.append((point.x, point.y, z))
             if si > 0:
                 v = si * rows
