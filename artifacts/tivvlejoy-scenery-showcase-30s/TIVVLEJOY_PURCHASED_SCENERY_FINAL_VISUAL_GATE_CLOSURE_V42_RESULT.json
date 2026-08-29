@@ -1,0 +1,141 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_FINAL_VISUAL_GATE_CLOSURE_V42_RESULT",
+  "inspectedAt": "2026-08-29T16:42:00Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "9c38ec33acf9749070ebded8e05a3e9c41c5cdb2",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "finalSha": "4184965f96b442b1202d3a869dbfb20c03b7dfbb",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "number": 169,
+    "base": "cursor/tivvlejoy-ep001-animation-worker-payload-v1-73f1"
+  },
+  "livePodProof": {
+    "endpoint": "https://rest.runpod.io/v1/pods",
+    "response": [],
+    "relevantPodAlive": false
+  },
+  "paidWorkflowState": {
+    "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
+    "inProgress": false,
+    "createPerformed": false
+  },
+  "v34WaterLockVerification": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.8,
+    "metallic": 0.0,
+    "specular": 0.5,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "WATER_WIDTH_SCALE": 0.3,
+    "BED_WIDTH_SCALE": 0.68,
+    "lightPathHdriReflectionControl": true,
+    "hdriReflectionRotationZ": 0.48,
+    "cameraDistanceShaderGating": false,
+    "riverIdentity": "v34_candidate_d / Water_Mat_1"
+  },
+  "cameraC": {
+    "before": {
+      "position": [1.4, -19.8, 2.72],
+      "look": [-3.6, -10.4, 0.0],
+      "focalLengthMm": 32.0,
+      "pitchDeg": -14.3
+    },
+    "after": {
+      "position": [2.2, -21.4, 3.4],
+      "look": [-3.4, -10.2, 1.75],
+      "focalLengthMm": 32.0,
+      "pitchDeg": -7.5
+    },
+    "changed": true,
+    "reason": "V41's downward 32 mm frustum left only an 8 degree sky wedge, so any Louis placement became a sliver. Camera C now stays aimed at the creek XY and pitches up so a purchased Louis face can occupy the right-of-cabin sky. An earlier V42 look past y=-4 turned the shot into a cabin/village frame and was reverted.",
+    "magnitude": "Translate +0.8 x, -1.6 y, +0.68 z metres. Look.z +1.75 m. Pitch -14.3 to -7.5 deg. Lens unchanged at 32 mm.",
+    "creekFirstPreserved": "Look target remains on the creek (y=-10.2). Water and south bank occupy the lower frame. Cabin stays off-axis. The mountain is secondary in the upper third."
+  },
+  "shotAssessments": {
+    "SHOT_01": "Valley/cabin establish preserved. Windows stay dark recesses. Louis range remains the background. Meadow still reads as a mottled displaced plane; oversized Grass01 cards appear as flat green planes rather than grown coverage.",
+    "SHOT_02": "Creek-first identity recovered after the village-look false start. Cabin off-axis. Windows dark. A purchased Louis range now fills the upper third and reads as a mountain, not an 8 degree sliver. Hero bank still shows a traceable waterline and leftover voids around rocks.",
+    "SHOT_03": "Dense west-grove forest passage preserved. Cabin absent. No regression.",
+    "SHOT_04": "Village/path reveal preserved. Cabins, cart, fence, layered Louis range. Openings dark. New Grass01 cards read as blocky green planes around the street.",
+    "SHOT_05": "120 mm telephoto pines-against-Louis preserved. Hero peak GrassyMountain2 at (28, 16, 0.48) was not moved.",
+    "SHOT_06": "Tree-framed scenic payoff with a readable Louis mass. Distinct from 03 and 05."
+  },
+  "gates": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PARTIAL",
+    "F": "PARTIAL",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "PARTIAL",
+    "K": "PASS",
+    "L": "PASS",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "T": "PASS",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "gateNotesEFJT": {
+    "E": "V41 shader continents/disks remain. V42 added 7 irregular zones and planted Grass01_LOD0 plus stones/litter. At 540 px SHOT_01 still reads as one displaced meadow plane; the plants either vanish or show as flat green cards. Not grown ecological coverage.",
+    "F": "Hero shoreline events and a closed bank solid replaced phase-shifted isolines. The grass/water cut is still visually followable on SHOT_02, especially around the left hero rocks.",
+    "J": "Stacked overlay shelves were replaced by one closed south-bank solid with buried rocks and collars. Black soil slabs did not return, but camera-visible triangular voids and a sharp water/bank cavity remain. The bank does not yet read as grass + eroded soil + damp shelf + rocks + bed + water.",
+    "T": "Camera C pitches up while staying on the creek. Full LP_GrassyMountain1 (no 20% cap) is peak-sat at (-1.2, 40, scale 0.26, rot_z 0.12) with only the valley apron clipped. Face fill and material lift give value. At 540 px SHOT_02 the mountain occupies the upper third and is immediately a range, not a sliver. SHOT_05 hero peak untouched."
+  },
+  "exactERepair": {
+    "structuralEcologicalZones": ["A_dense", "B_earth", "C_needle", "D_wild", "E_worn", "F_rocky", "G_cabin"],
+    "vegetationDensityChanges": "Irregular Grass01 plant lists per zone; dense/tall vs short/worn vs needle-edge saplings. No bounded boxes.",
+    "geometryScatterChanges": "Purchased Grass01_LOD0 clumps, five meadow stones, extra earth/needle beds. Terrain undulation from V41 kept as support only.",
+    "materialSupport": "Existing continents/vertex eco-mask remain support. They are not the V42 claim."
+  },
+  "exactFJRepair": {
+    "heroBankMeshWork": "One closed TJ_HeroBankSolid from underwater lip to meadow blend, profiled by hero_shore_event. Terrain water_half follows the same events.",
+    "voidFixes": "Removed hero-corridor overlay stones and soil-scar shelves. Embedded rocks with soil mounds and collars. Recalculated outward normals.",
+    "shorelineEvents": ["retreat", "inlet", "rock", "bay", "overhang", "gravel", "shelf", "cut"],
+    "heroRockIntegration": "Eight buried hero rocks with soil collars intended to interrupt the waterline.",
+    "wetDryTreatment": "Solid uses a darker wet-soil material; damp/soil/grass stations vary width from the event table. Color follows the mesh instead of painted stripes."
+  },
+  "exactTRepair": {
+    "cameraCAdjustment": "YES. Stay on creek XY, pitch up from -14.3 to -7.5 deg, small back/right/up translate. Lens stays 32 mm.",
+    "foregroundOcclusionChanges": "Hide only trees in x=-3.5..11, y=10..46. Do not gut the west forest.",
+    "louisAssets": ["LP_GrassyMountain1", "LP_MeadowRange1", "LP_MeadowRange3"],
+    "louisTransforms": {
+      "LP_GrassyMountain1": {"peak": [-1.2, 40.0], "scale": 0.26, "rotZ": 0.12, "zLift": 0.05, "apronClipSouthY": 15.0, "heightCap": "none"},
+      "LP_MeadowRange1": {"peak": [-7.2, 30.0], "scale": 0.16, "rotZ": 0.36},
+      "LP_MeadowRange3": {"peak": [-6.0, 50.0], "scale": 0.17, "rotZ": 0.26},
+      "LP_GrassyMountain2": {"locked": [28.0, 16.0, 0.48, 0.42]}
+    },
+    "lightingAtmosphere": "TJ_LouisFaceFill 260 energy at (1, 24, 15), no shadow/glossy. GM1 materials copied and mixed 0.38 toward (0.56, 0.52, 0.38). Mist unchanged.",
+    "whyMountainReadsAt540": "The camera now shows ~14 deg of sky/distance instead of an 8 deg cap wedge, and the visible mesh is a full purchased south face rather than a 20% peak crop."
+  },
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_06_.png"
+  },
+  "passCount": 19,
+  "totalGates": 22,
+  "workerImageBuildStatus": "NOT_BUILT_VISUAL_GATE_FAILED",
+  "workerImageDigest": null,
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "readiness": "NOT_PAID_RENDER_READY",
+  "remainingBlocker": "E/F/J remain PARTIAL from cinematic-lookdev-v42-final 540 px stills. Meadow still a masked plane. Shoreline still traceable with leftover voids. T is closed. Do not CREATE.",
+  "nextPaidPrepStep": "Do not CREATE. Keep PR 169 draft. Next lookdev pass must rebuild the visible SHOT_02 water/bank contact as one hole-free erosion surface and make SHOT_01 ground coverage differ by real vegetation structure, not cards."
+}

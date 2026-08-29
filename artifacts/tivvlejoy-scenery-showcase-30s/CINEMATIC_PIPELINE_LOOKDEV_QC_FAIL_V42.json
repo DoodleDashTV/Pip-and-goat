@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_PIPELINE_LOOKDEV_QC_V42",
+  "result": "FAIL",
+  "humanApproved": false,
+  "profile": "LOOKDEV_FAST",
+  "resolution": "540x960",
+  "engine": "CYCLES",
+  "waterVariant": "D",
+  "passCount": 19,
+  "totalGates": 22,
+  "failedOrPartial": ["E", "F", "J"],
+  "stillPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev-v42-final/shot_06_.png"
+  },
+  "paidCreateBlocked": true,
+  "reason": "Local 540 px stills do not clear E, F, and J. T is closed. Not paid-render ready."
+}
