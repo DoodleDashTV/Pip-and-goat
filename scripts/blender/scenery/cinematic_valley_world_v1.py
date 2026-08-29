@@ -609,12 +609,14 @@ def place_meadow_ecology() -> list:
         (9.2, 31.0, 6.6, 0.08, False),
         (-3.4, 38.0, 5.8, 0.07, True),
         # SHOT_02 midground (creek to cabin). 4–8 m patches survive the low camera.
-        (-3.8, -4.2, 4.6, 0.06, False),
-        (2.4, -2.6, 3.8, 0.06, True),
-        (-6.2, 1.6, 4.2, 0.06, False),
-        (3.6, 4.0, 3.6, 0.06, True),
-        (0.6, -6.2, 3.4, 0.06, False),
-        (-1.8, 2.8, 3.2, 0.06, True),
+        (-3.8, -4.2, 6.2, 0.06, False),
+        (2.4, -2.6, 5.4, 0.06, True),
+        (-6.2, 1.6, 5.8, 0.06, False),
+        (3.6, 4.0, 5.0, 0.06, True),
+        (0.6, -6.2, 4.8, 0.06, False),
+        (-1.8, 2.8, 4.6, 0.06, True),
+        (-7.4, -0.8, 5.2, 0.06, True),
+        (1.2, 0.6, 6.4, 0.06, False),
     )
     for i, (x, y, size, thick, is_needle) in enumerate(patches):
         if in_river_channel(x, y, margin=1.2):
@@ -2203,11 +2205,10 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     grassy1 = next((obj for obj in peaks if "grassymountain1" in obj.name.lower()), None)
     grassy2 = next((obj for obj in peaks if "grassymountain2" in obj.name.lower()), None)
     grassy3 = next((obj for obj in peaks if "grassymountain3" in obj.name.lower()), None)
-    # Camera C looks down (~-14°). A 23 m peak at 40 m sits above the 32 mm
-    # frame; only a roof sliver remains. Keep the sunlit south face at ~12 m
-    # on the right-of-cabin sky gap (s≈11, elev≈14°).
+    # Camera C has only ~8° of sky above the cabin. A readable Louis range
+    # must be a WIDE face in that band (s≈8.5, elev 9–14°), not a tall sliver.
     if meadow1 is not None:
-        sit_louis_peak(meadow1, -5.0, 17.5, scale=0.18, rot_z=0.42, z_lift=0.0)
+        sit_louis_peak(meadow1, -10.0, 24.0, scale=0.16, rot_z=0.40, z_lift=0.0)
         link_exclusive(meadow1, collection)
         placed.append(meadow1)
     if meadow2 is not None:
@@ -2215,12 +2216,12 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
         link_exclusive(meadow2, collection)
         placed.append(meadow2)
     if meadow3 is not None:
-        sit_louis_peak(meadow3, -16.0, 44.0, scale=0.14, rot_z=0.28, z_lift=0.4)
+        sit_louis_peak(meadow3, -20.0, 56.0, scale=0.12, rot_z=0.24, z_lift=0.3)
         link_exclusive(meadow3, collection)
         placed.append(meadow3)
     if grassy1 is not None:
-        extract_louis_height_cap(grassy1, 0.68)
-        sit_louis_peak(grassy1, -12.0, 36.0, scale=0.36, rot_z=0.38, z_lift=0.2)
+        extract_louis_height_cap(grassy1, 0.80)
+        sit_louis_peak(grassy1, -18.5, 36.0, scale=0.78, rot_z=0.42, z_lift=0.0)
         link_exclusive(grassy1, collection)
         placed.append(grassy1)
     # SHOT_05 hero peak is locked. Do not move or restyle it.
