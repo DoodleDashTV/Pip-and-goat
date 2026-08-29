@@ -387,8 +387,8 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     bite = hero_grass_lip(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
     water_half = local * 0.34 + max(0.0, bite) * 0.22
     if south and HERO_X_MIN <= x <= HERO_X_MAX:
-        # Terrain, water film, and bank solid share one south-edge factor.
-        water_half = local * WATER_WIDTH_SCALE * hero_south_water_factor(x)
+        # Carve wider than the film so Camera C cannot see an under-water hole.
+        water_half = local * WATER_WIDTH_SCALE * hero_south_water_factor(x) + 0.28
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
@@ -710,6 +710,9 @@ def _meadow_keep(x: float, y: float) -> bool:
         return False
     if abs(x) < 3.0 and -4.0 < y < 18.0:
         return False
+    # Grass01 reads as a green card from locked Camera C. Keep it out of SHOT_02.
+    if -14.0 <= x <= 10.0 and -22.0 <= y <= 8.0:
+        return False
     return True
 
 
@@ -727,13 +730,13 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
     # (tag, cx, cy, rx, ry, count, scale_lo, scale_hi, seed)
     # Natural Grass01 is ~1 x 1 x 0.22 m. Usable tuft scale is 1.0–2.8 upright.
     zones = (
-        ("dense_medium", -5.2, 10.8, 6.4, 5.2, 42, 1.35, 2.15, 0.40),
+        ("dense_medium", -5.2, 12.4, 6.4, 5.2, 42, 1.25, 1.95, 0.40),
         ("short_sparse", 8.4, 20.2, 5.8, 4.6, 9, 0.85, 1.25, 1.10),
         ("needle_litter", -15.6, 17.4, 4.2, 5.0, 6, 0.90, 1.35, 2.20),
-        ("tall_wild", -2.4, -4.8, 4.8, 3.2, 16, 2.15, 2.75, 3.05),
-        ("rocky_sparse", 8.6, 11.0, 3.4, 2.8, 5, 1.00, 1.45, 4.40),
-        ("worn_open", -1.2, -1.6, 3.6, 5.8, 7, 0.62, 0.95, 5.15),
-        ("cabin_edge", -9.4, 5.2, 2.6, 3.4, 8, 1.20, 1.80, 0.85),
+        ("tall_wild", -18.4, 8.6, 4.2, 3.4, 14, 1.85, 2.55, 3.05),
+        ("rocky_sparse", 14.6, 16.0, 3.4, 2.8, 5, 1.00, 1.45, 4.40),
+        ("worn_open", 4.2, 28.4, 3.6, 5.2, 7, 0.62, 0.95, 5.15),
+        ("cabin_edge", -12.8, 8.4, 2.4, 3.0, 8, 1.15, 1.70, 0.85),
     )
     if grass_src is not None:
         for tag, cx, cy, rx, ry, count, slo, shi, seed in zones:
@@ -744,20 +747,17 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
                 scale = slo + (shi - slo) * t
                 extras.append(_plant_grass(grass_src, (x, y, 0.02), scale, seed + 0.37 * i))
                 planted += 1
-    extras.extend(place_hero_shore_grass(grass_src))
     # Bare earth is a first-class zone: no grass, visible ground + stones.
     macros = (
-        (8.2, 20.4, 4.6, 2.2, dirt, 0.28),
-        (10.4, 17.2, 3.4, 1.6, dirt, 1.20),
-        (6.4, 24.8, 3.8, 1.8, dirt, 2.55),
-        (7.6, 15.6, 2.8, 1.4, dirt, 0.70),
-        (-15.4, 16.4, 5.0, 2.4, needle, 0.55),
-        (-17.2, 21.8, 4.2, 2.0, needle, 1.80),
-        (-14.6, 12.6, 3.2, 1.6, needle, 2.90),
-        (-2.2, -6.2, 3.4, 1.4, dirt, 0.90),
-        (1.0, 1.8, 2.6, 1.1, dirt, 2.10),
-        (8.8, 10.4, 2.8, 1.3, dirt, 3.20),
-        (0.2, -3.4, 2.2, 4.4, dirt, 0.18),
+        (8.6, 20.8, 9.2, 4.4, dirt, 0.28),
+        (11.2, 16.4, 6.8, 3.2, dirt, 1.20),
+        (5.4, 26.6, 7.4, 3.6, dirt, 2.55),
+        (3.8, 32.0, 8.6, 4.0, dirt, 0.70),
+        (-15.4, 16.4, 7.2, 3.6, needle, 0.55),
+        (-17.6, 22.4, 6.4, 3.2, needle, 1.80),
+        (-14.2, 11.8, 5.0, 2.6, needle, 2.90),
+        (14.2, 15.6, 4.6, 2.4, dirt, 3.20),
+        (-6.8, 28.8, 5.8, 3.0, dirt, 1.55),
     )
     for i, (x, y, sx, sy, color, yaw) in enumerate(macros):
         if in_river_channel(x, y, margin=1.2):
@@ -2695,11 +2695,11 @@ def wet_stone_material() -> bpy.types.Material:
     bsdf = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
     if bsdf:
         if "Base Color" in bsdf.inputs:
-            bsdf.inputs["Base Color"].default_value = (0.16, 0.13, 0.10, 1.0)
+            bsdf.inputs["Base Color"].default_value = (0.075, 0.066, 0.055, 1.0)
         if "Roughness" in bsdf.inputs:
-            bsdf.inputs["Roughness"].default_value = 0.38
+            bsdf.inputs["Roughness"].default_value = 0.48
         if "Specular IOR Level" in bsdf.inputs:
-            bsdf.inputs["Specular IOR Level"].default_value = 0.42
+            bsdf.inputs["Specular IOR Level"].default_value = 0.28
         if "Metallic" in bsdf.inputs:
             bsdf.inputs["Metallic"].default_value = 0.0
         coord = nodes.new("ShaderNodeTexCoord")
@@ -2748,13 +2748,13 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 # Camera-visible shoreline rocks. edge=1 sits on the water film edge.
 # Irregular clusters, not an even march. Some in water, some on bank.
 HERO_EDGE_ROCKS = (
-    (-10.6, 2.55, 0.78, 0.38),
-    (-8.5, 1.65, 1.20, 0.32),
-    (-7.4, 3.15, 0.94, 0.26),
-    (-3.9, 2.85, 1.06, 0.40),
-    (-3.0, 1.55, 0.70, 0.46),
-    (1.3, 2.45, 1.22, 0.30),
-    (4.7, 3.05, 0.88, 0.34),
+    (-10.4, 3.45, 0.82, 0.22),
+    (-8.6, 2.05, 1.28, 0.18),
+    (-7.2, 3.80, 0.96, 0.16),
+    (-4.4, 3.25, 1.12, 0.20),
+    (-3.2, 1.85, 0.68, 0.28),
+    (-1.2, 2.70, 1.35, 0.18),
+    (0.6, 3.55, 0.90, 0.20),
 )
 
 
@@ -2870,23 +2870,25 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
             grass_run *= max(0.08, 1.0 - wrap)
             wet_run = max(wet_run, 0.18)
             soil_run = max(soil_run, wet_run + 0.28)
+        # Wet shelf only. A rising apron toward Camera C became the V43-c slab.
+        wet_cap = min(0.42, wet_run)
         lats = [
-            water_edge * 0.10,
-            water_edge * 0.48,
-            water_edge * 0.92,
-            water_edge + wet_run,
-            water_edge + damp_run,
-            water_edge + soil_run,
-            water_edge + soil_run + grass_run + 0.45,
+            water_edge * 0.08,
+            water_edge * 0.40,
+            water_edge * 0.78,
+            water_edge * 0.96,
+            water_edge + wet_cap,
+            water_edge + wet_cap + 0.22,
+            water_edge + wet_cap + 0.38,
         ]
         zs = [
             BED_CENTER_Z + 0.04,
-            BED_CENTER_Z + 0.14,
-            WATER_SURFACE_Z - 0.02,
-            WATER_SURFACE_Z + 0.012 + swell * 0.06,
-            -0.52 + swell * 0.08,
-            -0.14 + swell * 0.10,
-            0.03,
+            BED_CENTER_Z + 0.12,
+            WATER_SURFACE_Z - 0.06,
+            WATER_SURFACE_Z - 0.01,
+            WATER_SURFACE_Z + 0.02 + swell * 0.04,
+            -0.72,
+            -0.42,
         ]
         for row in range(1, rows):
             lats[row] = max(lats[row], lats[row - 1] + 0.10)
@@ -2921,14 +2923,12 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     for poly, row in zip(obj.data.polygons, face_rows):
         sample = min(samples - 1, poly.vertices[0] // rows)
         kind = kinds[min(len(kinds) - 1, sample * rows)] if kinds else "blend"
-        if row <= 1:
+        if row <= 2:
             poly.material_index = 0
-        elif row == 2:
-            poly.material_index = 4 if kind == "gravel" else 1
         elif row <= 4:
-            poly.material_index = 2 if kind != "gravel" else 4
+            poly.material_index = 4 if kind == "gravel" else 1
         else:
-            poly.material_index = 3
+            poly.material_index = 2
     if hasattr(obj, "visible_shadow"):
         obj.visible_shadow = False
     extras.append(obj)
@@ -2939,7 +2939,7 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         "solid": True,
         "filledToBed": True,
         "surfaceOnly": True,
-        "apronM": 0.45,
+        "apronM": 0.38,
         "endCaps": False,
         "upwardFaces": True,
         "sharedWaterEdge": True,
@@ -2977,7 +2977,8 @@ def place_hero_embedded_rocks(centers: list[Vector], soil_mat: bpy.types.Materia
                 continue
             used.add(px)
             loc = center + side * (-water_edge * edge)
-            loc.z = WATER_SURFACE_Z - scale * bury * 0.22
+            # Sit ON the lip so Camera C sees a silhouette, not a buried pebble.
+            loc.z = WATER_SURFACE_Z + scale * (0.16 - bury * 0.10)
             extras.append(_add_hero_shore_rock(f"TJ_HeroEmbed_{i}", loc, scale, mat, i * 0.47 + px))
             placed.append({
                 "x": round(loc.x, 2),
