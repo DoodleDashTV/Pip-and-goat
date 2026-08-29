@@ -31,8 +31,8 @@ SHOTS = (
         "end": 450,
         "lensMin": 45.0,
         "lensMax": 55.0,
-        "purpose": "species variation, foreground parallax, midground depth, opening to village",
-        "move": "forest_lateral_with_opening",
+        "purpose": "dense cinematic forest passage; cabin absent or extremely subordinate",
+        "move": "forest_immersion_dolly",
     },
     {
         "id": "SHOT_04",
@@ -49,9 +49,9 @@ SHOTS = (
         "name": "MOUNTAIN_COMPRESSION",
         "start": 601,
         "end": 750,
-        "lensMin": 60.0,
-        "lensMax": 85.0,
-        "purpose": "long-lens compression of village/forest, 3DT hero, Louis ridges, atmosphere",
+        "lensMin": 85.0,
+        "lensMax": 140.0,
+        "purpose": "unmistakable telephoto mountain compression; Louis mass dominates the frame",
         "move": "locked_long_lens_push",
     },
     {
@@ -61,7 +61,7 @@ SHOTS = (
         "end": 900,
         "lensMin": 40.0,
         "lensMax": 55.0,
-        "purpose": "river, village, forest, mountains, sky, character staging; settle for title",
+        "purpose": "final scenic payoff: layered landscape beauty, not another village establish",
         "move": "hero_settle",
     },
 )
@@ -186,11 +186,12 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_03",
             "camera": "TJ_SHOT_03_CAM",
-            # Stay on the west flank, but look along the tree line toward the
-            # village opening instead of over empty north meadow.
+            # V39: live inside a west grove and look deeper into the trees.
+            # The west-bank "village opening" camera still read as a cabin peek.
             "retiredEmptyMeadow": {"location": (-34.0, 16.0, 5.2), "look": (-14.0, 36.0, 7.2), "lens": 48.0},
-            "start": {"location": (-38.0, -6.0, 4.60), "look": (-24.0, 4.5, 2.90), "lens": 48.0},
-            "end": {"location": (-36.0, -3.4, 4.80), "look": (-21.5, 7.2, 3.20), "lens": 52.0},
+            "retiredCabinPeek": {"location": (-38.0, -6.0, 4.60), "look": (-24.0, 4.5, 2.90), "lens": 48.0},
+            "start": {"location": (-50.0, -22.0, 3.35), "look": (-58.0, -4.0, 2.40), "lens": 50.0},
+            "end": {"location": (-48.5, -19.5, 3.50), "look": (-56.5, -1.5, 2.55), "lens": 54.0},
         },
         {
             "id": "SHOT_04",
@@ -201,14 +202,15 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_05",
             "camera": "TJ_SHOT_05_CAM",
-            "start": {"location": (18.0, -82.0, 14.2), "look": (0.0, 6.0, 5.2), "lens": 78.0},
-            "end": {"location": (16.5, -76.0, 14.6), "look": (0.4, 8.0, 5.6), "lens": 82.0},
+            # 120 mm from far SE, aimed at a close Louis peak — not the street.
+            "start": {"location": (38.0, -122.0, 16.0), "look": (26.0, 28.0, 18.0), "lens": 120.0},
+            "end": {"location": (36.0, -116.0, 16.4), "look": (26.4, 30.0, 18.6), "lens": 128.0},
         },
         {
             "id": "SHOT_06",
             "camera": "TJ_SHOT_06_CAM",
-            "start": {"location": (7.2, -32.0, 7.6), "look": (0.0, 9.0, 1.15), "lens": 42.0},
-            "end": {"location": (5.8, -26.0, 7.2), "look": (0.0, 8.2, 1.05), "lens": 48.0},
+            "start": {"location": (14.0, -18.0, 4.40), "look": (24.0, 26.0, 12.0), "lens": 44.0},
+            "end": {"location": (13.2, -15.5, 4.55), "look": (25.0, 28.0, 12.8), "lens": 48.0},
         },
     ]
 

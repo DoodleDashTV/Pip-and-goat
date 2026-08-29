@@ -349,11 +349,13 @@ def in_village(x: float, y: float) -> bool:
 
 
 def in_mountain_corridor(x: float, y: float) -> bool:
-    return abs(x) < MOUNTAIN_CORRIDOR_X and y > -24.0
+    # Widen so flank pines cannot wall off the SHOT_02 mountain read.
+    return abs(x) < 12.0 and y > -24.0
 
 
 def in_shot03_corridor(x: float, y: float) -> bool:
-    return dist_to_polyline(x, y, ((-38.0, -6.0, 0.0), (-24.0, 4.5, 0.0), (-18.0, 10.0, 0.0))) < 5.4
+    """Camera keep-out only. Do not clear a village-facing tree alley."""
+    return math.hypot(x + 50.0, y + 22.0) < 8.0
 
 
 def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, ...] = ()) -> list[Path]:
@@ -502,6 +504,12 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         # mountain/sky sliver without pitching the approved creek look.
         if 0.5 <= x <= 10.0 and -9.0 <= y <= 6.0 and river_dist > bank_outer:
             height -= 0.55 * max(0.0, 1.0 - abs(x - 4.5) / 6.0)
+        # V39: drop the north meadow mound so Louis peaks can read behind
+        # the cabin. Does not touch the locked trough or water half-widths.
+        if -18.0 <= x <= 14.0 and 8.0 <= y <= 38.0 and river_dist > bank_outer:
+            gx = math.exp(-((x + 4.0) / 14.0) ** 2)
+            gy = math.exp(-((y - 22.0) / 14.0) ** 2)
+            height -= 1.15 * gx * gy
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
                 (VILLAGE_X_HALF - abs(x)) / 4.0,
@@ -545,9 +553,9 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         bsdf.inputs["Roughness"].default_value = 0.96
     coord = nodes.new("ShaderNodeTexCoord")
     noise = nodes.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 0.014
+    noise.inputs["Scale"].default_value = 0.028
     if "Detail" in noise.inputs:
-        noise.inputs["Detail"].default_value = 3.0
+        noise.inputs["Detail"].default_value = 5.0
     links.new(coord.outputs["Object"], noise.inputs["Vector"])
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE"
@@ -565,7 +573,7 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         if tex.image and tex.image.colorspace_settings:
             tex.image.colorspace_settings.name = "sRGB"
         mapping = nodes.new("ShaderNodeMapping")
-        mapping.inputs["Scale"].default_value = (0.016, 0.016, 0.016)
+        mapping.inputs["Scale"].default_value = (0.028, 0.028, 0.028)
         links.new(coord.outputs["Object"], mapping.inputs["Vector"])
         links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
         mix = _mix_rgb(nodes)
@@ -589,6 +597,50 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         links.new(color, detail_mix.inputs["Color1"])
         links.new(detail_ramp.outputs["Color"], detail_mix.inputs["Color2"])
         color = detail_mix.outputs["Color"]
+    # Image-scale soil / needle islands so far grass cannot read as one carpet.
+    soil = nodes.new("ShaderNodeTexNoise")
+    soil.inputs["Scale"].default_value = 0.055
+    if "Detail" in soil.inputs:
+        soil.inputs["Detail"].default_value = 4.0
+    links.new(coord.outputs["Object"], soil.inputs["Vector"])
+    soil2 = nodes.new("ShaderNodeTexNoise")
+    soil2.inputs["Scale"].default_value = 0.14
+    if "Detail" in soil2.inputs:
+        soil2.inputs["Detail"].default_value = 6.0
+    links.new(coord.outputs["Object"], soil2.inputs["Vector"])
+    soil_mul = nodes.new("ShaderNodeMath")
+    soil_mul.operation = "MULTIPLY"
+    links.new(soil.outputs["Fac"], soil_mul.inputs[0])
+    links.new(soil2.outputs["Fac"], soil_mul.inputs[1])
+    soil_fac = nodes.new("ShaderNodeMapRange")
+    soil_fac.inputs["From Min"].default_value = 0.18
+    soil_fac.inputs["From Max"].default_value = 0.42
+    soil_fac.inputs["To Min"].default_value = 0.0
+    soil_fac.inputs["To Max"].default_value = 0.72
+    links.new(soil_mul.outputs["Value"], soil_fac.inputs["Value"])
+    soil_mix = _mix_rgb(nodes)
+    if "Color1" in soil_mix.inputs:
+        links.new(color, soil_mix.inputs["Color1"])
+        soil_mix.inputs["Color2"].default_value = (0.118, 0.078, 0.042, 1.0)
+        links.new(soil_fac.outputs["Result"] if "Result" in soil_fac.outputs else soil_fac.outputs[0], soil_mix.inputs["Fac"])
+        color = soil_mix.outputs["Color"]
+    needle = nodes.new("ShaderNodeTexNoise")
+    needle.inputs["Scale"].default_value = 0.08
+    if "Detail" in needle.inputs:
+        needle.inputs["Detail"].default_value = 3.0
+    links.new(coord.outputs["Object"], needle.inputs["Vector"])
+    needle_fac = nodes.new("ShaderNodeMapRange")
+    needle_fac.inputs["From Min"].default_value = 0.62
+    needle_fac.inputs["From Max"].default_value = 0.92
+    needle_fac.inputs["To Min"].default_value = 0.0
+    needle_fac.inputs["To Max"].default_value = 0.55
+    links.new(needle.outputs["Fac"], needle_fac.inputs["Value"])
+    needle_mix = _mix_rgb(nodes)
+    if "Color1" in needle_mix.inputs:
+        links.new(color, needle_mix.inputs["Color1"])
+        needle_mix.inputs["Color2"].default_value = (0.034, 0.048, 0.022, 1.0)
+        links.new(needle_fac.outputs["Result"] if "Result" in needle_fac.outputs else needle_fac.outputs[0], needle_mix.inputs["Fac"])
+        color = needle_mix.outputs["Color"]
     bump = nodes.new("ShaderNodeBump")
     bump.inputs["Strength"].default_value = 0.42
     links.new(detail.outputs["Fac"], bump.inputs["Height"])
@@ -647,7 +699,7 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         dist, signed, along, left_half, right_half = channel_profile(x, y)
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
-        fade = local_half + ((SOUTH_BANK_RUN + 1.2) if signed < 0.0 else 5.2)
+        fade = local_half + ((SOUTH_BANK_RUN + 2.4) if signed < 0.0 else 6.8)
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
@@ -721,6 +773,13 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                     value = max(value, 0.16 + 0.62 * tongue)
                 if dist > local_half + 0.35 and tongue < 0.24:
                     value *= 0.08
+        if not (HERO_X_MIN <= x <= HERO_X_MAX):
+            far = 0.5 + 0.5 * math.sin(x * 0.29 + along * 0.17)
+            far *= 0.5 + 0.5 * math.sin(x * 0.71 + y * 0.23)
+            if dist < fade and far > 0.70:
+                value = max(value, 0.20)
+            if dist > local_half * 0.75 and far < 0.30:
+                value *= 0.32
         value *= 0.80 + 0.20 * max(0.0, blotch)
         color.data[index].color = (value, value, value, 1.0)
 
@@ -1799,13 +1858,13 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     return river, assigned, extras
 
 
-def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0) -> None:
+def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0, rot_z: float = 0.0) -> None:
     obj.parent = None
     try:
         obj.matrix_parent_inverse.identity()
     except Exception:
         pass
-    obj.rotation_euler = (0.0, 0.0, 0.0)
+    obj.rotation_euler = (0.0, 0.0, rot_z)
     obj.scale = (scale, scale, scale)
     obj.location = (0.0, 0.0, 0.0)
     bpy.context.view_layer.update()
@@ -1840,19 +1899,26 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
                 bpy.data.objects.remove(obj, do_unlink=True)
             except Exception:
                 pass
-    foothill_slots = ((10.0, 46.0, 0.16), (52.0, 48.0, 0.15))
-    # Center peak sits closer so locked camera C can still read a mountain
-    # silhouette over the cabin without changing the approved creek look.
-    peak_slots = ((-36.0, 78.0, 0.30), (12.0, 52.0, 0.40), (50.0, 80.0, 0.28))
+    # (center_x, south_y, scale, rot_z). Closer masses for SHOT_02 depth and
+    # SHOT_05 telephoto compression. Do not smash into the cabin street.
+    foothill_slots = (
+        (4.0, 24.0, 0.22, 0.18),
+        (36.0, 28.0, 0.18, -0.22),
+    )
+    peak_slots = (
+        (-14.0, 28.0, 0.50, 0.28),
+        (28.0, 16.0, 0.48, 0.42),
+        (46.0, 52.0, 0.30, -0.16),
+    )
     placed = []
     foothills = [obj for obj in members if obj and "meadowrange" in obj.name.lower()]
     peaks = [obj for obj in members if obj and "grassymountain" in obj.name.lower()]
-    for obj, (cx, south, scale) in zip(foothills, foothill_slots):
-        sit_louis_piece(obj, cx, south, scale)
+    for obj, (cx, south, scale, rot_z) in zip(foothills, foothill_slots):
+        sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
         link_exclusive(obj, collection)
         placed.append(obj)
-    for obj, (cx, south, scale) in zip(peaks, peak_slots):
-        sit_louis_piece(obj, cx, south, scale)
+    for obj, (cx, south, scale, rot_z) in zip(peaks, peak_slots):
+        sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
         link_exclusive(obj, collection)
         placed.append(obj)
     print(json.dumps({
@@ -2180,10 +2246,10 @@ def place_hero_soil_scars(centers: list[Vector]) -> list:
     """Irregular dirt shelves that thin grass on the camera-visible south bank."""
     extras = []
     mat = dirt_bank_material()
-    step = 6
+    step = 5
     for i in range(4, max(5, len(centers) - 4), step):
         center = centers[i]
-        if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+        if not (-18.0 <= center.x <= 14.0):
             continue
         if (i // step) % 3 == 0:
             continue
@@ -2240,82 +2306,183 @@ def place_waterline_dressing(trees: list) -> list:
 
 
 def place_shot03_forest_passage(trees: list) -> list:
-    """Dense west-flank passage with a clear lens corridor and a village opening."""
+    """Dense irregular west grove. Look away from the village, not a tree alley."""
     extras = []
     live = [obj for obj in trees if obj and obj.type == "MESH"]
     if not live:
         return extras
-    cam_xy = Vector((-38.0, -6.0, 0.0))
-    look_xy = Vector((-24.0, 4.5, 0.0))
-    along = look_xy - cam_xy
-    span = along.length
-    along.normalize()
-    side = Vector((-along.y, along.x, 0.0))
+    cam = Vector((-50.0, -22.0, 0.0))
+    # Explicit world plants: near occluders stay small; mid/far vary wildly.
+    # No mirrored left/right pairs. Cabin street is east of this grove.
     plants = (
-        (0.18, 8.6, 0.42),
-        (0.20, -8.8, 0.38),
-        (0.32, 7.4, 0.62),
-        (0.34, -7.8, 0.56),
-        (0.44, 9.2, 0.88),
-        (0.46, -9.4, 0.80),
-        (0.54, 6.8, 1.05),
-        (0.58, -10.2, 0.94),
-        (0.66, 8.8, 1.18),
-        (0.70, -7.2, 1.10),
-        (0.78, 10.0, 1.28),
-        (0.82, -9.6, 1.16),
-        (0.90, 7.6, 1.34),
-        (0.94, -8.4, 1.22),
+        (-54.8, -17.6, 0.20),
+        (-46.4, -16.2, 0.16),
+        (-43.2, -21.4, 0.24),
+        (-57.6, -14.8, 0.18),
+        (-62.4, -10.2, 0.58),
+        (-55.2, -7.4, 0.92),
+        (-68.8, -13.6, 0.46),
+        (-51.6, -3.2, 1.02),
+        (-64.0, 1.4, 0.78),
+        (-71.6, -5.8, 0.64),
+        (-47.8, -8.6, 0.38),
+        (-73.4, 3.2, 0.86),
+        (-60.8, 8.6, 1.18),
+        (-53.0, 6.4, 0.66),
+        (-67.2, 12.8, 1.08),
+        (-76.0, 8.0, 0.74),
+        (-58.8, 16.4, 1.22),
+        (-44.8, -11.8, 0.32),
+        (-69.6, 18.2, 0.94),
+        (-80.2, 2.6, 0.70),
+        (-49.2, 4.8, 0.52),
+        (-63.4, -16.8, 0.28),
     )
-    for i, (t, offset, scale) in enumerate(plants):
-        loc = cam_xy + along * (t * span) + side * offset
-        if (Vector((loc.x, loc.y, 0.0)) - cam_xy).length < 14.0:
+    for i, (x, y, scale) in enumerate(plants):
+        if math.hypot(x - cam.x, y - cam.y) < 6.5 and scale > 0.22:
             continue
-        if in_river_channel(loc.x, loc.y, margin=1.0) or in_village(loc.x, loc.y):
+        if in_river_channel(x, y, margin=1.0) or in_village(x, y):
             continue
-        sap = duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), scale)
-        sap.rotation_euler.z += 0.41 * ((i * 3) % 7)
+        sap = duplicate_mesh_in_world(live[i % len(live)], (x, y, 0.0), scale)
+        sap.rotation_euler.z += 0.53 * ((i * 5) % 11)
         extras.append(sap)
-    extras.extend(scatter_clumps(live, (-30.0, 16.0, 0.0), 4, 3, 5.8, 1.08, 23))
-    extras.extend(scatter_clumps(live, (-26.0, -4.0, 0.0), 3, 3, 5.2, 0.86, 29))
-    extras.extend(scatter_clumps(live, (-34.0, 10.0, 0.0), 3, 2, 4.6, 0.74, 31))
-    extras.extend(scatter_clumps(live, (-20.0, 8.0, 0.0), 3, 2, 4.2, 0.96, 37))
+    # Understory / saplings — clustered, not a grid.
+    saplings = (
+        (-52.6, -14.4, 0.10),
+        (-56.8, -9.6, 0.08),
+        (-61.2, -4.2, 0.12),
+        (-66.4, 0.8, 0.09),
+        (-54.0, -1.6, 0.11),
+        (-70.2, 6.4, 0.13),
+        (-48.6, -12.2, 0.07),
+        (-59.4, 11.0, 0.10),
+        (-64.8, 7.2, 0.08),
+        (-73.0, -1.4, 0.12),
+        (-51.0, 2.2, 0.09),
+        (-57.8, 5.6, 0.14),
+    )
+    for i, (x, y, scale) in enumerate(saplings):
+        if in_river_channel(x, y, margin=0.6) or in_village(x, y):
+            continue
+        sap = duplicate_mesh_in_world(live[(i + 2) % len(live)], (x, y, 0.0), scale)
+        sap.rotation_euler.z += 0.71 * (i + 3)
+        extras.append(sap)
+    extras.extend(scatter_clumps(live, (-66.0, 4.0, 0.0), 4, 3, 7.2, 0.82, 41))
+    extras.extend(scatter_clumps(live, (-74.0, 14.0, 0.0), 3, 3, 6.4, 0.70, 43))
+    extras.extend(scatter_clumps(live, (-58.0, 18.0, 0.0), 3, 2, 5.8, 0.96, 47))
+    extras.extend(scatter_clumps(live, (-78.0, -6.0, 0.0), 3, 2, 5.2, 0.58, 53))
+    extras.extend(place_shot03_forest_floor(live))
+    return extras
+
+
+def place_shot03_forest_floor(trees: list) -> list:
+    """Soil scars, fallen trunks, and debris so the grove floor is not lawn."""
+    extras = []
+    mat = dirt_bank_material()
+    scars = (
+        (-56.4, -12.8, 1.8, 0.16),
+        (-63.2, -3.6, 2.2, 0.14),
+        (-69.0, 5.4, 1.6, 0.12),
+        (-52.8, -6.2, 1.4, 0.10),
+        (-60.6, 9.8, 2.0, 0.15),
+        (-74.4, 1.2, 1.7, 0.13),
+    )
+    for i, (x, y, size, thick) in enumerate(scars):
+        loc = Vector((x, y, 0.08))
+        scar = _add_lumpy_rock(f"TJ_ForestSoil_{i}", loc, size, mat, i * 0.37 + 1.1)
+        scar.scale = (1.35, 0.90, thick)
+        extras.append(scar)
+    live = [obj for obj in trees if obj and obj.type == "MESH"]
+    if live:
+        logs = ((-58.2, -8.4, 0.16), (-65.6, 3.8, 0.14), (-71.4, 10.6, 0.12))
+        for i, (x, y, scale) in enumerate(logs):
+            log = duplicate_mesh_in_world(live[i % len(live)], (x, y, 0.18), scale)
+            log.rotation_euler.x = math.radians(86.0 + 4.0 * (i % 2))
+            log.rotation_euler.z += 0.80 * (i + 1)
+            extras.append(log)
     return extras
 
 
 def place_shot05_compression_frame(trees: list) -> list:
-    """One purchased tree in the long-lens foreground, not a row."""
+    """Off-axis purchased trees stacked against the close Louis mass."""
     extras = []
     live = [obj for obj in trees if obj and obj.type == "MESH"]
     if not live:
         return extras
-    sap = duplicate_mesh_in_world(live[0], (28.0, -48.0, 0.0), 0.92)
+    sap = duplicate_mesh_in_world(live[0], (44.0, -94.0, 0.0), 1.05)
     sap.rotation_euler.z += 0.55
     extras.append(sap)
-    extras.append(duplicate_mesh_in_world(live[min(1, len(live) - 1)], (30.5, -40.0, 0.0), 0.58))
+    extras.append(duplicate_mesh_in_world(live[min(1, len(live) - 1)], (30.0, -88.0, 0.0), 0.62))
+    extras.append(duplicate_mesh_in_world(live[min(2, len(live) - 1)], (41.0, -78.0, 0.0), 0.38))
     return extras
 
 
+def _zero_material_emission(mat) -> int:
+    changed = 0
+    if mat is None or not mat.node_tree:
+        return 0
+    for node in mat.node_tree.nodes:
+        if node.type == "BSDF_PRINCIPLED" and "Emission Strength" in node.inputs:
+            if float(node.inputs["Emission Strength"].default_value or 0.0) > 0.0:
+                node.inputs["Emission Strength"].default_value = 0.0
+                changed += 1
+            if "Emission Color" in node.inputs:
+                node.inputs["Emission Color"].default_value = (0.0, 0.0, 0.0, 1.0)
+        if node.type == "EMISSION" and "Strength" in node.inputs:
+            if float(node.inputs["Strength"].default_value or 0.0) > 0.0:
+                node.inputs["Strength"].default_value = 0.0
+                changed += 1
+    return changed
+
+
+def _dark_cabin_glass() -> bpy.types.Material:
+    mat = bpy.data.materials.get("TJ_CabinDaylightGlass") or bpy.data.materials.new("TJ_CabinDaylightGlass")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    nodes.clear()
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
+    if "Base Color" in bsdf.inputs:
+        bsdf.inputs["Base Color"].default_value = (0.028, 0.018, 0.012, 1.0)
+    if "Roughness" in bsdf.inputs:
+        bsdf.inputs["Roughness"].default_value = 0.28
+    if "Metallic" in bsdf.inputs:
+        bsdf.inputs["Metallic"].default_value = 0.0
+    if "Specular IOR Level" in bsdf.inputs:
+        bsdf.inputs["Specular IOR Level"].default_value = 0.22
+    if "IOR" in bsdf.inputs:
+        bsdf.inputs["IOR"].default_value = 1.45
+    if "Transmission Weight" in bsdf.inputs:
+        bsdf.inputs["Transmission Weight"].default_value = 0.0
+    if "Emission Strength" in bsdf.inputs:
+        bsdf.inputs["Emission Strength"].default_value = 0.045
+    if "Emission Color" in bsdf.inputs:
+        bsdf.inputs["Emission Color"].default_value = (1.0, 0.52, 0.26, 1.0)
+    return mat
+
+
 def repair_cabin_placeholders() -> list[dict]:
-    """Darken untextured white opening cards. Keep purchased cabin meshes."""
+    """Kill daylight white-card openings. Keep purchased cabin meshes."""
     reports = []
-    dark = bpy.data.materials.new("TJ_CabinInteriorVoid")
-    dark.use_nodes = True
-    bsdf = next((node for node in dark.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
-    if bsdf and "Base Color" in bsdf.inputs:
-        bsdf.inputs["Base Color"].default_value = (0.04, 0.025, 0.016, 1.0)
-        if "Roughness" in bsdf.inputs:
-            bsdf.inputs["Roughness"].default_value = 0.92
-        if "Emission Strength" in bsdf.inputs:
-            bsdf.inputs["Emission Strength"].default_value = 0.0
+    glass = _dark_cabin_glass()
     keep = ("roof", "straw", "fence", "gate", "cart", "tree")
+    hide_tokens = ("_lod", "emi", "interior", "inside")
     for obj in list(bpy.data.objects):
         if obj.type != "MESH":
             continue
         name = obj.name.lower()
         parent = str(getattr(obj.parent, "name", "") or "").lower()
         blob = f"{name} {parent}"
-        if not any(token in blob for token in ("village", "cabin", "building", "door", "frame", "window")):
+        village = any(token in blob for token in ("village", "cabin", "building", "door", "frame", "window"))
+        if not village:
+            continue
+        if any(token in name for token in hide_tokens):
+            obj.hide_render = True
+            obj.hide_viewport = True
+            reports.append({"name": obj.name, "action": "hide_interior_or_lod"})
+            print(json.dumps({"event": "cabin_interior_hidden", "name": obj.name}), flush=True)
             continue
         if any(token in name for token in keep):
             continue
@@ -2324,43 +2491,40 @@ def repair_cabin_placeholders() -> list[dict]:
             bright = False
             has_img = material_has_valid_image(mat) if mat else False
             color = None
+            mat_name = str(getattr(mat, "name", "") or "")
             if mat and mat.node_tree:
+                zeroed = _zero_material_emission(mat)
+                if zeroed:
+                    reports.append({"name": obj.name, "slot": index, "action": "zero_emission", "count": zeroed, "material": mat_name})
                 body = next((node for node in mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
                 if body and "Base Color" in body.inputs and not body.inputs["Base Color"].links:
                     color = tuple(body.inputs["Base Color"].default_value[:3])
                     bright = color[0] > 0.72 and color[1] > 0.72 and color[2] > 0.72
-                if body and "Emission Strength" in body.inputs:
-                    emit = float(body.inputs["Emission Strength"].default_value or 0.0)
-                    if emit > 0.8:
-                        body.inputs["Emission Strength"].default_value = 0.28
-                        reports.append({"name": obj.name, "slot": index, "action": "clamp_emission", "from": emit})
-                for node in mat.node_tree.nodes:
-                    if node.type == "EMISSION" and "Strength" in node.inputs:
-                        emit = float(node.inputs["Strength"].default_value or 0.0)
-                        if emit > 0.8:
-                            node.inputs["Strength"].default_value = 0.28
-                            reports.append({"name": obj.name, "slot": index, "action": "clamp_emission_node", "from": emit})
-            if (not has_img and bright) or (mat is None and "door" in blob):
-                slot.material = dark
-                reports.append({"name": obj.name, "slot": index, "material": getattr(mat, "name", None), "action": "darken_white_slot", "color": color})
-                print(json.dumps({"event": "cabin_placeholder_darkened", "name": obj.name, "slot": index, "material": getattr(mat, "name", None), "color": color}), flush=True)
+            windowish = mat_name.lower().startswith("window") or "window" in name
+            if windowish or (not has_img and bright) or (mat is None and "door" in blob):
+                slot.material = glass
+                reports.append({"name": obj.name, "slot": index, "material": mat_name or None, "action": "assign_daylight_glass", "color": color})
+                print(json.dumps({"event": "cabin_window_glass", "name": obj.name, "slot": index, "material": mat_name, "color": color}), flush=True)
             print(json.dumps({
                 "event": "cabin_material_slot",
                 "name": obj.name,
                 "slot": index,
-                "material": getattr(mat, "name", None),
+                "material": mat_name or None,
                 "hasImage": has_img,
                 "bright": bright,
                 "color": color,
             }), flush=True)
     for mat in list(bpy.data.materials):
-        if mat is None or not str(mat.name).lower().startswith("window"):
+        if mat is None:
             continue
-        if material_has_valid_image(mat):
-            continue
-        mat.user_remap(dark)
-        reports.append({"name": mat.name, "action": "remap_window_material"})
-        print(json.dumps({"event": "cabin_window_material_remapped", "name": mat.name}), flush=True)
+        label = str(mat.name).lower()
+        if label.startswith("window") or "emi" in label:
+            if material_has_valid_image(mat) and not label.startswith("window"):
+                _zero_material_emission(mat)
+                continue
+            mat.user_remap(glass)
+            reports.append({"name": mat.name, "action": "remap_window_or_emi_to_glass"})
+            print(json.dumps({"event": "cabin_window_material_remapped", "name": mat.name}), flush=True)
     return reports
 
 
@@ -2389,7 +2553,7 @@ def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, ra
                 continue
             if in_shot03_corridor(loc[0], loc[1]):
                 continue
-            if math.hypot(loc[0] + 38.0, loc[1] + 6.0) < 12.0:
+            if math.hypot(loc[0] + 50.0, loc[1] + 22.0) < 9.0:
                 continue
             extras.append(duplicate_mesh_in_world(src, loc, scale * (0.85 + 0.08 * ((i + clump) % 5))))
     return extras
@@ -2424,11 +2588,11 @@ def setup_lighting_hierarchy() -> None:
         bounce.data.color = (1.0, 0.86, 0.62)
     if hasattr(bounce, "visible_glossy"):
         bounce.visible_glossy = False
-    bpy.ops.object.light_add(type="AREA", location=(-28.0, 4.0, 8.0))
+    bpy.ops.object.light_add(type="AREA", location=(-56.0, -10.0, 10.0))
     forest = bpy.context.object
     forest.name = "TJ_ForestFill"
-    forest.data.energy = 130
-    forest.data.size = 20
+    forest.data.energy = 160
+    forest.data.size = 28
     forest.rotation_euler = (math.radians(58), 0.0, math.radians(18))
     if hasattr(forest.data, "color"):
         forest.data.color = (1.0, 0.88, 0.70)
@@ -2775,11 +2939,13 @@ def main() -> int:
             if hasattr(obj, "visible_shadow"):
                 obj.visible_shadow = False
         if nature_members:
-            west = duplicate_mesh_in_world(nature_members[0], (-44.0, 54.0, 0.0), 1.6)
+            grove = duplicate_mesh_in_world(nature_members[0], (-64.0, 8.0, 0.0), 1.15)
+            west = duplicate_mesh_in_world(nature_members[0], (-72.0, 48.0, 0.0), 1.4)
             east = duplicate_mesh_in_world(nature_members[0], (46.0, 56.0, 0.0), 1.7)
             for obj in nature_members:
                 obj.hide_render = True
                 obj.hide_viewport = True
+            link_exclusive(grove, collections["WORLD_FOREST_FOREGROUND"])
             link_exclusive(west, collections["WORLD_FOREST_MIDGROUND"])
             link_exclusive(east, collections["WORLD_FOREST_BACKGROUND"])
 
@@ -2789,9 +2955,9 @@ def main() -> int:
     ]
     if not trees:
         trees = [obj for obj in bpy.data.objects if obj.type == "MESH" and "tree" in obj.name.lower()]
-    west_fg = scatter_clumps(trees, (-30.0, 18.0, 0.0), 3, 2, 6.5, 1.05, 3)
-    west_fg.extend(scatter_clumps(trees, (-22.0, -4.0, 0.0), 2, 2, 5.5, 0.92, 19))
-    west_mg = scatter_clumps(trees, (-44.0, 40.0, 0.0), 3, 2, 8.0, 1.35, 7)
+    west_fg = scatter_clumps(trees, (-36.0, 18.0, 0.0), 3, 2, 6.5, 1.05, 3)
+    west_fg.extend(scatter_clumps(trees, (-28.0, -8.0, 0.0), 2, 2, 5.5, 0.92, 19))
+    west_mg = scatter_clumps(trees, (-52.0, 42.0, 0.0), 3, 2, 8.0, 1.35, 7)
     east_fg = scatter_clumps(trees, (24.0, 12.0, 0.0), 3, 2, 7.0, 1.08, 5)
     east_mg = scatter_clumps(trees, (28.0, 32.0, 0.0), 3, 2, 8.0, 1.40, 11)
     if trees:
@@ -2815,8 +2981,8 @@ def main() -> int:
             west_fg.append(duplicate_mesh_in_world(trees[int(abs(item[0])) % src_count], (item[0], item[1], 0.0), item[2]))
         west_fg.extend(place_bank_crest_trees(trees))
         west_fg.extend(place_waterline_dressing(trees))
-    west_bg = scatter_clumps(trees, (-26.0, 52.0, 0.0), 2, 2, 9.0, 1.8, 13)
-    east_bg = scatter_clumps(trees, (24.0, 54.0, 0.0), 2, 2, 9.0, 1.85, 17)
+    west_bg = scatter_clumps(trees, (-38.0, 58.0, 0.0), 2, 2, 9.0, 1.6, 13)
+    east_bg = scatter_clumps(trees, (30.0, 58.0, 0.0), 2, 2, 9.0, 1.65, 17)
     foreground = west_fg + east_fg
     midground = west_mg + east_mg
     background = west_bg + east_bg
@@ -2925,8 +3091,8 @@ def main() -> int:
         "northBankRun": NORTH_BANK_RUN,
         "waterArchitecture": "v34_candidate_d",
         "cameraDistanceShaderGate": False,
-        "forestLayout": "flank_clumps_mountain_corridor",
-        "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
+        "forestLayout": "dense_west_grove_shot03_no_village_alley",
+        "mountainLayout": "louis_close_peak_shot05_and_shot02_saddle",
     }
     Path(args.proof_path).write_text(json.dumps(proof, indent=2) + "\n", encoding="utf-8")
     write_progress("CINEMATIC_WORLD_BUILT", cameras=len(cameras), forestCopies=proof["forestCopies"])

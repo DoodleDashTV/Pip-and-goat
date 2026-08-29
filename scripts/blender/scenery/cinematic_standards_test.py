@@ -107,22 +107,21 @@ def test_six_shot_plan():
     assert len(cameras) == 6
     lenses = [cam["start"]["lens"] for cam in cameras]
     assert min(lenses) <= 28.0
-    assert max(lenses) >= 70.0
+    assert max(lenses) >= 100.0
     assert len(set(lenses)) >= 5
     shot05 = next(cam for cam in cameras if cam["id"] == "SHOT_05")
     assert shot05["start"]["location"][2] >= 12.0
     assert abs(shot05["start"]["location"][0]) >= 16.0
-    assert shot05["start"]["location"][1] <= -70.0
-    assert 0.0 <= shot05["start"]["look"][1] <= 24.0
-    assert shot05["start"]["look"][2] <= 12.0
-    assert shot05["start"]["lens"] >= 70.0
+    assert shot05["start"]["location"][1] <= -100.0
+    assert shot05["start"]["look"][2] >= 10.0
+    assert shot05["start"]["lens"] >= 100.0
     shot03 = next(cam for cam in cameras if cam["id"] == "SHOT_03")
-    assert shot03["start"]["location"][0] <= -28.0
-    assert shot03["start"]["look"][0] <= -12.0
-    # Forest passage must look along the west trees toward the village, not over empty north meadow.
-    assert shot03["start"]["look"][1] <= 22.0
+    assert shot03["start"]["location"][0] <= -40.0
+    assert shot03["start"]["look"][0] <= -40.0
+    # Dense forest: look deeper into the west grove, not toward the village street.
+    assert shot03["start"]["look"][1] <= 6.0
     assert shot03["start"]["location"][2] <= 6.0
-    assert shot03["start"]["location"][1] <= 0.0
+    assert shot03["start"]["location"][1] <= -12.0
     shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
     # V37 keeps camera C, but pitches below the cabin so the creek owns more frame.
     assert shot02["start"]["location"][1] < -16.0
@@ -141,7 +140,7 @@ def test_six_shot_plan():
     assert len(lookdev_frames()) == 12
     payload = shot_standard_payload()
     assert payload["cutsNotInterpolated"] is True
-    assert SHOTS[4]["lensMin"] == 60.0
+    assert SHOTS[4]["lensMin"] == 85.0
     heroes = hero_search_cameras()
     assert [item["id"] for item in heroes] == ["A", "B", "C", "D", "E"]
     zs = [item["location"][2] for item in heroes]
