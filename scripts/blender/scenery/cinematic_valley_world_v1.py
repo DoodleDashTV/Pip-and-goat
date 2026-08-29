@@ -269,23 +269,35 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
         return meadow_z
     if dist < water_half:
         t = dist / max(0.12, water_half)
-        return center_z + (shoulder_z - center_z) * (t ** 1.55)
+        height = center_z + (shoulder_z - center_z) * (t ** 1.55)
+        return _waterline_wobble(height, x, y, along)
     if dist < bed_half:
         t = (dist - water_half) / max(0.16, bed_half - water_half)
         irreg = 0.08 * math.sin(x * 0.81 + y * 0.54) + 0.05 * math.sin(along * 0.67)
-        return shoulder_z + 0.20 * (t ** 1.35) + irreg
+        height = shoulder_z + 0.20 * (t ** 1.35) + irreg
+        return _waterline_wobble(height, x, y, along)
     t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
     shelf = shoulder_z + 0.20
     crest_z += 0.10 * math.sin(x * 1.17 + y * 0.83) + 0.07 * math.sin(along * 0.91)
     crest_z += 0.06 * math.sin(x * 2.4 + y * 1.8)
     crest_z += 0.09 * math.sin(x * 3.1 + along * 1.7)
     # Round the camera-facing lip. Do not change trough depths or water/bed halves.
-    if t < 0.58:
-        u = t / 0.58
-        return shelf + (crest_z - shelf) * (u ** 1.55)
-    u = (t - 0.58) / 0.42
+    if t < 0.72:
+        u = t / 0.72
+        return shelf + (crest_z - shelf) * (u ** 1.65)
+    u = (t - 0.72) / 0.28
     lip = 0.11 * math.sin(x * 2.05 + along * 0.44) + 0.07 * math.sin(y * 1.6 + x * 0.9)
     return (crest_z + lip) + (meadow_z - crest_z - lip) * (u ** 1.08)
+
+
+def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
+    """Advance/retreat only the z=-1.15 contour. Deep trough center stays put."""
+    if abs(height - WATER_SURFACE_Z) >= 0.42:
+        return height
+    height += 0.16 * math.sin(x * 2.05 + y * 1.55)
+    height += 0.10 * math.sin(along * 0.73 + x * 1.1)
+    height += 0.06 * math.sin(x * 3.4 + along * 1.9)
+    return height
 
 
 def build_terrain(_files: list[Path]) -> bpy.types.Object:
@@ -1026,9 +1038,7 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
         for link in list(bump.inputs["Height"].links):
             links.remove(link)
         links.new(flow.outputs["Value"], bump.inputs["Height"])
-        trans = nodes.new("ShaderNodeBsdfRefraction")
-        if hasattr(trans, "distribution"):
-            trans.distribution = "GGX"
+        trans = nodes.new("ShaderNodeBsdfTransparent")
         if "Color" in trans.inputs:
             trans.inputs["Color"].default_value = (
                 min(0.78, max(0.58, deep[0] * 14.0 + 0.52)),
@@ -1036,12 +1046,6 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
                 min(0.82, max(0.64, deep[2] * 14.0 + 0.58)),
                 1.0,
             )
-        if "IOR" in trans.inputs:
-            trans.inputs["IOR"].default_value = 1.05
-        if "Roughness" in trans.inputs:
-            trans.inputs["Roughness"].default_value = 0.10
-        if "Normal" in trans.inputs:
-            links.new(bump.outputs["Normal"], trans.inputs["Normal"])
         if "Color" in glossy.inputs:
             glossy.inputs["Color"].default_value = cfg["glossy_color"]
         face_amt = nodes.new("ShaderNodeMapRange")
@@ -1263,6 +1267,9 @@ def spline_channel_mesh(
                 swell += 0.055 * math.sin(i * 0.41 + col * 1.05 + center.y * 0.26)
                 swell += 0.038 * math.sin(i * 0.77 + col * 2.0)
                 swell += 0.024 * math.sin(i * 1.13 + col * 1.6 + center.x * 0.5)
+                if abs(offset) > 0.62:
+                    swell += 0.14 * math.sin(i * 0.47 + col)
+                    swell += 0.08 * math.sin(i * 1.21 + center.y * 0.4)
                 point.z += swell
             verts.append((point.x, point.y, point.z))
             if foam_edges:
