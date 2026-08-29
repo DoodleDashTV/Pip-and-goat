@@ -18,7 +18,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from cinematic_shots import SHOTS, camera_name, default_shot_cameras, lookdev_frames, marker_frames  # noqa: E402
+from cinematic_shots import SHOTS, camera_name, default_shot_cameras, hero_search_cameras, lookdev_frames, marker_frames  # noqa: E402
 from cinematic_standards import (  # noqa: E402
     MASTER_COLLECTIONS,
     assert_final_contract,
@@ -108,6 +108,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--control-tests", action="store_true")
     parser.add_argument("--water-variant", default="D", help="A=V33 baseline, B=real IOR+open HDRI, C=real IOR+HDRI control, D=tuned C")
     parser.add_argument("--ab-water", action="store_true", help="Render SHOT_02 once per water variant A-D")
+    parser.add_argument("--hero-search", action="store_true", help="Render V36 creek-hero camera candidates A-E")
     return parser.parse_args(argv)
 
 
@@ -2270,6 +2271,29 @@ def setup_six_cameras() -> list[str]:
     return names
 
 
+def setup_hero_search_cameras() -> list[str]:
+    """Lookdev-only V36 hero candidates. Not part of the six-shot edit until one wins."""
+    scene = bpy.context.scene
+    names = []
+    for spec in hero_search_cameras():
+        bpy.ops.object.camera_add(location=spec["location"])
+        cam = bpy.context.object
+        cam.name = f"TJ_HERO_{spec['id']}_CAM"
+        cam.data.lens = spec["lens"]
+        cam.data.sensor_width = 32
+        cam.data.dof.use_dof = False
+        target = bpy.data.objects.new(cam.name + "_LOOK", None)
+        scene.collection.objects.link(target)
+        target.location = spec["look"]
+        constraint = cam.constraints.new(type="TRACK_TO")
+        constraint.target = target
+        constraint.track_axis = "TRACK_NEGATIVE_Z"
+        constraint.up_axis = "UP_Y"
+        names.append(cam.name)
+        print(json.dumps({"event": "hero_search_camera", "id": spec["id"], "name": spec["name"], "location": list(spec["location"]), "look": list(spec["look"]), "lens": spec["lens"]}), flush=True)
+    return names
+
+
 def setup_control_cameras() -> list[str]:
     """Lookdev-only grazing and downward river cameras. Not part of the six-shot edit."""
     scene = bpy.context.scene
@@ -2578,6 +2602,8 @@ def main() -> int:
     cameras = setup_six_cameras()
     control_cams = setup_control_cameras()
     cameras.extend(control_cams)
+    if args.hero_search:
+        cameras.extend(setup_hero_search_cameras())
     applied = apply_profile(args.profile, args)
 
     contributions = {
@@ -2662,6 +2688,18 @@ def main() -> int:
     write_progress("CINEMATIC_WORLD_BUILT", cameras=len(cameras), forestCopies=proof["forestCopies"])
 
     frames = [int(part) for part in (args.stills_frames or ",".join(str(item) for item in lookdev_frames())).split(",") if part.strip()]
+    if args.hero_search:
+        bpy.context.scene.frame_set(210)
+        for spec in hero_search_cameras():
+            cam = bpy.data.objects.get(f"TJ_HERO_{spec['id']}_CAM")
+            if cam is None:
+                continue
+            bpy.context.scene.camera = cam
+            bpy.context.scene.render.filepath = str(out / f"hero_{spec['id'].lower()}_{spec['name']}_")
+            write_progress("LOOKDEV_HERO_SEARCH", id=spec["id"], name=spec["name"], lens=spec["lens"])
+            bpy.ops.render.render(write_still=True)
+        write_progress("LOOKDEV_COMPLETE", frames=len(hero_search_cameras()), heroSearch=True)
+        return 0
     if args.ab_water:
         river_obj = bpy.data.objects.get("TJ_River_PurchasedWater")
         set_active_camera_for_frame(210)

@@ -8,6 +8,7 @@ from cinematic_shots import (
     camera_name,
     default_shot_cameras,
     frame_to_shot,
+    hero_search_cameras,
     lookdev_frames,
     marker_frames,
     shot_standard_payload,
@@ -122,6 +123,12 @@ def test_six_shot_plan():
     payload = shot_standard_payload()
     assert payload["cutsNotInterpolated"] is True
     assert SHOTS[4]["lensMin"] == 60.0
+    heroes = hero_search_cameras()
+    assert [item["id"] for item in heroes] == ["A", "B", "C", "D", "E"]
+    zs = [item["location"][2] for item in heroes]
+    assert max(zs) - min(zs) >= 6.0
+    xs = [item["location"][0] for item in heroes]
+    assert max(xs) - min(xs) >= 20.0
 
 
 def test_visible_use_requires_rendered_pixels():

@@ -109,6 +109,55 @@ def hero_still_frames() -> dict[str, int]:
     }
 
 
+def hero_search_cameras() -> list[dict]:
+    """V36: five materially different creek-hero viewpoints. Not SHOT_02 tweaks.
+
+    Creek runs east around y≈-12. Cabin01 sits near (-9.2, -2).
+    """
+    return [
+        {
+            "id": "A",
+            "name": "three_quarter_downstream",
+            "location": (-24.0, -26.0, 7.2),
+            "look": (6.0, -10.0, -0.50),
+            "lens": 28.0,
+            "why": "Moderately elevated 3/4 looking downstream along the bend toward the village.",
+        },
+        {
+            "id": "B",
+            "name": "low_upstream_stones",
+            "location": (14.0, -16.5, 2.25),
+            "look": (-10.0, -10.0, -1.00),
+            "lens": 35.0,
+            "why": "Low upstream view so water comes toward camera with stones in the foreground.",
+        },
+        {
+            "id": "C",
+            "name": "across_creek_opposite_bank",
+            "location": (0.5, -24.0, 3.40),
+            "look": (-6.0, -2.0, 1.20),
+            "lens": 36.0,
+            "why": "Across-creek view: south bank, water, opposite bank, cabin beyond.",
+        },
+        {
+            "id": "D",
+            "name": "elevated_oblique_bed_cabin",
+            "location": (-20.0, -32.0, 10.5),
+            "look": (-4.0, -8.0, -0.80),
+            "lens": 26.0,
+            "why": "Elevated oblique so bed, water film, cabin, and valley depth sit in one frame.",
+        },
+        {
+            "id": "E",
+            "name": "creek_leading_line_village",
+            "location": (-32.0, -22.0, 5.0),
+            "look": (-6.0, -6.0, 0.60),
+            "lens": 30.0,
+            "why": "Creek as a leading line from the west bend toward the cabin/village.",
+        },
+    ]
+
+
 def default_shot_cameras() -> list[dict]:
     """Authored 9:16 valley cameras. Distinct purpose, lens, and composition.
 
