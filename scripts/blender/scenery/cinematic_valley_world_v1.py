@@ -606,10 +606,10 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         soil.inputs["Detail"].default_value = 2.0
     links.new(coord.outputs["Object"], soil.inputs["Vector"])
     soil_fac = nodes.new("ShaderNodeMapRange")
-    soil_fac.inputs["From Min"].default_value = 0.58
-    soil_fac.inputs["From Max"].default_value = 0.78
+    soil_fac.inputs["From Min"].default_value = 0.50
+    soil_fac.inputs["From Max"].default_value = 0.74
     soil_fac.inputs["To Min"].default_value = 0.0
-    soil_fac.inputs["To Max"].default_value = 0.92
+    soil_fac.inputs["To Max"].default_value = 0.88
     links.new(soil.outputs["Fac"], soil_fac.inputs["Value"])
     soil_mix = _mix_rgb(nodes)
     if "Color1" in soil_mix.inputs:
@@ -885,12 +885,12 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     if "Specular IOR Level" in earth.inputs:
         earth.inputs["Specular IOR Level"].default_value = 0.06
     hole = nodes.new("ShaderNodeTexNoise")
-    hole.inputs["Scale"].default_value = 1.85
+    hole.inputs["Scale"].default_value = 0.42
     if "Detail" in hole.inputs:
-        hole.inputs["Detail"].default_value = 6.0
+        hole.inputs["Detail"].default_value = 3.0
     links.new(coord.outputs["Object"], hole.inputs["Vector"])
     hole2 = nodes.new("ShaderNodeTexNoise")
-    hole2.inputs["Scale"].default_value = 4.4
+    hole2.inputs["Scale"].default_value = 0.95
     if "Detail" in hole2.inputs:
         hole2.inputs["Detail"].default_value = 4.0
     links.new(coord.outputs["Object"], hole2.inputs["Vector"])
@@ -1914,7 +1914,7 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     # (5.5, 18) was out of the 32 mm portrait frustum. Do not move the
     # SHOT_05 telephoto hero at (28, 16).
     peak_slots = (
-        (0.0, 20.0, 0.68, 0.38),
+        (0.0, 20.0, 0.62, 2.65),
         (28.0, 16.0, 0.48, 0.42),
         (46.0, 52.0, 0.30, -0.16),
     )
@@ -1925,8 +1925,11 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
         sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
         link_exclusive(obj, collection)
         placed.append(obj)
-    for obj, (cx, south, scale, rot_z) in zip(peaks, peak_slots):
+    for i, (obj, (cx, south, scale, rot_z)) in enumerate(zip(peaks, peak_slots)):
         sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
+        if i == 0:
+            # Lift the SHOT_02 peak so a lit grassy face clears the cabin roof.
+            obj.location.z += 3.4
         link_exclusive(obj, collection)
         placed.append(obj)
     print(json.dumps({
@@ -2265,14 +2268,14 @@ def place_hero_soil_scars(centers: list[Vector]) -> list:
         left, _right = _channel_halves_for_index(centers, i)
         t = 0.55 + 0.35 * math.sin(i * 0.71)
         loc = center + side * (-left * t)
-        loc.z = BED_SHOULDER_Z + 0.16 + 0.22 * math.sin(i)
-        scar = _add_lumpy_rock(f"TJ_HeroSoil_{i}", loc, 4.6 + 1.1 * (i % 2), mat, i * 0.29)
-        scar.scale = (2.8, 1.45, 0.38)
+        loc.z = BED_SHOULDER_Z + 0.12 + 0.16 * math.sin(i)
+        scar = _add_lumpy_rock(f"TJ_HeroSoil_{i}", loc, 3.6 + 0.6 * (i % 2), mat, i * 0.29)
+        scar.scale = (2.15, 1.20, 0.26)
         extras.append(scar)
         nloc = center + side * (left * (0.62 + 0.28 * math.sin(i * 0.53)))
-        nloc.z = BED_SHOULDER_Z + 0.22 + 0.20 * math.cos(i)
-        north = _add_lumpy_rock(f"TJ_HeroSoilN_{i}", nloc, 3.8 + 0.8 * ((i + 1) % 2), mat, i * 0.41 + 0.7)
-        north.scale = (2.4, 1.35, 0.34)
+        nloc.z = BED_SHOULDER_Z + 0.16 + 0.14 * math.cos(i)
+        north = _add_lumpy_rock(f"TJ_HeroSoilN_{i}", nloc, 3.0 + 0.5 * ((i + 1) % 2), mat, i * 0.41 + 0.7)
+        north.scale = (1.90, 1.10, 0.22)
         extras.append(north)
     return extras
 
