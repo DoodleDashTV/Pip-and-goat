@@ -101,23 +101,25 @@ def hero_grass_lip(x: float, along: float) -> float:
     return max(-0.70, min(1.00, sum(lips) + wobble))
 
 
-# V44: 6 camera-readable south-bank events. emerge + metres = water covers more bank.
+# V44: 6 camera-readable south-bank events. emerge moves the water intersection.
+# Narrow radii so the left waterline breaks instead of waving as one isoline.
 HERO_MACRO_EVENTS = (
-    (-9.6, 1.90, "boulder", 0.45, 3.10),
-    (-6.6, 1.75, "bay", 1.90, 5.80),
-    (-3.6, 1.50, "point", -1.20, 2.70),
-    (-0.6, 1.55, "boulder", 0.25, 3.40),
-    (2.4, 1.65, "gravel", 1.30, 5.10),
-    (5.6, 1.55, "cut", 1.60, 3.50),
+    (-9.6, 0.85, "boulder", -0.85, 3.10),
+    (-6.6, 1.05, "bay", 1.90, 5.80),
+    (-3.6, 0.80, "point", -1.20, 2.70),
+    (-0.6, 0.90, "boulder", 0.25, 3.40),
+    (2.4, 1.00, "gravel", 1.30, 5.10),
+    (5.6, 0.85, "cut", 1.60, 3.50),
 )
 
-# (x, edge, scale, bury). edge 1 = film, <1 in water. Left-weighted for SHOT_02.
+# (x, edge, scale, bury). edge 1 = terrain∩water, <1 in water, >1 on bank.
 HERO_MACRO_ROCKS = (
-    (-10.05, 0.70, 4.20, 0.50),
-    (-8.65, 1.10, 3.15, 0.44),
-    (-3.70, 0.66, 3.55, 0.46),
-    (-0.45, 0.86, 4.05, 0.52),
-    (2.55, 1.22, 2.75, 0.40),
+    (-10.05, 0.96, 3.35, 0.22),
+    (-8.55, 1.04, 2.85, 0.20),
+    (-6.80, 0.90, 2.55, 0.24),
+    (-3.55, 0.94, 3.05, 0.20),
+    (-0.40, 1.02, 3.20, 0.22),
+    (2.60, 0.92, 2.45, 0.18),
 )
 
 
@@ -150,31 +152,54 @@ def hero_macro_event(x: float) -> dict:
 
 
 def hero_south_water_factor(x: float) -> float:
-    """Modest local film scale so water occupies bays. Not a global widen."""
+    """Local film scale so the locked water stays under the bank. Not a global widen.
+
+    Points never pinch the film — terrain enters water. Bays get a little more
+    coverage so a recessed pocket is not a dry cavity.
+    """
     if x < HERO_X_MIN or x > HERO_X_MAX:
         return 1.0
     event = hero_macro_event(x)
     kind = event["kind"]
     weight = event["weight"]
     if kind == "bay":
-        return max(0.72, min(1.48, 1.0 + 0.40 * weight))
+        return max(0.72, min(1.48, 1.22 + 0.24 * weight))
     if kind == "point":
-        return max(0.72, min(1.48, 1.0 - 0.20 * weight))
+        return max(0.72, min(1.48, 1.10))
     if kind == "cut":
-        return max(0.72, min(1.48, 1.0 + 0.26 * weight))
+        return max(0.72, min(1.48, 1.18 + 0.16 * weight))
     if kind == "gravel":
-        return max(0.72, min(1.48, 1.0 + 0.18 * weight))
-    return 1.0
+        return max(0.72, min(1.48, 1.16 + 0.12 * weight))
+    return 1.16
+
+
+def hero_south_emerge(x: float, film: float) -> float:
+    """Metres from centerline to the terrain ∩ water intersection.
+
+    Always strictly inside the locked film so the water mesh edge is hidden
+    under risen bank and is not a second constructed shoreline.
+    """
+    event = hero_macro_event(x)
+    water = film * hero_south_water_factor(x)
+    emerge = film * 0.78 + event["emerge"] * 0.62
+    emerge = min(emerge, water - 0.42)
+    return max(film * 0.22, emerge)
 
 
 def hero_rock_collar(x: float, y: float) -> float:
-    """Negative metres so terrain sockets around embedded hero rocks."""
-    dip = 0.0
-    for px, _edge, scale, bury in HERO_MACRO_ROCKS:
-        # Rocks sit near the south lip; a wide Gaussian is enough without Y.
-        w = _gaussian(x, px, 0.85 + 0.18 * scale)
-        dip = max(dip, w * scale * bury * 0.16)
-    return dip
+    """Compatibility no-op. Wrap is applied in hero_rock_wrap at the intersection."""
+    return 0.0
+
+
+def hero_rock_wrap(x: float, dist: float, emerge: float) -> float:
+    """Positive metres. Soil rises around each rock. A dip opened the V44-a cavity."""
+    wrap = 0.0
+    for px, edge, scale, _bury in HERO_MACRO_ROCKS:
+        rock_dist = emerge * edge
+        w = _gaussian(x, px, 0.70 + 0.10 * scale)
+        w *= _gaussian(dist, rock_dist, 0.62 + 0.08 * scale)
+        wrap = max(wrap, w * 0.30)
+    return wrap
 
 
 def hero_shore_event(x: float) -> dict:

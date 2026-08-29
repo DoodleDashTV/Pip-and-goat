@@ -27,7 +27,9 @@ from cinematic_creek_profile import (  # noqa: E402
     hero_north_notch_depth,
     hero_north_wet_tongue,
     hero_rock_collar,
+    hero_rock_wrap,
     hero_shore_event,
+    hero_south_emerge,
     hero_south_water_factor,
     hero_south_wet_tongue,
     hero_waterline_bite,
@@ -383,37 +385,39 @@ def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, 
 def _hero_south_body(x: float, y: float, dist: float, along: float, local: float, meadow_z: float, center_z: float) -> float:
     """One heightfield from bed through water to meadow. No separate lip mesh.
 
-    Terrain continues under the locked film. The visible shoreline is the
-    Z = water intersection, deformed by a few metre-scale events.
+    Terrain continues under the locked film. The visible shoreline is only
+    where this surface crosses WATER_SURFACE_Z. Events move that intersection;
+    they do not raise mid-bank mounds.
     """
-    film = local * WATER_WIDTH_SCALE * hero_south_water_factor(x)
+    film = local * WATER_WIDTH_SCALE
     event = hero_macro_event(x)
-    emerge = film - 0.28 + event["emerge"]
-    emerge = max(film * 0.35, min(film + 1.60, emerge))
+    emerge = hero_south_emerge(x, film)
     if dist > local + SOUTH_BANK_RUN + 0.40:
         return meadow_z
     if dist < emerge:
         t = dist / max(0.12, emerge)
-        return center_z + (WATER_SURFACE_Z - 0.05 - center_z) * (t ** 1.10)
-    u = min(1.0, max(0.0, (dist - emerge) / max(0.85, event["rise"])))
+        return center_z + (WATER_SURFACE_Z - 0.04 - center_z) * (t ** 1.08)
+    along_bank = dist - emerge
     kind = event["kind"]
-    if kind == "point":
-        height = WATER_SURFACE_Z + (meadow_z - WATER_SURFACE_Z) * (u ** 0.82)
-    elif kind in {"bay", "gravel"}:
-        if u < 0.32:
-            height = WATER_SURFACE_Z + 0.04 + 0.22 * (u / 0.32)
-        else:
-            height = WATER_SURFACE_Z + 0.26 + (meadow_z - WATER_SURFACE_Z - 0.26) * ((u - 0.32) / 0.68)
-    elif kind == "cut":
-        if u < 0.20:
-            height = WATER_SURFACE_Z + 0.03 + 0.10 * (u / 0.20)
-        else:
-            height = WATER_SURFACE_Z + 0.13 + (meadow_z - WATER_SURFACE_Z - 0.13) * ((u - 0.20) / 0.80)
+    # Wet shelf: soil/gravel face the camera can read, then one slope to meadow.
+    if kind == "gravel":
+        shelf_run, shelf_h = 2.10, 0.16
+    elif kind in {"bay", "cut"}:
+        shelf_run, shelf_h = 1.70, 0.20
+    elif kind == "point":
+        shelf_run, shelf_h = 1.05, 0.42
     else:
-        height = WATER_SURFACE_Z + 0.05 + (meadow_z - WATER_SURFACE_Z - 0.05) * (u ** 1.02)
-    height -= hero_rock_collar(x, y)
-    height += 0.035 * math.sin(x * 0.62 + along * 0.28)
-    return max(center_z, min(meadow_z + 0.10, height))
+        shelf_run, shelf_h = 1.25, 0.36
+    if along_bank < shelf_run:
+        t = along_bank / max(0.20, shelf_run)
+        height = WATER_SURFACE_Z + 0.02 + shelf_h * (t ** 0.82)
+    else:
+        t = min(1.0, (along_bank - shelf_run) / max(2.4, SOUTH_BANK_RUN - shelf_run))
+        shelf_top = WATER_SURFACE_Z + shelf_h + 0.02
+        height = shelf_top + (meadow_z - shelf_top) * (t ** 1.18)
+    height += hero_rock_wrap(x, dist, emerge)
+    height += 0.022 * math.sin(x * 0.48 + along * 0.20)
+    return max(center_z, min(meadow_z + 0.12, height))
 
 
 def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
@@ -819,7 +823,7 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
 
 
 def place_hero_shore_grass(grass_src) -> list:
-    """Naturally sized tufts that hide sections of the SHOT_02 waterline."""
+    """Left-shore vegetation masses. Few clumps, natural scale, on the intersection."""
     extras = []
     if grass_src is None:
         return extras
@@ -828,13 +832,11 @@ def place_hero_shore_grass(grass_src) -> list:
         return extras
     centers = evaluated_centerline(guide, samples=80)
     planted = 0
-    # (x, edge, scale) edge 1 = film lip, <1 over water, >1 on bank
+    # Left SHOT_02 only. A grass line along the whole bank would recreate F.
     tufts = (
-        (-10.2, 1.18, 1.85), (-9.2, 0.92, 2.15), (-8.0, 1.35, 1.55),
-        (-6.6, 1.08, 2.05), (-5.4, 1.42, 1.70), (-4.2, 0.88, 2.25),
-        (-2.6, 1.22, 1.90), (-1.4, 1.55, 1.45), (0.2, 0.95, 2.10),
-        (1.6, 1.28, 1.65), (3.0, 1.48, 1.80), (4.4, 1.02, 2.20),
-        (5.6, 1.32, 1.50), (6.8, 0.90, 1.95),
+        (-10.15, 1.12, 1.70),
+        (-8.50, 1.20, 1.90),
+        (-6.75, 1.28, 1.55),
     )
     used = set()
     for i, center in enumerate(centers):
@@ -842,16 +844,16 @@ def place_hero_shore_grass(grass_src) -> list:
             continue
         side = _side_from_centers(centers, i)
         left, _right = _channel_halves_for_index(centers, i)
-        water_edge = left * WATER_WIDTH_SCALE * hero_south_water_factor(center.x)
+        emerge = hero_south_emerge(center.x, left * WATER_WIDTH_SCALE)
         for px, edge, scale in tufts:
             if px in used or abs(center.x - px) > 0.70:
                 continue
             used.add(px)
-            loc = center + side * (-water_edge * edge)
-            loc.z = 0.03 if edge >= 1.0 else WATER_SURFACE_Z + 0.10
+            loc = center + side * (-emerge * edge)
+            loc.z = WATER_SURFACE_Z + 0.16
             extras.append(_plant_grass(grass_src, (loc.x, loc.y, loc.z), scale, 0.41 * planted))
             planted += 1
-    print(json.dumps({"event": "hero_shore_grass", "tufts": planted}), flush=True)
+    print(json.dumps({"event": "hero_shore_grass", "tufts": planted, "leftOnly": True}), flush=True)
     return extras
 
 
@@ -1162,17 +1164,20 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
             if dist > lower and blob < 0.20:
                 value *= 0.10
             if HERO_X_MIN <= x <= HERO_X_MAX:
-                # Scar grass in the hero look: soil/damp must win over meadow.
+                # Soil/wet follow the same intersection as the heightfield.
+                film = local_half * WATER_WIDTH_SCALE
+                emerge = hero_south_emerge(x, film)
                 tongue = hero_south_wet_tongue(x, y, along)
-                if dist < local_half * 1.15:
-                    value = max(value, 0.52 + 0.18 * blotch)
-                elif dist < fade:
-                    value = max(value, 0.28 * (1.0 - (dist - local_half) / max(1.0, fade - local_half)))
-                reach = local_half * 0.55 + 2.40 * tongue
-                if dist < reach:
-                    value = max(value, 0.16 + 0.50 * tongue)
-                if dist > local_half * 0.70 and tongue < 0.22:
-                    value *= 0.18
+                if dist < emerge + 0.35:
+                    value = 0.86
+                elif dist < emerge + 1.80:
+                    t = (dist - emerge - 0.35) / 1.45
+                    value = max(value, 0.78 - 0.40 * t + 0.16 * tongue)
+                elif dist < emerge + 4.20:
+                    t = (dist - emerge - 1.80) / 2.40
+                    value = max(value * 0.22, 0.42 * (1.0 - t) * (0.35 + 0.65 * tongue))
+                if dist > emerge + 2.20 and tongue < 0.20:
+                    value *= 0.16
         else:
             inner = bed * 0.42
             shelf = local_half * 0.72
@@ -2094,7 +2099,10 @@ def spline_channel_mesh(
         if foam_edges:
             if HERO_X_MIN <= center.x <= HERO_X_MAX:
                 event = hero_shore_event(center.x)
-                left_pinch = hero_south_water_factor(center.x)
+                # Water stays under the bank. Pinch is derived from the
+                # terrain intersection so the film edge is not a second shoreline.
+                emerge = hero_south_emerge(center.x, left)
+                left_pinch = max(0.72, min(1.48, (emerge + 0.50) / max(0.18, left)))
                 right_pinch *= max(0.58, min(1.28, 1.0 + 0.22 * event["water"]))
             else:
                 south_bay = (i % 23)
@@ -2768,17 +2776,17 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 
 
 def _add_hero_shore_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Material, yaw: float) -> bpy.types.Object:
-    """Taller shoreline mass so Camera C sees a silhouette, not a pebble."""
-    sx, sy, sz = 0.92 * scale, 0.74 * scale, 0.88 * scale
+    """Embedded shoreline mass. Wide buried base so Camera C cannot see an underside."""
+    sx, sy, sz = 0.95 * scale, 0.88 * scale, 0.82 * scale
     verts = [
-        (-0.70 * sx, -0.42 * sy, -0.22 * sz),
-        (0.62 * sx, -0.50 * sy, -0.16 * sz),
-        (0.78 * sx, 0.22 * sy, -0.10 * sz),
-        (0.12 * sx, 0.60 * sy, -0.14 * sz),
-        (-0.58 * sx, 0.38 * sy, -0.18 * sz),
-        (-0.18 * sx, -0.08 * sy, 0.58 * sz),
-        (0.28 * sx, 0.16 * sy, 0.50 * sz),
-        (0.04 * sx, 0.02 * sy, -0.34 * sz),
+        (-0.78 * sx, -0.55 * sy, -0.48 * sz),
+        (0.70 * sx, -0.62 * sy, -0.44 * sz),
+        (0.82 * sx, 0.28 * sy, -0.40 * sz),
+        (0.10 * sx, 0.68 * sy, -0.42 * sz),
+        (-0.64 * sx, 0.46 * sy, -0.46 * sz),
+        (-0.20 * sx, -0.10 * sy, 0.56 * sz),
+        (0.30 * sx, 0.18 * sy, 0.50 * sz),
+        (0.04 * sx, 0.02 * sy, -0.62 * sz),
     ]
     faces = [
         (0, 1, 6, 5), (1, 2, 6), (2, 3, 6), (3, 4, 5, 6), (4, 0, 5),
@@ -2875,13 +2883,14 @@ def place_hero_macro_rocks(centers: list[Vector]) -> list:
             continue
         side = _side_from_centers(centers, i)
         left, _right = _channel_halves_for_index(centers, i)
-        film = left * WATER_WIDTH_SCALE * hero_south_water_factor(center.x)
+        film = left * WATER_WIDTH_SCALE
+        emerge = hero_south_emerge(center.x, film)
         for px, edge, scale, bury in HERO_MACRO_ROCKS:
             if px in used or abs(center.x - px) > 0.65:
                 continue
             used.add(px)
-            loc = center + side * (-film * edge)
-            loc.z = WATER_SURFACE_Z - scale * bury * 0.28
+            loc = center + side * (-emerge * edge)
+            loc.z = WATER_SURFACE_Z - scale * bury * 0.14
             extras.append(_add_hero_shore_rock(f"TJ_HeroMacroRock_{i}", loc, scale, mat, 0.61 * i + px))
             placed.append({
                 "x": round(loc.x, 2),
@@ -3043,8 +3052,10 @@ def place_waterline_dressing(trees: list) -> list:
         if in_village(loc.x, loc.y) or dist < left * 0.40:
             continue
         extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.14 + 0.10 * ((i * 3) % 5) / 4.0))
-        # A few grasses that actually touch the waterline in the SHOT_02 look.
-        if HERO_X_MIN <= loc.x <= HERO_X_MAX and key in {2, 3, 6}:
+        # Hero-corridor mid-stream saplings sat at z=0 and read as floating cones.
+        if HERO_X_MIN <= loc.x <= HERO_X_MAX:
+            continue
+        if key in {2, 3, 6}:
             wet = center + side * (-left * (0.38 + 0.14 * math.sin(i)))
             if not in_village(wet.x, wet.y):
                 extras.append(duplicate_mesh_in_world(live[(i + 2) % len(live)], (wet.x, wet.y, 0.0), 0.09 + 0.05 * (i % 3)))
@@ -4072,6 +4083,8 @@ def main() -> int:
     open_shot02_mountain_gap()
     grass_src = load_purchased_grass(village_files)
     for prop in place_structural_meadow_zones(grass_src, trees):
+        link_exclusive(prop, collections["WORLD_TERRAIN"])
+    for prop in place_hero_shore_grass(grass_src):
         link_exclusive(prop, collections["WORLD_TERRAIN"])
     foreground = west_fg + east_fg
     midground = west_mg + east_mg

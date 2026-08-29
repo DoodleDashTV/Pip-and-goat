@@ -36,6 +36,7 @@ from cinematic_creek_profile import (
     hero_north_wet_tongue,
     hero_macro_event,
     hero_shore_event,
+    hero_south_emerge,
     hero_south_water_factor,
     hero_south_wet_tongue,
     hero_waterline_bite,
@@ -202,6 +203,10 @@ def test_v37_north_bank_breakup_is_broad_and_discontinuous():
     assert hero_south_water_factor(-6.6) > hero_south_water_factor(-3.6)
     assert 0.72 <= hero_south_water_factor(-6.6) <= 1.48
     assert hero_south_water_factor(-14.0) == 1.0
+    film = 1.80
+    assert hero_south_emerge(-6.6, film) > hero_south_emerge(-3.6, film)
+    assert hero_south_emerge(-9.6, film) < film * hero_south_water_factor(-9.6)
+    assert hero_south_emerge(-14.0, film) < film
 
 
 def test_visible_use_requires_rendered_pixels():
