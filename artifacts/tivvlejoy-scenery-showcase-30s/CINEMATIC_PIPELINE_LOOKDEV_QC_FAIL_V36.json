@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-29T01:55:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "startingSha": "bf24890a1590966739696bd85a7a40428101c6be",
+  "commit": "50874ca",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev72",
+  "heroSearchDir": "/tmp/o14-lookdev/cinematic-hero-search36b",
+  "v31GeometryPreserved": true,
+  "v34WaterArchitecturePreserved": true,
+  "hdriLightPathControl": true,
+  "cameraDistanceShaderGate": false,
+  "retiredV35Shot02": true,
+  "humanApproved": false,
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false
+}
