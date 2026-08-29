@@ -2705,13 +2705,13 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 
 # Camera-visible shoreline rocks. edge=1 sits on the water film edge.
 HERO_EDGE_ROCKS = (
-    (-9.8, 1.90, 0.95, 0.34),
-    (-7.1, 2.35, 1.12, 0.28),
-    (-4.6, 1.55, 0.82, 0.40),
-    (-2.0, 2.55, 1.18, 0.30),
-    (0.8, 1.70, 0.90, 0.36),
-    (3.6, 2.20, 1.25, 0.26),
-    (6.0, 1.40, 0.72, 0.44),
+    (-9.8, 2.40, 0.95, 0.34),
+    (-7.1, 3.10, 1.12, 0.28),
+    (-4.6, 2.05, 0.82, 0.40),
+    (-2.0, 3.35, 1.18, 0.30),
+    (0.8, 2.25, 0.90, 0.36),
+    (3.6, 2.85, 1.25, 0.26),
+    (6.0, 1.85, 0.72, 0.44),
 )
 
 
@@ -2760,8 +2760,12 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         event = hero_shore_event(center.x)
         water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.90 * event["water"])
         swell = 0.0
+        notch = 0.0
         for px, scale, _edge, _bury in HERO_EDGE_ROCKS:
-            swell = max(swell, math.exp(-((center.x - px) / 1.05) ** 2) * scale * 0.20)
+            w = math.exp(-((center.x - px) / 1.05) ** 2)
+            swell = max(swell, w * scale * 0.20)
+            notch = max(notch, w * 0.55)
+        water_edge *= max(0.55, 1.0 - notch)
         wet_run = event["wet"]
         damp_run = event["damp"]
         soil_run = event["soil"]
@@ -2782,27 +2786,19 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
             (water_edge + damp_run, -0.50 + swell * 0.10),
             (water_edge + soil_run, -0.10 + swell * 0.14),
             (water_edge + soil_run + grass_run, 0.05 + swell * 0.08),
-            (water_edge + soil_run + 2.70 + grass_run, 0.12),
+            (water_edge + soil_run + 4.20 + grass_run, 0.10),
         )
         kind = event["kind"]
         for row, (lat, z) in enumerate(stations):
             point = center + side * (-lat)
-            point.z = z + 0.018 * math.sin(center.x * 1.35 + row * 0.55)
+            point.z = z
             top.append((point.x, point.y, point.z))
             kinds.append(kind)
-    bottom = []
-    for idx, (x, y, z) in enumerate(top):
-        row = idx % rows
-        if row <= 3:
-            bz = BED_CENTER_Z - 0.10
-        else:
-            bz = min(z - 0.16, -0.18)
-        bottom.append((x, y, bz))
-    verts = list(top) + list(bottom)
+    # Surface only. A closed underside/end-cap faced Camera C as a brown slab.
+    verts = list(top)
     faces = []
     face_rows = []
     samples = len(hero)
-    off = samples * rows
     for i in range(samples - 1):
         for row in range(rows - 1):
             a = i * rows + row
@@ -2811,25 +2807,6 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
             d = (i + 1) * rows + row
             faces.append((a, b, c, d))
             face_rows.append(row)
-            faces.append((a + off, d + off, c + off, b + off))
-            face_rows.append(row)
-        inner_a = i * rows
-        inner_b = (i + 1) * rows
-        faces.append((inner_a, inner_b, inner_b + off, inner_a + off))
-        face_rows.append(0)
-        outer_a = i * rows + (rows - 1)
-        outer_b = (i + 1) * rows + (rows - 1)
-        faces.append((outer_a, outer_a + off, outer_b + off, outer_b))
-        face_rows.append(6)
-    for row in range(rows - 1):
-        a = row
-        b = row + 1
-        faces.append((b, a, a + off, b + off))
-        face_rows.append(row)
-        a = (samples - 1) * rows + row
-        b = a + 1
-        faces.append((a, b, b + off, a + off))
-        face_rows.append(row)
     mesh = bpy.data.meshes.new("TJ_HeroBankSolid")
     mesh.from_pydata(verts, [], faces)
     bm = bmesh.new()
@@ -2846,9 +2823,7 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
     obj.data.materials.append(grass_mat)
     obj.data.materials.append(gravel_mat)
     for poly, row in zip(obj.data.polygons, face_rows):
-        sample = 0
-        if off:
-            sample = min(samples - 1, (poly.vertices[0] % off) // rows)
+        sample = min(samples - 1, poly.vertices[0] // rows)
         kind = kinds[min(len(kinds) - 1, sample * rows)] if kinds else "blend"
         if row <= 1:
             poly.material_index = 0
@@ -2867,7 +2842,8 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         "layers": 1,
         "solid": True,
         "filledToBed": True,
-        "endCaps": True,
+        "surfaceOnly": True,
+        "endCaps": False,
         "heroSamples": len(hero),
         "edgeRocks": len(HERO_EDGE_ROCKS),
     }), flush=True)
@@ -2901,8 +2877,8 @@ def place_hero_embedded_rocks(centers: list[Vector], soil_mat: bpy.types.Materia
             if px in used or abs(center.x - px) > 0.85:
                 continue
             used.add(px)
-            loc = center + side * (-water_edge * edge)
-            loc.z = WATER_SURFACE_Z - bury * 0.62
+            loc = center + side * (-(water_edge * edge + 0.45))
+            loc.z = WATER_SURFACE_Z + scale * 0.08
             extras.append(_add_lumpy_rock(f"TJ_HeroEmbed_{i}", loc, scale, mat, i * 0.47))
     return extras
 
@@ -2949,7 +2925,7 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
     # Near-camera boulder so SHOT_02 has a foreground waterline cue.
     extras.append(_add_lumpy_rock(
         "TJ_FgBankRock",
-        Vector((-12.4, -16.2, WATER_SURFACE_Z - 0.10)),
+        Vector((-18.4, -22.2, WATER_SURFACE_Z - 0.10)),
         1.55,
         mat,
         1.15,
