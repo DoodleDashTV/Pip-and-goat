@@ -114,12 +114,12 @@ HERO_MACRO_EVENTS = (
 
 # (x, south_of_intersection_m, scale, bury). ~0.25 m south so the mass sits on the line.
 HERO_MACRO_ROCKS = (
-    (-10.20, 0.22, 3.20, 0.18),
-    (-8.15, 0.28, 2.90, 0.16),
-    (-6.20, 0.18, 2.70, 0.17),
-    (-3.30, 0.24, 2.85, 0.16),
-    (-0.20, 0.26, 3.00, 0.17),
-    (2.80, 0.20, 2.40, 0.15),
+    (-10.20, 0.20, 3.30, 0.16),
+    (-8.10, 0.16, 3.00, 0.15),
+    (-6.15, 0.22, 2.80, 0.16),
+    (-4.70, 0.18, 2.90, 0.15),
+    (-1.70, 0.24, 2.75, 0.16),
+    (2.10, 0.18, 2.45, 0.14),
 )
 
 
@@ -192,13 +192,15 @@ def hero_rock_collar(x: float, y: float) -> float:
 
 
 def hero_rock_wrap(x: float, dist: float, emerge: float) -> float:
-    """Positive metres. Soil rises into each rock. Never a dip or mid-bank ridge."""
+    """Positive metres. Soil collar seals the rock/water/terrain contact."""
     wrap = 0.0
     for px, south, scale, _bury in HERO_MACRO_ROCKS:
         rock_dist = emerge + south
-        w = _gaussian(x, px, 0.85 + 0.10 * scale)
-        w *= _gaussian(dist, rock_dist, 0.80 + 0.08 * scale)
-        wrap = max(wrap, w * 0.34)
+        rx = 0.88 + 0.11 * scale
+        rd = 0.78 + 0.09 * scale
+        radial = math.hypot((x - px) / rx, (dist - rock_dist) / rd)
+        if radial < 2.4:
+            wrap = max(wrap, 0.50 * math.exp(-radial * radial))
     return wrap
 
 

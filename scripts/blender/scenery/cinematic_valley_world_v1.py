@@ -415,8 +415,11 @@ def _hero_south_body(x: float, y: float, dist: float, along: float, local: float
         t = min(1.0, (along_bank - shelf_run) / max(2.4, SOUTH_BANK_RUN - shelf_run))
         shelf_top = WATER_SURFACE_Z + shelf_h + 0.02
         height = shelf_top + (meadow_z - shelf_top) * (t ** 1.18)
-    height += hero_rock_wrap(x, dist, emerge)
+    wrap = hero_rock_wrap(x, dist, emerge)
+    height += wrap
     height += 0.022 * math.sin(x * 0.48 + along * 0.20)
+    if wrap > 0.12:
+        height = max(height, WATER_SURFACE_Z + 0.05)
     return max(center_z, min(meadow_z + 0.12, height))
 
 
@@ -2782,7 +2785,10 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 def _add_hero_shore_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Material, yaw: float) -> bpy.types.Object:
     """Closed convex stone, elongated along the shore. No camera-facing underside."""
     bm = bmesh.new()
-    bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.52 * scale)
+    try:
+        bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.52 * scale)
+    except TypeError:
+        bmesh.ops.create_icosphere(bm, subdivisions=2, diameter=1.04 * scale)
     for vert in bm.verts:
         vert.co.x *= 1.55
         vert.co.y *= 0.68
@@ -2793,6 +2799,7 @@ def _add_hero_shore_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Ma
         vert.co.z += 0.04 * scale * math.sin(vert.co.x * 2.2 + vert.co.y * 1.8)
         if vert.co.z < 0.0:
             vert.co.z *= 1.15
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     mesh = bpy.data.meshes.new(name)
     bm.to_mesh(mesh)
     bm.free()
