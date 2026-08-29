@@ -2641,24 +2641,22 @@ def main() -> int:
     east_fg = scatter_clumps(trees, (24.0, 12.0, 0.0), 3, 2, 7.0, 1.08, 5)
     east_mg = scatter_clumps(trees, (28.0, 32.0, 0.0), 3, 2, 8.0, 1.40, 11)
     if trees:
-        cam_xy = Vector((-32.5, 1.8, 0.0))
-        look_xy = Vector((-13.4, 15.2, 0.0))
+        cam_xy = Vector((-36.0, -1.2, 0.0))
+        look_xy = Vector((-14.0, 13.5, 0.0))
         along = look_xy - cam_xy
         span = along.length
         along.normalize()
         side = Vector((-along.y, along.x, 0.0))
         src_count = len(trees)
         for i, (t, offset, scale) in enumerate((
-            (0.08, 2.6, 1.16),
-            (0.10, -2.8, 1.12),
-            (0.22, 3.4, 1.22),
-            (0.24, -3.2, 1.18),
-            (0.40, 3.8, 1.30),
-            (0.42, -3.6, 1.24),
-            (0.58, 4.2, 1.36),
-            (0.60, -4.0, 1.28),
-            (0.76, 4.6, 1.40),
-            (0.78, -4.4, 1.32),
+            (0.28, 4.4, 1.18),
+            (0.30, -4.6, 1.14),
+            (0.44, 4.8, 1.26),
+            (0.46, -5.0, 1.20),
+            (0.60, 5.2, 1.34),
+            (0.62, -5.2, 1.28),
+            (0.76, 5.4, 1.38),
+            (0.78, -5.4, 1.32),
         )):
             loc = cam_xy + along * (t * span) + side * offset
             west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
