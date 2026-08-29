@@ -190,8 +190,8 @@ def default_shot_cameras() -> list[dict]:
             # The west-bank "village opening" camera still read as a cabin peek.
             "retiredEmptyMeadow": {"location": (-34.0, 16.0, 5.2), "look": (-14.0, 36.0, 7.2), "lens": 48.0},
             "retiredCabinPeek": {"location": (-38.0, -6.0, 4.60), "look": (-24.0, 4.5, 2.90), "lens": 48.0},
-            "start": {"location": (-50.0, -22.0, 3.35), "look": (-58.0, -4.0, 2.40), "lens": 50.0},
-            "end": {"location": (-48.5, -19.5, 3.50), "look": (-56.5, -1.5, 2.55), "lens": 54.0},
+            "start": {"location": (-50.0, -22.0, 2.85), "look": (-58.0, -4.0, 1.55), "lens": 50.0},
+            "end": {"location": (-48.5, -19.5, 3.00), "look": (-56.5, -1.5, 1.70), "lens": 54.0},
         },
         {
             "id": "SHOT_04",
@@ -203,8 +203,8 @@ def default_shot_cameras() -> list[dict]:
             "id": "SHOT_05",
             "camera": "TJ_SHOT_05_CAM",
             # 120 mm from far SE, aimed at a close Louis peak — not the street.
-            "start": {"location": (38.0, -122.0, 16.0), "look": (26.0, 28.0, 18.0), "lens": 120.0},
-            "end": {"location": (36.0, -116.0, 16.4), "look": (26.4, 30.0, 18.6), "lens": 128.0},
+            "start": {"location": (38.0, -122.0, 16.0), "look": (26.0, 24.0, 9.5), "lens": 120.0},
+            "end": {"location": (36.0, -116.0, 16.4), "look": (26.4, 26.0, 10.2), "lens": 128.0},
         },
         {
             "id": "SHOT_06",

@@ -1880,6 +1880,10 @@ def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scal
     )
     if hasattr(obj, "visible_shadow"):
         obj.visible_shadow = False
+    bpy.context.view_layer.update()
+    bounds = group_bounds([obj])
+    if bounds:
+        obj.location.z -= bounds[0].z
 
 
 def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) -> list:
@@ -2305,6 +2309,41 @@ def place_waterline_dressing(trees: list) -> list:
     return extras
 
 
+def plant_purchased_tree(src, loc, scale: float):
+    sap = duplicate_mesh_in_world(src, loc, scale)
+    sap.hide_render = False
+    sap.hide_viewport = False
+    return sap
+
+
+def place_cabin_interior_voids() -> list:
+    """Dark occupancy so window holes cannot punch through to the HDRI sky."""
+    extras = []
+    mat = bpy.data.materials.get("TJ_CabinDaylightGlass") or _dark_cabin_glass()
+    slots = (
+        (-9.2, -2.0),
+        (9.4, -0.2),
+        (-9.8, 5.0),
+        (9.8, 6.6),
+        (-10.2, 11.6),
+        (10.0, 13.0),
+        (-9.4, 17.8),
+        (10.4, 19.2),
+    )
+    for i, (x, y) in enumerate(slots):
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x, y, 1.35))
+        box = bpy.context.object
+        box.name = f"TJ_CabinInteriorVoid_{i}"
+        box.scale = (2.35, 1.95, 1.25)
+        box.data.materials.clear()
+        box.data.materials.append(mat)
+        if hasattr(box, "visible_shadow"):
+            box.visible_shadow = False
+        extras.append(box)
+        print(json.dumps({"event": "cabin_interior_void", "name": box.name, "xy": [x, y]}), flush=True)
+    return extras
+
+
 def place_shot03_forest_passage(trees: list) -> list:
     """Dense irregular west grove. Look away from the village, not a tree alley."""
     extras = []
@@ -2337,13 +2376,20 @@ def place_shot03_forest_passage(trees: list) -> list:
         (-80.2, 2.6, 0.70),
         (-49.2, 4.8, 0.52),
         (-63.4, -16.8, 0.28),
+        (-54.2, -12.4, 0.74),
+        (-56.8, -8.8, 0.88),
+        (-59.4, -5.2, 1.06),
+        (-61.8, -1.6, 0.96),
+        (-64.6, 2.8, 1.14),
+        (-52.4, -10.6, 0.42),
+        (-57.2, 0.6, 0.68),
     )
     for i, (x, y, scale) in enumerate(plants):
         if math.hypot(x - cam.x, y - cam.y) < 6.5 and scale > 0.22:
             continue
         if in_river_channel(x, y, margin=1.0) or in_village(x, y):
             continue
-        sap = duplicate_mesh_in_world(live[i % len(live)], (x, y, 0.0), scale)
+        sap = plant_purchased_tree(live[i % len(live)], (x, y, 0.0), scale)
         sap.rotation_euler.z += 0.53 * ((i * 5) % 11)
         extras.append(sap)
     # Understory / saplings — clustered, not a grid.
@@ -2364,7 +2410,7 @@ def place_shot03_forest_passage(trees: list) -> list:
     for i, (x, y, scale) in enumerate(saplings):
         if in_river_channel(x, y, margin=0.6) or in_village(x, y):
             continue
-        sap = duplicate_mesh_in_world(live[(i + 2) % len(live)], (x, y, 0.0), scale)
+        sap = plant_purchased_tree(live[(i + 2) % len(live)], (x, y, 0.0), scale)
         sap.rotation_euler.z += 0.71 * (i + 3)
         extras.append(sap)
     extras.extend(scatter_clumps(live, (-66.0, 4.0, 0.0), 4, 3, 7.2, 0.82, 41))
@@ -2396,7 +2442,7 @@ def place_shot03_forest_floor(trees: list) -> list:
     if live:
         logs = ((-58.2, -8.4, 0.16), (-65.6, 3.8, 0.14), (-71.4, 10.6, 0.12))
         for i, (x, y, scale) in enumerate(logs):
-            log = duplicate_mesh_in_world(live[i % len(live)], (x, y, 0.18), scale)
+            log = plant_purchased_tree(live[i % len(live)], (x, y, 0.18), scale)
             log.rotation_euler.x = math.radians(86.0 + 4.0 * (i % 2))
             log.rotation_euler.z += 0.80 * (i + 1)
             extras.append(log)
@@ -2409,11 +2455,14 @@ def place_shot05_compression_frame(trees: list) -> list:
     live = [obj for obj in trees if obj and obj.type == "MESH"]
     if not live:
         return extras
-    sap = duplicate_mesh_in_world(live[0], (44.0, -94.0, 0.0), 1.05)
+    sap = plant_purchased_tree(live[0], (44.0, -94.0, 0.0), 1.05)
     sap.rotation_euler.z += 0.55
     extras.append(sap)
-    extras.append(duplicate_mesh_in_world(live[min(1, len(live) - 1)], (30.0, -88.0, 0.0), 0.62))
-    extras.append(duplicate_mesh_in_world(live[min(2, len(live) - 1)], (41.0, -78.0, 0.0), 0.38))
+    extras.append(plant_purchased_tree(live[min(1, len(live) - 1)], (30.0, -88.0, 0.0), 0.62))
+    extras.append(plant_purchased_tree(live[min(2, len(live) - 1)], (41.0, -78.0, 0.0), 0.38))
+    extras.append(plant_purchased_tree(live[0], (22.0, 10.0, 0.0), 1.18))
+    extras.append(plant_purchased_tree(live[min(1, len(live) - 1)], (32.0, 8.0, 0.0), 0.78))
+    extras.append(plant_purchased_tree(live[min(2, len(live) - 1)], (18.0, 6.0, 0.0), 0.46))
     return extras
 
 
@@ -2447,19 +2496,19 @@ def _dark_cabin_glass() -> bpy.types.Material:
     if "Base Color" in bsdf.inputs:
         bsdf.inputs["Base Color"].default_value = (0.028, 0.018, 0.012, 1.0)
     if "Roughness" in bsdf.inputs:
-        bsdf.inputs["Roughness"].default_value = 0.28
+        bsdf.inputs["Roughness"].default_value = 0.88
     if "Metallic" in bsdf.inputs:
         bsdf.inputs["Metallic"].default_value = 0.0
     if "Specular IOR Level" in bsdf.inputs:
-        bsdf.inputs["Specular IOR Level"].default_value = 0.22
+        bsdf.inputs["Specular IOR Level"].default_value = 0.04
     if "IOR" in bsdf.inputs:
         bsdf.inputs["IOR"].default_value = 1.45
     if "Transmission Weight" in bsdf.inputs:
         bsdf.inputs["Transmission Weight"].default_value = 0.0
     if "Emission Strength" in bsdf.inputs:
-        bsdf.inputs["Emission Strength"].default_value = 0.045
+        bsdf.inputs["Emission Strength"].default_value = 0.02
     if "Emission Color" in bsdf.inputs:
-        bsdf.inputs["Emission Color"].default_value = (1.0, 0.52, 0.26, 1.0)
+        bsdf.inputs["Emission Color"].default_value = (1.0, 0.48, 0.22, 1.0)
     return mat
 
 
@@ -2468,7 +2517,7 @@ def repair_cabin_placeholders() -> list[dict]:
     reports = []
     glass = _dark_cabin_glass()
     keep = ("roof", "straw", "fence", "gate", "cart", "tree")
-    hide_tokens = ("_lod", "emi", "interior", "inside")
+    hide_tokens = ("emi", "interior", "inside")
     for obj in list(bpy.data.objects):
         if obj.type != "MESH":
             continue
@@ -2478,7 +2527,14 @@ def repair_cabin_placeholders() -> list[dict]:
         village = any(token in blob for token in ("village", "cabin", "building", "door", "frame", "window"))
         if not village:
             continue
-        if any(token in name for token in hide_tokens):
+        # Never hide purchased trees. lookdev84 hid Tree*_LOD0, and every
+        # forest copy inherited hide_render, leaving SHOT_03 as empty meadow.
+        if "tree" in name:
+            obj.hide_render = False
+            obj.hide_viewport = False
+            continue
+        lod_ok = "_lod" in name and not any(token in name for token in ("tree", "pine"))
+        if any(token in name for token in hide_tokens) or lod_ok:
             obj.hide_render = True
             obj.hide_viewport = True
             reports.append({"name": obj.name, "action": "hide_interior_or_lod"})
@@ -2555,7 +2611,7 @@ def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, ra
                 continue
             if math.hypot(loc[0] + 50.0, loc[1] + 22.0) < 9.0:
                 continue
-            extras.append(duplicate_mesh_in_world(src, loc, scale * (0.85 + 0.08 * ((i + clump) % 5))))
+            extras.append(plant_purchased_tree(src, loc, scale * (0.85 + 0.08 * ((i + clump) % 5))))
     return extras
 
 
@@ -2924,6 +2980,8 @@ def main() -> int:
     forced = ensure_purchased_albedos(all_files)
     lifted = lift_purchased_shading()
     cabin_repairs = repair_cabin_placeholders()
+    for void in place_cabin_interior_voids():
+        link_exclusive(void, collections["WORLD_VILLAGE"])
 
     nature_members = []
     nature_files = expanded.get("forest_nature", [])
@@ -2939,13 +2997,11 @@ def main() -> int:
             if hasattr(obj, "visible_shadow"):
                 obj.visible_shadow = False
         if nature_members:
-            grove = duplicate_mesh_in_world(nature_members[0], (-64.0, 8.0, 0.0), 1.15)
             west = duplicate_mesh_in_world(nature_members[0], (-72.0, 48.0, 0.0), 1.4)
             east = duplicate_mesh_in_world(nature_members[0], (46.0, 56.0, 0.0), 1.7)
             for obj in nature_members:
                 obj.hide_render = True
                 obj.hide_viewport = True
-            link_exclusive(grove, collections["WORLD_FOREST_FOREGROUND"])
             link_exclusive(west, collections["WORLD_FOREST_MIDGROUND"])
             link_exclusive(east, collections["WORLD_FOREST_BACKGROUND"])
 
@@ -2978,9 +3034,13 @@ def main() -> int:
         ):
             if in_river_channel(item[0], item[1], margin=0.8):
                 continue
-            west_fg.append(duplicate_mesh_in_world(trees[int(abs(item[0])) % src_count], (item[0], item[1], 0.0), item[2]))
+            west_fg.append(plant_purchased_tree(trees[int(abs(item[0])) % src_count], (item[0], item[1], 0.0), item[2]))
         west_fg.extend(place_bank_crest_trees(trees))
         west_fg.extend(place_waterline_dressing(trees))
+    for obj in list(bpy.data.objects):
+        if obj.type == "MESH" and "tree" in obj.name.lower():
+            obj.hide_render = False
+            obj.hide_viewport = False
     west_bg = scatter_clumps(trees, (-38.0, 58.0, 0.0), 2, 2, 9.0, 1.6, 13)
     east_bg = scatter_clumps(trees, (30.0, 58.0, 0.0), 2, 2, 9.0, 1.65, 17)
     foreground = west_fg + east_fg
