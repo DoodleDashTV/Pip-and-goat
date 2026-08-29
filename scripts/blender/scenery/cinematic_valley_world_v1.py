@@ -669,7 +669,6 @@ def load_purchased_grass(files: list[Path]):
     src.hide_render = True
     src.hide_viewport = True
     src.location = (0.0, -420.0, -90.0)
-    enable_foliage_alpha([src])
     print(json.dumps({"event": "purchased_grass_loaded", "name": src.name}), flush=True)
     return src
 
@@ -678,8 +677,10 @@ def _plant_grass(src, loc, scale: float, yaw: float):
     sap = duplicate_mesh_in_world(src, loc, scale)
     sap.hide_render = False
     sap.hide_viewport = False
+    # Tilt toward the high SHOT_01 camera so the purchased clump has area, not an edge.
+    sap.rotation_euler.x = 0.42
     sap.rotation_euler.z += yaw
-    sap.location.z = 0.02
+    sap.location.z = 0.04
     if hasattr(sap, "visible_shadow"):
         sap.visible_shadow = False
     return sap
@@ -697,12 +698,13 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
     live_trees = [obj for obj in trees if obj and obj.type == "MESH"]
     # (x, y, scale, yaw) — irregular, no grid.
     dense_healthy = (
-        (-6.4, 7.2, 3.4, 0.20), (-4.8, 9.6, 3.8, 1.10), (-2.2, 8.0, 3.2, 2.40),
-        (-5.6, 12.4, 4.2, 0.70), (-1.4, 11.2, 3.6, 3.80), (-7.8, 10.8, 3.0, 5.10),
-        (-3.6, 14.8, 4.0, 1.90), (0.4, 9.4, 3.3, 4.20), (-8.8, 7.6, 3.1, 0.40),
-        (-0.8, 13.6, 3.7, 2.80), (-4.0, 6.2, 2.9, 1.50), (-6.8, 15.2, 3.5, 3.30),
-        (-5.2, 19.4, 4.4, 0.60), (1.8, 16.8, 3.9, 2.20), (-2.6, 21.6, 4.1, 4.50),
-        (-7.4, 24.8, 3.6, 1.30), (3.2, 19.0, 4.0, 3.10),
+        (-6.4, 7.2, 9.5, 0.20), (-4.8, 9.6, 11.0, 1.10), (-2.2, 8.0, 8.8, 2.40),
+        (-5.6, 12.4, 12.2, 0.70), (-1.4, 11.2, 10.4, 3.80), (-7.8, 10.8, 8.2, 5.10),
+        (-3.6, 14.8, 11.6, 1.90), (0.4, 9.4, 9.0, 4.20), (-8.8, 7.6, 8.6, 0.40),
+        (-0.8, 13.6, 10.8, 2.80), (-4.0, 6.2, 7.8, 1.50), (-6.8, 15.2, 10.2, 3.30),
+        (-5.2, 19.4, 12.8, 0.60), (1.8, 16.8, 11.2, 2.20), (-2.6, 21.6, 12.0, 4.50),
+        (-7.4, 24.8, 10.6, 1.30), (3.2, 19.0, 11.4, 3.10),
+        (4.8, 28.6, 13.0, 0.90), (-9.6, 30.2, 12.4, 2.70), (2.4, 33.4, 11.8, 4.10),
     )
     short_earth = (
         (6.2, 18.4, 1.15, 0.30), (8.8, 21.0, 0.95, 2.10), (4.6, 22.8, 1.25, 4.00),
@@ -714,9 +716,9 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
         (-13.0, 12.8, 1.3, 1.70), (-15.6, 23.2, 1.5, 3.90),
     )
     tall_wild = (
-        (-2.8, -3.4, 3.4, 0.25), (1.6, -5.2, 3.1, 1.80), (-5.2, -1.2, 3.6, 3.40),
-        (0.2, -1.8, 2.8, 5.00), (-6.4, -4.8, 3.2, 2.10), (2.2, -7.0, 2.9, 4.60),
-        (-4.4, -6.2, 3.0, 1.40), (-1.8, -8.4, 2.6, 0.70),
+        (-2.8, -3.4, 7.2, 0.25), (1.6, -5.2, 6.4, 1.80), (-5.2, -1.2, 7.8, 3.40),
+        (0.2, -1.8, 5.8, 5.00), (-6.4, -4.8, 6.8, 2.10), (2.2, -7.0, 6.2, 4.60),
+        (-4.4, -6.2, 6.6, 1.40), (-1.8, -8.4, 5.4, 0.70),
     )
     worn_strip = (
         (-3.8, -6.8, 0.72, 0.10), (-1.6, -4.6, 0.64, 2.40), (0.4, -2.2, 0.80, 4.20),
@@ -2735,14 +2737,14 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         event = hero_shore_event(center.x)
         water_edge = left * WATER_WIDTH_SCALE * (1.0 + 0.55 * event["water"])
         stations = (
-            (-0.18, BED_CENTER_Z + 0.22),
-            (water_edge * 0.15, WATER_SURFACE_Z - 0.06),
-            (water_edge + event["wet"] * 0.35, WATER_SURFACE_Z + 0.01),
-            (water_edge + event["wet"], WATER_SURFACE_Z + 0.05),
-            (water_edge + event["damp"], -0.35),
-            (water_edge + event["soil"] * 0.70, -0.08),
-            (water_edge + event["soil"] + event["grass"], 0.08),
-            (water_edge + event["soil"] + 2.20 + event["grass"], 0.13),
+            (-0.35, WATER_SURFACE_Z - 0.12),
+            (water_edge * 0.20, WATER_SURFACE_Z - 0.04),
+            (water_edge * 0.65, WATER_SURFACE_Z + 0.01),
+            (water_edge + event["wet"], WATER_SURFACE_Z + 0.06),
+            (water_edge + event["damp"], -0.42),
+            (water_edge + event["soil"] * 0.65, -0.12),
+            (water_edge + event["soil"] + event["grass"], 0.07),
+            (water_edge + event["soil"] + 2.40 + event["grass"], 0.14),
         )
         for row, (lat, z) in enumerate(stations):
             point = center + side * (-lat)
@@ -2769,10 +2771,14 @@ def build_hero_bank_support(centers: list[Vector]) -> list:
         faces.append((outer_a, outer_a + samples * rows, outer_b + samples * rows, outer_b))
     mesh = bpy.data.meshes.new("TJ_HeroBankSolid")
     mesh.from_pydata(verts, [], faces)
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(mesh)
+    bm.free()
     mesh.update()
     obj = bpy.data.objects.new("TJ_HeroBankSolid", mesh)
     bpy.context.scene.collection.objects.link(obj)
-    shade_smooth(obj)
     obj.data.materials.append(wet_mat)
     if hasattr(obj, "visible_shadow"):
         obj.visible_shadow = False
