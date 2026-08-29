@@ -505,12 +505,12 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         # mountain/sky sliver without pitching the approved creek look.
         if 0.5 <= x <= 10.0 and -9.0 <= y <= 6.0 and river_dist > bank_outer:
             height -= 0.55 * max(0.0, 1.0 - abs(x - 4.5) / 6.0)
-        # Open the SHOT_02 right-of-cabin corridor so the closer Louis peak
-        # can silhouette above the creek hero. Trough widths stay locked.
-        if -4.0 <= x <= 14.0 and 4.0 <= y <= 36.0 and river_dist > bank_outer:
-            gx = math.exp(-((x - 4.5) / 10.0) ** 2)
-            gy = math.exp(-((y - 18.0) / 12.0) ** 2)
-            height -= 1.55 * gx * gy
+        # Open the SHOT_02 right-of-cabin corridor. Peak sits at x≈0, y≈20
+        # so its western flank enters camera C (right of Building04).
+        if -8.0 <= x <= 10.0 and 8.0 <= y <= 38.0 and river_dist > bank_outer:
+            gx = math.exp(-((x - 0.0) / 9.0) ** 2)
+            gy = math.exp(-((y - 20.0) / 12.0) ** 2)
+            height -= 1.70 * gx * gy
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
                 (VILLAGE_X_HALF - abs(x)) / 4.0,
@@ -598,43 +598,35 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         links.new(color, detail_mix.inputs["Color1"])
         links.new(detail_ramp.outputs["Color"], detail_mix.inputs["Color2"])
         color = detail_mix.outputs["Color"]
-    # Image-scale soil / needle islands. V39 0.055 features vanished at 540 px.
+    # Image-scale soil / needle islands. One large noise, high threshold:
+    # distinct dirt patches, not a multiplied speckle carpet or a sand flood.
     soil = nodes.new("ShaderNodeTexNoise")
-    soil.inputs["Scale"].default_value = 0.016
+    soil.inputs["Scale"].default_value = 0.009
     if "Detail" in soil.inputs:
-        soil.inputs["Detail"].default_value = 3.0
+        soil.inputs["Detail"].default_value = 2.0
     links.new(coord.outputs["Object"], soil.inputs["Vector"])
-    soil2 = nodes.new("ShaderNodeTexNoise")
-    soil2.inputs["Scale"].default_value = 0.038
-    if "Detail" in soil2.inputs:
-        soil2.inputs["Detail"].default_value = 4.0
-    links.new(coord.outputs["Object"], soil2.inputs["Vector"])
-    soil_mul = nodes.new("ShaderNodeMath")
-    soil_mul.operation = "MULTIPLY"
-    links.new(soil.outputs["Fac"], soil_mul.inputs[0])
-    links.new(soil2.outputs["Fac"], soil_mul.inputs[1])
     soil_fac = nodes.new("ShaderNodeMapRange")
-    soil_fac.inputs["From Min"].default_value = 0.22
-    soil_fac.inputs["From Max"].default_value = 0.40
+    soil_fac.inputs["From Min"].default_value = 0.58
+    soil_fac.inputs["From Max"].default_value = 0.78
     soil_fac.inputs["To Min"].default_value = 0.0
-    soil_fac.inputs["To Max"].default_value = 0.80
-    links.new(soil_mul.outputs["Value"], soil_fac.inputs["Value"])
+    soil_fac.inputs["To Max"].default_value = 0.92
+    links.new(soil.outputs["Fac"], soil_fac.inputs["Value"])
     soil_mix = _mix_rgb(nodes)
     if "Color1" in soil_mix.inputs:
         links.new(color, soil_mix.inputs["Color1"])
-        soil_mix.inputs["Color2"].default_value = (0.168, 0.102, 0.048, 1.0)
+        soil_mix.inputs["Color2"].default_value = (0.142, 0.088, 0.042, 1.0)
         links.new(soil_fac.outputs["Result"] if "Result" in soil_fac.outputs else soil_fac.outputs[0], soil_mix.inputs["Fac"])
         color = soil_mix.outputs["Color"]
     needle = nodes.new("ShaderNodeTexNoise")
-    needle.inputs["Scale"].default_value = 0.028
+    needle.inputs["Scale"].default_value = 0.018
     if "Detail" in needle.inputs:
         needle.inputs["Detail"].default_value = 2.0
     links.new(coord.outputs["Object"], needle.inputs["Vector"])
     needle_fac = nodes.new("ShaderNodeMapRange")
-    needle_fac.inputs["From Min"].default_value = 0.52
-    needle_fac.inputs["From Max"].default_value = 0.88
+    needle_fac.inputs["From Min"].default_value = 0.62
+    needle_fac.inputs["From Max"].default_value = 0.90
     needle_fac.inputs["To Min"].default_value = 0.0
-    needle_fac.inputs["To Max"].default_value = 0.82
+    needle_fac.inputs["To Max"].default_value = 0.78
     links.new(needle.outputs["Fac"], needle_fac.inputs["Value"])
     needle_mix = _mix_rgb(nodes)
     if "Color1" in needle_mix.inputs:
@@ -781,9 +773,15 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                 value = max(value, 0.20)
             if dist > local_half * 0.75 and far < 0.30:
                 value *= 0.32
-        if HERO_X_MIN <= x <= HERO_X_MAX and dist < local_half * 1.35:
-            value = max(value, 0.48 + 0.20 * blotch)
-        value *= 0.80 + 0.20 * max(0.0, blotch)
+        if HERO_X_MIN <= x <= HERO_X_MAX and dist < local_half * 1.70:
+            # Patchy wet shelves, not one continuous tan isoline.
+            patch = 0.5 + 0.5 * math.sin(x * 0.67 + along * 0.29)
+            patch *= 0.5 + 0.5 * math.sin(x * 1.19 - y * 0.37)
+            if patch > 0.38:
+                value = max(value, 0.28 + 0.46 * blotch * patch)
+            elif patch < 0.20 and dist > local_half * 0.50:
+                value *= 0.06
+        value *= 0.72 + 0.28 * max(0.0, blotch)
         color.data[index].color = (value, value, value, 1.0)
 
 
@@ -1909,13 +1907,14 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     # (center_x, south_y, scale, rot_z). Closer masses for SHOT_02 depth and
     # SHOT_05 telephoto compression. Do not smash into the cabin street.
     foothill_slots = (
-        (3.5, 16.0, 0.26, 0.12),
+        (-1.5, 14.5, 0.30, 0.18),
         (36.0, 28.0, 0.18, -0.22),
     )
-    # First peak sits in the SHOT_02 sky-gap right of Cabin01.
-    # Second peak stays the SHOT_05 telephoto hero. Do not move it west.
+    # First peak: west flank sits in camera C's right-of-cabin sky gap.
+    # (5.5, 18) was out of the 32 mm portrait frustum. Do not move the
+    # SHOT_05 telephoto hero at (28, 16).
     peak_slots = (
-        (-16.0, 22.0, 0.56, 0.20),
+        (0.0, 20.0, 0.68, 0.38),
         (28.0, 16.0, 0.48, 0.42),
         (46.0, 52.0, 0.30, -0.16),
     )
@@ -2266,14 +2265,14 @@ def place_hero_soil_scars(centers: list[Vector]) -> list:
         left, _right = _channel_halves_for_index(centers, i)
         t = 0.55 + 0.35 * math.sin(i * 0.71)
         loc = center + side * (-left * t)
-        loc.z = BED_SHOULDER_Z + 0.10 + 0.18 * math.sin(i)
-        scar = _add_lumpy_rock(f"TJ_HeroSoil_{i}", loc, 3.4 + 0.7 * (i % 2), mat, i * 0.29)
-        scar.scale = (2.2, 1.15, 0.28)
+        loc.z = BED_SHOULDER_Z + 0.16 + 0.22 * math.sin(i)
+        scar = _add_lumpy_rock(f"TJ_HeroSoil_{i}", loc, 4.6 + 1.1 * (i % 2), mat, i * 0.29)
+        scar.scale = (2.8, 1.45, 0.38)
         extras.append(scar)
         nloc = center + side * (left * (0.62 + 0.28 * math.sin(i * 0.53)))
-        nloc.z = BED_SHOULDER_Z + 0.18 + 0.16 * math.cos(i)
-        north = _add_lumpy_rock(f"TJ_HeroSoilN_{i}", nloc, 2.8 + 0.5 * ((i + 1) % 2), mat, i * 0.41 + 0.7)
-        north.scale = (1.85, 1.05, 0.24)
+        nloc.z = BED_SHOULDER_Z + 0.22 + 0.20 * math.cos(i)
+        north = _add_lumpy_rock(f"TJ_HeroSoilN_{i}", nloc, 3.8 + 0.8 * ((i + 1) % 2), mat, i * 0.41 + 0.7)
+        north.scale = (2.4, 1.35, 0.34)
         extras.append(north)
     return extras
 
@@ -2331,6 +2330,23 @@ def _opaque_window_void() -> bpy.types.Material:
     diffuse = nodes.new("ShaderNodeBsdfDiffuse")
     if "Color" in diffuse.inputs:
         diffuse.inputs["Color"].default_value = (0.018, 0.012, 0.008, 1.0)
+    if "Roughness" in diffuse.inputs:
+        diffuse.inputs["Roughness"].default_value = 1.0
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(diffuse.outputs["BSDF"], out.inputs["Surface"])
+    return mat
+
+
+def _log_wall_plug() -> bpy.types.Material:
+    """Dark log fill. Covers through-holes without reading as glass or sky."""
+    mat = bpy.data.materials.get("TJ_LogWallPlug") or bpy.data.materials.new("TJ_LogWallPlug")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    nodes.clear()
+    diffuse = nodes.new("ShaderNodeBsdfDiffuse")
+    if "Color" in diffuse.inputs:
+        diffuse.inputs["Color"].default_value = (0.055, 0.032, 0.018, 1.0)
     if "Roughness" in diffuse.inputs:
         diffuse.inputs["Roughness"].default_value = 1.0
     out = nodes.new("ShaderNodeOutputMaterial")
@@ -2469,20 +2485,23 @@ def install_recessed_window_cassettes() -> list:
 
 
 def cover_camera_facing_openings() -> list:
-    """Thin dark plates just inside south/east walls of every cabin.
+    """Back every cabin hole with a dark interior and a log-colored wall plug.
 
-    lookdev89 proved Window01 faces live on the north cabins. The SHOT_01/02
-    hero openings are holes on the creek-side walls. Wall-flush AABB cubes
-    leaked; these plates sit 38 cm inside and cannot breach the roof.
+    lookdev90: Window01 faces are on north cabins only. SHOT_01/02 cyan is a
+    through-hole in Building04 log courses. Tall AABB liners can pierce roofs;
+    flush cubes leaked as tan cards. Use a well-inset interior volume, a
+    window-band liner, and an exterior log plug on the camera walls.
     """
     extras = []
-    mat = _opaque_window_void()
+    void = _opaque_window_void()
+    wood = _log_wall_plug()
     hosts = [
         obj for obj in bpy.data.objects
         if obj.type == "MESH"
-        and any(token in obj.name.lower() for token in ("building", "cabin", "frame"))
+        and any(token in obj.name.lower() for token in ("building", "cabin"))
         and "_lod" not in obj.name.lower()
         and "tree" not in obj.name.lower()
+        and "tj_" not in obj.name.lower()
     ]
     for obj in hosts:
         bounds = group_bounds([obj])
@@ -2494,29 +2513,103 @@ def cover_camera_facing_openings() -> list:
         height = maxs.z - mins.z
         if width < 1.2 or depth < 1.2 or height < 1.4:
             continue
-        plates = (
-            ((maxs.x - 0.38, (mins.y + maxs.y) * 0.5, mins.z + min(1.65, height * 0.42)), (0.04, max(1.1, depth * 0.55), 0.95), "east"),
-            (((mins.x + maxs.x) * 0.5, mins.y + 0.38, mins.z + min(1.65, height * 0.42)), (max(1.1, width * 0.55), 0.04, 0.95), "south"),
+        mid_x = (mins.x + maxs.x) * 0.5
+        mid_y = (mins.y + maxs.y) * 0.5
+        band_z = mins.z + min(1.55, height * 0.38)
+        # Interior volume: blocks any sightline through a log gap to the HDRI.
+        inset = 0.62
+        bpy.ops.mesh.primitive_cube_add(
+            size=1.0,
+            location=(mid_x, mid_y, mins.z + height * 0.36),
         )
-        for (lx, ly, lz), (sx, sy, sz), tag in plates:
+        volume = bpy.context.object
+        volume.name = f"TJ_CabinInterior_{obj.name}"
+        volume.scale = (
+            max(0.8, width - 2.0 * inset),
+            max(0.8, depth - 2.0 * inset),
+            max(1.1, height * 0.48),
+        )
+        volume.data.materials.clear()
+        volume.data.materials.append(void)
+        if hasattr(volume, "visible_shadow"):
+            volume.visible_shadow = False
+        if hasattr(volume, "visible_glossy"):
+            volume.visible_glossy = False
+        extras.append(volume)
+        print(json.dumps({
+            "event": "cabin_interior_void",
+            "host": obj.name,
+            "center": [round(mid_x, 3), round(mid_y, 3), round(mins.z + height * 0.36, 3)],
+        }), flush=True)
+        # Window-band liners stay below the roof.
+        liners = (
+            ((maxs.x - 0.34, mid_y, band_z), (0.06, max(1.2, depth * 0.78), 2.15), "east"),
+            ((mins.x + 0.34, mid_y, band_z), (0.06, max(1.2, depth * 0.78), 2.15), "west"),
+            ((mid_x, mins.y + 0.34, band_z), (max(1.2, width * 0.78), 0.06, 2.15), "south"),
+            ((mid_x, maxs.y - 0.34, band_z), (max(1.2, width * 0.78), 0.06, 2.15), "north"),
+        )
+        for (lx, ly, lz), (sx, sy, sz), tag in liners:
             bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, ly, lz))
             plate = bpy.context.object
             plate.name = f"TJ_WallVoid_{obj.name}_{tag}"
             plate.scale = (sx, sy, sz)
             plate.data.materials.clear()
-            plate.data.materials.append(mat)
+            plate.data.materials.append(void)
             if hasattr(plate, "visible_shadow"):
                 plate.visible_shadow = False
             if hasattr(plate, "visible_glossy"):
                 plate.visible_glossy = False
             extras.append(plate)
+        # Exterior log plugs only on the creek cabin. Other buildings get
+        # interior voids so SHOT_01 does not grow brown wall cards.
+        if obj.name != "Building04":
+            continue
+        plugs = (
+            ((maxs.x + 0.05, mid_y, band_z), (0.08, max(1.3, depth * 0.86), 2.35), "east"),
+            ((mid_x, mins.y - 0.05, band_z), (max(1.3, width * 0.86), 0.08, 2.35), "south"),
+        )
+        for (lx, ly, lz), (sx, sy, sz), tag in plugs:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, ly, lz))
+            plug = bpy.context.object
+            plug.name = f"TJ_LogPlug_{obj.name}_{tag}"
+            plug.scale = (sx, sy, sz)
+            plug.data.materials.clear()
+            plug.data.materials.append(wood)
+            if hasattr(plug, "visible_shadow"):
+                plug.visible_shadow = False
+            if hasattr(plug, "visible_glossy"):
+                plug.visible_glossy = False
+            extras.append(plug)
             print(json.dumps({
-                "event": "cabin_wall_void",
+                "event": "cabin_log_plug",
                 "host": obj.name,
                 "tag": tag,
                 "center": [round(lx, 3), round(ly, 3), round(lz, 3)],
             }), flush=True)
     return extras
+
+
+def open_shot02_mountain_gap() -> int:
+    """Hide trees sitting in camera C's right-of-cabin sky corridor."""
+    hidden = 0
+    for obj in list(bpy.data.objects):
+        if obj.type != "MESH" or "tree" not in obj.name.lower():
+            continue
+        if obj.name.lower().startswith("tj_shot05") or obj.name.lower().startswith("tj_shot03"):
+            continue
+        loc = obj.matrix_world.translation
+        if -6.5 <= loc.x <= 8.5 and 10.0 <= loc.y <= 34.0:
+            if loc.x >= 18.0:
+                continue
+            obj.hide_render = True
+            obj.hide_viewport = True
+            hidden += 1
+            print(json.dumps({
+                "event": "shot02_gap_tree_hidden",
+                "name": obj.name,
+                "xy": [round(loc.x, 2), round(loc.y, 2)],
+            }), flush=True)
+    return hidden
 
 
 def place_shot03_forest_passage(trees: list) -> list:
@@ -3218,6 +3311,7 @@ def main() -> int:
         if obj.type == "MESH" and "tree" in obj.name.lower():
             obj.hide_render = False
             obj.hide_viewport = False
+    open_shot02_mountain_gap()
     west_bg = scatter_clumps(trees, (-38.0, 58.0, 0.0), 2, 2, 9.0, 1.6, 13)
     east_bg = scatter_clumps(trees, (30.0, 58.0, 0.0), 2, 2, 9.0, 1.65, 17)
     foreground = west_fg + east_fg
