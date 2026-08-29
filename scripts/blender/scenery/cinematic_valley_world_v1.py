@@ -34,6 +34,10 @@ from cinematic_creek_profile import (  # noqa: E402
     hero_south_wet_tongue,
     hero_waterline_bite,
 )
+from cinematic_master_look_v1 import (  # noqa: E402
+    apply_cinematic_master_post_profile,
+    apply_cinematic_master_pre_profile,
+)
 from cinematic_standards import (  # noqa: E402
     MASTER_COLLECTIONS,
     assert_final_contract,
@@ -4140,13 +4144,14 @@ def main() -> int:
     stage.hide_render = True
     stage.hide_viewport = True
     link_exclusive(stage, collections["WORLD_CHARACTER_STAGING"])
-    setup_mist_and_compositor()
+    apply_cinematic_master_pre_profile()
     cameras = setup_six_cameras()
     control_cams = setup_control_cameras()
     cameras.extend(control_cams)
     if args.hero_search:
         cameras.extend(setup_hero_search_cameras())
     applied = apply_profile(args.profile, args)
+    apply_cinematic_master_post_profile()
 
     contributions = {
         "village_blender": visible_use_record("village_blender", downloaded=True, extracted=True, datablockLoaded=imported > 0, renderedPixels=imported > 0, shotIds=["SHOT_04", "SHOT_06"], evidence="collection:WORLD_VILLAGE"),
@@ -4203,7 +4208,7 @@ def main() -> int:
         "liftedShading": lifted,
         "cabinPlaceholderRepairs": cabin_repairs,
         "atmosphereExecuted": True,
-        "atmosphereMethod": "mist_pass_compositor",
+        "atmosphereMethod": "volume_scatter_plus_mist_plus_compositor",
         "contributions": contributions,
         "randomOrGeneratedStockAssetCount": 0,
         "commercialAssetPathsEmitted": False,
@@ -4211,7 +4216,7 @@ def main() -> int:
         "stillsOnly": bool(args.stills_only),
         "engine": applied["engine"],
         "cameraPath": "six_shot_markers",
-        "lighting": "single_key_sun_plus_sky_fill_plus_restrained_bounce",
+        "lighting": "cinematic_master_daylight_v1",
         "groundSource": "shaped_valley_carrier_purchased_meadow",
         "riverSource": "geometry_first_carved_channel_dark_bed_narrow_film",
         "hideWater": bool(args.hide_water),
