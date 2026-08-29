@@ -2636,29 +2636,32 @@ def main() -> int:
     ]
     if not trees:
         trees = [obj for obj in bpy.data.objects if obj.type == "MESH" and "tree" in obj.name.lower()]
-    west_fg = scatter_clumps(trees, (-26.0, 6.0, 0.0), 3, 2, 7.0, 1.05, 3)
+    west_fg = scatter_clumps(trees, (-30.0, 18.0, 0.0), 3, 2, 6.5, 1.05, 3)
+    west_fg.extend(scatter_clumps(trees, (-22.0, -4.0, 0.0), 2, 2, 5.5, 0.92, 19))
     west_mg = scatter_clumps(trees, (-44.0, 40.0, 0.0), 3, 2, 8.0, 1.35, 7)
     east_fg = scatter_clumps(trees, (24.0, 12.0, 0.0), 3, 2, 7.0, 1.08, 5)
     east_mg = scatter_clumps(trees, (28.0, 32.0, 0.0), 3, 2, 8.0, 1.40, 11)
     if trees:
-        cam_xy = Vector((-36.0, -1.2, 0.0))
-        look_xy = Vector((-14.0, 13.5, 0.0))
+        cam_xy = Vector((-40.0, -8.0, 0.0))
+        look_xy = Vector((-16.0, 10.0, 0.0))
         along = look_xy - cam_xy
         span = along.length
         along.normalize()
         side = Vector((-along.y, along.x, 0.0))
         src_count = len(trees)
         for i, (t, offset, scale) in enumerate((
-            (0.28, 4.4, 1.18),
-            (0.30, -4.6, 1.14),
-            (0.44, 4.8, 1.26),
-            (0.46, -5.0, 1.20),
-            (0.60, 5.2, 1.34),
-            (0.62, -5.2, 1.28),
-            (0.76, 5.4, 1.38),
-            (0.78, -5.4, 1.32),
+            (0.40, 7.4, 0.48),
+            (0.42, -7.6, 0.44),
+            (0.56, 8.0, 0.82),
+            (0.58, -8.2, 0.78),
+            (0.72, 8.4, 1.12),
+            (0.74, -8.6, 1.06),
+            (0.86, 8.8, 1.28),
+            (0.88, -8.8, 1.22),
         )):
             loc = cam_xy + along * (t * span) + side * offset
+            if (Vector((loc.x, loc.y, 0.0)) - cam_xy).length < 12.0:
+                continue
             west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
         if not in_river_channel(-16.5, -7.2, margin=1.2):
             west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))

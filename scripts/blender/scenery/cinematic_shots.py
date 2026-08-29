@@ -189,8 +189,8 @@ def default_shot_cameras() -> list[dict]:
             # Stay on the west flank, but look along the tree line toward the
             # village opening instead of over empty north meadow.
             "retiredEmptyMeadow": {"location": (-34.0, 16.0, 5.2), "look": (-14.0, 36.0, 7.2), "lens": 48.0},
-            "start": {"location": (-36.0, -1.2, 4.25), "look": (-14.0, 13.5, 3.55), "lens": 48.0},
-            "end": {"location": (-33.5, 1.8, 4.45), "look": (-12.8, 16.2, 3.85), "lens": 52.0},
+            "start": {"location": (-40.0, -8.0, 5.40), "look": (-16.0, 10.0, 4.20), "lens": 48.0},
+            "end": {"location": (-37.5, -5.2, 5.60), "look": (-13.6, 12.8, 4.50), "lens": 52.0},
         },
         {
             "id": "SHOT_04",
