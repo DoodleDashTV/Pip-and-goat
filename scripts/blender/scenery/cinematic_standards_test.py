@@ -34,6 +34,7 @@ from cinematic_creek_profile import (
     hero_grass_lip,
     hero_north_notch_depth,
     hero_north_wet_tongue,
+    hero_macro_event,
     hero_shore_event,
     hero_south_water_factor,
     hero_south_wet_tongue,
@@ -193,12 +194,13 @@ def test_v37_north_bank_breakup_is_broad_and_discontinuous():
     assert hero_grass_lip(-14.0, 0.0) == 0.0
     # Grass and water must not share one isoline.
     assert abs(hero_grass_lip(-7.6, 0.0) - hero_waterline_bite(-7.6, 0.0)) >= 0.20
-    kinds = {hero_shore_event(x)["kind"] for x in (-10.4, -7.8, -5.6, -3.2, -0.6, 1.8, 4.2, 6.6)}
-    assert len(kinds) >= 6
-    assert hero_shore_event(-7.8)["water"] > hero_shore_event(-0.6)["water"]
+    kinds = {hero_macro_event(x)["kind"] for x in (-9.6, -6.6, -3.6, -0.6, 2.4, 5.6)}
+    assert len(kinds) >= 5
+    assert hero_macro_event(-6.6)["emerge"] > hero_macro_event(-3.6)["emerge"]
+    assert hero_macro_event(-14.0)["kind"] == "none"
     assert hero_shore_event(-14.0)["kind"] == "none"
-    assert hero_south_water_factor(-7.8) > hero_south_water_factor(-0.6)
-    assert 0.55 <= hero_south_water_factor(-7.8) <= 1.60
+    assert hero_south_water_factor(-6.6) > hero_south_water_factor(-3.6)
+    assert 0.72 <= hero_south_water_factor(-6.6) <= 1.48
     assert hero_south_water_factor(-14.0) == 1.0
 
 

@@ -101,64 +101,106 @@ def hero_grass_lip(x: float, along: float) -> float:
     return max(-0.70, min(1.00, sum(lips) + wobble))
 
 
-def hero_south_water_factor(x: float) -> float:
-    """Shared south-film scale so terrain, water, and bank stay sealed.
+# V44: 6 camera-readable south-bank events. emerge + metres = water covers more bank.
+HERO_MACRO_EVENTS = (
+    (-9.6, 1.90, "boulder", 0.45, 3.10),
+    (-6.6, 1.75, "bay", 1.90, 5.80),
+    (-3.6, 1.50, "point", -1.20, 2.70),
+    (-0.6, 1.55, "boulder", 0.25, 3.40),
+    (2.4, 1.65, "gravel", 1.30, 5.10),
+    (5.6, 1.55, "cut", 1.60, 3.50),
+)
 
-    1.0 is WATER_WIDTH_SCALE. Values above 1 open an inlet; below 1 overhangs.
-    The global water width is not changed — only the hero south lip moves.
-    """
-    if x < HERO_X_MIN or x > HERO_X_MAX:
-        return 1.0
-    event = hero_shore_event(x)
-    return max(0.55, min(1.60, 1.0 + 0.88 * event["water"]))
+# (x, edge, scale, bury). edge 1 = film, <1 in water. Left-weighted for SHOT_02.
+HERO_MACRO_ROCKS = (
+    (-10.05, 0.70, 4.20, 0.50),
+    (-8.65, 1.10, 3.15, 0.44),
+    (-3.70, 0.66, 3.55, 0.46),
+    (-0.45, 0.86, 4.05, 0.52),
+    (2.55, 1.22, 2.75, 0.40),
+)
 
 
-def hero_shore_event(x: float) -> dict:
-    """Blend 8 irregular SHOT_02 south-bank events. Distances are metres.
-
-    Keys:
-    soil/damp/wet: outward run from the water film edge
-    water: signed water-edge offset (+ into bank, - grass overhang)
-    grass: extra grass run past the soil
-    """
-    empty = {"kind": "none", "soil": 1.7, "damp": 1.05, "wet": 0.55, "water": 0.0, "grass": 0.12}
+def hero_macro_event(x: float) -> dict:
+    """One blended south-bank event. Used by terrain, water, and rocks."""
+    empty = {"kind": "none", "emerge": 0.0, "rise": 4.2, "weight": 0.0}
     if x < HERO_X_MIN or x > HERO_X_MAX:
         return empty
-    events = (
-        (-10.4, 1.15, "retreat", 3.15, 2.20, 0.42, 0.48, 0.02),
-        (-7.8, 0.95, "inlet", 0.95, 0.42, 0.14, 0.88, 0.00),
-        (-5.6, 0.80, "rock", 1.25, 0.70, 0.40, 0.04, 0.08),
-        (-3.2, 1.20, "bay", 3.40, 2.45, 1.45, 0.62, 0.00),
-        (-0.6, 0.88, "overhang", 0.70, 0.22, 0.08, -0.36, 0.62),
-        (1.8, 0.95, "gravel", 2.15, 1.55, 1.15, 0.28, 0.02),
-        (4.2, 1.15, "shelf", 3.85, 2.85, 1.70, 0.10, 0.04),
-        (6.6, 0.92, "cut", 1.05, 0.48, 0.16, 0.78, 0.02),
-    )
     weight_sum = 0.0
-    soil = damp = wet = water = grass = 0.0
-    best_kind = "blend"
+    emerge = rise = 0.0
+    best_kind = "none"
     best_w = 0.0
-    for cx, radius, kind, s, d, w, wat, g in events:
+    for cx, radius, kind, em, rs in HERO_MACRO_EVENTS:
         ww = _gaussian(x, cx, radius)
-        soil += s * ww
-        damp += d * ww
-        wet += w * ww
-        water += wat * ww
-        grass += g * ww
+        emerge += em * ww
+        rise += rs * ww
         weight_sum += ww
         if ww > best_w:
             best_w = ww
             best_kind = kind
-    if weight_sum < 0.08:
+    if weight_sum < 0.06:
         return empty
     inv = 1.0 / weight_sum
     return {
         "kind": best_kind,
-        "soil": max(0.50, soil * inv),
-        "damp": max(0.12, damp * inv),
-        "wet": max(0.05, wet * inv),
-        "water": max(-0.42, min(0.95, water * inv)),
-        "grass": max(0.0, grass * inv),
+        "emerge": max(-1.40, min(2.10, emerge * inv)),
+        "rise": max(2.40, min(6.40, rise * inv)),
+        "weight": min(1.0, best_w),
+    }
+
+
+def hero_south_water_factor(x: float) -> float:
+    """Modest local film scale so water occupies bays. Not a global widen."""
+    if x < HERO_X_MIN or x > HERO_X_MAX:
+        return 1.0
+    event = hero_macro_event(x)
+    kind = event["kind"]
+    weight = event["weight"]
+    if kind == "bay":
+        return max(0.72, min(1.48, 1.0 + 0.40 * weight))
+    if kind == "point":
+        return max(0.72, min(1.48, 1.0 - 0.20 * weight))
+    if kind == "cut":
+        return max(0.72, min(1.48, 1.0 + 0.26 * weight))
+    if kind == "gravel":
+        return max(0.72, min(1.48, 1.0 + 0.18 * weight))
+    return 1.0
+
+
+def hero_rock_collar(x: float, y: float) -> float:
+    """Negative metres so terrain sockets around embedded hero rocks."""
+    dip = 0.0
+    for px, _edge, scale, bury in HERO_MACRO_ROCKS:
+        # Rocks sit near the south lip; a wide Gaussian is enough without Y.
+        w = _gaussian(x, px, 0.85 + 0.18 * scale)
+        dip = max(dip, w * scale * bury * 0.16)
+    return dip
+
+
+def hero_shore_event(x: float) -> dict:
+    """Compatibility view of V44 macro events for remaining callers."""
+    empty = {"kind": "none", "soil": 1.7, "damp": 1.05, "wet": 0.55, "water": 0.0, "grass": 0.12}
+    event = hero_macro_event(x)
+    if event["kind"] == "none":
+        return empty
+    kind = event["kind"]
+    emerge = event["emerge"]
+    rise = event["rise"]
+    soil = 0.55 + 0.35 * max(0.0, emerge)
+    damp = 0.20 + 0.28 * max(0.0, emerge)
+    wet = 0.08 + 0.18 * max(0.0, emerge)
+    grass = 0.45 if kind == "point" else 0.06
+    if kind == "gravel":
+        soil, damp, wet, grass = 1.80, 1.20, 0.85, 0.03
+    return {
+        "kind": kind,
+        "soil": max(0.50, soil),
+        "damp": max(0.12, damp),
+        "wet": max(0.05, wet),
+        "water": max(-0.42, min(0.95, emerge * 0.48)),
+        "grass": max(0.0, grass),
+        "rise": rise,
+        "emerge": emerge,
     }
 
 
