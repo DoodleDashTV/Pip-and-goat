@@ -278,6 +278,7 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     shelf = shoulder_z + 0.20
     crest_z += 0.10 * math.sin(x * 1.17 + y * 0.83) + 0.07 * math.sin(along * 0.91)
     crest_z += 0.06 * math.sin(x * 2.4 + y * 1.8)
+    crest_z += 0.09 * math.sin(x * 3.1 + along * 1.7)
     # Round the camera-facing lip. Do not change trough depths or water/bed halves.
     if t < 0.58:
         u = t / 0.58
@@ -318,6 +319,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             height *= pad
         vert.co.z = max(BED_CENTER_Z - 0.28, min(2.8, height))
     paint_wet_bank_mask(ground)
+    soften_channel_crest(ground)
     ground.data.update()
     shade_smooth(ground)
     img = purchased_meadow_image()
@@ -476,6 +478,33 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         color.data[index].color = (value, value, value, 1.0)
 
 
+def soften_channel_crest(ground: bpy.types.Object) -> None:
+    """Bevel only the visible grass-to-bank crest. Trough depths stay locked."""
+    mesh = ground.data
+    neighbors: list[list[int]] = [[] for _ in mesh.vertices]
+    for edge in mesh.edges:
+        a, b = edge.vertices
+        neighbors[a].append(b)
+        neighbors[b].append(a)
+    zs = [vert.co.z for vert in mesh.vertices]
+    for _pass in range(3):
+        nxt = zs[:]
+        for index, vert in enumerate(mesh.vertices):
+            dist, signed, _along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
+            local = left_half if signed < 0.0 else right_half
+            bed_half = local * 0.90
+            bank_outer = local + (2.55 if signed < 0.0 else 1.45) + 0.50
+            if dist < bed_half or dist > bank_outer or not neighbors[index]:
+                continue
+            avg = sum(zs[j] for j in neighbors[index]) / float(len(neighbors[index]))
+            t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
+            amt = 0.38 + 0.32 * min(1.0, max(0.0, t))
+            nxt[index] = zs[index] * (1.0 - amt) + avg * amt
+        zs = nxt
+    for index, vert in enumerate(mesh.vertices):
+        vert.co.z = zs[index]
+
+
 def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     """Grass -> damp mixed soil -> dark bed. No water BSDF on the meadow."""
     nodes = mat.node_tree.nodes
@@ -532,7 +561,62 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(wet_fac.outputs["Result"] if "Result" in wet_fac.outputs else wet_fac.outputs[0], wet.inputs["Fac"])
     for link in list(bsdf.inputs["Base Color"].links):
         links.remove(link)
-    links.new(wet.outputs["Color"], bsdf.inputs["Base Color"])
+    # Keep meadow grass green. Soil is a separate BSDF. Color-tinting the
+    # grass itself is what drew the knife-edge contour in V32/lookdev54.
+    links.new(incoming, bsdf.inputs["Base Color"])
+    earth = nodes.new("ShaderNodeBsdfPrincipled")
+    earth.name = "TJ_BankEarth"
+    links.new(wet.outputs["Color"], earth.inputs["Base Color"])
+    if "Roughness" in earth.inputs:
+        earth.inputs["Roughness"].default_value = 0.94
+    if "Metallic" in earth.inputs:
+        earth.inputs["Metallic"].default_value = 0.0
+    if "Specular IOR Level" in earth.inputs:
+        earth.inputs["Specular IOR Level"].default_value = 0.06
+    hole = nodes.new("ShaderNodeTexNoise")
+    hole.inputs["Scale"].default_value = 1.85
+    if "Detail" in hole.inputs:
+        hole.inputs["Detail"].default_value = 6.0
+    links.new(coord.outputs["Object"], hole.inputs["Vector"])
+    hole2 = nodes.new("ShaderNodeTexNoise")
+    hole2.inputs["Scale"].default_value = 4.4
+    if "Detail" in hole2.inputs:
+        hole2.inputs["Detail"].default_value = 4.0
+    links.new(coord.outputs["Object"], hole2.inputs["Vector"])
+    hole_avg = nodes.new("ShaderNodeMath")
+    hole_avg.operation = "ADD"
+    links.new(hole.outputs["Fac"], hole_avg.inputs[0])
+    links.new(hole2.outputs["Fac"], hole_avg.inputs[1])
+    hole_half = nodes.new("ShaderNodeMath")
+    hole_half.operation = "MULTIPLY"
+    hole_half.inputs[1].default_value = 0.5
+    links.new(hole_avg.outputs["Value"], hole_half.inputs[0])
+    thresh_span = nodes.new("ShaderNodeMath")
+    thresh_span.operation = "MULTIPLY"
+    thresh_span.inputs[1].default_value = 0.40
+    links.new(hole_half.outputs["Value"], thresh_span.inputs[0])
+    thresh = nodes.new("ShaderNodeMath")
+    thresh.operation = "ADD"
+    thresh.inputs[1].default_value = 0.07
+    links.new(thresh_span.outputs["Value"], thresh.inputs[0])
+    delta = nodes.new("ShaderNodeMath")
+    delta.operation = "SUBTRACT"
+    links.new(mask, delta.inputs[0])
+    links.new(thresh.outputs["Value"], delta.inputs[1])
+    patch = nodes.new("ShaderNodeMapRange")
+    patch.inputs["From Min"].default_value = -0.07
+    patch.inputs["From Max"].default_value = 0.11
+    patch.inputs["To Min"].default_value = 0.0
+    patch.inputs["To Max"].default_value = 1.0
+    links.new(delta.outputs["Value"], patch.inputs["Value"])
+    mix_sh = nodes.new("ShaderNodeMixShader")
+    links.new(patch.outputs["Result"] if "Result" in patch.outputs else patch.outputs[0], mix_sh.inputs[0])
+    links.new(bsdf.outputs["BSDF"], mix_sh.inputs[1])
+    links.new(earth.outputs["BSDF"], mix_sh.inputs[2])
+    out = next(node for node in nodes if node.type == "OUTPUT_MATERIAL")
+    for link in list(out.inputs["Surface"].links):
+        links.remove(link)
+    links.new(mix_sh.outputs["Shader"], out.inputs["Surface"])
     bump = next((node for node in nodes if node.type == "BUMP"), None)
     if bump is not None and "Height" in bump.inputs and bump.inputs["Height"].links:
         height_in = bump.inputs["Height"].links[0].from_socket
@@ -589,8 +673,8 @@ def cinematic_riverbed_material() -> bpy.types.Material:
     coord = nodes.new("ShaderNodeTexCoord")
     mix = _mix_rgb(nodes)
     if "Color1" in mix.inputs:
-        mix.inputs["Color1"].default_value = (0.010, 0.009, 0.006, 1.0)
-        mix.inputs["Color2"].default_value = (0.030, 0.026, 0.016, 1.0)
+        mix.inputs["Color1"].default_value = (0.008, 0.007, 0.004, 1.0)
+        mix.inputs["Color2"].default_value = (0.026, 0.020, 0.012, 1.0)
         links.new(attr.outputs["Color"], mix.inputs["Fac"])
         links.new(mix.outputs["Color"], body.inputs["Base Color"])
     if "Roughness" in body.inputs:
@@ -678,21 +762,21 @@ def _water_variant_cfg(variant: str, tint) -> dict:
         }
     return {
         "label": "D",
-        "specular": 0.12,
-        "ior": 1.10,
+        "specular": 0.0,
+        "ior": 1.0,
         "distance_gate": False,
-        "trans_center": 0.38,
-        "trans_edge": 0.58,
-        "trans_far": 0.38,
-        "sheen": 0.12,
-        "sheen_far": 0.12,
-        "rough_lo": 0.22,
-        "rough_hi": 0.40,
-        "extra_glossy": True,
-        "glossy_color": (0.11, 0.14, 0.13, 1.0),
-        "gloss_rough_lo": 0.26,
-        "gloss_rough_hi": 0.46,
-        "bump": 0.30,
+        "trans_center": 0.0,
+        "trans_edge": 0.0,
+        "trans_far": 0.0,
+        "sheen": 0.0,
+        "sheen_far": 0.0,
+        "rough_lo": 0.20,
+        "rough_hi": 0.38,
+        "extra_glossy": False,
+        "glossy_color": (0.22, 0.28, 0.26, 1.0),
+        "gloss_rough_lo": 0.18,
+        "gloss_rough_hi": 0.36,
+        "bump": 0.34,
         "deep": deep,
     }
 
@@ -916,12 +1000,84 @@ def cinematic_river_material(tint=None, variant: str | None = None) -> bpy.types
     else:
         links.new(body.outputs["BSDF"], out.inputs["Surface"])
     if cfg["label"] == "D":
+        # Principled transmission at 14° is either white Fresnel foil (B) or
+        # ~60% opaque teal paint (lookdev54). Transparent + remapped glossy
+        # keeps bed-through and liquid sheen without an HDRI ribbon.
+        for link in list(out.inputs["Surface"].links):
+            links.remove(link)
+        wave_mul = nodes.new("ShaderNodeMath")
+        wave_mul.operation = "MULTIPLY"
+        wave_mul.inputs[1].default_value = 0.26
+        wave_src = wave.outputs["Fac"] if "Fac" in wave.outputs else wave.outputs[0]
+        links.new(wave_src, wave_mul.inputs[0])
+        flow = nodes.new("ShaderNodeMath")
+        flow.operation = "ADD"
+        links.new(combo.outputs["Value"], flow.inputs[0])
+        links.new(wave_mul.outputs["Value"], flow.inputs[1])
+        for link in list(bump.inputs["Height"].links):
+            links.remove(link)
+        links.new(flow.outputs["Value"], bump.inputs["Height"])
+        trans = nodes.new("ShaderNodeBsdfTransparent")
+        if "Color" in trans.inputs:
+            trans.inputs["Color"].default_value = (
+                min(0.46, max(0.22, deep[0] * 10.0 + 0.18)),
+                min(0.64, max(0.34, deep[1] * 10.0 + 0.26)),
+                min(0.56, max(0.28, deep[2] * 10.0 + 0.22)),
+                1.0,
+            )
+        if "Color" in glossy.inputs:
+            glossy.inputs["Color"].default_value = cfg["glossy_color"]
+        face_amt = nodes.new("ShaderNodeMapRange")
+        face_amt.inputs["From Min"].default_value = 0.0
+        face_amt.inputs["From Max"].default_value = 1.0
+        face_amt.inputs["To Min"].default_value = 0.17
+        face_amt.inputs["To Max"].default_value = 0.33
+        links.new(layer.outputs["Facing"], face_amt.inputs["Value"])
+        face_var = nodes.new("ShaderNodeMapRange")
+        face_var.inputs["From Min"].default_value = 0.0
+        face_var.inputs["From Max"].default_value = 1.0
+        face_var.inputs["To Min"].default_value = 0.78
+        face_var.inputs["To Max"].default_value = 1.0
+        links.new(swell.outputs["Fac"], face_var.inputs["Value"])
+        face_mul = nodes.new("ShaderNodeMath")
+        face_mul.operation = "MULTIPLY"
+        links.new(face_amt.outputs["Result"] if "Result" in face_amt.outputs else face_amt.outputs[0], face_mul.inputs[0])
+        links.new(face_var.outputs["Result"] if "Result" in face_var.outputs else face_var.outputs[0], face_mul.inputs[1])
+        mix_liq = nodes.new("ShaderNodeMixShader")
+        links.new(face_mul.outputs["Value"], mix_liq.inputs[0])
+        links.new(trans.outputs["BSDF"], mix_liq.inputs[1])
+        links.new(glossy.outputs["BSDF"], mix_liq.inputs[2])
+        glint = nodes.new("ShaderNodeBsdfGlossy")
+        if hasattr(glint, "distribution"):
+            glint.distribution = "GGX"
+        if "Color" in glint.inputs:
+            glint.inputs["Color"].default_value = (0.38, 0.44, 0.42, 1.0)
+        if "Roughness" in glint.inputs:
+            glint.inputs["Roughness"].default_value = 0.07
+        if "Normal" in glint.inputs:
+            links.new(bump.outputs["Normal"], glint.inputs["Normal"])
+        glint_amt = nodes.new("ShaderNodeMapRange")
+        glint_amt.inputs["From Min"].default_value = 0.74
+        glint_amt.inputs["From Max"].default_value = 1.0
+        glint_amt.inputs["To Min"].default_value = 0.0
+        glint_amt.inputs["To Max"].default_value = 0.09
+        links.new(ripple.outputs["Fac"], glint_amt.inputs["Value"])
+        mix_glint = nodes.new("ShaderNodeMixShader")
+        links.new(glint_amt.outputs["Result"] if "Result" in glint_amt.outputs else glint_amt.outputs[0], mix_glint.inputs[0])
+        links.new(mix_liq.outputs["Shader"], mix_glint.inputs[1])
+        links.new(glint.outputs["BSDF"], mix_glint.inputs[2])
+        links.new(mix_glint.outputs["Shader"], out.inputs["Surface"])
         absorb = nodes.new("ShaderNodeVolumeAbsorption")
         if "Color" in absorb.inputs:
-            absorb.inputs["Color"].default_value = (0.04, 0.09, 0.07, 1.0)
+            absorb.inputs["Color"].default_value = (0.06, 0.13, 0.10, 1.0)
         if "Density" in absorb.inputs:
-            absorb.inputs["Density"].default_value = 3.2
+            absorb.inputs["Density"].default_value = 0.85
         links.new(absorb.outputs["Volume"], out.inputs["Volume"])
+        if hasattr(mat, "cycles"):
+            try:
+                mat.cycles.use_transparent_shadow = True
+            except Exception:
+                pass
     return mat
 
 
@@ -1075,8 +1231,9 @@ def spline_channel_mesh(
             if abs(offset) > 0.62:
                 edge_noise = 0.34 * math.sin(i * 0.37 + col * 1.7) + 0.22 * math.sin(i * 0.19)
                 if foam_edges:
-                    edge_noise += 0.28 * math.sin(i * 0.53 + (1.0 if offset >= 0.0 else -1.0))
-                    edge_noise += 0.16 * math.sin(i * 0.91 + col * 2.1)
+                    edge_noise += 0.34 * math.sin(i * 0.53 + (1.0 if offset >= 0.0 else -1.0))
+                    edge_noise += 0.20 * math.sin(i * 0.91 + col * 2.1)
+                    edge_noise += 0.12 * math.sin(i * 1.37 + along_depth * 4.0)
             lateral = half * abs(offset) + edge_noise
             point = center + side * (lateral * (1.0 if offset >= 0.0 else -1.0))
             edge = abs(offset)
@@ -1221,8 +1378,9 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     )
     assigned = assign_purchased_water(river)
     extras = [bed]
+    extras.extend(place_waterline_interruptions(centers))
     # Rectangular bank patches read as planks/bridges. Terrain wet-mask,
-    # dark bed, and crest trees carry the breakup.
+    # dark bed, crest trees, and a few half-sunk stones carry the breakup.
     print(json.dumps({
         "event": "geometry_first_channel_built",
         "bed": bed.name,
@@ -1367,6 +1525,55 @@ def place_bank_crest_trees(trees: list) -> list:
     return extras
 
 
+def place_waterline_interruptions(centers: list[Vector]) -> list:
+    """A few half-sunk stones that break the waterline. Not a border, not spheres."""
+    extras = []
+    mat = cinematic_riverbed_material()
+    step = 10
+    for i in range(5, max(6, len(centers) - 5), step):
+        if (i // step) % 3 == 0:
+            continue
+        center = centers[i]
+        side = _side_from_centers(centers, i)
+        left, right = _channel_halves_for_index(centers, i)
+        half = left * WATER_WIDTH_SCALE * (0.90 + 0.12 * math.sin(i * 0.61))
+        loc = center + side * (-half)
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(loc.x, loc.y, WATER_SURFACE_Z - 0.04))
+        rock = bpy.context.object
+        rock.name = f"TJ_WaterlineStone_{i}"
+        rock.scale = (
+            0.30 + 0.14 * ((i * 3) % 5) / 4.0,
+            0.16 + 0.08 * ((i * 2) % 4) / 3.0,
+            0.07 + 0.03 * (i % 3) / 2.0,
+        )
+        rock.rotation_euler = (0.18 * math.sin(i * 0.7), 0.14 * math.cos(i * 0.5), i * 0.63)
+        try:
+            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+        except Exception:
+            pass
+        shade_smooth(rock)
+        rock.data.materials.clear()
+        rock.data.materials.append(mat)
+        extras.append(rock)
+        if i % 20 == 5:
+            half_n = right * WATER_WIDTH_SCALE * 0.94
+            loc_n = center + side * half_n
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(loc_n.x, loc_n.y, WATER_SURFACE_Z - 0.03))
+            rock_n = bpy.context.object
+            rock_n.name = f"TJ_WaterlineStoneN_{i}"
+            rock_n.scale = (0.22, 0.12, 0.06)
+            rock_n.rotation_euler = (0.1, 0.2, i * 0.4)
+            try:
+                bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+            except Exception:
+                pass
+            shade_smooth(rock_n)
+            rock_n.data.materials.clear()
+            rock_n.data.materials.append(mat)
+            extras.append(rock_n)
+    return extras
+
+
 def place_waterline_dressing(trees: list) -> list:
     """Small south-bank plantings that break the grass-to-water knife."""
     extras = []
@@ -1379,7 +1586,7 @@ def place_waterline_dressing(trees: list) -> list:
     centers = evaluated_centerline(guide, samples=80)
     for i, center in enumerate(centers):
         key = (i * 5 + 2) % 9
-        if key not in {1, 3, 6}:
+        if key not in {1, 2, 3, 6, 8}:
             continue
         left, _right = _channel_halves_for_index(centers, i)
         side = _side_from_centers(centers, i)
