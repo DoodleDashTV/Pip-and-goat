@@ -19,7 +19,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from cinematic_shots import SHOTS, camera_name, default_shot_cameras, hero_search_cameras, lookdev_frames, marker_frames  # noqa: E402
-from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue  # noqa: E402
+from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue, hero_south_wet_tongue  # noqa: E402
 from cinematic_standards import (  # noqa: E402
     MASTER_COLLECTIONS,
     assert_final_contract,
@@ -43,6 +43,10 @@ from showcase_original14_30s import (  # noqa: E402
     paint_simple_color,
     remap_missing_images,
     setup_world,
+    material_has_valid_image,
+    is_box_mesh,
+    mesh_face_count,
+    object_dimensions,
 )
 
 # East-flowing valley river. Asymmetric bends; widths vary left/right independently.
@@ -349,7 +353,7 @@ def in_mountain_corridor(x: float, y: float) -> bool:
 
 
 def in_shot03_corridor(x: float, y: float) -> bool:
-    return dist_to_polyline(x, y, ((-34.0, 16.0, 0.0), (-14.0, 36.0, 0.0), (-8.0, 44.0, 0.0))) < 9.5
+    return dist_to_polyline(x, y, ((-38.0, -6.0, 0.0), (-18.0, 8.5, 0.0), (-12.0, 14.0, 0.0))) < 6.4
 
 
 def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, ...] = ()) -> list[Path]:
@@ -678,10 +682,16 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                 value *= 0.10
             if HERO_X_MIN <= x <= HERO_X_MAX:
                 # Scar grass in the hero look: soil/damp must win over meadow.
+                tongue = hero_south_wet_tongue(x, y, along)
                 if dist < local_half * 1.15:
                     value = max(value, 0.52 + 0.18 * blotch)
                 elif dist < fade:
                     value = max(value, 0.28 * (1.0 - (dist - local_half) / max(1.0, fade - local_half)))
+                reach = local_half * 0.55 + 2.40 * tongue
+                if dist < reach:
+                    value = max(value, 0.16 + 0.50 * tongue)
+                if dist > local_half * 0.70 and tongue < 0.22:
+                    value *= 0.18
         else:
             inner = bed * 0.42
             shelf = local_half * 0.72
@@ -702,11 +712,11 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                 # V37: irregular soil tongues cross the visible grass crest.
                 # Do not reinforce one continuous wet strip along the bank.
                 tongue = hero_north_wet_tongue(x, y, along)
-                reach = local_half + 0.55 + 3.10 * tongue
+                reach = local_half + 0.35 + 3.80 * tongue
                 if dist < reach:
-                    value = max(value, 0.18 + 0.54 * tongue)
-                if dist > local_half + 0.45 and tongue < 0.28:
-                    value *= 0.16
+                    value = max(value, 0.16 + 0.62 * tongue)
+                if dist > local_half + 0.35 and tongue < 0.24:
+                    value *= 0.08
         value *= 0.80 + 0.20 * max(0.0, blotch)
         color.data[index].color = (value, value, value, 1.0)
 
@@ -1827,7 +1837,9 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
             except Exception:
                 pass
     foothill_slots = ((10.0, 46.0, 0.16), (52.0, 48.0, 0.15))
-    peak_slots = ((-36.0, 78.0, 0.30), (8.0, 84.0, 0.32), (50.0, 80.0, 0.28))
+    # Center peak sits closer so locked camera C can still read a mountain
+    # silhouette over the cabin without changing the approved creek look.
+    peak_slots = ((-36.0, 78.0, 0.30), (-2.0, 58.0, 0.36), (50.0, 80.0, 0.28))
     placed = []
     foothills = [obj for obj in members if obj and "meadowrange" in obj.name.lower()]
     peaks = [obj for obj in members if obj and "grassymountain" in obj.name.lower()]
@@ -2179,6 +2191,11 @@ def place_hero_soil_scars(centers: list[Vector]) -> list:
         scar = _add_lumpy_rock(f"TJ_HeroSoil_{i}", loc, 2.1 + 0.4 * (i % 2), mat, i * 0.29)
         scar.scale = (1.4, 0.85, 0.22)
         extras.append(scar)
+        nloc = center + side * (left * (0.62 + 0.28 * math.sin(i * 0.53)))
+        nloc.z = BED_SHOULDER_Z + 0.18 + 0.16 * math.cos(i)
+        north = _add_lumpy_rock(f"TJ_HeroSoilN_{i}", nloc, 1.8 + 0.35 * ((i + 1) % 2), mat, i * 0.41 + 0.7)
+        north.scale = (1.15, 0.70, 0.18)
+        extras.append(north)
     return extras
 
 
@@ -2209,7 +2226,108 @@ def place_waterline_dressing(trees: list) -> list:
             wet = center + side * (-left * (0.38 + 0.14 * math.sin(i)))
             if not in_village(wet.x, wet.y):
                 extras.append(duplicate_mesh_in_world(live[(i + 2) % len(live)], (wet.x, wet.y, 0.0), 0.09 + 0.05 * (i % 3)))
+        if HERO_X_MIN <= center.x <= HERO_X_MAX and key in {1, 3, 8}:
+            north = center + side * (left * (0.88 + 0.22 * math.sin(i * 0.77)))
+            if not in_village(north.x, north.y) and not in_river_channel(north.x, north.y, margin=0.25):
+                sap = duplicate_mesh_in_world(live[(i + 1) % len(live)], (north.x, north.y, 0.0), 0.08 + 0.07 * ((i * 2) % 4) / 3.0)
+                sap.rotation_euler.z += 0.37 * (i % 5)
+                extras.append(sap)
     return extras
+
+
+def place_shot03_forest_passage(trees: list) -> list:
+    """Dense west-flank passage with a clear lens corridor and a village opening."""
+    extras = []
+    live = [obj for obj in trees if obj and obj.type == "MESH"]
+    if not live:
+        return extras
+    cam_xy = Vector((-38.0, -6.0, 0.0))
+    look_xy = Vector((-18.0, 8.5, 0.0))
+    along = look_xy - cam_xy
+    span = along.length
+    along.normalize()
+    side = Vector((-along.y, along.x, 0.0))
+    plants = (
+        (0.18, 8.6, 0.42),
+        (0.20, -8.8, 0.38),
+        (0.32, 7.4, 0.62),
+        (0.34, -7.8, 0.56),
+        (0.44, 9.2, 0.88),
+        (0.46, -9.4, 0.80),
+        (0.54, 6.8, 1.05),
+        (0.58, -10.2, 0.94),
+        (0.66, 8.8, 1.18),
+        (0.70, -7.2, 1.10),
+        (0.78, 10.0, 1.28),
+        (0.82, -9.6, 1.16),
+        (0.90, 7.6, 1.34),
+        (0.94, -8.4, 1.22),
+    )
+    for i, (t, offset, scale) in enumerate(plants):
+        loc = cam_xy + along * (t * span) + side * offset
+        if (Vector((loc.x, loc.y, 0.0)) - cam_xy).length < 14.0:
+            continue
+        if in_river_channel(loc.x, loc.y, margin=1.0) or in_village(loc.x, loc.y):
+            continue
+        sap = duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), scale)
+        sap.rotation_euler.z += 0.41 * ((i * 3) % 7)
+        extras.append(sap)
+    extras.extend(scatter_clumps(live, (-28.0, 14.0, 0.0), 4, 3, 5.8, 1.08, 23))
+    extras.extend(scatter_clumps(live, (-22.0, -2.0, 0.0), 3, 2, 5.2, 0.86, 29))
+    return extras
+
+
+def place_shot05_compression_frame(trees: list) -> list:
+    """One purchased tree in the long-lens foreground, not a row."""
+    extras = []
+    live = [obj for obj in trees if obj and obj.type == "MESH"]
+    if not live:
+        return extras
+    sap = duplicate_mesh_in_world(live[0], (11.5, -46.0, 0.0), 1.35)
+    sap.rotation_euler.z += 0.55
+    extras.append(sap)
+    extras.append(duplicate_mesh_in_world(live[min(1, len(live) - 1)], (14.8, -38.5, 0.0), 0.72))
+    return extras
+
+
+def repair_cabin_placeholders() -> list[dict]:
+    """Hide only noncanonical white opening cards. Keep purchased cabin meshes."""
+    reports = []
+    keep = ("building", "cabin", "roof", "door", "fence", "gate", "cart", "tree", "straw", "log", "chimney")
+    suspect = ("interior", "placeholder", "dummy", "cube", "plane")
+    for obj in list(bpy.data.objects):
+        if obj.type != "MESH":
+            continue
+        name = obj.name.lower()
+        parent = str(getattr(obj.parent, "name", "") or "").lower()
+        blob = f"{name} {parent}"
+        if "village" not in blob and "cabin" not in blob and "building" not in blob and "door" not in blob and "frame" not in blob:
+            continue
+        if any(token in name for token in keep) and "interior" not in name:
+            continue
+        has_img = any(material_has_valid_image(slot.material) for slot in obj.material_slots)
+        boxy = is_box_mesh(mesh_face_count(obj), object_dimensions(obj))
+        if any(token in name for token in suspect) or (boxy and not has_img):
+            obj.hide_render = True
+            obj.hide_viewport = True
+            reports.append({"name": obj.name, "parent": parent, "action": "hide", "hasImage": has_img, "boxy": boxy})
+            print(json.dumps({"event": "cabin_placeholder_hidden", "name": obj.name, "parent": parent, "hasImage": has_img}), flush=True)
+    for mat in bpy.data.materials:
+        if not mat or not mat.node_tree:
+            continue
+        blob = mat.name.lower()
+        if not any(word in blob for word in ("cabin", "building", "door", "window", "glass", "emi")):
+            continue
+        for node in mat.node_tree.nodes:
+            if node.type == "EMISSION" and "Strength" in node.inputs:
+                node.inputs["Strength"].default_value = min(0.45, float(node.inputs["Strength"].default_value or 0.0))
+            if node.type == "BSDF_PRINCIPLED" and "Emission Strength" in node.inputs:
+                node.inputs["Emission Strength"].default_value = min(0.35, float(node.inputs["Emission Strength"].default_value or 0.0))
+                if "Emission Color" in node.inputs and not node.inputs["Emission Color"].links:
+                    color = node.inputs["Emission Color"].default_value
+                    if color[0] > 0.85 and color[1] > 0.85 and color[2] > 0.85:
+                        node.inputs["Emission Color"].default_value = (0.55, 0.42, 0.28, 1.0)
+    return reports
 
 
 def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, radius: float, scale: float, seed: int) -> list:
@@ -2237,7 +2355,7 @@ def scatter_clumps(sources: list, origin: tuple, clumps: int, per_clump: int, ra
                 continue
             if in_shot03_corridor(loc[0], loc[1]):
                 continue
-            if math.hypot(loc[0] + 34.0, loc[1] - 16.0) < 12.0:
+            if math.hypot(loc[0] + 38.0, loc[1] + 6.0) < 12.0:
                 continue
             extras.append(duplicate_mesh_in_world(src, loc, scale * (0.85 + 0.08 * ((i + clump) % 5))))
     return extras
@@ -2272,7 +2390,7 @@ def setup_lighting_hierarchy() -> None:
         bounce.data.color = (1.0, 0.86, 0.62)
     if hasattr(bounce, "visible_glossy"):
         bounce.visible_glossy = False
-    bpy.ops.object.light_add(type="AREA", location=(-28.0, 22.0, 9.0))
+    bpy.ops.object.light_add(type="AREA", location=(-28.0, 4.0, 8.0))
     forest = bpy.context.object
     forest.name = "TJ_ForestFill"
     forest.data.energy = 130
@@ -2302,8 +2420,8 @@ def setup_mist_and_compositor() -> None:
     scene = bpy.context.scene
     if hasattr(scene.world, "mist_settings"):
         scene.world.mist_settings.use_mist = True
-        scene.world.mist_settings.start = 58.0
-        scene.world.mist_settings.depth = 170.0
+        scene.world.mist_settings.start = 42.0
+        scene.world.mist_settings.depth = 150.0
         scene.world.mist_settings.falloff = "QUADRATIC"
     view = scene.view_layers[0]
     if hasattr(view, "use_pass_mist"):
@@ -2607,6 +2725,7 @@ def main() -> int:
     remapped = remap_missing_images(all_files)
     forced = ensure_purchased_albedos(all_files)
     lifted = lift_purchased_shading()
+    cabin_repairs = repair_cabin_placeholders()
 
     nature_members = []
     nature_files = expanded.get("forest_nature", [])
@@ -2642,27 +2761,9 @@ def main() -> int:
     east_fg = scatter_clumps(trees, (24.0, 12.0, 0.0), 3, 2, 7.0, 1.08, 5)
     east_mg = scatter_clumps(trees, (28.0, 32.0, 0.0), 3, 2, 8.0, 1.40, 11)
     if trees:
-        cam_xy = Vector((-40.0, -8.0, 0.0))
-        look_xy = Vector((-16.0, 10.0, 0.0))
-        along = look_xy - cam_xy
-        span = along.length
-        along.normalize()
-        side = Vector((-along.y, along.x, 0.0))
         src_count = len(trees)
-        for i, (t, offset, scale) in enumerate((
-            (0.40, 7.4, 0.48),
-            (0.42, -7.6, 0.44),
-            (0.56, 8.0, 0.82),
-            (0.58, -8.2, 0.78),
-            (0.72, 8.4, 1.12),
-            (0.74, -8.6, 1.06),
-            (0.86, 8.8, 1.28),
-            (0.88, -8.8, 1.22),
-        )):
-            loc = cam_xy + along * (t * span) + side * offset
-            if (Vector((loc.x, loc.y, 0.0)) - cam_xy).length < 12.0:
-                continue
-            west_fg.append(duplicate_mesh_in_world(trees[i % src_count], (loc.x, loc.y, 0.0), scale))
+        west_fg.extend(place_shot03_forest_passage(trees))
+        west_fg.extend(place_shot05_compression_frame(trees))
         if not in_river_channel(-16.5, -7.2, margin=1.2):
             west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))
         for item in (
@@ -2768,6 +2869,7 @@ def main() -> int:
         "remapped": remapped,
         "forcedAlbedos": forced,
         "liftedShading": lifted,
+        "cabinPlaceholderRepairs": cabin_repairs,
         "atmosphereExecuted": True,
         "atmosphereMethod": "mist_pass_compositor",
         "contributions": contributions,

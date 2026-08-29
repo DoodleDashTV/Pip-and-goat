@@ -189,8 +189,8 @@ def default_shot_cameras() -> list[dict]:
             # Stay on the west flank, but look along the tree line toward the
             # village opening instead of over empty north meadow.
             "retiredEmptyMeadow": {"location": (-34.0, 16.0, 5.2), "look": (-14.0, 36.0, 7.2), "lens": 48.0},
-            "start": {"location": (-40.0, -8.0, 5.40), "look": (-16.0, 10.0, 4.20), "lens": 48.0},
-            "end": {"location": (-37.5, -5.2, 5.60), "look": (-13.6, 12.8, 4.50), "lens": 52.0},
+            "start": {"location": (-38.0, -6.0, 4.80), "look": (-18.0, 8.5, 3.40), "lens": 48.0},
+            "end": {"location": (-36.0, -3.4, 5.00), "look": (-15.2, 11.2, 3.70), "lens": 52.0},
         },
         {
             "id": "SHOT_04",
@@ -201,8 +201,8 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_05",
             "camera": "TJ_SHOT_05_CAM",
-            "start": {"location": (26.0, -104.0, 18.5), "look": (0.0, 48.0, 14.0), "lens": 70.0},
-            "end": {"location": (22.0, -96.0, 19.5), "look": (0.0, 54.0, 15.5), "lens": 78.0},
+            "start": {"location": (18.0, -82.0, 14.2), "look": (0.0, 6.0, 5.2), "lens": 78.0},
+            "end": {"location": (16.5, -76.0, 14.6), "look": (0.4, 8.0, 5.6), "lens": 82.0},
         },
         {
             "id": "SHOT_06",

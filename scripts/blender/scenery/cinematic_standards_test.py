@@ -30,7 +30,7 @@ from cinematic_standards import (
     require_visual_approval_before_paid_final,
     visible_use_record,
 )
-from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue
+from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue, hero_south_wet_tongue
 
 
 def test_profiles_are_separated():
@@ -110,11 +110,12 @@ def test_six_shot_plan():
     assert max(lenses) >= 70.0
     assert len(set(lenses)) >= 5
     shot05 = next(cam for cam in cameras if cam["id"] == "SHOT_05")
-    assert shot05["start"]["location"][2] >= 14.0
+    assert shot05["start"]["location"][2] >= 12.0
     assert abs(shot05["start"]["location"][0]) >= 16.0
-    assert shot05["start"]["look"][1] >= 40.0
     assert shot05["start"]["location"][1] <= -70.0
-    assert shot05["start"]["look"][2] <= 20.0
+    assert 0.0 <= shot05["start"]["look"][1] <= 24.0
+    assert shot05["start"]["look"][2] <= 12.0
+    assert shot05["start"]["lens"] >= 70.0
     shot03 = next(cam for cam in cameras if cam["id"] == "SHOT_03")
     assert shot03["start"]["location"][0] <= -28.0
     assert shot03["start"]["look"][0] <= -12.0
@@ -162,6 +163,9 @@ def test_v37_north_bank_breakup_is_broad_and_discontinuous():
     tongues = [hero_north_wet_tongue(x, -8.0 + x * 0.1, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
     assert max(tongues) - min(tongues) >= 0.35
     assert all(0.0 <= value <= 1.0 for value in tongues)
+    south = [hero_south_wet_tongue(x, -14.0, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(south) - min(south) >= 0.28
+    assert all(0.0 <= value <= 1.0 for value in south)
 
 
 def test_visible_use_requires_rendered_pixels():
