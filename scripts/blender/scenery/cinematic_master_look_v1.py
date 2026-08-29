@@ -30,12 +30,12 @@ def apply_cinematic_daylight() -> dict:
     changed = {}
     sun = bpy.data.objects.get("TJ_KeySun")
     if sun and sun.type == "LIGHT":
-        sun.data.energy = 3.55
+        sun.data.energy = 4.15
         sun.data.angle = math.radians(5.4)
         sun.rotation_euler = (math.radians(47.0), math.radians(9.0), math.radians(36.0))
         if hasattr(sun.data, "color"):
             sun.data.color = (1.0, 0.92, 0.78)
-        changed["sun"] = {"energy": 3.55, "angleDeg": 5.4, "eulerDeg": [47.0, 9.0, 36.0]}
+        changed["sun"] = {"energy": 4.15, "angleDeg": 5.4, "eulerDeg": [47.0, 9.0, 36.0]}
     sky = bpy.data.objects.get("TJ_SkyFill")
     if sky and sky.type == "LIGHT":
         sky.data.energy = 340.0
@@ -97,7 +97,7 @@ def apply_world_atmosphere() -> dict:
     if "Color" in scatter.inputs:
         scatter.inputs["Color"].default_value = (0.78, 0.84, 0.90, 1.0)
     if "Density" in scatter.inputs:
-        scatter.inputs["Density"].default_value = 0.0075
+        scatter.inputs["Density"].default_value = 0.00045
     if "Anisotropy" in scatter.inputs:
         scatter.inputs["Anisotropy"].default_value = 0.32
     if "Volume" in out.inputs:
@@ -112,8 +112,8 @@ def apply_world_atmosphere() -> dict:
     view = bpy.context.scene.view_layers[0]
     if hasattr(view, "use_pass_mist"):
         view.use_pass_mist = True
-    _log("cinematic_atmosphere_applied", density=0.0075, mistStart=14.0, mistDepth=78.0)
-    return {"mode": "volume_scatter_plus_mist", "density": 0.0075}
+    _log("cinematic_atmosphere_applied", density=0.00045, mistStart=14.0, mistDepth=78.0)
+    return {"mode": "volume_scatter_plus_mist", "density": 0.00045}
 
 
 def apply_foliage_transmission() -> int:
@@ -204,7 +204,7 @@ def apply_compositor_finish() -> None:
         curve.inputs["From Min"].default_value = 0.06
         curve.inputs["From Max"].default_value = 1.0
         curve.inputs["To Min"].default_value = 0.0
-        curve.inputs["To Max"].default_value = 0.58
+        curve.inputs["To Max"].default_value = 0.42
         links.new(render.outputs["Mist"], curve.inputs["Value"])
         links.new(curve.outputs["Value"], haze_fac)
     else:
@@ -251,10 +251,10 @@ def apply_color_management() -> dict:
         return {"mode": "missing"}
     scene.view_settings.view_transform = "AgX"
     scene.view_settings.look = "None"
-    scene.view_settings.exposure = 0.18
+    scene.view_settings.exposure = 0.28
     scene.view_settings.gamma = 1.0
-    _log("cinematic_color_management", viewTransform="AgX", look="None", exposure=0.18)
-    return {"viewTransform": "AgX", "look": "None", "exposure": 0.18}
+    _log("cinematic_color_management", viewTransform="AgX", look="None", exposure=0.28)
+    return {"viewTransform": "AgX", "look": "None", "exposure": 0.28}
 
 
 def apply_cycles_hero_quality() -> dict:
