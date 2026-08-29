@@ -135,7 +135,7 @@ def hero_search_cameras() -> list[dict]:
             "id": "C",
             "name": "across_creek_opposite_bank",
             "location": (1.4, -19.8, 2.72),
-            "look": (-3.6, -10.4, -0.52),
+            "look": (-3.6, -10.4, -0.22),
             "lens": 32.0,
             "why": "V37 hero: creek-first diagonal with a thin horizon so mountains stay readable behind the off-axis cabin.",
         },
@@ -180,8 +180,8 @@ def default_shot_cameras() -> list[dict]:
             # wider lens so the creek leads before the off-axis cabin resolves.
             "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
             "publishedV37": {"location": (0.2, -23.2, 3.05), "look": (-5.8, -5.2, 0.20), "lens": 34.0},
-            "start": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, -0.52), "lens": 32.0},
-            "end": {"location": (2.8, -18.8, 2.82), "look": (-1.8, -9.2, -0.32), "lens": 34.0},
+            "start": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, -0.22), "lens": 32.0},
+            "end": {"location": (2.8, -18.8, 2.82), "look": (-1.8, -9.2, -0.08), "lens": 34.0},
         },
         {
             "id": "SHOT_03",
@@ -189,8 +189,8 @@ def default_shot_cameras() -> list[dict]:
             # Stay on the west flank, but look along the tree line toward the
             # village opening instead of over empty north meadow.
             "retiredEmptyMeadow": {"location": (-34.0, 16.0, 5.2), "look": (-14.0, 36.0, 7.2), "lens": 48.0},
-            "start": {"location": (-38.0, -6.0, 4.60), "look": (-22.0, 6.0, 3.10), "lens": 48.0},
-            "end": {"location": (-36.0, -3.4, 4.80), "look": (-19.5, 8.8, 3.40), "lens": 52.0},
+            "start": {"location": (-38.0, -6.0, 4.60), "look": (-24.0, 4.5, 2.90), "lens": 48.0},
+            "end": {"location": (-36.0, -3.4, 4.80), "look": (-21.5, 7.2, 3.20), "lens": 52.0},
         },
         {
             "id": "SHOT_04",

@@ -353,7 +353,7 @@ def in_mountain_corridor(x: float, y: float) -> bool:
 
 
 def in_shot03_corridor(x: float, y: float) -> bool:
-    return dist_to_polyline(x, y, ((-38.0, -6.0, 0.0), (-22.0, 6.0, 0.0), (-16.0, 12.0, 0.0))) < 5.8
+    return dist_to_polyline(x, y, ((-38.0, -6.0, 0.0), (-24.0, 4.5, 0.0), (-18.0, 10.0, 0.0))) < 5.4
 
 
 def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, ...] = ()) -> list[Path]:
@@ -2246,7 +2246,7 @@ def place_shot03_forest_passage(trees: list) -> list:
     if not live:
         return extras
     cam_xy = Vector((-38.0, -6.0, 0.0))
-    look_xy = Vector((-22.0, 6.0, 0.0))
+    look_xy = Vector((-24.0, 4.5, 0.0))
     along = look_xy - cam_xy
     span = along.length
     along.normalize()
@@ -2279,6 +2279,7 @@ def place_shot03_forest_passage(trees: list) -> list:
     extras.extend(scatter_clumps(live, (-30.0, 16.0, 0.0), 4, 3, 5.8, 1.08, 23))
     extras.extend(scatter_clumps(live, (-26.0, -4.0, 0.0), 3, 3, 5.2, 0.86, 29))
     extras.extend(scatter_clumps(live, (-34.0, 10.0, 0.0), 3, 2, 4.6, 0.74, 31))
+    extras.extend(scatter_clumps(live, (-20.0, 8.0, 0.0), 3, 2, 4.2, 0.96, 37))
     return extras
 
 
@@ -2352,6 +2353,14 @@ def repair_cabin_placeholders() -> list[dict]:
                 "bright": bright,
                 "color": color,
             }), flush=True)
+    for mat in list(bpy.data.materials):
+        if mat is None or not str(mat.name).lower().startswith("window"):
+            continue
+        if material_has_valid_image(mat):
+            continue
+        mat.user_remap(dark)
+        reports.append({"name": mat.name, "action": "remap_window_material"})
+        print(json.dumps({"event": "cabin_window_material_remapped", "name": mat.name}), flush=True)
     return reports
 
 
@@ -2789,8 +2798,7 @@ def main() -> int:
         src_count = len(trees)
         west_fg.extend(place_shot03_forest_passage(trees))
         west_fg.extend(place_shot05_compression_frame(trees))
-        if not in_river_channel(-16.5, -7.2, margin=1.2):
-            west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))
+        # Skip the near-left hero tree; it ate the locked SHOT_02 sky.
         for item in (
             (-17.0, -21.5, 0.82),
             (18.5, -20.4, 0.74),
