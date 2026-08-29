@@ -92,18 +92,10 @@ def apply_world_atmosphere() -> dict:
     for node in list(nodes):
         if str(node.name).startswith("TJ_ATMO_"):
             nodes.remove(node)
-    scatter = nodes.new("ShaderNodeVolumeScatter")
-    scatter.name = "TJ_ATMO_Scatter"
-    if "Color" in scatter.inputs:
-        scatter.inputs["Color"].default_value = (0.78, 0.84, 0.90, 1.0)
-    if "Density" in scatter.inputs:
-        scatter.inputs["Density"].default_value = 0.00012
-    if "Anisotropy" in scatter.inputs:
-        scatter.inputs["Anisotropy"].default_value = 0.32
+    # Volume scatter in this valley eats the creek. Aerial depth is mist-only.
     if "Volume" in out.inputs:
         for link in list(out.inputs["Volume"].links):
             links.remove(link)
-        links.new(scatter.outputs["Volume"], out.inputs["Volume"])
     if hasattr(world, "mist_settings"):
         world.mist_settings.use_mist = True
         world.mist_settings.start = 14.0
@@ -112,8 +104,8 @@ def apply_world_atmosphere() -> dict:
     view = bpy.context.scene.view_layers[0]
     if hasattr(view, "use_pass_mist"):
         view.use_pass_mist = True
-    _log("cinematic_atmosphere_applied", density=0.00045, mistStart=14.0, mistDepth=78.0)
-    return {"mode": "volume_scatter_plus_mist", "density": 0.00045}
+    _log("cinematic_atmosphere_applied", density=0.0, mistStart=14.0, mistDepth=78.0)
+    return {"mode": "mist_only", "density": 0.0}
 
 
 def apply_foliage_transmission() -> int:
@@ -183,7 +175,7 @@ def apply_material_cohesion() -> dict:
 
 
 def apply_compositor_finish() -> None:
-    """Mist aerial perspective only. No grade node that can swallow the beauty."""
+    """V44-safe mist mix. Stronger far haze, beauty always in Color1."""
     scene = bpy.context.scene
     scene.use_nodes = True
     nodes = scene.node_tree.nodes
@@ -191,20 +183,23 @@ def apply_compositor_finish() -> None:
     nodes.clear()
     render = nodes.new("CompositorNodeRLayers")
     composite = nodes.new("CompositorNodeComposite")
-    haze = nodes.new("CompositorNodeMixRGB")
-    haze.blend_type = "MIX"
-    haze.inputs[0].default_value = 0.12
-    haze.inputs[2].default_value = (0.72, 0.78, 0.86, 1.0)
+    mix = nodes.new("CompositorNodeMixRGB")
+    mix.blend_type = "MIX"
+    fac = mix.inputs.get("Fac") or mix.inputs[0]
+    color1 = mix.inputs.get("Color1") or mix.inputs.get("A") or mix.inputs[1]
+    color2 = mix.inputs.get("Color2") or mix.inputs.get("B") or mix.inputs[2]
+    color2.default_value = (0.70, 0.77, 0.86, 1.0)
     if "Mist" in render.outputs:
-        curve = nodes.new("CompositorNodeMapRange")
-        curve.inputs[1].default_value = 0.10
-        curve.inputs[2].default_value = 1.0
-        curve.inputs[3].default_value = 0.0
-        curve.inputs[4].default_value = 0.34
-        links.new(render.outputs["Mist"], curve.inputs[0])
-        links.new(curve.outputs[0], haze.inputs[0])
-    links.new(render.outputs["Image"], haze.inputs[1])
-    links.new(haze.outputs[0], composite.inputs["Image"])
+        scale = nodes.new("CompositorNodeMath")
+        scale.operation = "MULTIPLY"
+        scale.inputs[1].default_value = 0.28
+        links.new(render.outputs["Mist"], scale.inputs[0])
+        links.new(scale.outputs["Value"], fac)
+    else:
+        fac.default_value = 0.08
+    links.new(render.outputs["Image"], color1)
+    out_sock = mix.outputs.get("Color") or mix.outputs.get("Result") or mix.outputs[0]
+    links.new(out_sock, composite.inputs["Image"])
     _log("cinematic_compositor_applied", haze=True, glare=False, vignette=False, grain=False)
 
 
@@ -275,14 +270,12 @@ def install_camera_rig_empties() -> list[str]:
 def apply_cinematic_master_pre_profile() -> dict:
     daylight = apply_cinematic_daylight()
     atmo = apply_world_atmosphere()
-    foliage = apply_foliage_transmission()
-    cohesion = apply_material_cohesion()
     apply_compositor_finish()
     return {
         "daylight": daylight,
         "atmosphere": atmo,
-        "foliageMaterials": foliage,
-        "cohesion": cohesion,
+        "foliageMaterials": 0,
+        "cohesion": {},
     }
 
 
