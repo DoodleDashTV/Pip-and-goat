@@ -127,8 +127,8 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_02",
             "camera": "TJ_SHOT_02_CAM",
-            "start": {"location": (-16.2, -18.8, 4.15), "look": (8.8, -12.6, -1.08), "lens": 38.0},
-            "end": {"location": (-10.4, -18.2, 4.05), "look": (16.4, -13.4, -0.95), "lens": 40.0},
+            "start": {"location": (-9.6, -20.2, 4.55), "look": (7.2, -10.8, -1.28), "lens": 38.0},
+            "end": {"location": (-3.6, -19.4, 4.40), "look": (14.2, -10.2, -1.12), "lens": 42.0},
         },
         {
             "id": "SHOT_03",

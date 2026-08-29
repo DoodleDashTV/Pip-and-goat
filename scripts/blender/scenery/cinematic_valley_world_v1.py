@@ -169,6 +169,13 @@ def channel_profile(x: float, y: float, points=RIVER_SPLINE) -> tuple[float, flo
     pool = 0.55 + 0.45 * math.sin(along * 0.09)
     pinch = 0.62 + 0.38 * math.sin(along * 0.21 + 0.7)
     left = 5.4 + 2.2 * pool + 1.05 * math.sin(along * 0.29)
+    # Organic south bays — incommensurate wavelengths, not a saw-tooth crest.
+    bay = 0.5 + 0.5 * math.sin(along * 0.37 + 0.6)
+    pinch_s = 0.5 + 0.5 * math.sin(along * 0.83 + 2.1)
+    if bay * pinch_s > 0.64:
+        left -= 0.90 * ((bay * pinch_s - 0.64) / 0.36)
+    if bay < 0.20:
+        left += 0.60
     right = 2.7 + 1.15 * pinch + 0.45 * math.cos(along * 0.27)
     left = max(4.0, min(8.2, left))
     right = max(2.1, min(4.4, right))
@@ -251,8 +258,8 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
     dim.name = "TJ_HDRI_Dim"
     if "Color1" in dim.inputs:
         links.new(gamma.outputs["Color"], dim.inputs["Color1"])
-        dim.inputs["Color2"].default_value = (0.22, 0.32, 0.40, 1.0)
-        dim.inputs["Fac"].default_value = 0.40
+        dim.inputs["Color2"].default_value = (0.18, 0.26, 0.30, 1.0)
+        dim.inputs["Fac"].default_value = 0.26
         refl_color = dim.outputs["Color"]
     else:
         refl_color = gamma.outputs["Color"]
@@ -262,12 +269,12 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         mul.blend_type = "MULTIPLY"
     if "Color1" in mul.inputs:
         links.new(refl_color, mul.inputs["Color1"])
-        mul.inputs["Color2"].default_value = (0.50, 0.58, 0.56, 1.0)
+        mul.inputs["Color2"].default_value = (0.44, 0.50, 0.46, 1.0)
         mul.inputs["Fac"].default_value = 1.0
         refl_color = mul.outputs["Color"]
     bg_refl = nodes.new("ShaderNodeBackground")
     bg_refl.name = "TJ_HDRI_ReflectionBg"
-    bg_refl.inputs["Strength"].default_value = 0.50
+    bg_refl.inputs["Strength"].default_value = 0.52
     links.new(refl_color, bg_refl.inputs["Color"])
     mix = nodes.new("ShaderNodeMixShader")
     mix.name = "TJ_HDRI_RayMix"
@@ -280,7 +287,7 @@ def apply_hdri_reflection_control(enabled: bool) -> dict:
         "mode": "controlled",
         "lightPath": used,
         "gamma": 1.85,
-        "reflectionStrength": 0.50,
+        "reflectionStrength": 0.52,
         "cameraRotation": list(HDRI_CAMERA_ROTATION),
         "reflectionRotationZ": HDRI_REFLECTION_ROTATION_Z,
     }), flush=True)
@@ -389,17 +396,30 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
             u = t / 0.30
             height = lower + (mid - lower) * (u ** 1.25)
             height += 0.07 * math.sin(x * 2.2 + along * 0.9)
+            # Small shelves so the lower bank is not one plane.
+            if (0.5 + 0.5 * math.sin(x * 0.91 + along * 0.44)) > 0.78:
+                height = lower + 0.12 * u
         elif t < 0.68:
             u = (t - 0.30) / 0.38
             height = mid + (upper - mid) * (u ** 1.35)
             height += 0.11 * math.sin(x * 1.6 + y * 1.1)
             if (0.5 + 0.5 * math.sin(x * 1.15 + along * 0.37)) > 0.70:
-                height -= 0.18 * (1.0 - abs(u - 0.45))
+                height -= 0.22 * (1.0 - abs(u - 0.45))
         else:
             u = (t - 0.68) / 0.32
             lip = 0.09 * math.sin(x * 2.05 + along * 0.44)
             height = (upper + lip) + (meadow_z - upper - lip) * (u ** 1.12)
             height += 0.08 * math.sin(x * 3.4 + y * 1.7)
+        # Break the inner isoline: irregular gullies and lobes, not saw teeth.
+        gully = (0.5 + 0.5 * math.sin(x * 0.67 + along * 0.29))
+        gully *= (0.5 + 0.5 * math.sin(x * 1.43 + 1.8))
+        lobe = (0.5 + 0.5 * math.sin(x * 0.39 + along * 0.51 + 0.7))
+        lobe *= (0.5 + 0.5 * math.cos(x * 1.05 + y * 0.4))
+        if dist < bed_half + 3.2:
+            if gully > 0.76:
+                height -= 0.32 * ((gully - 0.76) / 0.24)
+            if lobe > 0.80:
+                height += 0.20 * ((lobe - 0.80) / 0.20)
         return height
     if t < 0.72:
         u = t / 0.72
@@ -589,22 +609,49 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
-        inner = bed * 0.42
-        shelf = local_half * 0.72
         blotch = 0.5 + 0.5 * math.sin(x * 2.15 + y * 1.64) * math.sin(along * 0.83 + x * 0.41)
-        if dist < inner:
-            value = 0.62 + 0.16 * math.sin(along * 0.41 + x * 0.7)
-        elif dist < shelf:
-            t = (dist - inner) / max(0.25, shelf - inner)
-            value = 0.70 - 0.40 * t
-        elif dist < fade:
-            t = (dist - shelf) / max(0.55, fade - shelf)
-            jag_t = t + 0.22 * math.sin(along * 0.33 + x * 0.8)
-            value = max(0.0, 0.26 * ((1.0 - min(1.0, jag_t)) ** 1.75))
-            if t > 0.32 and blotch < 0.45:
-                value *= 0.22
+        if signed < 0.0:
+            # Wide irregular soil on the camera bank so grass/bed is not one isoline.
+            inner = local_half * 0.28
+            lower = local_half * 0.58 + 0.70 * math.sin(x * 0.93 + along * 0.41)
+            mid = local_half * 1.05 + 0.95 * math.sin(x * 0.61 + y * 1.1)
+            if dist < inner:
+                value = 0.80 + 0.10 * math.sin(along * 0.5)
+            elif dist < lower:
+                t = (dist - inner) / max(0.22, lower - inner)
+                value = 0.74 - 0.24 * t
+                if blotch < 0.30:
+                    value *= 0.38
+            elif dist < mid:
+                t = (dist - lower) / max(0.28, mid - lower)
+                value = 0.50 - 0.30 * t
+                if blotch > 0.74:
+                    value += 0.20
+                if blotch < 0.26:
+                    value *= 0.12
+            elif dist < fade:
+                t = (dist - mid) / max(0.55, fade - mid)
+                value = max(0.0, 0.24 * ((1.0 - min(1.0, t)) ** 1.65))
+                if blotch < 0.42:
+                    value *= 0.10
+            else:
+                value = 0.0
         else:
-            value = 0.0
+            inner = bed * 0.42
+            shelf = local_half * 0.72
+            if dist < inner:
+                value = 0.62 + 0.16 * math.sin(along * 0.41 + x * 0.7)
+            elif dist < shelf:
+                t = (dist - inner) / max(0.25, shelf - inner)
+                value = 0.70 - 0.40 * t
+            elif dist < fade:
+                t = (dist - shelf) / max(0.55, fade - shelf)
+                jag_t = t + 0.22 * math.sin(along * 0.33 + x * 0.8)
+                value = max(0.0, 0.26 * ((1.0 - min(1.0, jag_t)) ** 1.75))
+                if t > 0.32 and blotch < 0.45:
+                    value *= 0.22
+            else:
+                value = 0.0
         value *= 0.80 + 0.20 * max(0.0, blotch)
         color.data[index].color = (value, value, value, 1.0)
 
@@ -879,12 +926,12 @@ def _water_variant_cfg(variant: str, tint) -> dict:
         **liquid,
         "label": "D",
         "hdri_control": True,
-        "trans": 0.80,
+        "trans": 0.84,
         "rough_lo": 0.14,
         "rough_hi": 0.28,
         "bump_lo": 0.16,
         "bump_hi": 0.07,
-        "volume_density": 0.18,
+        "volume_density": 0.14,
     }
 
 
@@ -1499,6 +1546,13 @@ def spline_channel_mesh(
                     edge_noise += 0.34 * math.sin(i * 0.53 + (1.0 if offset >= 0.0 else -1.0))
                     edge_noise += 0.20 * math.sin(i * 0.91 + col * 2.1)
                     edge_noise += 0.12 * math.sin(i * 1.37 + along_depth * 4.0)
+                elif offset < 0.0:
+                    # Dark-bed south lip: irregular bays so the grass/bed cut is not one ribbon.
+                    edge_noise += 0.48 * math.sin(i * 0.43 + col) + 0.28 * math.sin(i * 0.21)
+                    if (i % 17) in {4, 5, 6}:
+                        half *= 0.64
+                    if (i % 13) == 2:
+                        half *= 0.78
             lateral = half * abs(offset) + edge_noise
             point = center + side * (lateral * (1.0 if offset >= 0.0 else -1.0))
             edge = abs(offset)
@@ -1648,11 +1702,9 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     assigned = assign_purchased_water(river)
     extras = [bed]
     extras.extend(place_waterline_interruptions(centers))
-    extras.extend(place_crest_grass_tufts(centers))
-    # Hanging-grass cards read as blocky slabs from the new SHOT_02. The
-    # 12m three-stage south bank is the silhouette fix.
-    # Rectangular bank patches read as planks/bridges. Terrain wet-mask,
-    # dark bed, crest trees, and a few half-sunk stones carry the breakup.
+    # Crest-grass cubes read as mint slabs from SHOT_02. Waterline stones
+    # and the irregular wet-mask now break the isoline instead.
+    # Hanging-grass cards and rectangular bank patches stay off.
     print(json.dumps({
         "event": "geometry_first_channel_built",
         "bed": bed.name,
@@ -1907,67 +1959,80 @@ def place_crest_grass_tufts(centers: list[Vector]) -> list:
     return extras
 
 
+def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Material, yaw: float) -> bpy.types.Object:
+    """Irregular dark rock that can pierce the water plane. Not a cube, not a sphere."""
+    sx, sy, sz = 0.72 * scale, 0.48 * scale, 0.38 * scale
+    verts = [
+        (-0.70 * sx, -0.42 * sy, -0.16 * sz),
+        (0.62 * sx, -0.50 * sy, -0.12 * sz),
+        (0.78 * sx, 0.22 * sy, -0.08 * sz),
+        (0.12 * sx, 0.60 * sy, -0.11 * sz),
+        (-0.58 * sx, 0.38 * sy, -0.15 * sz),
+        (-0.18 * sx, -0.08 * sy, 0.46 * sz),
+        (0.28 * sx, 0.16 * sy, 0.38 * sz),
+        (0.04 * sx, 0.02 * sy, -0.28 * sz),
+    ]
+    faces = [
+        (0, 1, 6, 5), (1, 2, 6), (2, 3, 6), (3, 4, 5, 6), (4, 0, 5),
+        (0, 7, 1), (1, 7, 2), (2, 7, 3), (3, 7, 4), (4, 7, 0),
+    ]
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = (loc.x, loc.y, loc.z)
+    obj.rotation_euler = (0.16 * math.sin(yaw), 0.12 * math.cos(yaw * 0.7), yaw)
+    shade_smooth(obj)
+    obj.data.materials.append(mat)
+    return obj
+
+
 def place_waterline_interruptions(centers: list[Vector]) -> list:
-    """A few half-sunk stones that break the waterline. Not a border, not spheres."""
+    """Hero-scale stones that visibly enter the water in the SHOT_02 frustum."""
     extras = []
     mat = cinematic_riverbed_material()
-    step = 10
-    for i in range(5, max(6, len(centers) - 5), step):
-        if (i // step) % 3 == 0:
-            continue
-        center = centers[i]
+    hero_xs = (-9.4, -5.8, -2.0, 2.2, 6.6, 10.8)
+    cut_xs = (-8.0, -3.4, 1.6, 7.2, 11.4)
+    island_xs = (-1.4, 5.8)
+    used_hero = set()
+    used_cut = set()
+    used_island = set()
+    for i, center in enumerate(centers):
         side = _side_from_centers(centers, i)
-        left, right = _channel_halves_for_index(centers, i)
-        half = left * WATER_WIDTH_SCALE * (0.90 + 0.12 * math.sin(i * 0.61))
-        loc = center + side * (-half)
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(loc.x, loc.y, WATER_SURFACE_Z + 0.02))
-        rock = bpy.context.object
-        rock.name = f"TJ_WaterlineStone_{i}"
-        rock.scale = (
-            0.62 + 0.28 * ((i * 3) % 5) / 4.0,
-            0.34 + 0.16 * ((i * 2) % 4) / 3.0,
-            0.22 + 0.08 * (i % 3) / 2.0,
-        )
-        rock.rotation_euler = (0.18 * math.sin(i * 0.7), 0.14 * math.cos(i * 0.5), i * 0.63)
-        try:
-            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
-        except Exception:
-            pass
-        shade_smooth(rock)
-        rock.data.materials.clear()
-        rock.data.materials.append(mat)
-        extras.append(rock)
-        if i % 20 == 5:
-            half_n = right * WATER_WIDTH_SCALE * 0.94
-            loc_n = center + side * half_n
-            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(loc_n.x, loc_n.y, WATER_SURFACE_Z - 0.03))
-            rock_n = bpy.context.object
-            rock_n.name = f"TJ_WaterlineStoneN_{i}"
-            rock_n.scale = (0.22, 0.12, 0.06)
-            rock_n.rotation_euler = (0.1, 0.2, i * 0.4)
-            try:
-                bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
-            except Exception:
-                pass
-            shade_smooth(rock_n)
-            rock_n.data.materials.clear()
-            rock_n.data.materials.append(mat)
-            extras.append(rock_n)
-        if (i // step) % 4 == 1:
-            island = center + side * (-left * WATER_WIDTH_SCALE * 0.35)
-            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(island.x, island.y, WATER_SURFACE_Z + 0.01))
-            bed = bpy.context.object
-            bed.name = f"TJ_WetIsland_{i}"
-            bed.scale = (0.70 + 0.20 * math.sin(i), 0.36, 0.10)
-            bed.rotation_euler = (0.05, 0.08, i * 0.51)
-            try:
-                bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
-            except Exception:
-                pass
-            shade_smooth(bed)
-            bed.data.materials.clear()
-            bed.data.materials.append(mat)
-            extras.append(bed)
+        left, _right = _channel_halves_for_index(centers, i)
+        for hx in hero_xs:
+            if hx in used_hero or abs(center.x - hx) > 1.05:
+                continue
+            used_hero.add(hx)
+            inward = 0.28 + 0.34 * ((len(used_hero) * 3) % 5) / 4.0
+            loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
+            loc.z = WATER_SURFACE_Z + 0.05
+            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 2.05 + 0.45 * (len(used_hero) % 3), mat, i * 0.71))
+        for cx in cut_xs:
+            if cx in used_cut or abs(center.x - cx) > 1.05:
+                continue
+            used_cut.add(cx)
+            loc = center + side * (-left * BED_WIDTH_SCALE * (0.92 + 0.08 * math.sin(i)))
+            loc.z = BED_SHOULDER_Z + 0.16
+            extras.append(_add_lumpy_rock(f"TJ_IsolineRock_{i}", loc, 1.55 + 0.35 * (len(used_cut) % 2), mat, i * 0.53 + 0.8))
+        for ix in island_xs:
+            if ix in used_island or abs(center.x - ix) > 1.05:
+                continue
+            used_island.add(ix)
+            loc = center + side * (-left * WATER_WIDTH_SCALE * 0.18)
+            loc.z = WATER_SURFACE_Z - 0.02
+            island = _add_lumpy_rock(f"TJ_WetIsland_{i}", loc, 1.35, mat, i * 0.4)
+            island.scale = (1.15, 0.72, 0.28)
+            extras.append(island)
+    # Near-camera boulder so SHOT_02 has a foreground waterline cue.
+    extras.append(_add_lumpy_rock(
+        "TJ_FgBankRock",
+        Vector((-11.6, -17.6, WATER_SURFACE_Z + 0.18)),
+        2.6,
+        mat,
+        1.15,
+    ))
     return extras
 
 
@@ -1993,6 +2058,11 @@ def place_waterline_dressing(trees: list) -> list:
         if in_village(loc.x, loc.y) or dist < left * 0.40:
             continue
         extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.14 + 0.10 * ((i * 3) % 5) / 4.0))
+        # A few grasses that actually touch the waterline in the SHOT_02 look.
+        if -11.0 <= loc.x <= 12.0 and key in {2, 6}:
+            wet = center + side * (-left * (0.48 + 0.10 * math.sin(i)))
+            if not in_village(wet.x, wet.y):
+                extras.append(duplicate_mesh_in_world(live[(i + 2) % len(live)], (wet.x, wet.y, 0.0), 0.10 + 0.04 * (i % 3)))
     return extras
 
 
@@ -2425,20 +2495,14 @@ def main() -> int:
             west_fg.append(duplicate_mesh_in_world(trees[0], (-16.5, -7.2, 0.0), 1.05))
         for item in (
             (-17.0, -21.5, 0.82),
-            (12.5, -19.0, 0.74),
-            (-8.5, -22.0, 0.68),
+            (18.5, -20.4, 0.74),
             (22.0, -21.0, 0.90),
-            (-14.0, -22.4, 0.32),
-            (-3.5, -23.0, 0.26),
-            (6.5, -21.6, 0.30),
+            (-14.8, -23.2, 0.28),
+            (-3.8, -24.6, 0.22),
             (16.5, -23.2, 0.34),
             (-18.4, -19.6, 0.36),
-            (-4.8, -20.2, 0.28),
-            (3.8, -20.8, 0.32),
-            (11.2, -19.4, 0.26),
             (-13.2, -27.4, 0.88),
-            (-5.4, -28.0, 0.42),
-            (1.8, -26.8, 0.36),
+            (-6.2, -27.2, 0.34),
         ):
             if in_river_channel(item[0], item[1], margin=0.8):
                 continue
@@ -2550,6 +2614,8 @@ def main() -> int:
         "hdriReflectionRotationZ": HDRI_REFLECTION_ROTATION_Z,
         "southBankRun": SOUTH_BANK_RUN,
         "northBankRun": NORTH_BANK_RUN,
+        "waterArchitecture": "v34_candidate_d",
+        "cameraDistanceShaderGate": False,
         "forestLayout": "flank_clumps_mountain_corridor",
         "mountainLayout": "louis_lp_meadow_range_and_grassy_peaks",
     }
