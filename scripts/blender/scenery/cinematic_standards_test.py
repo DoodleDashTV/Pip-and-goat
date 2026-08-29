@@ -31,6 +31,7 @@ from cinematic_standards import (
     visible_use_record,
 )
 from cinematic_creek_profile import (
+    hero_grass_lip,
     hero_north_notch_depth,
     hero_north_wet_tongue,
     hero_south_wet_tongue,
@@ -177,6 +178,13 @@ def test_v37_north_bank_breakup_is_broad_and_discontinuous():
     assert max(bites) - min(bites) >= 0.70
     assert hero_waterline_bite(-14.0, 0.0) == 0.0
     assert hero_waterline_bite(10.0, 0.0) == 0.0
+    lips = [hero_grass_lip(x, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(lips) >= 0.30
+    assert min(lips) <= -0.15
+    assert max(lips) - min(lips) >= 0.55
+    assert hero_grass_lip(-14.0, 0.0) == 0.0
+    # Grass and water must not share one isoline.
+    assert abs(hero_grass_lip(-7.6, 0.0) - hero_waterline_bite(-7.6, 0.0)) >= 0.20
 
 
 def test_visible_use_requires_rendered_pixels():

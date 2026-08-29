@@ -21,6 +21,7 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from cinematic_shots import SHOTS, camera_name, default_shot_cameras, hero_search_cameras, lookdev_frames, marker_frames  # noqa: E402
 from cinematic_creek_profile import (  # noqa: E402
+    hero_grass_lip,
     hero_north_notch_depth,
     hero_north_wet_tongue,
     hero_south_wet_tongue,
@@ -380,8 +381,8 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     south = signed < 0.0
     crest_wobble = 0.18 * math.sin(along * 0.21 + x * 0.19) + 0.08 * math.sin(x * 0.73)
     bank_run = (SOUTH_BANK_RUN if south else NORTH_BANK_RUN) + 0.70 * math.sin(along * 0.33 + (0.0 if south else 1.4))
-    bite = hero_waterline_bite(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
-    water_half = local * 0.34 + max(0.0, bite) * 0.32
+    bite = hero_grass_lip(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
+    water_half = local * 0.34 + max(0.0, bite) * 0.22
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
@@ -435,21 +436,21 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
         lobe *= (0.5 + 0.5 * math.cos(x * 1.05 + y * 0.4))
         if dist < bed_half + 3.2:
             if gully > 0.76:
-                height -= 0.32 * ((gully - 0.76) / 0.24)
+                height -= 0.14 * ((gully - 0.76) / 0.24)
             if lobe > 0.80:
-                height += 0.20 * ((lobe - 0.80) / 0.20)
+                height += 0.12 * ((lobe - 0.80) / 0.20)
         if HERO_X_MIN <= x <= HERO_X_MAX:
-            # Overlapping convex/concave forms so SHOT_02 cannot trace one lip.
+            # Shallow pockets only. Deep cuts render as black caves at 540 px.
             pocket = (0.5 + 0.5 * math.sin(x * 0.51 + along * 0.22))
             pocket *= (0.5 + 0.5 * math.sin(x * 1.27 + y * 0.61 + 0.9))
             slump = (0.5 + 0.5 * math.cos(x * 0.33 + along * 0.47))
             slump *= (0.5 + 0.5 * math.sin(x * 0.88 + 1.3))
             if pocket > 0.70:
-                height -= 0.38 * ((pocket - 0.70) / 0.30)
+                height -= 0.16 * ((pocket - 0.70) / 0.30)
             if slump > 0.78:
-                height += 0.26 * ((slump - 0.78) / 0.22)
+                height += 0.14 * ((slump - 0.78) / 0.22)
             if 0.42 < t < 0.78 and (0.5 + 0.5 * math.sin(x * 2.05 + along)) > 0.82:
-                height -= 0.16
+                height -= 0.07
         return height
     if t < 0.72:
         u = t / 0.72
@@ -478,14 +479,14 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
 
 def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
     """Advance/retreat only the z=-1.15 contour. Deep trough center stays put."""
-    bite = hero_waterline_bite(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
-    if abs(height - WATER_SURFACE_Z) >= 0.50 + 0.22 * abs(bite):
+    bite = hero_grass_lip(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
+    if abs(height - WATER_SURFACE_Z) >= 0.50 + 0.18 * abs(bite):
         return height
     height += 0.18 * math.sin(x * 2.05 + y * 1.55)
     height += 0.12 * math.sin(along * 0.73 + x * 1.1)
     height += 0.07 * math.sin(x * 3.4 + along * 1.9)
-    # +bite lowers the bank into the water (a bay). -bite lifts a soil tongue.
-    height -= 0.14 * bite
+    # Small contour move only. Deep bites become black overhangs at 540 px.
+    height -= 0.07 * bite
     return height
 
 
@@ -524,13 +525,17 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         if river_dist > bank_outer + 1.2:
             eco = 0.5 + 0.5 * math.sin(x * 0.13 + 0.4) * math.sin(y * 0.10 + 0.8)
             dry = 0.5 + 0.5 * math.sin(x * 0.08 + 1.7) * math.cos(y * 0.12)
-            amt = 0.45 if in_village(x, y) else 1.0
+            mid = 0.5 + 0.5 * math.sin(x * 0.21 + 0.9) * math.cos(y * 0.17 + 1.4)
+            amt = 0.55 if in_village(x, y) else 1.0
             if eco > 0.62:
-                height += amt * 0.24 * ((eco - 0.62) / 0.38)
+                height += amt * 0.32 * ((eco - 0.62) / 0.38)
             if eco < 0.30:
-                height -= amt * 0.16 * ((0.30 - eco) / 0.30)
+                height -= amt * 0.20 * ((0.30 - eco) / 0.30)
             if dry > 0.72 and -8.0 <= y <= 42.0:
-                height -= amt * 0.08
+                height -= amt * 0.11
+            # SHOT_02 midground (creek to cabin) needs glancing-angle relief.
+            if -10.0 <= y <= 12.0 and -10.0 <= x <= 8.0:
+                height += amt * 0.14 * (mid - 0.5)
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
                 (VILLAGE_X_HALF - abs(x)) / 4.0,
@@ -541,6 +546,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             height *= pad
         vert.co.z = max(BED_CENTER_Z - 0.28, min(2.8, height))
     paint_wet_bank_mask(ground)
+    paint_meadow_ecology_mask(ground)
     soften_channel_crest(ground)
     ground.data.update()
     shade_smooth(ground)
@@ -551,7 +557,7 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
 
 
 def place_meadow_ecology() -> list:
-    """Low needle beds and earth patches that read at 540 px on SHOT_01."""
+    """Low needle beds and earth patches that read at 540 px on SHOT_01/02."""
     extras = []
     dirt = dirt_bank_material()
     needle = dirt_bank_material()
@@ -560,26 +566,74 @@ def place_meadow_ecology() -> list:
         if body and "Base Color" in body.inputs:
             body.inputs["Base Color"].default_value = (0.038, 0.048, 0.022, 1.0)
     patches = (
-        (-6.5, 8.5, 4.2, 0.10, True),
-        (5.8, 14.2, 3.6, 0.09, False),
-        (-2.2, 22.0, 5.0, 0.11, True),
-        (8.4, 6.4, 3.2, 0.08, False),
-        (-11.0, 18.6, 3.8, 0.09, True),
-        (3.2, 28.5, 4.4, 0.10, False),
-        (-8.8, 32.0, 3.5, 0.08, True),
-        (11.2, 20.4, 3.0, 0.08, False),
-        (1.6, 7.2, 3.4, 0.09, True),
-        (-4.8, 5.4, 2.8, 0.08, False),
-        (4.2, 9.8, 3.1, 0.08, True),
+        # Far SHOT_01 floor: several-metre elongated beds, not dots.
+        (-6.5, 8.5, 4.8, 0.08, True),
+        (5.8, 14.2, 4.2, 0.07, False),
+        (-2.2, 22.0, 5.6, 0.08, True),
+        (8.4, 6.4, 3.6, 0.07, False),
+        (-11.0, 18.6, 4.4, 0.07, True),
+        (3.2, 28.5, 5.2, 0.08, False),
+        (-8.8, 32.0, 4.0, 0.07, True),
+        (11.2, 20.4, 3.6, 0.07, False),
+        (1.6, 7.2, 3.8, 0.07, True),
+        (-4.8, 5.4, 3.2, 0.07, False),
+        (4.2, 9.8, 3.5, 0.07, True),
+        (-12.0, 24.0, 6.2, 0.07, True),
+        (9.2, 31.0, 6.6, 0.08, False),
+        (-3.4, 38.0, 5.8, 0.07, True),
+        # SHOT_02 midground (creek to cabin). 4–8 m patches survive the low camera.
+        (-3.8, -4.2, 4.6, 0.06, False),
+        (2.4, -2.6, 3.8, 0.06, True),
+        (-6.2, 1.6, 4.2, 0.06, False),
+        (3.6, 4.0, 3.6, 0.06, True),
+        (0.6, -6.2, 3.4, 0.06, False),
+        (-1.8, 2.8, 3.2, 0.06, True),
     )
     for i, (x, y, size, thick, is_needle) in enumerate(patches):
         if in_river_channel(x, y, margin=1.2):
             continue
-        loc = Vector((x, y, 0.06))
+        loc = Vector((x, y, 0.05))
         bed = _add_lumpy_rock(f"TJ_MeadowEco_{i}", loc, size, needle if is_needle else dirt, i * 0.41)
-        bed.scale = (2.05, 0.78, thick)
+        bed.scale = (2.35, 0.82, thick)
         extras.append(bed)
     return extras
+
+
+def paint_meadow_ecology_mask(ground: bpy.types.Object) -> None:
+    """Winner-take-all metre-scale regions. R=weight, G=kind (dry/earth/needle)."""
+    mesh = ground.data
+    try:
+        color = mesh.color_attributes.new(name="TJ_EcoMask", type="FLOAT_COLOR", domain="POINT")
+    except Exception:
+        color = mesh.color_attributes.get("TJ_EcoMask")
+    if color is None:
+        return
+    # (cx, cy, rx, ry, kind) kind 0.20=dry, 0.55=earth, 0.90=needle
+    regions = (
+        (5.4, 16.5, 12.0, 7.5, 0.20),
+        (-9.2, 26.0, 11.0, 8.5, 0.55),
+        (2.8, 34.5, 15.0, 9.0, 0.20),
+        (-14.0, 12.0, 8.0, 6.0, 0.90),
+        (10.5, 8.5, 9.0, 6.5, 0.55),
+        (-3.6, -3.8, 5.8, 3.4, 0.20),
+        (2.6, -1.8, 4.8, 3.0, 0.55),
+        (-6.4, 2.2, 4.4, 3.2, 0.90),
+        (3.8, 4.2, 5.2, 3.4, 0.20),
+        (0.4, 7.4, 4.6, 2.8, 0.55),
+        (-8.0, 36.0, 10.0, 7.0, 0.90),
+        (7.0, 24.0, 8.5, 5.5, 0.20),
+    )
+    for index, vert in enumerate(mesh.vertices):
+        x, y = vert.co.x, vert.co.y
+        best_w = 0.0
+        best_kind = 0.20
+        for cx, cy, rx, ry, kind in regions:
+            w = math.exp(-(((x - cx) / max(rx, 0.4)) ** 2 + ((y - cy) / max(ry, 0.4)) ** 2))
+            if w > best_w:
+                best_w = w
+                best_kind = kind
+        weight = max(0.0, min(1.0, (best_w - 0.18) / 0.72))
+        color.data[index].color = (weight, best_kind, 0.0, 1.0)
 
 
 def _mix_rgb(nodes):
@@ -635,31 +689,73 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
             links.new(ramp.outputs["Color"], mix.inputs["Color1"])
             links.new(tex.outputs["Color"], mix.inputs["Color2"])
             color = mix.outputs["Color"]
-    # Several-metre Voronoi cells: lush / dry / earth. Readable at 540 px.
+    # Elongated ecological cells, not circular Voronoi dots.
+    cell_map = nodes.new("ShaderNodeMapping")
+    cell_map.inputs["Scale"].default_value = (0.034, 0.016, 1.0)
+    cell_map.inputs["Rotation"].default_value = (0.0, 0.0, 0.41)
+    links.new(coord.outputs["Object"], cell_map.inputs["Vector"])
     cells = nodes.new("ShaderNodeTexVoronoi")
     if "Scale" in cells.inputs:
-        cells.inputs["Scale"].default_value = 0.055
+        cells.inputs["Scale"].default_value = 0.042
     if hasattr(cells, "voronoi_dimensions"):
         cells.voronoi_dimensions = "2D"
-    links.new(coord.outputs["Object"], cells.inputs["Vector"])
+    links.new(cell_map.outputs["Vector"], cells.inputs["Vector"])
     cell_fac = cells.outputs["Distance"] if "Distance" in cells.outputs else cells.outputs[0]
     eco_ramp = nodes.new("ShaderNodeValToRGB")
     eco_ramp.color_ramp.interpolation = "EASE"
     eco_ramp.color_ramp.elements[0].position = 0.0
-    eco_ramp.color_ramp.elements[0].color = (0.058, 0.102, 0.034, 1.0)
+    eco_ramp.color_ramp.elements[0].color = (0.040, 0.128, 0.030, 1.0)
     eco_ramp.color_ramp.elements[1].position = 1.0
-    eco_ramp.color_ramp.elements[1].color = (0.150, 0.092, 0.044, 1.0)
+    eco_ramp.color_ramp.elements[1].color = (0.178, 0.102, 0.048, 1.0)
     dry_stop = eco_ramp.color_ramp.elements.new(0.42)
-    dry_stop.color = (0.098, 0.082, 0.036, 1.0)
+    dry_stop.color = (0.128, 0.082, 0.036, 1.0)
     needle_stop = eco_ramp.color_ramp.elements.new(0.70)
-    needle_stop.color = (0.040, 0.052, 0.022, 1.0)
+    needle_stop.color = (0.036, 0.050, 0.020, 1.0)
     links.new(cell_fac, eco_ramp.inputs["Fac"])
     eco_mix = _mix_rgb(nodes)
     if "Color1" in eco_mix.inputs:
-        eco_mix.inputs["Fac"].default_value = 0.86
+        eco_mix.inputs["Fac"].default_value = 0.78
         links.new(color, eco_mix.inputs["Color1"])
         links.new(eco_ramp.outputs["Color"], eco_mix.inputs["Color2"])
         color = eco_mix.outputs["Color"]
+    # Broad 40–80 m lush/dry continents so SHOT_01 is not one carpet.
+    land = nodes.new("ShaderNodeTexNoise")
+    land.inputs["Scale"].default_value = 0.009
+    if "Detail" in land.inputs:
+        land.inputs["Detail"].default_value = 1.2
+    links.new(coord.outputs["Object"], land.inputs["Vector"])
+    land_ramp = nodes.new("ShaderNodeValToRGB")
+    land_ramp.color_ramp.interpolation = "EASE"
+    land_ramp.color_ramp.elements[0].color = (0.034, 0.110, 0.028, 1.0)
+    land_ramp.color_ramp.elements[1].color = (0.150, 0.095, 0.044, 1.0)
+    links.new(land.outputs["Fac"], land_ramp.inputs["Fac"])
+    land_mix = _mix_rgb(nodes)
+    if "Color1" in land_mix.inputs:
+        land_mix.inputs["Fac"].default_value = 0.48
+        links.new(color, land_mix.inputs["Color1"])
+        links.new(land_ramp.outputs["Color"], land_mix.inputs["Color2"])
+        color = land_mix.outputs["Color"]
+    # Authored metre-scale regions (vertex color). R=weight, G=kind.
+    eco_attr = nodes.new("ShaderNodeVertexColor")
+    if hasattr(eco_attr, "layer_name"):
+        eco_attr.layer_name = "TJ_EcoMask"
+    kind_ramp = nodes.new("ShaderNodeValToRGB")
+    kind_ramp.color_ramp.interpolation = "EASE"
+    kind_ramp.color_ramp.elements[0].position = 0.0
+    kind_ramp.color_ramp.elements[0].color = (0.132, 0.088, 0.038, 1.0)
+    kind_ramp.color_ramp.elements[1].position = 1.0
+    kind_ramp.color_ramp.elements[1].color = (0.034, 0.046, 0.020, 1.0)
+    mid_earth = kind_ramp.color_ramp.elements.new(0.55)
+    mid_earth.color = (0.160, 0.100, 0.050, 1.0)
+    sep_eco = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(eco_attr.outputs.get("Color") or eco_attr.outputs[0], sep_eco.inputs["Vector"])
+    links.new(sep_eco.outputs["Y"], kind_ramp.inputs["Fac"])
+    region_mix = _mix_rgb(nodes)
+    if "Color1" in region_mix.inputs:
+        links.new(color, region_mix.inputs["Color1"])
+        links.new(kind_ramp.outputs["Color"], region_mix.inputs["Color2"])
+        links.new(sep_eco.outputs["X"], region_mix.inputs["Fac"])
+        color = region_mix.outputs["Color"]
     detail = nodes.new("ShaderNodeTexNoise")
     detail.inputs["Scale"].default_value = 1.4
     if "Detail" in detail.inputs:
@@ -872,18 +968,19 @@ def soften_channel_crest(ground: bpy.types.Object) -> None:
         neighbors[a].append(b)
         neighbors[b].append(a)
     zs = [vert.co.z for vert in mesh.vertices]
-    for _pass in range(5):
+    for _pass in range(2):
         nxt = zs[:]
         for index, vert in enumerate(mesh.vertices):
             dist, signed, _along, left_half, right_half = channel_profile(vert.co.x, vert.co.y)
             local = left_half if signed < 0.0 else right_half
             bed_half = local * 0.90
             bank_outer = local + (SOUTH_BANK_RUN if signed < 0.0 else NORTH_BANK_RUN) + 0.70
-            if dist < bed_half or dist > bank_outer or not neighbors[index]:
+            # Leave the waterline unsmoothed so bays/tongues survive at 540 px.
+            if dist < local * 0.42 or dist < bed_half or dist > bank_outer or not neighbors[index]:
                 continue
             avg = sum(zs[j] for j in neighbors[index]) / float(len(neighbors[index]))
             t = (dist - bed_half) / max(0.22, bank_outer - bed_half)
-            amt = 0.48 + 0.30 * min(1.0, max(0.0, t))
+            amt = 0.22 + 0.16 * min(1.0, max(0.0, t))
             if signed > 0.0 and HERO_X_MIN <= vert.co.x <= HERO_X_MAX:
                 # Preserve the broad V37 far-bank slumps through the bevel pass.
                 breakup = hero_north_notch_depth(vert.co.x, _along)
@@ -1753,8 +1850,8 @@ def spline_channel_mesh(
                 if south_bay in {5, 16}:
                     left_pinch *= 1.22
                 bite = hero_waterline_bite(center.x, float(i) * 0.85)
-                left_pinch *= max(0.42, min(1.55, 1.0 + 0.52 * bite))
-                right_pinch *= max(0.55, min(1.35, 1.0 + 0.28 * bite))
+                left_pinch *= max(0.38, min(1.65, 1.0 + 0.70 * bite))
+                right_pinch *= max(0.52, min(1.40, 1.0 + 0.34 * bite))
         for col, offset in enumerate(offsets):
             pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
@@ -1940,6 +2037,77 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
     return river, assigned, extras
 
 
+def _louis_peak_world(obj: bpy.types.Object):
+    bpy.context.view_layer.update()
+    peak = None
+    if obj.type != "MESH":
+        return None
+    for vert in obj.data.vertices:
+        point = obj.matrix_world @ vert.co
+        if peak is None or point.z > peak.z:
+            peak = point.copy()
+    return peak
+
+
+def extract_louis_height_cap(src: bpy.types.Object, z_frac: float) -> bpy.types.Object:
+    """Keep the upper purchased Louis mass so the 500 m apron cannot flood the valley."""
+    if src.data and src.data.users > 1:
+        src.data = src.data.copy()
+    zmax = max((vert.co.z for vert in src.data.vertices), default=0.0)
+    cut = zmax * z_frac
+    bm = bmesh.new()
+    bm.from_mesh(src.data)
+    dead = [vert for vert in bm.verts if vert.co.z < cut]
+    if dead:
+        bmesh.ops.delete(bm, geom=dead, context="VERTS")
+    bm.to_mesh(src.data)
+    bm.free()
+    src.data.update()
+    return src
+
+
+def sit_louis_peak(obj: bpy.types.Object, peak_x: float, peak_y: float, scale: float, rot_z: float = 0.0, z_lift: float = 0.0) -> None:
+    """Place the tallest purchased vertex on camera C's sky-gap ray."""
+    obj.parent = None
+    try:
+        obj.matrix_parent_inverse.identity()
+    except Exception:
+        pass
+    obj.rotation_euler = (0.0, 0.0, rot_z)
+    obj.scale = (scale, scale, scale)
+    obj.location = (0.0, 0.0, 0.0)
+    bpy.context.view_layer.update()
+    peak = _louis_peak_world(obj)
+    if peak is None:
+        obj.location = (peak_x, peak_y, z_lift)
+        return
+    obj.location = (peak_x - peak.x, peak_y - peak.y, 0.0)
+    if hasattr(obj, "visible_shadow"):
+        obj.visible_shadow = False
+    bpy.context.view_layer.update()
+    bounds = group_bounds([obj])
+    if bounds:
+        obj.location.z -= bounds[0].z
+        obj.location.z += z_lift
+    peak = _louis_peak_world(obj)
+    print(json.dumps({
+        "event": "louis_peak_sat",
+        "name": obj.name,
+        "target": [round(peak_x, 2), round(peak_y, 2)],
+        "peak": [round(peak.x, 2), round(peak.y, 2), round(peak.z, 2)] if peak else None,
+        "scale": scale,
+        "rotZ": rot_z,
+        "shot02ts": _shot02_ts(peak.x, peak.y) if peak else None,
+    }), flush=True)
+
+
+def _shot02_ts(x: float, y: float) -> list[float]:
+    """Camera C start: (1.4, -19.8) look (-3.6, -10.4)."""
+    dx = x - 1.4
+    dy = y + 19.8
+    return [round(dx * -0.470 + dy * 0.884, 2), round(dx * 0.884 + dy * 0.470, 2)]
+
+
 def sit_louis_piece(obj: bpy.types.Object, center_x: float, south_y: float, scale: float, z_lift: float = 0.0, rot_z: float = 0.0) -> None:
     obj.parent = None
     try:
@@ -1985,32 +2153,44 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
                 bpy.data.objects.remove(obj, do_unlink=True)
             except Exception:
                 pass
-    # (center_x, south_y, scale, rot_z). Closer masses for SHOT_02 depth and
-    # SHOT_05 telephoto compression. Do not smash into the cabin street.
-    foothill_slots = (
-        (-1.0, 21.0, 0.22, 0.24),
-        (36.0, 28.0, 0.18, -0.22),
-    )
-    # First peak sits just north of Building04 so its sunlit south face
-    # clears the cabin roof in camera C. Do not move the SHOT_05 hero.
-    peak_slots = (
-        (-8.5, 15.0, 0.30, 0.28),
-        (28.0, 16.0, 0.48, 0.42),
-        (46.0, 52.0, 0.30, -0.16),
-    )
     placed = []
     foothills = [obj for obj in members if obj and "meadowrange" in obj.name.lower()]
     peaks = [obj for obj in members if obj and "grassymountain" in obj.name.lower()]
-    for obj, (cx, south, scale, rot_z) in zip(foothills, foothill_slots):
-        sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
-        link_exclusive(obj, collection)
-        placed.append(obj)
-    for i, (obj, (cx, south, scale, rot_z)) in enumerate(zip(peaks, peak_slots)):
-        sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
-        if i == 0:
-            obj.location.z += 3.6
-        link_exclusive(obj, collection)
-        placed.append(obj)
+    meadow1 = next((obj for obj in foothills if "meadowrange1" in obj.name.lower()), None)
+    meadow2 = next((obj for obj in foothills if "meadowrange2" in obj.name.lower()), None)
+    meadow3 = next((obj for obj in foothills if "meadowrange3" in obj.name.lower()), None)
+    grassy1 = next((obj for obj in peaks if "grassymountain1" in obj.name.lower()), None)
+    grassy2 = next((obj for obj in peaks if "grassymountain2" in obj.name.lower()), None)
+    grassy3 = next((obj for obj in peaks if "grassymountain3" in obj.name.lower()), None)
+    # MeadowRange1's authored peak already sits on the south face. Put that
+    # sunlit peak on camera C's sky-gap ray (t≈42, s≈8). Do not AABB-south-sit
+    # a 500 m tile — that parked the peak outside the 32 mm frustum.
+    if meadow1 is not None:
+        sit_louis_peak(meadow1, -8.2, 22.0, scale=0.34, rot_z=0.40, z_lift=1.8)
+        link_exclusive(meadow1, collection)
+        placed.append(meadow1)
+    if meadow2 is not None:
+        sit_louis_piece(meadow2, 36.0, 28.0, 0.18, rot_z=-0.22)
+        link_exclusive(meadow2, collection)
+        placed.append(meadow2)
+    if meadow3 is not None:
+        sit_louis_peak(meadow3, -22.0, 52.0, scale=0.20, rot_z=0.22, z_lift=2.4)
+        link_exclusive(meadow3, collection)
+        placed.append(meadow3)
+    if grassy1 is not None:
+        extract_louis_height_cap(grassy1, 0.60)
+        sit_louis_peak(grassy1, -18.0, 48.0, scale=0.48, rot_z=0.36, z_lift=1.2)
+        link_exclusive(grassy1, collection)
+        placed.append(grassy1)
+    # SHOT_05 hero peak is locked. Do not move or restyle it.
+    if grassy2 is not None:
+        sit_louis_piece(grassy2, 28.0, 16.0, 0.48, rot_z=0.42)
+        link_exclusive(grassy2, collection)
+        placed.append(grassy2)
+    if grassy3 is not None:
+        sit_louis_piece(grassy3, 46.0, 52.0, 0.30, rot_z=-0.16)
+        link_exclusive(grassy3, collection)
+        placed.append(grassy3)
     print(json.dumps({
         "event": "louis_lp_ridge_placed",
         "count": len(placed),
@@ -2277,7 +2457,7 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
             inward = 0.28 + 0.34 * ((len(used_hero) * 3) % 5) / 4.0
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
             loc.z = WATER_SURFACE_Z + 0.05
-            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 3.6 + 0.70 * (len(used_hero) % 3), mat, i * 0.71))
+            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 2.6 + 0.45 * (len(used_hero) % 3), mat, i * 0.71))
         for cx in cut_xs:
             if cx in used_cut or abs(center.x - cx) > 1.05:
                 continue
@@ -2297,8 +2477,8 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
     # Near-camera boulder so SHOT_02 has a foreground waterline cue.
     extras.append(_add_lumpy_rock(
         "TJ_FgBankRock",
-        Vector((-12.4, -16.2, WATER_SURFACE_Z + 0.10)),
-        2.4,
+        Vector((-12.4, -16.2, WATER_SURFACE_Z + 0.04)),
+        1.9,
         mat,
         1.15,
     ))
@@ -2324,7 +2504,7 @@ def place_hero_creek_interactions(centers: list[Vector], mat: bpy.types.Material
             inward = 0.20 + 0.40 * (len(used) % 3) / 2.0
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
             loc.z = WATER_SURFACE_Z + (0.08 if len(used) % 2 else -0.02)
-            extras.append(_add_lumpy_rock(f"TJ_HeroStone_{i}", loc, 2.8 + 0.5 * (len(used) % 3), mat, i * 0.47))
+            extras.append(_add_lumpy_rock(f"TJ_HeroStone_{i}", loc, 2.2 + 0.35 * (len(used) % 3), mat, i * 0.47))
             if len(used) in {2, 4}:
                 nloc = center + side * (left * WATER_WIDTH_SCALE * 0.55)
                 nloc.z = WATER_SURFACE_Z + 0.04
@@ -2364,6 +2544,11 @@ def place_hero_damp_shelves(centers: list[Vector]) -> list:
     """Flat wet-soil tongues that break the grass isoline at image scale."""
     extras = []
     mat = dirt_bank_material()
+    grass = dirt_bank_material()
+    if grass.node_tree:
+        body = next((node for node in grass.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+        if body and "Base Color" in body.inputs:
+            body.inputs["Base Color"].default_value = (0.052, 0.088, 0.030, 1.0)
     picks = (-8.6, -6.0, -3.1, 0.8, 3.6, 6.2)
     used = set()
     for i, center in enumerate(centers):
@@ -2375,12 +2560,18 @@ def place_hero_damp_shelves(centers: list[Vector]) -> list:
             if px in used or abs(center.x - px) > 0.95:
                 continue
             used.add(px)
-            inward = 0.30 + 0.28 * ((len(used) * 2) % 3) / 2.0
-            loc = center + side * (-left * WATER_WIDTH_SCALE * (0.55 + 0.70 * inward))
-            loc.z = WATER_SURFACE_Z + 0.03
-            shelf = _add_lumpy_rock(f"TJ_DampShelf_{i}", loc, 2.2 + 0.35 * (len(used) % 2), mat, i * 0.33)
-            shelf.scale = (1.65, 0.72, 0.10)
+            inward = 0.22 + 0.40 * ((len(used) * 2) % 3) / 2.0
+            loc = center + side * (-left * WATER_WIDTH_SCALE * (0.35 + 0.95 * inward))
+            loc.z = WATER_SURFACE_Z + 0.035
+            shelf = _add_lumpy_rock(f"TJ_DampShelf_{i}", loc, 2.8 + 0.45 * (len(used) % 2), mat, i * 0.33)
+            shelf.scale = (2.15, 0.95, 0.07)
             extras.append(shelf)
+            if len(used) in {1, 3, 5}:
+                over = center + side * (-left * WATER_WIDTH_SCALE * (0.12 + 0.20 * inward))
+                over.z = WATER_SURFACE_Z + 0.05
+                hang = _add_lumpy_rock(f"TJ_GrassOver_{i}", over, 1.8, grass, i * 0.51 + 0.4)
+                hang.scale = (1.55, 0.70, 0.06)
+                extras.append(hang)
     return extras
 
 
@@ -2705,8 +2896,8 @@ def open_shot02_mountain_gap() -> int:
         if obj.name.lower().startswith("tj_shot05") or obj.name.lower().startswith("tj_shot03"):
             continue
         loc = obj.matrix_world.translation
-        if -6.5 <= loc.x <= 8.5 and 10.0 <= loc.y <= 34.0:
-            if loc.x >= 18.0:
+        if -30.0 <= loc.x <= 6.0 and 8.0 <= loc.y <= 72.0:
+            if loc.x >= 14.0:
                 continue
             obj.hide_render = True
             obj.hide_viewport = True
@@ -3423,6 +3614,7 @@ def main() -> int:
     open_shot02_mountain_gap()
     west_bg = scatter_clumps(trees, (-38.0, 58.0, 0.0), 2, 2, 9.0, 1.6, 13)
     east_bg = scatter_clumps(trees, (30.0, 58.0, 0.0), 2, 2, 9.0, 1.65, 17)
+    open_shot02_mountain_gap()
     foreground = west_fg + east_fg
     midground = west_mg + east_mg
     background = west_bg + east_bg

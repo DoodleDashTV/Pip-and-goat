@@ -79,6 +79,28 @@ def hero_waterline_bite(x: float, along: float) -> float:
     return max(-0.80, min(1.15, sum(bays) + wobble))
 
 
+def hero_grass_lip(x: float, along: float) -> float:
+    """Terrain-only lip, phase-shifted from hero_waterline_bite.
+
+    Water and grass must not share one isoline. Positive values pull grass
+    back; negative values push a soil/grass tongue over the water.
+    """
+    if x < HERO_X_MIN or x > HERO_X_MAX:
+        return 0.0
+    lips = (
+        0.88 * _gaussian(x, -6.1, 1.05),
+        -0.64 * _gaussian(x, -3.8, 0.78),
+        0.96 * _gaussian(x, -0.6, 1.25),
+        -0.50 * _gaussian(x, 1.8, 0.68),
+        0.72 * _gaussian(x, 4.4, 1.00),
+        -0.56 * _gaussian(x, -9.4, 0.72),
+        0.60 * _gaussian(x, 7.2, 0.90),
+        0.44 * _gaussian(x, -1.8, 0.58),
+    )
+    wobble = 0.14 * math.sin(along * 1.22 + x * 0.61)
+    return max(-0.70, min(1.00, sum(lips) + wobble))
+
+
 def hero_south_wet_tongue(x: float, y: float, along: float) -> float:
     """Discontinuous soil on the camera-side bank so grass cannot hold one lip."""
     if x < HERO_X_MIN or x > HERO_X_MAX:
