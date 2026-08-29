@@ -200,13 +200,13 @@ def apply_compositor_finish() -> None:
     haze_b = haze.inputs.get("Color2") or haze.inputs[2]
     haze_b.default_value = (0.70, 0.76, 0.84, 1.0)
     if "Mist" in render.outputs:
-        curve = nodes.new("CompositorNodeValToRGB")
-        curve.color_ramp.elements[0].position = 0.08
-        curve.color_ramp.elements[0].color = (0.0, 0.0, 0.0, 1.0)
-        curve.color_ramp.elements[1].position = 1.0
-        curve.color_ramp.elements[1].color = (0.62, 0.62, 0.62, 1.0)
-        links.new(render.outputs["Mist"], curve.inputs["Fac"])
-        links.new(curve.outputs["Color"], haze_fac)
+        curve = nodes.new("CompositorNodeMapRange")
+        curve.inputs["From Min"].default_value = 0.06
+        curve.inputs["From Max"].default_value = 1.0
+        curve.inputs["To Min"].default_value = 0.0
+        curve.inputs["To Max"].default_value = 0.58
+        links.new(render.outputs["Mist"], curve.inputs["Value"])
+        links.new(curve.outputs["Value"], haze_fac)
     else:
         haze_fac.default_value = 0.10
     links.new(render.outputs["Image"], haze_a)
