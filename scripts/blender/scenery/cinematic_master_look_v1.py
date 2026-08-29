@@ -97,7 +97,7 @@ def apply_world_atmosphere() -> dict:
     if "Color" in scatter.inputs:
         scatter.inputs["Color"].default_value = (0.78, 0.84, 0.90, 1.0)
     if "Density" in scatter.inputs:
-        scatter.inputs["Density"].default_value = 0.00045
+        scatter.inputs["Density"].default_value = 0.00012
     if "Anisotropy" in scatter.inputs:
         scatter.inputs["Anisotropy"].default_value = 0.32
     if "Volume" in out.inputs:
@@ -183,7 +183,7 @@ def apply_material_cohesion() -> dict:
 
 
 def apply_compositor_finish() -> None:
-    """Mist aerial perspective + restrained glare. No visible vignette or grain."""
+    """Mist aerial perspective only. No grade node that can swallow the beauty."""
     scene = bpy.context.scene
     scene.use_nodes = True
     nodes = scene.node_tree.nodes
@@ -191,57 +191,21 @@ def apply_compositor_finish() -> None:
     nodes.clear()
     render = nodes.new("CompositorNodeRLayers")
     composite = nodes.new("CompositorNodeComposite")
-    viewer = nodes.new("CompositorNodeViewer")
-
     haze = nodes.new("CompositorNodeMixRGB")
     haze.blend_type = "MIX"
-    haze_fac = haze.inputs.get("Fac") or haze.inputs[0]
-    haze_a = haze.inputs.get("Color1") or haze.inputs[1]
-    haze_b = haze.inputs.get("Color2") or haze.inputs[2]
-    haze_b.default_value = (0.70, 0.76, 0.84, 1.0)
+    haze.inputs[0].default_value = 0.12
+    haze.inputs[2].default_value = (0.72, 0.78, 0.86, 1.0)
     if "Mist" in render.outputs:
         curve = nodes.new("CompositorNodeMapRange")
-        curve.inputs["From Min"].default_value = 0.06
-        curve.inputs["From Max"].default_value = 1.0
-        curve.inputs["To Min"].default_value = 0.0
-        curve.inputs["To Max"].default_value = 0.42
-        links.new(render.outputs["Mist"], curve.inputs["Value"])
-        links.new(curve.outputs["Value"], haze_fac)
-    else:
-        haze_fac.default_value = 0.10
-    links.new(render.outputs["Image"], haze_a)
-
-    balance = nodes.new("CompositorNodeColorBalance")
-    if hasattr(balance, "correction_method"):
-        try:
-            balance.correction_method = "LIFT_GAMMA_GAIN"
-        except Exception:
-            pass
-    if hasattr(balance, "lift"):
-        balance.lift = (1.04, 1.01, 0.97)
-    if hasattr(balance, "gamma"):
-        balance.gamma = (1.01, 1.00, 0.99)
-    if hasattr(balance, "gain"):
-        balance.gain = (0.98, 0.99, 1.02)
-    links.new(haze.outputs.get("Color") or haze.outputs[0], balance.inputs["Image"] if "Image" in balance.inputs else balance.inputs[1])
-
-    glare = nodes.new("CompositorNodeGlare")
-    if hasattr(glare, "glare_type"):
-        glare.glare_type = "FOG_GLOW"
-    if hasattr(glare, "quality"):
-        glare.quality = "HIGH"
-    if hasattr(glare, "threshold"):
-        glare.threshold = 1.15
-    if hasattr(glare, "mix"):
-        glare.mix = -0.88
-    if hasattr(glare, "size"):
-        glare.size = 6
-    src = balance.outputs.get("Image") or balance.outputs[0]
-    links.new(src, glare.inputs["Image"] if "Image" in glare.inputs else glare.inputs[0])
-    finished = glare.outputs.get("Image") or glare.outputs[0]
-    links.new(finished, composite.inputs["Image"])
-    links.new(finished, viewer.inputs["Image"])
-    _log("cinematic_compositor_applied", haze=True, glare="fog_glow_restrained", vignette=False, grain=False)
+        curve.inputs[1].default_value = 0.10
+        curve.inputs[2].default_value = 1.0
+        curve.inputs[3].default_value = 0.0
+        curve.inputs[4].default_value = 0.34
+        links.new(render.outputs["Mist"], curve.inputs[0])
+        links.new(curve.outputs[0], haze.inputs[0])
+    links.new(render.outputs["Image"], haze.inputs[1])
+    links.new(haze.outputs[0], composite.inputs["Image"])
+    _log("cinematic_compositor_applied", haze=True, glare=False, vignette=False, grain=False)
 
 
 def apply_color_management() -> dict:
