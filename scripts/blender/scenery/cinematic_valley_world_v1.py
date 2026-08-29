@@ -20,7 +20,12 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from cinematic_shots import SHOTS, camera_name, default_shot_cameras, hero_search_cameras, lookdev_frames, marker_frames  # noqa: E402
-from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue, hero_south_wet_tongue  # noqa: E402
+from cinematic_creek_profile import (  # noqa: E402
+    hero_north_notch_depth,
+    hero_north_wet_tongue,
+    hero_south_wet_tongue,
+    hero_waterline_bite,
+)
 from cinematic_standards import (  # noqa: E402
     MASTER_COLLECTIONS,
     assert_final_contract,
@@ -375,7 +380,8 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
     south = signed < 0.0
     crest_wobble = 0.18 * math.sin(along * 0.21 + x * 0.19) + 0.08 * math.sin(x * 0.73)
     bank_run = (SOUTH_BANK_RUN if south else NORTH_BANK_RUN) + 0.70 * math.sin(along * 0.33 + (0.0 if south else 1.4))
-    water_half = local * 0.34
+    bite = hero_waterline_bite(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
+    water_half = local * 0.34 + max(0.0, bite) * 0.62
     bed_half = local * 0.90
     bank_outer = local + bank_run
     pool = 0.22 * (0.5 + 0.5 * math.sin(along * 0.11))
@@ -472,11 +478,14 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
 
 def _waterline_wobble(height: float, x: float, y: float, along: float) -> float:
     """Advance/retreat only the z=-1.15 contour. Deep trough center stays put."""
-    if abs(height - WATER_SURFACE_Z) >= 0.42:
+    bite = hero_waterline_bite(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
+    if abs(height - WATER_SURFACE_Z) >= 0.50 + 0.22 * abs(bite):
         return height
-    height += 0.16 * math.sin(x * 2.05 + y * 1.55)
-    height += 0.10 * math.sin(along * 0.73 + x * 1.1)
-    height += 0.06 * math.sin(x * 3.4 + along * 1.9)
+    height += 0.18 * math.sin(x * 2.05 + y * 1.55)
+    height += 0.12 * math.sin(along * 0.73 + x * 1.1)
+    height += 0.07 * math.sin(x * 3.4 + along * 1.9)
+    # +bite lowers the bank into the water (a bay). -bite lifts a soil tongue.
+    height -= 0.30 * bite
     return height
 
 
@@ -505,12 +514,23 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         # mountain/sky sliver without pitching the approved creek look.
         if 0.5 <= x <= 10.0 and -9.0 <= y <= 6.0 and river_dist > bank_outer:
             height -= 0.55 * max(0.0, 1.0 - abs(x - 4.5) / 6.0)
-        # Open the SHOT_02 right-of-cabin corridor. Peak sits at x≈0, y≈20
-        # so its western flank enters camera C (right of Building04).
-        if -8.0 <= x <= 10.0 and 8.0 <= y <= 38.0 and river_dist > bank_outer:
-            gx = math.exp(-((x - 0.0) / 9.0) ** 2)
-            gy = math.exp(-((y - 20.0) / 12.0) ** 2)
-            height -= 1.70 * gx * gy
+        # Open the SHOT_02 right-of-cabin corridor toward the sunlit peak
+        # at x≈-3, y≈30. Trough widths stay locked.
+        if -10.0 <= x <= 8.0 and 10.0 <= y <= 44.0 and river_dist > bank_outer:
+            gx = math.exp(-((x + 3.0) / 9.0) ** 2)
+            gy = math.exp(-((y - 30.0) / 13.0) ** 2)
+            height -= 1.60 * gx * gy
+        # Large ecological mounds / flats so SHOT_01 meadow is not a plane.
+        if river_dist > bank_outer + 1.2:
+            eco = 0.5 + 0.5 * math.sin(x * 0.13 + 0.4) * math.sin(y * 0.10 + 0.8)
+            dry = 0.5 + 0.5 * math.sin(x * 0.08 + 1.7) * math.cos(y * 0.12)
+            amt = 0.45 if in_village(x, y) else 1.0
+            if eco > 0.62:
+                height += amt * 0.24 * ((eco - 0.62) / 0.38)
+            if eco < 0.30:
+                height -= amt * 0.16 * ((0.30 - eco) / 0.30)
+            if dry > 0.72 and -8.0 <= y <= 42.0:
+                height -= amt * 0.08
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
                 (VILLAGE_X_HALF - abs(x)) / 4.0,
@@ -528,6 +548,35 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
     ground.data.materials.append(cinematic_meadow_material(img))
     print(json.dumps({"event": "terrain_ground_image", "path": img.name if img else None}), flush=True)
     return ground
+
+
+def place_meadow_ecology() -> list:
+    """Low needle beds and earth patches that read at 540 px on SHOT_01."""
+    extras = []
+    dirt = dirt_bank_material()
+    needle = dirt_bank_material()
+    if needle.node_tree:
+        body = next((node for node in needle.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+        if body and "Base Color" in body.inputs:
+            body.inputs["Base Color"].default_value = (0.038, 0.048, 0.022, 1.0)
+    patches = (
+        (-6.5, 8.5, 4.2, 0.10, True),
+        (5.8, 14.2, 3.6, 0.09, False),
+        (-2.2, 22.0, 5.0, 0.11, True),
+        (8.4, 6.4, 3.2, 0.08, False),
+        (-11.0, 18.6, 3.8, 0.09, True),
+        (3.2, 28.5, 4.4, 0.10, False),
+        (-8.8, 32.0, 3.5, 0.08, True),
+        (11.2, 20.4, 3.0, 0.08, False),
+    )
+    for i, (x, y, size, thick, is_needle) in enumerate(patches):
+        if in_river_channel(x, y, margin=1.2):
+            continue
+        loc = Vector((x, y, 0.06))
+        bed = _add_lumpy_rock(f"TJ_MeadowEco_{i}", loc, size, needle if is_needle else dirt, i * 0.41)
+        bed.scale = (1.55, 1.10, thick)
+        extras.append(bed)
+    return extras
 
 
 def _mix_rgb(nodes):
@@ -561,11 +610,11 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE"
     ramp.color_ramp.elements[0].position = 0.16
-    ramp.color_ramp.elements[0].color = (0.028, 0.045, 0.022, 1.0)
+    ramp.color_ramp.elements[0].color = (0.034, 0.062, 0.024, 1.0)
     ramp.color_ramp.elements[1].position = 0.84
-    ramp.color_ramp.elements[1].color = (0.055, 0.080, 0.032, 1.0)
+    ramp.color_ramp.elements[1].color = (0.072, 0.110, 0.038, 1.0)
     mid = ramp.color_ramp.elements.new(0.50)
-    mid.color = (0.040, 0.062, 0.028, 1.0)
+    mid.color = (0.050, 0.082, 0.030, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
     color = ramp.outputs["Color"]
     if image is not None:
@@ -574,59 +623,83 @@ def cinematic_meadow_material(image) -> bpy.types.Material:
         if tex.image and tex.image.colorspace_settings:
             tex.image.colorspace_settings.name = "sRGB"
         mapping = nodes.new("ShaderNodeMapping")
-        mapping.inputs["Scale"].default_value = (0.028, 0.028, 0.028)
+        mapping.inputs["Scale"].default_value = (0.022, 0.022, 0.022)
         links.new(coord.outputs["Object"], mapping.inputs["Vector"])
         links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
         mix = _mix_rgb(nodes)
         if "Color1" in mix.inputs:
-            mix.inputs["Fac"].default_value = 0.40
+            mix.inputs["Fac"].default_value = 0.22
             links.new(ramp.outputs["Color"], mix.inputs["Color1"])
             links.new(tex.outputs["Color"], mix.inputs["Color2"])
             color = mix.outputs["Color"]
+    # Several-metre Voronoi cells: lush / dry / earth. Readable at 540 px.
+    cells = nodes.new("ShaderNodeTexVoronoi")
+    if "Scale" in cells.inputs:
+        cells.inputs["Scale"].default_value = 0.055
+    if hasattr(cells, "voronoi_dimensions"):
+        cells.voronoi_dimensions = "2D"
+    links.new(coord.outputs["Object"], cells.inputs["Vector"])
+    cell_fac = cells.outputs["Distance"] if "Distance" in cells.outputs else cells.outputs[0]
+    eco_ramp = nodes.new("ShaderNodeValToRGB")
+    eco_ramp.color_ramp.interpolation = "CONSTANT"
+    eco_ramp.color_ramp.elements[0].position = 0.0
+    eco_ramp.color_ramp.elements[0].color = (0.058, 0.102, 0.034, 1.0)
+    eco_ramp.color_ramp.elements[1].position = 1.0
+    eco_ramp.color_ramp.elements[1].color = (0.150, 0.092, 0.044, 1.0)
+    dry_stop = eco_ramp.color_ramp.elements.new(0.42)
+    dry_stop.color = (0.098, 0.082, 0.036, 1.0)
+    needle_stop = eco_ramp.color_ramp.elements.new(0.70)
+    needle_stop.color = (0.040, 0.052, 0.022, 1.0)
+    links.new(cell_fac, eco_ramp.inputs["Fac"])
+    eco_mix = _mix_rgb(nodes)
+    if "Color1" in eco_mix.inputs:
+        eco_mix.inputs["Fac"].default_value = 0.78
+        links.new(color, eco_mix.inputs["Color1"])
+        links.new(eco_ramp.outputs["Color"], eco_mix.inputs["Color2"])
+        color = eco_mix.outputs["Color"]
     detail = nodes.new("ShaderNodeTexNoise")
-    detail.inputs["Scale"].default_value = 2.2
+    detail.inputs["Scale"].default_value = 1.4
     if "Detail" in detail.inputs:
-        detail.inputs["Detail"].default_value = 6.0
+        detail.inputs["Detail"].default_value = 4.0
     links.new(coord.outputs["Object"], detail.inputs["Vector"])
     detail_ramp = nodes.new("ShaderNodeValToRGB")
-    detail_ramp.color_ramp.elements[0].color = (0.022, 0.038, 0.016, 1.0)
-    detail_ramp.color_ramp.elements[1].color = (0.070, 0.095, 0.034, 1.0)
+    detail_ramp.color_ramp.elements[0].color = (0.028, 0.048, 0.018, 1.0)
+    detail_ramp.color_ramp.elements[1].color = (0.080, 0.105, 0.038, 1.0)
     links.new(detail.outputs["Fac"], detail_ramp.inputs["Fac"])
     detail_mix = _mix_rgb(nodes)
     if "Color1" in detail_mix.inputs:
-        detail_mix.inputs["Fac"].default_value = 0.34
+        detail_mix.inputs["Fac"].default_value = 0.22
         links.new(color, detail_mix.inputs["Color1"])
         links.new(detail_ramp.outputs["Color"], detail_mix.inputs["Color2"])
         color = detail_mix.outputs["Color"]
-    # Image-scale soil / needle islands. One large noise, high threshold:
-    # distinct dirt patches, not a multiplied speckle carpet or a sand flood.
+    # Sparse earth islands inside some cells, not a dotted carpet.
     soil = nodes.new("ShaderNodeTexNoise")
-    soil.inputs["Scale"].default_value = 0.009
+    soil.inputs["Scale"].default_value = 0.012
     if "Detail" in soil.inputs:
-        soil.inputs["Detail"].default_value = 2.0
+        soil.inputs["Detail"].default_value = 1.5
     links.new(coord.outputs["Object"], soil.inputs["Vector"])
     soil_fac = nodes.new("ShaderNodeMapRange")
-    soil_fac.inputs["From Min"].default_value = 0.50
-    soil_fac.inputs["From Max"].default_value = 0.74
+    soil_fac.inputs["From Min"].default_value = 0.68
+    soil_fac.inputs["From Max"].default_value = 0.86
     soil_fac.inputs["To Min"].default_value = 0.0
-    soil_fac.inputs["To Max"].default_value = 0.88
+    soil_fac.inputs["To Max"].default_value = 0.70
     links.new(soil.outputs["Fac"], soil_fac.inputs["Value"])
     soil_mix = _mix_rgb(nodes)
     if "Color1" in soil_mix.inputs:
         links.new(color, soil_mix.inputs["Color1"])
-        soil_mix.inputs["Color2"].default_value = (0.142, 0.088, 0.042, 1.0)
+        soil_mix.inputs["Color2"].default_value = (0.155, 0.095, 0.046, 1.0)
         links.new(soil_fac.outputs["Result"] if "Result" in soil_fac.outputs else soil_fac.outputs[0], soil_mix.inputs["Fac"])
         color = soil_mix.outputs["Color"]
     needle = nodes.new("ShaderNodeTexNoise")
-    needle.inputs["Scale"].default_value = 0.018
+    needle.inputs["Scale"].default_value = 0.016
     if "Detail" in needle.inputs:
-        needle.inputs["Detail"].default_value = 2.0
+        needle.inputs["Detail"].default_value = 1.5
     links.new(coord.outputs["Object"], needle.inputs["Vector"])
     needle_fac = nodes.new("ShaderNodeMapRange")
-    needle_fac.inputs["From Min"].default_value = 0.62
-    needle_fac.inputs["From Max"].default_value = 0.90
+    needle_fac.inputs["From Min"].default_value = 0.74
+    needle_fac.inputs["From Max"].default_value = 0.92
     needle_fac.inputs["To Min"].default_value = 0.0
-    needle_fac.inputs["To Max"].default_value = 0.78
+    needle_fac.inputs["To Max"].default_value = 0.62
     links.new(needle.outputs["Fac"], needle_fac.inputs["Value"])
     needle_mix = _mix_rgb(nodes)
     if "Color1" in needle_mix.inputs:
@@ -693,6 +766,8 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
         local_half = left_half if signed < 0.0 else right_half
         bed = local_half * 0.90
         fade = local_half + ((SOUTH_BANK_RUN + 4.8) if signed < 0.0 else 9.2)
+        bite = hero_waterline_bite(x, along) if HERO_X_MIN <= x <= HERO_X_MAX else 0.0
+        fade += 0.85 * bite
         jag = 1.05 * math.sin(x * 1.73 + y * 0.91) + 0.70 * math.sin(along * 0.47 + signed * 2.4)
         jag += 0.45 * math.sin(x * 0.61 + y * 1.27) + 0.28 * math.sin(x * 2.4 + y * 1.9)
         fade += jag
@@ -1907,14 +1982,14 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     # (center_x, south_y, scale, rot_z). Closer masses for SHOT_02 depth and
     # SHOT_05 telephoto compression. Do not smash into the cabin street.
     foothill_slots = (
-        (-1.5, 14.5, 0.30, 0.18),
+        (-5.0, 26.0, 0.24, 0.28),
         (36.0, 28.0, 0.18, -0.22),
     )
-    # First peak: west flank sits in camera C's right-of-cabin sky gap.
-    # (5.5, 18) was out of the 32 mm portrait frustum. Do not move the
-    # SHOT_05 telephoto hero at (28, 16).
+    # First peak: sunlit south face in camera C's right-of-cabin gap.
+    # rot_z=2.65 showed the shadowed back and read as a black ridge.
+    # Do not move the SHOT_05 telephoto hero at (28, 16).
     peak_slots = (
-        (0.0, 20.0, 0.62, 2.65),
+        (-3.0, 30.0, 0.42, 0.34),
         (28.0, 16.0, 0.48, 0.42),
         (46.0, 52.0, 0.30, -0.16),
     )
@@ -1925,11 +2000,8 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
         sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
         link_exclusive(obj, collection)
         placed.append(obj)
-    for i, (obj, (cx, south, scale, rot_z)) in enumerate(zip(peaks, peak_slots)):
+    for obj, (cx, south, scale, rot_z) in zip(peaks, peak_slots):
         sit_louis_piece(obj, cx, south, scale, rot_z=rot_z)
-        if i == 0:
-            # Lift the SHOT_02 peak so a lit grassy face clears the cabin roof.
-            obj.location.z += 3.4
         link_exclusive(obj, collection)
         placed.append(obj)
     print(json.dumps({
@@ -2205,7 +2277,7 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
             used_cut.add(cx)
             loc = center + side * (-left * BED_WIDTH_SCALE * (0.92 + 0.08 * math.sin(i)))
             loc.z = BED_SHOULDER_Z + 0.16
-            extras.append(_add_lumpy_rock(f"TJ_IsolineRock_{i}", loc, 2.4 + 0.55 * (len(used_cut) % 2), mat, i * 0.53 + 0.8))
+            extras.append(_add_lumpy_rock(f"TJ_IsolineRock_{i}", loc, 1.6 + 0.35 * (len(used_cut) % 2), mat, i * 0.53 + 0.8))
         for ix in island_xs:
             if ix in used_island or abs(center.x - ix) > 1.05:
                 continue
@@ -2218,8 +2290,8 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
     # Near-camera boulder so SHOT_02 has a foreground waterline cue.
     extras.append(_add_lumpy_rock(
         "TJ_FgBankRock",
-        Vector((-12.4, -16.2, WATER_SURFACE_Z + 0.22)),
-        4.2,
+        Vector((-12.4, -16.2, WATER_SURFACE_Z + 0.10)),
+        2.4,
         mat,
         1.15,
     ))
@@ -2277,6 +2349,31 @@ def place_hero_soil_scars(centers: list[Vector]) -> list:
         north = _add_lumpy_rock(f"TJ_HeroSoilN_{i}", nloc, 3.0 + 0.5 * ((i + 1) % 2), mat, i * 0.41 + 0.7)
         north.scale = (1.90, 1.10, 0.22)
         extras.append(north)
+    extras.extend(place_hero_damp_shelves(centers))
+    return extras
+
+
+def place_hero_damp_shelves(centers: list[Vector]) -> list:
+    """Flat wet-soil tongues that break the grass isoline at image scale."""
+    extras = []
+    mat = dirt_bank_material()
+    picks = (-8.6, -6.0, -3.1, 0.8, 3.6, 6.2)
+    used = set()
+    for i, center in enumerate(centers):
+        if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+            continue
+        side = _side_from_centers(centers, i)
+        left, _right = _channel_halves_for_index(centers, i)
+        for px in picks:
+            if px in used or abs(center.x - px) > 0.95:
+                continue
+            used.add(px)
+            inward = 0.30 + 0.28 * ((len(used) * 2) % 3) / 2.0
+            loc = center + side * (-left * WATER_WIDTH_SCALE * (0.55 + 0.70 * inward))
+            loc.z = WATER_SURFACE_Z + 0.03
+            shelf = _add_lumpy_rock(f"TJ_DampShelf_{i}", loc, 2.2 + 0.35 * (len(used) % 2), mat, i * 0.33)
+            shelf.scale = (1.65, 0.72, 0.10)
+            extras.append(shelf)
     return extras
 
 
@@ -2945,8 +3042,8 @@ def setup_mist_and_compositor() -> None:
     scene = bpy.context.scene
     if hasattr(scene.world, "mist_settings"):
         scene.world.mist_settings.use_mist = True
-        scene.world.mist_settings.start = 42.0
-        scene.world.mist_settings.depth = 150.0
+        scene.world.mist_settings.start = 34.0
+        scene.world.mist_settings.depth = 160.0
         scene.world.mist_settings.falloff = "QUADRATIC"
     view = scene.view_layers[0]
     if hasattr(view, "use_pass_mist"):
@@ -2969,7 +3066,7 @@ def setup_mist_and_compositor() -> None:
     if "Mist" in render.outputs:
         scale = nodes.new("CompositorNodeMath")
         scale.operation = "MULTIPLY"
-        scale.inputs[1].default_value = 0.13
+        scale.inputs[1].default_value = 0.16
         links.new(render.outputs["Mist"], scale.inputs[0])
         links.new(scale.outputs["Value"], fac)
     links.new(render.outputs["Image"], color1)
@@ -3169,6 +3266,8 @@ def main() -> int:
     mountain_members = place_louis_lp_ridge(expanded.get("background_mountains", []), collections["WORLD_MOUNTAINS_BACKGROUND"])
     terrain = build_terrain(all_files)
     link_exclusive(terrain, collections["WORLD_TERRAIN"])
+    for prop in place_meadow_ecology():
+        link_exclusive(prop, collections["WORLD_TERRAIN"])
     water_loaded = load_water_materials(expanded.get("village_project", []) + expanded.get("forest_ecokit", []))
     river, river_material, banks = build_river()
     link_exclusive(river, collections["WORLD_RIVER"])

@@ -30,7 +30,12 @@ from cinematic_standards import (
     require_visual_approval_before_paid_final,
     visible_use_record,
 )
-from cinematic_creek_profile import hero_north_notch_depth, hero_north_wet_tongue, hero_south_wet_tongue
+from cinematic_creek_profile import (
+    hero_north_notch_depth,
+    hero_north_wet_tongue,
+    hero_south_wet_tongue,
+    hero_waterline_bite,
+)
 
 
 def test_profiles_are_separated():
@@ -166,6 +171,12 @@ def test_v37_north_bank_breakup_is_broad_and_discontinuous():
     south = [hero_south_wet_tongue(x, -14.0, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
     assert max(south) - min(south) >= 0.28
     assert all(0.0 <= value <= 1.0 for value in south)
+    bites = [hero_waterline_bite(x, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(bites) >= 0.35
+    assert min(bites) <= -0.20
+    assert max(bites) - min(bites) >= 0.70
+    assert hero_waterline_bite(-14.0, 0.0) == 0.0
+    assert hero_waterline_bite(10.0, 0.0) == 0.0
 
 
 def test_visible_use_requires_rendered_pixels():

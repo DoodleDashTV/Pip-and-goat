@@ -56,6 +56,29 @@ def hero_north_wet_tongue(x: float, y: float, along: float) -> float:
     return max(0.0, min(1.0, broad * (0.34 + 0.66 * broken) * gaps))
 
 
+def hero_waterline_bite(x: float, along: float) -> float:
+    """Signed metres at the waterline. + bank retreats, - grass/soil overhangs.
+
+    Bays are a few metres wide so they survive 540 px. The creek trough width
+    (WATER_WIDTH_SCALE) is not changed; only the terrain contour moves.
+    """
+    if x < HERO_X_MIN or x > HERO_X_MAX:
+        return 0.0
+    bays = (
+        1.05 * _gaussian(x, -7.6, 1.20),
+        -0.72 * _gaussian(x, -5.2, 0.82),
+        1.18 * _gaussian(x, -2.4, 1.40),
+        -0.58 * _gaussian(x, 0.2, 0.70),
+        0.88 * _gaussian(x, 2.8, 1.10),
+        -0.64 * _gaussian(x, 5.0, 0.88),
+        0.76 * _gaussian(x, -10.2, 1.05),
+        0.62 * _gaussian(x, 6.8, 0.84),
+        -0.50 * _gaussian(x, -8.8, 0.62),
+    )
+    wobble = 0.18 * math.sin(along * 1.55 + x * 0.83)
+    return max(-0.80, min(1.15, sum(bays) + wobble))
+
+
 def hero_south_wet_tongue(x: float, y: float, along: float) -> float:
     """Discontinuous soil on the camera-side bank so grass cannot hold one lip."""
     if x < HERO_X_MIN or x > HERO_X_MAX:
