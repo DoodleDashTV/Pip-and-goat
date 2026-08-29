@@ -75,6 +75,9 @@ HDRI_CAMERA_ROTATION = (0.0, 0.0, 0.0)
 HDRI_REFLECTION_ROTATION_Z = 0.48
 BED_WIDTH_SCALE = 0.68
 WATER_THICKNESS = 0.18
+# V36 hero camera C looks north across x≈-10..8. Local bank work lives here.
+HERO_X_MIN = -12.0
+HERO_X_MAX = 8.0
 VILLAGE_X_HALF = 16.0
 VILLAGE_Y_MIN = -8.0
 VILLAGE_Y_MAX = 22.0
@@ -421,6 +424,18 @@ def sculpt_channel_height(x: float, y: float, meadow_z: float) -> float:
                 height -= 0.32 * ((gully - 0.76) / 0.24)
             if lobe > 0.80:
                 height += 0.20 * ((lobe - 0.80) / 0.20)
+        if HERO_X_MIN <= x <= HERO_X_MAX:
+            # Overlapping convex/concave forms so SHOT_02 cannot trace one lip.
+            pocket = (0.5 + 0.5 * math.sin(x * 0.51 + along * 0.22))
+            pocket *= (0.5 + 0.5 * math.sin(x * 1.27 + y * 0.61 + 0.9))
+            slump = (0.5 + 0.5 * math.cos(x * 0.33 + along * 0.47))
+            slump *= (0.5 + 0.5 * math.sin(x * 0.88 + 1.3))
+            if pocket > 0.70:
+                height -= 0.38 * ((pocket - 0.70) / 0.30)
+            if slump > 0.78:
+                height += 0.26 * ((slump - 0.78) / 0.22)
+            if 0.42 < t < 0.78 and (0.5 + 0.5 * math.sin(x * 2.05 + along)) > 0.82:
+                height -= 0.16
         return height
     if t < 0.72:
         u = t / 0.72
@@ -643,6 +658,12 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                 value = max(value, 0.44)
             if dist > lower and blob < 0.20:
                 value *= 0.10
+            if HERO_X_MIN <= x <= HERO_X_MAX:
+                # Scar grass in the hero look: soil/damp must win over meadow.
+                if dist < local_half * 1.15:
+                    value = max(value, 0.52 + 0.18 * blotch)
+                elif dist < fade:
+                    value = max(value, 0.28 * (1.0 - (dist - local_half) / max(1.0, fade - local_half)))
         else:
             inner = bed * 0.42
             shelf = local_half * 0.72
@@ -1543,6 +1564,11 @@ def spline_channel_mesh(
                 right_pinch *= 0.55
             if south_bay == 19:
                 left_pinch *= 0.62
+            if HERO_X_MIN <= center.x <= HERO_X_MAX:
+                if south_bay in {1, 2, 7, 14, 20}:
+                    left_pinch *= 0.48 + 0.16 * math.sin(i * 1.3)
+                if south_bay in {5, 16}:
+                    left_pinch *= 1.22
         for col, offset in enumerate(offsets):
             pinch = left_pinch if offset < 0.0 else right_pinch
             half = (left if offset < 0.0 else right) * pinch
@@ -2073,6 +2099,51 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
         mat,
         1.15,
     ))
+    extras.extend(place_hero_creek_interactions(centers, mat))
+    extras.extend(place_hero_soil_scars(centers))
+    return extras
+
+
+def place_hero_creek_interactions(centers: list[Vector], mat: bpy.types.Material) -> list:
+    """2–4 useful stones in the V36 hero frustum. World objects, not camera cards."""
+    extras = []
+    picks = (-7.4, -3.6, -0.4, 2.8, 5.6)
+    used = set()
+    for i, center in enumerate(centers):
+        if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+            continue
+        side = _side_from_centers(centers, i)
+        left, _right = _channel_halves_for_index(centers, i)
+        for px in picks:
+            if px in used or abs(center.x - px) > 0.95:
+                continue
+            used.add(px)
+            inward = 0.20 + 0.40 * (len(used) % 3) / 2.0
+            loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
+            loc.z = WATER_SURFACE_Z + (0.08 if len(used) % 2 else -0.02)
+            extras.append(_add_lumpy_rock(f"TJ_HeroStone_{i}", loc, 2.8 + 0.5 * (len(used) % 3), mat, i * 0.47))
+    return extras
+
+
+def place_hero_soil_scars(centers: list[Vector]) -> list:
+    """Irregular dirt shelves that thin grass on the camera-visible south bank."""
+    extras = []
+    mat = dirt_bank_material()
+    step = 6
+    for i in range(4, max(5, len(centers) - 4), step):
+        center = centers[i]
+        if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+            continue
+        if (i // step) % 3 == 0:
+            continue
+        side = _side_from_centers(centers, i)
+        left, _right = _channel_halves_for_index(centers, i)
+        t = 0.55 + 0.35 * math.sin(i * 0.71)
+        loc = center + side * (-left * t)
+        loc.z = BED_SHOULDER_Z + 0.10 + 0.18 * math.sin(i)
+        scar = _add_lumpy_rock(f"TJ_HeroSoil_{i}", loc, 2.1 + 0.4 * (i % 2), mat, i * 0.29)
+        scar.scale = (1.4, 0.85, 0.22)
+        extras.append(scar)
     return extras
 
 
@@ -2099,10 +2170,10 @@ def place_waterline_dressing(trees: list) -> list:
             continue
         extras.append(duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), 0.14 + 0.10 * ((i * 3) % 5) / 4.0))
         # A few grasses that actually touch the waterline in the SHOT_02 look.
-        if -11.0 <= loc.x <= 12.0 and key in {2, 6}:
-            wet = center + side * (-left * (0.48 + 0.10 * math.sin(i)))
+        if HERO_X_MIN <= loc.x <= HERO_X_MAX and key in {2, 3, 6}:
+            wet = center + side * (-left * (0.38 + 0.14 * math.sin(i)))
             if not in_village(wet.x, wet.y):
-                extras.append(duplicate_mesh_in_world(live[(i + 2) % len(live)], (wet.x, wet.y, 0.0), 0.10 + 0.04 * (i % 3)))
+                extras.append(duplicate_mesh_in_world(live[(i + 2) % len(live)], (wet.x, wet.y, 0.0), 0.09 + 0.05 * (i % 3)))
     return extras
 
 

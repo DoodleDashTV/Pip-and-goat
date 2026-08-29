@@ -19,8 +19,8 @@ SHOTS = (
         "name": "RIVER_DISCOVERY",
         "start": 151,
         "end": 300,
-        "lensMin": 38.0,
-        "lensMax": 44.0,
+        "lensMin": 34.0,
+        "lensMax": 40.0,
         "purpose": "unmistakable water, reflections, ripples, irregular banks, wet rocks, flora",
         "move": "low_riverbank_dolly",
     },
@@ -176,8 +176,11 @@ def default_shot_cameras() -> list[dict]:
         {
             "id": "SHOT_02",
             "camera": "TJ_SHOT_02_CAM",
-            "start": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
-            "end": {"location": (-1.0, -19.6, 4.30), "look": (15.2, -10.6, -1.00), "lens": 42.0},
+            # V36: V35 grazing stripe is retired. Authoritative hero is search
+            # candidate C — across-creek, diagonal water, cabin destination.
+            "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
+            "start": {"location": (1.2, -21.5, 2.85), "look": (-5.2, -4.5, 0.35), "lens": 36.0},
+            "end": {"location": (3.4, -20.2, 2.95), "look": (-2.8, -2.8, 0.55), "lens": 40.0},
         },
         {
             "id": "SHOT_03",
