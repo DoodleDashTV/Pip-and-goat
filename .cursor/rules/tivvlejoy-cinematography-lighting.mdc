@@ -1,0 +1,21 @@
+---
+description: Cinematography, composition, lighting, and child-viewing comfort
+globs:
+  - "scripts/blender/**/*camera*.py"
+  - "scripts/blender/**/*light*.py"
+  - "scripts/blender/scenery/**/*.py"
+  - "packages/direction/src/camera/**/*.ts"
+  - "packages/direction/src/lighting/**/*.ts"
+  - "apps/web/src/lib/tivvlejoy-nightshift-production/{cinematography,composition,camera-motion,lighting}.ts"
+alwaysApply: false
+---
+
+# Cinematography and lighting
+
+- Choose camera height, lens, motion, and depth from the shot's story purpose. Do not force every shot to eye level, a low hero angle, or shallow depth of field.
+- For 9:16, preserve the hero read, faces, gestures, feet when locomotion matters, lead room, caption-safe bands, and deliberate foreground/midground/background separation.
+- Keep camera motion smooth and motivated. Respect the existing comfort ceilings; do not add handheld noise or shake by default. Small impact motion is allowed only when story-motivated, bounded, and reviewed.
+- Lighting must support focal hierarchy, readable expressions, coherent sources, material response, and the approved color script. Do not force maximum saturation or warm lighting into every dramatic context.
+- Reject clipping, floating dressing, repeated patterns, missing/default materials, broken reflections, incoherent shadows, empty terrain, and background competition.
+- Never solve a visual defect with camera-distance material gates, per-camera shader tricks, or content hidden only from the failing view.
+

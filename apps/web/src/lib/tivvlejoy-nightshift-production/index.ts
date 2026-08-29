@@ -16,6 +16,7 @@ export * from './editorial';
 export * from './dialogue';
 export * from './sound';
 export * from './captions';
+export * from './finishing';
 export * from './jl-cuts';
 export * from './dailies';
 export * from './impact';

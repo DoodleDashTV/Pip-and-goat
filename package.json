@@ -108,6 +108,8 @@
     "validate:dialogue-editor": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-dialogue-editor.test.ts",
     "validate:master-timeline": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-editorial.test.ts src/lib/tivvlejoy-director-package.test.ts",
     "validate:captions": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-captions.test.ts",
+    "validate:automated-finishing": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-automated-finishing.test.ts",
+    "validate:motion-polish": "PYTHONPATH=scripts/blender/animation python3 -m unittest scripts/blender/animation/test_motion_polish.py",
     "validate:sound-design": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-sound-design.test.ts",
     "validate:music-cues": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-sound-design.test.ts",
     "validate:audio-mix-plan": "pnpm --filter @doodle-dash/web exec vitest run src/lib/tivvlejoy-sound-design.test.ts",

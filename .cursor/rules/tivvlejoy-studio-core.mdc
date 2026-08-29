@@ -1,0 +1,14 @@
+---
+description: TivvleJoy studio-wide canon, evidence, and execution safety
+alwaysApply: true
+---
+
+# TivvleJoy studio core
+
+- Treat approved character identity, proportions, accessories, registered purchased assets, source hashes, and approval receipts as immutable inputs. Never silently replace them with placeholders, generic primitives, procedural substitutes, or approximate lookalikes.
+- Preserve genuine execution evidence. Reconcile stale state with an explicit terminal state, reason, and timestamp; never delete or relabel historical evidence as live progress.
+- Technical success is not visual approval. CI, a completed render, or a valid file cannot auto-pass a human visual gate.
+- Do not claim `PAID_RENDER_READY_AWAITING_AUTHORIZATION` until every mandatory gate passes against the exact previewed scene and manifest.
+- Never initiate paid compute, create a cloud worker, pin/build a paid worker image, merge a production PR, or publish a final artifact without explicit task-specific authorization and a recorded maximum cost.
+- Keep local planning, validation, and preview work deterministic, offline, and free unless the user explicitly authorizes otherwise.
+

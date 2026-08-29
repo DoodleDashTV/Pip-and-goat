@@ -1,0 +1,20 @@
+---
+description: Character animation and Blender motion-polish standards
+globs:
+  - "scripts/blender/**/*.py"
+  - "apps/web/src/lib/tivvlejoy-character-animation/**/*.{ts,tsx}"
+  - "apps/web/src/lib/*animation*.{ts,tsx}"
+  - "packages/direction/src/acting/**/*.ts"
+alwaysApply: false
+---
+
+# Animation and motion polish
+
+- Plan readable poses and action phases: thought/hold, anticipation when motivated, primary action, optional overshoot, settle, and purposeful stillness.
+- Use action-specific motion profiles. Do not apply a universal squash/stretch percentage. Stay inside the approved rig's deformation envelope and preserve character volume and identity.
+- Organic acting must not accidentally use uniform robotic spacing. Linear or constant interpolation remains valid for deliberate mechanical motion, visibility switches, blocking, and other technical channels.
+- Favor clean arcs, grounded contacts, controlled overlap, stable gaze, and face/body agreement. Reject foot slide, grip drift, IK/FK pops, penetrations, float, chatter, and unmotivated secondary noise.
+- Key stepped blocking before spline polish. Audit the spline pass for interpolation, handles, overshoot, contacts, and delivery-frame readability.
+- Use deterministic profiles from `scripts/blender/animation/motion_polish.py`; do not invent per-shot easing hacks when an approved profile fits.
+- Do not change Pip or Goat canon geometry, proportions, or signature accessories to make an animation easier.
+

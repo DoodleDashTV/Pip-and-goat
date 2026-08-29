@@ -14,4 +14,5 @@ required asset path is absent or does not exist.
 - `apply_lip_sync.py`
 - `render_frames.py`
 - `assemble_scene.py`
+- `animation/motion_polish.py` — action-specific F-curve and camera-comfort profiles with pure-Python audit helpers. Technical checks never replace visual approval.
 - `characters/` — reusable TivvleJoy character build department (`build_character.py`). Dry-run safe. Never overwrites SOURCE. Never false-PASSes without real Goat bytes and Blender.

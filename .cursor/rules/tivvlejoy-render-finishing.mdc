@@ -1,0 +1,19 @@
+---
+description: Deterministic preview, render, editorial, caption, and delivery rules
+globs:
+  - "scripts/blender/render_frames.py"
+  - "scripts/postproduction/**/*"
+  - "packages/direction/src/ffmpeg.ts"
+  - "apps/web/src/lib/tivvlejoy-nightshift-production/{editorial,captions,finishing}.ts"
+alwaysApply: false
+---
+
+# Render and finishing
+
+- Validate opening, representative middle, ending, and worst-case frames locally before any paid render. Use the lowest-cost tier that can reveal the defect under review.
+- Finishing timelines are frame-driven and deterministic. Do not use wall-clock CSS animation, `Math.random()`, or runtime-dependent timing for titles, captions, end cards, or branding.
+- Preserve source framing by default. Cross-aspect variants use a safe contain layout unless a reviewed, face-safe reframe explicitly authorizes cropping.
+- Captions must share locked dialogue timing, pass reading-speed/overlap/line/safe-area checks, and remain clear of important faces and action.
+- Automated finishing may assemble approved picture, audio, titles, captions, branding, and delivery variants. It may not make a failed source visually approved or relabel a preview as final.
+- Prefer the existing deterministic FFmpeg/editorial contracts. Add another renderer only behind an adapter, with its license, determinism, and cost reviewed first.
+
