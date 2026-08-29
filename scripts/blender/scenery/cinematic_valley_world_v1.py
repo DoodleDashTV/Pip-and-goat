@@ -353,7 +353,7 @@ def in_mountain_corridor(x: float, y: float) -> bool:
 
 
 def in_shot03_corridor(x: float, y: float) -> bool:
-    return dist_to_polyline(x, y, ((-38.0, -6.0, 0.0), (-18.0, 8.5, 0.0), (-12.0, 14.0, 0.0))) < 6.4
+    return dist_to_polyline(x, y, ((-38.0, -6.0, 0.0), (-22.0, 6.0, 0.0), (-16.0, 12.0, 0.0))) < 5.8
 
 
 def role_files(files: list[Path], include: tuple[str, ...], exclude: tuple[str, ...] = ()) -> list[Path]:
@@ -498,6 +498,10 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
         local_half = left_half if _signed < 0.0 else right_half
         bank_outer = local_half + (SOUTH_BANK_RUN if _signed < 0.0 else NORTH_BANK_RUN) + 0.70
         height = sculpt_channel_height(x, y, height)
+        # Open a low saddle right of Cabin01 so locked camera C can see a
+        # mountain/sky sliver without pitching the approved creek look.
+        if 0.5 <= x <= 10.0 and -9.0 <= y <= 6.0 and river_dist > bank_outer:
+            height -= 0.55 * max(0.0, 1.0 - abs(x - 4.5) / 6.0)
         if in_village(x, y) and river_dist > bank_outer:
             edge = min(
                 (VILLAGE_X_HALF - abs(x)) / 4.0,
@@ -1839,7 +1843,7 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     foothill_slots = ((10.0, 46.0, 0.16), (52.0, 48.0, 0.15))
     # Center peak sits closer so locked camera C can still read a mountain
     # silhouette over the cabin without changing the approved creek look.
-    peak_slots = ((-36.0, 78.0, 0.30), (-2.0, 58.0, 0.36), (50.0, 80.0, 0.28))
+    peak_slots = ((-36.0, 78.0, 0.30), (12.0, 52.0, 0.40), (50.0, 80.0, 0.28))
     placed = []
     foothills = [obj for obj in members if obj and "meadowrange" in obj.name.lower()]
     peaks = [obj for obj in members if obj and "grassymountain" in obj.name.lower()]
@@ -2242,7 +2246,7 @@ def place_shot03_forest_passage(trees: list) -> list:
     if not live:
         return extras
     cam_xy = Vector((-38.0, -6.0, 0.0))
-    look_xy = Vector((-18.0, 8.5, 0.0))
+    look_xy = Vector((-22.0, 6.0, 0.0))
     along = look_xy - cam_xy
     span = along.length
     along.normalize()
@@ -2272,8 +2276,9 @@ def place_shot03_forest_passage(trees: list) -> list:
         sap = duplicate_mesh_in_world(live[i % len(live)], (loc.x, loc.y, 0.0), scale)
         sap.rotation_euler.z += 0.41 * ((i * 3) % 7)
         extras.append(sap)
-    extras.extend(scatter_clumps(live, (-28.0, 14.0, 0.0), 4, 3, 5.8, 1.08, 23))
-    extras.extend(scatter_clumps(live, (-22.0, -2.0, 0.0), 3, 2, 5.2, 0.86, 29))
+    extras.extend(scatter_clumps(live, (-30.0, 16.0, 0.0), 4, 3, 5.8, 1.08, 23))
+    extras.extend(scatter_clumps(live, (-26.0, -4.0, 0.0), 3, 3, 5.2, 0.86, 29))
+    extras.extend(scatter_clumps(live, (-34.0, 10.0, 0.0), 3, 2, 4.6, 0.74, 31))
     return extras
 
 
@@ -2283,50 +2288,70 @@ def place_shot05_compression_frame(trees: list) -> list:
     live = [obj for obj in trees if obj and obj.type == "MESH"]
     if not live:
         return extras
-    sap = duplicate_mesh_in_world(live[0], (11.5, -46.0, 0.0), 1.35)
+    sap = duplicate_mesh_in_world(live[0], (28.0, -48.0, 0.0), 0.92)
     sap.rotation_euler.z += 0.55
     extras.append(sap)
-    extras.append(duplicate_mesh_in_world(live[min(1, len(live) - 1)], (14.8, -38.5, 0.0), 0.72))
+    extras.append(duplicate_mesh_in_world(live[min(1, len(live) - 1)], (30.5, -40.0, 0.0), 0.58))
     return extras
 
 
 def repair_cabin_placeholders() -> list[dict]:
-    """Hide only noncanonical white opening cards. Keep purchased cabin meshes."""
+    """Darken untextured white opening cards. Keep purchased cabin meshes."""
     reports = []
-    keep = ("building", "cabin", "roof", "door", "fence", "gate", "cart", "tree", "straw", "log", "chimney")
-    suspect = ("interior", "placeholder", "dummy", "cube", "plane")
+    dark = bpy.data.materials.new("TJ_CabinInteriorVoid")
+    dark.use_nodes = True
+    bsdf = next((node for node in dark.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+    if bsdf and "Base Color" in bsdf.inputs:
+        bsdf.inputs["Base Color"].default_value = (0.04, 0.025, 0.016, 1.0)
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.92
+        if "Emission Strength" in bsdf.inputs:
+            bsdf.inputs["Emission Strength"].default_value = 0.0
+    keep = ("roof", "straw", "fence", "gate", "cart", "tree")
     for obj in list(bpy.data.objects):
         if obj.type != "MESH":
             continue
         name = obj.name.lower()
         parent = str(getattr(obj.parent, "name", "") or "").lower()
         blob = f"{name} {parent}"
-        if "village" not in blob and "cabin" not in blob and "building" not in blob and "door" not in blob and "frame" not in blob:
+        if not any(token in blob for token in ("village", "cabin", "building", "door", "frame", "window")):
             continue
-        if any(token in name for token in keep) and "interior" not in name:
+        if any(token in name for token in keep):
             continue
-        has_img = any(material_has_valid_image(slot.material) for slot in obj.material_slots)
-        boxy = is_box_mesh(mesh_face_count(obj), object_dimensions(obj))
-        if any(token in name for token in suspect) or (boxy and not has_img):
-            obj.hide_render = True
-            obj.hide_viewport = True
-            reports.append({"name": obj.name, "parent": parent, "action": "hide", "hasImage": has_img, "boxy": boxy})
-            print(json.dumps({"event": "cabin_placeholder_hidden", "name": obj.name, "parent": parent, "hasImage": has_img}), flush=True)
-    for mat in bpy.data.materials:
-        if not mat or not mat.node_tree:
-            continue
-        blob = mat.name.lower()
-        if not any(word in blob for word in ("cabin", "building", "door", "window", "glass", "emi")):
-            continue
-        for node in mat.node_tree.nodes:
-            if node.type == "EMISSION" and "Strength" in node.inputs:
-                node.inputs["Strength"].default_value = min(0.45, float(node.inputs["Strength"].default_value or 0.0))
-            if node.type == "BSDF_PRINCIPLED" and "Emission Strength" in node.inputs:
-                node.inputs["Emission Strength"].default_value = min(0.35, float(node.inputs["Emission Strength"].default_value or 0.0))
-                if "Emission Color" in node.inputs and not node.inputs["Emission Color"].links:
-                    color = node.inputs["Emission Color"].default_value
-                    if color[0] > 0.85 and color[1] > 0.85 and color[2] > 0.85:
-                        node.inputs["Emission Color"].default_value = (0.55, 0.42, 0.28, 1.0)
+        for index, slot in enumerate(obj.material_slots):
+            mat = slot.material
+            bright = False
+            has_img = material_has_valid_image(mat) if mat else False
+            color = None
+            if mat and mat.node_tree:
+                body = next((node for node in mat.node_tree.nodes if node.type == "BSDF_PRINCIPLED"), None)
+                if body and "Base Color" in body.inputs and not body.inputs["Base Color"].links:
+                    color = tuple(body.inputs["Base Color"].default_value[:3])
+                    bright = color[0] > 0.72 and color[1] > 0.72 and color[2] > 0.72
+                if body and "Emission Strength" in body.inputs:
+                    emit = float(body.inputs["Emission Strength"].default_value or 0.0)
+                    if emit > 0.8:
+                        body.inputs["Emission Strength"].default_value = 0.28
+                        reports.append({"name": obj.name, "slot": index, "action": "clamp_emission", "from": emit})
+                for node in mat.node_tree.nodes:
+                    if node.type == "EMISSION" and "Strength" in node.inputs:
+                        emit = float(node.inputs["Strength"].default_value or 0.0)
+                        if emit > 0.8:
+                            node.inputs["Strength"].default_value = 0.28
+                            reports.append({"name": obj.name, "slot": index, "action": "clamp_emission_node", "from": emit})
+            if (not has_img and bright) or (mat is None and "door" in blob):
+                slot.material = dark
+                reports.append({"name": obj.name, "slot": index, "material": getattr(mat, "name", None), "action": "darken_white_slot", "color": color})
+                print(json.dumps({"event": "cabin_placeholder_darkened", "name": obj.name, "slot": index, "material": getattr(mat, "name", None), "color": color}), flush=True)
+            print(json.dumps({
+                "event": "cabin_material_slot",
+                "name": obj.name,
+                "slot": index,
+                "material": getattr(mat, "name", None),
+                "hasImage": has_img,
+                "bright": bright,
+                "color": color,
+            }), flush=True)
     return reports
 
 
