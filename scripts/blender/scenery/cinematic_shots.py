@@ -179,8 +179,8 @@ def default_shot_cameras() -> list[dict]:
             # V36: V35 grazing stripe is retired. Authoritative hero is search
             # candidate C — across-creek, diagonal water, cabin destination.
             "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
-            "start": {"location": (2.4, -23.6, 3.65), "look": (-6.8, -2.4, 0.85), "lens": 34.0},
-            "end": {"location": (4.6, -22.4, 3.75), "look": (-4.2, -1.2, 1.05), "lens": 38.0},
+            "start": {"location": (0.5, -24.0, 3.40), "look": (-6.0, -2.0, 1.20), "lens": 36.0},
+            "end": {"location": (2.2, -22.8, 3.50), "look": (-3.8, -0.6, 1.35), "lens": 38.0},
         },
         {
             "id": "SHOT_03",
