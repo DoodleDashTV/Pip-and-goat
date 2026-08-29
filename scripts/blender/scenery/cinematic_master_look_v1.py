@@ -209,11 +209,11 @@ def apply_color_management() -> dict:
     if not hasattr(scene, "view_settings"):
         return {"mode": "missing"}
     scene.view_settings.view_transform = "AgX"
-    scene.view_settings.look = "None"
-    scene.view_settings.exposure = 0.28
+    scene.view_settings.look = "AgX - Base Contrast"
+    scene.view_settings.exposure = 0.34
     scene.view_settings.gamma = 1.0
-    _log("cinematic_color_management", viewTransform="AgX", look="None", exposure=0.28)
-    return {"viewTransform": "AgX", "look": "None", "exposure": 0.28}
+    _log("cinematic_color_management", viewTransform="AgX", look="AgX - Base Contrast", exposure=0.34)
+    return {"viewTransform": "AgX", "look": "AgX - Base Contrast", "exposure": 0.34}
 
 
 def apply_cycles_hero_quality() -> dict:
