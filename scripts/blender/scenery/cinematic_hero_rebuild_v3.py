@@ -241,7 +241,8 @@ def build_hero_terrain(col: bpy.types.Collection) -> dict:
                 loop[color_layer] = a
     bm.to_mesh(mesh)
     bm.free()
-    mesh.use_auto_smooth = True
+    for poly in mesh.polygons:
+        poly.use_smooth = True
     obj.data.materials.append(_terrain_material())
     _log("v3_terrain_built", verts=xs * ys)
     return {"verts": xs * ys}
