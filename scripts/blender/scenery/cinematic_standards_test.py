@@ -118,6 +118,9 @@ def test_six_shot_plan():
     shot03 = next(cam for cam in cameras if cam["id"] == "SHOT_03")
     assert shot03["start"]["location"][0] <= -28.0
     assert shot03["start"]["look"][0] <= -12.0
+    # Forest passage must look along the west trees toward the village, not over empty north meadow.
+    assert shot03["start"]["look"][1] <= 22.0
+    assert shot03["start"]["location"][2] <= 4.0
     shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
     # V37 keeps camera C, but pitches below the cabin so the creek owns more frame.
     assert shot02["start"]["location"][1] < -16.0

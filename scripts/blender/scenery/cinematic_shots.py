@@ -134,10 +134,10 @@ def hero_search_cameras() -> list[dict]:
         {
             "id": "C",
             "name": "across_creek_opposite_bank",
-            "location": (1.4, -19.8, 2.60),
-            "look": (-3.6, -10.6, -0.95),
+            "location": (1.4, -19.8, 2.72),
+            "look": (-3.6, -10.4, -0.52),
             "lens": 32.0,
-            "why": "V37 hero repair: closer/lower into the creek so water leads; cabin stays off-axis up-left.",
+            "why": "V37 hero: creek-first diagonal with a thin horizon so mountains stay readable behind the off-axis cabin.",
         },
         {
             "id": "D",
@@ -179,14 +179,18 @@ def default_shot_cameras() -> list[dict]:
             # V37: camera C remains authoritative, with a lower sightline and
             # wider lens so the creek leads before the off-axis cabin resolves.
             "retiredV35": {"location": (-6.2, -20.4, 4.45), "look": (9.0, -11.2, -1.16), "lens": 38.0},
-            "start": {"location": (1.4, -19.8, 2.60), "look": (-3.6, -10.6, -0.95), "lens": 32.0},
-            "end": {"location": (2.8, -18.8, 2.70), "look": (-1.8, -9.4, -0.75), "lens": 34.0},
+            "publishedV37": {"location": (0.2, -23.2, 3.05), "look": (-5.8, -5.2, 0.20), "lens": 34.0},
+            "start": {"location": (1.4, -19.8, 2.72), "look": (-3.6, -10.4, -0.52), "lens": 32.0},
+            "end": {"location": (2.8, -18.8, 2.82), "look": (-1.8, -9.2, -0.32), "lens": 34.0},
         },
         {
             "id": "SHOT_03",
             "camera": "TJ_SHOT_03_CAM",
-            "start": {"location": (-34.0, 16.0, 5.2), "look": (-14.0, 36.0, 7.2), "lens": 48.0},
-            "end": {"location": (-30.0, 20.0, 5.6), "look": (-12.5, 40.0, 7.8), "lens": 52.0},
+            # Stay on the west flank, but look along the tree line toward the
+            # village opening instead of over empty north meadow.
+            "retiredEmptyMeadow": {"location": (-34.0, 16.0, 5.2), "look": (-14.0, 36.0, 7.2), "lens": 48.0},
+            "start": {"location": (-32.5, 1.8, 3.05), "look": (-13.4, 15.2, 2.15), "lens": 48.0},
+            "end": {"location": (-30.5, 4.6, 3.25), "look": (-12.6, 18.0, 2.45), "lens": 52.0},
         },
         {
             "id": "SHOT_04",
