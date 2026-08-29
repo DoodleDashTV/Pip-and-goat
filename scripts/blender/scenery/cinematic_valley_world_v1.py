@@ -590,8 +590,8 @@ def _add_eco_disk(name: str, loc: Vector, sx: float, sy: float, color: tuple, ya
 def place_meadow_ecology() -> list:
     """Low needle beds and earth patches that read at 540 px on SHOT_01/02."""
     extras = []
-    dirt_col = (0.142, 0.092, 0.046)
-    needle_col = (0.036, 0.048, 0.020)
+    dirt_col = (0.168, 0.102, 0.048)
+    needle_col = (0.028, 0.040, 0.016)
     patches = (
         # Far SHOT_01 floor: several-metre elongated beds, not dots.
         (-6.5, 8.5, 4.8, 0.08, True),
@@ -621,7 +621,7 @@ def place_meadow_ecology() -> list:
     for i, (x, y, size, thick, is_needle) in enumerate(patches):
         if in_river_channel(x, y, margin=1.2):
             continue
-        loc = Vector((x, y, 0.04))
+        loc = Vector((x, y, 0.09))
         sx = size * 1.15
         sy = size * 0.48
         extras.append(_add_eco_disk(
