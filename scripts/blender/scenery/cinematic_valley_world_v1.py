@@ -771,19 +771,19 @@ def embed_wet_banks_on_floor(mat: bpy.types.Material) -> None:
     links.new(hole_avg.outputs["Value"], hole_half.inputs[0])
     thresh_span = nodes.new("ShaderNodeMath")
     thresh_span.operation = "MULTIPLY"
-    thresh_span.inputs[1].default_value = 0.48
+    thresh_span.inputs[1].default_value = 0.28
     links.new(hole_half.outputs["Value"], thresh_span.inputs[0])
     thresh = nodes.new("ShaderNodeMath")
     thresh.operation = "ADD"
-    thresh.inputs[1].default_value = 0.16
+    thresh.inputs[1].default_value = 0.06
     links.new(thresh_span.outputs["Value"], thresh.inputs[0])
     delta = nodes.new("ShaderNodeMath")
     delta.operation = "SUBTRACT"
     links.new(mask, delta.inputs[0])
     links.new(thresh.outputs["Value"], delta.inputs[1])
     patch = nodes.new("ShaderNodeMapRange")
-    patch.inputs["From Min"].default_value = -0.16
-    patch.inputs["From Max"].default_value = 0.20
+    patch.inputs["From Min"].default_value = -0.06
+    patch.inputs["From Max"].default_value = 0.14
     patch.inputs["To Min"].default_value = 0.0
     patch.inputs["To Max"].default_value = 1.0
     links.new(delta.outputs["Value"], patch.inputs["Value"])
@@ -1681,7 +1681,8 @@ def build_river() -> tuple[bpy.types.Object, str, list]:
         centers,
         width_scale=BED_WIDTH_SCALE,
         z_center=BED_CENTER_Z + 0.05,
-        z_edge=BED_SHOULDER_Z + 0.04,
+        # Keep the dark bed under the water so it cannot draw a raised knife lip.
+        z_edge=WATER_SURFACE_Z - 0.05,
         rows=11,
         foam_edges=False,
     )
@@ -1959,9 +1960,39 @@ def place_crest_grass_tufts(centers: list[Vector]) -> list:
     return extras
 
 
+def wet_stone_material() -> bpy.types.Material:
+    """Mid-tone wet rock so stones read against dark water when they pierce it."""
+    mat = bpy.data.materials.new("TJ_WetStone")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
+    if bsdf:
+        if "Base Color" in bsdf.inputs:
+            bsdf.inputs["Base Color"].default_value = (0.16, 0.13, 0.10, 1.0)
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.38
+        if "Specular IOR Level" in bsdf.inputs:
+            bsdf.inputs["Specular IOR Level"].default_value = 0.42
+        if "Metallic" in bsdf.inputs:
+            bsdf.inputs["Metallic"].default_value = 0.0
+        coord = nodes.new("ShaderNodeTexCoord")
+        noise = nodes.new("ShaderNodeTexNoise")
+        noise.inputs["Scale"].default_value = 4.8
+        if "Detail" in noise.inputs:
+            noise.inputs["Detail"].default_value = 5.0
+        links.new(coord.outputs["Object"], noise.inputs["Vector"])
+        bump = nodes.new("ShaderNodeBump")
+        bump.inputs["Strength"].default_value = 0.55
+        links.new(noise.outputs["Fac"], bump.inputs["Height"])
+        if "Normal" in bsdf.inputs:
+            links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
 def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Material, yaw: float) -> bpy.types.Object:
-    """Irregular dark rock that can pierce the water plane. Not a cube, not a sphere."""
-    sx, sy, sz = 0.72 * scale, 0.48 * scale, 0.38 * scale
+    """Irregular wet rock that can pierce the water plane. Not a cube, not a sphere."""
+    sx, sy, sz = 0.95 * scale, 0.62 * scale, 0.52 * scale
     verts = [
         (-0.70 * sx, -0.42 * sy, -0.16 * sz),
         (0.62 * sx, -0.50 * sy, -0.12 * sz),
@@ -1991,7 +2022,7 @@ def _add_lumpy_rock(name: str, loc: Vector, scale: float, mat: bpy.types.Materia
 def place_waterline_interruptions(centers: list[Vector]) -> list:
     """Hero-scale stones that visibly enter the water in the SHOT_02 frustum."""
     extras = []
-    mat = cinematic_riverbed_material()
+    mat = wet_stone_material()
     hero_xs = (-9.4, -5.8, -2.0, 2.2, 6.6, 10.8)
     cut_xs = (-8.0, -3.4, 1.6, 7.2, 11.4)
     island_xs = (-1.4, 5.8)
@@ -2008,28 +2039,28 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
             inward = 0.28 + 0.34 * ((len(used_hero) * 3) % 5) / 4.0
             loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
             loc.z = WATER_SURFACE_Z + 0.05
-            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 2.05 + 0.45 * (len(used_hero) % 3), mat, i * 0.71))
+            extras.append(_add_lumpy_rock(f"TJ_WaterlineStone_{i}", loc, 3.6 + 0.70 * (len(used_hero) % 3), mat, i * 0.71))
         for cx in cut_xs:
             if cx in used_cut or abs(center.x - cx) > 1.05:
                 continue
             used_cut.add(cx)
             loc = center + side * (-left * BED_WIDTH_SCALE * (0.92 + 0.08 * math.sin(i)))
             loc.z = BED_SHOULDER_Z + 0.16
-            extras.append(_add_lumpy_rock(f"TJ_IsolineRock_{i}", loc, 1.55 + 0.35 * (len(used_cut) % 2), mat, i * 0.53 + 0.8))
+            extras.append(_add_lumpy_rock(f"TJ_IsolineRock_{i}", loc, 2.4 + 0.55 * (len(used_cut) % 2), mat, i * 0.53 + 0.8))
         for ix in island_xs:
             if ix in used_island or abs(center.x - ix) > 1.05:
                 continue
             used_island.add(ix)
             loc = center + side * (-left * WATER_WIDTH_SCALE * 0.18)
             loc.z = WATER_SURFACE_Z - 0.02
-            island = _add_lumpy_rock(f"TJ_WetIsland_{i}", loc, 1.35, mat, i * 0.4)
-            island.scale = (1.15, 0.72, 0.28)
+            island = _add_lumpy_rock(f"TJ_WetIsland_{i}", loc, 2.15, mat, i * 0.4)
+            island.scale = (1.35, 0.82, 0.32)
             extras.append(island)
     # Near-camera boulder so SHOT_02 has a foreground waterline cue.
     extras.append(_add_lumpy_rock(
         "TJ_FgBankRock",
-        Vector((-11.6, -17.6, WATER_SURFACE_Z + 0.18)),
-        2.6,
+        Vector((-12.4, -16.2, WATER_SURFACE_Z + 0.22)),
+        4.2,
         mat,
         1.15,
     ))
