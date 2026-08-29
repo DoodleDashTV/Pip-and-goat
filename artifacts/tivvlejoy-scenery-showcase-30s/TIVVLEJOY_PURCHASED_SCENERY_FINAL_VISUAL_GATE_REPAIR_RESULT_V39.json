@@ -4,7 +4,7 @@
   "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
   "startingSha": "7b3b7b47627e32aecec936e18d470537e4dfc9ea",
   "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
-  "finalSha": "6acf5d25c83f35205c435a22fdeb9f2be6301158",
+  "finalSha": "e9807fed5e465f1f53c2cc10d8fddcef6c24805d",
   "pr169": {
     "state": "OPEN",
     "draft": true,
@@ -25,12 +25,12 @@
   "v34WaterLockVerification": {
     "engine": "CYCLES",
     "ior": 1.33,
-    "transmission": 0.80,
+    "transmission": 0.8,
     "metallic": 0.0,
-    "specular": 0.50,
+    "specular": 0.5,
     "waterThicknessM": 0.18,
     "volumeAbsorption": 0.18,
-    "WATER_WIDTH_SCALE": 0.30,
+    "WATER_WIDTH_SCALE": 0.3,
     "BED_WIDTH_SCALE": 0.68,
     "lightPathHdriReflectionControl": true,
     "hdriReflectionRotationZ": 0.48,
@@ -79,7 +79,7 @@
     "V": "PASS"
   },
   "whiteWindow": {
-    "rootCause": "Building01–04 slot 1 uses untextured Window01* default grey (0.8,0.8,0.8) with no image. Cabin/Building Principled emission was 1.0. After zeroing emission and remapping Window* to matte TJ_CabinDaylightGlass, SHOT_01/02 still show a cyan-blue rectangle. That remaining punch is the flat window opening catching the Sky HDRI / reading as a hole, not a leftover 1.0 EMI node.",
+    "rootCause": "Building01\u201304 slot 1 uses untextured Window01* default grey (0.8,0.8,0.8) with no image. Cabin/Building Principled emission was 1.0. After zeroing emission and remapping Window* to matte TJ_CabinDaylightGlass, SHOT_01/02 still show a cyan-blue rectangle. That remaining punch is the flat window opening catching the Sky HDRI / reading as a hole, not a leftover 1.0 EMI node.",
     "correctionsTried": [
       "Zeroed all Building/Window Principled and Emission node strengths",
       "Remapped Window01* to TJ_CabinDaylightGlass (dark, roughness 0.96, transmission 0, emission 0.02 warm)",
@@ -87,22 +87,95 @@
       "Tried slot-placed and AABB interior cubes; both leaked as tan cards and did not kill the cyan punch"
     ],
     "lookdev88Status": "Cyan window card still visible on SHOT_01 and SHOT_02. SHOT_04 windows read dark. Not pixel-PASS.",
-    "exactNames": ["Window01", "Window01.001", "Window01.002", "Window01.003", "Building01–04 slot 1"]
+    "exactNames": [
+      "Window01",
+      "Window01.001",
+      "Window01.002",
+      "Window01.003",
+      "Building01\u201304 slot 1"
+    ]
   },
   "forestPassConstruction": {
-    "camera": {"start": [-50.0, -22.0, 2.85], "look": [-58.0, -4.0, 1.55], "lens": 50.0},
+    "camera": {
+      "start": [
+        -50.0,
+        -22.0,
+        2.85
+      ],
+      "look": [
+        -58.0,
+        -4.0,
+        1.55
+      ],
+      "lens": 50.0
+    },
     "layout": "Irregular west grove looking away from the village. Near occluders small; mid/far trunk-scale variation; saplings; soil scars; fallen trunks.",
     "bugFixed": "lookdev84 hid Tree*_LOD0; every forest copy inherited hide_render. Forced tree unhide.",
     "pixelResult": "lookdev88 SHOT_03 reads dense cinematic forest, not a cabin peek."
   },
   "telephotoConstruction": {
-    "camera": {"start": [38.0, -122.0, 16.0], "look": [26.0, 24.0, 12.5], "lens": 120.0},
+    "camera": {
+      "start": [
+        38.0,
+        -122.0,
+        16.0
+      ],
+      "look": [
+        26.0,
+        24.0,
+        12.5
+      ],
+      "lens": 120.0
+    },
     "mountains": {
-      "peaks": [[-14.0, 28.0, 0.50], [28.0, 16.0, 0.48], [46.0, 52.0, 0.30]],
-      "foothills": [[4.0, 24.0, 0.22], [36.0, 28.0, 0.18]],
+      "peaks": [
+        [
+          -14.0,
+          28.0,
+          0.5
+        ],
+        [
+          28.0,
+          16.0,
+          0.48
+        ],
+        [
+          46.0,
+          52.0,
+          0.3
+        ]
+      ],
+      "foothills": [
+        [
+          4.0,
+          24.0,
+          0.22
+        ],
+        [
+          36.0,
+          28.0,
+          0.18
+        ]
+      ],
       "groundSnappedAfterRotation": true
     },
-    "midgroundPines": [[22.0, 10.0, 1.18], [32.0, 8.0, 0.78], [18.0, 6.0, 0.46]],
+    "midgroundPines": [
+      [
+        22.0,
+        10.0,
+        1.18
+      ],
+      [
+        32.0,
+        8.0,
+        0.78
+      ],
+      [
+        18.0,
+        6.0,
+        0.46
+      ]
+    ],
     "pixelResult": "lookdev88 SHOT_05 reads as long-lens mountain compression with purchased pines stacked against Louis mass."
   },
   "grassBankNaturalization": [
@@ -121,7 +194,7 @@
     "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev88/shot_06_.png"
   },
   "purchasedAssetsVisiblyUsed": [
-    "Cabin01A–04B village architecture on SHOT_01/02/04",
+    "Cabin01A\u201304B village architecture on SHOT_01/02/04",
     "Cart01 Gate01 Fence01",
     "Tree01 Tree02 Tree03 dense west grove and SHOT_05 stack",
     "Water_Mat_1 donor / V34 variant D creek",
@@ -136,7 +209,10 @@
     "resolution": "540x960",
     "samples": 32,
     "waterVariant": "D",
-    "frameRange": [1, 900]
+    "frameRange": [
+      1,
+      900
+    ]
   },
   "workerImageBuildStatus": "NOT_BUILT_VISUAL_GATE_FAILED",
   "workerImageDigest": null,
