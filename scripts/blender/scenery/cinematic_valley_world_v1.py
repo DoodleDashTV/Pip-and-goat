@@ -636,6 +636,12 @@ def paint_wet_bank_mask(ground: bpy.types.Object) -> None:
                     value *= 0.10
             else:
                 value = 0.0
+            blob = 0.5 + 0.5 * math.sin(x * 0.38 + along * 0.19)
+            blob *= 0.5 + 0.5 * math.sin(x * 0.71 + y * 0.33)
+            if dist < fade and blob > 0.74:
+                value = max(value, 0.44)
+            if dist > lower and blob < 0.20:
+                value *= 0.10
         else:
             inner = bed * 0.42
             shelf = local_half * 0.72
