@@ -38,6 +38,12 @@ from cinematic_master_look_v1 import (  # noqa: E402
     apply_cinematic_master_post_profile,
     apply_cinematic_master_pre_profile,
 )
+from cinematic_hero_rebuild_v2 import (  # noqa: E402
+    apply_hero_rebuild_v2,
+    apply_light_mood,
+    import_nature_library,
+    COMP_CAMERAS,
+)
 from cinematic_standards import (  # noqa: E402
     MASTER_COLLECTIONS,
     assert_final_contract,
@@ -136,6 +142,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--water-variant", default="D", help="A=V33 baseline, B=real IOR+open HDRI, C=real IOR+HDRI control, D=tuned C")
     parser.add_argument("--ab-water", action="store_true", help="Render SHOT_02 once per water variant A-D")
     parser.add_argument("--hero-search", action="store_true", help="Render V36 creek-hero camera candidates A-E")
+    parser.add_argument("--v2-compare", default="", help="comps|lights — render V2 hero candidates")
+    parser.add_argument("--v2-camera", default="A", help="A|B|C composition for the V2 hero")
+    parser.add_argument("--v2-light", default="C", help="A|B|C lighting mood for the V2 hero")
     return parser.parse_args(argv)
 
 
@@ -4054,26 +4063,9 @@ def main() -> int:
         link_exclusive(plate, collections["WORLD_VILLAGE"])
 
     nature_members = []
-    nature_files = expanded.get("forest_nature", [])
-    if nature_files:
-        for candidate in geometry_candidates(nature_files, "forest_nature"):
-            objs = import_geometry(candidate, "forest_nature")
-            if objs:
-                nature_members.extend(keep_hero_meshes(objs, "forest_nature", 6))
-        for obj in nature_members:
-            if obj.type != "MESH":
-                continue
-            paint_simple_color(obj, f"TJ_Canopy_{obj.name}", (0.05, 0.12, 0.05), 0.92)
-            if hasattr(obj, "visible_shadow"):
-                obj.visible_shadow = False
-        if nature_members:
-            west = duplicate_mesh_in_world(nature_members[0], (-72.0, 48.0, 0.0), 1.4)
-            east = duplicate_mesh_in_world(nature_members[0], (46.0, 56.0, 0.0), 1.7)
-            for obj in nature_members:
-                obj.hide_render = True
-                obj.hide_viewport = True
-            link_exclusive(west, collections["WORLD_FOREST_MIDGROUND"])
-            link_exclusive(east, collections["WORLD_FOREST_BACKGROUND"])
+    nature_library = import_nature_library(expanded.get("forest_nature", []))
+    if nature_library:
+        nature_members = [obj for bucket in nature_library.values() for obj in bucket]
 
     trees = [
         obj for obj in street_tree_members
@@ -4152,6 +4144,12 @@ def main() -> int:
         cameras.extend(setup_hero_search_cameras())
     applied = apply_profile(args.profile, args)
     apply_cinematic_master_post_profile()
+    apply_hero_rebuild_v2(nature_library, collections, mood=str(args.v2_light or "C").upper())
+    chosen = COMP_CAMERAS.get(str(args.v2_camera or "A").upper())
+    if chosen is not None:
+        hero_cam = bpy.data.objects.get(chosen["name"])
+        if hero_cam is not None:
+            bpy.context.scene.camera = hero_cam
 
     contributions = {
         "village_blender": visible_use_record("village_blender", downloaded=True, extracted=True, datablockLoaded=imported > 0, renderedPixels=imported > 0, shotIds=["SHOT_04", "SHOT_06"], evidence="collection:WORLD_VILLAGE"),
@@ -4171,8 +4169,8 @@ def main() -> int:
             extracted=True,
             datablockLoaded=bool(nature_members),
             renderedPixels=bool(nature_members),
-            shotIds=["SHOT_01", "SHOT_03"] if nature_members else [],
-            evidence="collection:WORLD_FOREST_MIDGROUND" if nature_members else "",
+            shotIds=["SHOT_02"] if nature_members else [],
+            evidence="collection:WORLD_FOREST_FOREGROUND" if nature_members else "",
         ),
         "forest_ecokit": visible_use_record(
             "forest_ecokit",
@@ -4236,6 +4234,36 @@ def main() -> int:
     write_progress("CINEMATIC_WORLD_BUILT", cameras=len(cameras), forestCopies=proof["forestCopies"])
 
     frames = [int(part) for part in (args.stills_frames or ",".join(str(item) for item in lookdev_frames())).split(",") if part.strip()]
+    if str(args.v2_compare or "").lower() == "comps":
+        scene = bpy.context.scene
+        scene.render.use_persistent_data = False
+        scene.frame_set(210)
+        for key, spec in COMP_CAMERAS.items():
+            cam = bpy.data.objects.get(spec["name"])
+            if cam is None:
+                continue
+            scene.camera = cam
+            scene.render.filepath = str(out / f"v2_comp_{key.lower()}_")
+            write_progress("V2_COMP", id=key, camera=cam.name, lens=spec["lens"])
+            bpy.ops.render.render(write_still=True)
+        write_progress("LOOKDEV_COMPLETE", compare="comps", frames=3)
+        return 0
+    if str(args.v2_compare or "").lower() == "lights":
+        scene = bpy.context.scene
+        scene.render.use_persistent_data = False
+        scene.frame_set(210)
+        key = str(args.v2_camera or "A").upper()
+        spec = COMP_CAMERAS.get(key) or COMP_CAMERAS["A"]
+        cam = bpy.data.objects.get(spec["name"])
+        if cam is not None:
+            scene.camera = cam
+        for mood in ("A", "B", "C"):
+            apply_light_mood(mood)
+            scene.render.filepath = str(out / f"v2_light_{mood.lower()}_")
+            write_progress("V2_LIGHT", mood=mood, camera=spec["name"])
+            bpy.ops.render.render(write_still=True)
+        write_progress("LOOKDEV_COMPLETE", compare="lights", frames=3)
+        return 0
     if args.hero_search:
         scene = bpy.context.scene
         scene.render.use_persistent_data = False
@@ -4276,10 +4304,18 @@ def main() -> int:
         return 0
     if args.stills_only or normalize_profile(args.profile) in {"BLOCKOUT", "LOOKDEV_FAST", "HERO_STILL"}:
         for frame in frames:
-            set_active_camera_for_frame(frame)
-            shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
-            bpy.context.scene.render.filepath = str(out / f"{shot['id'].lower()}_")
-            write_progress("LOOKDEV_STILL", frame=frame, shot=shot["id"])
+            bpy.context.scene.frame_set(frame)
+            v2_spec = COMP_CAMERAS.get(str(args.v2_camera or "A").upper())
+            v2_cam = bpy.data.objects.get(v2_spec["name"]) if v2_spec else None
+            if v2_cam is not None:
+                bpy.context.scene.camera = v2_cam
+                label = f"v2_{str(args.v2_camera or 'A').lower()}_l{str(args.v2_light or 'C').lower()}"
+            else:
+                set_active_camera_for_frame(frame)
+                shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
+                label = shot["id"].lower()
+            bpy.context.scene.render.filepath = str(out / f"{label}_")
+            write_progress("LOOKDEV_STILL", frame=frame, shot=label)
             bpy.ops.render.render(write_still=True)
         if args.control_tests:
             for name, label in (("TJ_RIVER_GRAZE_CAM", "control_graze"), ("TJ_RIVER_DOWN_CAM", "control_down")):
