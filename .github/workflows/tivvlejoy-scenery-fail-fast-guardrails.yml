@@ -1,0 +1,49 @@
+name: TivvleJoy Scenery Fail-Fast Guardrails
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/blender/scenery/**'
+      - 'scripts/cloud/scenery-showcase-30s/**'
+      - 'config/tivvlejoy-scenery-fail-fast-policy.json'
+      - '.github/workflows/tivvlejoy-scenery-fail-fast-guardrails.yml'
+  push:
+    paths:
+      - 'scripts/blender/scenery/**'
+      - 'scripts/cloud/scenery-showcase-30s/**'
+      - 'config/tivvlejoy-scenery-fail-fast-policy.json'
+      - '.github/workflows/tivvlejoy-scenery-fail-fast-guardrails.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  guardrails:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run fail-fast contract tests
+        working-directory: scripts/blender/scenery
+        run: python pipeline_guardrails_test.py
+      - name: Compile fail-fast guardrail module
+        run: python -m py_compile scripts/blender/scenery/pipeline_guardrails.py
+      - name: Prove production stays fail-closed without a readiness receipt
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p = Path('scripts/blender/scenery/pipeline_guardrails.py')
+          spec = importlib.util.spec_from_file_location('guardrails', p)
+          mod = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+          receipt = mod.production_readiness_receipt({})
+          assert receipt['productionReady'] is False
+          assert receipt['paidFinalAllowed'] is False
+          assert receipt['blockers']
+          print('fail-closed receipt PASS')
+          PY
