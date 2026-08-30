@@ -18,6 +18,7 @@ def test_predictor_adds_isolated_deltas_with_slack():
 
 def test_measured_v3_history_keeps_hdri_as_largest_isolated_peak():
     assert MEASURED_COMPONENT_HWM_V3["hdri_15k"] > 5 * 1024 * 1024 * 1024
+    assert MEASURED_COMPONENT_HWM_V3["hdri_8k"] < MEASURED_COMPONENT_HWM_V3["hdri_15k"]
     assert MEASURED_COMPONENT_HWM_V3["beech"] < 1024 * 1024 * 1024
     row = predict_cycles_sync(
         component_peaks=MEASURED_COMPONENT_HWM_V3,

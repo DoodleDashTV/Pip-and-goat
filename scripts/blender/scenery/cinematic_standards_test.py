@@ -95,6 +95,11 @@ from cycles_memory_predictor_v1_test import (  # noqa: E402
     test_predictor_adds_isolated_deltas_with_slack,
     test_unknown_parts_are_ignored,
 )
+from worker_memory_contract_v1_test import (  # noqa: E402
+    test_accepts_32gib_4090_proof_a,
+    test_blocks_paid_create_flag,
+    test_rejects_16gib_cursor_vm,
+)
 from memory_safe_asset_loader_v1_test import (  # noqa: E402
     test_dependency_preservation_allows_referenced_images,
     test_exact_object_append_policy_is_ok,
@@ -387,6 +392,9 @@ if __name__ == "__main__":
     test_predictor_adds_isolated_deltas_with_slack()
     test_measured_v3_history_keeps_hdri_as_largest_isolated_peak()
     test_unknown_parts_are_ignored()
+    test_rejects_16gib_cursor_vm()
+    test_accepts_32gib_4090_proof_a()
+    test_blocks_paid_create_flag()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False
     assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"

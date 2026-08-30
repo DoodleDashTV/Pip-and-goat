@@ -1,0 +1,36 @@
+{
+  "schema": "TJ_HDRI_DERIVATIVE_RECEIPT_V4",
+  "createdAt": "2026-08-30T13:13:11.285853+00:00",
+  "items": [
+    {
+      "id": "H15",
+      "path": "/tmp/o14-lookdev/expanded-original14/sky_hdri/HDRi_JPG_Pack/sk2/Image0001.jpg",
+      "bytes": 2818519,
+      "sha256": "2c747a306f1f8a3031155d3a266cc56b62e91966431db54e67c36f772c58c20c",
+      "expectedWidth": 15000,
+      "expectedHeight": 7500,
+      "authoritativeSource": true,
+      "overwriteSource": false
+    },
+    {
+      "id": "H8",
+      "path": "/tmp/tj_hdri_diag_8k.jpg",
+      "bytes": 452041,
+      "sha256": "c41f736d1278b7a61684fa76bd34983c5722e3536ed1d04a7c96c8024c99f65e",
+      "expectedWidth": 8192,
+      "expectedHeight": 4096,
+      "authoritativeSource": false,
+      "overwriteSource": false
+    },
+    {
+      "id": "H4",
+      "path": "/tmp/tj_hdri_diag_4k.jpg",
+      "bytes": 166721,
+      "sha256": "a5232835ab9e2b66906ed05967ad063f8e8f4920a72f7c31dc8fb233b7243065",
+      "expectedWidth": 4096,
+      "expectedHeight": 2048,
+      "authoritativeSource": false,
+      "overwriteSource": false
+    }
+  ]
+}

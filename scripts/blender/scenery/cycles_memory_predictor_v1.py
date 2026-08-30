@@ -12,7 +12,9 @@ SCHEMA = "TIVVLEJOY_CYCLES_MEMORY_PREDICTOR_V1"
 # Isolated 64x64 / 1-sample / denoise-off HWM from V3 decompose (bytes).
 MEASURED_COMPONENT_HWM_V3 = {
     "empty": 278_000_000,
-    "hdri_15k": 5_695_967_232,
+    "hdri_15k": 5_699_858_432,
+    "hdri_8k": 1_912_504_320,
+    "hdri_4k": 700_370_944,
     "terrain": 331_000_000,
     "water": 278_000_000,
     "bed": 295_000_000,

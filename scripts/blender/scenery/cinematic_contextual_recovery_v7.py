@@ -53,6 +53,21 @@ OUT_DEFAULT = Path("/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinemati
 DENOISE = True
 # Measured Cycles sync increment for this Proof A scene on Blender 4.2.2 CPU.
 MEASURED_CYCLES_INCREMENT_BYTES = 12_539_740_160
+# Isolated H15-H8 HWM reduction 3.53 GiB applied to the V2 full-scene hold.
+HDRI_CYCLES_INCREMENT_BYTES = {
+    "hdri_15k": MEASURED_CYCLES_INCREMENT_BYTES,
+    "hdri_8k": 9_010_000_000,
+    "hdri_4k": 7_800_000_000,
+}
+
+
+def hdri_component_key() -> str:
+    name = Path(str(v6.HDRI)).name.lower()
+    if "8k" in name or "8192" in name:
+        return "hdri_8k"
+    if "4k" in name or "4096" in name:
+        return "hdri_4k"
+    return "hdri_15k"
 
 
 def _log(event: str, **payload) -> None:
@@ -328,9 +343,11 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
     probe["purgeAfter"] = snapshot("purge_after", extra=scene_counts())
     sys_mem = detect_system_memory()
     counts = scene_counts()
+    hdri_key = hdri_component_key()
+    extra = HDRI_CYCLES_INCREMENT_BYTES.get(hdri_key, MEASURED_CYCLES_INCREMENT_BYTES)
     predictor = predict_cycles_sync(
         component_peaks=MEASURED_COMPONENT_HWM_V3,
-        parts=["hdri_15k", "terrain", "water", "bed", "gravel", "rocks", "grass", "fern", "beech"],
+        parts=[hdri_key, "terrain", "water", "bed", "gravel", "rocks", "grass", "fern", "beech"],
         empty_hwm=MEASURED_COMPONENT_HWM_V3["empty"],
         base_vertices=int(counts.get("vertices") or 0),
         texture_bytes=int((probe["images"] or {}).get("estimatedRawBytes") or 0),
@@ -344,7 +361,7 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
         mesh_count=counts.get("meshes") or 0,
         image_count=counts.get("images") or 0,
         estimated_texture_bytes=int((probe["images"] or {}).get("estimatedRawBytes") or 0),
-        estimated_additional_bytes=MEASURED_CYCLES_INCREMENT_BYTES,
+        estimated_additional_bytes=extra,
         expected_asset_manifest=["festuca_a", "carex_a", "fern_a", "beech_a", "ecokit_rocks", "hdri_jpg"],
         base_vertices=int(counts.get("vertices") or 0),
         component_peak_history=MEASURED_COMPONENT_HWM_V3,
@@ -513,6 +530,11 @@ def parse_args(argv=None):
     p.add_argument("--resolution", default="540x960")
     p.add_argument("--denoise", dest="denoise", action="store_true", default=True)
     p.add_argument("--no-denoise", dest="denoise", action="store_false", help="Disable OIDN to cut Cycles RAM waste")
+    p.add_argument(
+        "--hdri-path",
+        default="",
+        help="Optional non-destructive Cycles lighting HDRI override. Does not overwrite the owned 15k source.",
+    )
     return p.parse_args(argv)
 
 
@@ -523,6 +545,11 @@ def main(argv=None) -> int:
     global DENOISE
     DENOISE = bool(args.denoise)
     v6.RENDER_RES = tuple(int(x) for x in args.resolution.lower().split("x"))
+    if str(args.hdri_path or "").strip():
+        override = Path(args.hdri_path)
+        if override.is_file():
+            v6.HDRI = override
+            _log("hdri_override", path=str(override), bytes=override.stat().st_size)
     results = []
     wanted = ["A", "B", "C", "D"] if args.proof == "all" else [args.proof]
     bpy.context.scene.cycles.use_denoising = bool(args.denoise)
