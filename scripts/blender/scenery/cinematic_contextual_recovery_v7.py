@@ -56,7 +56,7 @@ MEASURED_CYCLES_INCREMENT_BYTES = 12_539_740_160
 # Isolated H15-H8 HWM reduction 3.53 GiB applied to the V2 full-scene hold.
 HDRI_CYCLES_INCREMENT_BYTES = {
     "hdri_15k": MEASURED_CYCLES_INCREMENT_BYTES,
-    "hdri_8k": 9_010_000_000,
+    "hdri_8k": 14_204_388 * 1024,  # measured Proof A H8 HWM before watchdog kill
     "hdri_4k": 7_800_000_000,
 }
 

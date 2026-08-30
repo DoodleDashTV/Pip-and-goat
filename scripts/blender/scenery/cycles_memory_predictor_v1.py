@@ -14,6 +14,7 @@ MEASURED_COMPONENT_HWM_V3 = {
     "empty": 278_000_000,
     "hdri_15k": 5_699_858_432,
     "hdri_8k": 1_912_504_320,
+    "proof_a_h8_full": 14_204_388 * 1024,
     "hdri_4k": 700_370_944,
     "terrain": 331_000_000,
     "water": 278_000_000,

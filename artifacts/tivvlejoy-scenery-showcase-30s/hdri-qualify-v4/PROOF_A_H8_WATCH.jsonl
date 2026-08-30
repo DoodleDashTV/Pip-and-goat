@@ -1,0 +1,20 @@
+blender_pid=3726
+t=10s rss_kib=5900 hwm_kib=7924 avail_kib=15407224
+t=20s rss_kib=2050508 hwm_kib=2134384 avail_kib=13479396
+t=30s rss_kib=2848468 hwm_kib=2891972 avail_kib=12697152
+t=40s rss_kib=3344888 hwm_kib=3502584 avail_kib=12149936
+t=50s rss_kib=4756356 hwm_kib=4835256 avail_kib=10543796
+t=60s rss_kib=5686544 hwm_kib=5695016 avail_kib=9664504
+t=70s rss_kib=6589936 hwm_kib=6594032 avail_kib=8546032
+t=80s rss_kib=7473308 hwm_kib=7570696 avail_kib=7670960
+t=90s rss_kib=8361200 hwm_kib=8468020 avail_kib=6671924
+t=100s rss_kib=10203400 hwm_kib=10203876 avail_kib=4965404
+t=110s rss_kib=10593436 hwm_kib=10666708 avail_kib=4538392
+t=120s rss_kib=11686340 hwm_kib=11686368 avail_kib=3565208
+t=130s rss_kib=12494912 hwm_kib=12598448 avail_kib=2780008
+t=140s rss_kib=12563824 hwm_kib=12776196 avail_kib=2717124
+t=150s rss_kib=12630700 hwm_kib=12803568 avail_kib=2694828
+t=160s rss_kib=14203960 hwm_kib=14204388 avail_kib=1412648
+KILL memory rss=14203960 avail=1412648
+killed
+DONE
