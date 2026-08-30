@@ -60,6 +60,11 @@ PROOF_QUALITY_FORBIDDEN_IN_FINAL = (
     "single_wide_camera_drift",
     "atmosphere_defined_but_not_executed",
     "datablock_load_counted_as_visible_use",
+    "silent_hero_fallback",
+    "source_skipped_due_size_limit",
+    "background_asset_used_as_hero",
+    "worker_parity_unverified",
+    "component_proofs_missing",
 )
 
 AUTOMATIC_VISUAL_FAILURES = (
@@ -91,6 +96,12 @@ AUTOMATIC_VISUAL_FAILURES = (
     "excessive_motion_blur",
     "upscaled_softness",
     "visible_placeholder_fallback_materials",
+    "visible_hero_billboard_or_card",
+    "obvious_texture_tiling",
+    "asset_pack_appearance",
+    "procedural_meadow_plane",
+    "procedural_lumpy_riverbank",
+    "razor_shoreline",
 )
 
 
@@ -262,6 +273,14 @@ def require_visual_approval_before_paid_final(receipt: dict[str, Any] | None) ->
         raise ValueError("Justin visual approval is required before paid FINAL")
     if str(receipt.get("recipeIdentity") or "") != str(receipt.get("authorizedRecipeIdentity") or ""):
         raise ValueError("approval receipt identity does not match this recipe")
+
+
+def require_production_readiness_before_paid_final(receipt: dict[str, Any] | None) -> None:
+    """Require the fail-fast source/quality/temporal/parity receipt as well."""
+    if not receipt:
+        raise ValueError("production readiness receipt is required before paid FINAL authorization")
+    from pipeline_guardrails import assert_paid_final_ready
+    assert_paid_final_ready(receipt)
 
 
 def ffmpeg_final_args(fps: int = FINAL_FPS) -> list[str]:
