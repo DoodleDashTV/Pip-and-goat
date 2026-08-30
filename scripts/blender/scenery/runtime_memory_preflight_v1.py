@@ -85,15 +85,20 @@ def cycles_preflight(
     mesh_count: int = 0,
     image_count: int = 0,
     estimated_texture_bytes: int = 0,
+    estimated_additional_bytes: int = 0,
     expected_asset_manifest: list[str] | None = None,
 ) -> dict[str, Any]:
     need = required_available_bytes(mem_total)
     rss_cap = rss_block_bytes(mem_total)
+    extra = max(int(estimated_additional_bytes), 0)
+    predicted_available = int(mem_available) - extra
     blockers: list[str] = []
     if mem_available < need:
         blockers.append("AVAILABLE_RAM_BELOW_HEADROOM")
     if rss > rss_cap:
         blockers.append("RSS_FRACTION_EXCEEDED")
+    if extra and predicted_available < need:
+        blockers.append("PREDICTED_CYCLES_HEADROOM")
     ok = not blockers
     return {
         "schema": SCHEMA,
@@ -112,6 +117,8 @@ def cycles_preflight(
         "meshCount": mesh_count,
         "imageCount": image_count,
         "estimatedTextureBytes": estimated_texture_bytes,
+        "estimatedAdditionalBytes": extra,
+        "predictedAvailable": predicted_available,
         "expectedAssetManifest": list(expected_asset_manifest or []),
         "headroomBytes": mem_available - need,
         "scaledFromDetectedMemory": True,

@@ -1,0 +1,15 @@
+{
+  "mode": "water",
+  "beforeRss": 254173184,
+  "afterRss": 301830144,
+  "deltaRss": 47656960,
+  "memAvailableAfter": 15157006336,
+  "error": null,
+  "pngBytes": 5006,
+  "countsBefore": {
+    "objects": 2,
+    "meshes": 1,
+    "images": 1,
+    "vertices": 160
+  }
+}

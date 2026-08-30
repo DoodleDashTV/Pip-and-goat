@@ -142,7 +142,11 @@ def add_camera(name: str, loc, look, lens: float = 38.0) -> bpy.types.Object:
     direction = Vector(look) - Vector(loc)
     obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
     bpy.context.scene.camera = obj
-    bpy.context.view_layer.update()
+    # Do not view_layer.update() here. A full depsgraph eval of V7 Proof A
+    # (terrain/rock SUBSURF + 15k HDRI) jumped RSS from ~0.4 GiB to ~12.8 GiB
+    # and tripped the runtime memory preflight before Cycles.
+    if obj.parent is None:
+        obj.matrix_world = obj.matrix_basis
     return obj
 
 

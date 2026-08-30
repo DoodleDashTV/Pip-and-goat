@@ -45,6 +45,17 @@ def test_blocks_the_confirmed_16gib_pre_cycles_state():
         assert FAIL_CODE in str(exc)
 
 
+def test_predicted_cycles_increment_blocks():
+    receipt = cycles_preflight(
+        mem_total=16 * 1024 * 1024 * 1024,
+        mem_available=int(14.0 * 1024 * 1024 * 1024),
+        rss=int(0.4 * 1024 * 1024 * 1024),
+        estimated_additional_bytes=int(12.5 * 1024 * 1024 * 1024),
+    )
+    assert receipt["ok"] is False
+    assert "PREDICTED_CYCLES_HEADROOM" in receipt["blockers"]
+
+
 def test_allows_healthy_headroom():
     receipt = cycles_preflight(
         mem_total=16 * 1024 * 1024 * 1024,

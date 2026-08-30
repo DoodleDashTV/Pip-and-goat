@@ -1,0 +1,15 @@
+{
+  "mode": "beech",
+  "beforeRss": 340459520,
+  "afterRss": 448380928,
+  "deltaRss": 107921408,
+  "memAvailableAfter": 14983593984,
+  "error": null,
+  "pngBytes": 7237,
+  "countsBefore": {
+    "objects": 3,
+    "meshes": 1,
+    "images": 6,
+    "vertices": 259333
+  }
+}

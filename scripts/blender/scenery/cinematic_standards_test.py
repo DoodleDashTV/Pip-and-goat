@@ -84,6 +84,7 @@ from v7_resource_probe_test import (  # noqa: E402
 )
 from runtime_memory_preflight_v1_test import (  # noqa: E402
     test_allows_healthy_headroom,
+    test_predicted_cycles_increment_blocks,
     test_blocks_the_confirmed_16gib_pre_cycles_state,
     test_budget_scales_from_detected_memory,
     test_detect_system_memory_parses_proc_text,
@@ -366,6 +367,7 @@ if __name__ == "__main__":
     test_budget_scales_from_detected_memory()
     test_blocks_the_confirmed_16gib_pre_cycles_state()
     test_allows_healthy_headroom()
+    test_predicted_cycles_increment_blocks()
     test_detect_system_memory_parses_proc_text()
     test_exact_object_append_policy_is_ok()
     test_no_explicit_all_image_append()

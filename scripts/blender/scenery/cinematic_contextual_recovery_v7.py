@@ -49,6 +49,8 @@ from v7_resource_probe import PeakTracker, scene_counts, snapshot
 
 OUT_DEFAULT = Path("/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinematic-contextual-recovery-v7")
 DENOISE = True
+# Measured Cycles sync increment for this Proof A scene on Blender 4.2.2 CPU.
+MEASURED_CYCLES_INCREMENT_BYTES = 12_539_740_160
 
 
 def _log(event: str, **payload) -> None:
@@ -330,6 +332,7 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
         mesh_count=counts.get("meshes") or 0,
         image_count=counts.get("images") or 0,
         estimated_texture_bytes=int((probe["images"] or {}).get("estimatedRawBytes") or 0),
+        estimated_additional_bytes=MEASURED_CYCLES_INCREMENT_BYTES,
         expected_asset_manifest=["festuca_a", "carex_a", "fern_a", "beech_a", "ecokit_rocks", "hdri_jpg"],
     )
     probe["cyclesPreflight"] = preflight

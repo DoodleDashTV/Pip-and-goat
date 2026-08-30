@@ -1,0 +1,15 @@
+{
+  "mode": "empty",
+  "beforeRss": 254246912,
+  "afterRss": 273829888,
+  "deltaRss": 19582976,
+  "memAvailableAfter": 15375241216,
+  "error": null,
+  "pngBytes": 2438,
+  "countsBefore": {
+    "objects": 1,
+    "meshes": 0,
+    "images": 0,
+    "vertices": 0
+  }
+}
