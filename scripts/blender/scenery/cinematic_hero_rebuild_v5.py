@@ -19,6 +19,7 @@ from cinematic_meadow_v1 import meadow_payload, meadow_scatter_plan
 from cinematic_riverbank_v1 import (
     WATER_Z,
     controls_payload,
+    point_on_south_shore,
     riverbank_sample,
     rock_slots,
 )
@@ -162,14 +163,14 @@ TREE_GROUPS = (
 )
 
 FERN_PLAN = (
-    ((-5.40, -15.80), 0.85, 0.4),
-    ((-2.55, -15.10), 0.72, 1.5),
-    ((1.05, -16.40), 0.78, 2.1),
-    ((-8.20, -14.20), 0.66, 0.7),
-    ((-11.40, -12.60), 0.80, -0.4),
-    ((-6.80, -11.90), 0.58, 1.9),
-    ((3.20, -13.80), 0.62, -1.1),
-    ((-9.60, -16.90), 0.70, 0.2),
+    (-5.40, 0.85, 0.85, 0.4),
+    (-2.55, 0.70, 0.72, 1.5),
+    (1.05, 0.90, 0.78, 2.1),
+    (-8.20, 1.10, 0.66, 0.7),
+    (-7.85, 1.40, 0.80, -0.4),
+    (-3.60, 1.20, 0.58, 1.9),
+    (3.20, 0.95, 0.62, -1.1),
+    (-10.70, 0.75, 0.70, 0.2),
 )
 
 
@@ -490,6 +491,8 @@ def plant_vegetation(library: dict, col: bpy.types.Collection) -> dict:
     planted = {"trees": 0, "ferns": 0, "meadow": 0}
     for i, (species, xy, height, yaw, role) in enumerate(TREE_GROUPS):
         group = library.get(species) or []
+        if species.startswith("willow"):
+            xy = point_on_south_shore(xy[0], offset=2.55)
         z, biome = riverbank_sample(xy[0], xy[1])
         if biome in {"bed", "underwater"}:
             continue
@@ -498,19 +501,20 @@ def plant_vegetation(library: dict, col: bpy.types.Collection) -> dict:
             planted["trees"] += 1
     fern_keys = [key for key in ("fern_a", "fern_b", "fern_d") if library.get(key)]
     bank_grass = (
-        ((-6.4, -16.2), 1.25, 0.2),
-        ((-3.8, -15.6), 1.45, 1.1),
-        ((-1.2, -16.0), 1.35, 2.0),
-        ((1.6, -15.4), 1.20, 0.6),
-        ((-8.8, -15.8), 1.30, 1.7),
-        ((3.8, -14.6), 1.15, -0.5),
-        ((-5.0, -14.4), 1.10, 0.9),
-        ((-0.2, -14.8), 1.40, 2.4),
+        (-6.4, 0.55, 1.25, 0.2),
+        (-3.8, 0.70, 1.45, 1.1),
+        (-1.2, 0.45, 1.35, 2.0),
+        (1.6, 0.60, 1.20, 0.6),
+        (-8.8, 0.50, 1.30, 1.7),
+        (3.8, 0.80, 1.15, -0.5),
+        (-5.0, 0.35, 1.10, 0.9),
+        (-0.2, 0.25, 1.40, 2.4),
     )
-    for i, (xy, height, yaw) in enumerate(FERN_PLAN):
+    for i, (x, offset, height, yaw) in enumerate(FERN_PLAN):
         if not fern_keys:
             break
         group = library[fern_keys[i % len(fern_keys)]]
+        xy = point_on_south_shore(x, offset=offset)
         z, biome = riverbank_sample(xy[0], xy[1])
         if biome in {"bed", "underwater"}:
             continue
@@ -518,9 +522,10 @@ def plant_vegetation(library: dict, col: bpy.types.Collection) -> dict:
         if obj is not None:
             planted["ferns"] += 1
     carex = library.get("carex_b") or library.get("carex_a") or []
-    for i, (xy, height, yaw) in enumerate(bank_grass):
+    for i, (x, offset, height, yaw) in enumerate(bank_grass):
         if not carex:
             break
+        xy = point_on_south_shore(x, offset=offset)
         z, biome = riverbank_sample(xy[0], xy[1])
         if biome in {"bed", "underwater"}:
             continue

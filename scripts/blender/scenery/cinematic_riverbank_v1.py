@@ -269,29 +269,50 @@ def worn_path(x: float, y: float) -> bool:
     return path < 1.15 and dist > DEFAULT_FILM + 1.2
 
 
+def point_on_south_shore(x: float, controls: RiverbankControls | None = None, offset: float = 0.0) -> tuple[float, float]:
+    """World XY on the camera-side bank. offset>0 is landward, <0 is toward/into water."""
+    emerge = shoreline_distance(x, controls, south=True) + offset
+    best = (x, -16.0)
+    best_err = 1e9
+    y = -24.0
+    while y <= 2.0:
+        dist, signed = channel_profile(x, y)
+        if signed < 0.0:
+            err = abs(dist - emerge)
+            if err < best_err:
+                best_err = err
+                best = (x, y)
+        y += 0.08
+    return best
+
+
 def rock_slots(controls: RiverbankControls | None = None) -> tuple[tuple[float, float, float, float, str], ...]:
-    """Authored creek-scale rock placements. (x, y, scale, bury, role)."""
+    """Creek-scale rocks on the real TERRAIN ∩ WATER line. (x, y, scale, bury, role)."""
     cfg = controls or DEFAULT_CONTROLS
     bury = cfg.rock_burial
     density = cfg.rock_density
     if density <= 0.0:
         return ()
-    slots = (
-        (-7.95, -16.85, 0.95, bury + 0.10, "waterline"),
-        (-5.10, -15.55, 1.15, bury + 0.14, "projection"),
-        (-2.40, -16.40, 0.72, bury + 0.08, "soil"),
-        (0.70, -17.10, 0.80, bury + 0.12, "waterline"),
-        (3.40, -15.20, 0.58, bury + 0.06, "soil"),
-        (-4.20, -13.80, 0.48, bury + 0.20, "underwater"),
-        (-1.10, -13.20, 0.42, bury + 0.22, "underwater"),
-        (2.10, -13.55, 0.36, bury + 0.16, "bed"),
-        (-9.40, -17.60, 0.70, bury + 0.10, "vegetated"),
-        (5.80, -14.80, 0.52, bury + 0.08, "soil"),
-        (-6.60, -12.90, 0.40, bury + 0.18, "underwater"),
-        (-0.40, -15.00, 0.34, bury + 0.05, "vegetated"),
+    plan = (
+        (-7.85, -0.05, 0.95, bury + 0.10, "waterline"),
+        (-5.05, 0.18, 1.15, bury + 0.14, "projection"),
+        (-2.15, 0.35, 0.72, bury + 0.08, "soil"),
+        (0.95, -0.08, 0.80, bury + 0.12, "waterline"),
+        (3.55, 0.40, 0.58, bury + 0.06, "soil"),
+        (-4.20, -0.55, 0.48, bury + 0.20, "underwater"),
+        (-1.10, -0.70, 0.42, bury + 0.22, "underwater"),
+        (2.10, -0.45, 0.36, bury + 0.16, "bed"),
+        (-10.70, 0.55, 0.70, bury + 0.10, "vegetated"),
+        (6.35, 0.30, 0.52, bury + 0.08, "soil"),
+        (-6.60, -0.60, 0.40, bury + 0.18, "underwater"),
+        (-0.40, 0.22, 0.34, bury + 0.05, "vegetated"),
     )
+    slots = []
+    for x, offset, scale, rock_bury, role in plan:
+        px, py = point_on_south_shore(x, cfg, offset)
+        slots.append((px, py, scale, rock_bury, role))
     keep = max(4, int(round(len(slots) * min(1.0, density))))
-    return slots[:keep]
+    return tuple(slots[:keep])
 
 
 def controls_payload(controls: RiverbankControls | None = None) -> dict:

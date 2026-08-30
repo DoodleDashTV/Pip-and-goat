@@ -10,7 +10,9 @@ from cinematic_riverbank_v1 import (
     RiverbankControls,
     controls_payload,
     hero_event,
+    point_on_south_shore,
     riverbank_sample,
+    rock_slots,
     shoreline_distance,
     worn_path,
 )
@@ -85,6 +87,19 @@ def test_controls_change_width_and_depth():
     assert deep < shallow
 
 
+def test_dressing_sits_on_the_real_waterline():
+    x, y = point_on_south_shore(-2.15)
+    z, _ = riverbank_sample(x, y)
+    assert abs(z - WATER_Z) < 0.18
+    # Old V5 lookdev parked rocks at Y≈-16, which is meadow, not the creek.
+    far = riverbank_sample(-2.15, -16.4)
+    assert far[0] > WATER_Z + 0.20
+    rocks = rock_slots()
+    assert rocks
+    rz, _ = riverbank_sample(rocks[0][0], rocks[0][1])
+    assert abs(rz - WATER_Z) < 0.45
+
+
 def test_payload_and_worn_path():
     payload = controls_payload()
     assert payload["shoreline"] == "terrain_intersect_water"
@@ -101,5 +116,6 @@ if __name__ == "__main__":
     test_macro_events_are_few_and_irregular()
     test_no_high_frequency_lumps()
     test_controls_change_width_and_depth()
+    test_dressing_sits_on_the_real_waterline()
     test_payload_and_worn_path()
     print("cinematic_riverbank_v1_test PASS")

@@ -38,6 +38,7 @@ from cinematic_hero_rebuild_v3_test import (  # noqa: E402
 from cinematic_riverbank_v1_test import (  # noqa: E402
     test_biome_progresses_from_bed_to_meadow,
     test_controls_change_width_and_depth,
+    test_dressing_sits_on_the_real_waterline,
     test_macro_events_are_few_and_irregular,
     test_no_high_frequency_lumps,
     test_no_landward_cavity,
@@ -47,6 +48,25 @@ from cinematic_meadow_v1_test import (  # noqa: E402
     test_density_falls_with_distance_but_not_to_a_plane,
     test_negative_space_exists,
     test_zones_are_physical_and_varied,
+)
+from cinematic_shoreline_v1_test import (  # noqa: E402
+    test_color_does_not_step_at_waterline,
+    test_cues_sit_on_real_waterline,
+    test_transition_has_real_width_and_overlap,
+)
+from cinematic_meadow_v2_test import (  # noqa: E402
+    test_communities_overlap,
+    test_foundation_is_a_field_not_dots,
+)
+from cinematic_v6_issues_test import test_all_recurring_issues_require_root_cause  # noqa: E402
+from cinematic_water_lock_v1_test import test_abc_preserve_lock, test_lock_is_physical_d  # noqa: E402
+from cinematic_louis_apron_v1_test import (  # noqa: E402
+    test_conservative_removes_fewer_than_south_only,
+    test_visible_south_face_is_kept,
+)
+from cinematic_style_unifier_v1_test import (  # noqa: E402
+    test_detects_botaniq_by_image_not_just_prefix,
+    test_spec_does_not_flatten_or_photoreal_louis,
 )
 from owned_building_audit import audit_summary  # noqa: E402
 from cinematic_creek_profile import (
@@ -291,9 +311,22 @@ if __name__ == "__main__":
     test_macro_events_are_few_and_irregular()
     test_no_high_frequency_lumps()
     test_controls_change_width_and_depth()
+    test_dressing_sits_on_the_real_waterline()
     test_zones_are_physical_and_varied()
     test_negative_space_exists()
     test_density_falls_with_distance_but_not_to_a_plane()
+    test_transition_has_real_width_and_overlap()
+    test_color_does_not_step_at_waterline()
+    test_cues_sit_on_real_waterline()
+    test_foundation_is_a_field_not_dots()
+    test_communities_overlap()
+    test_all_recurring_issues_require_root_cause()
+    test_lock_is_physical_d()
+    test_abc_preserve_lock()
+    test_visible_south_face_is_kept()
+    test_conservative_removes_fewer_than_south_only()
+    test_spec_does_not_flatten_or_photoreal_louis()
+    test_detects_botaniq_by_image_not_just_prefix()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False
     assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"
