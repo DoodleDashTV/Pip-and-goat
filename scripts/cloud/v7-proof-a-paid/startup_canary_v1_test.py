@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-from docker_args_v1 import CURRENT_PIN_DOCKER_ARGS, PREFERRED_BAKED_DOCKER_ARGS, docker_args_compatible
+from docker_args_v1 import (
+    BROKEN_NODE_E_DOCKER_ARGS,
+    CURRENT_PIN_DOCKER_ARGS,
+    PREFERRED_BAKED_DOCKER_ARGS,
+    docker_args_compatible,
+)
 from host_memory_receipt_v1 import collect_host_memory_receipt
 from startup_canary_v1 import clip_for_artifact, container_canary_signals
 from startup_markers_v1 import MARKERS, marker_payload
@@ -14,7 +19,11 @@ def test_rejects_nested_shell_docker_args():
 def test_accepts_node_cmd_shape():
     assert docker_args_compatible(PREFERRED_BAKED_DOCKER_ARGS)["ok"] is True
     assert docker_args_compatible(CURRENT_PIN_DOCKER_ARGS)["ok"] is True
-    assert CURRENT_PIN_DOCKER_ARGS.split()[0] == "node"
+    assert CURRENT_PIN_DOCKER_ARGS.split() == ["node", "./src/v7-proof-a-boot.js"]
+    broken = docker_args_compatible(BROKEN_NODE_E_DOCKER_ARGS)
+    assert broken["ok"] is False
+    assert "NODE_E_DOCKER_ARGS" in broken["blockers"]
+    assert "SHELL_METACHAR_DOCKER_ARGS" in broken["blockers"]
 
 
 def test_markers_and_receipt():

@@ -1,0 +1,79 @@
+{
+  "schema": "TIVVLEJOY_V7_STARTUP_PROOF_V1",
+  "brokenNodeE": {
+    "bashCStatus": 2,
+    "bashCStderr": "bash: -c: line 1: syntax error near unexpected token `('\nbash: -c: line 1: `node -e (async()=>{console.log(JSON.stringify({event:'IMAGE_PROCESS_STARTED'}));console.log(JSON.stringify({event:'NODE_ENTRY_STARTED'}));const r2=require('/opt/ddp",
+    "tokenCount": 6,
+    "argvStatus": 1,
+    "argvStderr": "[eval]:1\n(async()=>{console.log(JSON.stringify({event:'IMAGE_PROCESS_STARTED'}));console.log(JSON.stringify({event:'NODE_ENTRY_STARTED'}));const\n                                                                                               ",
+    "bashSyntaxError": true,
+    "argvTruncated": true
+  },
+  "fileShapedArgs": {
+    "status": 0,
+    "hasImageProcess": true
+  },
+  "pid1": {
+    "status": 0,
+    "stdout": [
+      "{\"event\":\"BOOTSTRAP_ENTERED\",\"pid\":25099,\"argv\":\"node -e console.log(JSON.stringify({event:'CHILD'}))\"}",
+      "{\"event\":\"NODE_AVAILABLE\",\"version\":\"v22.14.0\"}",
+      "{\"event\":\"CHILD\"}"
+    ]
+  },
+  "seconds": 2,
+  "threeRuns": [
+    {
+      "run": 1,
+      "ready": true,
+      "healthOk": true,
+      "stayedAliveSeconds": 2.2,
+      "exitAfterTerminate": 0,
+      "markers": [
+        "{\"ts\":\"2026-08-30T22:09:47.347Z\",\"event\":\"IMAGE_PROCESS_STARTED\"}",
+        "{\"ts\":\"2026-08-30T22:09:47.349Z\",\"event\":\"NODE_ENTRY_STARTED\",\"argv0\":\"/workspace/workers/runpod-blender/src/v7-proof-a-boot.js\",\"version\":\"v22.14.0\"}",
+        "{\"ts\":\"2026-08-30T22:09:47.349Z\",\"event\":\"WORKER_MODULE_LOADED\",\"proof\":true,\"r2Skipped\":true,\"blenderSkipped\":true}",
+        "{\"ts\":\"2026-08-30T22:09:47.353Z\",\"event\":\"WORKER_LISTENING\",\"port\":18081,\"bind\":\"127.0.0.1\"}",
+        "{\"ts\":\"2026-08-30T22:09:47.354Z\",\"event\":\"WORKER_READY\",\"seconds\":32}"
+      ],
+      "blenderInvoked": false,
+      "r2Invoked": false
+    },
+    {
+      "run": 2,
+      "ready": true,
+      "healthOk": true,
+      "stayedAliveSeconds": 2.2,
+      "exitAfterTerminate": 0,
+      "markers": [
+        "{\"ts\":\"2026-08-30T22:09:49.580Z\",\"event\":\"IMAGE_PROCESS_STARTED\"}",
+        "{\"ts\":\"2026-08-30T22:09:49.582Z\",\"event\":\"NODE_ENTRY_STARTED\",\"argv0\":\"/workspace/workers/runpod-blender/src/v7-proof-a-boot.js\",\"version\":\"v22.14.0\"}",
+        "{\"ts\":\"2026-08-30T22:09:49.582Z\",\"event\":\"WORKER_MODULE_LOADED\",\"proof\":true,\"r2Skipped\":true,\"blenderSkipped\":true}",
+        "{\"ts\":\"2026-08-30T22:09:49.587Z\",\"event\":\"WORKER_LISTENING\",\"port\":18082,\"bind\":\"127.0.0.1\"}",
+        "{\"ts\":\"2026-08-30T22:09:49.587Z\",\"event\":\"WORKER_READY\",\"seconds\":32}"
+      ],
+      "blenderInvoked": false,
+      "r2Invoked": false
+    },
+    {
+      "run": 3,
+      "ready": true,
+      "healthOk": true,
+      "stayedAliveSeconds": 2.2,
+      "exitAfterTerminate": 0,
+      "markers": [
+        "{\"ts\":\"2026-08-30T22:09:51.790Z\",\"event\":\"IMAGE_PROCESS_STARTED\"}",
+        "{\"ts\":\"2026-08-30T22:09:51.792Z\",\"event\":\"NODE_ENTRY_STARTED\",\"argv0\":\"/workspace/workers/runpod-blender/src/v7-proof-a-boot.js\",\"version\":\"v22.14.0\"}",
+        "{\"ts\":\"2026-08-30T22:09:51.792Z\",\"event\":\"WORKER_MODULE_LOADED\",\"proof\":true,\"r2Skipped\":true,\"blenderSkipped\":true}",
+        "{\"ts\":\"2026-08-30T22:09:51.797Z\",\"event\":\"WORKER_LISTENING\",\"port\":18083,\"bind\":\"127.0.0.1\"}",
+        "{\"ts\":\"2026-08-30T22:09:51.797Z\",\"event\":\"WORKER_READY\",\"seconds\":32}"
+      ],
+      "blenderInvoked": false,
+      "r2Invoked": false
+    }
+  ],
+  "blenderInvoked": false,
+  "r2Invoked": false,
+  "runpodCreate": 0,
+  "ok": true
+}

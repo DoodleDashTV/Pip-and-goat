@@ -1,0 +1,25 @@
+# Thin overlay over the failed-run scenery digest. Adds only the file-shaped
+# V7 Proof A boot path and a PID-1 bootstrap. No commercial assets. No secrets.
+ARG PARENT_REF
+FROM ${PARENT_REF}
+
+WORKDIR /opt/ddp-worker
+
+COPY workers/runpod-blender/src/v7-pid1-bootstrap.sh ./src/v7-pid1-bootstrap.sh
+COPY workers/runpod-blender/src/v7-proof-a-boot.js ./src/v7-proof-a-boot.js
+
+RUN chmod 0755 ./src/v7-pid1-bootstrap.sh && \
+    node --check ./src/v7-proof-a-boot.js && \
+    blender --version | grep -F 'Blender 4.2.2'
+
+ENV PAID_EXECUTION_AUTHORIZED=false \
+    CLOUD_RENDER_ENABLED=false \
+    V7_STARTUP_PROOF=0 \
+    V7_HEALTH_PORT=18080
+
+LABEL tivvlejoy.v7.proofa.startup="file-shaped-boot" \
+      tivvlejoy.v7.proofa.pid1="v7-pid1-bootstrap.sh" \
+      tivvlejoy.scenery.commercial.assets.baked="false"
+
+ENTRYPOINT ["/opt/ddp-worker/src/v7-pid1-bootstrap.sh"]
+CMD ["node", "./src/v7-proof-a-boot.js"]

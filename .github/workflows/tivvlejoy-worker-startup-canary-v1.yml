@@ -33,8 +33,10 @@ jobs:
           python3 scripts/blender/scenery/worker_memory_contract_v1_test.py
           python3 scripts/cloud/v7-proof-a-paid/startup_canary_v1_test.py
           python3 scripts/cloud/v7-proof-a-paid/startup_canary_v1.py
+          python3 scripts/cloud/v7-proof-a-paid/startup_proof_v1.py --fast
           node --check workers/runpod-blender/src/v7-proof-a-boot.js
           node workers/runpod-blender/test/v7-proof-a-boot.test.js
+          node workers/runpod-blender/test/v7-proof-a-startup-proof.test.js
 
       - name: Anonymous container start on the pinned digest
         run: |

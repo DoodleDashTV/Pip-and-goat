@@ -4,16 +4,15 @@ from __future__ import annotations
 # The pinned scenery image inherits:
 #   Entrypoint: /opt/nvidia/nvidia_entrypoint.sh
 #   Cmd:        node ./src/scenery-showcase-entry-v2.js
-# dockerArgs are appended to Entrypoint (Docker default) or replace Cmd.
-# A single-string `sh -c '...'` is not the same argv shape as Cmd.
+# GraphQL dockerArgs is a single string. RunPod applies it as bash -c and/or
+# space-split extra argv. A `node -e (async()=>{...})()` string is invalid in
+# both forms: bash dies on `(`, and str.split() truncates the program.
 
 NVIDIA_ENTRYPOINT = "/opt/nvidia/nvidia_entrypoint.sh"
 IMAGE_CMD = ("node", "./src/scenery-showcase-entry-v2.js")
 
-# Space-split safe: first token `node`, second `-e`, remainder is the program.
-# Three space-separated tokens: node, -e, <no-space program>.
-# Works as extra argv to /opt/nvidia/nvidia_entrypoint.sh on the current pin.
-CURRENT_PIN_DOCKER_ARGS = (
+# Exact string used on pod 0msnqqdigglatj. Kept only to prove it is incompatible.
+BROKEN_NODE_E_DOCKER_ARGS = (
     "node -e "
     "(async()=>{console.log(JSON.stringify({event:'IMAGE_PROCESS_STARTED'}));"
     "console.log(JSON.stringify({event:'NODE_ENTRY_STARTED'}));"
@@ -25,7 +24,10 @@ CURRENT_PIN_DOCKER_ARGS = (
     ".catch(e=>{console.error(String(e&&e.message||e));process.exit(1)})"
 )
 
+# File-shaped extra argv. Survives bash -c and space-split. Requires the boot
+# file to be baked into the worker image.
 PREFERRED_BAKED_DOCKER_ARGS = "node ./src/v7-proof-a-boot.js"
+CURRENT_PIN_DOCKER_ARGS = PREFERRED_BAKED_DOCKER_ARGS
 
 
 def docker_args_compatible(docker_args: str) -> dict:
@@ -35,9 +37,17 @@ def docker_args_compatible(docker_args: str) -> dict:
         blockers.append("DOCKER_ARGS_EMPTY")
     if value.startswith("sh -c") or value.startswith("bash -lc") or value.startswith("sh -lc"):
         blockers.append("NESTED_SHELL_DOCKER_ARGS")
+    if " -e " in f" {value} " or value.startswith("node -e"):
+        blockers.append("NODE_E_DOCKER_ARGS")
+    if any(ch in value for ch in ("(", ")", "{", "}", "`", "&", "|", ";")):
+        blockers.append("SHELL_METACHAR_DOCKER_ARGS")
     tokens = value.split()
+    if len(tokens) != 2:
+        blockers.append("DOCKER_ARGS_NOT_TWO_TOKENS")
     if tokens and tokens[0] not in {"node", "blender"}:
         blockers.append("FIRST_TOKEN_NOT_IMAGE_CMD_SHAPE")
+    if len(tokens) >= 2 and not (tokens[1].startswith("./") or tokens[1].startswith("/")):
+        blockers.append("SECOND_TOKEN_NOT_FILE_PATH")
     return {
         "ok": not blockers,
         "blockers": blockers,
@@ -46,7 +56,7 @@ def docker_args_compatible(docker_args: str) -> dict:
         "dockerArgs": value,
         "compatible": not blockers,
         "finding": (
-            "dockerArgs must be extra argv for /opt/nvidia/nvidia_entrypoint.sh, "
-            "matching Cmd shape `node <file-or--e>`."
+            "dockerArgs must be two space-separated tokens `node ./src/<file.js>` "
+            "so GraphQL string application (bash -c or space-split) cannot mangle them."
         ),
     }

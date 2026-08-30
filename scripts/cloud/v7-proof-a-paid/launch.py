@@ -273,7 +273,12 @@ def pin_ref() -> dict:
         raise RuntimeError("WORKER_IMAGE_BAD_DIGEST")
     if pin.get("blenderVersion") != "4.2.2":
         raise RuntimeError("WORKER_IMAGE_BLENDER_MISMATCH")
-    return {"ref": ref, "digest": digest, "blenderVersion": pin["blenderVersion"]}
+    return {
+        "ref": ref,
+        "digest": digest,
+        "blenderVersion": pin["blenderVersion"],
+        "workerEntrypoint": pin.get("workerEntrypoint"),
+    }
 
 
 def source_files() -> list[dict]:
@@ -382,6 +387,8 @@ def preflight() -> dict:
         if worst > MAX_SPEND:
             blockers.append("COST_ESTIMATE_EXCEEDS_040")
     pin = pin_ref()
+    if pin.get("workerEntrypoint") != "v7-proof-a-boot.js":
+        blockers.append("STARTUP_IMAGE_NOT_PINNED")
     files = source_files()
     if sha256_file(SOURCE_HDRI) != EXPECTED_SOURCE:
         blockers.append("HDRI_SOURCE_IDENTITY")
@@ -696,6 +703,8 @@ def main() -> int:
         markers = None
         client = r2_client()
         timeline: list[dict] = [{"ts": utc_now(), "stage": stage, "podId": pod_id}]
+        saw_positive_uptime = False
+        crash_loop_count = 0
         while time.time() < hard_deadline:
             status = r2_get_json(client, f"{PREFIX}/status.json")
             receipt = r2_get_json(client, f"{PREFIX}/host-memory-receipt.json")
@@ -716,10 +725,16 @@ def main() -> int:
                 hard_deadline = min(hard_deadline, started + (MAX_SPEND / observed_rate) * 3600 * 0.95)
                 startup_spend_deadline = started + (STARTUP_SPEND_CAP / observed_rate) * 3600
             if uptime is not None and uptime >= 0:
+                saw_positive_uptime = True
                 if stage in {"POD_CREATED", "HOST_ASSIGNED", "IMAGE_PULLING"}:
                     stage = "CONTAINER_STARTED"
                     if worker_marker_deadline is None:
                         worker_marker_deadline = time.time() + WORKER_MARKER_TIMEOUT_S
+            elif saw_positive_uptime and uptime is not None and uptime < 0:
+                crash_loop_count += 1
+                timeline.append({"ts": utc_now(), "stage": "WORKER_CRASH_LOOP", "uptimeInSeconds": uptime, "count": crash_loop_count})
+                if crash_loop_count >= 2:
+                    raise RuntimeError(f"WORKER_CRASH_LOOP:{crash_loop_count}")
             if receipt:
                 stage = "WORKER_STARTED"
             if status and status.get("code") in {"RENDERED", "RENDER_FAILED"}:
