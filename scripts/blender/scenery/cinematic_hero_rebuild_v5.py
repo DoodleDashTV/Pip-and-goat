@@ -435,19 +435,25 @@ def build_hero_terrain(col: bpy.types.Collection) -> dict:
 def _bank_color(z: float, biome: str) -> tuple[float, float, float, float]:
     """Continuous wet-to-earth-to-olive. Meadow green is vegetation, not a painted plane."""
     t = max(0.0, min(1.0, (z - WATER_Z) / 1.55))
-    wet = (0.22, 0.16, 0.10)
-    soil = (0.32, 0.21, 0.12)
-    earth = (0.28, 0.22, 0.12)
-    if t < 0.18:
-        u = t / 0.18
+    wet = (0.20, 0.14, 0.09)
+    soil = (0.30, 0.20, 0.11)
+    earth = (0.26, 0.22, 0.12)
+    olive = (0.20, 0.24, 0.11)
+    if t < 0.16:
+        u = t / 0.16
         r = wet[0] * (1.0 - u) + soil[0] * u
         g = wet[1] * (1.0 - u) + soil[1] * u
         b = wet[2] * (1.0 - u) + soil[2] * u
-    else:
-        u = (t - 0.18) / 0.82
+    elif t < 0.55:
+        u = (t - 0.16) / 0.39
         r = soil[0] * (1.0 - u) + earth[0] * u
         g = soil[1] * (1.0 - u) + earth[1] * u
         b = soil[2] * (1.0 - u) + earth[2] * u
+    else:
+        u = (t - 0.55) / 0.45
+        r = earth[0] * (1.0 - u) + olive[0] * u
+        g = earth[1] * (1.0 - u) + olive[1] * u
+        b = earth[2] * (1.0 - u) + olive[2] * u
     if biome in {"gravel", "bed", "underwater"}:
         r, g, b = (0.30 * r + 0.18, 0.30 * g + 0.15, 0.30 * b + 0.11)
     return (r, g, b, 1.0)
@@ -521,12 +527,15 @@ def plant_vegetation(library: dict, col: bpy.types.Collection) -> dict:
         obj = _dup_group(carex, (xy[0], xy[1], z + 0.02), height, yaw, 0.03, col, f"TJ_V5_BankGrass_{i}")
         if obj is not None:
             planted["meadow"] += 1
-    plan = meadow_scatter_plan((-14.0, 9.0, -21.5, 3.5), 1.70)
+    wedge = meadow_scatter_plan((-9.5, 6.2, -21.2, -6.4), 0.95)
+    far = meadow_scatter_plan((-14.0, 9.0, -6.2, 3.5), 1.85)
+    plan = wedge + far
     plan.sort(key=lambda item: (item["x"] - 2.05) ** 2 + (item["y"] + 21.6) ** 2)
     kept = []
     for item in plan:
         dist2 = (item["x"] - 2.05) ** 2 + (item["y"] + 21.6) ** 2
-        if dist2 < 10.0 ** 2 or (dist2 < 18.0 ** 2 and len(kept) < 55) or len(kept) < 72:
+        limit = 160 if dist2 < 14.0 ** 2 else 210
+        if len(kept) < limit:
             kept.append(item)
     plan = kept
     for i, item in enumerate(plan):
@@ -585,12 +594,13 @@ def recede_owned_cabin() -> dict:
     """Village Cabin04A is MIDGROUND only. Push it out of hero pixels."""
     moved = []
     hidden = []
-    keep_tokens = ("cabin04a", "building04", "roof04")
+    keep_tokens = ("building04_lod0", "roof04_lod0")
     hide_tokens = (
-        "cabin01", "cabin02", "cabin03", "cabin05",
-        "building01", "building02", "building03", "building05",
-        "roof01", "roof02", "roof03", "roof05",
-        "cabin01b", "cabin02b", "cabin03b", "cabin04b", "cabin05b",
+        "cabin01", "cabin02", "cabin03", "cabin05", "cabin04",
+        "building01", "building02", "building03", "building04", "building05",
+        "roof01", "roof02", "roof03", "roof04", "roof05",
+        "cart01", "fence01", "gate01",
+        "cabininterior", "logplug", "wallvoid", "windowrecess",
     )
     keep = []
     for obj in list(bpy.data.objects):
@@ -641,11 +651,17 @@ def style_grade_botaniq() -> dict:
         if mat is None or not mat.use_nodes:
             continue
         name = (mat.name or "").lower()
+        images = [
+            node.image.name.lower()
+            for node in mat.node_tree.nodes
+            if node.type == "TEX_IMAGE" and node.image
+        ]
+        botaniq_map = any("bq_" in img or "botaniq" in img for img in images)
         used_by_v5 = any(
-            obj.get("tj_v5") and any(slot.material == mat for slot in obj.material_slots)
+            bool(obj.get("tj_v5")) and any(slot.material == mat for slot in obj.material_slots)
             for obj in bpy.data.objects
         )
-        if not (name.startswith("bq_") or "botaniq" in name or "bq_" in name or used_by_v5):
+        if not (name.startswith("bq_") or "botaniq" in name or "bq_" in name or botaniq_map or used_by_v5):
             continue
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
