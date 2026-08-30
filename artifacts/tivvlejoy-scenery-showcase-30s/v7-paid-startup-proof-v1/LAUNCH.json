@@ -1,0 +1,7 @@
+{
+  "podId": "fegncnyyr98pfi",
+  "digest": "sha256:868b7d5e796df7cd8e3c96df39a1eb2560344f492ed3d081f0bf6e3416a65142",
+  "dockerArgs": "node ./src/v7-proof-a-boot.js",
+  "quotedUsdPerHr": 0.74,
+  "at": "2026-08-30T22:40:42.952402+00:00"
+}
