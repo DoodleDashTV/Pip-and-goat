@@ -1,0 +1,46 @@
+{
+  "schema": "TIVVLEJOY_V7_LARGER_MEMORY_PAID_PROOF_A_EXECUTION_V1_RESULT",
+  "status": "V7_PROOF_A_PAID_EXECUTION_FAILED",
+  "retryAuthorized": false,
+  "finalVideoAuthorized": false,
+  "motionProofAuthorized": false,
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "62ae32be06c0196a06a6c0dfcda5525ea367b14a",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "pr": {
+    "number": 169,
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "authorization": {
+    "id": "TIVVLEJOY_V7_LARGER_MEMORY_PAID_PROOF_A_EXECUTION_V1",
+    "maxSpendUsd": 0.4,
+    "paidCreateAllowance": 1,
+    "createPerformed": 1
+  },
+  "worker": {
+    "podId": "pnmqjjnnfxupfe",
+    "gpu": "RTX 4090",
+    "gpuVramGiB": 24,
+    "systemRamMeasured": null,
+    "minMemoryInGbRequested": 32,
+    "usdPerHr": 0.74
+  },
+  "render": {
+    "resolution": "540x960",
+    "samples": 32,
+    "pngWritten": false,
+    "phoneWritten": false,
+    "code": "CONTAINER_NEVER_STARTED"
+  },
+  "spend": {
+    "runtimeSeconds": 1213.3,
+    "actualUsd": 0.2494
+  },
+  "cleanup": {
+    "podTerminated": true,
+    "livePods": []
+  }
+}

@@ -12,7 +12,7 @@
     "retry": false
   },
   "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
-  "sha": "62ae32be06c0196a06a6c0dfcda5525ea367b14a",
+  "sha": "326d605ffdc5aa9b3e5581b6f0b3ce15278aac00",
   "requiredSha": "62ae32be06c0196a06a6c0dfcda5525ea367b14a",
   "requiredShaIsAncestor": true,
   "pr": {
@@ -171,5 +171,5 @@
       "sha256": "b1dba266a1e11175c09263acbbe5be3270293c79e1eb161958e3cb1646876eb6"
     }
   ],
-  "at": "2026-08-30T15:27:42.717904+00:00"
+  "at": "2026-08-30T15:28:58.397009+00:00"
 }
