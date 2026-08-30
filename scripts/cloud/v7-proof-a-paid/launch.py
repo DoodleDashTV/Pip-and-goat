@@ -46,6 +46,7 @@ EXPECTED_SOURCE = "2c747a306f1f8a3031155d3a266cc56b62e91966431db54e67c36f772c58c
 PREFIX = "tivvlejoy-assets/executions/v7-proof-a-paid-retry-v1"
 OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-proof-a-paid-retry-v1"
 PIN_FILE = REPO / "config/cloud/scenery-showcase-worker-image.json"
+OVERLAY_PIN = REPO / "config/cloud/v7-proof-a-startup-image.json"
 ENTRY_FILE = Path(__file__).resolve().parent / "entry.js"
 
 SOURCE_HDRI = Path("/tmp/o14-lookdev/expanded-original14/sky_hdri/HDRi_JPG_Pack/sk2/Image0001.jpg")
@@ -264,20 +265,23 @@ def magenta_ratio(path: Path) -> float:
 
 def pin_ref() -> dict:
     pin = json.loads(PIN_FILE.read_text())
-    ref = str(pin.get("ref") or "")
-    digest = str(pin.get("digest") or "")
+    overlay = json.loads(OVERLAY_PIN.read_text()) if OVERLAY_PIN.is_file() else {}
+    repo = str(pin.get("imageRepository") or "")
+    digest = str(overlay.get("digest") or pin.get("digest") or "")
+    ref = f"{repo}@{digest}" if overlay.get("digest") and repo.startswith("ghcr.io/") else str(pin.get("ref") or "")
     if not ref.startswith("ghcr.io/") or "@sha256:" not in ref:
         raise RuntimeError("WORKER_IMAGE_NOT_PINNED")
-    hexpart = ref.split("@sha256:", 1)[1]
+    hexpart = digest[len("sha256:") :] if digest.startswith("sha256:") else ref.split("@sha256:", 1)[1]
     if len(hexpart) != 64 or any((c < "0" or c > "9") and (c < "a" or c > "f") for c in hexpart):
         raise RuntimeError("WORKER_IMAGE_BAD_DIGEST")
-    if pin.get("blenderVersion") != "4.2.2":
+    blender = overlay.get("blenderVersion") or pin.get("blenderVersion")
+    if blender != "4.2.2":
         raise RuntimeError("WORKER_IMAGE_BLENDER_MISMATCH")
     return {
         "ref": ref,
         "digest": digest,
-        "blenderVersion": pin["blenderVersion"],
-        "workerEntrypoint": pin.get("workerEntrypoint"),
+        "blenderVersion": blender,
+        "workerEntrypoint": overlay.get("workerEntrypoint") or pin.get("workerEntrypoint"),
     }
 
 
