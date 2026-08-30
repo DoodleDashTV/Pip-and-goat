@@ -222,8 +222,8 @@ def build_hero_terrain(col: bpy.types.Collection) -> dict:
     obj = bpy.data.objects.new("TJ_V3_HeroTerrain", mesh)
     col.objects.link(obj)
     bm = bmesh.new()
-    xs = 42
-    ys = 48
+    xs = 72
+    ys = 80
     x0, x1 = -16.0, 11.0
     y0, y1 = -24.5, 5.5
     verts = []
