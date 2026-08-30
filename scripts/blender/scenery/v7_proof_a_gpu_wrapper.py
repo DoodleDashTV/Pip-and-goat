@@ -31,6 +31,7 @@ def enable_cycles_gpu() -> dict:
         use = "GPU" in str(device.type)
         device.use = use
         enabled.append({"name": device.name, "type": str(device.type), "use": bool(device.use)})
+    _log("CYCLES_DEVICE_VERIFIED", devices=enabled, sceneDevice=scene.cycles.device)
     _log("cycles_gpu_enabled", devices=enabled, sceneDevice=scene.cycles.device)
     return {"sceneDevice": scene.cycles.device, "devices": enabled}
 
@@ -70,6 +71,7 @@ def main() -> int:
     _log("wrapper_start", nvidia=nvidia_smi(), argv=argv)
     v6._reset_scene_cpu = v6.reset_scene
     v6.reset_scene = reset_scene_gpu
+    _log("RENDER_STARTED")
     rc = v7.main(argv)
     _log("wrapper_done", rc=rc, nvidia=nvidia_smi())
     return rc

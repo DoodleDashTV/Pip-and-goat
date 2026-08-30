@@ -29,8 +29,8 @@ from cinematic_water_lock_v1 import WATER_LOCK  # noqa: E402
 from docker_args_v1 import CURRENT_PIN_DOCKER_ARGS, docker_args_compatible  # noqa: E402
 from worker_memory_contract_v1 import evaluate_worker_memory_contract  # noqa: E402
 
-AUTH = "TIVVLEJOY_V7_LARGER_MEMORY_PAID_PROOF_A_EXECUTION_V1"
-POD_NAME = "tj-v7-proof-a-lm-v1"
+AUTH = "TIVVLEJOY_V7_PAID_PROOF_A_RETRY_AUTHORIZATION_V1"
+POD_NAME = "tj-v7-proof-a-r1"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
 MAX_SPEND = 0.40
 STARTUP_SPEND_CAP = 0.10
@@ -39,12 +39,12 @@ WORKER_MARKER_TIMEOUT_S = 180
 MIN_RAM_GB = 32
 HARD_RAM_GB = 24
 MIN_VRAM_GB = 24
-REQUIRED_SHA = "62ae32be06c0196a06a6c0dfcda5525ea367b14a"
+REQUIRED_SHA = "47e1e2b11ff16b23ea34cc9b55e5e165036d865b"
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 EXPECTED_H8 = "c41f736d1278b7a61684fa76bd34983c5722e3536ed1d04a7c96c8024c99f65e"
 EXPECTED_SOURCE = "2c747a306f1f8a3031155d3a266cc56b62e91966431db54e67c36f772c58c20c"
-PREFIX = "tivvlejoy-assets/executions/v7-proof-a-paid-v1"
-OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-proof-a-paid"
+PREFIX = "tivvlejoy-assets/executions/v7-proof-a-paid-retry-v1"
+OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-proof-a-paid-retry-v1"
 PIN_FILE = REPO / "config/cloud/scenery-showcase-worker-image.json"
 ENTRY_FILE = Path(__file__).resolve().parent / "entry.js"
 
@@ -153,6 +153,21 @@ def list_pods() -> list[dict]:
         """
     )
     return ((data.get("myself") or {}).get("pods")) or []
+
+
+def pod_uptime_seconds(pod: dict | None) -> int | None:
+    if not pod:
+        return None
+    runtime = pod.get("runtime") if isinstance(pod.get("runtime"), dict) else {}
+    raw = runtime.get("uptimeInSeconds")
+    if raw is None:
+        raw = pod.get("uptimeInSeconds")
+    if raw is None:
+        return None
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None
 
 
 def active_pods(pods: list[dict]) -> list[dict]:
@@ -408,6 +423,7 @@ def preflight() -> dict:
         "motion": False,
         "finalVideo": False,
         "retry": False,
+        "automaticSecondCreate": False,
     }
     row = {
         "schema": "TIVVLEJOY_V7_PROOF_A_PAID_PREFLIGHT_V1",
@@ -599,6 +615,7 @@ def download_outputs() -> dict:
         "host-memory-receipt.json",
         "BLENDER_STDOUT.txt",
         "BLENDER_STDERR.txt",
+        "startup-markers.json",
     ):
         dest = OUT / name
         try:
@@ -637,6 +654,10 @@ def main() -> int:
     started = time.time()
     pod_id = None
     create_performed = 0
+    status = None
+    receipt = None
+    markers = None
+    stage = None
     try:
         try:
             log("create_entered", gpu=GPU_TYPE, minMemoryInGb=MIN_RAM_GB)
@@ -671,32 +692,59 @@ def main() -> int:
         worker_marker_deadline = None
         stage = "POD_CREATED"
         status = None
+        receipt = None
+        markers = None
         client = r2_client()
+        timeline: list[dict] = [{"ts": utc_now(), "stage": stage, "podId": pod_id}]
         while time.time() < hard_deadline:
             status = r2_get_json(client, f"{PREFIX}/status.json")
             receipt = r2_get_json(client, f"{PREFIX}/host-memory-receipt.json")
+            markers = r2_get_json(client, f"{PREFIX}/startup-markers.json")
             if status and status.get("status") in {"COMPLETE", "FAILED"}:
+                timeline.append({"ts": utc_now(), "stage": "STATUS_" + str(status.get("status")), "code": status.get("code")})
                 break
             pods = list_pods()
             exact = next((p for p in pods if p.get("id") == pod_id), None)
-            uptime = (exact or {}).get("uptimeInSeconds")
+            uptime = pod_uptime_seconds(exact)
+            prev = stage
             if exact and exact.get("machineId"):
                 stage = "HOST_ASSIGNED"
-            if exact and str(exact.get("desiredStatus") or "").upper() == "RUNNING" and (uptime is None or int(uptime) < 0):
+            if exact and str(exact.get("desiredStatus") or "").upper() == "RUNNING" and (uptime is None or uptime < 0):
                 stage = "IMAGE_PULLING"
             if exact and exact.get("costPerHr"):
                 observed_rate = float(exact["costPerHr"])
                 hard_deadline = min(hard_deadline, started + (MAX_SPEND / observed_rate) * 3600 * 0.95)
                 startup_spend_deadline = started + (STARTUP_SPEND_CAP / observed_rate) * 3600
-            if uptime is not None and int(uptime) >= 0:
+            if uptime is not None and uptime >= 0:
                 if stage in {"POD_CREATED", "HOST_ASSIGNED", "IMAGE_PULLING"}:
                     stage = "CONTAINER_STARTED"
-                    worker_marker_deadline = time.time() + WORKER_MARKER_TIMEOUT_S
+                    if worker_marker_deadline is None:
+                        worker_marker_deadline = time.time() + WORKER_MARKER_TIMEOUT_S
             if receipt:
                 stage = "WORKER_STARTED"
             if status and status.get("code") in {"RENDERED", "RENDER_FAILED"}:
                 stage = "BLENDER_STARTED"
+            if stage != prev:
+                timeline.append(
+                    {
+                        "ts": utc_now(),
+                        "stage": stage,
+                        "uptimeInSeconds": uptime,
+                        "desiredStatus": (exact or {}).get("desiredStatus"),
+                        "costPerHr": (exact or {}).get("costPerHr"),
+                    }
+                )
+                write_json(OUT / "STARTUP_TIMELINE.json", {"schema": "TIVVLEJOY_V7_PROOF_A_STARTUP_TIMELINE_V1", "events": timeline})
             elapsed = time.time() - started
+            log(
+                "poll",
+                stage=stage,
+                uptime=uptime,
+                elapsed=round(elapsed, 1),
+                hasReceipt=bool(receipt),
+                hasStatus=bool(status),
+                markerCount=len((markers or {}).get("markers") or []),
+            )
             if time.time() > startup_spend_deadline and stage in {"POD_CREATED", "HOST_ASSIGNED", "IMAGE_PULLING"}:
                 raise RuntimeError(f"STARTUP_SPEND_CAP:{stage}:{round(elapsed,1)}")
             if time.time() > container_deadline and stage in {"POD_CREATED", "HOST_ASSIGNED", "IMAGE_PULLING"}:
@@ -711,10 +759,19 @@ def main() -> int:
         outputs = download_outputs()
         write_json(OUT / "DOWNLOAD.json", outputs)
     finally:
+        try:
+            outputs = download_outputs()
+            write_json(OUT / "DOWNLOAD.json", outputs)
+        except Exception:
+            outputs = {}
         cleanup = terminate_pod(pod_id)
         write_json(OUT / "CLEANUP.json", cleanup)
+        try:
+            outputs = download_outputs()
+            write_json(OUT / "DOWNLOAD.json", outputs)
+        except Exception:
+            pass
         runtime_s = max(0.0, time.time() - started)
-        # Use observed pod rate if recorded.
         try:
             observed_rate = float((json.loads((OUT / "LAUNCH.json").read_text()).get("quotedUsdPerHr") or rate))
         except Exception:
@@ -731,6 +788,28 @@ def main() -> int:
                 "liveAfterCleanup": cleanup.get("live"),
             },
         )
+        live_after = cleanup.get("live") or []
+        write_json(
+            OUT / "RESULT.json",
+            {
+                "schema": AUTH + "_RESULT",
+                "status": "V7_PROOF_A_PAID_EXECUTION_COMPLETE"
+                if (status or {}).get("status") == "COMPLETE"
+                else "V7_PROOF_A_PAID_EXECUTION_FAILED",
+                "authorization": AUTH,
+                "podId": pod_id,
+                "createPerformed": create_performed,
+                "stage": stage,
+                "statusPayload": status,
+                "receipt": receipt,
+                "markers": markers,
+                "spend": {"runtimeSeconds": round(runtime_s, 1), "actualUsd": spend, "rateUsdPerHr": observed_rate},
+                "cleanup": {"podTerminated": bool(cleanup.get("confirmed")), "livePods": live_after},
+                "finalVideoAuthorized": False,
+                "retryAuthorized": False,
+                "at": utc_now(),
+            },
+        )
     return 0
 
 
@@ -738,13 +817,24 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except Exception as exc:
-        write_json(
-            OUT / "RESULT.json",
-            {
-                "status": "V7_PROOF_A_PAID_EXECUTION_FAILED",
-                "error": f"{type(exc).__name__}:{str(exc)[:400]}",
-                "at": utc_now(),
-            },
-        )
+        existing = {}
+        if (OUT / "RESULT.json").exists():
+            try:
+                existing = json.loads((OUT / "RESULT.json").read_text())
+            except Exception:
+                existing = {}
+        if not existing.get("spend"):
+            write_json(
+                OUT / "RESULT.json",
+                {
+                    "status": "V7_PROOF_A_PAID_EXECUTION_FAILED",
+                    "error": f"{type(exc).__name__}:{str(exc)[:400]}",
+                    "at": utc_now(),
+                },
+            )
+        else:
+            existing["error"] = f"{type(exc).__name__}:{str(exc)[:400]}"
+            existing["status"] = existing.get("status") or "V7_PROOF_A_PAID_EXECUTION_FAILED"
+            write_json(OUT / "RESULT.json", existing)
         log("launch_failed", error=type(exc).__name__)
         raise

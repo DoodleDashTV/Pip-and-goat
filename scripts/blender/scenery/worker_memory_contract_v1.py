@@ -13,6 +13,8 @@ FAIL_CODE = "WORKER_MEMORY_CONTRACT_FAILED"
 MINIMUM_SYSTEM_RAM_BYTES = 24 * 1024 * 1024 * 1024
 RECOMMENDED_SYSTEM_RAM_BYTES = 32 * 1024 * 1024 * 1024
 TARGET_GPU_VRAM_BYTES = 24 * 1024 * 1024 * 1024
+# nvidia-smi on a 24 GB 4090 often reports ~24564 MiB, which is just under 24 GiB.
+MEASURED_GPU_VRAM_MIN_BYTES = 23 * 1024 * 1024 * 1024
 REQUIRED_BLENDER = "4.2.2"
 REQUIRED_ENGINE = "CYCLES"
 
@@ -36,7 +38,7 @@ def evaluate_worker_memory_contract(
         blockers.append("SYSTEM_RAM_BELOW_24GIB")
     elif int(system_ram_bytes or 0) < RECOMMENDED_SYSTEM_RAM_BYTES:
         warnings.append("SYSTEM_RAM_BELOW_32GIB_PREFERRED")
-    if gpu_vram_bytes is not None and int(gpu_vram_bytes) < TARGET_GPU_VRAM_BYTES:
+    if gpu_vram_bytes is not None and int(gpu_vram_bytes) < MEASURED_GPU_VRAM_MIN_BYTES:
         blockers.append("GPU_VRAM_BELOW_24GIB")
     if blender_version != REQUIRED_BLENDER:
         blockers.append("BLENDER_VERSION_MISMATCH")

@@ -59,13 +59,28 @@ function nvidia() {
 
 function blenderVersion() {
   const result = spawnSync('blender', ['--version'], { encoding: 'utf8', timeout: 20000 });
-  const line = String(result.stdout || '').split('\n')[0] || '';
-  const match = line.match(/Blender\s+(\d+\.\d+\.\d+)/);
-  return { raw: line.trim(), version: match ? match[1] : null };
+  const text = `${result.stdout || ''}\n${result.stderr || ''}`;
+  const match = text.match(/Blender\s+(\d+\.\d+\.\d+)/);
+  const raw = text.split('\n').find((line) => line.includes('Blender')) || '';
+  return { raw: raw.trim(), version: match ? match[1] : null };
 }
 
 async function uploadJson(ctx, key, payload) {
   await r2.uploadBuffer(ctx, key, Buffer.from(`${JSON.stringify(payload, null, 2)}\n`), 'application/json');
+}
+
+const MARKERS = [];
+async function mark(ctx, prefix, stage, extra = {}) {
+  const row = { schema: 'TIVVLEJOY_WORKER_STARTUP_MARKERS_V1', stage, ts: new Date().toISOString(), ...extra };
+  MARKERS.push(row);
+  log(stage, extra);
+  if (ctx && prefix) {
+    await uploadJson(ctx, `${prefix}/startup-markers.json`, {
+      schema: 'TIVVLEJOY_WORKER_STARTUP_MARKERS_V1',
+      markers: MARKERS,
+    });
+  }
+  return row;
 }
 
 async function main() {
@@ -76,12 +91,13 @@ async function main() {
   mkdirSync(OUT_DIR, { recursive: true });
 
   const started = new Date().toISOString();
-  log('IMAGE_PROCESS_STARTED');
-  log('NODE_ENTRY_STARTED');
+  await mark(ctx, prefix, 'IMAGE_PROCESS_STARTED');
+  await mark(ctx, prefix, 'NODE_ENTRY_STARTED');
   const gpu = nvidia();
   const mem = meminfo();
   const blender = blenderVersion();
   log('worker_boot', { gpu, memTotalGiB: +(mem.memTotal / 1024 ** 3).toFixed(2), blender: blender.version });
+  const vramBytes = Math.round((gpu.vramTotalMiB || 0) * 1024 * 1024);
   if (mem.memTotal < 24 * 1024 * 1024 * 1024) {
     await uploadJson(ctx, `${prefix}/host-memory-receipt.json`, { schema: 'TIVVLEJOY_HOST_MEMORY_RECEIPT_V1', ok: false, code: 'SYSTEM_RAM_BELOW_24GIB', ...mem, gpu });
     await uploadJson(ctx, `${prefix}/status.json`, {
@@ -95,23 +111,44 @@ async function main() {
     process.exitCode = 3;
     return;
   }
+  if (!gpu.ok || (gpu.vramTotalMiB || 0) < 23000) {
+    await uploadJson(ctx, `${prefix}/host-memory-receipt.json`, {
+      schema: 'TIVVLEJOY_HOST_MEMORY_RECEIPT_V1',
+      ok: false,
+      code: 'GPU_VRAM_BELOW_24GIB',
+      ...mem,
+      gpu,
+    });
+    await uploadJson(ctx, `${prefix}/status.json`, {
+      schema: 'TIVVLEJOY_V7_PROOF_A_PAID_STATUS_V1',
+      status: 'FAILED',
+      code: 'GPU_VRAM_BELOW_24GIB',
+      mem,
+      gpu,
+      started,
+      ended: new Date().toISOString(),
+    });
+    process.exitCode = 3;
+    return;
+  }
   const warnings = mem.memTotal < 32 * 1024 * 1024 * 1024 ? ['SYSTEM_RAM_BELOW_32GIB_PREFERRED'] : [];
   await uploadJson(ctx, `${prefix}/host-memory-receipt.json`, {
     schema: 'TIVVLEJOY_HOST_MEMORY_RECEIPT_V1',
     ok: true,
     warnings,
     blenderAllowed: true,
+    gpuVramBytes: vramBytes,
     ...mem,
     gpu,
   });
-  log('HOST_MEMORY_RECEIPT_WRITTEN', { memTotal: mem.memTotal, warnings });
+  await mark(ctx, prefix, 'HOST_MEMORY_RECEIPT_WRITTEN', { memTotal: mem.memTotal, warnings, vramBytes });
 
-  log('R2_CLIENT_STARTED');
-  log('SOURCE_MANIFEST_FETCH_STARTED');
+  await mark(ctx, prefix, 'R2_CLIENT_STARTED');
+  await mark(ctx, prefix, 'SOURCE_MANIFEST_FETCH_STARTED');
   const manifestKey = `${prefix}/source-manifest.json`;
   const localManifest = '/tmp/v7-source-manifest.json';
   await r2.downloadToFile(ctx, manifestKey, localManifest);
-  log('SOURCE_MANIFEST_FETCH_COMPLETE');
+  await mark(ctx, prefix, 'SOURCE_MANIFEST_FETCH_COMPLETE');
   const manifest = JSON.parse(readFileSync(localManifest, 'utf8'));
 
   for (const file of manifest.files || []) {
@@ -146,12 +183,12 @@ sys.path.insert(0, "${SCRIPT_DIR}")
 from worker_memory_contract_v1 import evaluate_worker_memory_contract
 row = evaluate_worker_memory_contract(
     system_ram_bytes=${int(mem.memTotal)},
-    gpu_vram_bytes=${Math.round((gpu.vramTotalMiB || 0) * 1024 * 1024)},
+    gpu_vram_bytes=${vramBytes},
     memory_prediction_bytes=14 * 1024 * 1024 * 1024,
     source_manifest=["festuca_a", "carex_a", "fern_a", "beech_a", "ecokit_rocks", "hdri_jpg"],
     hdri_identity="Image0001.jpg:15000x7500:${EXPECTED_SOURCE}",
     hdri_derivative_identity="H8:8192x4096:${EXPECTED_H8}",
-    blender_version="${blender.version or ''}",
+    blender_version="${blender.version || ''}",
     cycles_device="GPU",
     render_profile="PROOF_A_STILL",
     paid_create_allowed=False,
@@ -179,8 +216,8 @@ print(json.dumps(row))
 
   const beforeMem = meminfo();
   const beforeGpu = nvidia();
-  log('BLENDER_EXEC_STARTED');
-  log('BLENDER_PROCESS_STARTED');
+  await mark(ctx, prefix, 'BLENDER_EXEC_STARTED');
+  await mark(ctx, prefix, 'BLENDER_PROCESS_STARTED');
   const render = spawnSync(
     'blender',
     [

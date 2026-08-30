@@ -7,9 +7,9 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "blender/scenery"))
 from worker_memory_contract_v1 import (
+    MEASURED_GPU_VRAM_MIN_BYTES,
     MINIMUM_SYSTEM_RAM_BYTES,
     RECOMMENDED_SYSTEM_RAM_BYTES,
-    TARGET_GPU_VRAM_BYTES,
     evaluate_worker_memory_contract,
 )
 
@@ -57,7 +57,7 @@ def collect_host_memory_receipt(
         blockers.append(STOP_CODE)
     elif mem["memTotal"] < RECOMMENDED_SYSTEM_RAM_BYTES:
         warnings.append("SYSTEM_RAM_BELOW_32GIB_PREFERRED")
-    if gpu_vram_bytes is not None and int(gpu_vram_bytes) < TARGET_GPU_VRAM_BYTES:
+    if gpu_vram_bytes is not None and int(gpu_vram_bytes) < MEASURED_GPU_VRAM_MIN_BYTES:
         blockers.append("GPU_VRAM_BELOW_24GIB")
     contract = evaluate_worker_memory_contract(
         system_ram_bytes=mem["memTotal"],
