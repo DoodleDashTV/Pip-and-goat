@@ -33,6 +33,7 @@ jobs:
           python pipeline_guardrails_test.py
           python runtime_memory_preflight_v1_test.py
           python memory_safe_asset_loader_v1_test.py
+          python cycles_memory_predictor_v1_test.py
       - name: Compile fail-fast guardrail module
         run: python -m py_compile scripts/blender/scenery/pipeline_guardrails.py
       - name: Prove production stays fail-closed without a readiness receipt

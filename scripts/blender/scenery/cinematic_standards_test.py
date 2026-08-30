@@ -89,6 +89,10 @@ from runtime_memory_preflight_v1_test import (  # noqa: E402
     test_budget_scales_from_detected_memory,
     test_detect_system_memory_parses_proc_text,
 )
+from cycles_memory_predictor_v1_test import (  # noqa: E402
+    test_predictor_adds_isolated_deltas_with_slack,
+    test_unknown_parts_are_ignored,
+)
 from memory_safe_asset_loader_v1_test import (  # noqa: E402
     test_dependency_preservation_allows_referenced_images,
     test_exact_object_append_policy_is_ok,
@@ -375,6 +379,8 @@ if __name__ == "__main__":
     test_unreferenced_library_dump_warns()
     test_severe_amplification_blocks_when_budget_threatened()
     test_image_raw_bytes()
+    test_predictor_adds_isolated_deltas_with_slack()
+    test_unknown_parts_are_ignored()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False
     assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"
