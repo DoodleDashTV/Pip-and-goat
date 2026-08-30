@@ -46,6 +46,33 @@ def test_extract_skips_huge_obj_and_keeps_individual_assets():
     assert should_extract_member('Pine_Tree_01.fbx', 3 * 1024 * 1024, 'forest_nature') is True
     assert should_extract_member('house_a.blend', 40 * 1024 * 1024, 'village_blender') is True
     assert should_extract_member('huge_dump.obj', 90 * 1024 * 1024, 'forest_nature') is False
+    # Production still skips the purchased originals that exceed 180 MiB.
+    assert should_extract_member('Stylized_Forest_Nature_Kit.blend', 494 * 1024 * 1024, 'forest_nature') is False
+    assert should_extract_member('Flora_Mat&GN&Models.blend', 670 * 1024 * 1024, 'forest_ecokit') is False
+    assert should_extract_member('Rock_Models.blend', 258 * 1024 * 1024, 'forest_ecokit') is False
+    assert should_extract_member('sk2/0001.hdr', 67 * 1024 * 1024, 'sky_hdri') is False
+
+
+def test_lookdev_intake_allows_verified_large_originals():
+    assert should_extract_member(
+        'Stylized_Forest_Nature_Kit.blend', 494 * 1024 * 1024, 'forest_nature', intake='lookdev',
+    ) is True
+    assert should_extract_member(
+        'Flora_Mat&GN&Models.blend', 670 * 1024 * 1024, 'forest_ecokit', intake='lookdev',
+    ) is True
+    assert should_extract_member(
+        'Rock_Models.blend', 258 * 1024 * 1024, 'forest_ecokit', intake='lookdev',
+    ) is True
+    assert should_extract_member(
+        'HDRi_JPG_Pack/sk2/0001.hdr', 67 * 1024 * 1024, 'sky_hdri', intake='lookdev',
+    ) is True
+    # Lookdev still refuses combined OBJ dumps and unknown huge blends.
+    assert should_extract_member(
+        'Stylized_Forest_Nature_Kit.obj', 90 * 1024 * 1024, 'forest_nature', intake='lookdev',
+    ) is False
+    assert should_extract_member(
+        'unknown_kit.blend', 400 * 1024 * 1024, 'forest_nature', intake='lookdev',
+    ) is False
 
 
 def test_geometry_picker_prefers_small_blend_over_combined_obj():
@@ -427,6 +454,7 @@ def test_camera_hero_rejects_lily_pad_and_water():
 if __name__ == '__main__':
     test_dump_name_detects_combined_forest_kit()
     test_extract_skips_huge_obj_and_keeps_individual_assets()
+    test_lookdev_intake_allows_verified_large_originals()
     test_geometry_picker_prefers_small_blend_over_combined_obj()
     test_fallback_to_dump_when_it_is_the_only_geometry()
     test_extract_sort_puts_individual_blend_before_dump_obj()

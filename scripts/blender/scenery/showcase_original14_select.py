@@ -437,7 +437,15 @@ def geometry_file_limit(role: str) -> int:
     return 1
 
 
-def should_extract_member(filename: str, file_size: int, role: str) -> bool:
+def should_extract_member(
+    filename: str,
+    file_size: int,
+    role: str,
+    intake: str = 'production',
+) -> bool:
+    if str(intake or 'production').lower() == 'lookdev':
+        from lookdev_large_source_intake import lookdev_should_extract_member
+        return lookdev_should_extract_member(filename, file_size, role)
     ext = Path(str(filename)).suffix.lower()
     if ext not in SUPPORT_EXTS:
         return False

@@ -114,7 +114,13 @@ def safe_member_path(destination: Path, member: str) -> Path | None:
     return target
 
 
-def extract_selected(zip_path: Path, destination: Path, role: str, depth: int = 0) -> list[Path]:
+def extract_selected(
+    zip_path: Path,
+    destination: Path,
+    role: str,
+    depth: int = 0,
+    intake: str = 'production',
+) -> list[Path]:
     destination.mkdir(parents=True, exist_ok=True)
     extracted: list[Path] = []
     try:
@@ -123,7 +129,7 @@ def extract_selected(zip_path: Path, destination: Path, role: str, depth: int = 
             wanted = [
                 i for i in infos
                 if Path(i.filename).suffix.lower() in SUPPORT_EXTS
-                and should_extract_member(i.filename, int(i.file_size or 0), role)
+                and should_extract_member(i.filename, int(i.file_size or 0), role, intake=intake)
             ]
             # Prefer individual purchased geometry over combined dumps / huge images.
             wanted.sort(key=lambda i: extract_sort_key(i.filename, int(i.file_size or 0), role))
@@ -147,7 +153,7 @@ def extract_selected(zip_path: Path, destination: Path, role: str, depth: int = 
     if depth == 0:
         nested = [p for p in extracted if p.suffix.lower() == '.zip'][:4]
         for i, nested_zip in enumerate(nested):
-            extracted.extend(extract_selected(nested_zip, destination / f'nested_{i}', role, depth=1))
+            extracted.extend(extract_selected(nested_zip, destination / f'nested_{i}', role, depth=1, intake=intake))
     return extracted
 
 
