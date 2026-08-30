@@ -88,14 +88,17 @@ from runtime_memory_preflight_v1_test import (  # noqa: E402
     test_blocks_the_confirmed_16gib_pre_cycles_state,
     test_budget_scales_from_detected_memory,
     test_detect_system_memory_parses_proc_text,
+    test_preflight_stores_geometry_and_component_history,
 )
 from cycles_memory_predictor_v1_test import (  # noqa: E402
+    test_measured_v3_history_keeps_hdri_as_largest_isolated_peak,
     test_predictor_adds_isolated_deltas_with_slack,
     test_unknown_parts_are_ignored,
 )
 from memory_safe_asset_loader_v1_test import (  # noqa: E402
     test_dependency_preservation_allows_referenced_images,
     test_exact_object_append_policy_is_ok,
+    test_hidden_library_master_excludes_instances,
     test_image_raw_bytes,
     test_no_explicit_all_image_append,
     test_severe_amplification_blocks_when_budget_threatened,
@@ -373,13 +376,16 @@ if __name__ == "__main__":
     test_allows_healthy_headroom()
     test_predicted_cycles_increment_blocks()
     test_detect_system_memory_parses_proc_text()
+    test_preflight_stores_geometry_and_component_history()
     test_exact_object_append_policy_is_ok()
     test_no_explicit_all_image_append()
     test_dependency_preservation_allows_referenced_images()
     test_unreferenced_library_dump_warns()
     test_severe_amplification_blocks_when_budget_threatened()
     test_image_raw_bytes()
+    test_hidden_library_master_excludes_instances()
     test_predictor_adds_isolated_deltas_with_slack()
+    test_measured_v3_history_keeps_hdri_as_largest_isolated_peak()
     test_unknown_parts_are_ignored()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False

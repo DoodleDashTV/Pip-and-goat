@@ -1,0 +1,239 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_06",
+  "parts": [
+    "rocks"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 255418368,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093256.902719,
+    "rss": 274882560,
+    "hwm": 409935872,
+    "memTotal": 16791945216,
+    "memAvailable": 15455424512,
+    "memFree": 14887088128,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861753856,
+    "objects": 9,
+    "meshes": 8,
+    "materials": 5,
+    "images": 4,
+    "vertices": 14162,
+    "faces": 21542
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093256.982128,
+    "rss": 292491264,
+    "hwm": 409935872,
+    "memTotal": 16791945216,
+    "memAvailable": 15447035904,
+    "memFree": 14878699520,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861749760,
+    "objects": 9,
+    "meshes": 8,
+    "materials": 5,
+    "images": 5,
+    "vertices": 14162,
+    "faces": 21542
+  },
+  "hwm": 409935872,
+  "deltaRss": 17608704,
+  "peakFromHwm": 409935872,
+  "error": null,
+  "pngBytes": 4067,
+  "png": true,
+  "images": {
+    "count": 4,
+    "rawBytes": 0,
+    "largest": [
+      {
+        "name": "01-8.png",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "01-8.png.001",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "Tree Trunk_1.png",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "Tree Trunk_1.png.001",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      }
+    ]
+  },
+  "modifiers": [],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [
+      {
+        "name": "Rock_Model_Large_001",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 2740
+      },
+      {
+        "name": "Rock_Model_Large_003",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 2111
+      },
+      {
+        "name": "Rock_Model_Large_005",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 3049
+      },
+      {
+        "name": "Rock_Model_Large_007",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 959
+      },
+      {
+        "name": "Rock_Model_Large_009",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 3583
+      },
+      {
+        "name": "Rock_Model_Small_5_001",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 580
+      },
+      {
+        "name": "Rock_Model_Small_5_011",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 620
+      },
+      {
+        "name": "Rock_Model_Small_5_021",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 520
+      }
+    ],
+    "count": 8
+  },
+  "instances": {
+    "uniqueMeshes": 8,
+    "objects": 9,
+    "shared": [],
+    "singleUser": 8
+  },
+  "beech": null,
+  "evalGeom": {
+    "ok": true,
+    "objects": [],
+    "evalVerts": 0,
+    "evalFaces": 0,
+    "rssBefore": 274886656,
+    "rssAfter": 274886656,
+    "rssJump": 0,
+    "aborted": false
+  },
+  "counts": {
+    "objects": 9,
+    "meshes": 8,
+    "materials": 5,
+    "images": 5,
+    "vertices": 14162,
+    "faces": 21542
+  }
+}

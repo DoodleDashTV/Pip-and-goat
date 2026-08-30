@@ -1,0 +1,221 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_09_EXCLUDE",
+  "parts": [
+    "beech"
+  ],
+  "libMode": "exclude",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 255700992,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093259.2128313,
+    "rss": 346869760,
+    "hwm": 354709504,
+    "memTotal": 16791945216,
+    "memAvailable": 15254155264,
+    "memFree": 14685736960,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861708800,
+    "objects": 3,
+    "meshes": 1,
+    "materials": 2,
+    "images": 5,
+    "vertices": 259333,
+    "faces": 238914
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093259.3481364,
+    "rss": 372277248,
+    "hwm": 410894336,
+    "memTotal": 16791945216,
+    "memAvailable": 15224201216,
+    "memFree": 14655782912,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861704704,
+    "objects": 3,
+    "meshes": 1,
+    "materials": 2,
+    "images": 6,
+    "vertices": 259333,
+    "faces": 238914
+  },
+  "hwm": 410894336,
+  "deltaRss": 25407488,
+  "peakFromHwm": 410894336,
+  "error": null,
+  "pngBytes": 4067,
+  "png": true,
+  "images": {
+    "count": 5,
+    "rawBytes": 41943040,
+    "largest": [
+      {
+        "name": "bq_Leaf_Fagus-sylvatica_Diffuse.png",
+        "width": 2048,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 16777216,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Leaf_Fagus-sylvatica_Normal.jpg",
+        "width": 2048,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 16777216,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Bark_Fagus-sylvatica_Diffuse.jpg",
+        "width": 512,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 4194304,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Bark_Fagus-sylvatica_Normal.jpg",
+        "width": 512,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 4194304,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Moss_Diffuse.jpg",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      }
+    ]
+  },
+  "modifiers": [],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [
+      {
+        "name": "bq_Tree_Fagus-sylvatica_A_summer",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "TJ_LIB_EXCLUDE"
+        ],
+        "verts": 259333
+      },
+      {
+        "name": "TJ_V7_ReflectBeech",
+        "hide_render": false,
+        "hide_viewport": false,
+        "collections": [
+          "TJ_LIB_EXCLUDE"
+        ],
+        "verts": 259333
+      }
+    ],
+    "count": 2
+  },
+  "instances": {
+    "uniqueMeshes": 1,
+    "objects": 3,
+    "shared": [
+      {
+        "mesh": "bq_Tree_Fagus-sylvatica_A_summer",
+        "verts": 259333,
+        "users": 2,
+        "objects": [
+          "bq_Tree_Fagus-sylvatica_A_summer",
+          "TJ_V7_ReflectBeech"
+        ]
+      }
+    ],
+    "singleUser": 0
+  },
+  "beech": {
+    "found": true,
+    "name": "bq_Tree_Fagus-sylvatica_A_summer",
+    "type": "MESH",
+    "baseVerts": 259333,
+    "baseFaces": 238914,
+    "modifiers": [],
+    "materials": [
+      {
+        "name": "bq_Bark_Fagus-sylvatica",
+        "blend": "HASHED",
+        "shadow": "OPAQUE"
+      },
+      {
+        "name": "bq_Leaf_Fagus-sylvatica",
+        "blend": "HASHED",
+        "shadow": "HASHED"
+      }
+    ],
+    "alphaLikely": true,
+    "libraryGroupSize": 1,
+    "hide_render": true,
+    "users": 2
+  },
+  "evalGeom": null,
+  "counts": {
+    "objects": 3,
+    "meshes": 1,
+    "materials": 2,
+    "images": 6,
+    "vertices": 259333,
+    "faces": 238914
+  }
+}

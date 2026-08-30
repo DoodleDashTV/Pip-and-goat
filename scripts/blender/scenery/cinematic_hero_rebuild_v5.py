@@ -300,6 +300,8 @@ def _dup_group(loaded: list, loc, height: float, yaw: float, bury: float, col, n
         bpy.context.scene.collection.objects.link(obj)
         obj.hide_render = False
         obj.hide_viewport = False
+        if "tj_v5_lib" in obj:
+            del obj["tj_v5_lib"]
         copies.append((src, obj))
     hero_copy = next(obj for src, obj in copies if src == hero)
     dim = max(float(hero.dimensions.z), 0.05)
@@ -377,6 +379,8 @@ def _dup_mesh(src, loc, scale: float, yaw: float, bury: float, col, name: str):
     bpy.context.scene.collection.objects.link(obj)
     obj.hide_render = False
     obj.hide_viewport = False
+    if "tj_v5_lib" in obj:
+        del obj["tj_v5_lib"]
     obj.matrix_world = Matrix.Identity(4)
     obj.scale = (scale, scale, scale)
     obj.rotation_euler = (0.15 * (hash(name) % 5 - 2), 0.12 * (hash(name) % 3 - 1), yaw)

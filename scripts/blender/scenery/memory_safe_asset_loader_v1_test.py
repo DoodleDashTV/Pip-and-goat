@@ -5,6 +5,7 @@ from memory_safe_asset_loader_v1 import (
     SCHEMA,
     amplification_report,
     image_raw_bytes,
+    is_hidden_library_master,
 )
 
 
@@ -80,6 +81,18 @@ def test_image_raw_bytes():
     assert image_raw_bytes(1024, 1024, 4, True) == 1024 * 1024 * 4 * 4
 
 
+def test_hidden_library_master_excludes_instances():
+    assert is_hidden_library_master(
+        hide_render=True, name="bq_Tree_Fagus-sylvatica_A_summer", is_lib_flag=True, is_visible_instance=False
+    )
+    assert not is_hidden_library_master(
+        hide_render=False, name="TJ_V7_ReflectBeech", is_lib_flag=True, is_visible_instance=True
+    )
+    assert not is_hidden_library_master(
+        hide_render=False, name="TJ_V7_ReflectBeech", is_lib_flag=True, is_visible_instance=False
+    )
+
+
 if __name__ == "__main__":
     test_exact_object_append_policy_is_ok()
     test_no_explicit_all_image_append()
@@ -87,4 +100,5 @@ if __name__ == "__main__":
     test_unreferenced_library_dump_warns()
     test_severe_amplification_blocks_when_budget_threatened()
     test_image_raw_bytes()
+    test_hidden_library_master_excludes_instances()
     print("memory_safe_asset_loader_v1_test PASS")

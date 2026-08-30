@@ -29,7 +29,7 @@ from cinematic_riverbank_v1 import WATER_Z, riverbank_sample
 from cinematic_shoreline_v1 import transition_color
 from cinematic_shoreline_v2 import gravel_scatter_plan
 from cinematic_water_lock_v1 import test_cfg
-from memory_safe_asset_loader_v1 import image_audit
+from memory_safe_asset_loader_v1 import exclude_hidden_library_masters, image_audit, is_hidden_library_master
 from v7_resource_probe import scene_counts, snapshot
 
 OUT = Path("/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cycles-sync-root-cause-v3")
@@ -79,34 +79,22 @@ def cycles_config() -> dict:
                 out[key] = getattr(cyc, key)
             except Exception:
                 out[key] = "unreadable"
+    if hasattr(scene.render, "use_persistent_data"):
+        out["use_persistent_data"] = bool(scene.render.use_persistent_data)
+    if hasattr(scene.render, "film_transparent"):
+        out["film_transparent"] = bool(scene.render.film_transparent)
     return out
-
-
-def exclude_library_masters() -> dict:
-    col = bpy.data.collections.get("TJ_LIB_EXCLUDE") or bpy.data.collections.new("TJ_LIB_EXCLUDE")
-    if col.name not in bpy.context.scene.collection.children:
-        bpy.context.scene.collection.children.link(col)
-    moved = []
-    for obj in list(bpy.data.objects):
-        if obj.get("tj_v5_lib") or (obj.hide_render and "bq_" in obj.name) or (
-            obj.hide_render and obj.name.startswith("Rock_Model")
-        ):
-            for existing in list(obj.users_collection):
-                existing.objects.unlink(obj)
-            col.objects.link(obj)
-            moved.append(obj.name)
-    layer = bpy.context.view_layer.layer_collection
-    for child in layer.children:
-        if child.collection == col:
-            child.exclude = True
-            child.hide_viewport = True
-    return {"moved": moved, "excluded": True}
 
 
 def unlink_library_masters() -> dict:
     removed = []
     for obj in list(bpy.data.objects):
-        if obj.get("tj_v5_lib") or (obj.hide_render and ("bq_" in obj.name or obj.name.startswith("Rock_Model"))):
+        if is_hidden_library_master(
+            hide_render=bool(obj.hide_render),
+            name=obj.name,
+            is_lib_flag=bool(obj.get("tj_v5_lib")),
+            is_visible_instance=bool(obj.get("tj_v5")) or obj.name.startswith("TJ_"),
+        ):
             bpy.data.objects.remove(obj, do_unlink=True)
             removed.append(obj.name)
     return {"unlinked": removed}
@@ -172,6 +160,19 @@ def install_world(mode: str, cfg) -> str:
     return v6.install_hdri(cfg["hdriRotZ"], strength=0.88)
 
 
+def plant_rocks_only(col, rocks) -> int:
+    n = 0
+    for i, src in enumerate(rocks):
+        x = -3.2 + (i % 4) * 1.1
+        y = -9.4 + (i // 4) * 1.4
+        z, _ = riverbank_sample(x, y)
+        fitted = _fit_scale(src, 1.65, 1.0)
+        obj = _dup_mesh(src, (x, y, z), fitted, 0.45 * i, 0.08, col, f"TJ_V3_Rock_{i}")
+        finish_rock(obj, wet=False)
+        n += 1
+    return n
+
+
 def plant_gravel_only(col) -> int:
     n = 0
     for i, (x, y, radius, wet) in enumerate(gravel_scatter_plan(-2.0, 52)):
@@ -232,13 +233,23 @@ def instance_audit() -> dict:
 
 def hidden_master_audit() -> dict:
     rows = []
+    vl_names = {obj.name for obj in bpy.context.view_layer.objects}
     for obj in bpy.data.objects:
         if obj.get("tj_v5_lib") or (obj.hide_render and obj.type == "MESH"):
+            visible = None
+            try:
+                visible = bool(obj.visible_get())
+            except Exception:
+                visible = None
             rows.append({
                 "name": obj.name,
                 "hide_render": bool(obj.hide_render),
                 "hide_viewport": bool(obj.hide_viewport),
                 "collections": [col.name for col in obj.users_collection],
+                "inViewLayer": obj.name in vl_names,
+                "visibleGet": visible,
+                "isLibFlag": bool(obj.get("tj_v5_lib")),
+                "isInstanceFlag": bool(obj.get("tj_v5")),
                 "verts": len(obj.data.vertices) if obj.type == "MESH" and obj.data else 0,
             })
     return {"hiddenMeshObjects": rows, "count": len(rows)}
@@ -301,13 +312,37 @@ def beech_deep_audit(library: dict) -> dict:
         blend.append(info)
         mats.append(info)
     gn = [mod.type for mod in obj.modifiers]
+    leaf_faces = 0
+    bark_faces = 0
+    other_faces = 0
+    if obj.data:
+        for poly in obj.data.polygons:
+            slot = obj.material_slots[poly.material_index] if poly.material_index < len(obj.material_slots) else None
+            mat_name = slot.material.name if slot and slot.material else ""
+            low = mat_name.lower()
+            if "leaf" in low:
+                leaf_faces += 1
+            elif "bark" in low:
+                bark_faces += 1
+            else:
+                other_faces += 1
+    shape_keys = 0
+    if obj.data and getattr(obj.data, "shape_keys", None) and obj.data.shape_keys.key_blocks:
+        shape_keys = len(obj.data.shape_keys.key_blocks)
     return {
         "found": True,
         "name": obj.name,
         "type": obj.type,
         "baseVerts": len(obj.data.vertices) if obj.data else 0,
         "baseFaces": len(obj.data.polygons) if obj.data else 0,
+        "leafFaces": leaf_faces,
+        "barkFaces": bark_faces,
+        "otherFaces": other_faces,
+        "shapeKeys": shape_keys,
         "modifiers": gn,
+        "hasGeometryNodes": "NODES" in gn,
+        "hasSubdivision": "SUBSURF" in gn,
+        "hasDisplace": "DISPLACE" in gn,
         "materials": mats,
         "alphaLikely": alpha,
         "libraryGroupSize": len(group),
@@ -339,6 +374,8 @@ def build(parts, args, cfg):
         v6.apply_locked_water_material(water, cfg)
     if "rocks" in parts:
         rocks = _append_objects(ROCK_BLEND, ROCK_NAMES)
+        if "shore" not in parts:
+            plant_rocks_only(col, rocks)
     plant_keys = tuple(k for k in ("grass", "fern", "beech") if k in parts)
     key_map = {"grass": "festuca_a", "fern": "fern_a", "beech": "beech_a"}
     if plant_keys:
@@ -353,7 +390,7 @@ def build(parts, args, cfg):
         z, _ = riverbank_sample(-4.4, -3.8)
         _dup_group(library["beech_a"], (-4.4, -3.8, max(z, WATER_Z + 0.15)), 7.4, 0.35, 0.12, col, "TJ_V7_ReflectBeech")
     if args.lib_mode == "exclude":
-        exclude_library_masters()
+        exclude_hidden_library_masters()
     elif args.lib_mode == "unlink":
         unlink_library_masters()
     apply_subdiv_policy(args.subdiv)

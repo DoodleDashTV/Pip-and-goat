@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from cycles_memory_predictor_v1 import SCHEMA, predict_cycles_sync
+from cycles_memory_predictor_v1 import MEASURED_COMPONENT_HWM_V3, SCHEMA, predict_cycles_sync
 
 
 def test_predictor_adds_isolated_deltas_with_slack():
@@ -16,6 +16,17 @@ def test_predictor_adds_isolated_deltas_with_slack():
     assert row["sumIsolatedDeltas"] == (300_000_000 - 260_000_000) + (6_000_000_000 - 260_000_000)
 
 
+def test_measured_v3_history_keeps_hdri_as_largest_isolated_peak():
+    assert MEASURED_COMPONENT_HWM_V3["hdri_15k"] > 5 * 1024 * 1024 * 1024
+    assert MEASURED_COMPONENT_HWM_V3["beech"] < 1024 * 1024 * 1024
+    row = predict_cycles_sync(
+        component_peaks=MEASURED_COMPONENT_HWM_V3,
+        parts=["hdri_15k", "beech"],
+        empty_hwm=MEASURED_COMPONENT_HWM_V3["empty"],
+    )
+    assert row["predictedPeak"] > 5 * 1024 * 1024 * 1024
+
+
 def test_unknown_parts_are_ignored():
     row = predict_cycles_sync(
         component_peaks={"hdri": 300_000_000},
@@ -28,5 +39,6 @@ def test_unknown_parts_are_ignored():
 
 if __name__ == "__main__":
     test_predictor_adds_isolated_deltas_with_slack()
+    test_measured_v3_history_keeps_hdri_as_largest_isolated_peak()
     test_unknown_parts_are_ignored()
     print("cycles_memory_predictor_v1_test PASS")

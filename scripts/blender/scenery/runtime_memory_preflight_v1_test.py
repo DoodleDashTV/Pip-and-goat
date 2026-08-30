@@ -71,6 +71,24 @@ def test_allows_healthy_headroom():
     assert_cycles_allowed(receipt)
 
 
+def test_preflight_stores_geometry_and_component_history():
+    receipt = cycles_preflight(
+        mem_total=16 * 1024 * 1024 * 1024,
+        mem_available=int(8.0 * 1024 * 1024 * 1024),
+        rss=int(0.9 * 1024 * 1024 * 1024),
+        base_vertices=420_000,
+        evaluated_vertices=420_000,
+        estimated_texture_bytes=450_000_000,
+        component_peak_history={"hdri_15k": 5_695_967_232, "beech": 594_685_952},
+        expected_cycles_sync_bytes=5_695_967_232,
+    )
+    assert receipt["ok"] is True
+    assert receipt["baseVertices"] == 420_000
+    assert receipt["evaluatedVertices"] == 420_000
+    assert receipt["componentPeakHistory"]["hdri_15k"] == 5_695_967_232
+    assert receipt["expectedCyclesSyncBytes"] == 5_695_967_232
+
+
 def test_detect_system_memory_parses_proc_text():
     meminfo = (
         "MemTotal:       16398384 kB\n"
@@ -89,5 +107,6 @@ if __name__ == "__main__":
     test_budget_scales_from_detected_memory()
     test_blocks_the_confirmed_16gib_pre_cycles_state()
     test_allows_healthy_headroom()
+    test_preflight_stores_geometry_and_component_history()
     test_detect_system_memory_parses_proc_text()
     print("runtime_memory_preflight_v1_test PASS")

@@ -87,6 +87,10 @@ def cycles_preflight(
     estimated_texture_bytes: int = 0,
     estimated_additional_bytes: int = 0,
     expected_asset_manifest: list[str] | None = None,
+    base_vertices: int = 0,
+    evaluated_vertices: int | None = None,
+    component_peak_history: dict[str, int] | None = None,
+    expected_cycles_sync_bytes: int | None = None,
 ) -> dict[str, Any]:
     need = required_available_bytes(mem_total)
     rss_cap = rss_block_bytes(mem_total)
@@ -122,6 +126,10 @@ def cycles_preflight(
         "expectedAssetManifest": list(expected_asset_manifest or []),
         "headroomBytes": mem_available - need,
         "scaledFromDetectedMemory": True,
+        "baseVertices": int(base_vertices or 0),
+        "evaluatedVertices": evaluated_vertices,
+        "componentPeakHistory": dict(component_peak_history or {}),
+        "expectedCyclesSyncBytes": expected_cycles_sync_bytes,
     }
 
 

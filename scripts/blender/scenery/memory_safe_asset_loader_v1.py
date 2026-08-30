@@ -62,6 +62,53 @@ def amplification_report(
     }
 
 
+def is_hidden_library_master(
+    *,
+    hide_render: bool,
+    name: str,
+    is_lib_flag: bool,
+    is_visible_instance: bool,
+) -> bool:
+    """True only for parked hide_render source masters, never planted copies."""
+    if is_visible_instance:
+        return False
+    if not hide_render:
+        return False
+    if is_lib_flag:
+        return True
+    return name.startswith("bq_") or name.startswith("Rock_Model")
+
+
+def exclude_hidden_library_masters() -> dict[str, Any]:
+    """Keep purchased source masters outside the render depsgraph. A-class."""
+    import bpy
+
+    col = bpy.data.collections.get("TJ_LIB_EXCLUDE") or bpy.data.collections.new("TJ_LIB_EXCLUDE")
+    if col.name not in bpy.context.scene.collection.children:
+        bpy.context.scene.collection.children.link(col)
+    moved: list[str] = []
+    for obj in list(bpy.data.objects):
+        if not is_hidden_library_master(
+            hide_render=bool(obj.hide_render),
+            name=obj.name,
+            is_lib_flag=bool(obj.get("tj_v5_lib")),
+            is_visible_instance=bool(obj.get("tj_v5")) or obj.name.startswith("TJ_"),
+        ):
+            continue
+        for existing in list(obj.users_collection):
+            if existing != col:
+                existing.objects.unlink(obj)
+        if obj.name not in col.objects:
+            col.objects.link(obj)
+        moved.append(obj.name)
+    layer = bpy.context.view_layer.layer_collection
+    for child in layer.children:
+        if child.collection == col:
+            child.exclude = True
+            child.hide_viewport = True
+    return {"moved": moved, "excluded": True, "count": len(moved)}
+
+
 def image_raw_bytes(width: int, height: int, channels: int, is_float: bool) -> int:
     w = max(int(width), 0)
     h = max(int(height), 0)

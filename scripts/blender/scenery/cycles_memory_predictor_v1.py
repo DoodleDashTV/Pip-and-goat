@@ -9,6 +9,20 @@ from typing import Any
 
 SCHEMA = "TIVVLEJOY_CYCLES_MEMORY_PREDICTOR_V1"
 
+# Isolated 64x64 / 1-sample / denoise-off HWM from V3 decompose (bytes).
+MEASURED_COMPONENT_HWM_V3 = {
+    "empty": 278_000_000,
+    "hdri_15k": 5_695_967_232,
+    "terrain": 331_000_000,
+    "water": 278_000_000,
+    "bed": 295_000_000,
+    "gravel": 386_000_000,
+    "rocks": 410_000_000,
+    "grass": 289_000_000,
+    "fern": 288_000_000,
+    "beech": 594_685_952,
+}
+
 
 def predict_cycles_sync(
     *,

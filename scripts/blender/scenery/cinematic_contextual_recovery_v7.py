@@ -39,11 +39,13 @@ from cinematic_style_unifier_v2 import apply_style_unifier_v2
 from cinematic_water_lock_v1 import WATER_LOCK, test_cfg
 from memory_safe_asset_loader_v1 import (
     dependency_integrity,
+    exclude_hidden_library_masters,
     image_audit,
     purge_unused_datablocks,
     sit_from_bound_box,
 )
 from owned_building_audit import audit_summary
+from cycles_memory_predictor_v1 import MEASURED_COMPONENT_HWM_V3, predict_cycles_sync
 from runtime_memory_preflight_v1 import cycles_preflight, detect_system_memory
 from v7_resource_probe import PeakTracker, scene_counts, snapshot
 
@@ -89,6 +91,8 @@ def instance_one(src, loc, height: float, yaw: float, bury: float, col, name: st
     bpy.context.scene.collection.objects.link(obj)
     obj.hide_render = False
     obj.hide_viewport = False
+    if "tj_v5_lib" in obj:
+        del obj["tj_v5_lib"]
     dim = max(float(src.dimensions.z), 0.05)
     scale = height / dim
     obj.scale = (scale, scale, scale)
@@ -311,6 +315,7 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
         z, _ = riverbank_sample(-4.4, -3.8)
         _dup_group(library["beech_a"], (-4.4, -3.8, max(z, WATER_Z + 0.15)), 7.4, 0.35, 0.12, col, "TJ_V7_ReflectBeech")
         foil = 1
+    probe["libraryExclude"] = exclude_hidden_library_masters()
     style = apply_style_unifier_v2()
     sx, sy = point_on_south_shore(-2.0, offset=0.05)
     # Contextual creek role: bank + water + bed + one reflection mass.
@@ -323,6 +328,13 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
     probe["purgeAfter"] = snapshot("purge_after", extra=scene_counts())
     sys_mem = detect_system_memory()
     counts = scene_counts()
+    predictor = predict_cycles_sync(
+        component_peaks=MEASURED_COMPONENT_HWM_V3,
+        parts=["hdri_15k", "terrain", "water", "bed", "gravel", "rocks", "grass", "fern", "beech"],
+        empty_hwm=MEASURED_COMPONENT_HWM_V3["empty"],
+        base_vertices=int(counts.get("vertices") or 0),
+        texture_bytes=int((probe["images"] or {}).get("estimatedRawBytes") or 0),
+    )
     preflight = cycles_preflight(
         mem_total=int(sys_mem.get("memTotal") or 0),
         mem_available=int(sys_mem.get("memAvailable") or 0),
@@ -334,7 +346,11 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
         estimated_texture_bytes=int((probe["images"] or {}).get("estimatedRawBytes") or 0),
         estimated_additional_bytes=MEASURED_CYCLES_INCREMENT_BYTES,
         expected_asset_manifest=["festuca_a", "carex_a", "fern_a", "beech_a", "ecokit_rocks", "hdri_jpg"],
+        base_vertices=int(counts.get("vertices") or 0),
+        component_peak_history=MEASURED_COMPONENT_HWM_V3,
+        expected_cycles_sync_bytes=int(predictor["predictedPeak"]),
     )
+    probe["cyclesPredictor"] = predictor
     probe["cyclesPreflight"] = preflight
     tag = f"A_CREEK_BANK_{cfg['name']}"
     full = out / f"{tag}.png"
