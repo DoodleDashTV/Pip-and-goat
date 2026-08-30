@@ -3,7 +3,7 @@ TIVVLEJOY_CINEMATIC_SOURCE_FIDELITY_AND_HERO_REBUILD_V3_RESULT
 starting branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
 starting SHA: 0e4d80d6ae2b5e78acd1c34c46e10ec145a625e2
 final branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
-final SHA: PENDING_COMMIT
+final SHA: 8725a85f51e5e4b8c64403fda714b6348d7be4d7
 PR state: #169 OPEN / DRAFT / UNMERGED / NOT READY
 
 SOURCE AUDIT SUMMARY:
