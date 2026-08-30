@@ -1,0 +1,75 @@
+{
+  "sources": [
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/grass/bq_Grass_Carex-oshimensis_B_spring.blend",
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/plants/bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn.blend",
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/mosses-and-lichens/bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn.blend",
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/shrubs/bq_Shrub_Corylus-avellana_C_spring-summer.blend"
+  ],
+  "samples": [
+    {
+      "name": "bq_Grass_Carex-oshimensis_B_spring",
+      "verts": 183753,
+      "faces": 120100,
+      "dims": [
+        4.069,
+        3.992,
+        0.85
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Grass_Carex-oshimensis"
+      ],
+      "modifiers": []
+    },
+    {
+      "name": "bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn",
+      "verts": 19635,
+      "faces": 11991,
+      "dims": [
+        1.673,
+        2.035,
+        0.85
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Leaf_Fern",
+        "bq_Stem_Fern"
+      ],
+      "modifiers": []
+    },
+    {
+      "name": "bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn",
+      "verts": 449,
+      "faces": 226,
+      "dims": [
+        2.429,
+        2.727,
+        0.85
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Leaf_Rhytidiadelphus-squarrosus"
+      ],
+      "modifiers": []
+    },
+    {
+      "name": "bq_Shrub_Corylus-avellana_C_spring-summer",
+      "verts": 141461,
+      "faces": 103445,
+      "dims": [
+        1.189,
+        0.963,
+        0.85
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Bark_Corylus-avellana",
+        "bq_Leaf_Corylus-avellana"
+      ],
+      "modifiers": []
+    }
+  ],
+  "volumetricCount": 4,
+  "still": "/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinematic-asset-recovery-v4/meadow/MEADOW_QUALITY_CROP.png",
+  "status": "MEADOW_PROOF_POSSIBLE_WITH_RECOVERED_ASSETS"
+}

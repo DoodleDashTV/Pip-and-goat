@@ -34,7 +34,24 @@ LOOKDEV_VERIFIED_BLEND_MAX_BYTES = {
     "rock_models.blend": 400 * 1024 * 1024,
     "grassy.blend": 700 * 1024 * 1024,
     "meadow.blend": 700 * 1024 * 1024,
+    "3dt_pack_mountains.blend": 1600 * 1024 * 1024,
 }
+
+# Individual Botaniq Full library assets are native .blend files under 80 MiB.
+LOOKDEV_BOTANIQ_MEMBER_MAX_BYTES = 100 * 1024 * 1024
+
+BOTANIQ_QUALITY_MEMBERS = (
+    "botaniq_full/blends/models/deciduous/bq_Tree_Salix-babylonica_C_summer.blend",
+    "botaniq_full/blends/models/deciduous/bq_Tree_Fagus-sylvatica_C_summer.blend",
+    "botaniq_full/blends/models/shrubs/bq_Shrub_Corylus-avellana_C_spring-summer.blend",
+    "botaniq_full/blends/models/plants/bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn.blend",
+    "botaniq_full/blends/models/grass/bq_Grass_Carex-oshimensis_B_spring.blend",
+    "botaniq_full/blends/models/mosses-and-lichens/bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn.blend",
+)
+
+THREEDT_QUALITY_MEMBERS = (
+    "Blender Files/3DT_Pack_Mountains.blend",
+)
 
 LOOKDEV_HDR_MAX_BYTES = 96 * 1024 * 1024
 LOOKDEV_TGA_MAX_BYTES = 80 * 1024 * 1024
@@ -165,7 +182,11 @@ def lookdev_should_extract_member(filename: str, file_size: int, role: str) -> b
         return False
     if ext == ".blend":
         cap = LOOKDEV_VERIFIED_BLEND_MAX_BYTES.get(name)
-        return cap is not None and 0 < size <= cap
+        if cap is not None and 0 < size <= cap:
+            return True
+        if name.startswith("bq_") and 0 < size <= LOOKDEV_BOTANIQ_MEMBER_MAX_BYTES:
+            return True
+        return False
     if ext == ".hdr" and role == "sky_hdri":
         return 0 < size <= LOOKDEV_HDR_MAX_BYTES
     if ext == ".tga" and role == "forest_nature":

@@ -73,6 +73,12 @@ def test_lookdev_intake_allows_verified_large_originals():
     assert should_extract_member(
         'unknown_kit.blend', 400 * 1024 * 1024, 'forest_nature', intake='lookdev',
     ) is False
+    assert should_extract_member(
+        'bq_Tree_Salix-babylonica_C_summer.blend', 26 * 1024 * 1024, 'botaniq_full', intake='lookdev',
+    ) is True
+    assert should_extract_member(
+        '3DT_Pack_Mountains.blend', 1415 * 1024 * 1024, 'mountains_3dt', intake='lookdev',
+    ) is True
 
 
 def test_geometry_picker_prefers_small_blend_over_combined_obj():

@@ -24,6 +24,16 @@ def test_lookdev_refuses_scripts_and_dumps():
     assert lookdev_should_extract_member('addon.py', 1200, 'forest_ecokit') is False
     assert lookdev_should_extract_member('Stylized_Forest_Nature_Kit.obj', 40 * 1024 * 1024, 'forest_nature') is False
     assert lookdev_should_extract_member('../Stylized_Forest_Nature_Kit.blend', 494 * 1024 * 1024, 'forest_nature') is False
+    assert lookdev_should_extract_member(
+        'botaniq_full/blends/models/deciduous/bq_Tree_Salix-babylonica_C_summer.blend',
+        26 * 1024 * 1024,
+        'botaniq_full',
+    ) is True
+    assert lookdev_should_extract_member(
+        'Blender Files/3DT_Pack_Mountains.blend',
+        1415 * 1024 * 1024,
+        'mountains_3dt',
+    ) is True
 
 
 def test_safe_member_path_blocks_traversal(tmp_path: Path):
