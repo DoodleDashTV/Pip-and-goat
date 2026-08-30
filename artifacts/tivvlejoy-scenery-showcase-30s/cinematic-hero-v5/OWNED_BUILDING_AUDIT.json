@@ -1,0 +1,23 @@
+{
+  "schema": "TIVVLEJOY_OWNED_BUILDING_AUDIT_V5",
+  "newPurchaseRequired": false,
+  "purchasePerformed": false,
+  "status": "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED",
+  "bestCandidate": "Village Cabin04A LOD0 (Building04_LOD0 + Roof04_LOD0)",
+  "bestRating": "MIDGROUND",
+  "heroRating": "REJECT",
+  "otherCottageHouseShopBarnHut": "NONE_IN_OWNED_CATALOG",
+  "v5Use": "recede Cabin04A into supporting midground so tiled roof / flat walls / weak porch are not hero pixels",
+  "catalogSearched": [
+    "SRC_VILLAGE_BLEND_ZIP",
+    "SRC_VILLAGE_FBX_ZIP",
+    "SRC_VILLAGE_PROJECT_ZIP",
+    "SRC_VILLAGE_TEXTURES_ZIP",
+    "SRC_STYLIZED_TAVERN_INTERIOR",
+    "SRC_FOREST_STYLISED_ECOKIT",
+    "SRC_FOREST_MODEL_PACKAGE",
+    "SRC_LOUIS_BG_MOUNTAINS_V1",
+    "SRC_3DT_MOUNTAIN_PACK_BLENDER",
+    "SRC_BOTANIQ_FULL_7_2_0"
+  ]
+}

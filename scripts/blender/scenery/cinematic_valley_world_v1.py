@@ -46,8 +46,14 @@ from cinematic_hero_rebuild_v2 import (  # noqa: E402
 )
 from cinematic_hero_rebuild_v3 import (  # noqa: E402
     apply_hero_rebuild_v3,
-    apply_light_mood,
+    apply_light_mood as apply_v3_light_mood,
     COMP_CAMERAS,
+)
+from cinematic_hero_rebuild_v5 import (  # noqa: E402
+    apply_hero_rebuild_v5,
+    apply_light_mood as apply_v5_light_mood,
+    COMP_CAMERAS as V5_COMP_CAMERAS,
+    CROP_CAMERAS as V5_CROP_CAMERAS,
 )
 from cinematic_standards import (  # noqa: E402
     MASTER_COLLECTIONS,
@@ -153,6 +159,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--v3-compare", default="", help="comps|lights|crops — render V3 hero candidates")
     parser.add_argument("--v3-camera", default="A", help="A|B|C composition for the V3 hero")
     parser.add_argument("--v3-light", default="C", help="A|B|C lighting mood for the V3 hero")
+    parser.add_argument("--hero-rebuild", default="v3", choices=("v3", "v5", "none"), help="Hero overlay. V5 replaces V3.")
+    parser.add_argument("--v5-compare", default="", help="comps|lights|crops — render V5 hero candidates")
+    parser.add_argument("--v5-camera", default="A", help="A|B|C composition for the V5 hero")
+    parser.add_argument("--v5-light", default="C", help="A|B|C lighting mood for the V5 hero")
     return parser.parse_args(argv)
 
 
@@ -4151,8 +4161,14 @@ def main() -> int:
         cameras.extend(setup_hero_search_cameras())
     applied = apply_profile(args.profile, args)
     apply_cinematic_master_post_profile()
-    apply_hero_rebuild_v3(collections, mood=str(args.v3_light or "C").upper())
-    chosen = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())
+    if str(args.hero_rebuild or "v3").lower() == "v5":
+        apply_hero_rebuild_v5(collections, mood=str(args.v5_light or "C").upper())
+        chosen = V5_COMP_CAMERAS.get(str(args.v5_camera or "A").upper())
+    elif str(args.hero_rebuild or "v3").lower() != "none":
+        apply_hero_rebuild_v3(collections, mood=str(args.v3_light or "C").upper())
+        chosen = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())
+    else:
+        chosen = None
     if chosen is not None:
         hero_cam = bpy.data.objects.get(chosen["name"])
         if hero_cam is not None:
@@ -4186,12 +4202,20 @@ def main() -> int:
             datablockLoaded=True,
             renderedPixels=True,
             shotIds=["SHOT_02"],
-            evidence="collection:TJ_HERO_V3_WORLD",
+            evidence="collection:TJ_HERO_V5_WORLD" if str(args.hero_rebuild or "v3").lower() == "v5" else "collection:TJ_HERO_V3_WORLD",
         ),
         "background_mountains": visible_use_record("background_mountains", downloaded=True, extracted=True, datablockLoaded=bool(mountain_members), renderedPixels=bool(mountain_members), shotIds=["SHOT_01", "SHOT_05"], evidence="collection:WORLD_MOUNTAINS_BACKGROUND"),
         "sky_hdri": visible_use_record("sky_hdri", downloaded=True, extracted=True, datablockLoaded=True, renderedPixels=True, shotIds=["SHOT_01"], evidence=f"world:{sky_name}"),
         "mountains_3dt": visible_use_record("mountains_3dt"),
-        "botaniq_full": visible_use_record("botaniq_full"),
+        "botaniq_full": visible_use_record(
+            "botaniq_full",
+            downloaded=True,
+            extracted=True,
+            datablockLoaded=str(args.hero_rebuild or "v3").lower() == "v5",
+            renderedPixels=str(args.hero_rebuild or "v3").lower() == "v5",
+            shotIds=["SHOT_02"] if str(args.hero_rebuild or "v3").lower() == "v5" else [],
+            evidence="collection:TJ_HERO_V5_WORLD" if str(args.hero_rebuild or "v3").lower() == "v5" else "",
+        ),
         "physical_starlight": visible_use_record("physical_starlight"),
         "gaffer": visible_use_record("gaffer"),
     }
@@ -4271,11 +4295,63 @@ def main() -> int:
         if cam is not None:
             scene.camera = cam
         for mood in ("A", "B", "C"):
-            apply_light_mood(mood)
+            apply_v3_light_mood(mood)
             scene.render.filepath = str(out / f"v3_light_{mood.lower()}_")
             write_progress("V3_LIGHT", mood=mood, camera=spec["name"])
             bpy.ops.render.render(write_still=True)
         write_progress("LOOKDEV_COMPLETE", compare="v3_lights", frames=3)
+        return 0
+    if str(args.v5_compare or "").lower() == "comps":
+        scene = bpy.context.scene
+        scene.render.use_persistent_data = False
+        scene.frame_set(210)
+        for marker in scene.timeline_markers:
+            marker.camera = None
+        for key, spec in V5_COMP_CAMERAS.items():
+            cam = bpy.data.objects.get(spec["name"])
+            if cam is None:
+                continue
+            scene.camera = cam
+            bpy.context.view_layer.update()
+            scene.render.filepath = str(out / f"v5_comp_{key.lower()}_")
+            write_progress("V5_COMP", id=key, camera=cam.name, lens=spec["lens"])
+            bpy.ops.render.render(write_still=True)
+        write_progress("LOOKDEV_COMPLETE", compare="v5_comps", frames=3)
+        return 0
+    if str(args.v5_compare or "").lower() == "lights":
+        scene = bpy.context.scene
+        scene.render.use_persistent_data = False
+        scene.frame_set(210)
+        for marker in scene.timeline_markers:
+            marker.camera = None
+        key = str(args.v5_camera or "A").upper()
+        spec = V5_COMP_CAMERAS.get(key) or V5_COMP_CAMERAS["A"]
+        cam = bpy.data.objects.get(spec["name"])
+        if cam is not None:
+            scene.camera = cam
+        for mood in ("A", "B", "C"):
+            apply_v5_light_mood(mood)
+            scene.render.filepath = str(out / f"v5_light_{mood.lower()}_")
+            write_progress("V5_LIGHT", mood=mood, camera=spec["name"])
+            bpy.ops.render.render(write_still=True)
+        write_progress("LOOKDEV_COMPLETE", compare="v5_lights", frames=3)
+        return 0
+    if str(args.v5_compare or "").lower() == "crops":
+        scene = bpy.context.scene
+        scene.render.use_persistent_data = False
+        scene.frame_set(210)
+        for marker in scene.timeline_markers:
+            marker.camera = None
+        for key, spec in V5_CROP_CAMERAS.items():
+            cam = bpy.data.objects.get(spec["name"])
+            if cam is None:
+                continue
+            scene.camera = cam
+            bpy.context.view_layer.update()
+            scene.render.filepath = str(out / f"v5_crop_{key.lower()}_")
+            write_progress("V5_CROP", id=key, camera=cam.name, lens=spec["lens"])
+            bpy.ops.render.render(write_still=True)
+        write_progress("LOOKDEV_COMPLETE", compare="v5_crops", frames=3)
         return 0
     if str(args.v2_compare or "").lower() == "comps":
         scene = bpy.context.scene
@@ -4353,15 +4429,26 @@ def main() -> int:
     if args.stills_only or normalize_profile(args.profile) in {"BLOCKOUT", "LOOKDEV_FAST", "HERO_STILL"}:
         for frame in frames:
             bpy.context.scene.frame_set(frame)
-            v3_spec = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())
-            v3_cam = bpy.data.objects.get(v3_spec["name"]) if v3_spec else None
-            if v3_cam is not None:
-                bpy.context.scene.camera = v3_cam
-                label = f"v3_{str(args.v3_camera or 'A').lower()}_l{str(args.v3_light or 'C').lower()}"
+            if str(args.hero_rebuild or "v3").lower() == "v5":
+                v5_spec = V5_COMP_CAMERAS.get(str(args.v5_camera or "A").upper())
+                v5_cam = bpy.data.objects.get(v5_spec["name"]) if v5_spec else None
+                if v5_cam is not None:
+                    bpy.context.scene.camera = v5_cam
+                    label = f"v5_{str(args.v5_camera or 'A').lower()}_l{str(args.v5_light or 'C').lower()}"
+                else:
+                    set_active_camera_for_frame(frame)
+                    shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
+                    label = shot["id"].lower()
             else:
-                set_active_camera_for_frame(frame)
-                shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
-                label = shot["id"].lower()
+                v3_spec = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())
+                v3_cam = bpy.data.objects.get(v3_spec["name"]) if v3_spec else None
+                if v3_cam is not None:
+                    bpy.context.scene.camera = v3_cam
+                    label = f"v3_{str(args.v3_camera or 'A').lower()}_l{str(args.v3_light or 'C').lower()}"
+                else:
+                    set_active_camera_for_frame(frame)
+                    shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
+                    label = shot["id"].lower()
             bpy.context.scene.render.filepath = str(out / f"{label}_")
             write_progress("LOOKDEV_STILL", frame=frame, shot=label)
             bpy.ops.render.render(write_still=True)

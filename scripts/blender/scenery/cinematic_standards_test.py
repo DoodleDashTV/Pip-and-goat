@@ -35,6 +35,20 @@ from cinematic_hero_rebuild_v3_test import (  # noqa: E402
     test_channel_has_a_creek,
     test_negative_space_path_exists,
 )
+from cinematic_riverbank_v1_test import (  # noqa: E402
+    test_biome_progresses_from_bed_to_meadow,
+    test_controls_change_width_and_depth,
+    test_macro_events_are_few_and_irregular,
+    test_no_high_frequency_lumps,
+    test_no_landward_cavity,
+    test_shoreline_is_terrain_water_intersection,
+)
+from cinematic_meadow_v1_test import (  # noqa: E402
+    test_density_falls_with_distance_but_not_to_a_plane,
+    test_negative_space_exists,
+    test_zones_are_physical_and_varied,
+)
+from owned_building_audit import audit_summary  # noqa: E402
 from cinematic_creek_profile import (
     hero_grass_lip,
     hero_north_notch_depth,
@@ -271,4 +285,16 @@ if __name__ == "__main__":
     test_channel_has_a_creek()
     test_authored_bank_is_a_profile_not_noise()
     test_negative_space_path_exists()
+    test_biome_progresses_from_bed_to_meadow()
+    test_shoreline_is_terrain_water_intersection()
+    test_no_landward_cavity()
+    test_macro_events_are_few_and_irregular()
+    test_no_high_frequency_lumps()
+    test_controls_change_width_and_depth()
+    test_zones_are_physical_and_varied()
+    test_negative_space_exists()
+    test_density_falls_with_distance_but_not_to_a_plane()
+    summary = audit_summary()
+    assert summary["purchasePerformed"] is False
+    assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"
     print("cinematic_standards_test PASS")
