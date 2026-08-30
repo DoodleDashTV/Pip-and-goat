@@ -1,0 +1,6 @@
+[Sun Aug 30 03:59:44 2026] tokio-rt-worker invoked oom-killer: gfp_mask=0x140cca(GFP_HIGHUSER_MOVABLE|__GFP_COMP), order=0, oom_score_adj=0
+[Sun Aug 30 03:59:44 2026]  oom_kill_process+0x101/0x220
+[Sun Aug 30 03:59:44 2026] [  pid  ]   uid  tgid total_vm      rss rss_anon rss_file rss_shmem pgtables_bytes swapents oom_score_adj name
+[Sun Aug 30 03:59:44 2026] [   5519]  1000  5519  5012503  3902724  3902698       26         0 33792000        0             0 blender
+[Sun Aug 30 03:59:44 2026] oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=isod.service,mems_allowed=0,global_oom,task_memcg=/system.slice/pod-3ttiffuy2bbcdix3waxf4upxjy-61fd0de5,task=blender,pid=5519,uid=1000
+[Sun Aug 30 03:59:44 2026] Out of memory: Killed process 5519 (blender) total-vm:20050012kB, anon-rss:15610792kB, file-rss:104kB, shmem-rss:0kB, UID:1000 pgtables:33000kB oom_score_adj:0
