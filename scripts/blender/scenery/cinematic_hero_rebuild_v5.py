@@ -155,6 +155,7 @@ TREE_GROUPS = (
     ("beech_a", (-18.20, -13.10), 6.0, -0.70, "support"),
     ("willow_b", (8.20, -8.60), 5.4, -1.10, "support"),
     ("beech_b", (-12.80, -16.40), 4.6, 1.70, "young"),
+    ("beech_a", (-9.40, -6.80), 6.8, 0.90, "support"),
     ("hazel_a", (-8.90, -10.40), 2.4, 0.40, "understory"),
     ("hazel_b", (6.10, -9.10), 2.1, -0.85, "understory"),
     ("hazel_a", (-15.50, -7.20), 2.6, 1.25, "understory"),
@@ -237,6 +238,11 @@ def hide_legacy_visuals() -> dict:
             obj.hide_viewport = True
             hidden["nature"] += 1
         if any(token in name for token in ("Cabin01B", "Cabin02B", "Cabin03B", "Cabin04B", "Cabin05B")):
+            obj.hide_render = True
+            obj.hide_viewport = True
+            hidden["cabin_b"] += 1
+        clutter = any(token in name for token in ("Cart01", "Fence01", "Gate01", "Door01", "Frame01"))
+        if clutter:
             obj.hide_render = True
             obj.hide_viewport = True
             hidden["cabin_b"] += 1
@@ -389,11 +395,11 @@ def build_hero_terrain(col: bpy.types.Collection) -> dict:
     obj = bpy.data.objects.new("TJ_V5_HeroTerrain", mesh)
     col.objects.link(obj)
     bm = bmesh.new()
-    xs, ys = 108, 118
+    xs, ys = 168, 186
     x0, x1 = -18.0, 12.0
     y0, y1 = -25.5, 8.0
     verts = []
-    biomes = []
+    colors = []
     for iy in range(ys):
         row = []
         ty = y0 + (y1 - y0) * iy / (ys - 1)
@@ -401,34 +407,50 @@ def build_hero_terrain(col: bpy.types.Collection) -> dict:
             tx = x0 + (x1 - x0) * ix / (xs - 1)
             z, biome = riverbank_sample(tx, ty)
             row.append(bm.verts.new((tx, ty, z)))
-            biomes.append(biome)
+            colors.append(_bank_color(z, biome))
         verts.append(row)
     color_layer = bm.loops.layers.color.new("biome")
-    biome_rgba = {
-        "bed": (0.20, 0.16, 0.11, 1.0),
-        "underwater": (0.16, 0.14, 0.10, 1.0),
-        "wet_shelf": (0.22, 0.17, 0.11, 1.0),
-        "gravel": (0.32, 0.28, 0.22, 1.0),
-        "damp": (0.26, 0.18, 0.10, 1.0),
-        "eroded": (0.30, 0.18, 0.09, 1.0),
-        "dry_soil": (0.34, 0.22, 0.12, 1.0),
-        "root_grass": (0.24, 0.30, 0.12, 1.0),
-        "meadow": (0.20, 0.28, 0.11, 1.0),
-    }
     for iy in range(ys - 1):
         for ix in range(xs - 1):
             face = bm.faces.new((verts[iy][ix], verts[iy][ix + 1], verts[iy + 1][ix + 1], verts[iy + 1][ix]))
-            kind = biomes[iy * xs + ix]
-            rgba = biome_rgba.get(kind, biome_rgba["meadow"])
             for loop in face.loops:
-                loop[color_layer] = rgba
+                vx, vy = loop.vert.co.x, loop.vert.co.y
+                # Color from this vertex, not one face-corner biome. No razor isoline.
+                idx = int(round((vy - y0) / (y1 - y0) * (ys - 1))) * xs + int(round((vx - x0) / (x1 - x0) * (xs - 1)))
+                idx = max(0, min(len(colors) - 1, idx))
+                loop[color_layer] = colors[idx]
     bm.to_mesh(mesh)
     bm.free()
     for poly in mesh.polygons:
         poly.use_smooth = True
+    subdiv = obj.modifiers.new("TJ_V5_BankSmooth", "SUBSURF")
+    subdiv.levels = 1
+    subdiv.render_levels = 1
+    subdiv.subdivision_type = "CATMULL_CLARK"
     obj.data.materials.append(_terrain_material())
-    _log("v5_terrain_built", verts=xs * ys)
-    return {"verts": xs * ys, "system": "TJ_RIVERBANK_GENERATOR_V1"}
+    _log("v5_terrain_built", verts=xs * ys, subdiv=1)
+    return {"verts": xs * ys, "system": "TJ_RIVERBANK_GENERATOR_V1", "subdiv": 1}
+
+
+def _bank_color(z: float, biome: str) -> tuple[float, float, float, float]:
+    """Continuous wet-to-earth-to-olive. Meadow green is vegetation, not a painted plane."""
+    t = max(0.0, min(1.0, (z - WATER_Z) / 1.55))
+    wet = (0.22, 0.16, 0.10)
+    soil = (0.32, 0.21, 0.12)
+    earth = (0.28, 0.22, 0.12)
+    if t < 0.18:
+        u = t / 0.18
+        r = wet[0] * (1.0 - u) + soil[0] * u
+        g = wet[1] * (1.0 - u) + soil[1] * u
+        b = wet[2] * (1.0 - u) + soil[2] * u
+    else:
+        u = (t - 0.18) / 0.82
+        r = soil[0] * (1.0 - u) + earth[0] * u
+        g = soil[1] * (1.0 - u) + earth[1] * u
+        b = soil[2] * (1.0 - u) + earth[2] * u
+    if biome in {"gravel", "bed", "underwater"}:
+        r, g, b = (0.30 * r + 0.18, 0.30 * g + 0.15, 0.30 * b + 0.11)
+    return (r, g, b, 1.0)
 
 
 def _terrain_material() -> bpy.types.Material:
@@ -469,6 +491,16 @@ def plant_vegetation(library: dict, col: bpy.types.Collection) -> dict:
         if obj is not None:
             planted["trees"] += 1
     fern_keys = [key for key in ("fern_a", "fern_b", "fern_d") if library.get(key)]
+    bank_grass = (
+        ((-6.4, -16.2), 1.25, 0.2),
+        ((-3.8, -15.6), 1.45, 1.1),
+        ((-1.2, -16.0), 1.35, 2.0),
+        ((1.6, -15.4), 1.20, 0.6),
+        ((-8.8, -15.8), 1.30, 1.7),
+        ((3.8, -14.6), 1.15, -0.5),
+        ((-5.0, -14.4), 1.10, 0.9),
+        ((-0.2, -14.8), 1.40, 2.4),
+    )
     for i, (xy, height, yaw) in enumerate(FERN_PLAN):
         if not fern_keys:
             break
@@ -479,6 +511,16 @@ def plant_vegetation(library: dict, col: bpy.types.Collection) -> dict:
         obj = _dup_group(group, (xy[0], xy[1], z), height, yaw, 0.04, col, f"TJ_V5_Fern_{i}")
         if obj is not None:
             planted["ferns"] += 1
+    carex = library.get("carex_b") or library.get("carex_a") or []
+    for i, (xy, height, yaw) in enumerate(bank_grass):
+        if not carex:
+            break
+        z, biome = riverbank_sample(xy[0], xy[1])
+        if biome in {"bed", "underwater"}:
+            continue
+        obj = _dup_group(carex, (xy[0], xy[1], z + 0.02), height, yaw, 0.03, col, f"TJ_V5_BankGrass_{i}")
+        if obj is not None:
+            planted["meadow"] += 1
     plan = meadow_scatter_plan((-14.0, 9.0, -21.5, 3.5), 1.70)
     plan.sort(key=lambda item: (item["x"] - 2.05) ** 2 + (item["y"] + 21.6) ** 2)
     kept = []
@@ -496,15 +538,15 @@ def plant_vegetation(library: dict, col: bpy.types.Collection) -> dict:
             continue
         zone = item["zone"]
         height = {
-            "short_grass": 0.42,
-            "medium_meadow": 0.62,
-            "tall_pocket": 0.95,
-            "bare_earth": 0.28,
-            "forest_litter": 0.38,
-            "fern_shrub": 0.70,
-            "rocky_sparse": 0.32,
-            "worn_open": 0.22,
-        }.get(zone, 0.50)
+            "short_grass": 0.95,
+            "medium_meadow": 1.35,
+            "tall_pocket": 1.85,
+            "bare_earth": 0.45,
+            "forest_litter": 0.70,
+            "fern_shrub": 1.10,
+            "rocky_sparse": 0.55,
+            "worn_open": 0.38,
+        }.get(zone, 1.05)
         yaw = 0.37 * i
         obj = _dup_group(group, (item["x"], item["y"], z + 0.01), height, yaw, 0.02, col, f"TJ_V5_Meadow_{i}")
         if obj is not None:
@@ -563,12 +605,18 @@ def recede_owned_cabin() -> dict:
     if keep:
         cx = sum(obj.location.x for obj in keep) / len(keep)
         cy = sum(obj.location.y for obj in keep) / len(keep)
-        target = Vector((-16.8, 11.6, 0.0))
+        target = Vector((-20.4, 16.8, 0.0))
         z, _ = riverbank_sample(target.x, target.y)
         delta = Vector((target.x - cx, target.y - cy, z - min(obj.location.z for obj in keep)))
         for obj in keep:
             # LOD0 only if present
-            if "lod" in obj.name.lower() and "lod0" not in obj.name.lower():
+            low_name = obj.name.lower()
+            if "lod" in low_name and "lod0" not in low_name:
+                obj.hide_render = True
+                obj.hide_viewport = True
+                hidden.append(obj.name)
+                continue
+            if low_name in {"building04", "roof04"} and any("lod0" in other.name.lower() for other in keep):
                 obj.hide_render = True
                 obj.hide_viewport = True
                 hidden.append(obj.name)
@@ -577,11 +625,11 @@ def recede_owned_cabin() -> dict:
             obj.hide_render = False
             obj.hide_viewport = False
             moved.append(obj.name)
-    _log("v5_cabin_receded", moved=moved[:12], hidden=len(hidden), target=(-16.8, 11.6))
+    _log("v5_cabin_receded", moved=moved[:12], hidden=len(hidden), target=(-20.4, 16.8))
     return {
         "moved": moved,
         "hidden": hidden,
-        "target": [-16.8, 11.6],
+        "target": [-20.4, 16.8],
         **audit_summary(),
     }
 
@@ -593,7 +641,11 @@ def style_grade_botaniq() -> dict:
         if mat is None or not mat.use_nodes:
             continue
         name = (mat.name or "").lower()
-        if not (name.startswith("bq_") or "botaniq" in name or "bq_" in name):
+        used_by_v5 = any(
+            obj.get("tj_v5") and any(slot.material == mat for slot in obj.material_slots)
+            for obj in bpy.data.objects
+        )
+        if not (name.startswith("bq_") or "botaniq" in name or "bq_" in name or used_by_v5):
             continue
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
