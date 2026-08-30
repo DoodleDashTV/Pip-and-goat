@@ -37,7 +37,14 @@ from cinematic_shoreline_v1 import transition_color
 from cinematic_shoreline_v2 import gravel_scatter_plan, physical_slots, shoreline_v2_payload
 from cinematic_style_unifier_v2 import apply_style_unifier_v2
 from cinematic_water_lock_v1 import WATER_LOCK, test_cfg
+from memory_safe_asset_loader_v1 import (
+    dependency_integrity,
+    image_audit,
+    purge_unused_datablocks,
+    sit_from_bound_box,
+)
 from owned_building_audit import audit_summary
+from runtime_memory_preflight_v1 import cycles_preflight, detect_system_memory
 from v7_resource_probe import PeakTracker, scene_counts, snapshot
 
 OUT_DEFAULT = Path("/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinematic-contextual-recovery-v7")
@@ -82,11 +89,7 @@ def instance_one(src, loc, height: float, yaw: float, bury: float, col, name: st
     scale = height / dim
     obj.scale = (scale, scale, scale)
     obj.rotation_euler = (obj.rotation_euler.x, obj.rotation_euler.y, obj.rotation_euler.z + yaw)
-    obj.location = (0.0, 0.0, 0.0)
-    bpy.context.view_layer.update()
-    corners = [obj.matrix_world @ Vector(c) for c in obj.bound_box]
-    lowest = min(c.z for c in corners)
-    obj.location = (loc[0], loc[1], loc[2] - lowest - bury)
+    sit_from_bound_box(obj, loc, bury)
     obj.name = name
     v6._link(obj, col)
     return obj
@@ -309,18 +312,29 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
     # Contextual creek role: bank + water + bed + one reflection mass.
     v6.add_camera("TJ_V7_CreekCam", (sx + 2.6, sy - 4.0, 1.48), (sx - 0.6, sy + 0.55, WATER_Z + 0.12), 40.0)
     probe["after_scene_build"] = snapshot("after_scene_build", extra=scene_counts())
+    probe["purgeBefore"] = snapshot("purge_before")
+    probe["purge"] = purge_unused_datablocks()
+    probe["images"] = image_audit()
+    probe["dependencies"] = dependency_integrity()
+    probe["purgeAfter"] = snapshot("purge_after", extra=scene_counts())
+    sys_mem = detect_system_memory()
+    counts = scene_counts()
+    preflight = cycles_preflight(
+        mem_total=int(sys_mem.get("memTotal") or 0),
+        mem_available=int(sys_mem.get("memAvailable") or 0),
+        rss=int(sys_mem.get("rss") or 0),
+        swap_total=int(sys_mem.get("swapTotal") or 0),
+        object_count=counts.get("objects") or 0,
+        mesh_count=counts.get("meshes") or 0,
+        image_count=counts.get("images") or 0,
+        estimated_texture_bytes=int((probe["images"] or {}).get("estimatedRawBytes") or 0),
+        expected_asset_manifest=["festuca_a", "carex_a", "fern_a", "beech_a", "ecokit_rocks", "hdri_jpg"],
+    )
+    probe["cyclesPreflight"] = preflight
     tag = f"A_CREEK_BANK_{cfg['name']}"
     full = out / f"{tag}.png"
-    probe["before_render"] = snapshot("before_render", extra=scene_counts())
-    tracker = PeakTracker()
-    tracker.start()
-    t0 = __import__("time").time()
-    v6.render_png(full, samples)
-    render_s = __import__("time").time() - t0
-    peak = tracker.stop()
-    probe["after_render"] = snapshot("after_render", extra={"renderSeconds": render_s, "peakRss": peak, **scene_counts()})
-    phone = v6.phone_size(full, out / f"{tag}_PHONE.png")
-    return {
+    phone = out / f"{tag}_PHONE.png"
+    result = {
         "proof": "A",
         "system": "TJ_CREEK_BANK_VIGNETTE_V1",
         "waterTest": cfg["name"],
@@ -333,8 +347,28 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
         "path": str(full),
         "phone": str(phone),
         "resourceProbe": probe,
-        "pngBytes": full.stat().st_size if full.is_file() else 0,
+        "cyclesPreflight": preflight,
+        "pngBytes": 0,
     }
+    if not preflight.get("ok"):
+        _log("runtime_memory_budget_exceeded", **{k: preflight[k] for k in ("code", "blockers", "rss", "memAvailable", "requiredAvailable") if k in preflight})
+        result["status"] = "RUNTIME_MEMORY_BUDGET_EXCEEDED"
+        result["pngWritten"] = False
+        return result
+    probe["before_render"] = snapshot("before_render", extra=scene_counts())
+    tracker = PeakTracker()
+    tracker.start()
+    t0 = __import__("time").time()
+    v6.render_png(full, samples)
+    render_s = __import__("time").time() - t0
+    peak = tracker.stop()
+    probe["after_render"] = snapshot("after_render", extra={"renderSeconds": render_s, "peakRss": peak, **scene_counts()})
+    phone_path = v6.phone_size(full, phone)
+    result["phone"] = str(phone_path)
+    result["pngBytes"] = full.stat().st_size if full.is_file() else 0
+    result["pngWritten"] = result["pngBytes"] > 0
+    result["status"] = "RENDERED" if result["pngWritten"] else "NO_PNG"
+    return result
 
 
 def meadow_forest_vignette(out: Path, samples: int) -> dict:
@@ -490,6 +524,8 @@ def main(argv=None) -> int:
     }
     (out / "CONTEXTUAL_RECOVERY_V7.json").write_text(json.dumps(receipt, indent=2) + "\n")
     _log("contextual_recovery_done", count=len(results), out=str(out))
+    if any(item.get("status") == "RUNTIME_MEMORY_BUDGET_EXCEEDED" for item in results):
+        return 2
     return 0
 
 

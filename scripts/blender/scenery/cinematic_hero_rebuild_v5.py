@@ -23,6 +23,7 @@ from cinematic_riverbank_v1 import (
     riverbank_sample,
     rock_slots,
 )
+from memory_safe_asset_loader_v1 import append_named_objects, append_primary_group, sit_from_bound_box
 from owned_building_audit import audit_summary
 
 
@@ -263,19 +264,19 @@ def _append_blend_group(blend: Path) -> list:
     if not blend.exists():
         _log("v5_blend_missing", path=str(blend))
         return []
-    before = set(bpy.data.objects.keys())
-    with bpy.data.libraries.load(str(blend), link=False) as (src, dst):
-        dst.objects = list(src.objects or [])
-        dst.images = list(src.images or [])
-        _log("v5_append", blend=blend.name, objects=len(dst.objects or []), images=len(dst.images or []))
-    loaded = [bpy.data.objects[name] for name in bpy.data.objects.keys() if name not in before]
+    receipt = append_primary_group(blend, hide_as_library=True)
+    loaded = list(receipt.get("objects") or [])
     for obj in loaded:
-        if obj.name not in bpy.context.scene.collection.objects:
-            bpy.context.scene.collection.objects.link(obj)
-        obj.hide_render = True
-        obj.hide_viewport = True
         obj["tj_v5_lib"] = 1
         obj.location = (obj.location.x, obj.location.y - 900.0, obj.location.z - 80.0)
+    _log(
+        "v5_append",
+        blend=blend.name,
+        objects=len(loaded),
+        images=len(receipt.get("newImageNames") or []),
+        sourceImages=receipt.get("sourceImageCount"),
+        explicitAllImages=False,
+    )
     return loaded
 
 
@@ -310,12 +311,17 @@ def _dup_group(loaded: list, loc, height: float, yaw: float, bury: float, col, n
             obj.rotation_euler.y,
             obj.rotation_euler.z + yaw,
         )
-    bpy.context.view_layer.update()
+    for _src, obj in copies:
+        if obj.parent is None:
+            obj.matrix_world = obj.matrix_basis
+    if hero.parent is None:
+        hero.matrix_world = hero.matrix_basis
     hero_world = hero.matrix_world.copy()
     for src, obj in copies:
+        if src.parent is None:
+            src.matrix_world = src.matrix_basis
         rel = hero_world.inverted() @ src.matrix_world
         obj.matrix_world = hero_copy.matrix_world @ rel
-    bpy.context.view_layer.update()
     corners = []
     for _src, obj in copies:
         if obj.type != "MESH":
@@ -335,26 +341,19 @@ def _append_objects(blend: Path, names: tuple[str, ...]) -> list:
     if not blend.exists():
         _log("v5_rock_blend_missing", path=str(blend))
         return []
-    with bpy.data.libraries.load(str(blend), link=False) as (src, dst):
-        available = set(src.objects or [])
-        dst.objects = [name for name in names if name in available]
-        dst.images = list(src.images or [])
-    loaded = []
-    for name in names:
-        obj = bpy.data.objects.get(name)
-        if obj is None:
-            continue
-        world = obj.matrix_world.copy()
+    receipt = append_named_objects(blend, names, hide_as_library=True, library_park=(0.0, -800.0, -80.0))
+    loaded = list(receipt.get("objects") or [])
+    for obj in loaded:
         obj.parent = None
         obj.matrix_parent_inverse.identity()
-        obj.matrix_world = world
         obj.location = (0.0, -800.0, -80.0)
-        obj.hide_render = True
-        obj.hide_viewport = True
-        if obj.name not in bpy.context.scene.collection.objects:
-            bpy.context.scene.collection.objects.link(obj)
-        loaded.append(obj)
-    _log("v5_rocks_appended", count=len(loaded))
+    _log(
+        "v5_rocks_appended",
+        count=len(loaded),
+        images=len(receipt.get("newImageNames") or []),
+        sourceImages=receipt.get("sourceImageCount"),
+        explicitAllImages=False,
+    )
     return loaded
 
 
@@ -381,10 +380,7 @@ def _dup_mesh(src, loc, scale: float, yaw: float, bury: float, col, name: str):
     obj.matrix_world = Matrix.Identity(4)
     obj.scale = (scale, scale, scale)
     obj.rotation_euler = (0.15 * (hash(name) % 5 - 2), 0.12 * (hash(name) % 3 - 1), yaw)
-    obj.location = (0.0, 0.0, 0.0)
-    bpy.context.view_layer.update()
-    base = _base_offset(obj)
-    obj.location = (loc[0], loc[1], loc[2] - base - bury)
+    sit_from_bound_box(obj, loc, bury)
     obj.name = name
     obj["tj_v5"] = 1
     link_v5(obj, col)

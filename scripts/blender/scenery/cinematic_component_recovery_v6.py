@@ -526,15 +526,11 @@ def load_named(blend: Path, names: tuple[str, ...]) -> list:
     if not blend.exists():
         _log("blend_missing", path=str(blend))
         return []
-    with bpy.data.libraries.load(str(blend), link=False) as (src, dst):
-        available = set(src.objects or [])
-        dst.objects = [n for n in names if n in available]
-        dst.images = list(src.images or [])
+    from memory_safe_asset_loader_v1 import append_named_objects
+
+    receipt = append_named_objects(blend, names, hide_as_library=False)
     loaded = []
-    for name in names:
-        obj = bpy.data.objects.get(name)
-        if obj is None:
-            continue
+    for obj in receipt.get("objects") or []:
         obj.parent = None
         if obj.name not in bpy.context.scene.collection.objects:
             bpy.context.scene.collection.objects.link(obj)

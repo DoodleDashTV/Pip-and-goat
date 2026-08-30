@@ -82,6 +82,20 @@ from v7_resource_probe_test import (  # noqa: E402
     test_meminfo_and_disk_are_dicts,
     test_snapshot_has_resource_fields,
 )
+from runtime_memory_preflight_v1_test import (  # noqa: E402
+    test_allows_healthy_headroom,
+    test_blocks_the_confirmed_16gib_pre_cycles_state,
+    test_budget_scales_from_detected_memory,
+    test_detect_system_memory_parses_proc_text,
+)
+from memory_safe_asset_loader_v1_test import (  # noqa: E402
+    test_dependency_preservation_allows_referenced_images,
+    test_exact_object_append_policy_is_ok,
+    test_image_raw_bytes,
+    test_no_explicit_all_image_append,
+    test_severe_amplification_blocks_when_budget_threatened,
+    test_unreferenced_library_dump_warns,
+)
 from owned_building_audit import audit_summary  # noqa: E402
 from cinematic_creek_profile import (
     hero_grass_lip,
@@ -349,6 +363,16 @@ if __name__ == "__main__":
     test_v2_keeps_stylized_not_photoreal()
     test_snapshot_has_resource_fields()
     test_meminfo_and_disk_are_dicts()
+    test_budget_scales_from_detected_memory()
+    test_blocks_the_confirmed_16gib_pre_cycles_state()
+    test_allows_healthy_headroom()
+    test_detect_system_memory_parses_proc_text()
+    test_exact_object_append_policy_is_ok()
+    test_no_explicit_all_image_append()
+    test_dependency_preservation_allows_referenced_images()
+    test_unreferenced_library_dump_warns()
+    test_severe_amplification_blocks_when_budget_threatened()
+    test_image_raw_bytes()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False
     assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"

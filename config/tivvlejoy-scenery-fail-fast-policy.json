@@ -46,6 +46,23 @@
     "motion_temporal_approval",
     "worker_parity_pass"
   ],
+  "runtimeMemoryPreflight": {
+    "schema": "TIVVLEJOY_RUNTIME_MEMORY_PREFLIGHT_V1",
+    "failCode": "RUNTIME_MEMORY_BUDGET_EXCEEDED",
+    "rssFractionBlock": 0.68,
+    "availableFractionRequired": 0.25,
+    "availableAbsFloorBytes": 3221225472,
+    "availableAbsCeilBytes": 8589934592,
+    "blockCyclesWhenExceeded": true
+  },
+  "sourceDependencyAmplification": {
+    "schema": "TJ_MEMORY_SAFE_ASSET_LOADER_V1",
+    "explicitAllImageAppend": false,
+    "imageRatioWarn": 24,
+    "objectRatioWarn": 12,
+    "warningCode": "SOURCE_DEPENDENCY_AMPLIFICATION_WARNING",
+    "blockCode": "SOURCE_DEPENDENCY_AMPLIFICATION_BLOCK"
+  },
   "degradationReportRequired": true,
   "degradationReportMustBeEmptyForHeroAssets": true,
   "workerParityFields": [
