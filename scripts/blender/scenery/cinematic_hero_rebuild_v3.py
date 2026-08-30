@@ -166,9 +166,11 @@ def _append_objects(blend: Path, names: tuple[str, ...]) -> list:
     with bpy.data.libraries.load(str(blend), link=False) as (src, dst):
         available = set(src.objects or [])
         dst.objects = [name for name in names if name in available]
+        dst.images = list(src.images or [])
         missing = [name for name in names if name not in available]
         if missing:
             _log("v3_append_missing", blend=blend.name, missing=missing[:12])
+        _log("v3_append_images", blend=blend.name, images=len(dst.images or []))
     loaded = []
     for name in names:
         obj = bpy.data.objects.get(name)
