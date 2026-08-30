@@ -48,6 +48,7 @@ from runtime_memory_preflight_v1 import cycles_preflight, detect_system_memory
 from v7_resource_probe import PeakTracker, scene_counts, snapshot
 
 OUT_DEFAULT = Path("/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinematic-contextual-recovery-v7")
+DENOISE = True
 
 
 def _log(event: str, **payload) -> None:
@@ -57,6 +58,7 @@ def _log(event: str, **payload) -> None:
 def setup(cfg, res=(540, 960)) -> None:
     v6.RENDER_RES = res
     v6.reset_scene()
+    bpy.context.scene.cycles.use_denoising = bool(DENOISE)
     v6.install_hdri(cfg["hdriRotZ"], strength=0.88)
     v6.add_sun(cfg["sunEnergy"], cfg["sunEulerDeg"])
     v6.add_fill("TJ_V7_Sky", (4.0, -8.0, 14.0), 360.0, 12.0)
@@ -490,6 +492,8 @@ def parse_args(argv=None):
     p.add_argument("--output-dir", default=str(OUT_DEFAULT))
     p.add_argument("--samples", type=int, default=32)
     p.add_argument("--resolution", default="540x960")
+    p.add_argument("--denoise", dest="denoise", action="store_true", default=True)
+    p.add_argument("--no-denoise", dest="denoise", action="store_false", help="Disable OIDN to cut Cycles RAM waste")
     return p.parse_args(argv)
 
 
@@ -497,10 +501,13 @@ def main(argv=None) -> int:
     args = parse_args(argv)
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
+    global DENOISE
+    DENOISE = bool(args.denoise)
     v6.RENDER_RES = tuple(int(x) for x in args.resolution.lower().split("x"))
     results = []
     wanted = ["A", "B", "C", "D"] if args.proof == "all" else [args.proof]
-    snapshot("process_start", extra={"proofs": wanted, "resolution": args.resolution, "samples": args.samples})
+    bpy.context.scene.cycles.use_denoising = bool(args.denoise)
+    snapshot("process_start", extra={"proofs": wanted, "resolution": args.resolution, "samples": args.samples, "denoise": bool(args.denoise)})
     for name in wanted:
         _log("proof_start", name=name)
         if name == "A":
