@@ -1,0 +1,81 @@
+{
+  "schema": "TIVVLEJOY_COMPONENT_PROOF_V1",
+  "fullHeroAssembled": false,
+  "paidCreate": 0,
+  "livePods": [],
+  "runPodSpendUsd": 0,
+  "proofs": [
+    {
+      "schema": "TIVVLEJOY_COMPONENT_PROOF_V1",
+      "component": "shoreline",
+      "result": "FAIL",
+      "evidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/A_SHORELINE_TRANSITION.png",
+      "resolution": "540x960",
+      "phoneSizeChecked": true,
+      "phoneEvidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/A_SHORELINE_TRANSITION_PHONE.png",
+      "ok": false,
+      "blockers": ["COMPONENT_PROOF_FAILED"],
+      "notes": "Razor water/bank line and featureless brown bank remain obvious on phone."
+    },
+    {
+      "schema": "TIVVLEJOY_COMPONENT_PROOF_V1",
+      "component": "water_bank",
+      "result": "FAIL",
+      "evidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/B_WATER_WATER_TEST_C.png",
+      "resolution": "540x960",
+      "phoneSizeChecked": true,
+      "phoneEvidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/B_WATER_WATER_TEST_C_PHONE.png",
+      "ok": false,
+      "blockers": ["COMPONENT_PROOF_FAILED"],
+      "notes": "A/B/C all fail. Physics lock held. Bed weak. Selected C as intended balance; pixels still cheap."
+    },
+    {
+      "schema": "TIVVLEJOY_COMPONENT_PROOF_V1",
+      "component": "ground_meadow",
+      "result": "FAIL",
+      "evidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/C_MEADOW_SYSTEM_V2.png",
+      "resolution": "540x960",
+      "phoneSizeChecked": true,
+      "phoneEvidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/C_MEADOW_SYSTEM_V2_PHONE.png",
+      "ok": false,
+      "blockers": ["COMPONENT_PROOF_FAILED"],
+      "notes": "Botaniq clumps remain discrete tufts on a painted olive plane. Scatter algorithm still readable."
+    },
+    {
+      "schema": "TIVVLEJOY_COMPONENT_PROOF_V1",
+      "component": "vegetation",
+      "result": "FAIL",
+      "evidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/D_VEGETATION_STYLE.png",
+      "resolution": "540x960",
+      "phoneSizeChecked": true,
+      "phoneEvidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/D_VEGETATION_STYLE_PHONE.png",
+      "ok": false,
+      "blockers": ["COMPONENT_PROOF_FAILED"],
+      "notes": "Beech is denser than willow and less card-like. Isolated plane still asset-pack; style not world-integrated."
+    },
+    {
+      "schema": "TIVVLEJOY_COMPONENT_PROOF_V1",
+      "component": "mountain_background",
+      "result": "FAIL",
+      "evidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/E_MOUNTAIN_LOUIS.png",
+      "resolution": "540x960",
+      "phoneSizeChecked": true,
+      "phoneEvidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/E_MOUNTAIN_LOUIS_PHONE.png",
+      "ok": false,
+      "blockers": ["COMPONENT_PROOF_FAILED"],
+      "notes": "Conservative south+low-Z clip still opens HDRI wedges. Visible foot is not unused apron."
+    },
+    {
+      "schema": "TIVVLEJOY_COMPONENT_PROOF_V1",
+      "component": "building",
+      "result": "FAIL",
+      "evidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/F_BUILDING_SUPPORTING.png",
+      "resolution": "540x960",
+      "phoneSizeChecked": true,
+      "phoneEvidence": "artifacts/tivvlejoy-scenery-showcase-30s/cinematic-component-recovery-v6/F_BUILDING_SUPPORTING_PHONE.png",
+      "ok": false,
+      "blockers": ["COMPONENT_PROOF_FAILED"],
+      "notes": "Locked REJECT-hero / MIDGROUND. Isolated crop framed the cabin as subject and reads game-kit. No purchase."
+    }
+  ]
+}

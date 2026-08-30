@@ -139,14 +139,10 @@ def add_camera(name: str, loc, look, lens: float = 38.0) -> bpy.types.Object:
     obj = bpy.data.objects.new(name, cam)
     bpy.context.scene.collection.objects.link(obj)
     obj.location = loc
-    target = bpy.data.objects.new(name + "_LOOK", None)
-    bpy.context.scene.collection.objects.link(target)
-    target.location = look
-    con = obj.constraints.new("TRACK_TO")
-    con.target = target
-    con.track_axis = "TRACK_NEGATIVE_Z"
-    con.up_axis = "UP_Y"
+    direction = Vector(look) - Vector(loc)
+    obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
     bpy.context.scene.camera = obj
+    bpy.context.view_layer.update()
     return obj
 
 
@@ -214,36 +210,48 @@ def build_strip_terrain(col, name: str, bounds, res, color_fn, z_fn=None) -> bpy
     return obj
 
 
+def _channel_edge_y(x: float, south: bool, inset: float = 0.96) -> float:
+    emerge = shoreline_distance(x, south=south) * inset
+    best_y = -16.0 if south else -4.0
+    best_err = 1e9
+    y = -24.0
+    while y <= 4.0:
+        dist, signed = channel_profile(x, y)
+        if (signed < 0.0) == south:
+            err = abs(dist - emerge)
+            if err < best_err:
+                best_err = err
+                best_y = y
+        y += 0.06
+    return best_y
+
+
 def build_water_prism(col, bounds, name="TJ_V6_Water") -> bpy.types.Object:
-    """Closed 18 cm prism inside the real channel. Lock: thickness 0.18."""
-    x0, x1, y0, y1 = bounds
-    xs, ys = 48, 56
+    """Closed 18 cm prism *inside* the channel only. Not a terrain-covering sheet."""
+    x0, x1, _y0, _y1 = bounds
+    steps = 40
     thick = WATER_LOCK["prismM"]
     mesh = bpy.data.meshes.new(name)
     obj = bpy.data.objects.new(name, mesh)
     col.objects.link(obj)
     bm = bmesh.new()
-    top = []
-    bot = []
-    for iy in range(ys):
-        ty = y0 + (y1 - y0) * iy / (ys - 1)
-        trow = []
-        brow = []
-        for ix in range(xs):
-            tx = x0 + (x1 - x0) * ix / (xs - 1)
-            dist, _signed = channel_profile(tx, ty)
-            emerge = shoreline_distance(tx, south=True)
-            # Inset so the water edge is not a second traced silhouette.
-            inside = dist < emerge * 0.96
-            z_top = WATER_Z if inside else WATER_Z + 0.04
-            trow.append(bm.verts.new((tx, ty, z_top)))
-            brow.append(bm.verts.new((tx, ty, z_top - thick)))
-        top.append(trow)
-        bot.append(brow)
-    for iy in range(ys - 1):
-        for ix in range(xs - 1):
-            bm.faces.new((top[iy][ix], top[iy][ix + 1], top[iy + 1][ix + 1], top[iy + 1][ix]))
-            bm.faces.new((bot[iy][ix], bot[iy + 1][ix], bot[iy + 1][ix + 1], bot[iy][ix + 1]))
+    south_top, north_top, south_bot, north_bot = [], [], [], []
+    for i in range(steps):
+        x = x0 + (x1 - x0) * i / (steps - 1)
+        # 1.02 overlaps the wet shelf so the water edge is not an independent traced line.
+        ys = _channel_edge_y(x, south=True, inset=1.02)
+        yn = _channel_edge_y(x, south=False, inset=1.02)
+        south_top.append(bm.verts.new((x, ys, WATER_Z)))
+        north_top.append(bm.verts.new((x, yn, WATER_Z)))
+        south_bot.append(bm.verts.new((x, ys, WATER_Z - thick)))
+        north_bot.append(bm.verts.new((x, yn, WATER_Z - thick)))
+    for i in range(steps - 1):
+        bm.faces.new((south_top[i], north_top[i], north_top[i + 1], south_top[i + 1]))
+        bm.faces.new((south_bot[i], south_bot[i + 1], north_bot[i + 1], north_bot[i]))
+        bm.faces.new((south_top[i], south_top[i + 1], south_bot[i + 1], south_bot[i]))
+        bm.faces.new((north_top[i], north_bot[i], north_bot[i + 1], north_top[i + 1]))
+    bm.faces.new((south_top[0], south_bot[0], north_bot[0], north_top[0]))
+    bm.faces.new((south_top[-1], north_top[-1], north_bot[-1], south_bot[-1]))
     bm.to_mesh(mesh)
     bm.free()
     for poly in mesh.polygons:
@@ -324,6 +332,57 @@ def build_creek_bed(col, bounds, cfg: dict) -> bpy.types.Object:
     return obj
 
 
+def stone_material(wet: bool = False) -> bpy.types.Material:
+    name = "TJ_V6_StoneWet" if wet else "TJ_V6_Stone"
+    mat = bpy.data.materials.get(name)
+    if mat is not None:
+        return mat
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = next(n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+    if wet:
+        bsdf.inputs["Base Color"].default_value = (0.18, 0.15, 0.12, 1.0)
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.38
+    else:
+        bsdf.inputs["Base Color"].default_value = (0.28, 0.23, 0.17, 1.0)
+        if "Roughness" in bsdf.inputs:
+            bsdf.inputs["Roughness"].default_value = 0.78
+    if "Specular IOR Level" in bsdf.inputs:
+        bsdf.inputs["Specular IOR Level"].default_value = 0.22 if wet else 0.10
+    return mat
+
+
+def stamp_stone(obj, wet: bool = False) -> None:
+    if obj is None or obj.data is None:
+        return
+    if obj.data.users > 1:
+        obj.data = obj.data.copy()
+    obj.data.materials.clear()
+    obj.data.materials.append(stone_material(wet))
+
+
+def scatter_gravel(col, x_center: float, count: int = 36) -> int:
+    planted = 0
+    for i in range(count):
+        along = -0.55 + 1.70 * ((i % 9) / 8.0)
+        x = x_center + 0.42 * math.sin(i * 1.73 + 0.4)
+        px, py = point_on_south_shore(x, offset=along)
+        z, _ = riverbank_sample(px, py)
+        mesh = bpy.data.meshes.new(f"TJ_V6_Gravel_{i}")
+        obj = bpy.data.objects.new(f"TJ_V6_Gravel_{i}", mesh)
+        col.objects.link(obj)
+        bm = bmesh.new()
+        bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.035 + 0.028 * (i % 5))
+        bm.to_mesh(mesh)
+        bm.free()
+        obj.location = (px, py, z + 0.01)
+        obj.rotation_euler = (0.4 * (i % 5), 0.3 * (i % 3), 0.7 * i)
+        stamp_stone(obj, wet=along < 0.25)
+        planted += 1
+    return planted
+
+
 def plant_bed_stones(col, rocks, bounds) -> int:
     if not rocks:
         return 0
@@ -345,7 +404,8 @@ def plant_bed_stones(col, rocks, bounds) -> int:
         z, _ = riverbank_sample(px, py)
         src = rocks[i % len(rocks)]
         fitted = _fit_scale(src, 1.65, scale)
-        _dup_mesh(src, (px, py, z), fitted, 0.4 * i, bury, col, f"TJ_V6_BedStone_{i}")
+        obj = _dup_mesh(src, (px, py, z), fitted, 0.4 * i, bury, col, f"TJ_V6_BedStone_{i}")
+        stamp_stone(obj, wet=True)
         planted += 1
     return planted
 
@@ -361,19 +421,40 @@ def plant_shore_cues(col, rocks, library) -> dict:
                 src = rocks[i % len(rocks)]
                 fitted = _fit_scale(src, 1.65, scale)
                 bury = 0.22 if "submerged" in cue or cue == "underwater_bed" else 0.10
-                _dup_mesh(src, (x, y, z), fitted, 0.55 * i, bury, col, f"TJ_V6_Shore_{cue}_{i}")
+                obj = _dup_mesh(src, (x, y, z), fitted, 0.55 * i, bury, col, f"TJ_V6_Shore_{cue}_{i}")
+                stamp_stone(obj, wet="submerged" in cue or cue == "underwater_bed")
                 planted["stone"] += 1
         elif "gravel" in cue or "soil" in cue:
             if rocks:
                 src = rocks[(i + 3) % len(rocks)]
                 fitted = _fit_scale(src, 1.65, scale * 0.55)
-                _dup_mesh(src, (x, y, z), fitted, 1.1 * i, 0.16, col, f"TJ_V6_Shore_{cue}_{i}")
+                obj = _dup_mesh(src, (x, y, z), fitted, 1.1 * i, 0.16, col, f"TJ_V6_Shore_{cue}_{i}")
+                stamp_stone(obj, wet="wet" in cue or "gravel" in cue)
                 planted["gravel"] += 1
         elif "grass" in cue:
             group = festuca or fern
             if group:
                 _dup_group(group, (x, y, z), 0.70 + 0.2 * scale, 0.3 * i, 0.03, col, f"TJ_V6_ShoreRoot_{i}")
                 planted["veg"] += 1
+    # Dense local cluster in the diagnostic crop so the transition has physical width.
+    for i, (x, offset, scale, bury) in enumerate((
+        (-2.6, -0.35, 0.36, 0.16),
+        (-2.1, -0.08, 0.28, 0.10),
+        (-1.7, 0.22, 0.24, 0.08),
+        (-2.4, 0.48, 0.20, 0.06),
+        (-1.9, 0.85, 0.22, 0.04),
+        (-3.0, -0.55, 0.32, 0.20),
+        (-1.4, -0.42, 0.26, 0.14),
+    )):
+        if not rocks:
+            break
+        px, py = point_on_south_shore(x, offset=offset)
+        z, _ = riverbank_sample(px, py)
+        src = rocks[i % len(rocks)]
+        fitted = _fit_scale(src, 1.65, scale)
+        obj = _dup_mesh(src, (px, py, z), fitted, 0.7 * i, bury, col, f"TJ_V6_ShoreCluster_{i}")
+        stamp_stone(obj, wet=offset < 0.2)
+        planted["stone"] += 1
     # Sparse overhang just landward of the waterline.
     for i, x in enumerate((-5.8, -1.6, 2.4)):
         if not fern:
@@ -494,12 +575,24 @@ def render_png(path: Path, samples: int) -> Path:
 
 
 def phone_size(src: Path, dest: Path, size=(180, 320)) -> Path:
-    from PIL import Image
-
     dest.parent.mkdir(parents=True, exist_ok=True)
-    im = Image.open(src).convert("RGB")
-    im = im.resize(size, Image.Resampling.LANCZOS)
-    im.save(dest)
+    try:
+        from PIL import Image
+
+        im = Image.open(src).convert("RGB")
+        im = im.resize(size, Image.Resampling.LANCZOS)
+        im.save(dest)
+        return dest
+    except ImportError:
+        pass
+    import subprocess
+
+    script = (
+        "from PIL import Image; "
+        f"im=Image.open({str(src)!r}).convert('RGB'); "
+        f"im.resize({size}, Image.Resampling.LANCZOS).save({str(dest)!r})"
+    )
+    subprocess.check_call(["python3", "-c", script])
     return dest
 
 
@@ -527,8 +620,9 @@ def component_shoreline(out: Path, samples: int) -> dict:
     rocks = _append_objects(ROCK_BLEND, ROCK_NAMES)
     library = {k: _append_blend_group(BOTANIQ_SOURCES[k]) for k in ("festuca_a", "carex_a", "fern_a") if BOTANIQ_SOURCES[k].exists()}
     cues = plant_shore_cues(col, rocks, library)
+    cues["gravelScatter"] = scatter_gravel(col, -2.2, 40)
     unify = apply_style_unifier()
-    add_camera("TJ_V6_ShoreCam", (1.6, sy - 5.4, 1.55), (sx - 0.4, sy + 0.8, WATER_Z + 0.15), 42.0)
+    add_camera("TJ_V6_ShoreCam", (sx + 2.4, sy - 3.2, 1.15), (sx - 0.2, sy + 0.35, WATER_Z + 0.08), 50.0)
     full = out / "A_SHORELINE_TRANSITION.png"
     render_png(full, samples)
     phone = phone_size(full, out / "A_SHORELINE_TRANSITION_PHONE.png")
@@ -559,7 +653,7 @@ def component_water(out: Path, samples: int, which: str) -> dict:
         foil = plant_tree_foil(col, library)
         apply_style_unifier()
     sx, sy = point_on_south_shore(-2.0, offset=-0.35)
-    add_camera("TJ_V6_WaterCam", (1.15, sy - 4.6, 1.72), (sx, sy + 0.6, WATER_Z - 0.05), 40.0)
+    add_camera("TJ_V6_WaterCam", (sx + 1.8, sy - 2.8, 1.25), (sx - 0.4, sy + 0.15, WATER_Z - 0.02), 48.0)
     full = out / f"B_WATER_{cfg['name']}.png"
     render_png(full, samples)
     phone = phone_size(full, out / f"B_WATER_{cfg['name']}_PHONE.png")
