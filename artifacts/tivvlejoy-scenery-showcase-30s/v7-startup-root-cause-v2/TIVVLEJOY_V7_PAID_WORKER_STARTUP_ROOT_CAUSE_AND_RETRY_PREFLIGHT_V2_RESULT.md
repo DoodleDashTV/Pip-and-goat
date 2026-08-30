@@ -47,16 +47,15 @@ container start: not executed on this VM (DOCKER_NOT_AVAILABLE)
 Node start: boot script syntax PASS; argv-shape canary PASS
 Blender executable: not executed on this VM
 Blender version: image label 4.2.2
-GHA run 33321945159 on ubuntu-latest DID pull and start the pinned digest without a GPU:
-  docker=true; node extra-argv exit 0; blender extra-argv exit 0
-  canary reported ok=false because it only scanned the first 400 stdout chars
-  those chars are the NVIDIA CUDA license banner from nvidia_entrypoint.sh
-  Blender 4.2.2 and NODE_ENTRY_STARTED print after that banner
-  workflow step 2 never ran because step 1 exited 2 on that false negative
-fix: search the full stream past the CUDA banner; do not grep only line 1
-result: TIVVLEJOY_WORKER_STARTUP_CANARY_V1 registry + argv + markers remain PASS locally.
-  Container start on this digest + extra argv is proven on GHA (exit 0 both probes).
-  Detection is corrected in this revision; re-run is zero-cost CI only.
+GHA 33321945159: false negative (banner truncation). Both extra-argv probes exited 0.
+GHA 33322215513 on 1c7a2fee: PASS
+  docker=true; publicPull=true; nvidiaBanner=true
+  NODE_ENTRY_STARTED after CUDA banner
+  Blender 4.2.2 LTS after CUDA banner
+  no GPU on the runner; NVIDIA driver warning expected
+  paid CREATE 0; RunPod not contacted
+result: TIVVLEJOY_WORKER_STARTUP_CANARY_V1 ok=true locally and on GHA.
+  Container start on this digest + extra argv is proven.
 
 R2:
 manifest: present (10 files)
@@ -89,7 +88,7 @@ FIXES:
 implemented: compatible dockerArgs; staged markers; host RAM receipt before downloads; startup spend cap; container/worker fail-fast; optional RunPod registry-auth id (unused; image is public); reusable GHA canary
 
 ZERO-COST TESTS:
-results: worker_memory_contract_v1_test PASS; startup_canary_v1_test PASS including NVIDIA-banner parser; startup_canary_v1 ok on this VM (no Docker); v7-proof-a-boot.test PASS; GHA 33321945159 was a banner-truncation false negative; live pods []; paid CREATE 0
+results: worker_memory_contract_v1_test PASS; startup_canary_v1_test PASS including NVIDIA-banner parser; startup_canary_v1 ok on this VM (no Docker); v7-proof-a-boot.test PASS; GHA 33321945159 false negative; GHA 33322215513 PASS (node + Blender 4.2.2 LTS past NVIDIA banner); live pods []; paid CREATE 0
 
 live pods: []
 paid CREATE: 0
