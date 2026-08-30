@@ -1,0 +1,178 @@
+{
+  "schema": "TIVVLEJOY_V7_PROOF_A_PAID_PREFLIGHT_V1",
+  "ok": true,
+  "blockers": [],
+  "authorization": {
+    "id": "TIVVLEJOY_V7_PAID_PROOF_A_RETRY_AUTHORIZATION_V1",
+    "maxSpendUsd": 0.4,
+    "paidCreateAllowance": 1,
+    "target": "V7_PROOF_A_WATER_TEST_C_540x960_32",
+    "motion": false,
+    "finalVideo": false,
+    "retry": false,
+    "automaticSecondCreate": false
+  },
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "sha": "6db7be2ca4bf006dd7735e9fb09a7c313c9673f1",
+  "requiredSha": "47e1e2b11ff16b23ea34cc9b55e5e165036d865b",
+  "requiredShaIsAncestor": true,
+  "pr": {
+    "number": 169,
+    "keep": [
+      "OPEN",
+      "DRAFT",
+      "UNMERGED",
+      "NOT_READY"
+    ]
+  },
+  "livePods": [],
+  "quote32": {
+    "id": "NVIDIA GeForce RTX 4090",
+    "displayName": "RTX 4090",
+    "vramGb": 24,
+    "secureUsdPerHr": 0.74,
+    "stockStatus": "Medium",
+    "minMemoryInGb": 32
+  },
+  "quote24": {
+    "id": "NVIDIA GeForce RTX 4090",
+    "displayName": "RTX 4090",
+    "vramGb": 24,
+    "secureUsdPerHr": 0.74,
+    "stockStatus": "High",
+    "minMemoryInGb": 24
+  },
+  "gpuSubstitution": false,
+  "costEstimateUsd": 0.2467,
+  "costWorstUsd": 0.37,
+  "hardSpendUsd": 0.4,
+  "pin": {
+    "digest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+    "blenderVersion": "4.2.2"
+  },
+  "catalogMemoryContract": {
+    "schema": "TIVVLEJOY_WORKER_MEMORY_CONTRACT_V1",
+    "ok": true,
+    "code": null,
+    "blockers": [],
+    "warnings": [],
+    "minimumSystemRam": 25769803776,
+    "recommendedSystemRam": 34359738368,
+    "gpuVram": 25769803776,
+    "memoryPrediction": 15032385536,
+    "sourceManifest": [
+      "festuca_a",
+      "carex_a",
+      "fern_a",
+      "beech_a",
+      "ecokit_rocks",
+      "hdri_jpg"
+    ],
+    "hdriIdentity": "Image0001.jpg:15000x7500:2c747a306f1f8a3031155d3a266cc56b62e91966431db54e67c36f772c58c20c",
+    "hdriDerivativeIdentity": "H8:8192x4096:c41f736d1278b7a61684fa76bd34983c5722e3536ed1d04a7c96c8024c99f65e",
+    "blenderVersion": "4.2.2",
+    "cyclesDevice": "GPU",
+    "renderProfile": "PROOF_A_STILL",
+    "paidCreateAllowed": false
+  },
+  "localCursorMemoryContract": {
+    "schema": "TIVVLEJOY_WORKER_MEMORY_CONTRACT_V1",
+    "ok": false,
+    "code": "WORKER_MEMORY_CONTRACT_FAILED",
+    "blockers": [
+      "SYSTEM_RAM_BELOW_24GIB",
+      "GPU_VRAM_BELOW_24GIB"
+    ],
+    "warnings": [],
+    "minimumSystemRam": 25769803776,
+    "recommendedSystemRam": 34359738368,
+    "gpuVram": 25769803776,
+    "memoryPrediction": null,
+    "sourceManifest": [
+      "festuca_a",
+      "carex_a",
+      "fern_a",
+      "beech_a",
+      "ecokit_rocks",
+      "hdri_jpg"
+    ],
+    "hdriIdentity": "Image0001.jpg:15000x7500:2c747a306f1f8a3031155d3a266cc56b62e91966431db54e67c36f772c58c20c",
+    "hdriDerivativeIdentity": null,
+    "blenderVersion": "4.2.2",
+    "cyclesDevice": "GPU",
+    "renderProfile": "PROOF_A_STILL",
+    "paidCreateAllowed": false
+  },
+  "waterLock": {
+    "ior": 1.33,
+    "transmission": 0.8,
+    "metallic": 0.0,
+    "specular": 0.5,
+    "prismM": 0.18,
+    "volumeDensity": 0.18
+  },
+  "h8Identity": "c41f736d1278b7a61684fa76bd34983c5722e3536ed1d04a7c96c8024c99f65e",
+  "sourceIdentity": "2c747a306f1f8a3031155d3a266cc56b62e91966431db54e67c36f772c58c20c",
+  "outputContract": {
+    "png": "A_CREEK_BANK_WATER_TEST_C.png",
+    "phone": "A_CREEK_BANK_WATER_TEST_C_PHONE.png",
+    "receipt": "RENDER_RECEIPT.json",
+    "resolution": "540x960",
+    "samples": 32,
+    "engine": "CYCLES",
+    "device": "GPU"
+  },
+  "files": [
+    {
+      "role": "hdri_source",
+      "bytes": 2818519,
+      "sha256": "2c747a306f1f8a3031155d3a266cc56b62e91966431db54e67c36f772c58c20c"
+    },
+    {
+      "role": "hdri_h8",
+      "bytes": 452041,
+      "sha256": "c41f736d1278b7a61684fa76bd34983c5722e3536ed1d04a7c96c8024c99f65e"
+    },
+    {
+      "role": "ecokit_rocks",
+      "bytes": 258365184,
+      "sha256": "ea72ac8e65b278c8bfc351d55efa6d8aef2eeec13068cec42cf79db1f23f592c"
+    },
+    {
+      "role": "scripts",
+      "bytes": 379011,
+      "sha256": "1933be50c72ce301e6145b50ff6fd699c33d032d0f6da8db9dc054b581acc757"
+    },
+    {
+      "role": "entry",
+      "bytes": 12232,
+      "sha256": "fbdc2892fdbb04620b876acd0bc65d2bbc9c8488208aafc9bb554d764f3bf0d6"
+    },
+    {
+      "role": "beech_a",
+      "bytes": 13882518,
+      "sha256": "3ac84cdd7a8024c7063711e473d11a91e171963942998f326fae2cb3e0d4dd5f"
+    },
+    {
+      "role": "festuca_a",
+      "bytes": 1565901,
+      "sha256": "162ae5554c8ede0b10d2c8623e147550741b3b4594a06b68e6a0c7e3569bbd9e"
+    },
+    {
+      "role": "carex_a",
+      "bytes": 1843876,
+      "sha256": "a28d5fc9969ac11b778cee0f693e00f40091a7ce4e4f205076a97c54265344e3"
+    },
+    {
+      "role": "fern_a",
+      "bytes": 1130279,
+      "sha256": "8936eb232db2276ebbabe1f3c3133db2f137f8448eed31c60e83df509861089c"
+    },
+    {
+      "role": "botaniq_materials",
+      "bytes": 758023,
+      "sha256": "b1dba266a1e11175c09263acbbe5be3270293c79e1eb161958e3cb1646876eb6"
+    }
+  ],
+  "at": "2026-08-30T21:19:00.164728+00:00"
+}

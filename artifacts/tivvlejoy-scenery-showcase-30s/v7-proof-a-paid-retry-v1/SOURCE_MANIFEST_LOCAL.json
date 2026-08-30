@@ -1,0 +1,15 @@
+{
+  "fileCount": 10,
+  "roles": [
+    "hdri_source",
+    "hdri_h8",
+    "ecokit_rocks",
+    "scripts",
+    "entry",
+    "beech_a",
+    "festuca_a",
+    "carex_a",
+    "fern_a",
+    "botaniq_materials"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schema": "TIVVLEJOY_V7_PROOF_A_LAUNCH_V1",
+  "podId": "0msnqqdigglatj",
+  "podName": "tj-v7-proof-a-r1",
+  "gpuTypeId": "NVIDIA GeForce RTX 4090",
+  "minMemoryInGb": 32,
+  "quotedUsdPerHr": 0.74,
+  "createPerformed": 1,
+  "startedAt": "2026-08-30T21:19:09.083574+00:00"
+}

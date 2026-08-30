@@ -1,0 +1,66 @@
+{
+  "schema": "TIVVLEJOY_V7_PROOF_A_STARTUP_TIMELINE_V1",
+  "events": [
+    {
+      "ts": "2026-08-30T21:19:09.087283+00:00",
+      "stage": "POD_CREATED",
+      "podId": "0msnqqdigglatj"
+    },
+    {
+      "ts": "2026-08-30T21:19:09.692633+00:00",
+      "stage": "IMAGE_PULLING",
+      "uptimeInSeconds": null,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    },
+    {
+      "ts": "2026-08-30T21:20:27.319598+00:00",
+      "stage": "CONTAINER_STARTED",
+      "uptimeInSeconds": 0,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    },
+    {
+      "ts": "2026-08-30T21:20:58.406115+00:00",
+      "stage": "IMAGE_PULLING",
+      "uptimeInSeconds": -6,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    },
+    {
+      "ts": "2026-08-30T21:22:00.463476+00:00",
+      "stage": "CONTAINER_STARTED",
+      "uptimeInSeconds": 0,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    },
+    {
+      "ts": "2026-08-30T21:22:16.002150+00:00",
+      "stage": "IMAGE_PULLING",
+      "uptimeInSeconds": -14,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    },
+    {
+      "ts": "2026-08-30T21:22:47.045183+00:00",
+      "stage": "CONTAINER_STARTED",
+      "uptimeInSeconds": 0,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    },
+    {
+      "ts": "2026-08-30T21:23:18.099593+00:00",
+      "stage": "IMAGE_PULLING",
+      "uptimeInSeconds": -9,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    },
+    {
+      "ts": "2026-08-30T21:23:49.185947+00:00",
+      "stage": "CONTAINER_STARTED",
+      "uptimeInSeconds": 0,
+      "desiredStatus": "RUNNING",
+      "costPerHr": 0.74
+    }
+  ]
+}
