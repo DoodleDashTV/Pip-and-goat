@@ -15,6 +15,7 @@ import {
   exactAuthorizationPresent,
   type SceneryShowcaseWorkerPin,
 } from './contract';
+import { loadProductionReadinessReceipt } from './quality-guardrails';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '../../..');
 const PIN_FILE = path.join(REPO_ROOT, 'config/cloud/scenery-showcase-worker-image.json');
@@ -43,6 +44,13 @@ async function run() {
   const blockers: string[] = [];
   let pin: SceneryShowcaseWorkerPin | null = null;
   let imageCheck: ReturnType<typeof validateRunpodWorkerImageRef> | null = null;
+
+  // Fail closed on the quality side before doing any paid-launch eligibility work.
+  // This receipt is produced only after source provenance, hidden-limit audit,
+  // distance-quality checks, component proofs, human still approval, temporal
+  // approval, and worker parity have all passed.
+  const qualityGuardrail = loadProductionReadinessReceipt(REPO_ROOT);
+  blockers.push(...qualityGuardrail.blockers);
 
   try {
     pin = JSON.parse(readFileSync(PIN_FILE, 'utf8')) as SceneryShowcaseWorkerPin;
@@ -113,11 +121,22 @@ async function run() {
   if (!authorizationPresent) blockers.push('PAID_AUTHORIZATION_MISSING');
 
   const facts = {
-    schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V1',
+    schema: 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V2',
     executionId: SCENERY_SHOWCASE_EXECUTION_ID,
     podName: SCENERY_SHOWCASE_POD_NAME,
     requiredAuthorization: SCENERY_SHOWCASE_AUTHORIZATION,
     authorizationPresent,
+    qualityGuardrail: {
+      ok: qualityGuardrail.ok,
+      path: qualityGuardrail.path,
+      schema: qualityGuardrail.receipt?.schema || null,
+      stages: qualityGuardrail.receipt?.stages || [],
+      humanVisualApproved: qualityGuardrail.receipt?.humanVisualApproved === true,
+      motionTemporalApproved: qualityGuardrail.receipt?.motionTemporalApproved === true,
+      workerParityOk: qualityGuardrail.receipt?.workerParityOk === true,
+      fallbackCount: qualityGuardrail.receipt?.fallbackCount ?? null,
+      blockers: qualityGuardrail.blockers,
+    },
     image: pin
       ? { status: pin.status, ref: pin.ref, digest: pin.digest, sourceCommit: pin.sourceCommit, blenderVersion: pin.blenderVersion }
       : null,
@@ -154,6 +173,7 @@ async function run() {
     status: facts.launchAllowed ? 'LAUNCH_AUTHORIZED' : facts.readyAwaitingAuthorization ? 'READY_AWAITING_AUTHORIZATION' : 'BLOCKED',
     launchAllowed: facts.launchAllowed,
     readyAwaitingAuthorization: facts.readyAwaitingAuthorization,
+    qualityGuardrailOk: qualityGuardrail.ok,
     blockers: facts.blockers,
     secureUsdPerHr,
     createRequests: 0,
