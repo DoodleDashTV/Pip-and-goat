@@ -13,7 +13,7 @@ after the combined-scene depsgraph / Cycles-sync cost was measured at
 - starting branch: `cursor/tivvlejoy-scenery-showcase-30s-v1-73f1`
 - starting SHA: `634b329bbabda332587fa6209172ca7b47b09877`
 - final branch: `cursor/tivvlejoy-scenery-showcase-30s-v1-73f1`
-- final SHA: *(this result tip)*
+- final SHA: `78e6ed9185aa10fb5fd25fa3a709a1a741686916`
 - PR: **#169 OPEN / DRAFT / UNMERGED / NOT READY**
 
 ## OLD FAILURE
