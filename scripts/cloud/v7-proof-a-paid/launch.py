@@ -24,13 +24,18 @@ from botocore.config import Config
 REPO = Path(__file__).resolve().parents[3]
 SCENERY = REPO / "scripts/blender/scenery"
 sys.path.insert(0, str(SCENERY))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cinematic_water_lock_v1 import WATER_LOCK  # noqa: E402
+from docker_args_v1 import CURRENT_PIN_DOCKER_ARGS, docker_args_compatible  # noqa: E402
 from worker_memory_contract_v1 import evaluate_worker_memory_contract  # noqa: E402
 
 AUTH = "TIVVLEJOY_V7_LARGER_MEMORY_PAID_PROOF_A_EXECUTION_V1"
 POD_NAME = "tj-v7-proof-a-lm-v1"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
 MAX_SPEND = 0.40
+STARTUP_SPEND_CAP = 0.10
+CONTAINER_START_TIMEOUT_S = 480
+WORKER_MARKER_TIMEOUT_S = 180
 MIN_RAM_GB = 32
 HARD_RAM_GB = 24
 MIN_VRAM_GB = 24
@@ -369,6 +374,8 @@ def preflight() -> dict:
         blockers.append("H8_IDENTITY")
     if WATER_LOCK != {"ior": 1.33, "transmission": 0.80, "metallic": 0.0, "specular": 0.50, "prismM": 0.18, "volumeDensity": 0.18}:
         blockers.append("WATER_LOCK")
+    if not docker_args_compatible(CURRENT_PIN_DOCKER_ARGS)["ok"]:
+        blockers.append("DOCKER_ARGS_INCOMPATIBLE")
     catalog_contract = evaluate_worker_memory_contract(
         system_ram_bytes=MIN_RAM_GB * 1024 * 1024 * 1024,
         gpu_vram_bytes=MIN_VRAM_GB * 1024 * 1024 * 1024,
@@ -485,14 +492,10 @@ def consume_ledger() -> None:
 
 
 def create_pod(image_ref: str, rate: float) -> str:
-    docker_args = (
-        "sh -c 'cd /opt/ddp-worker && node -e "
-        "\"(async()=>{const r2=require(\\\"./src/r2-client\\\");const {spawnSync}=require(\\\"child_process\\\");"
-        "const ctx=r2.createR2Client(process.env);"
-        "await r2.downloadToFile(ctx, process.env.V7_ENTRY_KEY, \\\"/tmp/v7-proof-a-entry.js\\\");"
-        "const r=spawnSync(\\\"node\\\",[\\\"/tmp/v7-proof-a-entry.js\\\"],{stdio:\\\"inherit\\\"});"
-        "process.exit(r.status||0)})().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)})\"'"
-    )
+    docker_args = CURRENT_PIN_DOCKER_ARGS
+    compat = docker_args_compatible(docker_args)
+    if not compat["ok"]:
+        raise RuntimeError("DOCKER_ARGS_INCOMPATIBLE:" + ",".join(compat["blockers"]))
     env = {
         "R2_ENDPOINT": os.environ["R2_ENDPOINT"],
         "R2_REGION": os.environ.get("R2_REGION") or "auto",
@@ -531,6 +534,11 @@ def create_pod(image_ref: str, rate: float) -> str:
                 "volumeInGb": 0,
                 "dockerArgs": docker_args,
                 "env": [{"key": k, "value": v} for k, v in env.items()],
+                **(
+                    {"containerRegistryAuthId": os.environ["RUNPOD_CONTAINER_REGISTRY_AUTH_ID"]}
+                    if os.environ.get("RUNPOD_CONTAINER_REGISTRY_AUTH_ID")
+                    else {}
+                ),
             }
         },
     )
@@ -588,6 +596,7 @@ def download_outputs() -> dict:
         "A_CREEK_BANK_WATER_TEST_C_PHONE.png",
         "CONTEXTUAL_RECOVERY_V7.json",
         "worker-memory-contract.json",
+        "host-memory-receipt.json",
         "BLENDER_STDOUT.txt",
         "BLENDER_STDERR.txt",
     ):
@@ -657,25 +666,48 @@ def main() -> int:
         )
         observed_rate = rate
         hard_deadline = started + min(32 * 60, (MAX_SPEND / max(observed_rate, 0.01)) * 3600 * 0.95)
-        startup_deadline = started + 12 * 60
+        startup_spend_deadline = started + (STARTUP_SPEND_CAP / max(observed_rate, 0.01)) * 3600
+        container_deadline = started + CONTAINER_START_TIMEOUT_S
+        worker_marker_deadline = None
+        stage = "POD_CREATED"
         status = None
         client = r2_client()
         while time.time() < hard_deadline:
             status = r2_get_json(client, f"{PREFIX}/status.json")
+            receipt = r2_get_json(client, f"{PREFIX}/host-memory-receipt.json")
             if status and status.get("status") in {"COMPLETE", "FAILED"}:
                 break
             pods = list_pods()
             exact = next((p for p in pods if p.get("id") == pod_id), None)
+            uptime = (exact or {}).get("uptimeInSeconds")
+            if exact and exact.get("machineId"):
+                stage = "HOST_ASSIGNED"
+            if exact and str(exact.get("desiredStatus") or "").upper() == "RUNNING" and (uptime is None or int(uptime) < 0):
+                stage = "IMAGE_PULLING"
             if exact and exact.get("costPerHr"):
                 observed_rate = float(exact["costPerHr"])
                 hard_deadline = min(hard_deadline, started + (MAX_SPEND / observed_rate) * 3600 * 0.95)
-            if not status and time.time() > startup_deadline:
-                raise RuntimeError("STARTUP_WATCHDOG_TIMEOUT")
+                startup_spend_deadline = started + (STARTUP_SPEND_CAP / observed_rate) * 3600
+            if uptime is not None and int(uptime) >= 0:
+                if stage in {"POD_CREATED", "HOST_ASSIGNED", "IMAGE_PULLING"}:
+                    stage = "CONTAINER_STARTED"
+                    worker_marker_deadline = time.time() + WORKER_MARKER_TIMEOUT_S
+            if receipt:
+                stage = "WORKER_STARTED"
+            if status and status.get("code") in {"RENDERED", "RENDER_FAILED"}:
+                stage = "BLENDER_STARTED"
+            elapsed = time.time() - started
+            if time.time() > startup_spend_deadline and stage in {"POD_CREATED", "HOST_ASSIGNED", "IMAGE_PULLING"}:
+                raise RuntimeError(f"STARTUP_SPEND_CAP:{stage}:{round(elapsed,1)}")
+            if time.time() > container_deadline and stage in {"POD_CREATED", "HOST_ASSIGNED", "IMAGE_PULLING"}:
+                raise RuntimeError(f"CONTAINER_START_TIMEOUT:{stage}:{round(elapsed,1)}")
+            if worker_marker_deadline and time.time() > worker_marker_deadline and stage == "CONTAINER_STARTED":
+                raise RuntimeError("WORKER_MARKER_TIMEOUT")
             if exact and str(exact.get("desiredStatus") or "").upper() in {"TERMINATED", "EXITED", "STOPPED"} and not status:
                 raise RuntimeError("POD_EXITED_WITHOUT_STATUS")
             time.sleep(15)
         if not status:
-            raise RuntimeError("HARD_RUNTIME_OR_COST_DEADLINE")
+            raise RuntimeError(f"HARD_RUNTIME_OR_COST_DEADLINE:{stage}")
         outputs = download_outputs()
         write_json(OUT / "DOWNLOAD.json", outputs)
     finally:

@@ -76,14 +76,42 @@ async function main() {
   mkdirSync(OUT_DIR, { recursive: true });
 
   const started = new Date().toISOString();
+  log('IMAGE_PROCESS_STARTED');
+  log('NODE_ENTRY_STARTED');
   const gpu = nvidia();
   const mem = meminfo();
   const blender = blenderVersion();
   log('worker_boot', { gpu, memTotalGiB: +(mem.memTotal / 1024 ** 3).toFixed(2), blender: blender.version });
+  if (mem.memTotal < 24 * 1024 * 1024 * 1024) {
+    await uploadJson(ctx, `${prefix}/host-memory-receipt.json`, { schema: 'TIVVLEJOY_HOST_MEMORY_RECEIPT_V1', ok: false, code: 'SYSTEM_RAM_BELOW_24GIB', ...mem, gpu });
+    await uploadJson(ctx, `${prefix}/status.json`, {
+      schema: 'TIVVLEJOY_V7_PROOF_A_PAID_STATUS_V1',
+      status: 'FAILED',
+      code: 'SYSTEM_RAM_BELOW_24GIB',
+      mem,
+      started,
+      ended: new Date().toISOString(),
+    });
+    process.exitCode = 3;
+    return;
+  }
+  const warnings = mem.memTotal < 32 * 1024 * 1024 * 1024 ? ['SYSTEM_RAM_BELOW_32GIB_PREFERRED'] : [];
+  await uploadJson(ctx, `${prefix}/host-memory-receipt.json`, {
+    schema: 'TIVVLEJOY_HOST_MEMORY_RECEIPT_V1',
+    ok: true,
+    warnings,
+    blenderAllowed: true,
+    ...mem,
+    gpu,
+  });
+  log('HOST_MEMORY_RECEIPT_WRITTEN', { memTotal: mem.memTotal, warnings });
 
+  log('R2_CLIENT_STARTED');
+  log('SOURCE_MANIFEST_FETCH_STARTED');
   const manifestKey = `${prefix}/source-manifest.json`;
   const localManifest = '/tmp/v7-source-manifest.json';
   await r2.downloadToFile(ctx, manifestKey, localManifest);
+  log('SOURCE_MANIFEST_FETCH_COMPLETE');
   const manifest = JSON.parse(readFileSync(localManifest, 'utf8'));
 
   for (const file of manifest.files || []) {
@@ -151,6 +179,8 @@ print(json.dumps(row))
 
   const beforeMem = meminfo();
   const beforeGpu = nvidia();
+  log('BLENDER_EXEC_STARTED');
+  log('BLENDER_PROCESS_STARTED');
   const render = spawnSync(
     'blender',
     [

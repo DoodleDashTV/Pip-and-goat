@@ -1,0 +1,53 @@
+{
+  "schema": "TIVVLEJOY_WORKER_STARTUP_CANARY_V1",
+  "imageRefDigest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+  "ghcr": {
+    "publicPull": true,
+    "architecture": "amd64",
+    "compressedBytes": 2164906933,
+    "layerCount": 25,
+    "entrypoint": [
+      "/opt/nvidia/nvidia_entrypoint.sh"
+    ],
+    "cmd": [
+      "node",
+      "./src/scenery-showcase-entry-v2.js"
+    ]
+  },
+  "previousDockerArgsCompatible": false,
+  "preferredDockerArgsCompatible": true,
+  "currentPinDockerArgsCompatible": true,
+  "nvidiaEntrypoint": "/opt/nvidia/nvidia_entrypoint.sh",
+  "imageCmd": [
+    "node",
+    "./src/scenery-showcase-entry-v2.js"
+  ],
+  "markers": [
+    "IMAGE_PROCESS_STARTED",
+    "NODE_ENTRY_STARTED",
+    "R2_CLIENT_STARTED",
+    "SOURCE_MANIFEST_FETCH_STARTED",
+    "SOURCE_MANIFEST_FETCH_COMPLETE",
+    "HOST_MEMORY_RECEIPT_WRITTEN",
+    "BLENDER_EXEC_STARTED",
+    "BLENDER_PROCESS_STARTED",
+    "CYCLES_DEVICE_VERIFIED",
+    "RENDER_STARTED"
+  ],
+  "hostMemoryReceiptOnCursorVm": {
+    "ok": false,
+    "blockers": [
+      "SYSTEM_RAM_BELOW_24GIB",
+      "GPU_VRAM_BELOW_24GIB"
+    ],
+    "warnings": []
+  },
+  "container": {
+    "attempted": false,
+    "reason": "DOCKER_NOT_AVAILABLE"
+  },
+  "bootScriptSyntax": true,
+  "runpodContactedForCreate": false,
+  "paidCreate": 0,
+  "ok": true
+}

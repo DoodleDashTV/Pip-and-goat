@@ -31,8 +31,11 @@ def evaluate_worker_memory_contract(
     paid_create_allowed: bool = False,
 ) -> dict[str, Any]:
     blockers: list[str] = []
+    warnings: list[str] = []
     if int(system_ram_bytes or 0) < MINIMUM_SYSTEM_RAM_BYTES:
         blockers.append("SYSTEM_RAM_BELOW_24GIB")
+    elif int(system_ram_bytes or 0) < RECOMMENDED_SYSTEM_RAM_BYTES:
+        warnings.append("SYSTEM_RAM_BELOW_32GIB_PREFERRED")
     if gpu_vram_bytes is not None and int(gpu_vram_bytes) < TARGET_GPU_VRAM_BYTES:
         blockers.append("GPU_VRAM_BELOW_24GIB")
     if blender_version != REQUIRED_BLENDER:
@@ -55,6 +58,7 @@ def evaluate_worker_memory_contract(
         "ok": ok,
         "code": None if ok else FAIL_CODE,
         "blockers": blockers,
+        "warnings": warnings,
         "minimumSystemRam": MINIMUM_SYSTEM_RAM_BYTES,
         "recommendedSystemRam": RECOMMENDED_SYSTEM_RAM_BYTES,
         "gpuVram": TARGET_GPU_VRAM_BYTES,

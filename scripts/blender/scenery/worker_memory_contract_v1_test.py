@@ -31,6 +31,21 @@ def test_accepts_32gib_4090_proof_a():
     )
     assert row["ok"] is True
     assert row["code"] is None
+    assert row["warnings"] == []
+
+
+def test_warns_below_32gib_but_allows_24gib():
+    row = evaluate_worker_memory_contract(
+        system_ram_bytes=24 * 1024 * 1024 * 1024,
+        gpu_vram_bytes=24 * 1024 * 1024 * 1024,
+        source_manifest=["hdri_jpg", "beech_a"],
+        hdri_identity="Image0001.jpg:15000x7500",
+        blender_version="4.2.2",
+        cycles_device="GPU",
+        render_profile="PROOF_A_STILL",
+    )
+    assert row["ok"] is True
+    assert "SYSTEM_RAM_BELOW_32GIB_PREFERRED" in row["warnings"]
 
 
 def test_blocks_paid_create_flag():
@@ -48,5 +63,6 @@ def test_blocks_paid_create_flag():
 if __name__ == "__main__":
     test_rejects_16gib_cursor_vm()
     test_accepts_32gib_4090_proof_a()
+    test_warns_below_32gib_but_allows_24gib()
     test_blocks_paid_create_flag()
     print("worker_memory_contract_v1_test PASS")
