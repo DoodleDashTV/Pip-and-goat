@@ -78,6 +78,10 @@ from cinematic_meadow_v3_test import (  # noqa: E402
     test_foundation_dominates_the_wedge,
 )
 from cinematic_style_unifier_v2_test import test_v2_keeps_stylized_not_photoreal  # noqa: E402
+from v7_resource_probe_test import (  # noqa: E402
+    test_meminfo_and_disk_are_dicts,
+    test_snapshot_has_resource_fields,
+)
 from owned_building_audit import audit_summary  # noqa: E402
 from cinematic_creek_profile import (
     hero_grass_lip,
@@ -343,6 +347,8 @@ if __name__ == "__main__":
     test_foundation_dominates_the_wedge()
     test_fields_overlap_and_have_negative_space()
     test_v2_keeps_stylized_not_photoreal()
+    test_snapshot_has_resource_fields()
+    test_meminfo_and_disk_are_dicts()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False
     assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"

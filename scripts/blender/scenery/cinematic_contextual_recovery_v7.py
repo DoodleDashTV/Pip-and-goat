@@ -38,6 +38,7 @@ from cinematic_shoreline_v2 import gravel_scatter_plan, physical_slots, shorelin
 from cinematic_style_unifier_v2 import apply_style_unifier_v2
 from cinematic_water_lock_v1 import WATER_LOCK, test_cfg
 from owned_building_audit import audit_summary
+from v7_resource_probe import PeakTracker, scene_counts, snapshot
 
 OUT_DEFAULT = Path("/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinematic-contextual-recovery-v7")
 
@@ -278,6 +279,7 @@ def place_cabin_midground(col) -> dict:
 
 def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
     cfg = test_cfg(which)
+    probe = {"start": snapshot("before_setup")}
     setup(cfg)
     col = v6._col("TJ_CREEK_BANK_VIGNETTE_V1")
     bounds = (-10.0, 6.5, -17.0, -2.5)
@@ -291,6 +293,10 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
     v6.apply_locked_water_material(water, cfg)
     rocks = _append_objects(ROCK_BLEND, ROCK_NAMES)
     library = load_lib(("festuca_a", "carex_a", "fern_a", "beech_a"))
+    probe["after_source_append"] = snapshot(
+        "after_source_append",
+        extra={"botaniqFiles": sum(1 for k in library if library[k]), "rockObjects": len(rocks), **scene_counts()},
+    )
     shore = plant_shoreline_v2(col, rocks, library)
     bed = plant_creek_bed_v2(col, rocks)
     foil = 0
@@ -302,9 +308,17 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
     sx, sy = point_on_south_shore(-2.0, offset=0.05)
     # Contextual creek role: bank + water + bed + one reflection mass.
     v6.add_camera("TJ_V7_CreekCam", (sx + 2.6, sy - 4.0, 1.48), (sx - 0.6, sy + 0.55, WATER_Z + 0.12), 40.0)
+    probe["after_scene_build"] = snapshot("after_scene_build", extra=scene_counts())
     tag = f"A_CREEK_BANK_{cfg['name']}"
     full = out / f"{tag}.png"
+    probe["before_render"] = snapshot("before_render", extra=scene_counts())
+    tracker = PeakTracker()
+    tracker.start()
+    t0 = __import__("time").time()
     v6.render_png(full, samples)
+    render_s = __import__("time").time() - t0
+    peak = tracker.stop()
+    probe["after_render"] = snapshot("after_render", extra={"renderSeconds": render_s, "peakRss": peak, **scene_counts()})
     phone = v6.phone_size(full, out / f"{tag}_PHONE.png")
     return {
         "proof": "A",
@@ -318,6 +332,8 @@ def creek_bank_vignette(out: Path, samples: int, which: str) -> dict:
         "shorelineV2": shoreline_v2_payload(),
         "path": str(full),
         "phone": str(phone),
+        "resourceProbe": probe,
+        "pngBytes": full.stat().st_size if full.is_file() else 0,
     }
 
 
@@ -450,6 +466,7 @@ def main(argv=None) -> int:
     v6.RENDER_RES = tuple(int(x) for x in args.resolution.lower().split("x"))
     results = []
     wanted = ["A", "B", "C", "D"] if args.proof == "all" else [args.proof]
+    snapshot("process_start", extra={"proofs": wanted, "resolution": args.resolution, "samples": args.samples})
     for name in wanted:
         _log("proof_start", name=name)
         if name == "A":
