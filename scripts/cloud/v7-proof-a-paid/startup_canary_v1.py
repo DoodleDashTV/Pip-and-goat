@@ -112,6 +112,25 @@ def audit_ghcr(ref: str) -> dict:
     }
 
 
+def clip_for_artifact(text: str, limit: int = 1200) -> str:
+    value = text or ""
+    if len(value) <= limit:
+        return value
+    head = limit // 3
+    tail = limit - head - 21
+    return f"{value[:head]}\n...[truncated]...\n{value[-tail:]}"
+
+
+def container_canary_signals(stdout: str, stderr: str = "") -> dict:
+    """Read past the NVIDIA CUDA banner that nvidia_entrypoint.sh prints first."""
+    text = f"{stdout or ''}\n{stderr or ''}"
+    return {
+        "nvidiaBanner": "== CUDA ==" in text or "CUDA Version" in text,
+        "nodeEntryStarted": "NODE_ENTRY_STARTED" in text,
+        "blender422": "Blender 4.2.2" in text,
+    }
+
+
 def local_container_canary(ref: str) -> dict:
     docker = shutil.which("docker")
     if not docker:
@@ -124,17 +143,30 @@ def local_container_canary(ref: str) -> dict:
     for name, argv in commands.items():
         try:
             run = subprocess.run(argv, capture_output=True, text=True, timeout=180)
+            stdout = run.stdout or ""
+            stderr = run.stderr or ""
+            signals = container_canary_signals(stdout, stderr)
             results[name] = {
                 "status": run.returncode,
-                "stdout": (run.stdout or "")[:400],
-                "stderr": (run.stderr or "")[:200],
+                "stdout": clip_for_artifact(stdout),
+                "stderr": clip_for_artifact(stderr, 400),
+                "signals": signals,
             }
         except Exception as exc:
             results[name] = {"status": 1, "error": type(exc).__name__}
-    node_ok = results.get("nodeStart", {}).get("status") == 0
-    blender_out = results.get("blenderVersion", {}).get("stdout") or ""
-    blender_ok = "4.2.2" in blender_out
-    return {"attempted": True, "nodeStart": node_ok, "blender422": blender_ok, "details": results}
+    node_row = results.get("nodeStart") or {}
+    blender_row = results.get("blenderVersion") or {}
+    node_signals = node_row.get("signals") or {}
+    blender_signals = blender_row.get("signals") or {}
+    node_ok = node_row.get("status") == 0 and bool(node_signals.get("nodeEntryStarted"))
+    blender_ok = blender_row.get("status") == 0 and bool(blender_signals.get("blender422"))
+    return {
+        "attempted": True,
+        "nodeStart": node_ok,
+        "blender422": blender_ok,
+        "nvidiaBanner": bool(node_signals.get("nvidiaBanner") or blender_signals.get("nvidiaBanner")),
+        "details": results,
+    }
 
 
 def main() -> int:
@@ -193,7 +225,16 @@ def main() -> int:
     }
     (OUT / "STARTUP_CANARY.json").write_text(json.dumps(row, indent=2) + "\n")
     (OUT / "GHCR_AUDIT.json").write_text(json.dumps(ghcr, indent=2) + "\n")
-    log("canary_done", ok=row["ok"], publicPull=ghcr["unauthenticatedRuntimeCanPullExactDigest"], docker=container["attempted"])
+    log(
+        "canary_done",
+        ok=row["ok"],
+        publicPull=ghcr["unauthenticatedRuntimeCanPullExactDigest"],
+        docker=container["attempted"],
+        nodeStart=container.get("nodeStart"),
+        blender422=container.get("blender422"),
+        nvidiaBanner=container.get("nvidiaBanner"),
+        skipReason=container.get("reason"),
+    )
     return 0 if row["ok"] else 2
 
 

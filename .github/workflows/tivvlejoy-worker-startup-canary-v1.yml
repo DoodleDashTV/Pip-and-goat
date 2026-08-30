@@ -44,8 +44,12 @@ jobs:
           start=$(date +%s)
           docker pull "$IMAGE"
           end=$(date +%s)
-          docker run --rm --network none "$IMAGE" node -e "console.log('NODE_ENTRY_STARTED')"
-          docker run --rm --network none "$IMAGE" blender --version | head -n 1 | grep -F 'Blender 4.2.2'
+          # nvidia_entrypoint.sh prints a CUDA license banner before exec.
+          # Search the full stream; do not grep only the first line.
+          docker run --rm --network none "$IMAGE" node -e "console.log('NODE_ENTRY_STARTED')" | tee /tmp/node-canary.txt
+          grep -F 'NODE_ENTRY_STARTED' /tmp/node-canary.txt
+          docker run --rm --network none "$IMAGE" blender --version | tee /tmp/blender-canary.txt
+          grep -F 'Blender 4.2.2' /tmp/blender-canary.txt
           python3 - <<PY
           import json
           p={

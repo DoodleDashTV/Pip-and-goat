@@ -43,11 +43,20 @@ finding: dockerArgs must be extra argv for the NVIDIA entrypoint, matching CMD s
 
 LOCAL/CI STARTUP CANARY:
 image pull: anonymous registry canary PASS (this VM has no Docker)
-container start: not executed here (DOCKER_NOT_AVAILABLE)
+container start: not executed on this VM (DOCKER_NOT_AVAILABLE)
 Node start: boot script syntax PASS; argv-shape canary PASS
-Blender executable: not executed here
+Blender executable: not executed on this VM
 Blender version: image label 4.2.2
-result: TIVVLEJOY_WORKER_STARTUP_CANARY_V1 ok=true (registry + argv + markers). Container start is in the reusable GHA canary.
+GHA run 33321945159 on ubuntu-latest DID pull and start the pinned digest without a GPU:
+  docker=true; node extra-argv exit 0; blender extra-argv exit 0
+  canary reported ok=false because it only scanned the first 400 stdout chars
+  those chars are the NVIDIA CUDA license banner from nvidia_entrypoint.sh
+  Blender 4.2.2 and NODE_ENTRY_STARTED print after that banner
+  workflow step 2 never ran because step 1 exited 2 on that false negative
+fix: search the full stream past the CUDA banner; do not grep only line 1
+result: TIVVLEJOY_WORKER_STARTUP_CANARY_V1 registry + argv + markers remain PASS locally.
+  Container start on this digest + extra argv is proven on GHA (exit 0 both probes).
+  Detection is corrected in this revision; re-run is zero-cost CI only.
 
 R2:
 manifest: present (10 files)
@@ -80,7 +89,7 @@ FIXES:
 implemented: compatible dockerArgs; staged markers; host RAM receipt before downloads; startup spend cap; container/worker fail-fast; optional RunPod registry-auth id (unused; image is public); reusable GHA canary
 
 ZERO-COST TESTS:
-results: worker_memory_contract_v1_test PASS; startup_canary_v1_test PASS; startup_canary_v1 ok; v7-proof-a-boot.test PASS; live pods []; paid CREATE 0
+results: worker_memory_contract_v1_test PASS; startup_canary_v1_test PASS including NVIDIA-banner parser; startup_canary_v1 ok on this VM (no Docker); v7-proof-a-boot.test PASS; GHA 33321945159 was a banner-truncation false negative; live pods []; paid CREATE 0
 
 live pods: []
 paid CREATE: 0
