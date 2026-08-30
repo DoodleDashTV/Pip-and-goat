@@ -1,0 +1,15 @@
+{
+  "schema": "TIVVLEJOY_V7_PAID_STARTUP_PROOF_IDENTITY_V1",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "localSha": "28a58e7490e822083de736bb8cfefec90a552b54",
+  "remoteTip": "28a58e7490e822083de736bb8cfefec90a552b54",
+  "remoteTipParent": "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c",
+  "requiredAncestor": "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c",
+  "requiredAncestorIsAncestor": true,
+  "requiredAncestorIsParentOfTip": true,
+  "whyStampFollowsReportedSha": "d1e3c152 is the content commit that pinned the overlay and recorded the 180s proofs. 28a58e74 is the later stamp commit whose parent is d1e3c152; it only writes 'final SHA: d1e3c152...' into the result markdown. The required check is ancestry, not tip equality.",
+  "overlayDigest": "sha256:868b7d5e796df7cd8e3c96df39a1eb2560344f492ed3d081f0bf6e3416a65142",
+  "requiredDigest": "sha256:868b7d5e796df7cd8e3c96df39a1eb2560344f492ed3d081f0bf6e3416a65142",
+  "digestMatch": true,
+  "at": "2026-08-30T22:39:49.642344+00:00"
+}
