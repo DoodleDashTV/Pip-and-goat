@@ -68,6 +68,16 @@ from cinematic_style_unifier_v1_test import (  # noqa: E402
     test_detects_botaniq_by_image_not_just_prefix,
     test_spec_does_not_flatten_or_photoreal_louis,
 )
+from cinematic_shoreline_v2_test import (  # noqa: E402
+    test_events_are_five_plus_and_irregular,
+    test_physical_slots_occupy_the_waterline,
+)
+from cinematic_creek_bed_v2_test import test_three_reveal_zones_and_mixed_stone  # noqa: E402
+from cinematic_meadow_v3_test import (  # noqa: E402
+    test_fields_overlap_and_have_negative_space,
+    test_foundation_dominates_the_wedge,
+)
+from cinematic_style_unifier_v2_test import test_v2_keeps_stylized_not_photoreal  # noqa: E402
 from owned_building_audit import audit_summary  # noqa: E402
 from cinematic_creek_profile import (
     hero_grass_lip,
@@ -327,6 +337,12 @@ if __name__ == "__main__":
     test_conservative_removes_fewer_than_south_only()
     test_spec_does_not_flatten_or_photoreal_louis()
     test_detects_botaniq_by_image_not_just_prefix()
+    test_events_are_five_plus_and_irregular()
+    test_physical_slots_occupy_the_waterline()
+    test_three_reveal_zones_and_mixed_stone()
+    test_foundation_dominates_the_wedge()
+    test_fields_overlap_and_have_negative_space()
+    test_v2_keeps_stylized_not_photoreal()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False
     assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"
