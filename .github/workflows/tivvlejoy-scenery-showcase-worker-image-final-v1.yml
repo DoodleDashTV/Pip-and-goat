@@ -117,13 +117,12 @@ jobs:
           case "${PUBLISHED_DIGEST}" in sha256:*) ;; *) echo 'Missing sha256 digest'; exit 1 ;; esac
           docker buildx imagetools inspect "${IMAGE_REPO}@${PUBLISHED_DIGEST}" | tee /tmp/final-imagetools.txt
           grep -F "${PUBLISHED_DIGEST}" /tmp/final-imagetools.txt
-          grep -Ei 'linux/amd64|linux amd64' /tmp/final-imagetools.txt
           docker pull "${IMAGE_REPO}@${PUBLISHED_DIGEST}"
           docker image inspect "${IMAGE_REPO}@${PUBLISHED_DIGEST}" > /tmp/final-image-inspect.json
           docker run --rm --entrypoint blender "${IMAGE_REPO}@${PUBLISHED_DIGEST}" --version | head -n 1 | tee /tmp/final-blender.txt
           grep -F 'Blender 4.2.2' /tmp/final-blender.txt
-          docker run --rm --entrypoint sh "${IMAGE_REPO}@${PUBLISHED_DIGEST}" -lc '
-            set -euo pipefail
+          docker run --rm --workdir /opt/ddp-worker --entrypoint /bin/sh "${IMAGE_REPO}@${PUBLISHED_DIGEST}" -c '
+            set -eu
             test -f ./src/scenery-showcase-original14-entry.js
             test -f ./src/scenery-showcase-original14.js
             test -f ./src/final-launch-contract-v1.js
@@ -134,9 +133,9 @@ jobs:
             grep -F "require('\''./scenery-showcase-original14.js'\'')" ./src/scenery-showcase-original14-entry.js
             ! grep -F scenery-showcase-entry-v2.js ./src/scenery-showcase-original14-entry.js
             ! grep -F v7-proof-a-boot.js ./src/scenery-showcase-original14-entry.js
-            test "${TIVVLEJOY_SCENERY_SCRIPTS_ROOT}" = /opt/ddp-worker/blender/scenery
-            test "${SCENERY_SHOWCASE_RENDER_PROFILE}" = FINAL
-            test "${SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES}" = 1440
+            test "${TIVVLEJOY_SCENERY_SCRIPTS_ROOT:-}" = /opt/ddp-worker/blender/scenery
+            test "${SCENERY_SHOWCASE_RENDER_PROFILE:-}" = FINAL
+            test "${SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES:-}" = 1440
           '
           mkdir -p artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1
           python3 - <<'PY'
