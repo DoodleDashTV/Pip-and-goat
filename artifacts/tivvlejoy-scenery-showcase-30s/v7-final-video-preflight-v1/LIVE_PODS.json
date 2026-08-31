@@ -1,0 +1,14 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_VIDEO_RENDER_ZERO_COST_PREFLIGHT_V1_LIVE_PODS",
+  "at": "2026-08-31T11:15:04.216675+00:00",
+  "createPerformed": 0,
+  "podCount": 0,
+  "activeCount": 0,
+  "active": [],
+  "proofBPod": {
+    "id": "px0b8pexnvd56v",
+    "name": "tj-v7-sup-b1",
+    "present": false,
+    "cleanupConfirmed": true
+  }
+}

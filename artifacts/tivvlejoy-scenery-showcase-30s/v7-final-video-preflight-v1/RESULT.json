@@ -1,0 +1,114 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_VIDEO_RENDER_ZERO_COST_PREFLIGHT_V1_RESULT",
+  "status": "V7_FINAL_VIDEO_RENDER_PREFLIGHT_BLOCKED",
+  "authorization": "TIVVLEJOY_V7_FINAL_VIDEO_RENDER_ZERO_COST_PREFLIGHT_V1",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "sha": "2605cbf13e508e68469646905ccf099d751de755",
+  "requiredAncestor": "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c",
+  "requiredAncestorIsAncestor": true,
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "paidCreate": 0,
+  "imageRebuild": false,
+  "blenderInvoked": false,
+  "r2BytesDownloaded": 0,
+  "proofB": {
+    "status": "V7_PAID_STARTUP_PROOF_B_PASSED",
+    "authorization": "TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_AUTHORIZATION_V1",
+    "consumed": true,
+    "podId": "px0b8pexnvd56v",
+    "actualUsd": 0.0473,
+    "pid": "50 -> 50",
+    "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+    "heartbeats": "0 -> 12"
+  },
+  "namingMismatch": {
+    "harmless": true,
+    "proofAMeans": "Water C still / larger-memory cinematic-creek render lineage",
+    "proofBMeans": "paid startup persist + HTTP observability only",
+    "renderReadyFlag": "V7_PROOF_A_RENDER_READY_AWAITING_AUTHORIZATION",
+    "renderReadyFlagValue": "YES",
+    "renderReadyFlagAuthorizes": "a new paid Proof A still only, not a 30s video"
+  },
+  "livePods": [],
+  "rtx4090SecureUsdPerHr": 0.74,
+  "rtx4090Stock": "Low",
+  "finalContract": {
+    "resolution": "1080x1920",
+    "aspect": "9:16",
+    "fps": 30,
+    "frameCount": 900,
+    "durationSeconds": 30,
+    "engine": "CYCLES",
+    "samples": 256,
+    "denoise": true,
+    "cyclesDevice": "GPU",
+    "masterBitDepth": "16",
+    "motionBlur": true,
+    "shutter": 0.5,
+    "noiseThreshold": 0.02,
+    "colorManagement": "AgX + AgX - Medium High Contrast",
+    "encode": "libx264 preset medium crf 17 yuv420p +faststart",
+    "allowUpscale": false
+  },
+  "wiredLaunchPaths": {
+    "genericShowcase": {
+      "launcher": "scripts/cloud/scenery-showcase-30s/launch.ts",
+      "imageDigest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+      "cmd": "node ./src/scenery-showcase-entry-v2.js",
+      "blender": "/opt/ddp-worker/blender/scenery/showcase_30s.py",
+      "engine": "BLENDER_EEVEE_NEXT",
+      "samples": 48,
+      "lockedCinematicScene": false,
+      "silentQualityReduction": true
+    },
+    "v7Overlay": {
+      "imageDigest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
+      "cmd": "node ./src/v7-proof-a-boot.js",
+      "starts30sShowcase": false,
+      "paidPath": "Proof A Water C still via downloaded entry.js"
+    },
+    "original14Cinematic": {
+      "worker": "workers/runpod-blender/src/scenery-showcase-original14.js",
+      "blender": "/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py",
+      "profileRequired": "FINAL",
+      "publishedAsCurrentPin": false
+    }
+  },
+  "waterLock": {
+    "ior": 1.33,
+    "transmission": 0.80,
+    "metallic": 0.0,
+    "specular": 0.50,
+    "prismM": 0.18,
+    "volumeDensity": 0.18,
+    "acceptedVariant": "D",
+    "argparseDefault": "D"
+  },
+  "cameraC": {
+    "shot": "SHOT_02",
+    "frames": [151, 300],
+    "location": [2.2, -21.4, 3.4],
+    "look": [-3.4, -10.2, 1.75],
+    "lensMm": 32.0
+  },
+  "cost": {
+    "measuredCpuHeroStill1080x1920Samples192Seconds": 440,
+    "estimatedGpuSecondsPerFrame256": [40, 75],
+    "estimatedWallHours": [10.5, 19.5],
+    "expectedUsdAt0_74": [7.8, 14.5],
+    "recommendedHardMaxUsd": 20.0,
+    "recommendedMaxRuntimeMinutes": 1440,
+    "existingContractHardCostUsd": 2.0,
+    "existingContractSufficient": false
+  },
+  "requiredAuthorizationName": "TIVVLEJOY_V7_FINAL_VIDEO_RENDER_AUTHORIZATION_V1",
+  "requiredAuthorizationIssuableNow": false,
+  "V7_PROOF_A_RENDER_READY_AWAITING_AUTHORIZATION": "YES",
+  "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true
+}
