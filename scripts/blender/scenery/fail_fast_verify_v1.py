@@ -21,12 +21,18 @@ from pipeline_guardrails import (
     source_provenance_record,
     worker_parity_audit,
 )
+from runtime_roots_v1 import find_named, resolve_assets_root
 
-ECOKIT_FLORA = Path(
-    "/tmp/o14-v4-source/SRC_FOREST_STYLISED_ECOKIT/Stylised EcoKit/Flora_Mat&GN&Models.blend"
-)
 LEGACY_BLEND_CAP = 180 * 1024 * 1024
 CANONICAL_FLORA = 670 * 1024 * 1024
+
+
+def _ecokit_flora_path() -> Path:
+    try:
+        found = find_named(resolve_assets_root(), "Flora_Mat&GN&Models.blend", kind="file")
+        return found if found is not None else Path("")
+    except Exception:
+        return Path("")
 
 
 def _catch(fn) -> tuple[bool, str]:
@@ -38,7 +44,8 @@ def _catch(fn) -> tuple[bool, str]:
 
 
 def prove_hidden_limit() -> dict:
-    observed = int(ECOKIT_FLORA.stat().st_size) if ECOKIT_FLORA.exists() else CANONICAL_FLORA
+    flora = _ecokit_flora_path()
+    observed = int(flora.stat().st_size) if flora and flora.exists() else CANONICAL_FLORA
     audit = hidden_limit_audit(
         {"blend_extract_bytes": observed, "ecokit_flora_canonical_bytes": CANONICAL_FLORA},
         {"blend_extract_bytes": LEGACY_BLEND_CAP, "ecokit_flora_canonical_bytes": LEGACY_BLEND_CAP},

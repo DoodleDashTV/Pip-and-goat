@@ -58,7 +58,9 @@ jobs:
           node --check workers/runpod-blender/src/scenery-showcase-original14-entry.js
           node --test workers/runpod-blender/test/scenery-showcase-original14-roles.test.js
           node --test workers/runpod-blender/test/scenery-render-profiles.test.js
-          python3 -m py_compile scripts/blender/scenery/showcase_original14_select.py scripts/blender/scenery/showcase_original14_30s.py scripts/blender/scenery/cinematic_standards.py scripts/blender/scenery/cinematic_shots.py scripts/blender/scenery/cinematic_creek_profile.py scripts/blender/scenery/cinematic_valley_world_v1.py
+          node --test workers/runpod-blender/test/final-launch-contract-v1.test.js
+          node --test workers/runpod-blender/test/frame-checkpoint-v1.test.js
+          python3 -m py_compile scripts/blender/scenery/showcase_original14_select.py scripts/blender/scenery/showcase_original14_30s.py scripts/blender/scenery/cinematic_standards.py scripts/blender/scenery/cinematic_shots.py scripts/blender/scenery/cinematic_creek_profile.py scripts/blender/scenery/cinematic_valley_world_v1.py scripts/blender/scenery/runtime_roots_v1.py
           (cd scripts/blender/scenery && python3 showcase_original14_select_test.py)
           (cd scripts/blender/scenery && python3 cinematic_standards_test.py)
           grep -F "FROM ghcr.io/doodledashtv/ddp-runpod-blender@${EXPECTED_PARENT_DIGEST}" workers/runpod-blender/Dockerfile.scenery-showcase-original14
@@ -71,7 +73,26 @@ jobs:
           grep -F 'SCENERY_SHOWCASE_EEVEE_SAMPLES=12' workers/runpod-blender/Dockerfile.scenery-showcase-original14
           ! grep -n 'scale=1080:1920:flags=lanczos' workers/runpod-blender/src/scenery-showcase-original14.js
           ! grep -R -nE 'RUNPOD_API_KEY\s*=|R2_SECRET_ACCESS_KEY\s*=|OBJECT_STORAGE_SECRET_ACCESS_KEY\s*=' workers/runpod-blender/Dockerfile.scenery-showcase-original14 workers/runpod-blender/src/scenery-showcase-original14*.js scripts/blender/scenery/showcase_original14_30s.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          pin = json.loads(Path('config/cloud/scenery-showcase-final-image.json').read_text())
+          print('final_image_status', pin.get('status'))
+          if pin.get('status') == 'PUBLISHED_IMMUTABLE_DIGEST' and pin.get('digest'):
+              open('/tmp/original14-publish-allowed','w').write('true\n')
+          else:
+              open('/tmp/original14-publish-allowed','w').write('false\n')
+              print('ORIGINAL14_IMAGE_PUBLISH_BLOCKED')
+          PY
+      - name: Decide whether image publish is allowed
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          allowed="$(cat /tmp/original14-publish-allowed)"
+          echo "allowed=${allowed}" >> "$GITHUB_OUTPUT"
       - name: Resolve image repository
+        if: steps.publish.outputs.allowed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -79,14 +100,17 @@ jobs:
           echo "IMAGE_REPO=ghcr.io/${owner}/ddp-runpod-blender" >> "$GITHUB_ENV"
           echo "IMAGE_TAG=scenery-original14-v1-${GITHUB_SHA}" >> "$GITHUB_ENV"
       - name: Set up Docker Buildx
+        if: steps.publish.outputs.allowed == 'true'
         uses: docker/setup-buildx-action@v3
       - name: Login to GHCR
+        if: steps.publish.outputs.allowed == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish Original14 image
+        if: steps.publish.outputs.allowed == 'true'
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -101,6 +125,7 @@ jobs:
           provenance: false
           sbom: false
       - name: Verify immutable published digest
+        if: steps.publish.outputs.allowed == 'true'
         shell: bash
         env:
           PUBLISHED_DIGEST: ${{ steps.build.outputs.digest }}
@@ -128,6 +153,7 @@ jobs:
           print(json.dumps(evidence))
           PY
       - name: Upload sanitized image evidence
+        if: steps.publish.outputs.allowed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: tivvlejoy-scenery-original14-worker-image-v1

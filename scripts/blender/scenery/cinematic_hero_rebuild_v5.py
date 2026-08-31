@@ -15,6 +15,7 @@ import bpy
 from mathutils import Matrix, Vector
 
 from cinematic_master_look_v1 import apply_cinematic_daylight, apply_compositor_finish
+from runtime_roots_v1 import find_named, require_named, resolve_assets_root
 from cinematic_meadow_v1 import meadow_payload, meadow_scatter_plan
 from cinematic_riverbank_v1 import (
     WATER_Z,
@@ -27,33 +28,45 @@ from memory_safe_asset_loader_v1 import append_named_objects, append_primary_gro
 from owned_building_audit import audit_summary
 
 
-BOTANIQ_MODELS = Path(
-    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models"
-)
-ROCK_BLEND = Path(
-    "/tmp/o14-v4-source/SRC_FOREST_STYLISED_ECOKIT/Stylised EcoKit/Rock_Models.blend"
-)
-VILLAGE_NRM = Path("/tmp/o14-lookdev/expanded-original14/village_textures/Village (Textures)")
-if not VILLAGE_NRM.exists():
-    VILLAGE_NRM = Path("/tmp/o14-v4-source/SRC_VILLAGE_TEXTURES_ZIP/Village (Textures)")
-
-BOTANIQ_SOURCES = {
-    "willow_a": BOTANIQ_MODELS / "deciduous/bq_Tree_Salix-babylonica_A_summer.blend",
-    "willow_b": BOTANIQ_MODELS / "deciduous/bq_Tree_Salix-babylonica_B_summer.blend",
-    "beech_a": BOTANIQ_MODELS / "deciduous/bq_Tree_Fagus-sylvatica_A_summer.blend",
-    "beech_b": BOTANIQ_MODELS / "deciduous/bq_Tree_Fagus-sylvatica_B_summer.blend",
-    "hazel_a": BOTANIQ_MODELS / "shrubs/bq_Shrub_Corylus-avellana_A_spring-summer.blend",
-    "hazel_b": BOTANIQ_MODELS / "shrubs/bq_Shrub_Corylus-avellana_B_spring-summer.blend",
-    "fern_a": BOTANIQ_MODELS / "plants/bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn.blend",
-    "fern_b": BOTANIQ_MODELS / "plants/bq_Plant_Dryopteris-carthusiana_B_spring-summer-autumn.blend",
-    "fern_d": BOTANIQ_MODELS / "plants/bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn.blend",
-    "carex_a": BOTANIQ_MODELS / "grass/bq_Grass_Carex-oshimensis_A_spring.blend",
-    "carex_b": BOTANIQ_MODELS / "grass/bq_Grass_Carex-oshimensis_B_spring.blend",
-    "festuca_a": BOTANIQ_MODELS / "grass/bq_Grass_Festuca_glauca_A_spring.blend",
-    "festuca_b": BOTANIQ_MODELS / "grass/bq_Grass_Festuca_glauca_B_spring.blend",
-    "moss_a": BOTANIQ_MODELS / "mosses-and-lichens/bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn.blend",
-    "moss_b": BOTANIQ_MODELS / "mosses-and-lichens/bq_Moss_Rhytidiadelphus-squarrosus_B_spring-summer-autumn.blend",
+BOTANIQ_BASENAMES = {
+    "willow_a": "bq_Tree_Salix-babylonica_A_summer.blend",
+    "willow_b": "bq_Tree_Salix-babylonica_B_summer.blend",
+    "beech_a": "bq_Tree_Fagus-sylvatica_A_summer.blend",
+    "beech_b": "bq_Tree_Fagus-sylvatica_B_summer.blend",
+    "hazel_a": "bq_Shrub_Corylus-avellana_A_spring-summer.blend",
+    "hazel_b": "bq_Shrub_Corylus-avellana_B_spring-summer.blend",
+    "fern_a": "bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn.blend",
+    "fern_b": "bq_Plant_Dryopteris-carthusiana_B_spring-summer-autumn.blend",
+    "fern_d": "bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn.blend",
+    "carex_a": "bq_Grass_Carex-oshimensis_A_spring.blend",
+    "carex_b": "bq_Grass_Carex-oshimensis_B_spring.blend",
+    "festuca_a": "bq_Grass_Festuca_glauca_A_spring.blend",
+    "festuca_b": "bq_Grass_Festuca_glauca_B_spring.blend",
+    "moss_a": "bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn.blend",
+    "moss_b": "bq_Moss_Rhytidiadelphus-squarrosus_B_spring-summer-autumn.blend",
 }
+
+
+def ROCK_BLEND() -> Path:
+    return require_named(resolve_assets_root(), "Rock_Models.blend", kind="file")
+
+
+def VILLAGE_NRM() -> Path:
+    found = find_named(resolve_assets_root(), "Village (Textures)", kind="dir")
+    if found is None:
+        raise FileNotFoundError("Village textures directory missing under TIVVLEJOY_SCENERY_ASSETS_ROOT")
+    return found
+
+
+def BOTANIQ_SOURCES() -> dict:
+    root = resolve_assets_root()
+    out = {}
+    for key, name in BOTANIQ_BASENAMES.items():
+        found = find_named(root, name, kind="file")
+        if found is None:
+            raise FileNotFoundError(f"Botaniq source missing under assets root: {name}")
+        out[key] = found
+    return out
 
 ROCK_NAMES = (
     "Rock_Model_Large_001", "Rock_Model_Large_003", "Rock_Model_Large_005",
@@ -481,7 +494,7 @@ def _terrain_material() -> bpy.types.Material:
 
 def load_botaniq_library() -> dict:
     library = {}
-    for key, path in BOTANIQ_SOURCES.items():
+    for key, path in BOTANIQ_SOURCES().items():
         library[key] = _append_blend_group(path)
     _log("v5_botaniq_loaded", keys=[k for k, v in library.items() if v])
     return library
@@ -779,7 +792,7 @@ def apply_hero_rebuild_v5(collections: dict | None = None, mood: str = "C") -> d
     hidden = hide_legacy_visuals()
     terrain = build_hero_terrain(col)
     library = load_botaniq_library()
-    rocks = _append_objects(ROCK_BLEND, ROCK_NAMES)
+    rocks = _append_objects(ROCK_BLEND(), ROCK_NAMES)
     forest = plant_vegetation(library, col)
     planted_rocks = plant_rocks(rocks, library, col)
     cabin = recede_owned_cabin()

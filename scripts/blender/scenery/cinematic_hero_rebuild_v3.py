@@ -15,16 +15,32 @@ from mathutils import Matrix, Vector
 
 from cinematic_hero_v3_land import authored_height
 from cinematic_master_look_v1 import apply_cinematic_daylight, apply_compositor_finish
+from runtime_roots_v1 import find_named, require_named, resolve_assets_root
 
 
-FLORA_BLEND = Path(
-    "/tmp/o14-v3-source/10-SRC_FOREST_STYLISED_ECOKIT/Stylised EcoKit/Flora_Mat&GN&Models.blend"
-)
-ROCK_BLEND = Path(
-    "/tmp/o14-v3-source/10-SRC_FOREST_STYLISED_ECOKIT/Stylised EcoKit/Rock_Models.blend"
-)
-VILLAGE_NRM = Path("/tmp/o14-v3-source/02-SRC_VILLAGE_TEXTURES_ZIP/Village (Textures)")
-HDRI_HDR = Path("/tmp/o14-v3-source/08-SRC_SKY_HDRI_JPG_PACK/HDRi_JPG_Pack/sk2/0001.hdr")
+def _assets_root() -> Path:
+    return resolve_assets_root()
+
+
+def FLORA_BLEND() -> Path:
+    return require_named(_assets_root(), "Flora_Mat&GN&Models.blend", kind="file")
+
+
+def ROCK_BLEND() -> Path:
+    return require_named(_assets_root(), "Rock_Models.blend", kind="file")
+
+
+def VILLAGE_NRM() -> Path:
+    found = find_named(_assets_root(), "Village (Textures)", kind="dir")
+    if found is None:
+        found = find_named(_assets_root(), "Village _Textures_", kind="dir")
+    if found is None:
+        raise FileNotFoundError("Village textures directory missing under TIVVLEJOY_SCENERY_ASSETS_ROOT")
+    return found
+
+
+def HDRI_HDR() -> Path | None:
+    return find_named(_assets_root(), "0001.hdr", kind="file") or find_named(_assets_root(), "Image0001.jpg", kind="file")
 
 COMP_CAMERAS = {
     "A": {
@@ -402,9 +418,9 @@ def plant_rocks(rocks: list, col: bpy.types.Collection) -> dict:
 def retune_cabin_with_source_maps() -> dict:
     touched = []
     maps = {
-        "cabin": (VILLAGE_NRM / "Cabin01_NRM.png", VILLAGE_NRM / "Cabin01_SPE.png"),
-        "wood": (VILLAGE_NRM / "Wood01_NRM.png", VILLAGE_NRM / "Wood01_SPE.png"),
-        "straw": (VILLAGE_NRM / "Straw01_NRM.png", VILLAGE_NRM / "Straw01_SPE.png"),
+        "cabin": (VILLAGE_NRM() / "Cabin01_NRM.png", VILLAGE_NRM() / "Cabin01_SPE.png"),
+        "wood": (VILLAGE_NRM() / "Wood01_NRM.png", VILLAGE_NRM() / "Wood01_SPE.png"),
+        "straw": (VILLAGE_NRM() / "Straw01_NRM.png", VILLAGE_NRM() / "Straw01_SPE.png"),
     }
 
     def load(path: Path, noncolor: bool):
@@ -538,8 +554,8 @@ def apply_light_mood(mood: str) -> dict:
 
 
 def load_ecokit_library() -> dict:
-    flora = _append_objects(FLORA_BLEND, TREE_NAMES + FLORA_NAMES)
-    rocks = _append_objects(ROCK_BLEND, ROCK_NAMES)
+    flora = _append_objects(FLORA_BLEND(), TREE_NAMES + FLORA_NAMES)
+    rocks = _append_objects(ROCK_BLEND(), ROCK_NAMES)
     library = {"trees": [], "ferns": [], "bushes": [], "grass": [], "rocks": rocks}
     for obj in flora:
         low = obj.name.lower()

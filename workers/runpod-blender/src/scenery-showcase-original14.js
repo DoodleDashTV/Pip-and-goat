@@ -15,6 +15,8 @@ const core = require('./render-core');
 const { resolveHeadlessGlConfig, applyHeadlessGlEnv } = require('./headless-gl');
 const { REQUIRED_ROLES, selectAssets, selectExtraAssets } = require('./scenery-showcase-original14-roles');
 const { resolveProfile, ffmpegEncodeArgs, ffmpegHasUpscale } = require('./scenery-render-profiles');
+const contract = require('./final-launch-contract-v1');
+const checkpoint = require('./frame-checkpoint-v1');
 
 function strip(v) { return String(v || '').replace(/[\r\n]+/g, '').trim(); }
 function log(event, detail = {}) { console.log(JSON.stringify({ ts:new Date().toISOString(), event, ...detail })); }
@@ -77,6 +79,26 @@ function runBlender({env,args,timeoutMs,logPath,onTick}) {
       }
       finish({status,error:null});
     });
+  });
+}
+function measureVram() {
+  const res = spawnSync('nvidia-smi', ['--query-gpu=name,memory.total', '--format=csv,noheader,nounits'], { encoding: 'utf8', timeout: 15_000 });
+  if (res.status !== 0) return { gpuModel: null, vramMiB: 0 };
+  const parts = String(res.stdout || '').trim().split('\n')[0].split(',').map((p) => p.trim());
+  return { gpuModel: parts[0] || null, vramMiB: Number(parts[1]) || 0 };
+}
+function measureDiskFree(dir) {
+  if (typeof fs.statfsSync === 'function') {
+    const stat = fs.statfsSync(dir);
+    return Number(stat.bavail) * Number(stat.bsize);
+  }
+  return 0;
+}
+function requiredFileReceipts(paths) {
+  return paths.map((filePath) => {
+    const exists = fs.existsSync(filePath);
+    const bytes = exists && fs.statSync(filePath).isFile() ? fs.statSync(filePath).size : null;
+    return { name: path.basename(filePath), exists, bytes };
   });
 }
 function runFfmpeg({inputDir,fps,outputPath,profile}) {
@@ -163,8 +185,24 @@ async function main() {
     const originalRenderable=localAssets.filter((a)=>!a.unityPreservationOnly && !a.extra);
     if(originalRenderable.length!==11) throw Object.assign(new Error('Renderable Original-14 count != 11'),{code:'ORIGINAL_14_RENDERABLE_COUNT_FAILED'});
     const renderable=localAssets.filter((a)=>!a.unityPreservationOnly);
+    const louis=localAssets.find((a)=>a.sourceId==='SRC_LOUIS_BG_MOUNTAINS_V1');
+    if(!louis || Number(louis.byteSize) < 512 * 1024 * 1024) {
+      throw Object.assign(new Error('Louis contribution missing or below 512.1 MiB lock'),{code:'LOUIS_CONTRIBUTION_MISSING'});
+    }
+    contract.assertBotaniqExcluded([...selection.selected, ...extras.selected].map((row)=>row.key));
+    if (strip(env.V7_LIVE_PODS_JSON)) {
+      contract.assertZeroLivePods(JSON.parse(env.V7_LIVE_PODS_JSON));
+    }
+    contract.assertNoAutomaticRetry({
+      retryCreate: strip(env.V7_AUTOMATIC_RETRY_CREATE).toLowerCase()==='true',
+      createCount: Number(env.V7_PAID_CREATE_COUNT || 1),
+    });
 
-    stage='BUILD_SCENE';
+    stage='HOST_AND_LAUNCH_CONTRACT';
+    const gpu=measureVram();
+    const diskFree=measureDiskFree(workspace);
+    contract.assertHostResources({ memTotal: os.totalmem(), vramMiB: gpu.vramMiB, diskFree });
+    contract.assertRtx4090(gpu);
     const profile=resolveProfile(env);
     if (profile.id !== 'FINAL') {
       throw Object.assign(new Error('paid Original-14 worker encodes FINAL only; LOOKDEV/BLOCKOUT/HERO_STILL are local or stills profiles'),{code:'LOOKDEV_CANNOT_LABEL_FINAL'});
@@ -172,39 +210,76 @@ async function main() {
     if (strip(env.VISUAL_APPROVAL_RECEIPT_RESULT).toUpperCase() !== 'PASS') {
       throw Object.assign(new Error('visual approval receipt is required before paid FINAL'),{code:'VISUAL_APPROVAL_REQUIRED'});
     }
-    const internalResolution=profile.resolution;
-    const samples=Math.max(1,Number(env.SCENERY_SHOWCASE_EEVEE_SAMPLES||profile.samples));
-    const blenderMinutes=Math.max(20,Number(env.SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES||55));
-    const script=strip(env.SCENERY_SHOWCASE_BLENDER_SCRIPT||'/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py');
+    const resolved=contract.resolveFinalWorkerEnv(env);
+    const extractRoot=path.join(workspace,'expanded-original14');
+    await fsp.mkdir(extractRoot,{recursive:true});
+    env.TIVVLEJOY_SCENERY_ASSETS_ROOT=extractRoot;
+    env.TIVVLEJOY_SCENERY_OUTPUT_ROOT=outputDir;
+    env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT=strip(env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT)||'/opt/ddp-worker/blender/scenery';
+    const script=contract.FINAL_SCRIPT;
+    const preflightFiles=[script, ...localAssets.map((row)=>row.localPath)];
+    const receipts=requiredFileReceipts(preflightFiles);
+    log('original14_required_files',{receipts: receipts.map((row)=>({name:row.name,exists:row.exists,bytes:row.bytes}))});
+    if(receipts.some((row)=>!row.exists || !Number(row.bytes))) {
+      throw Object.assign(new Error('required FINAL inputs missing before Blender'),{code:'REQUIRED_FILE_MISSING',receipts});
+    }
+    const identity=checkpoint.buildRenderIdentity({
+      contentIdentity: strip(env.TIVVLEJOY_SCENE_CONTENT_SHA || env.TIVVLEJOY_SCENERY_SOURCE_COMMIT),
+    });
+    const checkpointPrefix=`${outputPrefix}/checkpoints`;
+    const manifestPath=path.join(outputDir,'frame-checkpoint-manifest.json');
+    const frameManifest=await checkpoint.loadManifest({transport:r2,ctx,prefix:checkpointPrefix,identity,destPath:manifestPath});
+    const resumed=await checkpoint.materializeVerifiedFrames({transport:r2,ctx,prefix:checkpointPrefix,outputDir,identity,manifest:frameManifest});
+    const verifiedJson=path.join(outputDir,'verified-frames.json');
+    checkpoint.writeVerifiedFramesJson(verifiedJson, resumed);
+    env.V7_VERIFIED_FRAMES_JSON=verifiedJson;
+    const internalResolution='1080x1920';
+    const samples=256;
+    const blenderMinutes=resolved.blenderMinutes;
     const progressPath=path.join(outputDir,'render-progress.json');
-    await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,internalResolution,samples,frame:0,framesWritten:0,totalFrames:900,at:new Date().toISOString()});
+    await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,internalResolution,samples,frame:0,framesWritten:resumed.length,totalFrames:900,resumedFrames:resumed.length,at:new Date().toISOString()});
     const gl=resolveHeadlessGlConfig({env}); const renderEnv=applyHeadlessGlEnv(env,gl);
-    const blenderArgs=['--background','--factory-startup','--python-exit-code','1','--python',script,'--',
-      '--assets-json',JSON.stringify(renderable),'--output-dir',outputDir,'--resolution',internalResolution,
-      '--fps','30','--start-frame','1','--end-frame','900','--samples',String(samples),'--proof-path',proofPath,
-      '--progress-path',progressPath,'--profile',profile.id];
-    log('original14_blender_launch',{glMode:gl.mode,renderableSourceCount:renderable.length,internalResolution,samples,timeoutMinutes:blenderMinutes});
+    renderEnv.TIVVLEJOY_SCENERY_ASSETS_ROOT=extractRoot;
+    renderEnv.TIVVLEJOY_SCENERY_OUTPUT_ROOT=outputDir;
+    renderEnv.TIVVLEJOY_SCENERY_SCRIPTS_ROOT=env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT;
+    renderEnv.V7_VERIFIED_FRAMES_JSON=verifiedJson;
+    const blenderArgs=contract.buildBlenderArgs({
+      assetsJson:JSON.stringify(renderable),
+      outputDir,
+      proofPath,
+      progressPath,
+    });
+    contract.assertFinalBlenderArgs(blenderArgs);
+    log('original14_blender_launch',{glMode:gl.mode,renderableSourceCount:renderable.length,internalResolution,samples,timeoutMinutes:blenderMinutes,waterVariant:'D',heroRebuild:'v3',resumedFrames:resumed.length});
     let lastProgressSig='';
     const publishProgress=async()=>{
+      try {
+        await checkpoint.checkpointNewFrames({transport:r2,ctx,prefix:checkpointPrefix,outputDir,identity,manifest:frameManifest});
+      } catch (error) {
+        log('original14_checkpoint_tick_error',{message:String(error.message||error).slice(0,300)});
+      }
       const framesWritten=countPngFrames(outputDir);
       const progress=readProgressFile(progressPath)||{};
       const nextStage=framesWritten>0?'BLENDER_RENDER':(progress.stage||'BLENDER_STARTED');
       stage=nextStage;
-      const payload={schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage:nextStage,internalResolution,samples,frame:Number(progress.frame||framesWritten||0),framesWritten,totalFrames:900,at:new Date().toISOString()};
-      const sig=`${payload.stage}:${payload.framesWritten}:${payload.frame}`;
+      const payload={schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage:nextStage,internalResolution,samples,frame:Number(progress.frame||framesWritten||0),framesWritten,verifiedFrames:frameManifest.verifiedCount||0,totalFrames:900,at:new Date().toISOString()};
+      const sig=`${payload.stage}:${payload.framesWritten}:${payload.frame}:${payload.verifiedFrames}`;
       if(sig===lastProgressSig) return;
       lastProgressSig=sig;
       await writeJson(startupKey,payload);
-      log('original14_blender_progress',{stage:payload.stage,frame:payload.frame,framesWritten});
+      log('original14_blender_progress',{stage:payload.stage,frame:payload.frame,framesWritten,verifiedFrames:payload.verifiedFrames});
     };
     const render=await runBlender({env:renderEnv,args:blenderArgs,timeoutMs:blenderMinutes*60_000,logPath:blenderLog,onTick:publishProgress});
     await publishProgress();
     if(render.error) throw Object.assign(new Error(`${render.error.message}: ${readTail(blenderLog)}`.slice(-7000)),{code:render.error.code==='ETIMEDOUT'?'TIMEOUT':'BLENDER_SPAWN_FAILED'});
     if(render.status!==0) throw Object.assign(new Error(`Blender exited ${render.status}: ${readTail(blenderLog)}`.slice(-7000)),{code:'BLENDER_FAILED'});
 
+    stage='VERIFY_NATIVE_FRAMES';
+    await checkpoint.checkpointNewFrames({transport:r2,ctx,prefix:checkpointPrefix,outputDir,identity,manifest:frameManifest});
     const internalManifest={frameRange:{start:1,end:900},resolution:internalResolution,fps:30};
     const frames=await core.verifyFrames({manifest:internalManifest,outputDir});
     if(frames.length<900) throw Object.assign(new Error(`Expected 900 frames, found ${frames.length}`),{code:'FRAME_COUNT_MISMATCH'});
+    checkpoint.assertEncodeAllowed(frameManifest, identity);
 
     stage='ENCODE_NATIVE_1080X1920';
     await writeJson(startupKey,{schema:'TIVVLEJOY_ORIGINAL14_STARTUP_V1',jobId,result:'RUNNING',stage,profile:profile.id,at:new Date().toISOString()});
@@ -221,13 +296,12 @@ async function main() {
     }
 
     stage='UPLOAD_AND_READBACK';
-    const artifactSha256=sha256File(mp4Path);
-    await r2.uploadFile(ctx,outputKey,mp4Path,'video/mp4');
+    const mp4Proof=await checkpoint.uploadMp4AndReadback({transport:r2,ctx,key:outputKey,filePath:mp4Path});
+    const artifactSha256=mp4Proof.sha256;
+    const readbackSha256=mp4Proof.sha256;
     await r2.uploadFile(ctx,proofKey,proofPath,'application/json');
     const sampleFrames=[1,180,360,540,720,900]; const sampleKeys=[];
     for(const n of sampleFrames){ const fp=path.join(outputDir,`frame_${String(n).padStart(4,'0')}.png`); if(!fs.existsSync(fp)) continue; const k=`${outputPrefix}/samples/frame_${String(n).padStart(4,'0')}.png`; await r2.uploadFile(ctx,k,fp,'image/png'); sampleKeys.push(k); }
-    const readback=path.join(workspace,'readback.mp4'); await r2.downloadToFile(ctx,outputKey,readback); const readbackSha256=sha256File(readback);
-    if(readbackSha256!==artifactSha256) throw Object.assign(new Error('MP4 readback SHA mismatch'),{code:'R2_READBACK_HASH_MISMATCH'});
 
     const complete={
       jobId,status:'COMPLETE',stage:'COMPLETE',outputKey,proofKey,selectionProofKey:selectionKey,sampleKeys,

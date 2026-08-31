@@ -1,0 +1,23 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_V1",
+  "status": "NOT_PUBLISHED",
+  "reason": "LOCAL_PIXEL_VISUAL_GATES_NOT_RUN",
+  "dockerfile": "workers/runpod-blender/Dockerfile.scenery-showcase-final",
+  "staticInspection": {
+    "cmd": [
+      "node",
+      "./src/scenery-showcase-original14-entry.js"
+    ],
+    "workingDir": "/opt/ddp-worker",
+    "platformIntended": "linux/amd64",
+    "entrypointNotV2": true,
+    "entrypointNotV7ProofABoot": true,
+    "profile": "FINAL",
+    "timeoutMinutes": 1440,
+    "engine": "CYCLES",
+    "samples": 256
+  },
+  "digest": null,
+  "built": false,
+  "podCreated": false
+}

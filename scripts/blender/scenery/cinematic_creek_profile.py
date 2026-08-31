@@ -122,6 +122,24 @@ HERO_MACRO_ROCKS = (
     (2.10, 0.18, 2.45, 0.14),
 )
 
+# Stones that sit ON the Camera C waterline between macro rocks so the left
+# isoline cannot be traced as one contour. Inward fraction is of the film half.
+HERO_CORRIDOR_WATERLINE_STONES = (
+    (-9.15, 0.22, 1.85),
+    (-7.20, 0.34, 1.60),
+    (-5.40, 0.18, 1.70),
+    (-3.10, 0.40, 1.55),
+    (-0.10, 0.26, 1.45),
+    (3.55, 0.30, 1.35),
+)
+
+# Extra cavity collars: raise terrain at documented V44 triple-points.
+HERO_CAVITY_COLLARS = (
+    (-9.60, 0.95, 0.22),
+    (-8.10, 0.70, 0.16),
+    (-6.60, 0.80, 0.14),
+)
+
 
 def hero_macro_event(x: float) -> dict:
     """One blended south-bank event. Used by terrain, water, and rocks."""
@@ -229,6 +247,16 @@ def hero_shore_event(x: float) -> dict:
         "rise": rise,
         "emerge": emerge,
     }
+
+
+def hero_cavity_collar_lift(x: float) -> float:
+    """Raise terrain at documented Camera C rock/film/bank triple points."""
+    if x < HERO_X_MIN or x > HERO_X_MAX:
+        return 0.0
+    lift = 0.0
+    for cx, radius, height in HERO_CAVITY_COLLARS:
+        lift += height * _gaussian(x, cx, radius)
+    return min(0.28, lift)
 
 
 def hero_south_wet_tongue(x: float, y: float, along: float) -> float:

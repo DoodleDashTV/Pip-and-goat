@@ -1,0 +1,64 @@
+{
+  "schema": "TIVVLEJOY_V7_GEOMETRY_GATE_CONTRACTS_V1",
+  "pixelSuiteRun": false,
+  "E": {
+    "gate": "E",
+    "macroPlateCount": 9,
+    "minMacroPlateCount": 8,
+    "rollAmplitudeM": 1.15,
+    "minRollAmplitudeM": 1.1,
+    "shot01FloorY": 8.0,
+    "ok": true
+  },
+  "F": {
+    "gate": "F",
+    "corridorStoneCount": 6,
+    "minCorridorStoneCount": 6,
+    "macroEventKinds": [
+      "bay",
+      "boulder",
+      "cut",
+      "gravel",
+      "point"
+    ],
+    "ok": true
+  },
+  "J": {
+    "gate": "J",
+    "collarCount": 3,
+    "lifts": {
+      "-9.6": 0.22162158574188942,
+      "-8.1": 0.18234628427397795,
+      "-6.6": 0.1416317449087582
+    },
+    "minLiftAtNeg960": 0.18,
+    "heroRockCount": 6,
+    "ok": true
+  },
+  "identity": {
+    "cameraC": {
+      "location": [
+        2.2,
+        -21.4,
+        3.4
+      ],
+      "look": [
+        -3.4,
+        -10.2,
+        1.75
+      ],
+      "lens": 32.0,
+      "matches": true
+    },
+    "waterLock": {
+      "ior": 1.33,
+      "transmission": 0.8,
+      "metallic": 0.0,
+      "specular": 0.5,
+      "prismM": 0.18,
+      "volumeDensity": 0.18
+    },
+    "waterVariant": "D"
+  },
+  "ok": true
+}

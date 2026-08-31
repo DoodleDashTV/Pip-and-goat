@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import sys
 from pathlib import Path
 
@@ -21,7 +22,9 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from cinematic_shots import SHOTS, camera_name, default_shot_cameras, hero_search_cameras, lookdev_frames, marker_frames  # noqa: E402
 from cinematic_creek_profile import (  # noqa: E402
+    HERO_CORRIDOR_WATERLINE_STONES,
     HERO_MACRO_ROCKS,
+    hero_cavity_collar_lift,
     hero_grass_lip,
     hero_macro_event,
     hero_north_notch_depth,
@@ -61,6 +64,11 @@ from cinematic_standards import (  # noqa: E402
     normalize_profile,
     profile_defaults,
     visible_use_record,
+)
+from runtime_roots_v1 import (  # noqa: E402
+    assert_not_lookdev_path,
+    require_files,
+    resolve_assets_root,
 )
 from mathutils.geometry import interpolate_bezier  # noqa: E402
 from showcase_original14_30s import (  # noqa: E402
@@ -448,9 +456,10 @@ def _hero_south_body(x: float, y: float, dist: float, along: float, local: float
         height = shelf_top + (meadow_z - shelf_top) * (t ** 1.18)
     wrap = hero_rock_wrap(x, dist, emerge)
     height += wrap
+    height += hero_cavity_collar_lift(x)
     height += 0.022 * math.sin(x * 0.48 + along * 0.20)
-    if wrap > 0.12:
-        height = max(height, WATER_SURFACE_Z + 0.05)
+    if wrap > 0.08:
+        height = max(height, WATER_SURFACE_Z + 0.07)
     return max(center_z, min(meadow_z + 0.12, height))
 
 
@@ -612,8 +621,11 @@ def build_terrain(_files: list[Path]) -> bpy.types.Object:
             # SHOT_02 midground (creek to cabin) needs glancing-angle relief.
             if -10.0 <= y <= 12.0 and -10.0 <= x <= 8.0:
                 height += amt * 0.14 * (mid - 0.5)
-            # Broad meadow rolls. 0.18 m vanished at SHOT_01; 0.55 m can cast shade.
+            # Broad meadow rolls. 0.55 m still read as a plane from SHOT_01;
+            # 1.15 m mounds plus a second 18 m wavelength occupy image area.
             roll = 0.55 * math.sin(x * 0.24 + 0.40) * math.cos(y * 0.20 + 0.70)
+            if y > 8.0 and not in_village(x, y):
+                roll += 0.60 * math.sin(x * 0.11 + 1.1) * math.cos(y * 0.09 + 0.4)
             if in_village(x, y):
                 roll *= 0.10
             height += amt * roll
@@ -818,6 +830,9 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
         (-16.2, 17.8, 11.5, 7.2, needle, 0.48),
         (-15.0, 26.4, 8.5, 5.5, needle, 1.70),
         (3.8, 35.0, 9.5, 5.8, dirt, 0.90),
+        (-8.4, 22.0, 16.0, 9.0, dirt, 0.55),
+        (18.0, 26.0, 12.0, 7.5, needle, 1.95),
+        (-2.0, 38.0, 11.0, 6.5, dirt, 0.30),
     )
     for i, (x, y, sx, sy, color, yaw) in enumerate(macros):
         if in_river_channel(x, y, margin=1.4):
@@ -849,7 +864,7 @@ def place_structural_meadow_zones(grass_src, trees: list) -> list:
     print(json.dumps({
         "event": "structural_meadow_zones",
         "grassPlants": planted,
-        "zones": 6,
+        "grassZones": len(zones),
         "macros": len(macros),
         "cameraScalePatches": True,
     }), flush=True)
@@ -2982,12 +2997,22 @@ def place_waterline_interruptions(centers: list[Vector]) -> list:
     hero_xs = (10.8, 14.6)
     cut_xs = (11.4, 15.2)
     island_xs = (16.2,)
+    corridor_used = set()
     used_hero = set()
     used_cut = set()
     used_island = set()
     for i, center in enumerate(centers):
         side = _side_from_centers(centers, i)
         left, _right = _channel_halves_for_index(centers, i)
+        for px, inward, scale in HERO_CORRIDOR_WATERLINE_STONES:
+            if px in corridor_used or abs(center.x - px) > 0.55:
+                continue
+            if not (HERO_X_MIN <= center.x <= HERO_X_MAX):
+                continue
+            corridor_used.add(px)
+            loc = center + side * (-left * WATER_WIDTH_SCALE * inward)
+            loc.z = WATER_SURFACE_Z - 0.06
+            extras.append(_add_lumpy_rock(f"TJ_CorridorStone_{i}", loc, scale, mat, i * 0.37 + px))
         for hx in hero_xs:
             if hx in used_hero or abs(center.x - hx) > 1.05:
                 continue
@@ -3975,17 +4000,30 @@ def main() -> int:
     if args.progress_path:
         PROGRESS_PATH = Path(args.progress_path)
     global WATER_VARIANT
-    WATER_VARIANT = (args.water_variant or "A").upper()
+    WATER_VARIANT = (args.water_variant or "D").upper()
     write_progress("CINEMATIC_WORLD_START", profile=args.profile, waterVariant=WATER_VARIANT)
     assets = json.loads(args.assets_json)
     if isinstance(assets, dict):
         assets = assets.get("assets") or assets.get("selected") or []
     clean_scene()
     collections = ensure_collections()
-    extract_root = out.parent / "expanded-original14"
+    os.environ.setdefault("TIVVLEJOY_SCENERY_OUTPUT_ROOT", str(out.resolve()))
+    os.environ.setdefault("TIVVLEJOY_SCENERY_SCRIPTS_ROOT", str(SCRIPT_DIR))
+    if os.environ.get("TIVVLEJOY_SCENERY_ASSETS_ROOT"):
+        extract_root = resolve_assets_root()
+    else:
+        extract_root = assert_not_lookdev_path(out.parent / "expanded-original14")
+        extract_root.mkdir(parents=True, exist_ok=True)
+        os.environ["TIVVLEJOY_SCENERY_ASSETS_ROOT"] = str(extract_root.resolve())
     expanded: dict[str, list[Path]] = {}
     for asset in assets:
         expanded[asset["role"]] = expand_asset(asset, extract_root)
+    if str(args.hero_rebuild or "v3").lower() == "v3":
+        receipts = require_files(extract_root, ["Flora_Mat&GN&Models.blend", "Rock_Models.blend"])
+        print(json.dumps({
+            "event": "required_extracted_files",
+            "receipts": [{"name": row["name"], "bytes": row["bytes"], "exists": row["exists"]} for row in receipts],
+        }), flush=True)
 
     all_files = [path for files in expanded.values() for path in files]
     mountain_members = place_louis_lp_ridge(expanded.get("background_mountains", []), collections["WORLD_MOUNTAINS_BACKGROUND"])
@@ -4466,7 +4504,18 @@ def main() -> int:
         write_progress("LOOKDEV_COMPLETE", frames=len(frames))
         return 0
 
+    verified = set()
+    skip_json = os.environ.get("V7_VERIFIED_FRAMES_JSON") or ""
+    if skip_json:
+        skip_path = Path(skip_json)
+        if skip_path.is_file():
+            payload = json.loads(skip_path.read_text(encoding="utf-8"))
+            verified = {int(n) for n in (payload.get("frames") or payload or [])}
     for frame in range(args.start_frame, args.end_frame + 1):
+        dest = out / f"frame_{frame:04d}.png"
+        if frame in verified and dest.is_file() and dest.stat().st_size > 0:
+            write_progress("BLENDER_RENDER_SKIP_VERIFIED", frame=frame, framesWritten=frame - args.start_frame + 1, totalFrames=900)
+            continue
         set_active_camera_for_frame(frame)
         bpy.context.scene.frame_set(frame)
         bpy.context.scene.render.filepath = str(out / "frame_")

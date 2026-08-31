@@ -1,0 +1,48 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_PREVIEW_ENVIRONMENT_V1",
+  "blenderInvoked": false,
+  "blenderPresent": false,
+  "dockerPresent": false,
+  "pixelSuiteRun": false,
+  "sixShotPreviewsGenerated": false,
+  "contactSheetGenerated": false,
+  "failureStage": "PREVIEW_RENDER_NOT_ATTEMPTED_ENVIRONMENT_INSUFFICIENT",
+  "host": {
+    "memTotalKiB": 16398384,
+    "memTotalGiB": 15.64,
+    "memAvailableKiB": 15174648,
+    "memAvailableGiB": 14.47,
+    "swapTotalKiB": 0
+  },
+  "priorMeasuredKill": {
+    "source": "artifacts/tivvlejoy-scenery-showcase-30s/hdri-qualify-v4",
+    "scene": "Proof A Water C + H8",
+    "resolution": "360x640",
+    "samples": 16,
+    "denoise": false,
+    "cyclesSyncRssGiB": 13.55,
+    "watchdogKillRssGiB": 14.2,
+    "pngWritten": false
+  },
+  "minimumHostRamGiB": 24,
+  "recommendedHostRamGiB": [
+    32,
+    64
+  ],
+  "assetsReducedToForcePass": false,
+  "previewContractIfRunnable": {
+    "resolution": "540x960",
+    "engine": "CYCLES",
+    "samples": 32,
+    "shots": [
+      "SHOT_01",
+      "SHOT_02",
+      "SHOT_03",
+      "SHOT_04",
+      "SHOT_05",
+      "SHOT_06"
+    ],
+    "doesNotChangeFinalContract": true,
+    "finalContract": "1080x1920 Cycles GPU 256 frames 1-900"
+  }
+}

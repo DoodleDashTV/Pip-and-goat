@@ -13,12 +13,21 @@ import bpy
 from mathutils import Vector
 
 from cinematic_master_look_v1 import apply_cinematic_daylight, apply_compositor_finish, apply_world_atmosphere
+from runtime_roots_v1 import find_named, require_named, resolve_assets_root
 
 
-NATURE_TEX_ROOT = Path(
-    "/tmp/o14-lookdev/expanded-original14/forest_nature/Textures_Stylized_Forest_Kit/1024"
-)
-VILLAGE_TEX_ROOT = Path("/tmp/o14-lookdev/expanded-original14/village_textures/Village (Textures)")
+def NATURE_TEX_ROOT() -> Path:
+    found = find_named(resolve_assets_root(), "1024", kind="dir")
+    if found is None:
+        raise FileNotFoundError("Nature 1024 texture root missing under TIVVLEJOY_SCENERY_ASSETS_ROOT")
+    return found
+
+
+def VILLAGE_TEX_ROOT() -> Path:
+    found = find_named(resolve_assets_root(), "Village (Textures)", kind="dir")
+    if found is None:
+        raise FileNotFoundError("Village textures directory missing under TIVVLEJOY_SCENERY_ASSETS_ROOT")
+    return found
 
 COMP_CAMERAS = {
     "A": {
@@ -193,20 +202,20 @@ def import_nature_library(files: list[Path]) -> dict:
     homes = {mesh.name: mesh.location.copy() for mesh in imported}
     foliage = _pbr_alpha(
         "TJ_NATURE_Foliage",
-        NATURE_TEX_ROOT / "Foliage_01" / "Forest_Foliage_01_BaseColor.tga",
-        NATURE_TEX_ROOT / "Foliage_01" / "Forest_Foliage_01_Opacity.tga",
+        NATURE_TEX_ROOT() / "Foliage_01" / "Forest_Foliage_01_BaseColor.tga",
+        NATURE_TEX_ROOT() / "Foliage_01" / "Forest_Foliage_01_Opacity.tga",
         roughness=0.68,
         subsurface=0.12,
     )
     foliage2 = _pbr_alpha(
         "TJ_NATURE_Foliage2",
-        NATURE_TEX_ROOT / "Foliage_02" / "Forest_Foliage_02_BaseColor.tga",
-        NATURE_TEX_ROOT / "Foliage_02" / "Forest_Foliage_02_Opacity.tga",
+        NATURE_TEX_ROOT() / "Foliage_02" / "Forest_Foliage_02_BaseColor.tga",
+        NATURE_TEX_ROOT() / "Foliage_02" / "Forest_Foliage_02_Opacity.tga",
         roughness=0.70,
         subsurface=0.10,
     )
-    rock_a = _rock_mat("TJ_NATURE_RockA", NATURE_TEX_ROOT / "Rocks_A" / "Rocks_A_BaseColor.tga")
-    rock_b = _rock_mat("TJ_NATURE_RockB", NATURE_TEX_ROOT / "Rocks_B" / "Rocks_B_BaseColor.tga")
+    rock_a = _rock_mat("TJ_NATURE_RockA", NATURE_TEX_ROOT() / "Rocks_A" / "Rocks_A_BaseColor.tga")
+    rock_b = _rock_mat("TJ_NATURE_RockB", NATURE_TEX_ROOT() / "Rocks_B" / "Rocks_B_BaseColor.tga")
     bark = _bark_mat()
     library = {"trunks": [], "canopies": [], "rocks": [], "grass": [], "ferns": [], "bushes": [], "flowers": []}
     for mesh in imported:
@@ -447,8 +456,8 @@ def retune_meadow_shader() -> dict:
 
 
 def retune_cabin_materials() -> dict:
-    wood = _load_image(VILLAGE_TEX_ROOT / "Wood01_ALB.png")
-    straw = _load_image(VILLAGE_TEX_ROOT / "Straw01_ALB.png")
+    wood = _load_image(VILLAGE_TEX_ROOT() / "Wood01_ALB.png")
+    straw = _load_image(VILLAGE_TEX_ROOT() / "Straw01_ALB.png")
     touched = []
     for mat in bpy.data.materials:
         if mat is None or not mat.use_nodes:
