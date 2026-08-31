@@ -1,0 +1,20 @@
+{
+  "schema": "TIVVLEJOY_V7_CAMERA_CONTRACT_REPAIR_TEST_RESULTS_V1",
+  "localBlender": "UNAVAILABLE",
+  "localBlenderValidation": "SKIPPED_NO_BLENDER_ON_VM",
+  "imageBuildWillRunBlenderCameraContract": true,
+  "tests": {
+    "cinematic_camera_contract_v1_test": "PASS",
+    "cinematic_visual_gate_contracts_v1_test": "PASS",
+    "cinematic_water_lock_v1_test": "PASS",
+    "cinematic_standards_test": "PASS",
+    "runtime_roots_v1_test": "PASS",
+    "pipeline_guardrails_test": "PASS",
+    "final_path_no_lookdev_tmp_test": "PASS",
+    "visual-proof-contract-v1.test.js": "PASS",
+    "final-launch-contract-v1.test.js": "PASS",
+    "frame-checkpoint-v1.test.js": "PASS"
+  },
+  "paidCreate": 0,
+  "runpodSpendUsd": 0
+}

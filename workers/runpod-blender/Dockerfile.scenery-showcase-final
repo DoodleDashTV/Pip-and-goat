@@ -57,7 +57,9 @@ RUN node --check ./src/scenery-showcase-original14-roles.js && \
     node --check ./src/final-launch-contract-v1.js && \
     node --check ./src/frame-checkpoint-v1.js && \
     node --check ./src/visual-proof-contract-v1.js && \
-    python3 -m py_compile ./blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/runtime_roots_v1.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_hero_rebuild_v3.py && \
+    python3 -m py_compile ./blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/runtime_roots_v1.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_hero_rebuild_v3.py ./blender/scenery/cinematic_camera_contract_v1.py ./blender/scenery/cinematic_shots.py && \
+    python3 ./blender/scenery/cinematic_camera_contract_v1_test.py && \
+    blender --background --factory-startup --python-exit-code 1 --python ./blender/scenery/cinematic_camera_contract_blender_v1.py && \
     grep -F "require('./scenery-showcase-original14.js')" ./src/scenery-showcase-original14-entry.js >/dev/null && \
     ! grep -F "scenery-showcase-entry-v2.js" ./src/scenery-showcase-original14-entry.js && \
     ! grep -F "v7-proof-a-boot.js" ./src/scenery-showcase-original14-entry.js && \

@@ -16,6 +16,9 @@ on:
       - 'workers/runpod-blender/src/visual-proof-contract-v1.js'
       - 'workers/runpod-blender/src/scenery-render-profiles.js'
       - 'scripts/blender/scenery/cinematic_valley_world_v1.py'
+      - 'scripts/blender/scenery/cinematic_camera_contract_v1.py'
+      - 'scripts/blender/scenery/cinematic_hero_rebuild_v3.py'
+      - 'scripts/blender/scenery/cinematic_shots.py'
       - 'scripts/blender/scenery/runtime_roots_v1.py'
       - '.github/workflows/tivvlejoy-scenery-showcase-worker-image-final-v1.yml'
 
@@ -67,6 +70,8 @@ jobs:
           node --test workers/runpod-blender/test/final-launch-contract-v1.test.js
           node --test workers/runpod-blender/test/frame-checkpoint-v1.test.js
           node --test workers/runpod-blender/test/visual-proof-contract-v1.test.js
+          python3 scripts/blender/scenery/cinematic_camera_contract_v1_test.py
+          python3 scripts/blender/scenery/cinematic_visual_gate_contracts_v1_test.py
           grep -F 'CMD ["node", "./src/scenery-showcase-original14-entry.js"]' workers/runpod-blender/Dockerfile.scenery-showcase-final
           ! grep -n 'scenery-showcase-entry-v2.js' workers/runpod-blender/src/scenery-showcase-original14-entry.js
           ! grep -n 'v7-proof-a-boot.js' workers/runpod-blender/src/scenery-showcase-original14-entry.js
@@ -121,6 +126,8 @@ jobs:
           docker image inspect "${IMAGE_REPO}@${PUBLISHED_DIGEST}" > /tmp/final-image-inspect.json
           docker run --rm --entrypoint blender "${IMAGE_REPO}@${PUBLISHED_DIGEST}" --version | head -n 1 | tee /tmp/final-blender.txt
           grep -F 'Blender 4.2.2' /tmp/final-blender.txt
+          docker run --rm --workdir /opt/ddp-worker --entrypoint blender "${IMAGE_REPO}@${PUBLISHED_DIGEST}" --background --factory-startup --python-exit-code 1 --python ./blender/scenery/cinematic_camera_contract_blender_v1.py | tee /tmp/final-camera-contract.json
+          grep -F 'TJ_SHOT_02_CAM' /tmp/final-camera-contract.json
           docker run --rm --workdir /opt/ddp-worker --entrypoint /bin/sh "${IMAGE_REPO}@${PUBLISHED_DIGEST}" -c '
             set -eu
             test -f ./src/scenery-showcase-original14-entry.js
@@ -129,7 +136,11 @@ jobs:
             test -f ./src/frame-checkpoint-v1.js
             test -f ./src/visual-proof-contract-v1.js
             test -f ./blender/scenery/cinematic_valley_world_v1.py
+            test -f ./blender/scenery/cinematic_camera_contract_v1.py
+            test -f ./blender/scenery/cinematic_shots.py
             test -f ./blender/scenery/runtime_roots_v1.py
+            grep -F 'TJ_SHOT_02_CAM' ./blender/scenery/cinematic_shots.py
+            grep -F '(2.2, -21.4, 3.40)' ./blender/scenery/cinematic_shots.py
             grep -F "require('\''./scenery-showcase-original14.js'\'')" ./src/scenery-showcase-original14-entry.js
             ! grep -F scenery-showcase-entry-v2.js ./src/scenery-showcase-original14-entry.js
             ! grep -F v7-proof-a-boot.js ./src/scenery-showcase-original14-entry.js
@@ -144,6 +155,13 @@ jobs:
           cfg = raw.get("Config") or {}
           cmd = cfg.get("Cmd") or []
           entry = cfg.get("Entrypoint")
+          camera = {}
+          cam_path = pathlib.Path("/tmp/final-camera-contract.json")
+          if cam_path.exists():
+              for line in cam_path.read_text().splitlines():
+                  line = line.strip()
+                  if line.startswith("{") and "TJ_SHOT_02_CAM" in line:
+                      camera = json.loads(line)
           inspect = {
             "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_INSPECT_V1",
             "status": "PUBLISHED_IMMUTABLE_DIGEST",
@@ -164,10 +182,21 @@ jobs:
             "scriptsRoot": "/opt/ddp-worker/blender/scenery",
             "checkpointModule": True,
             "visualProofModule": True,
+            "cameraContractModule": True,
+            "sixShotCameraContract": True,
+            "cameraCLock": True,
+            "blenderCameraContract": {
+              "ok": bool(camera.get("ok")),
+              "frame210": camera.get("frame210"),
+              "cameraC": camera.get("cameraC"),
+              "v3CompAUsed": camera.get("v3CompAUsed"),
+            },
             "paidGpuLaunchCount": 0,
             "runpodContacted": False,
             "credentialsIncluded": False,
           }
+          assert camera.get("ok") is True, camera
+          assert camera.get("frame210") == "TJ_SHOT_02_CAM"
           assert cmd == ["node", "./src/scenery-showcase-original14-entry.js"], cmd
           assert inspect["WorkingDir"] == "/opt/ddp-worker"
           assert inspect["platform"] == "linux/amd64"

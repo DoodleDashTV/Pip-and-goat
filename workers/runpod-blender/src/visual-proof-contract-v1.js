@@ -5,14 +5,22 @@
 const { FINAL_SCRIPT, FINAL_ENTRY, FORBIDDEN_CMDS, assertWorkerCmd, assertHostResources, assertRtx4090, assertZeroLivePods, assertNoAutomaticRetry, assertBotaniqExcluded } = require('./final-launch-contract-v1');
 
 const PREVIEW_FRAMES = Object.freeze([
-  { shot: 'SHOT_01', frame: 48 },
-  { shot: 'SHOT_02', frame: 210 },
-  { shot: 'SHOT_03', frame: 360 },
-  { shot: 'SHOT_04', frame: 520 },
-  { shot: 'SHOT_05', frame: 680 },
-  { shot: 'SHOT_06', frame: 860 },
+  { shot: 'SHOT_01', frame: 48, camera: 'TJ_SHOT_01_CAM', start: 1, end: 150 },
+  { shot: 'SHOT_02', frame: 210, camera: 'TJ_SHOT_02_CAM', start: 151, end: 300 },
+  { shot: 'SHOT_03', frame: 360, camera: 'TJ_SHOT_03_CAM', start: 301, end: 450 },
+  { shot: 'SHOT_04', frame: 520, camera: 'TJ_SHOT_04_CAM', start: 451, end: 600 },
+  { shot: 'SHOT_05', frame: 680, camera: 'TJ_SHOT_05_CAM', start: 601, end: 750 },
+  { shot: 'SHOT_06', frame: 860, camera: 'TJ_SHOT_06_CAM', start: 751, end: 900 },
 ]);
-const HERO = Object.freeze({ shot: 'SHOT_02', frame: 210 });
+const HERO = Object.freeze({ shot: 'SHOT_02', frame: 210, camera: 'TJ_SHOT_02_CAM' });
+const CAMERA_C = Object.freeze({
+  location: [2.2, -21.4, 3.40],
+  look: [-3.4, -10.2, 1.75],
+  lens: 32.0,
+  camera: 'TJ_SHOT_02_CAM',
+  shot: 'SHOT_02',
+});
+const FAILED_DIGEST = 'sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6';
 const HARD_SPEND_USD = 0.50;
 const USD_PER_HOUR = 0.74;
 const HARD_RUNTIME_MINUTES = 40;
@@ -104,6 +112,10 @@ function assertVisualProofArgs(args, { kind } = {}) {
   if (/water-variant C\b/.test(text)) blockers.push('WATER_C_FORBIDDEN');
   if (/scale=|lanczos/i.test(text)) blockers.push('UPSCALE_FORBIDDEN');
   if (text.includes('--end-frame 900')) blockers.push('NINE_HUNDRED_FRAME_FORBIDDEN');
+  if (text.includes('--v3-camera')) blockers.push('V3_CAMERA_FORBIDDEN');
+  if (text.includes('--v3-compare')) blockers.push('V3_COMPARE_FORBIDDEN');
+  if (text.includes('--v5-camera') || text.includes('--v5-compare')) blockers.push('V5_COMPARE_FORBIDDEN');
+  if (/TJ_V3_COMP_A/.test(text)) blockers.push('V3_COMP_A_FORBIDDEN');
   if (kind === 'preview') {
     if (!text.includes('--resolution 540x960')) blockers.push('PREVIEW_RESOLUTION_NOT_540x960');
     if (!text.includes('--samples 32')) blockers.push('PREVIEW_SAMPLES_NOT_32');
@@ -128,11 +140,14 @@ function isolatedProcessPlan() {
     kind: 'preview',
     shot: row.shot,
     frame: row.frame,
+    start: row.start,
+    end: row.end,
     resolution: '540x960',
     samples: 32,
     engine: 'CYCLES',
     denoise: true,
     isolatedBlender: true,
+    camera: row.camera,
   }));
   const hero = {
     kind: 'hero',
@@ -143,6 +158,7 @@ function isolatedProcessPlan() {
     engine: 'CYCLES',
     denoise: true,
     isolatedBlender: true,
+    camera: HERO.camera,
   };
   return {
     processes: preview.length + 1,
@@ -163,6 +179,17 @@ function assertVisualProofPlan(plan = isolatedProcessPlan()) {
   const shot02 = plan.preview.find((row) => row.shot === 'SHOT_02');
   if (!shot02 || shot02.frame < 151 || shot02.frame > 300) {
     throw Object.assign(new Error('SHOT_02 preview must be Camera C frames 151-300'), { code: 'SHOT_02_FRAME_OUT_OF_RANGE' });
+  }
+  if (shot02.camera !== CAMERA_C.camera || plan.hero.camera !== CAMERA_C.camera) {
+    throw Object.assign(new Error('SHOT_02 must use TJ_SHOT_02_CAM'), { code: 'CAMERA_C_NOT_USED' });
+  }
+  for (const row of plan.preview) {
+    if (row.camera !== `TJ_${row.shot}_CAM`) {
+      throw Object.assign(new Error(`${row.shot} camera is not the six-shot camera`), { code: 'SIX_SHOT_CAMERA_MISMATCH' });
+    }
+    if (row.frame < row.start || row.frame > row.end) {
+      throw Object.assign(new Error(`${row.shot} frame outside its range`), { code: 'SHOT_FRAME_OUT_OF_RANGE' });
+    }
   }
   return { ok: true, plan };
 }
@@ -210,6 +237,8 @@ function assertImageInspection(inspect = {}) {
 module.exports = {
   PREVIEW_FRAMES,
   HERO,
+  CAMERA_C,
+  FAILED_DIGEST,
   HARD_SPEND_USD,
   HARD_RUNTIME_MINUTES,
   AUTH_NAME,

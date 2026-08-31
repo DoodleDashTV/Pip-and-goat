@@ -4,6 +4,18 @@ from __future__ import annotations
 
 import math
 
+from cinematic_camera_contract_v1_test import (  # noqa: E402
+    test_camera_c_lock_exact,
+    test_evaluate_ok,
+    test_frame_210_uses_shot_02_camera,
+    test_six_approved_shot_cameras,
+    test_stills_path_no_longer_hijacks_v3_comp_a,
+    test_timeline_camera_changes_at_cuts,
+    test_v3_comp_a_cannot_replace_camera_c,
+    test_visual_proof_uses_same_cameras_as_final,
+    test_water_d_unchanged,
+    test_worker_entry_does_not_launch_forbidden_cmds,
+)
 from cinematic_shots import (
     SHOTS,
     assert_shot_plan,
@@ -395,6 +407,16 @@ if __name__ == "__main__":
     test_rejects_16gib_cursor_vm()
     test_accepts_32gib_4090_proof_a()
     test_blocks_paid_create_flag()
+    test_six_approved_shot_cameras()
+    test_timeline_camera_changes_at_cuts()
+    test_camera_c_lock_exact()
+    test_frame_210_uses_shot_02_camera()
+    test_v3_comp_a_cannot_replace_camera_c()
+    test_water_d_unchanged()
+    test_visual_proof_uses_same_cameras_as_final()
+    test_stills_path_no_longer_hijacks_v3_comp_a()
+    test_worker_entry_does_not_launch_forbidden_cmds()
+    test_evaluate_ok()
     summary = audit_summary()
     assert summary["purchasePerformed"] is False
     assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"

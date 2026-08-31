@@ -487,9 +487,8 @@ def install_real_hdri() -> str:
 
 
 def setup_comp_cameras() -> list[str]:
+    """Lookdev compare cameras only. Never clear six-shot timeline markers."""
     scene = bpy.context.scene
-    for marker in scene.timeline_markers:
-        marker.camera = None
     names = []
     for spec in COMP_CAMERAS.values():
         existing = bpy.data.objects.get(spec["name"])
@@ -570,7 +569,11 @@ def load_ecokit_library() -> dict:
     return library
 
 
-def apply_hero_rebuild_v3(collections: dict | None = None, mood: str = "C") -> dict:
+def apply_hero_rebuild_v3(
+    collections: dict | None = None,
+    mood: str = "C",
+    install_compare_cameras: bool = False,
+) -> dict:
     col = ensure_v3_collection()
     hidden = hide_legacy_visuals()
     library = load_ecokit_library()
@@ -579,7 +582,7 @@ def apply_hero_rebuild_v3(collections: dict | None = None, mood: str = "C") -> d
     rocks = plant_rocks(library.get("rocks") or [], col)
     cabin = retune_cabin_with_source_maps()
     hdri = install_real_hdri()
-    cams = setup_comp_cameras()
+    cams = setup_comp_cameras() if install_compare_cameras else []
     light = apply_light_mood(mood)
     _log(
         "v3_rebuild_applied",

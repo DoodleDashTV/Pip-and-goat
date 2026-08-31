@@ -16,15 +16,9 @@ from cinematic_creek_profile import (
     hero_cavity_collar_lift,
     hero_macro_event,
 )
+from cinematic_camera_contract_v1 import CAMERA_C
 from cinematic_shots import default_shot_cameras
 from cinematic_water_lock_v1 import WATER_LOCK
-
-
-CAMERA_C = {
-    "location": (2.2, -21.4, 3.40),
-    "look": (-3.4, -10.2, 1.75),
-    "lens": 32.0,
-}
 
 
 def gate_e_meadow_regions() -> dict:

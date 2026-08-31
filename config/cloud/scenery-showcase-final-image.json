@@ -1,14 +1,17 @@
 {
   "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_V1",
-  "status": "PUBLISHED_IMMUTABLE_DIGEST",
-  "reason": "PIXEL_GATES_BLOCKED_PENDING_PAID_PIXEL_PROOF",
+  "status": "CAMERA_CONTRACT_REPAIR_PENDING_NEW_DIGEST",
+  "reason": "FAILED_DIGEST_INELIGIBLE_CAMERA_C_REPLACED_BY_V3_COMP_A",
+  "ineligibleDigests": [
+    "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
+  ],
+  "digest": null,
   "dockerfile": "workers/runpod-blender/Dockerfile.scenery-showcase-final",
   "workerEntrypoint": "scenery-showcase-original14-entry.js",
   "cmd": ["node", "./src/scenery-showcase-original14-entry.js"],
   "forbiddenCmds": ["scenery-showcase-entry-v2.js", "v7-proof-a-boot.js"],
-  "digest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
   "parentDigest": "sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353",
-  "sourceCommit": "577cafe897c122c6b6bf85f03c0b2e6b24e79665",
+  "sourceCommit": null,
   "requiredContentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
   "platform": "linux/amd64",
   "architecture": "amd64",

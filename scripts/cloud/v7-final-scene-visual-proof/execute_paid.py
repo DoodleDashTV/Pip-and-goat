@@ -30,7 +30,8 @@ INSPECT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-
 STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-preflight-v1/RESULT.json"
 OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v1"
 
-REQUIRED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
+FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
+REQUIRED_DIGEST = ""  # set only after a repaired image is pinned
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 REQUIRED_IMAGE_COMMIT = "577cafe897c122c6b6bf85f03c0b2e6b24e79665"
 REQUIRED_CONTENT_ANCESTOR = "d5654510599f5b42919a949c5c4503c5ec1442f1"
@@ -243,38 +244,45 @@ def public_or_token_pull(repo: str, digest: str) -> dict:
 
 
 def output_contract() -> dict:
-    """The published digest stills path must keep Camera C and six shot cameras."""
-    valley = git("show", f"{REQUIRED_IMAGE_COMMIT}:scripts/blender/scenery/cinematic_valley_world_v1.py")
-    hero = git("show", f"{REQUIRED_IMAGE_COMMIT}:scripts/blender/scenery/cinematic_hero_rebuild_v3.py")
-    shots = git("show", f"{REQUIRED_IMAGE_COMMIT}:scripts/blender/scenery/cinematic_shots.py")
-    proof = git("show", f"{REQUIRED_IMAGE_COMMIT}:workers/runpod-blender/src/visual-proof-contract-v1.js")
+    """Current source must keep Camera C and six shot cameras. Failed digest stays ineligible."""
+    valley = (REPO / "scripts/blender/scenery/cinematic_valley_world_v1.py").read_text()
+    hero = (REPO / "scripts/blender/scenery/cinematic_hero_rebuild_v3.py").read_text()
+    shots = (REPO / "scripts/blender/scenery/cinematic_shots.py").read_text()
+    proof = (REPO / "workers/runpod-blender/src/visual-proof-contract-v1.js").read_text()
     hijack = (
-        'v3_spec = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())' in valley
-        and "bpy.context.scene.camera = v3_cam" in valley
-        and "setup_comp_cameras()" in hero
-        and '"name": "TJ_V3_COMP_A"' in hero
-        and "'--hero-rebuild'" in proof
-        and "v3" in proof
+        "bpy.context.scene.camera = v3_cam" in valley
+        or 'v3_cam = bpy.data.objects.get(v3_spec["name"])' in valley
+        or ("setup_comp_cameras()" in hero and "install_compare_cameras" not in hero)
     )
     camera_c_locked = "2.2, -21.4, 3.40" in shots and "-3.4, -10.2, 1.75" in shots
-    v3_a_diverges = "2.05, -21.6, 3.05" in hero
+    production_uses_resolver = "resolve_production_camera" in valley
+    failed_ineligible = FAILED_DIGEST in (json.loads(PIN.read_text()).get("ineligibleDigests") or [])
+    blockers = []
+    if hijack:
+        blockers.extend(["CAMERA_C_REPLACED_BY_V3_COMP_A", "SIX_SHOT_CAMERAS_NOT_USED"])
+    if not camera_c_locked:
+        blockers.append("CAMERA_C_LOCK_MISSING")
+    if not production_uses_resolver:
+        blockers.append("PRODUCTION_CAMERA_RESOLVER_MISSING")
+    if not failed_ineligible:
+        blockers.append("FAILED_DIGEST_NOT_MARKED_INELIGIBLE")
+    if "--v3-camera" not in proof or "V3_CAMERA_FORBIDDEN" not in proof:
+        blockers.append("VISUAL_PROOF_ALLOWS_V3_CAMERA")
     return {
         "schema": "TIVVLEJOY_V7_VISUAL_PROOF_OUTPUT_CONTRACT_V1",
         "stagedCameraC": list(CAMERA_C),
         "stagedLook": list(CAMERA_C_LOOK),
         "stagedLens": CAMERA_C_LENS,
-        "imageSourceCommit": REQUIRED_IMAGE_COMMIT,
+        "failedDigest": FAILED_DIGEST,
+        "failedDigestIneligible": failed_ineligible,
         "heroRebuildForcesV3CompCameras": hijack,
         "v3CompA": list(V3_COMP_A),
         "cameraCPresentInShotLock": camera_c_locked,
-        "v3CompADivergesFromCameraC": v3_a_diverges,
-        "sixShotCamerasUsed": not hijack,
+        "sixShotCamerasUsed": production_uses_resolver and not hijack,
         "waterVariant": "D",
         "encode900": False,
-        "ok": hijack is False and camera_c_locked and (not v3_a_diverges or not hijack),
-        "blockers": (
-            ["CAMERA_C_REPLACED_BY_V3_COMP_A", "SIX_SHOT_CAMERAS_NOT_USED"] if hijack else []
-        ),
+        "ok": not blockers,
+        "blockers": blockers,
     }
 
 
@@ -343,8 +351,10 @@ def fail_closed_checks() -> dict:
         blockers.append("IMAGE_COMMIT_NOT_ANCESTOR")
     if not ident["requiredContentAncestorIsAncestor"]:
         blockers.append("REQUIRED_ANCESTOR_MISSING")
-    if not pin["digestMatch"]:
-        blockers.append("DIGEST_MISMATCH")
+    if pin["digest"] == FAILED_DIGEST:
+        blockers.append("FAILED_DIGEST_INELIGIBLE")
+    if not pin["digest"] or not pin["digestMatch"]:
+        blockers.append("DIGEST_NOT_PINNED")
     if not pin["cmdMatch"] or pin.get("inspectCmd") != CMD:
         blockers.append("CMD_NOT_ORIGINAL14_ENTRY")
     if pin.get("blenderVersion") != "4.2.2":
@@ -395,12 +405,15 @@ def fail_closed_checks() -> dict:
         stock = str(quote.get("stockStatus") or "").lower()
         if stock in {"out", "unavailable", "none"}:
             blockers.append("SECURE_4090_NO_STOCK")
-        repo = image_repo()
-        pull = public_or_token_pull(repo, REQUIRED_DIGEST)
-        if not pull.get("ok"):
-            blockers.append("IMAGE_DIGEST_NOT_PULLABLE")
-        if pull.get("ok") and pull.get("needsRegistryAuth") and not os.environ.get("RUNPOD_CONTAINER_REGISTRY_AUTH_ID"):
-            blockers.append("REGISTRY_AUTH_ID_REQUIRED_FOR_PRIVATE_PULL")
+        if REQUIRED_DIGEST.startswith("sha256:") and len(REQUIRED_DIGEST) == 71:
+            repo = image_repo()
+            pull = public_or_token_pull(repo, REQUIRED_DIGEST)
+            if not pull.get("ok"):
+                blockers.append("IMAGE_DIGEST_NOT_PULLABLE")
+            if pull.get("ok") and pull.get("needsRegistryAuth") and not os.environ.get("RUNPOD_CONTAINER_REGISTRY_AUTH_ID"):
+                blockers.append("REGISTRY_AUTH_ID_REQUIRED_FOR_PRIVATE_PULL")
+        else:
+            pull = {"ok": False, "skipped": True, "reason": "DIGEST_NOT_PINNED"}
     except Exception as exc:
         blockers.append("RUNPOD_OR_REGISTRY_PROBE_FAILED")
         quote = {"error": type(exc).__name__}

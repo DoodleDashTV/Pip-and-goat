@@ -1,0 +1,39 @@
+{
+  "schema": "TIVVLEJOY_V7_CAMERA_REGRESSION_TRACE_V1",
+  "failedDigest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+  "imageSourceCommit": "577cafe897c122c6b6bf85f03c0b2e6b24e79665",
+  "contentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
+  "ineligibleForever": true,
+  "entry": {
+    "file": "workers/runpod-blender/src/scenery-showcase-original14-entry.js",
+    "launches": "scenery-showcase-original14.js",
+    "forbiddenAbsent": ["scenery-showcase-entry-v2.js", "v7-proof-a-boot.js"]
+  },
+  "worker": {
+    "file": "workers/runpod-blender/src/scenery-showcase-original14.js",
+    "jobKind": "VISUAL_PROOF",
+    "argsFrom": "visual-proof-contract-v1.js",
+    "requiredFlags": ["--hero-rebuild v3", "--stills-only", "--water-variant D"]
+  },
+  "visualProof": {
+    "file": "workers/runpod-blender/src/visual-proof-contract-v1.js",
+    "hero": {"shot": "SHOT_02", "frame": 210, "camera": "TJ_SHOT_02_CAM"}
+  },
+  "scene": {
+    "file": "scripts/blender/scenery/cinematic_valley_world_v1.py",
+    "regression": "stills-only defaulted --v3-camera A and bound TJ_V3_COMP_A whenever apply_hero_rebuild_v3 created compare cameras"
+  },
+  "heroRebuild": {
+    "file": "scripts/blender/scenery/cinematic_hero_rebuild_v3.py",
+    "regression": "apply_hero_rebuild_v3 always called setup_comp_cameras() and cleared six-shot timeline markers"
+  },
+  "manifest": {
+    "file": "scripts/blender/scenery/cinematic_shots.py",
+    "shot02": {
+      "camera": "TJ_SHOT_02_CAM",
+      "frames": [151, 300],
+      "heroFrame": 210,
+      "start": {"location": [2.2, -21.4, 3.4], "look": [-3.4, -10.2, 1.75], "lens": 32.0}
+    }
+  }
+}

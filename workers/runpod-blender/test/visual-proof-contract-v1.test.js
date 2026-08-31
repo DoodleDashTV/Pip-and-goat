@@ -13,6 +13,15 @@ test('preview and hero args stay Cycles / Water D / stills-only', () => {
   assert.equal(hero.includes('1080x1920'), true);
 });
 
+test('forbids V3 Comp A and compare-camera flags on visual-proof args', () => {
+  const hero = proof.buildHeroArgs();
+  const poisoned = [...hero, '--v3-camera', 'A'];
+  assert.throws(
+    () => proof.assertVisualProofArgs(poisoned, { kind: 'hero' }),
+    (e) => e.code === 'VISUAL_PROOF_CONTRACT_FAILED' && e.blockers.includes('V3_CAMERA_FORBIDDEN'),
+  );
+});
+
 test('forbids EEVEE, Water C, 900-frame video, and v2/v7 cmds', () => {
   assert.throws(
     () => proof.assertVisualProofArgs(['--engine', 'BLENDER_EEVEE_NEXT', '--stills-only'], { kind: 'preview' }),
@@ -31,6 +40,10 @@ test('seven isolated processes and $0.50 / 40 min ceiling', () => {
   assert.equal(proof.assertVisualProofPlan(plan).ok, true);
   const shot02 = plan.preview.find((row) => row.shot === 'SHOT_02');
   assert.equal(shot02.frame >= 151 && shot02.frame <= 300, true);
+  assert.equal(shot02.camera, 'TJ_SHOT_02_CAM');
+  assert.equal(plan.hero.camera, 'TJ_SHOT_02_CAM');
+  assert.deepEqual(proof.CAMERA_C.location, [2.2, -21.4, 3.4]);
+  assert.equal(proof.CAMERA_C.camera, 'TJ_SHOT_02_CAM');
   const spend = proof.spendCeiling();
   assert.equal(spend.hardSpendUsd, 0.5);
   assert.equal(spend.hardRuntimeMinutes, 40);

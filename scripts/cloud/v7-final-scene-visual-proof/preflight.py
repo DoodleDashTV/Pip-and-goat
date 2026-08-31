@@ -20,10 +20,12 @@ USD_PER_HOUR = 0.74
 def main() -> int:
     pin = json.loads(PIN.read_text()) if PIN.exists() else {}
     digest = str(pin.get("digest") or "")
+    ineligible = set(pin.get("ineligibleDigests") or [])
     published = pin.get("status") == "PUBLISHED_IMMUTABLE_DIGEST" and digest.startswith("sha256:") and len(digest) == 71
     cmd = pin.get("cmd") or []
     launchable = (
         published
+        and digest not in ineligible
         and cmd == ["node", "./src/scenery-showcase-original14-entry.js"]
         and pin.get("workerEntrypoint") == "scenery-showcase-original14-entry.js"
         and pin.get("runpodContacted") is False

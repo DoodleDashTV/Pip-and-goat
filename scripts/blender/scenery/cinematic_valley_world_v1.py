@@ -20,6 +20,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from cinematic_camera_contract_v1 import resolve_production_camera  # noqa: E402
 from cinematic_shots import SHOTS, camera_name, default_shot_cameras, hero_search_cameras, lookdev_frames, marker_frames  # noqa: E402
 from cinematic_creek_profile import (  # noqa: E402
     HERO_CORRIDOR_WATERLINE_STONES,
@@ -3987,8 +3988,8 @@ def apply_profile(profile_name: str, args) -> dict:
 
 
 def set_active_camera_for_frame(frame: int) -> None:
-    shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
-    bpy.context.scene.camera = bpy.data.objects[camera_name(shot["id"])]
+    name = resolve_production_camera(frame)
+    bpy.context.scene.camera = bpy.data.objects[name]
     bpy.context.scene.frame_set(frame)
 
 
@@ -4199,18 +4200,27 @@ def main() -> int:
         cameras.extend(setup_hero_search_cameras())
     applied = apply_profile(args.profile, args)
     apply_cinematic_master_post_profile()
+    compare_requested = bool(str(args.v3_compare or args.v5_compare or args.v2_compare or "").strip())
     if str(args.hero_rebuild or "v3").lower() == "v5":
         apply_hero_rebuild_v5(collections, mood=str(args.v5_light or "C").upper())
-        chosen = V5_COMP_CAMERAS.get(str(args.v5_camera or "A").upper())
     elif str(args.hero_rebuild or "v3").lower() != "none":
-        apply_hero_rebuild_v3(collections, mood=str(args.v3_light or "C").upper())
-        chosen = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())
-    else:
-        chosen = None
-    if chosen is not None:
-        hero_cam = bpy.data.objects.get(chosen["name"])
+        apply_hero_rebuild_v3(
+            collections,
+            mood=str(args.v3_light or "C").upper(),
+            install_compare_cameras=compare_requested,
+        )
+    if compare_requested:
+        if str(args.v5_compare or "").strip():
+            chosen = V5_COMP_CAMERAS.get(str(args.v5_camera or "A").upper())
+        elif str(args.v3_compare or "").strip():
+            chosen = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())
+        else:
+            chosen = None
+        hero_cam = bpy.data.objects.get((chosen or {}).get("name") or "")
         if hero_cam is not None:
             bpy.context.scene.camera = hero_cam
+    else:
+        set_active_camera_for_frame(int(args.start_frame or 1))
 
     contributions = {
         "village_blender": visible_use_record("village_blender", downloaded=True, extracted=True, datablockLoaded=imported > 0, renderedPixels=imported > 0, shotIds=["SHOT_04", "SHOT_06"], evidence="collection:WORLD_VILLAGE"),
@@ -4466,29 +4476,19 @@ def main() -> int:
         return 0
     if args.stills_only or normalize_profile(args.profile) in {"BLOCKOUT", "LOOKDEV_FAST", "HERO_STILL"}:
         for frame in frames:
-            bpy.context.scene.frame_set(frame)
-            if str(args.hero_rebuild or "v3").lower() == "v5":
-                v5_spec = V5_COMP_CAMERAS.get(str(args.v5_camera or "A").upper())
-                v5_cam = bpy.data.objects.get(v5_spec["name"]) if v5_spec else None
-                if v5_cam is not None:
-                    bpy.context.scene.camera = v5_cam
-                    label = f"v5_{str(args.v5_camera or 'A').lower()}_l{str(args.v5_light or 'C').lower()}"
-                else:
-                    set_active_camera_for_frame(frame)
-                    shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
-                    label = shot["id"].lower()
-            else:
-                v3_spec = COMP_CAMERAS.get(str(args.v3_camera or "A").upper())
-                v3_cam = bpy.data.objects.get(v3_spec["name"]) if v3_spec else None
-                if v3_cam is not None:
-                    bpy.context.scene.camera = v3_cam
-                    label = f"v3_{str(args.v3_camera or 'A').lower()}_l{str(args.v3_light or 'C').lower()}"
-                else:
-                    set_active_camera_for_frame(frame)
-                    shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
-                    label = shot["id"].lower()
+            set_active_camera_for_frame(frame)
+            shot = next(item for item in SHOTS if item["start"] <= frame <= item["end"])
+            label = shot["id"].lower()
+            if bpy.context.scene.camera is None or bpy.context.scene.camera.name in {
+                "TJ_V3_COMP_A",
+                "TJ_V3_COMP_B",
+                "TJ_V3_COMP_C",
+            }:
+                raise RuntimeError("PRODUCTION_CAMERA_REPLACED_BY_V3_COMP")
+            if bpy.context.scene.camera.name != resolve_production_camera(frame):
+                raise RuntimeError("STILLS_CAMERA_NOT_SIX_SHOT")
             bpy.context.scene.render.filepath = str(out / f"{label}_")
-            write_progress("LOOKDEV_STILL", frame=frame, shot=label)
+            write_progress("LOOKDEV_STILL", frame=frame, shot=label, camera=bpy.context.scene.camera.name)
             bpy.ops.render.render(write_still=True)
         if args.control_tests:
             for name, label in (("TJ_RIVER_GRAZE_CAM", "control_graze"), ("TJ_RIVER_DOWN_CAM", "control_down")):
