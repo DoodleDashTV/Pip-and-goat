@@ -1,0 +1,108 @@
+{
+  "schema": "TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_AUTHORIZATION_V1_RESULT",
+  "status": "V7_PAID_STARTUP_PROOF_B_PASSED",
+  "authorization": "TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_AUTHORIZATION_V1",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "remoteTip": "29e4d9d95a07693fe1d5a555adfb3b1b05441782",
+  "requiredAncestor": "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c",
+  "requiredAncestorIsAncestor": true,
+  "digest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
+  "podId": "px0b8pexnvd56v",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "hourlyRateUsd": 0.74,
+  "createPerformed": 1,
+  "markers": [
+    "BOOTSTRAP_ENTERED",
+    "NODE_AVAILABLE",
+    "IMAGE_PROCESS_STARTED",
+    "NODE_ENTRY_STARTED",
+    "WORKER_MODULE_LOADED",
+    "WORKER_LISTENING",
+    "WORKER_READY"
+  ],
+  "missingMarkers": [],
+  "orderedMarkers": true,
+  "heartbeatCount": 12,
+  "firstHeartbeatCount": 0,
+  "lastHeartbeatCount": 12,
+  "firstPid": 50,
+  "lastPid": 50,
+  "firstBootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+  "lastBootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+  "readyHttp": {
+    "urlHost": "runpod-proxy-18080",
+    "status": 200,
+    "path": "/startup-proof",
+    "body": {
+      "schema": "TIVVLEJOY_V7_STARTUP_PROOF_V2",
+      "ok": true,
+      "event": "WORKER_READY",
+      "url": "/startup-proof",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "uptimeMs": 187846,
+      "startedAt": "2026-08-31T10:57:56.399Z",
+      "imageDigest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
+      "sourceSha": "29e4d9d95a07693fe1d5a555adfb3b1b05441782",
+      "parentDigest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+      "workerEntrypoint": "v7-proof-a-boot.js",
+      "pid1": "v7-pid1-bootstrap.sh",
+      "markers": [
+        {
+          "stage": "BOOTSTRAP_ENTERED",
+          "at": "2026-08-31T10:57:56Z",
+          "via": "file"
+        },
+        {
+          "stage": "NODE_AVAILABLE",
+          "at": "2026-08-31T10:57:56Z",
+          "via": "file"
+        },
+        {
+          "stage": "IMAGE_PROCESS_STARTED",
+          "at": "2026-08-31T10:57:56.400Z",
+          "via": "file"
+        },
+        {
+          "stage": "NODE_ENTRY_STARTED",
+          "at": "2026-08-31T10:57:56.402Z",
+          "via": "file"
+        },
+        {
+          "stage": "WORKER_MODULE_LOADED",
+          "at": "2026-08-31T10:57:56.403Z",
+          "via": "file"
+        },
+        {
+          "stage": "WORKER_LISTENING",
+          "at": "2026-08-31T10:57:56.406Z",
+          "via": "file"
+        },
+        {
+          "stage": "WORKER_READY",
+          "at": "2026-08-31T10:57:56.406Z",
+          "via": "file"
+        }
+      ],
+      "heartbeatCount": 12,
+      "heartbeatAt": "2026-08-31T11:00:56.416Z",
+      "heartbeatAtMs": 1788174056416,
+      "restart": false,
+      "blenderInvoked": false,
+      "r2Invoked": false
+    }
+  },
+  "restartCount": 0,
+  "runtimeSeconds": 230.3,
+  "actualUsd": 0.0473,
+  "cleanup": {
+    "confirmed": true,
+    "live": []
+  },
+  "blenderInvoked": false,
+  "r2Invoked": false,
+  "imageRebuild": false,
+  "secondCreate": false,
+  "V7_PROOF_A_RENDER_READY_AWAITING_AUTHORIZATION": "YES",
+  "at": "2026-08-31T11:01:04.761277+00:00"
+}

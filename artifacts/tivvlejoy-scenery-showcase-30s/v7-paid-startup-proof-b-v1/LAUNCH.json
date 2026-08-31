@@ -1,0 +1,7 @@
+{
+  "podId": "px0b8pexnvd56v",
+  "digest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
+  "dockerArgs": "node ./src/v7-proof-a-boot.js",
+  "quotedUsdPerHr": 0.74,
+  "at": "2026-08-31T10:57:15.005644+00:00"
+}

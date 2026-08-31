@@ -1,0 +1,138 @@
+{
+  "firstPid": 50,
+  "lastPid": 50,
+  "firstBootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+  "lastBootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+  "firstHeartbeatCount": 0,
+  "lastHeartbeatCount": 12,
+  "firstUptimeMs": 2362,
+  "lastUptimeMs": 187846,
+  "samples": [
+    {
+      "ts": "2026-08-31T10:57:58.810928+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 0,
+      "uptimeMs": 2362
+    },
+    {
+      "ts": "2026-08-31T10:58:09.485307+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 0,
+      "uptimeMs": 13033
+    },
+    {
+      "ts": "2026-08-31T10:58:20.123599+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 1,
+      "uptimeMs": 23677
+    },
+    {
+      "ts": "2026-08-31T10:58:30.769856+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 2,
+      "uptimeMs": 34322
+    },
+    {
+      "ts": "2026-08-31T10:58:41.298247+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 2,
+      "uptimeMs": 44851
+    },
+    {
+      "ts": "2026-08-31T10:58:51.837763+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 3,
+      "uptimeMs": 55388
+    },
+    {
+      "ts": "2026-08-31T10:59:02.480515+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 4,
+      "uptimeMs": 66026
+    },
+    {
+      "ts": "2026-08-31T10:59:13.144658+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 5,
+      "uptimeMs": 76692
+    },
+    {
+      "ts": "2026-08-31T10:59:23.811084+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 5,
+      "uptimeMs": 87359
+    },
+    {
+      "ts": "2026-08-31T10:59:34.461740+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 6,
+      "uptimeMs": 98016
+    },
+    {
+      "ts": "2026-08-31T10:59:44.979033+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 7,
+      "uptimeMs": 108531
+    },
+    {
+      "ts": "2026-08-31T10:59:55.770110+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 7,
+      "uptimeMs": 119324
+    },
+    {
+      "ts": "2026-08-31T11:00:08.258990+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 8,
+      "uptimeMs": 131812
+    },
+    {
+      "ts": "2026-08-31T11:00:18.944625+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 9,
+      "uptimeMs": 142492
+    },
+    {
+      "ts": "2026-08-31T11:00:29.460323+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 10,
+      "uptimeMs": 153014
+    },
+    {
+      "ts": "2026-08-31T11:00:41.195500+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 10,
+      "uptimeMs": 164742
+    },
+    {
+      "ts": "2026-08-31T11:00:53.565069+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 11,
+      "uptimeMs": 177113
+    },
+    {
+      "ts": "2026-08-31T11:01:04.293405+00:00",
+      "pid": 50,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "heartbeatCount": 12,
+      "uptimeMs": 187846
+    }
+  ]
+}

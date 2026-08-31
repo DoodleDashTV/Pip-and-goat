@@ -1,9 +1,9 @@
 {
   "schema": "TIVVLEJOY_V7_PAID_STARTUP_PROOF_IDENTITY_V1",
   "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
-  "localSha": "fc0b7b0d55148c7c4edf77d1395b3f9ac2041012",
-  "remoteTip": "fc0b7b0d55148c7c4edf77d1395b3f9ac2041012",
-  "remoteTipParent": "fc81fcf11bfcac0d9a23600fb2c6f8a0b4070672",
+  "localSha": "29e4d9d95a07693fe1d5a555adfb3b1b05441782",
+  "remoteTip": "29e4d9d95a07693fe1d5a555adfb3b1b05441782",
+  "remoteTipParent": "fc0b7b0d55148c7c4edf77d1395b3f9ac2041012",
   "requiredAncestor": "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c",
   "requiredAncestorIsAncestor": true,
   "requiredAncestorIsParentOfTip": false,
@@ -11,5 +11,5 @@
   "overlayDigest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
   "requiredDigest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
   "digestMatch": true,
-  "at": "2026-08-31T10:57:01.170830+00:00"
+  "at": "2026-08-31T10:57:13.709552+00:00"
 }

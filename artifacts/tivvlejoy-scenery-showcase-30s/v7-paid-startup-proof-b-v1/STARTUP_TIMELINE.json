@@ -1,0 +1,25 @@
+{
+  "events": [
+    {
+      "ts": "2026-08-31T10:57:15.005790+00:00",
+      "stage": "POD_CREATED"
+    },
+    {
+      "ts": "2026-08-31T10:57:58.810943+00:00",
+      "stage": "WORKER_READY",
+      "uptimeInSeconds": null,
+      "bootId": "52f811f3-b2c8-4cb1-bdaf-6d55f5739ad8",
+      "pid": 50
+    },
+    {
+      "ts": "2026-08-31T10:58:19.793387+00:00",
+      "stage": "CONTAINER_STARTED",
+      "uptimeInSeconds": 13
+    },
+    {
+      "ts": "2026-08-31T11:01:04.293505+00:00",
+      "stage": "OBSERVE_COMPLETE",
+      "uptimeInSeconds": 163
+    }
+  ]
+}
