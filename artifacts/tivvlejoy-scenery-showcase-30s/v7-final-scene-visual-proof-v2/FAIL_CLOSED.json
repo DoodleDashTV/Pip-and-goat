@@ -1,0 +1,118 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_FAIL_CLOSED_V1",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2",
+  "ok": true,
+  "blockers": [],
+  "identity": {
+    "schema": "TIVVLEJOY_V7_VISUAL_PROOF_IDENTITY_V1",
+    "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2",
+    "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+    "localSha": "d8e68a1095ec31eb9abaa6382b3aa9277485467f",
+    "remoteTip": "d8e68a1095ec31eb9abaa6382b3aa9277485467f",
+    "requiredImageCommit": "c54aecdfc7e6da4f008b5dce8ba47cfe6cb04cfc",
+    "requiredImageCommitIsAncestor": true,
+    "requiredContentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
+    "requiredContentAncestorIsAncestor": true,
+    "at": "2026-08-31T23:49:18.474391+00:00"
+  },
+  "pin": {
+    "digest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+    "requiredDigest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+    "digestMatch": true,
+    "status": "PUBLISHED_IMMUTABLE_DIGEST",
+    "cmd": [
+      "node",
+      "./src/scenery-showcase-original14-entry.js"
+    ],
+    "cmdMatch": true,
+    "entrypoint": "scenery-showcase-original14-entry.js",
+    "forbiddenCmds": [
+      "scenery-showcase-entry-v2.js",
+      "v7-proof-a-boot.js"
+    ],
+    "blenderVersion": "4.2.2",
+    "waterVariant": "D",
+    "visualProofJobKind": "VISUAL_PROOF",
+    "stagedCameraC": [
+      2.2,
+      -21.4,
+      3.4
+    ],
+    "stagedDigest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+    "inspectCmd": [
+      "node",
+      "./src/scenery-showcase-original14-entry.js"
+    ],
+    "inspectWorkingDir": "/opt/ddp-worker",
+    "inspectLauncher": "node ./src/scenery-showcase-original14-entry.js"
+  },
+  "outputContract": {
+    "schema": "TIVVLEJOY_V7_VISUAL_PROOF_OUTPUT_CONTRACT_V1",
+    "stagedCameraC": [
+      2.2,
+      -21.4,
+      3.4
+    ],
+    "stagedLook": [
+      -3.4,
+      -10.2,
+      1.75
+    ],
+    "stagedLens": 32.0,
+    "failedDigest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+    "failedDigestIneligible": true,
+    "heroRebuildForcesV3CompCameras": false,
+    "v3CompA": [
+      2.05,
+      -21.6,
+      3.05
+    ],
+    "cameraCPresentInShotLock": true,
+    "sixShotCamerasUsed": true,
+    "waterVariant": "D",
+    "encode900": false,
+    "ok": true,
+    "blockers": []
+  },
+  "quote": {
+    "id": "NVIDIA GeForce RTX 4090",
+    "displayName": "RTX 4090",
+    "vramGb": 24,
+    "secureUsdPerHr": 0.74,
+    "stockStatus": "High"
+  },
+  "pull": {
+    "ok": true,
+    "anonymous": true,
+    "anonymousManifestStatus": 200,
+    "layerCount": 47,
+    "compressedBytes": 2165337316
+  },
+  "livePodCount": 0,
+  "livePodNames": [],
+  "pr169": {
+    "isDraft": true,
+    "state": "OPEN",
+    "mergedAt": null
+  },
+  "missingEnvNames": [],
+  "budget": {
+    "hardSpendUsd": 0.5,
+    "hardRuntimeMinutes": 40,
+    "expectedUsdAtCeiling": 0.4933,
+    "usdPerHour": 0.74
+  },
+  "resources": {
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "hostRamGiB": 24,
+    "vramGiB": 24,
+    "diskGiB": 60,
+    "containerDiskGiB": 100
+  },
+  "createCount": 1,
+  "retry": false,
+  "encode900": false,
+  "runpodMutation": false,
+  "paidCreate": 0,
+  "at": "2026-08-31T23:49:19.257445+00:00"
+}

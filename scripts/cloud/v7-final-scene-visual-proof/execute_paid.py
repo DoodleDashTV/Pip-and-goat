@@ -27,8 +27,8 @@ from preflight import AUTH_NAME, HARD_RUNTIME_MINUTES, HARD_SPEND_USD, USD_PER_H
 
 PIN = REPO / "config/cloud/scenery-showcase-final-image.json"
 INSPECT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1/IMAGE_INSPECT.json"
-STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-preflight-v1/RESULT.json"
-OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v1"
+STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2/STAGED.json"
+OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2"
 
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 REQUIRED_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
@@ -36,8 +36,8 @@ REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 REQUIRED_IMAGE_COMMIT = "c54aecdfc7e6da4f008b5dce8ba47cfe6cb04cfc"
 REQUIRED_CONTENT_ANCESTOR = "d5654510599f5b42919a949c5c4503c5ec1442f1"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
-POD_NAME = "tj-v7-fsvp-1"
-JOB_ID = "v7-final-visual-proof-v1"
+POD_NAME = "tj-v7-fsvp-2"
+JOB_ID = "v7-final-visual-proof-v2"
 CMD = ["node", "./src/scenery-showcase-original14-entry.js"]
 CAMERA_C = (2.2, -21.4, 3.40)
 CAMERA_C_LOOK = (-3.4, -10.2, 1.75)
@@ -47,7 +47,7 @@ MIN_RAM_GB = 24
 MIN_VRAM_GB = 24
 MIN_DISK_GB = 60
 CONTAINER_DISK_GB = 100
-MAX_PRICE = 0.80
+MAX_PRICE = 0.74
 
 
 def utc_now() -> str:
@@ -351,10 +351,28 @@ def fail_closed_checks() -> dict:
         blockers.append("IMAGE_COMMIT_NOT_ANCESTOR")
     if not ident["requiredContentAncestorIsAncestor"]:
         blockers.append("REQUIRED_ANCESTOR_MISSING")
-    if pin["digest"] == FAILED_DIGEST:
+    if pin["digest"] == FAILED_DIGEST or REQUIRED_DIGEST == FAILED_DIGEST:
         blockers.append("FAILED_DIGEST_INELIGIBLE")
+    if REQUIRED_DIGEST != "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b":
+        blockers.append("LOCKED_V2_DIGEST_MISMATCH")
     if not pin["digest"] or not pin["digestMatch"]:
         blockers.append("DIGEST_NOT_PINNED")
+    inspect = json.loads(INSPECT.read_text()) if INSPECT.is_file() else {}
+    blender = inspect.get("blenderCameraContract") or {}
+    if (blender.get("frame210") != "TJ_SHOT_02_CAM"
+            and (blender.get("frame210") or {}).get("camera") != "TJ_SHOT_02_CAM"):
+        blockers.append("FRAME_210_NOT_SHOT_02_CAM")
+    if blender.get("v3CompAUsed") is True:
+        blockers.append("V3_COMP_A_SELECTED")
+    if blender.get("cameras") != [
+        "TJ_SHOT_01_CAM",
+        "TJ_SHOT_02_CAM",
+        "TJ_SHOT_03_CAM",
+        "TJ_SHOT_04_CAM",
+        "TJ_SHOT_05_CAM",
+        "TJ_SHOT_06_CAM",
+    ]:
+        blockers.append("SIX_SHOT_MAPPING_MISSING")
     if not pin["cmdMatch"] or pin.get("inspectCmd") != CMD:
         blockers.append("CMD_NOT_ORIGINAL14_ENTRY")
     if pin.get("blenderVersion") != "4.2.2":
@@ -603,7 +621,7 @@ def download_outputs() -> dict:
 
 def write_result(status: str, **extra) -> None:
     payload = {
-        "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V1_RESULT",
+        "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2_RESULT",
         "status": status,
         "authorization": AUTH_NAME,
         "digest": REQUIRED_DIGEST,

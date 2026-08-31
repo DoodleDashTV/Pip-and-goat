@@ -1,0 +1,19 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2_STAGED",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2",
+  "image": {
+    "digest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+    "status": "PUBLISHED_IMMUTABLE_DIGEST"
+  },
+  "visualProof": {
+    "jobKind": "VISUAL_PROOF",
+    "cameraC": [2.2, -21.4, 3.4],
+    "look": [-3.4, -10.2, 1.75],
+    "lens": 32.0,
+    "waterVariant": "D",
+    "encode900": false
+  },
+  "failedDigestIneligible": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+  "createCount": 1,
+  "retry": false
+}

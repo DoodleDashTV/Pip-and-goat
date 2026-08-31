@@ -1,0 +1,28 @@
+{
+  "schema": "TIVVLEJOY_V7_VISUAL_PROOF_OUTPUT_CONTRACT_V1",
+  "stagedCameraC": [
+    2.2,
+    -21.4,
+    3.4
+  ],
+  "stagedLook": [
+    -3.4,
+    -10.2,
+    1.75
+  ],
+  "stagedLens": 32.0,
+  "failedDigest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+  "failedDigestIneligible": true,
+  "heroRebuildForcesV3CompCameras": false,
+  "v3CompA": [
+    2.05,
+    -21.6,
+    3.05
+  ],
+  "cameraCPresentInShotLock": true,
+  "sixShotCamerasUsed": true,
+  "waterVariant": "D",
+  "encode900": false,
+  "ok": true,
+  "blockers": []
+}

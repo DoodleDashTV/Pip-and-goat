@@ -1,0 +1,54 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2_RESULT",
+  "status": "CHECKS_PASSED_CREATE_NOT_ARMED",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2",
+  "digest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+  "paidCreate": 0,
+  "runpodSpendUsd": 0,
+  "runtimeSeconds": null,
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "encode900": false,
+  "merged": false,
+  "at": "2026-08-31T23:49:19.257948+00:00",
+  "blockers": [],
+  "outputContract": {
+    "schema": "TIVVLEJOY_V7_VISUAL_PROOF_OUTPUT_CONTRACT_V1",
+    "stagedCameraC": [
+      2.2,
+      -21.4,
+      3.4
+    ],
+    "stagedLook": [
+      -3.4,
+      -10.2,
+      1.75
+    ],
+    "stagedLens": 32.0,
+    "failedDigest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+    "failedDigestIneligible": true,
+    "heroRebuildForcesV3CompCameras": false,
+    "v3CompA": [
+      2.05,
+      -21.6,
+      3.05
+    ],
+    "cameraCPresentInShotLock": true,
+    "sixShotCamerasUsed": true,
+    "waterVariant": "D",
+    "encode900": false,
+    "ok": true,
+    "blockers": []
+  },
+  "quote": {
+    "id": "NVIDIA GeForce RTX 4090",
+    "displayName": "RTX 4090",
+    "vramGb": 24,
+    "secureUsdPerHr": 0.74,
+    "stockStatus": "High"
+  }
+}

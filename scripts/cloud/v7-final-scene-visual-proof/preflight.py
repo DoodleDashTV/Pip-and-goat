@@ -11,7 +11,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 PIN = REPO / "config/cloud/scenery-showcase-final-image.json"
-AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V1"
+AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2"
 HARD_SPEND_USD = 0.50
 HARD_RUNTIME_MINUTES = 40
 USD_PER_HOUR = 0.74
