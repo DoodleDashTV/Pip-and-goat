@@ -12,17 +12,73 @@
   "newImmutableDigest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
   "rootCause": "VISUAL_PROOF stills-only plus --hero-rebuild v3 installed V3 Comp A and bound scene.camera to TJ_V3_COMP_A (2.05, -21.6, 3.05) on all seven stills, bypassing TJ_SHOT_02_CAM / Camera C and the six-shot timeline.",
   "sixShotMapping": [
-    {"shot": "SHOT_01", "frames": [1, 150], "camera": "TJ_SHOT_01_CAM", "proofFrame": 48},
-    {"shot": "SHOT_02", "frames": [151, 300], "camera": "TJ_SHOT_02_CAM", "proofFrame": 210},
-    {"shot": "SHOT_03", "frames": [301, 450], "camera": "TJ_SHOT_03_CAM", "proofFrame": 360},
-    {"shot": "SHOT_04", "frames": [451, 600], "camera": "TJ_SHOT_04_CAM", "proofFrame": 520},
-    {"shot": "SHOT_05", "frames": [601, 750], "camera": "TJ_SHOT_05_CAM", "proofFrame": 680},
-    {"shot": "SHOT_06", "frames": [751, 900], "camera": "TJ_SHOT_06_CAM", "proofFrame": 860}
+    {
+      "shot": "SHOT_01",
+      "frames": [
+        1,
+        150
+      ],
+      "camera": "TJ_SHOT_01_CAM",
+      "proofFrame": 48
+    },
+    {
+      "shot": "SHOT_02",
+      "frames": [
+        151,
+        300
+      ],
+      "camera": "TJ_SHOT_02_CAM",
+      "proofFrame": 210
+    },
+    {
+      "shot": "SHOT_03",
+      "frames": [
+        301,
+        450
+      ],
+      "camera": "TJ_SHOT_03_CAM",
+      "proofFrame": 360
+    },
+    {
+      "shot": "SHOT_04",
+      "frames": [
+        451,
+        600
+      ],
+      "camera": "TJ_SHOT_04_CAM",
+      "proofFrame": 520
+    },
+    {
+      "shot": "SHOT_05",
+      "frames": [
+        601,
+        750
+      ],
+      "camera": "TJ_SHOT_05_CAM",
+      "proofFrame": 680
+    },
+    {
+      "shot": "SHOT_06",
+      "frames": [
+        751,
+        900
+      ],
+      "camera": "TJ_SHOT_06_CAM",
+      "proofFrame": 860
+    }
   ],
   "cameraC": {
     "camera": "TJ_SHOT_02_CAM",
-    "location": [2.2, -21.4, 3.4],
-    "look": [-3.4, -10.2, 1.75],
+    "location": [
+      2.2,
+      -21.4,
+      3.4
+    ],
+    "look": [
+      -3.4,
+      -10.2,
+      1.75
+    ],
     "lensMm": 32.0,
     "verifiedInImage": true
   },
@@ -43,8 +99,13 @@
   "inspectedImage": {
     "digest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
     "platform": "linux/amd64",
-    "Entrypoint": ["/opt/nvidia/nvidia_entrypoint.sh"],
-    "Cmd": ["node", "./src/scenery-showcase-original14-entry.js"],
+    "Entrypoint": [
+      "/opt/nvidia/nvidia_entrypoint.sh"
+    ],
+    "Cmd": [
+      "node",
+      "./src/scenery-showcase-original14-entry.js"
+    ],
     "WorkingDir": "/opt/ddp-worker",
     "blenderVersion": "4.2.2",
     "scriptsRoot": "/opt/ddp-worker/blender/scenery",
@@ -77,5 +138,6 @@
   },
   "V7_FINAL_SCENE_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION": "YES",
   "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
-  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true,
+  "finalSha": "adde6f3030f9b54933d09a5e826e12b420891b0d"
 }
