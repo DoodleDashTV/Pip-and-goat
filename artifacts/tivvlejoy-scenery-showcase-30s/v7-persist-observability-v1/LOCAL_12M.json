@@ -1,0 +1,9 @@
+{
+  "event": "PERSIST_12M_PASS",
+  "holdMs": 720000,
+  "pid": 39191,
+  "bootId": "boot-12m",
+  "heartbeats": 48,
+  "uptimeMs": 720264,
+  "exit": 0
+}

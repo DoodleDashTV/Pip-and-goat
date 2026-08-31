@@ -1,0 +1,32 @@
+{
+  "schema": "TIVVLEJOY_V7_WORKER_PERSISTENCE_AND_OBSERVABILITY_REPAIR_V1_RESULT",
+  "status": "V7_PERSIST_OBSERVABILITY_REPAIR_PASSED",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "f19a3c6c34ef436422a391f1b3c171517ed09983",
+  "repairSha": "33392912496f0ca2f775e1d20c295d1e666e7f22",
+  "requiredAncestor": "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c",
+  "requiredAncestorPreserved": true,
+  "pr": {"number": 169, "keep": ["OPEN", "DRAFT", "UNMERGED", "NOT_READY"]},
+  "rootCause": "application timer V7_STARTUP_PROOF_SECONDS / PROOF_SECONDS then process.exit(0)",
+  "launchConfigOnly": false,
+  "imageRebuildRequired": true,
+  "digest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
+  "parentDigest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+  "provenWorkflowRunId": 33343931770,
+  "localPersist": {"holdMs": 720000, "pid": 39191, "bootId": "boot-12m", "heartbeats": 48, "uptimeMs": 720264},
+  "ghaPersist": {"holdMs": 720000, "pid": 1, "bootId": "gha-persist-12m", "heartbeats": 48, "uptimeMs": 720454},
+  "samePid": true,
+  "heartbeatAdvances": true,
+  "gracefulShutdown": true,
+  "secretLeakScan": "PASS",
+  "paidCreate": 0,
+  "runpodContacted": false,
+  "estimatedPaidProofB": {
+    "wallMinutes": 8,
+    "estimatedUsd": 0.07,
+    "maximumSpendUsd": 0.1,
+    "createAllowance": 1,
+    "rateAssumptionUsdPerHr": 0.74
+  },
+  "V7_PAID_STARTUP_PROOF_B_AWAITING_AUTHORIZATION": "YES"
+}
