@@ -2,7 +2,11 @@
 """Zero-cost tests for FINAL image inspect JSON extraction. No Docker. No RunPod."""
 from __future__ import annotations
 
-from inspect_published_final_image import extract_camera_contract, frame210_camera, _xyz
+from pathlib import Path
+
+from inspect_published_final_image import CONTAINS_PY, extract_camera_contract, frame210_camera, _xyz
+
+SHOTS = Path(__file__).resolve().parents[2] / "blender/scenery/cinematic_shots.py"
 
 MIXED_BLENDER_LOG = """
 Blender 4.2.2 LTS (hash c03d7d98a413 built 2024-09-24 00:09:56)
@@ -34,6 +38,14 @@ def test_frame210_accepts_object_or_string() -> None:
     assert frame210_camera({"frame210": {"camera": "TJ_SHOT_02_CAM", "frame": 210}}) == "TJ_SHOT_02_CAM"
 
 
+def test_look_target_substring_is_not_a_grep_flag() -> None:
+    text = SHOTS.read_text()
+    assert "-3.4, -10.2, 1.75" in text
+    assert "2.2, -21.4, 3.40" in text
+    assert "sys.argv[2]" in CONTAINS_PY
+    assert "-F" not in CONTAINS_PY
+
+
 def test_missing_json_fails_closed() -> None:
     try:
         extract_camera_contract("Blender 4.2.2 LTS\nBlender quit\n")
@@ -46,5 +58,6 @@ def test_missing_json_fails_closed() -> None:
 if __name__ == "__main__":
     test_extracts_camera_contract_from_mixed_blender_log()
     test_frame210_accepts_object_or_string()
+    test_look_target_substring_is_not_a_grep_flag()
     test_missing_json_fails_closed()
     print("inspect_published_final_image_test PASS")

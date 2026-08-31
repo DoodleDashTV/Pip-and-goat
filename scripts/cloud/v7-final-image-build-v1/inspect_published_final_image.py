@@ -26,7 +26,7 @@ REQUIRED_FILES = (
     "./blender/scenery/cinematic_shots.py",
     "./blender/scenery/runtime_roots_v1.py",
 )
-REQUIRED_GREPS = (
+REQUIRED_SUBSTRINGS = (
     ("./blender/scenery/cinematic_shots.py", "TJ_SHOT_02_CAM"),
     ("./blender/scenery/cinematic_shots.py", "2.2, -21.4, 3.40"),
     ("./blender/scenery/cinematic_shots.py", "-3.4, -10.2, 1.75"),
@@ -34,9 +34,18 @@ REQUIRED_GREPS = (
     ("./src/visual-proof-contract-v1.js", "TJ_SHOT_02_CAM"),
     ("./src/frame-checkpoint-v1.js", "checkpoint"),
 )
-FORBIDDEN_GREPS = (
+FORBIDDEN_SUBSTRINGS = (
     ("./src/scenery-showcase-original14-entry.js", "scenery-showcase-entry-v2.js"),
     ("./src/scenery-showcase-original14-entry.js", "v7-proof-a-boot.js"),
+)
+CONTAINS_PY = (
+    "from pathlib import Path\n"
+    "import sys\n"
+    "path, needle, mode = sys.argv[1], sys.argv[2], sys.argv[3]\n"
+    "found = needle in Path(path).read_text()\n"
+    "if mode == 'require':\n"
+    "    raise SystemExit(0 if found else 1)\n"
+    "raise SystemExit(0 if not found else 1)\n"
 )
 REQUIRED_ENV = {
     "TIVVLEJOY_SCENERY_SCRIPTS_ROOT": "/opt/ddp-worker/blender/scenery",
@@ -93,42 +102,26 @@ def require_file(image: str, path: str) -> None:
     docker("run", "--rm", "--workdir", "/opt/ddp-worker", "--entrypoint", "test", image, "-f", path)
 
 
-def require_grep(image: str, path: str, pattern: str) -> None:
+def file_contains(image: str, path: str, pattern: str, *, required: bool) -> None:
     result = docker(
         "run",
         "--rm",
         "--workdir",
         "/opt/ddp-worker",
         "--entrypoint",
-        "grep",
+        "python3",
         image,
-        "-F",
-        pattern,
+        "-c",
+        CONTAINS_PY,
         path,
+        pattern,
+        "require" if required else "forbid",
         check=False,
     )
-    if result.returncode != 0:
-        raise SystemExit(f"GREP_MISSING {pattern!r} in {path}: {result.stderr or result.stdout}")
-
-
-def forbid_grep(image: str, path: str, pattern: str) -> None:
-    result = docker(
-        "run",
-        "--rm",
-        "--workdir",
-        "/opt/ddp-worker",
-        "--entrypoint",
-        "grep",
-        image,
-        "-F",
-        pattern,
-        path,
-        check=False,
-    )
-    if result.returncode == 0:
+    if required and result.returncode != 0:
+        raise SystemExit(f"SUBSTRING_MISSING {pattern!r} in {path}: {result.stderr or result.stdout}")
+    if not required and result.returncode != 0:
         raise SystemExit(f"FORBIDDEN_PATTERN_PRESENT {pattern!r} in {path}")
-    if result.returncode != 1:
-        raise SystemExit(f"GREP_FAILED {pattern!r} in {path}: {result.stderr}")
 
 
 def container_env(image: str) -> dict[str, str]:
@@ -169,12 +162,13 @@ def inspect_image() -> dict:
     if camera_proc.returncode != 0:
         raise SystemExit(f"BLENDER_CAMERA_CONTRACT_FAILED rc={camera_proc.returncode}\n{camera_log}")
     camera = extract_camera_contract(camera_log)
+    print(json.dumps({"blenderCameraContract": camera}, indent=2), flush=True)
     for path in REQUIRED_FILES:
         require_file(image, path)
-    for path, pattern in REQUIRED_GREPS:
-        require_grep(image, path, pattern)
-    for path, pattern in FORBIDDEN_GREPS:
-        forbid_grep(image, path, pattern)
+    for path, pattern in REQUIRED_SUBSTRINGS:
+        file_contains(image, path, pattern, required=True)
+    for path, pattern in FORBIDDEN_SUBSTRINGS:
+        file_contains(image, path, pattern, required=False)
     env = container_env(image)
     for key, value in REQUIRED_ENV.items():
         if env.get(key) != value:
