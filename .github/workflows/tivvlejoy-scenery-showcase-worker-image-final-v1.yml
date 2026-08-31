@@ -17,6 +17,8 @@ on:
       - 'workers/runpod-blender/src/scenery-render-profiles.js'
       - 'scripts/blender/scenery/cinematic_valley_world_v1.py'
       - 'scripts/blender/scenery/cinematic_camera_contract_v1.py'
+      - 'scripts/blender/scenery/cinematic_camera_contract_v1_test.py'
+      - 'scripts/blender/scenery/cinematic_camera_contract_blender_v1.py'
       - 'scripts/blender/scenery/cinematic_hero_rebuild_v3.py'
       - 'scripts/blender/scenery/cinematic_shots.py'
       - 'scripts/blender/scenery/runtime_roots_v1.py'

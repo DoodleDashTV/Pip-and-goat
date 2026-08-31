@@ -1,4 +1,5 @@
 # TivvleJoy cinematic FINAL scenery worker.
+# Camera C / six-shot contract is fail-closed in this image.
 # Thin child over the verified Original-14 parent; no purchased bytes or credentials baked in.
 # Pixel E/F/J remain BLOCKED_PENDING_PAID_PIXEL_PROOF. Image publication is allowed.
 # Parent digest only: sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353
