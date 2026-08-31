@@ -1,0 +1,9 @@
+{
+  "jobId": "v7-final-visual-proof-v2",
+  "status": "FAILED",
+  "stage": "HOST_AND_LAUNCH_CONTRACT",
+  "code": "FINAL_HOST_CONTRACT_FAILED",
+  "message": "VRAM_BELOW_24GIB",
+  "commercialAssetsPublished": false,
+  "at": "2026-08-31T23:51:48.610Z"
+}
