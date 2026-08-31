@@ -23,7 +23,37 @@ from cinematic_shots import camera_name, frame_to_shot, hero_still_frames
 from cinematic_water_lock_v1 import WATER_LOCK
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
+
+
+def _repo_root() -> Path:
+    candidates = (
+        HERE.parents[2],
+        Path("/opt/ddp-worker"),
+        Path("/workspace"),
+    )
+    markers = (
+        "workers/runpod-blender/src/visual-proof-contract-v1.js",
+        "src/visual-proof-contract-v1.js",
+    )
+    for root in candidates:
+        for marker in markers:
+            if (root / marker).is_file():
+                return root
+    return HERE.parents[2]
+
+
+REPO = _repo_root()
+
+
+def _js(name: str) -> Path:
+    for path in (
+        REPO / "workers/runpod-blender/src" / name,
+        REPO / "src" / name,
+        Path("/opt/ddp-worker/src") / name,
+    ):
+        if path.is_file():
+            return path
+    raise FileNotFoundError(name)
 
 
 def test_six_approved_shot_cameras() -> None:
@@ -108,7 +138,7 @@ def test_visual_proof_uses_same_cameras_as_final() -> None:
     proof = visual_proof_camera_plan()
     final = {row["shot"]: row["camera"] for row in timeline_assignments() if row["frame"] in {48, 210, 360, 520, 680, 860}}
     assert {row["shot"]: row["camera"] for row in proof} == final
-    js = (REPO / "workers/runpod-blender/src/visual-proof-contract-v1.js").read_text()
+    js = _js("visual-proof-contract-v1.js").read_text()
     assert "TJ_SHOT_02_CAM" in js
     assert "--v3-camera" in js and "V3_CAMERA_FORBIDDEN" in js
     assert "water-variant D" in js
@@ -131,7 +161,7 @@ def test_stills_path_no_longer_hijacks_v3_comp_a() -> None:
 
 
 def test_worker_entry_does_not_launch_forbidden_cmds() -> None:
-    entry = (REPO / "workers/runpod-blender/src/scenery-showcase-original14-entry.js").read_text()
+    entry = _js("scenery-showcase-original14-entry.js").read_text()
     assert "scenery-showcase-original14.js" in entry
     assert "scenery-showcase-entry-v2.js" not in entry
     assert "v7-proof-a-boot.js" not in entry
