@@ -2,6 +2,7 @@
 
 branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
 remote tip: 29e4d9d95a07693fe1d5a555adfb3b1b05441782
+final SHA: bef906384fe7be12f3fc6e231d3912b530410088
 required ancestor: d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c
 ancestor of tip: True
 why 28a58e74 follows d1e3c152: d1e3c152 is the content commit that pinned the overlay and recorded the 180s proofs. 28a58e74 is the later stamp commit whose parent is d1e3c152; it only writes 'final SHA: d1e3c152...' into the result markdown. The required check is ancestry, not tip equality.
