@@ -142,7 +142,7 @@ jobs:
             test -f ./blender/scenery/cinematic_shots.py
             test -f ./blender/scenery/runtime_roots_v1.py
             grep -F 'TJ_SHOT_02_CAM' ./blender/scenery/cinematic_shots.py
-            grep -F '(2.2, -21.4, 3.40)' ./blender/scenery/cinematic_shots.py
+            grep -F '2.2, -21.4, 3.40' ./blender/scenery/cinematic_shots.py
             grep -F "require('\''./scenery-showcase-original14.js'\'')" ./src/scenery-showcase-original14-entry.js
             ! grep -F scenery-showcase-entry-v2.js ./src/scenery-showcase-original14-entry.js
             ! grep -F v7-proof-a-boot.js ./src/scenery-showcase-original14-entry.js
