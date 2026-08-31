@@ -5,6 +5,7 @@ Zero paid RunPod execution. No CREATE. No 900-frame render. PR #169 stays draft.
 ## Identity
 
 - starting branch/SHA: `cursor/tivvlejoy-scenery-showcase-30s-v1-73f1` / `4c812b5147d0b4e0ce5e961fd315cde4d0fa6078`
+- content SHA: `d5654510599f5b42919a949c5c4503c5ec1442f1`
 - required content ancestor `f833d3dfcfaa7e97d5254bbe6b3b1b02f64fce01`: YES
 - required historical ancestor `d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c`: YES
 - PR #169: OPEN / DRAFT / UNMERGED / NOT READY
