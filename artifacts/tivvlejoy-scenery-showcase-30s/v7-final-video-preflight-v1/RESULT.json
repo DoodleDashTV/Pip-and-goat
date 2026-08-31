@@ -3,7 +3,7 @@
   "status": "V7_FINAL_VIDEO_RENDER_PREFLIGHT_BLOCKED",
   "authorization": "TIVVLEJOY_V7_FINAL_VIDEO_RENDER_ZERO_COST_PREFLIGHT_V1",
   "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
-  "sha": "2605cbf13e508e68469646905ccf099d751de755",
+  "sha": "f833d3dfcfaa7e97d5254bbe6b3b1b02f64fce01",
   "requiredAncestor": "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c",
   "requiredAncestorIsAncestor": true,
   "pr169": {
