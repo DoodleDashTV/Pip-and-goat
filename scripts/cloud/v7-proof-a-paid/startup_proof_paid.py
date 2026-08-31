@@ -19,8 +19,8 @@ REPO = HERE.parents[2]
 sys.path.insert(0, str(HERE))
 from docker_args_v1 import CURRENT_PIN_DOCKER_ARGS, docker_args_compatible  # noqa: E402
 
-AUTH = "TIVVLEJOY_V7_PAID_STARTUP_PROOF_AUTHORIZATION_V1"
-POD_NAME = "tj-v7-sup-v1"
+AUTH = "TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_AUTHORIZATION_V1"
+POD_NAME = "tj-v7-sup-b1"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
 MAX_SPEND = 0.10
 OBSERVE_S = 180
@@ -30,7 +30,7 @@ REQUIRED_ANCESTOR = "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c"
 REQUIRED_DIGEST = "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24"
 OVERLAY_PIN = REPO / "config/cloud/v7-proof-a-startup-image.json"
 SCENERY_PIN = REPO / "config/cloud/scenery-showcase-worker-image.json"
-OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-paid-startup-proof-v1"
+OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-paid-startup-proof-b-v1"
 REQUIRED_MARKERS = (
     "BOOTSTRAP_ENTERED",
     "NODE_AVAILABLE",
@@ -478,6 +478,15 @@ def main() -> int:
     saw_positive = False
     restart_count = 0
     log_text = ""
+    first_pid = None
+    first_boot = None
+    last_pid = None
+    last_boot = None
+    first_beats = 0
+    last_beats = 0
+    first_uptime_ms = None
+    last_uptime_ms = None
+    proof_samples: list[dict] = []
     try:
         log("create_entered", gpu=GPU_TYPE, digest=REQUIRED_DIGEST)
         try:
@@ -541,10 +550,34 @@ def main() -> int:
                     log_text += f"\nHEARTBEAT count={beats} bootId={boot_id}"
                 if body.get("ok") is True or body.get("event") == "WORKER_READY":
                     ready_http = {"urlHost": "runpod-proxy-18080", "status": 200, "path": path, "body": body}
+                    sample_pid = body.get("pid")
+                    sample_up = body.get("uptimeMs")
+                    if first_pid is None:
+                        first_pid = sample_pid
+                        first_boot = boot_id
+                        first_beats = beats
+                        first_uptime_ms = sample_up
+                    if first_pid is not None and sample_pid not in {None, first_pid}:
+                        restart_count += 1
+                    if first_boot and boot_id and boot_id != first_boot:
+                        restart_count += 1
+                    last_pid = sample_pid
+                    last_boot = boot_id
+                    last_beats = max(last_beats, beats)
+                    last_uptime_ms = sample_up
+                    proof_samples.append(
+                        {
+                            "ts": utc_now(),
+                            "pid": sample_pid,
+                            "bootId": boot_id,
+                            "heartbeatCount": beats,
+                            "uptimeMs": sample_up,
+                        }
+                    )
                     if ready_at is None:
                         ready_at = time.time()
-                        timeline.append({"ts": utc_now(), "stage": "WORKER_READY", "uptimeInSeconds": uptime, "bootId": boot_id})
-                        log("ready", uptime=uptime, bootId=boot_id)
+                        timeline.append({"ts": utc_now(), "stage": "WORKER_READY", "uptimeInSeconds": uptime, "bootId": boot_id, "pid": sample_pid})
+                        log("ready", uptime=uptime, bootId=boot_id, pid=sample_pid)
                     break
             elapsed = time.time() - started
             log(
@@ -593,10 +626,28 @@ def main() -> int:
             raise RuntimeError("REQUIRED_MARKERS_MISSING:" + ",".join(missing))
         if not ordered:
             raise RuntimeError("REQUIRED_MARKERS_OUT_OF_ORDER")
-        if beats < 2:
+        if beats < 2 or last_beats < first_beats + 1:
             raise RuntimeError("HEARTBEAT_NOT_CONTINUING")
+        if first_pid is None or last_pid != first_pid or last_boot != first_boot:
+            raise RuntimeError("PID_OR_BOOT_ID_CHANGED")
+        if last_uptime_ms is not None and first_uptime_ms is not None and last_uptime_ms < first_uptime_ms:
+            raise RuntimeError("UPTIME_RESET")
         if forbidden:
             raise RuntimeError("FORBIDDEN_MARKERS:" + ",".join(forbidden))
+        write_json(
+            OUT / "CONTINUITY.json",
+            {
+                "firstPid": first_pid,
+                "lastPid": last_pid,
+                "firstBootId": first_boot,
+                "lastBootId": last_boot,
+                "firstHeartbeatCount": first_beats,
+                "lastHeartbeatCount": last_beats,
+                "firstUptimeMs": first_uptime_ms,
+                "lastUptimeMs": last_uptime_ms,
+                "samples": proof_samples,
+            },
+        )
     finally:
         cleanup = terminate_pod(pod_id)
         write_json(OUT / "CLEANUP.json", cleanup)
@@ -607,15 +658,22 @@ def main() -> int:
             OUT / "SPEND.json",
             {"runtimeSeconds": round(runtime_s, 1), "rateUsdPerHr": rate, "actualUsd": spend, "createPerformed": create_performed, "podId": pod_id},
         )
+        proof_body = (ready_http or {}).get("body") or {}
+        if proof_body.get("markers"):
+            markers, beats, _boot = markers_from_proof(proof_body)
         missing = [m for m in REQUIRED_MARKERS if m not in markers]
         forbidden = [m for m in ("R2_CLIENT_STARTED", "BLENDER_EXEC_STARTED") if m in markers]
-        beats = heartbeat_count(log_text)
-        ordered = markers_in_order(log_text) if log_text else False
+        ordered = [m for m in REQUIRED_MARKERS if m in markers] == list(REQUIRED_MARKERS)
+        pid_ok = first_pid is not None and last_pid == first_pid and last_boot == first_boot
+        beats_ok = last_beats >= max(2, (first_beats or 0) + 1)
+        uptime_ok = last_uptime_ms is None or first_uptime_ms is None or last_uptime_ms >= first_uptime_ms
         ok = (
             bool(ready_at)
             and not missing
             and ordered
-            and beats >= 2
+            and beats_ok
+            and pid_ok
+            and uptime_ok
             and not forbidden
             and restart_count == 0
             and spend <= MAX_SPEND
@@ -625,7 +683,7 @@ def main() -> int:
         )
         result = {
             "schema": AUTH + "_RESULT",
-            "status": "V7_PAID_STARTUP_PROOF_PASSED" if ok else "V7_PAID_STARTUP_PROOF_FAILED",
+            "status": "V7_PAID_STARTUP_PROOF_B_PASSED" if ok else "V7_PAID_STARTUP_PROOF_B_FAILED",
             "authorization": AUTH,
             "branch": REQUIRED_BRANCH,
             "remoteTip": ident.get("remoteTip"),
@@ -639,7 +697,13 @@ def main() -> int:
             "markers": markers,
             "missingMarkers": missing,
             "orderedMarkers": ordered,
-            "heartbeatCount": beats,
+            "heartbeatCount": last_beats or beats,
+            "firstHeartbeatCount": first_beats,
+            "lastHeartbeatCount": last_beats,
+            "firstPid": first_pid,
+            "lastPid": last_pid,
+            "firstBootId": first_boot,
+            "lastBootId": last_boot,
             "readyHttp": ready_http,
             "restartCount": restart_count,
             "runtimeSeconds": round(runtime_s, 1),
@@ -659,7 +723,7 @@ def main() -> int:
 
 def write_result_md(result: dict, ident: dict, timeline: list[dict]) -> None:
     lines = [
-        "# TIVVLEJOY_V7_PAID_STARTUP_PROOF_V1_RESULT",
+        "# TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_V1_RESULT",
         "",
         f"branch: {REQUIRED_BRANCH}",
         f"remote tip: {ident.get('remoteTip')}",
@@ -687,7 +751,9 @@ def write_result_md(result: dict, ident: dict, timeline: list[dict]) -> None:
             f"markers: {', '.join(result.get('markers') or []) or 'none'}",
             f"missing: {', '.join(result.get('missingMarkers') or []) or 'none'}",
             f"ordered: {result.get('orderedMarkers')}",
-            f"heartbeat count: {result.get('heartbeatCount')}",
+            f"heartbeat count: {result.get('heartbeatCount')} first={result.get('firstHeartbeatCount')} last={result.get('lastHeartbeatCount')}",
+            f"pid continuity: {result.get('firstPid')} -> {result.get('lastPid')}",
+            f"bootId continuity: {result.get('firstBootId')} -> {result.get('lastBootId')}",
             f"ready HTTP: {json.dumps(result.get('readyHttp'))}",
             f"cleanup confirmed: {(result.get('cleanup') or {}).get('confirmed')}",
             f"live pods: {(result.get('cleanup') or {}).get('live')}",
@@ -704,7 +770,7 @@ def write_result_md(result: dict, ident: dict, timeline: list[dict]) -> None:
             "",
         ]
     )
-    (OUT / "TIVVLEJOY_V7_PAID_STARTUP_PROOF_V1_RESULT.md").write_text("\n".join(lines))
+    (OUT / "TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_V1_RESULT.md").write_text("\n".join(lines))
 
 
 if __name__ == "__main__":
@@ -717,7 +783,7 @@ if __name__ == "__main__":
                 existing = json.loads((OUT / "RESULT.json").read_text())
             except Exception:
                 existing = {}
-        existing["status"] = "V7_PAID_STARTUP_PROOF_FAILED"
+        existing["status"] = "V7_PAID_STARTUP_PROOF_B_FAILED"
         existing["error"] = f"{type(exc).__name__}:{str(exc)[:400]}"
         existing["at"] = utc_now()
         if "V7_PROOF_A_RENDER_READY_AWAITING_AUTHORIZATION" not in existing:
