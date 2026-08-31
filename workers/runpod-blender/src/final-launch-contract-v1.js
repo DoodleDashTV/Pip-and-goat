@@ -177,6 +177,7 @@ function inspectFinalDockerfile(text) {
 module.exports = {
   FINAL_SCRIPT,
   FINAL_ENTRY,
+  FORBIDDEN_CMDS,
   FINAL_TIMEOUT_MINUTES,
   REQUIRED_HOST_RAM,
   REQUIRED_VRAM_MIB,

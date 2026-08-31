@@ -17,6 +17,7 @@ const { REQUIRED_ROLES, selectAssets, selectExtraAssets } = require('./scenery-s
 const { resolveProfile, ffmpegEncodeArgs, ffmpegHasUpscale } = require('./scenery-render-profiles');
 const contract = require('./final-launch-contract-v1');
 const checkpoint = require('./frame-checkpoint-v1');
+const visualProof = require('./visual-proof-contract-v1');
 
 function strip(v) { return String(v || '').replace(/[\r\n]+/g, '').trim(); }
 function log(event, detail = {}) { console.log(JSON.stringify({ ts:new Date().toISOString(), event, ...detail })); }
@@ -101,6 +102,79 @@ function requiredFileReceipts(paths) {
     return { name: path.basename(filePath), exists, bytes };
   });
 }
+async function runVisualProof({
+  env, ctx, writeJson, startupKey, jobId, renderable, localAssets, extractRoot, outputDir, workspace, outputPrefix, selection, selectionKey,
+}) {
+  const plan = visualProof.assertVisualProofPlan(visualProof.isolatedProcessPlan()).plan;
+  visualProof.spendCeiling();
+  const script = contract.FINAL_SCRIPT;
+  const receipts = requiredFileReceipts([script, ...localAssets.map((row) => row.localPath)]);
+  log('visual_proof_required_files', { receipts: receipts.map((row) => ({ name: row.name, exists: row.exists, bytes: row.bytes })) });
+  if (receipts.some((row) => !row.exists || !Number(row.bytes))) {
+    throw Object.assign(new Error('required visual-proof inputs missing before Blender'), { code: 'REQUIRED_FILE_MISSING', receipts });
+  }
+  const gl = resolveHeadlessGlConfig({ env });
+  const renderEnv = applyHeadlessGlEnv(env, gl);
+  renderEnv.TIVVLEJOY_SCENERY_ASSETS_ROOT = extractRoot;
+  renderEnv.TIVVLEJOY_SCENERY_OUTPUT_ROOT = outputDir;
+  renderEnv.TIVVLEJOY_SCENERY_SCRIPTS_ROOT = env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT;
+  const uploaded = [];
+  const deadline = Date.now() + visualProof.HARD_RUNTIME_MINUTES * 60_000;
+  const runOne = async ({ kind, shot, frame }) => {
+    const remaining = deadline - Date.now();
+    if (remaining < 30_000) {
+      throw Object.assign(new Error('visual proof runtime ceiling'), { code: 'VISUAL_PROOF_TIMEOUT' });
+    }
+    const dest = path.join(outputDir, kind, shot);
+    await fsp.mkdir(dest, { recursive: true });
+    const stillProof = path.join(dest, 'usage.json');
+    const progressPath = path.join(dest, 'progress.json');
+    const args = kind === 'hero'
+      ? visualProof.buildHeroArgs({ assetsJson: JSON.stringify(renderable), outputDir: dest, proofPath: stillProof, progressPath, frame })
+      : visualProof.buildPreviewArgs({ assetsJson: JSON.stringify(renderable), outputDir: dest, proofPath: stillProof, progressPath, frame });
+    visualProof.assertVisualProofArgs(args, { kind });
+    const logPath = path.join(workspace, `blender-${kind}-${shot}.log`);
+    await writeJson(startupKey, {
+      schema: 'TIVVLEJOY_ORIGINAL14_STARTUP_V1', jobId, result: 'RUNNING', stage: 'VISUAL_PROOF_RENDER',
+      kind, shot, frame, at: new Date().toISOString(),
+    });
+    const render = await runBlender({ env: renderEnv, args, timeoutMs: remaining, logPath, onTick: async () => {} });
+    if (render.error) {
+      throw Object.assign(new Error(`${render.error.message}: ${readTail(logPath)}`.slice(-4000)), { code: render.error.code === 'ETIMEDOUT' ? 'TIMEOUT' : 'BLENDER_SPAWN_FAILED' });
+    }
+    if (render.status !== 0) {
+      throw Object.assign(new Error(`Blender exited ${render.status}: ${readTail(logPath)}`.slice(-4000)), { code: 'BLENDER_FAILED' });
+    }
+    const pngs = fs.readdirSync(dest).filter((name) => /\.png$/i.test(name));
+    if (!pngs.length) {
+      throw Object.assign(new Error(`no PNG for ${shot}`), { code: 'PREVIEW_PNG_MISSING' });
+    }
+    for (const name of pngs) {
+      const filePath = path.join(dest, name);
+      const digest = sha256File(filePath);
+      const key = `${outputPrefix}/visual-proof/${kind}/${shot}/${name}`;
+      await r2.uploadFile(ctx, key, filePath, 'image/png');
+      const readback = path.join(workspace, `${kind}-${shot}-${name}.readback`);
+      await r2.downloadToFile(ctx, key, readback, digest);
+      uploaded.push({ shot, kind, name, key, sha256: digest, bytes: fs.statSync(filePath).size });
+    }
+  };
+  for (const row of plan.preview) await runOne(row);
+  await runOne(plan.hero);
+  return {
+    jobId,
+    status: 'COMPLETE',
+    stage: 'VISUAL_PROOF_COMPLETE',
+    encode900: false,
+    uploaded,
+    originalSourceCount: 14,
+    renderableSourceCount: 11,
+    selectionProofKey: selectionKey,
+    materializedBytes: selection.totalBytes,
+    at: new Date().toISOString(),
+  };
+}
+
 function runFfmpeg({inputDir,fps,outputPath,profile}) {
   const args=ffmpegEncodeArgs({
     fps,
@@ -203,6 +277,21 @@ async function main() {
     const diskFree=measureDiskFree(workspace);
     contract.assertHostResources({ memTotal: os.totalmem(), vramMiB: gpu.vramMiB, diskFree });
     contract.assertRtx4090(gpu);
+    const extractRoot=path.join(workspace,'expanded-original14');
+    await fsp.mkdir(extractRoot,{recursive:true});
+    env.TIVVLEJOY_SCENERY_ASSETS_ROOT=extractRoot;
+    env.TIVVLEJOY_SCENERY_OUTPUT_ROOT=outputDir;
+    env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT=strip(env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT)||'/opt/ddp-worker/blender/scenery';
+    const jobKind=strip(env.TIVVLEJOY_JOB_KIND||'FINAL').toUpperCase();
+    if (jobKind==='VISUAL_PROOF') {
+      stage='VISUAL_PROOF';
+      const complete=await runVisualProof({
+        env,ctx,writeJson,startupKey,jobId,renderable,localAssets,extractRoot,outputDir,workspace,outputPrefix,selection,selectionKey,
+      });
+      await writeJson(statusKey,complete);
+      log('original14_visual_proof_complete',{jobId,uploaded:complete.uploaded.length});
+      return 0;
+    }
     const profile=resolveProfile(env);
     if (profile.id !== 'FINAL') {
       throw Object.assign(new Error('paid Original-14 worker encodes FINAL only; LOOKDEV/BLOCKOUT/HERO_STILL are local or stills profiles'),{code:'LOOKDEV_CANNOT_LABEL_FINAL'});
@@ -211,11 +300,6 @@ async function main() {
       throw Object.assign(new Error('visual approval receipt is required before paid FINAL'),{code:'VISUAL_APPROVAL_REQUIRED'});
     }
     const resolved=contract.resolveFinalWorkerEnv(env);
-    const extractRoot=path.join(workspace,'expanded-original14');
-    await fsp.mkdir(extractRoot,{recursive:true});
-    env.TIVVLEJOY_SCENERY_ASSETS_ROOT=extractRoot;
-    env.TIVVLEJOY_SCENERY_OUTPUT_ROOT=outputDir;
-    env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT=strip(env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT)||'/opt/ddp-worker/blender/scenery';
     const script=contract.FINAL_SCRIPT;
     const preflightFiles=[script, ...localAssets.map((row)=>row.localPath)];
     const receipts=requiredFileReceipts(preflightFiles);

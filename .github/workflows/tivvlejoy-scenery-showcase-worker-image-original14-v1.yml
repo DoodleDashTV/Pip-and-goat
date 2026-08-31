@@ -60,6 +60,7 @@ jobs:
           node --test workers/runpod-blender/test/scenery-render-profiles.test.js
           node --test workers/runpod-blender/test/final-launch-contract-v1.test.js
           node --test workers/runpod-blender/test/frame-checkpoint-v1.test.js
+          node --test workers/runpod-blender/test/visual-proof-contract-v1.test.js
           python3 -m py_compile scripts/blender/scenery/showcase_original14_select.py scripts/blender/scenery/showcase_original14_30s.py scripts/blender/scenery/cinematic_standards.py scripts/blender/scenery/cinematic_shots.py scripts/blender/scenery/cinematic_creek_profile.py scripts/blender/scenery/cinematic_valley_world_v1.py scripts/blender/scenery/runtime_roots_v1.py
           (cd scripts/blender/scenery && python3 showcase_original14_select_test.py)
           (cd scripts/blender/scenery && python3 cinematic_standards_test.py)

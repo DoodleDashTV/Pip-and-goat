@@ -1,6 +1,6 @@
 # TivvleJoy cinematic FINAL scenery worker.
 # Thin child over the verified Original-14 parent; no purchased bytes or credentials baked in.
-# Do not publish until local visual gates and launcher tests genuinely pass.
+# Pixel E/F/J remain BLOCKED_PENDING_PAID_PIXEL_PROOF. Image publication is allowed.
 # Parent digest only: sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353
 # Supply PARENT_IMAGE at build time. Do not bake a registry user into this file.
 ARG PARENT_IMAGE
@@ -15,6 +15,7 @@ COPY workers/runpod-blender/src/scenery-showcase-original14-entry.js ./src/scene
 COPY workers/runpod-blender/src/scenery-render-profiles.js ./src/scenery-render-profiles.js
 COPY workers/runpod-blender/src/final-launch-contract-v1.js ./src/final-launch-contract-v1.js
 COPY workers/runpod-blender/src/frame-checkpoint-v1.js ./src/frame-checkpoint-v1.js
+COPY workers/runpod-blender/src/visual-proof-contract-v1.js ./src/visual-proof-contract-v1.js
 
 ENV SCENERY_SHOWCASE_BLENDER_SCRIPT=/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py \
     TIVVLEJOY_SCENERY_SCRIPTS_ROOT=/opt/ddp-worker/blender/scenery \
@@ -55,6 +56,7 @@ RUN node --check ./src/scenery-showcase-original14-roles.js && \
     node --check ./src/scenery-render-profiles.js && \
     node --check ./src/final-launch-contract-v1.js && \
     node --check ./src/frame-checkpoint-v1.js && \
+    node --check ./src/visual-proof-contract-v1.js && \
     python3 -m py_compile ./blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/runtime_roots_v1.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_hero_rebuild_v3.py && \
     grep -F "require('./scenery-showcase-original14.js')" ./src/scenery-showcase-original14-entry.js >/dev/null && \
     ! grep -F "scenery-showcase-entry-v2.js" ./src/scenery-showcase-original14-entry.js && \
