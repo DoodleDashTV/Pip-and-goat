@@ -37,6 +37,7 @@ jobs:
           node --check workers/runpod-blender/src/v7-proof-a-boot.js
           node workers/runpod-blender/test/v7-proof-a-boot.test.js
           node workers/runpod-blender/test/v7-proof-a-startup-proof.test.js
+          node workers/runpod-blender/test/v7-production-lifetime-scan.test.js
 
       - name: Anonymous container start on the pinned digest
         run: |

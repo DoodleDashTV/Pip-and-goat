@@ -1,0 +1,17 @@
+{
+  "schema": "TIVVLEJOY_V7_300S_EXIT_ROOT_CAUSE_V1",
+  "source": "application timer",
+  "not": [
+    "wrapper/entrypoint",
+    "platform lifecycle",
+    "RunPod max lifetime"
+  ],
+  "chain": [
+    "scripts/cloud/v7-proof-a-paid/startup_proof_paid.py set V7_STARTUP_PROOF_SECONDS=300 on the pod",
+    "workers/runpod-blender/src/v7-proof-a-boot.js defaulted PROOF_SECONDS to 180 if unset",
+    "runStartupProof() awaited setTimeout(PROOF_SECONDS * 1000) then process.exit(0)"
+  ],
+  "launchConfigOnly": false,
+  "reasonLaunchConfigOnlyFails": "Removing the env still exits at the 180s code default. /ready also lacked markers, digest, heartbeat, and bootId, so observability requires an image-owned change.",
+  "imageRebuildRequired": true
+}

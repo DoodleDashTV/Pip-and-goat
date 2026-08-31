@@ -1,7 +1,10 @@
-# Thin overlay over the failed-run scenery digest. Adds only the file-shaped
-# V7 Proof A boot path and a PID-1 bootstrap. No commercial assets. No secrets.
+# Thin overlay over the scenery digest. Persistent file-shaped V7 boot + PID-1.
+# No commercial assets. No secrets. No finite stay-alive.
 ARG PARENT_REF
 FROM ${PARENT_REF}
+
+ARG SOURCE_SHA=unknown
+ARG PARENT_DIGEST=unknown
 
 WORKDIR /opt/ddp-worker
 
@@ -10,15 +13,18 @@ COPY workers/runpod-blender/src/v7-proof-a-boot.js ./src/v7-proof-a-boot.js
 
 RUN chmod 0755 ./src/v7-pid1-bootstrap.sh && \
     node --check ./src/v7-proof-a-boot.js && \
-    blender --version | grep -F 'Blender 4.2.2'
+    blender --version | grep -F 'Blender 4.2.2' && \
+    printf '%s\n' "{\"schema\":\"TIVVLEJOY_V7_IMAGE_IDENTITY_V1\",\"sourceSha\":\"${SOURCE_SHA}\",\"parentDigest\":\"${PARENT_DIGEST}\",\"workerEntrypoint\":\"v7-proof-a-boot.js\",\"pid1\":\"v7-pid1-bootstrap.sh\"}" \
+      > /opt/ddp-worker/.image-identity.json
 
 ENV PAID_EXECUTION_AUTHORIZED=false \
     CLOUD_RENDER_ENABLED=false \
-    V7_STARTUP_PROOF=0 \
-    V7_HEALTH_PORT=18080
+    V7_HEALTH_PORT=18080 \
+    V7_SOURCE_SHA=${SOURCE_SHA}
 
-LABEL tivvlejoy.v7.proofa.startup="file-shaped-boot" \
+LABEL tivvlejoy.v7.proofa.startup="persistent-file-shaped-boot" \
       tivvlejoy.v7.proofa.pid1="v7-pid1-bootstrap.sh" \
+      tivvlejoy.v7.proofa.persist="indefinite" \
       tivvlejoy.scenery.commercial.assets.baked="false"
 
 ENTRYPOINT ["/opt/ddp-worker/src/v7-pid1-bootstrap.sh"]

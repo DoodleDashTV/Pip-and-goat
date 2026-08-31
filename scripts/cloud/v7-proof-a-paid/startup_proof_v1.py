@@ -54,18 +54,41 @@ def test_broken_args_die_under_bash_c() -> dict:
 def test_file_args_survive_bash_c() -> dict:
     assert docker_args_compatible(CURRENT_PIN_DOCKER_ARGS)["ok"] is True
     assert docker_args_compatible(PREFERRED_BAKED_DOCKER_ARGS)["ok"] is True
-    run = subprocess.run(
+    proc = subprocess.Popen(
         ["bash", "-c", PREFERRED_BAKED_DOCKER_ARGS],
         cwd=str(REPO / "workers/runpod-blender"),
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
-        timeout=12,
-        env={**os.environ, "V7_STARTUP_PROOF": "1", "V7_STARTUP_PROOF_SECONDS": "1"},
+        env={**os.environ, "PAID_EXECUTION_AUTHORIZED": "false", "V7_HEALTH_PORT": "18201"},
     )
-    text = f"{run.stdout or ''}\n{run.stderr or ''}"
+    lines: list[str] = []
+
+    def drain_file() -> None:
+        if not proc.stdout:
+            return
+        for line in proc.stdout:
+            lines.append(line.rstrip())
+
+    threading.Thread(target=drain_file, daemon=True).start()
+    deadline = time.time() + 8
+    while time.time() < deadline:
+        text_so_far = "\n".join(lines)
+        if "IMAGE_PROCESS_STARTED" in text_so_far and "NODE_ENTRY_STARTED" in text_so_far:
+            break
+        if proc.poll() is not None:
+            break
+        time.sleep(0.1)
+    proc.terminate()
+    try:
+        proc.wait(timeout=6)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait(timeout=4)
+    text = "\n".join(lines)
     assert "IMAGE_PROCESS_STARTED" in text
     assert "NODE_ENTRY_STARTED" in text
-    return {"status": run.returncode, "hasImageProcess": True}
+    return {"status": proc.returncode, "hasImageProcess": True, "exitedByTerminate": True}
 
 
 def test_pid1_bootstrap() -> dict:
@@ -86,9 +109,10 @@ def test_pid1_bootstrap() -> dict:
 def _proof_once(seconds: int, run_id: int) -> dict:
     env = {
         **os.environ,
-        "V7_STARTUP_PROOF": "1",
-        "V7_STARTUP_PROOF_SECONDS": str(seconds + 30),
+        "PAID_EXECUTION_AUTHORIZED": "false",
         "V7_HEALTH_PORT": str(18080 + run_id),
+        "V7_HEALTH_BIND": "127.0.0.1",
+        "V7_BOOT_ID": f"proof-{run_id}",
     }
     proc = subprocess.Popen(
         ["node", str(BOOT)],

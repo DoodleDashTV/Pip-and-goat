@@ -79,7 +79,7 @@ def runpod_gql(query: str, variables: dict | None = None) -> dict:
     return parsed.get("data") or {}
 
 
-def runpod_rest(url: str, timeout: int = 30):
+def runpod_rest(url: str, timeout: int = 8):
     req = urllib.request.Request(
         url,
         headers={"Authorization": "Bearer " + os.environ["RUNPOD_API_KEY"], "User-Agent": "DoodleDashProduction/1.0"},
@@ -275,32 +275,25 @@ def _collect_text(value) -> str:
 
 
 def fetch_logs(pod_id: str) -> str:
-    chunks: list[str] = []
-    for url in (
-        f"https://rest.runpod.io/v1/pods/{pod_id}",
-        f"https://rest.runpod.io/v1/pods/{pod_id}/logs",
-        f"https://api.runpod.io/v2/{pod_id}/logs",
-        f"https://api.runpod.io/v2/pods/{pod_id}/logs",
-    ):
-        status, body = runpod_rest(url)
-        if status == 200:
-            text = _collect_text(body)
-            if text.strip():
-                chunks.append(text)
-    for query in (
-        "query ($id: String!) { pod(input: { podId: $id }) { id desiredStatus } }",
-        "query ($id: String!) { pod(input: { podId: $id }) { containerLog } }",
-        "query ($id: String!) { pod(input: { podId: $id }) { lastLogs } }",
-        "query ($id: String!) { pod(input: { podId: $id }) { logs } }",
-    ):
-        try:
-            data = runpod_gql(query, {"id": pod_id})
-            text = _collect_text((data.get("pod") or {}))
-            if text.strip() and "desiredStatus" not in text:
-                chunks.append(text)
-        except Exception:
-            continue
-    return "\n".join(chunks)
+    # Provider log APIs hang or 404. Startup proof is HTTP /ready and /startup-proof.
+    status, body = runpod_rest(f"https://rest.runpod.io/v1/pods/{pod_id}", timeout=8)
+    if status == 200:
+        return _collect_text(body)
+    return ""
+
+
+def markers_from_proof(body: dict) -> tuple[list[str], int, str]:
+    seen: list[str] = []
+    for row in body.get("markers") or []:
+        name = row.get("stage") if isinstance(row, dict) else None
+        at = row.get("at") if isinstance(row, dict) else None
+        if name and at and name not in seen:
+            seen.append(name)
+    if body.get("event") == "WORKER_READY" and "WORKER_READY" not in seen:
+        seen.append("WORKER_READY")
+    beats = int(body.get("heartbeatCount") or 0)
+    boot_id = str(body.get("bootId") or "")
+    return seen, beats, boot_id
 
 
 def extract_markers(text: str) -> list[str]:
@@ -368,12 +361,12 @@ def create_pod(image_ref: str, rate: float) -> str:
     if not compat["ok"]:
         raise RuntimeError("DOCKER_ARGS_INCOMPATIBLE:" + ",".join(compat["blockers"]))
     env = {
-        "V7_STARTUP_PROOF": "1",
-        "V7_STARTUP_PROOF_SECONDS": "300",
-        "V7_HEALTH_PORT": "18080",
-        "V7_HEALTH_BIND": "0.0.0.0",
         "PAID_EXECUTION_AUTHORIZED": "false",
         "CLOUD_RENDER_ENABLED": "false",
+        "V7_HEALTH_PORT": "18080",
+        "V7_HEALTH_BIND": "0.0.0.0",
+        "V7_IMAGE_DIGEST": REQUIRED_DIGEST,
+        "V7_SOURCE_SHA": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip(),
         "RUNPOD_GPU_HOURLY_RATE": str(rate),
     }
     if any(k in env for k in ("RUNPOD_API_KEY", "ALLOW_PAID_GPU_LAUNCH", "R2_SECRET_ACCESS_KEY", "R2_ACCESS_KEY_ID")):
@@ -537,29 +530,22 @@ def main() -> int:
                 timeline.append({"ts": utc_now(), "stage": "CRASH_LOOP", "uptimeInSeconds": uptime, "count": crash_loops})
                 if crash_loops >= 2:
                     raise RuntimeError("WORKER_CRASH_LOOP")
-            chunk = fetch_logs(pod_id)
-            if chunk and len(chunk) > len(log_text):
-                log_text = chunk
-                markers = extract_markers(log_text)
-            proxy = f"https://{pod_id}-18080.proxy.runpod.net/ready"
-            status, body = http_json(proxy)
-            if status == 200 and (body.get("ok") is True or body.get("event") == "WORKER_READY"):
-                ready_http = {"urlHost": "runpod-proxy-18080", "status": 200, "body": body}
-                if "WORKER_READY" not in markers:
-                    markers.append("WORKER_READY")
-                if ready_at is None:
-                    ready_at = time.time()
-                    timeline.append({"ts": utc_now(), "stage": "WORKER_READY", "uptimeInSeconds": uptime})
-                    log("ready", uptime=uptime)
-            ports = ((exact or {}).get("runtime") or {}).get("ports") or []
-            for port in ports:
-                if int(port.get("privatePort") or 0) == 18080 and port.get("ip"):
-                    alt = f"http://{port.get('ip')}:{port.get('publicPort') or 18080}/ready"
-                    st2, body2 = http_json(alt)
-                    if st2 == 200 and body2.get("ok") is True:
-                        ready_http = {"status": 200, "via": "runtime.ports", "body": body2}
-                        if ready_at is None:
-                            ready_at = time.time()
+            for path in ("/startup-proof", "/ready"):
+                status, body = http_json(f"https://{pod_id}-18080.proxy.runpod.net{path}")
+                if status != 200 or not isinstance(body, dict):
+                    continue
+                seen, beats, boot_id = markers_from_proof(body)
+                if seen:
+                    markers = seen
+                if beats:
+                    log_text += f"\nHEARTBEAT count={beats} bootId={boot_id}"
+                if body.get("ok") is True or body.get("event") == "WORKER_READY":
+                    ready_http = {"urlHost": "runpod-proxy-18080", "status": 200, "path": path, "body": body}
+                    if ready_at is None:
+                        ready_at = time.time()
+                        timeline.append({"ts": utc_now(), "stage": "WORKER_READY", "uptimeInSeconds": uptime, "bootId": boot_id})
+                        log("ready", uptime=uptime, bootId=boot_id)
+                    break
             elapsed = time.time() - started
             log(
                 "poll",
@@ -582,10 +568,13 @@ def main() -> int:
             time.sleep(10)
         if not ready_at:
             raise RuntimeError("READY_NOT_REACHED")
+        proof_body = (ready_http or {}).get("body") or {}
+        if proof_body.get("markers"):
+            markers, beats_http, _boot = markers_from_proof(proof_body)
         missing = [m for m in REQUIRED_MARKERS if m not in markers]
         forbidden = [m for m in ("R2_CLIENT_STARTED", "BLENDER_EXEC_STARTED") if m in markers]
-        beats = heartbeat_count(log_text)
-        ordered = markers_in_order(log_text) if not missing else False
+        beats = int(proof_body.get("heartbeatCount") or heartbeat_count(log_text))
+        ordered = [m for m in REQUIRED_MARKERS if m in markers] == list(REQUIRED_MARKERS)
         write_json(OUT / "LOG_META.json", {"bytes": len(log_text), "preview": log_text[-2000:]})
         (OUT / "CONTAINER_LOG.txt").write_text(log_text[-20000:] if log_text else "")
         write_json(
