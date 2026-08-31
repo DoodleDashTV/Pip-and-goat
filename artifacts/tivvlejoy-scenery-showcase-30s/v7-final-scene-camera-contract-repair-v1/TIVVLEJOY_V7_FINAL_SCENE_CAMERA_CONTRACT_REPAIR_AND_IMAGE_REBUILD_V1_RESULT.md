@@ -9,8 +9,8 @@ Zero RunPod CREATE. Failed digest remains permanently ineligible. New FINAL imag
 ## Identity
 
 - starting: `cursor/tivvlejoy-scenery-showcase-30s-v1-73f1` @ `1ddee2f36015142a97f2801a977fdd2464ab1f65`
-- image source commit: 
-- final SHA: `c54aecdfc7e6da4f008b5dce8ba47cfe6cb04cfc`
+- image source commit: `c54aecdfc7e6da4f008b5dce8ba47cfe6cb04cfc`
+- pin commit: `adde6f3030f9b54933d09a5e826e12b420891b0d`
 - content ancestor: `d5654510599f5b42919a949c5c4503c5ec1442f1`
 - failed image source (ineligible): `577cafe897c122c6b6bf85f03c0b2e6b24e79665`
 
