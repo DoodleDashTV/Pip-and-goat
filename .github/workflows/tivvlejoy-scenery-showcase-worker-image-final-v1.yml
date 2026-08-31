@@ -22,6 +22,8 @@ on:
       - 'scripts/blender/scenery/cinematic_hero_rebuild_v3.py'
       - 'scripts/blender/scenery/cinematic_shots.py'
       - 'scripts/blender/scenery/runtime_roots_v1.py'
+      - 'scripts/cloud/v7-final-image-build-v1/inspect_published_final_image.py'
+      - 'scripts/cloud/v7-final-image-build-v1/inspect_published_final_image_test.py'
       - '.github/workflows/tivvlejoy-scenery-showcase-worker-image-final-v1.yml'
 
 concurrency:
@@ -74,6 +76,7 @@ jobs:
           node --test workers/runpod-blender/test/visual-proof-contract-v1.test.js
           python3 scripts/blender/scenery/cinematic_camera_contract_v1_test.py
           python3 scripts/blender/scenery/cinematic_visual_gate_contracts_v1_test.py
+          python3 scripts/cloud/v7-final-image-build-v1/inspect_published_final_image_test.py
           grep -F 'CMD ["node", "./src/scenery-showcase-original14-entry.js"]' workers/runpod-blender/Dockerfile.scenery-showcase-final
           ! grep -n 'scenery-showcase-entry-v2.js' workers/runpod-blender/src/scenery-showcase-original14-entry.js
           ! grep -n 'v7-proof-a-boot.js' workers/runpod-blender/src/scenery-showcase-original14-entry.js
@@ -125,87 +128,7 @@ jobs:
           docker buildx imagetools inspect "${IMAGE_REPO}@${PUBLISHED_DIGEST}" | tee /tmp/final-imagetools.txt
           grep -F "${PUBLISHED_DIGEST}" /tmp/final-imagetools.txt
           docker pull "${IMAGE_REPO}@${PUBLISHED_DIGEST}"
-          docker image inspect "${IMAGE_REPO}@${PUBLISHED_DIGEST}" > /tmp/final-image-inspect.json
-          docker run --rm --entrypoint blender "${IMAGE_REPO}@${PUBLISHED_DIGEST}" --version | head -n 1 | tee /tmp/final-blender.txt
-          grep -F 'Blender 4.2.2' /tmp/final-blender.txt
-          docker run --rm --workdir /opt/ddp-worker --entrypoint blender "${IMAGE_REPO}@${PUBLISHED_DIGEST}" --background --factory-startup --python-exit-code 1 --python ./blender/scenery/cinematic_camera_contract_blender_v1.py | tee /tmp/final-camera-contract.json
-          grep -F 'TJ_SHOT_02_CAM' /tmp/final-camera-contract.json
-          docker run --rm --workdir /opt/ddp-worker --entrypoint /bin/sh "${IMAGE_REPO}@${PUBLISHED_DIGEST}" -c '
-            set -eu
-            test -f ./src/scenery-showcase-original14-entry.js
-            test -f ./src/scenery-showcase-original14.js
-            test -f ./src/final-launch-contract-v1.js
-            test -f ./src/frame-checkpoint-v1.js
-            test -f ./src/visual-proof-contract-v1.js
-            test -f ./blender/scenery/cinematic_valley_world_v1.py
-            test -f ./blender/scenery/cinematic_camera_contract_v1.py
-            test -f ./blender/scenery/cinematic_shots.py
-            test -f ./blender/scenery/runtime_roots_v1.py
-            grep -F 'TJ_SHOT_02_CAM' ./blender/scenery/cinematic_shots.py
-            grep -F '2.2, -21.4, 3.40' ./blender/scenery/cinematic_shots.py
-            grep -F "require('\''./scenery-showcase-original14.js'\'')" ./src/scenery-showcase-original14-entry.js
-            ! grep -F scenery-showcase-entry-v2.js ./src/scenery-showcase-original14-entry.js
-            ! grep -F v7-proof-a-boot.js ./src/scenery-showcase-original14-entry.js
-            test "${TIVVLEJOY_SCENERY_SCRIPTS_ROOT:-}" = /opt/ddp-worker/blender/scenery
-            test "${SCENERY_SHOWCASE_RENDER_PROFILE:-}" = FINAL
-            test "${SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES:-}" = 1440
-          '
-          mkdir -p artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1
-          python3 - <<'PY'
-          import json, os, pathlib
-          raw = json.loads(pathlib.Path("/tmp/final-image-inspect.json").read_text())[0]
-          cfg = raw.get("Config") or {}
-          cmd = cfg.get("Cmd") or []
-          entry = cfg.get("Entrypoint")
-          camera = {}
-          cam_path = pathlib.Path("/tmp/final-camera-contract.json")
-          if cam_path.exists():
-              for line in cam_path.read_text().splitlines():
-                  line = line.strip()
-                  if line.startswith("{") and "TJ_SHOT_02_CAM" in line:
-                      camera = json.loads(line)
-          inspect = {
-            "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_INSPECT_V1",
-            "status": "PUBLISHED_IMMUTABLE_DIGEST",
-            "digest": os.environ["PUBLISHED_DIGEST"],
-            "sourceCommit": os.environ["GITHUB_SHA"],
-            "sourceBranch": os.environ["GITHUB_REF_NAME"],
-            "requiredContentAncestor": os.environ["REQUIRED_CONTENT_ANCESTOR"],
-            "parentDigest": os.environ["EXPECTED_PARENT_DIGEST"],
-            "architecture": raw.get("Architecture"),
-            "os": raw.get("Os"),
-            "platform": f"{raw.get('Os')}/{raw.get('Architecture')}",
-            "Entrypoint": entry,
-            "Cmd": cmd,
-            "WorkingDir": cfg.get("WorkingDir"),
-            "blenderVersion": "4.2.2",
-            "launcher": "node ./src/scenery-showcase-original14-entry.js",
-            "forbiddenCmdsAbsent": True,
-            "scriptsRoot": "/opt/ddp-worker/blender/scenery",
-            "checkpointModule": True,
-            "visualProofModule": True,
-            "cameraContractModule": True,
-            "sixShotCameraContract": True,
-            "cameraCLock": True,
-            "blenderCameraContract": {
-              "ok": bool(camera.get("ok")),
-              "frame210": camera.get("frame210"),
-              "cameraC": camera.get("cameraC"),
-              "v3CompAUsed": camera.get("v3CompAUsed"),
-            },
-            "paidGpuLaunchCount": 0,
-            "runpodContacted": False,
-            "credentialsIncluded": False,
-          }
-          assert camera.get("ok") is True, camera
-          assert camera.get("frame210") == "TJ_SHOT_02_CAM"
-          assert cmd == ["node", "./src/scenery-showcase-original14-entry.js"], cmd
-          assert inspect["WorkingDir"] == "/opt/ddp-worker"
-          assert inspect["platform"] == "linux/amd64"
-          dest = pathlib.Path("artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1/IMAGE_INSPECT.json")
-          dest.write_text(json.dumps(inspect, indent=2) + "\n")
-          print(json.dumps({"digest": inspect["digest"], "Cmd": inspect["Cmd"], "WorkingDir": inspect["WorkingDir"], "platform": inspect["platform"]}))
-          PY
+          python3 scripts/cloud/v7-final-image-build-v1/inspect_published_final_image.py
 
       - name: Upload digest-only inspect evidence
         uses: actions/upload-artifact@v4
