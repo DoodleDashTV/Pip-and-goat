@@ -1,0 +1,48 @@
+TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V1
+
+DO NOT CREATE THIS AUTHORIZATION IN THIS PASS.
+Issuable now: YES
+
+I authorize exactly one paid RunPod CREATE for an exact-final-scene visual proof.
+
+Branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+Required content ancestor: d5654510599f5b42919a949c5c4503c5ec1442f1
+Required historical ancestors:
+  f833d3dfcfaa7e97d5254bbe6b3b1b02f64fce01
+  d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c
+PR #169 stays OPEN / DRAFT / UNMERGED / NOT READY.
+
+Image digest only:
+sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6
+CMD must be: node ./src/scenery-showcase-original14-entry.js
+Job kind: VISUAL_PROOF
+Blender script: cinematic_valley_world_v1.py
+Water variant: D
+Hero rebuild: v3
+Camera C SHOT_02 frame 210:
+  position (2.2,-21.4,3.40)
+  target (-3.4,-10.2,1.75)
+  lens 32mm
+  DOF OFF
+
+Host: one Secure RTX 4090, RAM >=24 GiB, VRAM >=24 GiB, disk >=60 GiB.
+CREATE count: 1.
+No retry.
+No automatic second CREATE.
+Automatic termination after pass or fail.
+Hard spend ceiling: $0.50 USD.
+Hard runtime ceiling: 40 minutes (0.4933 USD at $0.74/hr).
+
+Render only:
+- six isolated 540x960 Cycles/32 denoise-ON preview frames
+  SHOT_01/48 SHOT_02/210 SHOT_03/360 SHOT_04/520 SHOT_05/680 SHOT_06/860
+- one native 1080x1920 Cycles/256 denoise-ON SHOT_02 hero frame 210
+- contact sheet
+- incremental R2 upload + SHA-256 readback
+- pixel E/F/J and complete 22-gate results from those pixels only
+
+Do not render frames 1-900.
+Do not encode the 30-second video.
+Do not reuse V7_PROOF_A or any historical authorization.
+
+Ledger key must be unique. Cleanup may retry; CREATE may not.

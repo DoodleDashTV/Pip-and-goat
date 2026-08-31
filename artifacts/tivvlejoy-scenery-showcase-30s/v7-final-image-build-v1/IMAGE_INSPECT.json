@@ -1,0 +1,29 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_INSPECT_V1",
+  "status": "PUBLISHED_IMMUTABLE_DIGEST",
+  "digest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+  "sourceCommit": "577cafe897c122c6b6bf85f03c0b2e6b24e79665",
+  "sourceBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "requiredContentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
+  "parentDigest": "sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353",
+  "architecture": "amd64",
+  "os": "linux",
+  "platform": "linux/amd64",
+  "Entrypoint": [
+    "/opt/nvidia/nvidia_entrypoint.sh"
+  ],
+  "Cmd": [
+    "node",
+    "./src/scenery-showcase-original14-entry.js"
+  ],
+  "WorkingDir": "/opt/ddp-worker",
+  "blenderVersion": "4.2.2",
+  "launcher": "node ./src/scenery-showcase-original14-entry.js",
+  "forbiddenCmdsAbsent": true,
+  "scriptsRoot": "/opt/ddp-worker/blender/scenery",
+  "checkpointModule": true,
+  "visualProofModule": true,
+  "paidGpuLaunchCount": 0,
+  "runpodContacted": false,
+  "credentialsIncluded": false
+}
