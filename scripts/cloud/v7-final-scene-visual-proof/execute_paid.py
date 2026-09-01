@@ -23,14 +23,15 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from preflight import AUTH_NAME, HARD_RUNTIME_MINUTES, HARD_SPEND_USD, USD_PER_HOUR, PREVIOUS_AUTH_NAME  # noqa: E402
+from preflight import AUTH_NAME, HARD_RUNTIME_MINUTES, HARD_SPEND_USD, USD_PER_HOUR, PREVIOUS_AUTH_NAME, V2_AUTH_NAME  # noqa: E402
 
 PIN = REPO / "config/cloud/scenery-showcase-final-image.json"
 INSPECT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1/IMAGE_INSPECT.json"
-STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v3/STAGED.json"
-OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v3"
+STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v4/STAGED.json"
+OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v4"
 AUTH_FILE = OUT / "AUTHORIZATION.json"
 V2_LEDGER = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2/consumption-ledger.json"
+V3_LEDGER = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v3/consumption-ledger.json"
 
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
@@ -38,11 +39,11 @@ FAILED_EXTRACT_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be5
 REQUIRED_DIGEST = "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749"
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 REQUIRED_IMAGE_COMMIT = "b8ec9a4195d3f56caf6398ea642ec04596819c71"
-REQUIRED_LAUNCHER_SHA = "b8ec9a4195d3f56caf6398ea642ec04596819c71"
+REQUIRED_LAUNCHER_SHA = "57364226b52966a0f14195fdc03c28db547c7402"
 REQUIRED_CONTENT_ANCESTOR = "d5654510599f5b42919a949c5c4503c5ec1442f1"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
-POD_NAME = "tj-v7-fsvp-3"
-JOB_ID = "v7-final-visual-proof-v3"
+POD_NAME = "tj-v7-fsvp-4"
+JOB_ID = "v7-final-visual-proof-v4"
 CMD = ["node", "./src/scenery-showcase-original14-entry.js"]
 CAMERA_C = (2.2, -21.4, 3.40)
 CAMERA_C_LOOK = (-3.4, -10.2, 1.75)
@@ -280,6 +281,9 @@ def output_contract() -> dict:
         blockers.append("EXTRACT_FAILED_DIGEST_NOT_MARKED_INELIGIBLE")
     if "--v3-camera" not in proof or "V3_CAMERA_FORBIDDEN" not in proof:
         blockers.append("VISUAL_PROOF_ALLOWS_V3_CAMERA")
+    worker = (REPO / "workers/runpod-blender/src/scenery-showcase-original14.js").read_text()
+    if "--extract-and-verify" not in worker or "REQUIRED_LIBRARY_MISSING" not in worker:
+        blockers.append("REQUIRED_LIBRARY_PREFLIGHT_MISSING")
     return {
         "schema": "TIVVLEJOY_V7_VISUAL_PROOF_OUTPUT_CONTRACT_V1",
         "stagedCameraC": list(CAMERA_C),
@@ -365,10 +369,10 @@ def fail_closed_checks() -> dict:
     contract = output_contract()
     if ident["branch"] != REQUIRED_BRANCH:
         blockers.append("BRANCH_MISMATCH")
-    if AUTH_NAME != "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3":
-        blockers.append("V2_AUTHORIZATION_REUSED")
-    if AUTH_NAME == PREVIOUS_AUTH_NAME:
-        blockers.append("V2_AUTHORIZATION_REUSED")
+    if AUTH_NAME != "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V4":
+        blockers.append("V4_AUTHORIZATION_NAME_MISMATCH")
+    if AUTH_NAME in {PREVIOUS_AUTH_NAME, V2_AUTH_NAME}:
+        blockers.append("PRIOR_AUTHORIZATION_REUSED")
     if not ident["requiredImageCommitIsAncestor"]:
         blockers.append("IMAGE_COMMIT_NOT_ANCESTOR")
     if not ident.get("requiredLauncherShaIsAncestor"):
@@ -385,14 +389,19 @@ def fail_closed_checks() -> dict:
         blockers.append("EXTRACT_REPAIR_DIGEST_NOT_PINNED")
     auth = json.loads(AUTH_FILE.read_text()) if AUTH_FILE.is_file() else {}
     if auth.get("name") != AUTH_NAME or auth.get("digest") != REQUIRED_DIGEST or auth.get("requiredLauncherSha") != REQUIRED_LAUNCHER_SHA:
-        blockers.append("V3_AUTHORIZATION_NOT_BOUND")
+        blockers.append("V4_AUTHORIZATION_NOT_BOUND")
     if auth.get("consumed"):
-        blockers.append("V3_AUTHORIZATION_ALREADY_CONSUMED")
+        blockers.append("V4_AUTHORIZATION_ALREADY_CONSUMED")
     v2 = json.loads(V2_LEDGER.read_text()) if V2_LEDGER.is_file() else {}
-    if v2.get("authorization") != PREVIOUS_AUTH_NAME or int(v2.get("createPerformed") or 0) != 1:
+    if v2.get("authorization") != V2_AUTH_NAME or int(v2.get("createPerformed") or 0) != 1:
         blockers.append("V2_CONSUMPTION_NOT_PROVEN")
+    v3 = json.loads(V3_LEDGER.read_text()) if V3_LEDGER.is_file() else {}
+    if v3.get("authorization") != PREVIOUS_AUTH_NAME or int(v3.get("createPerformed") or 0) != 1:
+        blockers.append("V3_CONSUMPTION_NOT_PROVEN")
     if JOB_ID.endswith("v2") or POD_NAME.endswith("-2"):
         blockers.append("V2_JOB_REUSED")
+    if JOB_ID.endswith("v3") or POD_NAME.endswith("-3"):
+        blockers.append("V3_JOB_REUSED")
     if not pin["digest"] or not pin["digestMatch"]:
         blockers.append("DIGEST_NOT_PINNED")
     inspect = json.loads(INSPECT.read_text()) if INSPECT.is_file() else {}
@@ -743,7 +752,7 @@ def Number_is_finite(value) -> bool:
 
 def write_result(status: str, **extra) -> None:
     payload = {
-        "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3_RESULT",
+        "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V4_RESULT",
         "status": status,
         "authorization": AUTH_NAME,
         "digest": REQUIRED_DIGEST,
