@@ -46,6 +46,38 @@ jobs:
       - name: Unit-test fail-closed materialization
         working-directory: scripts/cloud/stagegraph-v1
         run: python -m unittest -v test_materialize_ecokit_v1.py
+      - name: Check private asset credentials
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          required = (
+              "R2_ENDPOINT",
+              "R2_ACCESS_KEY_ID",
+              "R2_SECRET_ACCESS_KEY",
+              "R2_BUCKET",
+          )
+          missing = [name for name in required if not os.environ.get(name)]
+          if missing:
+              out = Path("/tmp/tivvlejoy-stagegraph/ASSET_AUDIT_BLOCKED.json")
+              out.parent.mkdir(parents=True, exist_ok=True)
+              out.write_text(json.dumps({
+                  "schema": "TIVVLEJOY_STAGEGRAPH_ASSET_AUDIT_BLOCKED_V1",
+                  "status": "BLOCKED",
+                  "gate": "DEPENDENCY_AUDIT_PASS",
+                  "reason": "PRIVATE_ASSET_CREDENTIALS_NOT_CONFIGURED",
+                  "missingSecretNames": missing,
+                  "sourceAssetPublished": False,
+                  "paidMutationPerformed": False,
+                  "paidCreateCount": 0,
+                  "paidSpendUsd": 0
+              }, indent=2) + "\n")
+              print("EcoKit audit blocked: required private-asset credentials are not configured.")
+              raise SystemExit(2)
+          print("Private asset credential names are configured.")
+          PY
       - name: Install private object-store client
         run: python -m pip install --disable-pip-version-check boto3==1.40.14
       - name: Materialize exact EcoKit source
