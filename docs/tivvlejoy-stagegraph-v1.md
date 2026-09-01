@@ -4,7 +4,7 @@ StageGraph replaces free-form scenery assembly with evidence-gated production. A
 
 ## First active workstream
 
-The first certification candidate is `SRC_FOREST_MODEL_PACKAGE` (`Stylized_Forest_Nature_Kit.zip`). It is isolated from the failed multi-pack V4 scene so the studio can prove that one purchased pack can reproduce its advertised quality before combining environments.
+The first certification candidate is `SRC_FOREST_STYLISED_ECOKIT` (`Stylised EcoKit.zip`). Its source digest, two large native `.blend` libraries, and 1,134 extracted textures already have zero-cost receipts. It is isolated from the failed multi-pack V4 scene so the studio can prove that one purchased pack can reproduce its advertised quality before combining environments.
 
 The initial sequence is:
 
