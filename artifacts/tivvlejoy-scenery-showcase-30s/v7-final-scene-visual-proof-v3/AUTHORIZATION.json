@@ -9,14 +9,17 @@
   "cloudType": "SECURE",
   "maxUsdPerHour": 0.74,
   "maxRuntimeMinutes": 40,
-  "maxSpendUsd": 0.50,
+  "maxSpendUsd": 0.5,
   "createCount": 1,
   "retry": false,
   "encode900": false,
-  "consumed": false,
+  "consumed": true,
   "v2MustNotBeReused": true,
   "ineligibleDigests": [
     "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
     "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
-  ]
+  ],
+  "consumedAt": "2026-09-01T00:17:06.000803+00:00",
+  "podId": "kthjs7wmtootc3",
+  "createPerformed": 1
 }

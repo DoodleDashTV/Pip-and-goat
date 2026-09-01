@@ -1,0 +1,9 @@
+{
+  "schema": "TIVVLEJOY_V7_VISUAL_PROOF_LEDGER_V1",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3",
+  "createPerformed": 1,
+  "jobId": "v7-final-visual-proof-v3",
+  "podId": "kthjs7wmtootc3",
+  "digest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "at": "2026-09-01T00:17:06.000376+00:00"
+}

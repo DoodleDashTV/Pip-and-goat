@@ -1,0 +1,16 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_V3_PIXEL_SUITE",
+  "pixelSuiteRun": false,
+  "reason": "WORKER_FAILED_BEFORE_STILLS",
+  "workerCode": "BLENDER_FAILED",
+  "workerMessage": "required files missing: Flora_Mat&GN&Models.blend, Rock_Models.blend",
+  "images": [],
+  "E": "NOT_RUN",
+  "F": "NOT_RUN",
+  "J": "NOT_RUN",
+  "findings": {
+    "E": "No SHOT_01 pixels. Meadow regions cannot be judged from configuration.",
+    "F": "No SHOT_02 Camera C pixels. Waterline interruptions cannot be judged from configuration.",
+    "J": "No SHOT_02 pixels. Cavity collars cannot be judged from configuration."
+  }
+}
