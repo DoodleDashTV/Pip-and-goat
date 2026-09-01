@@ -7,7 +7,7 @@ def valid_audit():
     return {
         "schema": SCHEMA,
         "blenderVersion": "4.3.2",
-        "sourceId": "SRC_FOREST_MODEL_PACKAGE",
+        "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
         "sourceSha256": "ab" * 32,
         "missingImages": [],
         "missingLibraries": [],
