@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Materialize exactly one locked EcoKit archive from private R2 without publishing source bytes."""
+"""Zero-RunPod materialization of one locked EcoKit archive without publishing source bytes."""
 
 from __future__ import annotations
 
