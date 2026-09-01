@@ -1,0 +1,33 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_RECEIPT_V1",
+  "stage": "SOURCE_PACK_LOCKED",
+  "result": "PASS",
+  "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+  "filename": "Stylised EcoKit.zip",
+  "sourceBytes": 669481428,
+  "sourceSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+  "artifactSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+  "extractionEvidence": {
+    "libraryCount": 2,
+    "textureCount": 1134,
+    "missingNamedTextures": [],
+    "libraries": [
+      {
+        "name": "Flora_Mat&GN&Models.blend",
+        "bytes": 669989781,
+        "sha256": "ce663a3e7b70b566d05092c6d86a94d727dbb5232068369de002ada4c1124589"
+      },
+      {
+        "name": "Rock_Models.blend",
+        "bytes": 258365184,
+        "sha256": "ea72ac8e65b278c8bfc351d55efa6d8aef2eeec13068cec42cf79db1f23f592c"
+      }
+    ]
+  },
+  "limits": {
+    "dependencyAuditPass": false,
+    "vendorReferenceReproduced": false,
+    "visualApproval": false,
+    "paidAuthorization": false
+  }
+}
