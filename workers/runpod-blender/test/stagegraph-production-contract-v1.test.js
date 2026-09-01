@@ -16,7 +16,7 @@ function human(stage) {
 }
 
 test('starts with scenery certification and keeps characters waiting for the artist rigs', () => {
-  const graph = contract.evaluateStageGraph({ selectedSourceId: 'SRC_FOREST_MODEL_PACKAGE', receipts: {} });
+  const graph = contract.evaluateStageGraph({ selectedSourceId: 'SRC_FOREST_STYLISED_ECOKIT', receipts: {} });
   assert.equal(graph.nextStage, 'SOURCE_PACK_LOCKED');
   assert.equal(graph.characterState, 'WAITING_FOR_ARTIST_RIGS');
   assert.equal(graph.productionReady, false);
@@ -82,11 +82,11 @@ test('final render is blocked until every preceding production and human gate pa
 test('production-ready is earned only after the batch-of-ten gate', () => {
   const receipts = {};
   for (const stage of contract.STAGES) receipts[stage] = contract.HUMAN_APPROVAL_STAGES.has(stage) ? human(stage) : technical(stage);
-  const complete = contract.evaluateStageGraph({ selectedSourceId: 'SRC_FOREST_MODEL_PACKAGE', receipts });
+  const complete = contract.evaluateStageGraph({ selectedSourceId: 'SRC_FOREST_STYLISED_ECOKIT', receipts });
   assert.equal(complete.productionReady, true);
   assert.equal(complete.nextStage, null);
   delete receipts.BATCH_10_QC_PASS;
-  assert.equal(contract.evaluateStageGraph({ selectedSourceId: 'SRC_FOREST_MODEL_PACKAGE', receipts }).productionReady, false);
+  assert.equal(contract.evaluateStageGraph({ selectedSourceId: 'SRC_FOREST_STYLISED_ECOKIT', receipts }).productionReady, false);
 });
 
 test('five seconds per frame yields the conservative 60-second budget', () => {
