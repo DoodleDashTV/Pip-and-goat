@@ -32,9 +32,9 @@ OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-pro
 
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
-REQUIRED_DIGEST = ""  # set only after the VRAM-gate image is pinned
+REQUIRED_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
-REQUIRED_IMAGE_COMMIT = "c54aecdfc7e6da4f008b5dce8ba47cfe6cb04cfc"
+REQUIRED_IMAGE_COMMIT = "e5e4d36323e65dfc32963d0c5c357d3c32bafc46"
 REQUIRED_CONTENT_ANCESTOR = "d5654510599f5b42919a949c5c4503c5ec1442f1"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
 POD_NAME = "tj-v7-fsvp-2"
@@ -257,7 +257,9 @@ def output_contract() -> dict:
     )
     camera_c_locked = "2.2, -21.4, 3.40" in shots and "-3.4, -10.2, 1.75" in shots
     production_uses_resolver = "resolve_production_camera" in valley
-    failed_ineligible = FAILED_DIGEST in (json.loads(PIN.read_text()).get("ineligibleDigests") or [])
+    ineligible = json.loads(PIN.read_text()).get("ineligibleDigests") or []
+    failed_ineligible = FAILED_DIGEST in ineligible
+    vram_failed_ineligible = FAILED_VRAM_DIGEST in ineligible
     blockers = []
     if hijack:
         blockers.extend(["CAMERA_C_REPLACED_BY_V3_COMP_A", "SIX_SHOT_CAMERAS_NOT_USED"])
@@ -267,6 +269,8 @@ def output_contract() -> dict:
         blockers.append("PRODUCTION_CAMERA_RESOLVER_MISSING")
     if not failed_ineligible:
         blockers.append("FAILED_DIGEST_NOT_MARKED_INELIGIBLE")
+    if not vram_failed_ineligible:
+        blockers.append("VRAM_GATE_DIGEST_NOT_MARKED_INELIGIBLE")
     if "--v3-camera" not in proof or "V3_CAMERA_FORBIDDEN" not in proof:
         blockers.append("VISUAL_PROOF_ALLOWS_V3_CAMERA")
     return {
@@ -276,6 +280,8 @@ def output_contract() -> dict:
         "stagedLens": CAMERA_C_LENS,
         "failedDigest": FAILED_DIGEST,
         "failedDigestIneligible": failed_ineligible,
+        "failedVramDigest": FAILED_VRAM_DIGEST,
+        "failedVramDigestIneligible": vram_failed_ineligible,
         "heroRebuildForcesV3CompCameras": hijack,
         "v3CompA": list(V3_COMP_A),
         "cameraCPresentInShotLock": camera_c_locked,

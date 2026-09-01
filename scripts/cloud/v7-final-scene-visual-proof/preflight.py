@@ -12,6 +12,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 PIN = REPO / "config/cloud/scenery-showcase-final-image.json"
 AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2"
+NEXT_AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3"
+FAILED_CAMERA_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
+FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
 HARD_SPEND_USD = 0.50
 HARD_RUNTIME_MINUTES = 40
 USD_PER_HOUR = 0.74
@@ -26,22 +29,36 @@ def main() -> int:
     launchable = (
         published
         and digest not in ineligible
+        and digest != FAILED_CAMERA_DIGEST
+        and digest != FAILED_VRAM_DIGEST
+        and FAILED_CAMERA_DIGEST in ineligible
+        and FAILED_VRAM_DIGEST in ineligible
+        and pin.get("vramFloorMib") == 24500
         and cmd == ["node", "./src/scenery-showcase-original14-entry.js"]
         and pin.get("workerEntrypoint") == "scenery-showcase-original14-entry.js"
         and pin.get("runpodContacted") is False
+        and pin.get("waterVariant") == "D"
+        and pin.get("cameraContract") == "six-shot-camera-c-lock-v1"
     )
     expected_usd = round((HARD_RUNTIME_MINUTES / 60.0) * USD_PER_HOUR, 4)
     payload = {
         "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_PREFLIGHT_V1",
         "authorizationName": AUTH_NAME,
+        "previousAuthorization": AUTH_NAME,
+        "nextAuthorizationName": NEXT_AUTH_NAME,
         "authorizationCreated": False,
         "authorizationConsumed": False,
+        "v2ConsumedFailedAfterCreate": True,
         "issuable": launchable,
+        "v3AuthorizationSafelyIssuable": launchable,
+        "v3AuthorizationIssued": False,
         "image": {
             "status": pin.get("status"),
             "digest": digest or None,
             "cmd": cmd,
             "published": published,
+            "vramFloorMib": pin.get("vramFloorMib"),
+            "ineligibleDigests": sorted(ineligible),
         },
         "jobKind": "VISUAL_PROOF",
         "gpu": "NVIDIA GeForce RTX 4090",

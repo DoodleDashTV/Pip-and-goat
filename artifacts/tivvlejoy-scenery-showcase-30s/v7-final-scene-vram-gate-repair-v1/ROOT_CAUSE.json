@@ -38,5 +38,7 @@
   "documentedClassTotalMiB": 24564,
   "newFloorMiB": 24500,
   "safetyMarginMiBBelowDocumented4090": 64,
-  "marginAbove20GiBMiB": 4020
+  "marginAbove20GiBMiB": 4020,
+  "repairedImageDigest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "repairedImageSourceCommit": "e5e4d36323e65dfc32963d0c5c357d3c32bafc46"
 }
