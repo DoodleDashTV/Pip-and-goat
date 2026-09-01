@@ -1,0 +1,15 @@
+{
+  "schema": "TIVVLEJOY_WORKER_STARTUP_CANARY_V1_CONTAINER",
+  "runId": 33322215513,
+  "commit": "1c7a2fee84ff9b1340681b738b1d7a4f368b0d8f",
+  "anonymousPull": true,
+  "pullSeconds": 0,
+  "nodeStart": true,
+  "blender422": true,
+  "nvidiaBanner": true,
+  "nodeMarker": "NODE_ENTRY_STARTED",
+  "blenderVersionLine": "Blender 4.2.2 LTS",
+  "gpuRequired": false,
+  "runpodContacted": false,
+  "paidCreate": 0
+}

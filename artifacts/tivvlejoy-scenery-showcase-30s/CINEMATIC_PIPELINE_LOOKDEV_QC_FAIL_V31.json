@@ -1,0 +1,59 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T22:50:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "commit": "042dbdc6cf252b5b50f183b8846bec7a425f06cc",
+  "geometryTestDir": "/tmp/o14-lookdev/cinematic-lookdev39-geom",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev39",
+  "acceptanceAN": {
+    "A_water_hidden_shot02_is_creek": true,
+    "B_water_instantly_identifiable": false,
+    "C_water_only_part_of_channel": true,
+    "D_dark_wet_bed_visible": true,
+    "E_3d_bank_slope_depth": true,
+    "F_no_knife_edge_grass_seam": false,
+    "G_no_constant_width_ribbon": "partial",
+    "H_no_road_path_interpretation": "partial",
+    "I_reflections_support_water": false,
+    "J_natural_bank_breakup": "partial",
+    "K_shot02_cinematic": "partial",
+    "L_shot01_to_06_believable": false,
+    "M_purchased_scenery_authoritative": true,
+    "N_clean_enough_to_judge": true
+  },
+  "measurements": {
+    "SHOT_01": {"meanLum": 108.9, "midBminusG": -7.6, "botBminusG": -19.0},
+    "SHOT_02": {"meanLum": 73.0, "midBminusG": -9.4, "botBminusG": -19.9},
+    "SHOT_03": {"meanLum": 89.2, "midBminusG": 2.0, "botBminusG": -17.5},
+    "SHOT_04": {"meanLum": 96.9, "midBminusG": -15.2, "botBminusG": -9.8},
+    "SHOT_05": {"meanLum": 123.1, "midBminusG": 3.7, "botBminusG": -13.4},
+    "SHOT_06": {"meanLum": 83.8, "midBminusG": -12.9, "botBminusG": -15.6}
+  },
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/street/ridge hold. High crane still foreshortens the trench; water reads as a winding pale strip.",
+    "SHOT_02": "PARTIAL — water-hidden geometry is a creek. With water on, dark bed and 3D banks hold; the film is still a pale glossy ribbon in the trough.",
+    "SHOT_03": "PARTIAL — framed forest opening holds. Distant dark channel is not the subject.",
+    "SHOT_04": "PARTIAL — street/cart/fence/mountains hold. Foreground shows grass → bank → wide dark bed → narrow film.",
+    "SHOT_05": "PARTIAL — compression holds. Distant channel still risks a drainage-trench read.",
+    "SHOT_06": "FAIL — village/cart/fence hold. Foreground water remains a pale strip; banks do not read from this angle."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape"
+  ],
+  "progressThisRepair": {
+    "geometryFirstChannelLanded": true,
+    "waterHiddenShot02ReadsAsCreek": true,
+    "darkBedWiderThanWater": true,
+    "cameraVisibleBankDepthOnShot02": true,
+    "waterFilmStillPaleRibbon": true
+  },
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "smallestNextAction": "Keep the carved channel. Make the narrow film read as water from SHOT_02/01/06 without turning it pale or icy. Soften the grass/bed crest. Do not CREATE.",
+  "honestConclusion": "Dark bed + 3D banks now establish a creek silhouette with water hidden. The water film is still not instantly water. Do not CREATE. Do not return FINAL_RESULT."
+}

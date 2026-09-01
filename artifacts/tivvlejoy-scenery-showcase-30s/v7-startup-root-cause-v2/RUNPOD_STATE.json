@@ -1,0 +1,21 @@
+{
+  "schema": "TIVVLEJOY_V7_PAID_POD_STATE_AUDIT_V2",
+  "podId": "pnmqjjnnfxupfe",
+  "queryNow": "terminated pod is gone from GraphQL myself.pods and REST /v1/pods",
+  "livePodsNow": [],
+  "contemporaneousEvidenceOnly": true,
+  "hostAssigned": true,
+  "machineId": null,
+  "desiredStatusObserved": "RUNNING",
+  "lastStatusChange": "Rented by User: Sun Aug 30 2026 15:29:06 GMT+0000",
+  "runtimeUptimeObserved": "negative integers throughout (-2 to -16); never >= 0",
+  "machineGpu": "RTX 4090",
+  "costPerHr": 0.74,
+  "secureCloud": true,
+  "minMemoryInGbRequested": 32,
+  "containerState": "never reported positive runtime",
+  "imagePullState": "not exposed by available API fields",
+  "startupErrors": "not available after terminate",
+  "exitReason": "terminated by launcher after CONTAINER_NEVER_STARTED",
+  "lastConfirmedStartupStage": "HOST_ASSIGNED_OR_IMAGE_PULLING"
+}

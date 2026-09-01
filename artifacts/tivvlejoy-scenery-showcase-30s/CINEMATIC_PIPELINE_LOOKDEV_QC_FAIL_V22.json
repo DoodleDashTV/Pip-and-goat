@@ -1,0 +1,29 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:45:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "b2609a8",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev27",
+  "shots": {
+    "SHOT_01": "PARTIAL — establish still a valley. River remains a silvery ribbon in the lower left.",
+    "SHOT_02": "FAIL — along-channel water still a hard-edged path (unchanged this pass).",
+    "SHOT_03": "PARTIAL — framed opening from earlier passes.",
+    "SHOT_04": "FAIL — cabins at ±6m overlap a 34mm camera. Shot is a black alley between log ends.",
+    "SHOT_05": "PARTIAL — compression holds with a tree in front of the cluster.",
+    "SHOT_06": "FAIL — cabin-corner crop. Same over-tight street."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "village_reads_as_kit_on_a_pad",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Cabin kits are huge; ±6m is an alley. Restore street width and look across a facade, not down the centerline. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

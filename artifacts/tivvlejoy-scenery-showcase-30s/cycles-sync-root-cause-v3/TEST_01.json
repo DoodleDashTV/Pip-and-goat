@@ -1,0 +1,121 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_01",
+  "parts": [
+    "hdri"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 255524864,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093244.8318431,
+    "rss": 256278528,
+    "hwm": 256278528,
+    "memTotal": 16791945216,
+    "memAvailable": 15503245312,
+    "memFree": 14935175168,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861835776,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 1,
+    "vertices": 0,
+    "faces": 0
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093254.2741964,
+    "rss": 303611904,
+    "hwm": 5695967232,
+    "memTotal": 16791945216,
+    "memAvailable": 15278133248,
+    "memFree": 14710042624,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861827584,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 2,
+    "vertices": 0,
+    "faces": 0
+  },
+  "hwm": 5695967232,
+  "deltaRss": 47333376,
+  "peakFromHwm": 5695967232,
+  "error": null,
+  "pngBytes": 4486,
+  "png": true,
+  "images": {
+    "count": 1,
+    "rawBytes": 450000000,
+    "largest": [
+      {
+        "name": "Image0001.jpg",
+        "width": 15000,
+        "height": 7500,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 450000000,
+        "users": 1,
+        "referenced": true,
+        "role": "hdri"
+      }
+    ]
+  },
+  "modifiers": [],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [],
+    "count": 0
+  },
+  "instances": {
+    "uniqueMeshes": 0,
+    "objects": 1,
+    "shared": [],
+    "singleUser": 0
+  },
+  "beech": null,
+  "evalGeom": null,
+  "counts": {
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 2,
+    "vertices": 0,
+    "faces": 0
+  }
+}

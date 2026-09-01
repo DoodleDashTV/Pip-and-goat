@@ -1,0 +1,46 @@
+{
+  "schema": "TJ_RUNPOD_READONLY_V4",
+  "ok": true,
+  "created": 0,
+  "paidCreate": 0,
+  "systemRamNote": "gpuTypes does not expose host RAM. Reject any worker with system RAM < 24 GiB at launch time. Prefer 32 GiB+.",
+  "candidates": [
+    {
+      "gpu": "RTX 4090",
+      "vramGb": 24,
+      "secureUsdPerHr": 0.74,
+      "listUsdPerHr": 0.34,
+      "secureCloud": true,
+      "communityCloud": true,
+      "created": false
+    },
+    {
+      "gpu": "RTX 5090",
+      "vramGb": 32,
+      "secureUsdPerHr": null,
+      "listUsdPerHr": 0.69,
+      "created": false
+    },
+    {
+      "gpu": "L40",
+      "vramGb": 48,
+      "secureUsdPerHr": 0.82,
+      "listUsdPerHr": 0.69,
+      "created": false
+    },
+    {
+      "gpu": "L40S",
+      "vramGb": 48,
+      "secureUsdPerHr": 0.99,
+      "listUsdPerHr": 0.79,
+      "created": false
+    },
+    {
+      "gpu": "RTX 6000 Ada",
+      "vramGb": 48,
+      "secureUsdPerHr": 0.84,
+      "listUsdPerHr": 0.74,
+      "created": false
+    }
+  ]
+}

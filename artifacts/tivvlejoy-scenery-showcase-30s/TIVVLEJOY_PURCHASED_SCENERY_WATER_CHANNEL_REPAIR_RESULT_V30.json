@@ -1,0 +1,40 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_WATER_CHANNEL_REPAIR_RESULT_V30",
+  "startingSha": "8ef309eb892ec22929c1e7699e1dc2c44e993d8d",
+  "finalSha": "5825861076d16f1bf535a692e267759fa4569704",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "exactChanges": [
+    "Asymmetric extra spline bends",
+    "Independent left/right channel half-widths",
+    "TJ_River_DarkBed under a narrower TJ_River_PurchasedWater film",
+    "Terrain trench follows irregular widths with deeper center",
+    "Removed continuous bank-outline patches after lookdev35",
+    "SHOT_02 moved to south-bank downward look",
+    "South-bank vegetation breakup"
+  ],
+  "waterMaterial": "TJ_CinematicRiver: Water_Mat_1 tint donor, IOR 1.333, metallic 0, transmission 0.18, fresnel gloss capped at 0.22, RiverMask roughness breakup, noise ripples. Not Water_Mat ice tiles. Water_GN hidden.",
+  "riverbedConstruction": "TJ_River_DarkBed: 7-row variable-width strip, darker center, wet-earth BSDF, 18cm below film at center, width_scale 1.30 vs film 0.56",
+  "bankConstruction": "Terrain wet-earth vertex mask plus wider dark bed margins. No continuous dirt-outline mesh.",
+  "purchasedAssetsAuthoritative": true,
+  "previewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev36/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev36/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev36/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev36/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev36/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev36/shot_06_.png"
+  },
+  "shot02Before": "lookdev34 along-channel glossy ribbon / ice-plastic path",
+  "shot02After": "lookdev36 bank-side downward look; still a pale ribbon with a hard grass seam. Bed margins do not read as a creek.",
+  "latestGate": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V30.json",
+  "latestGateResult": "FAIL",
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false
+}

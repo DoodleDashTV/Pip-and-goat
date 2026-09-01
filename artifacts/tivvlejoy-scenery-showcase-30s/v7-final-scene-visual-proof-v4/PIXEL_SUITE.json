@@ -1,0 +1,35 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_V4_PIXEL_SUITE",
+  "pixelSuiteRun": true,
+  "workerStatus": "COMPLETE",
+  "encode900": false,
+  "images": [
+    {"shot": "SHOT_01", "frame": 48, "camera": "TJ_SHOT_01_CAM", "kind": "preview", "path": "images/preview_SHOT_01.png", "pixels": "540x960", "bytes": 609264},
+    {"shot": "SHOT_02", "frame": 210, "camera": "TJ_SHOT_02_CAM", "kind": "preview", "path": "images/preview_SHOT_02.png", "pixels": "540x960", "bytes": 708037},
+    {"shot": "SHOT_03", "frame": 360, "camera": "TJ_SHOT_03_CAM", "kind": "preview", "path": "images/preview_SHOT_03.png", "pixels": "540x960", "bytes": 526620},
+    {"shot": "SHOT_04", "frame": 520, "camera": "TJ_SHOT_04_CAM", "kind": "preview", "path": "images/preview_SHOT_04.png", "pixels": "540x960", "bytes": 628673},
+    {"shot": "SHOT_05", "frame": 680, "camera": "TJ_SHOT_05_CAM", "kind": "preview", "path": "images/preview_SHOT_05.png", "pixels": "540x960", "bytes": 644057},
+    {"shot": "SHOT_06", "frame": 860, "camera": "TJ_SHOT_06_CAM", "kind": "preview", "path": "images/preview_SHOT_06.png", "pixels": "540x960", "bytes": 563376},
+    {"shot": "SHOT_02", "frame": 210, "camera": "TJ_SHOT_02_CAM", "kind": "hero", "path": "images/hero_SHOT_02.png", "pixels": "1080x1920", "bytes": 9144486}
+  ],
+  "geometry": {
+    "E": "PASS",
+    "F": "PASS",
+    "J": "PASS"
+  },
+  "pixels": {
+    "E": "REVIEW",
+    "F": "REVIEW",
+    "J": "REVIEW"
+  },
+  "findings": {
+    "E": "SHOT_01 48 rendered. Aerial village and mountain mass are present. Foreground foliage cards read as untextured white/pink stems at LOOKDEV_FAST 32 samples.",
+    "F": "SHOT_02 210 Camera C rendered (preview + hero). Creek water and bank stones are visible. Preview is noisy; hero shows waterline rocks and Water D read.",
+    "J": "SHOT_02 cavity/collar geometry cannot be scored pass/fail from these stills alone. Geometry contract remains PASS.",
+    "SHOT_05": "Louis mountain compression shot rendered. Peak occupies the frame.",
+    "v3CompA": "Not used. Isolated stills used TJ_SHOT_* cameras.",
+    "extract": "Blender started after extract-and-verify; Flora/Rock were present."
+  },
+  "visualApprovalReceipt": "NOT_PASS",
+  "finalVideoAuthorized": false
+}

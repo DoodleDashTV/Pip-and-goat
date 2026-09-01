@@ -1,0 +1,255 @@
+name: TivvleJoy Real Scenery 30s Paid Render V2
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - 'artifacts/tivvlejoy-scenery-showcase-30s/PAID_AUTHORIZATION_V2.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tivvlejoy-real-scenery-30s-paid-render-v2
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 145
+    env:
+      LAUNCH_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s-v2
+      STATUS_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s
+      CLEANUP_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s/cleanup
+      LAUNCH_AUTHORIZATION: TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V2
+      CLEANUP_AUTHORIZATION: TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V1
+      EXPECTED_IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - name: Checkout authorization evidence only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            artifacts/tivvlejoy-scenery-showcase-30s/PAID_AUTHORIZATION_V2.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Validate explicit V2 authorization file
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RUNPOD_API_KEY"
+          python3 - <<'PY'
+          import json
+          p=json.load(open('artifacts/tivvlejoy-scenery-showcase-30s/PAID_AUTHORIZATION_V2.json'))
+          assert p.get('authorization') == 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V2'
+          assert p.get('maxCreates') == 1
+          assert p.get('purpose') == 'real-purchased-scenery-30s-proof'
+          print('V2 authorization file accepted; maxCreates=1')
+          PY
+
+      - name: Recheck zero-cost V2 preflight immediately before CREATE
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl --retry 8 --retry-all-errors --retry-delay 3 --max-time 90 -sS -o preflight.json -w '%{http_code}' \
+            --request POST "$LAUNCH_URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $LAUNCH_AUTHORIZATION" \
+            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+            --data '{"action":"preflight"}')
+          test "$code" = '200'
+          python3 - <<'PY'
+          import json, os
+          p=json.load(open('preflight.json'))
+          assert p.get('paidMutationPerformed') is False
+          assert p.get('ready') is True
+          assert p.get('workerImage') == os.environ['EXPECTED_IMAGE']
+          assert p.get('workerEntrypoint') == 'scenery-showcase-entry-v2.js'
+          assert p.get('dryShowcaseBaked') is True
+          assert p.get('runtimeDockerArgsRequired') is False
+          assets=p.get('assets') or {}
+          assert assets.get('ok') is True
+          assert assets.get('satisfiedRoleCount') == 12
+          assert assets.get('missingRoles') == []
+          rate=float((p.get('runpod') or {}).get('rate'))
+          assert 0 < rate <= 0.8
+          print(json.dumps({'ready':True,'secureUsdPerHr':rate,'stockStatus':(p.get('runpod') or {}).get('stockStatus')}))
+          PY
+
+      - name: One authorized CREATE
+        id: launch
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl --max-time 90 -sS -o launch.json -w '%{http_code}' \
+            --request POST "$LAUNCH_URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $LAUNCH_AUTHORIZATION" \
+            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+            --data '{"action":"launch"}')
+          python3 - <<'PY'
+          import json
+          p=json.load(open('launch.json'))
+          safe={k:p.get(k) for k in ('schema','executionId','createEntered','createRequests','retryCreate','runpod','workerImage','workerEntrypoint','dryShowcase','dryShowcaseBaked','runtimeDockerArgsRequired','limits','error')}
+          print(json.dumps(safe))
+          PY
+          test "$code" = '200'
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          p=json.load(open('launch.json'))
+          assert p.get('createEntered') is True
+          assert p.get('createRequests') == 1
+          assert p.get('retryCreate') is False
+          assert p.get('workerImage') == os.environ['EXPECTED_IMAGE']
+          assert p.get('workerEntrypoint') == 'scenery-showcase-entry-v2.js'
+          assert p.get('runtimeDockerArgsRequired') is False
+          pod=p.get('podId')
+          assert pod
+          print('pod_id='+pod)
+          PY
+
+      - name: Poll verified R2 render status with 30 minute cold-start allowance
+        shell: bash
+        run: |
+          set -euo pipefail
+          terminal=''
+          consecutive_curl_failures=0
+          for i in $(seq 1 480); do
+            if curl --retry 8 --retry-all-errors --retry-delay 3 --max-time 50 -sS "$STATUS_URL" -o status.json; then
+              consecutive_curl_failures=0
+            else
+              consecutive_curl_failures=$((consecutive_curl_failures + 1))
+              echo "poll i=$i state=BRIDGE_UNREACHABLE startup=UNKNOWN curl_failures=$consecutive_curl_failures"
+              if [ "$consecutive_curl_failures" -ge 20 ]; then
+                echo 'Status bridge unreachable for 20 consecutive attempts.'
+                exit 1
+              fi
+              sleep 15
+              continue
+            fi
+            read -r state startup stage <<<"$(python3 - <<'PY'
+          import json
+          try:
+            p=json.load(open('status.json'))
+          except Exception:
+            print('PARSE_ERROR', 'NO', 'NONE')
+            raise SystemExit(0)
+          status=p.get('status') or {}
+          startup=p.get('startup') or {}
+          print(str(status.get('status') or 'NONE'), 'YES' if startup else 'NO', str(startup.get('stage') or 'NONE'))
+          PY
+          )"
+            echo "poll i=$i state=$state startup=$startup stage=$stage"
+            if [ "$state" = 'COMPLETE' ]; then
+              terminal='COMPLETE'
+              break
+            fi
+            if [ "$state" = 'FAILED' ]; then
+              python3 - <<'PY'
+          import json
+          p=json.load(open('status.json'))
+          s=p.get('status') or {}
+          print('Worker failed:', s.get('code'), s.get('message'))
+          PY
+              exit 1
+            fi
+            if [ "$i" -ge 120 ] && [ "$startup" = 'NO' ]; then
+              echo 'Startup watchdog: no R2 PROCESS_STARTED marker after 30 minutes.'
+              exit 1
+            fi
+            sleep 15
+          done
+          test "$terminal" = 'COMPLETE'
+          python3 - <<'PY'
+          import json
+          p=json.load(open('status.json'))
+          s=p.get('status') or {}
+          assert s.get('status') == 'COMPLETE'
+          assert s.get('resolution') == '1080x1920'
+          assert int(s.get('fps')) == 30
+          assert int(s.get('frameCount')) >= 900
+          assert abs(float(s.get('durationSeconds')) - 30.0) <= 0.1
+          assert s.get('artifactSha256') == s.get('readbackSha256')
+          assert s.get('commercialAssetsPublished') is False
+          print(json.dumps({
+            'status':s.get('status'),
+            'frameCount':s.get('frameCount'),
+            'resolution':s.get('resolution'),
+            'fps':s.get('fps'),
+            'durationSeconds':s.get('durationSeconds'),
+            'selectedRoleCount':s.get('selectedRoleCount'),
+            'artifactSha256':s.get('artifactSha256'),
+            'commercialAssetsPublished':s.get('commercialAssetsPublished'),
+          }))
+          PY
+
+      - name: Download verified MP4
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --retry 6 --retry-all-errors --retry-delay 3 -sS "$STATUS_URL?download=1" -o download.json
+          python3 - <<'PY' > download-url.txt
+          import json
+          p=json.load(open('download.json'))
+          assert (p.get('status') or {}).get('status') == 'COMPLETE'
+          u=p.get('downloadUrl')
+          assert u
+          print(u)
+          PY
+          curl --retry 6 --retry-all-errors --retry-delay 3 -sS --fail "$(cat download-url.txt)" -o tivvlejoy-scenery-showcase-30s.mp4
+          ffprobe -v error -of json -show_streams -show_format tivvlejoy-scenery-showcase-30s.mp4 > ffprobe.json
+          python3 - <<'PY'
+          import json, os
+          p=json.load(open('ffprobe.json'))
+          v=next(s for s in p['streams'] if s.get('codec_type')=='video')
+          assert int(v['width']) == 1080
+          assert int(v['height']) == 1920
+          d=float(p['format']['duration'])
+          assert 29.8 <= d <= 30.2, d
+          size=os.path.getsize('tivvlejoy-scenery-showcase-30s.mp4')
+          assert size > 100000
+          print(json.dumps({'width':1080,'height':1920,'duration':d,'bytes':size}))
+          PY
+
+      - name: Upload finished scenery video
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-showcase-30s-real-assets-v2
+          path: |
+            tivvlejoy-scenery-showcase-30s.mp4
+            status.json
+            ffprobe.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+
+      - name: Always terminate exact showcase pod
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          code=$(curl --retry 8 --retry-all-errors --retry-delay 3 --max-time 90 -sS -o cleanup.json -w '%{http_code}' \
+            --request POST "$CLEANUP_URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $CLEANUP_AUTHORIZATION" \
+            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+            --data '{}')
+          python3 - <<'PY'
+          import json
+          try:
+            p=json.load(open('cleanup.json'))
+          except Exception:
+            p={}
+          print(json.dumps({
+            'matchedBefore':p.get('matchedBefore'),
+            'terminatedCount':p.get('terminatedCount'),
+            'remainingActiveExactName':p.get('remainingActiveExactName'),
+            'billingCleanupConfirmed':p.get('billingCleanupConfirmed'),
+            'error':p.get('error'),
+          }))
+          if p.get('billingCleanupConfirmed') is not True:
+            raise SystemExit(1)
+          PY
+          test "$code" = '200'

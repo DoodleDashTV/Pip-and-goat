@@ -1,0 +1,30 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:22:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "35fbdf3",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev9",
+  "shots": {
+    "SHOT_01": "FAIL — valley stack exists, but ground is still a pale sandy slab and the river is a bright blue inlet plus a muted sheet.",
+    "SHOT_02": "FAIL — Water_Mat_1 on the spline reads as cracked ice / crystalline tiles, not water.",
+    "SHOT_03": "PARTIAL — forest tree toward hills instead of a cabin portrait; still crushed and noisy.",
+    "SHOT_04": "FAIL — two cabins and a cart on a pad.",
+    "SHOT_05": "FAIL — floating mountain chunk in mid-frame plus a chimney/tree foreground.",
+    "SHOT_06": "FAIL — cabin-and-cart pad shot."
+  },
+  "automaticFailuresHit": [
+    "flat_lime_or_pale_green_ground",
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "mountains_as_repeated_stretched_tiles",
+    "low_poly_asset_test_appearance",
+    "excessive_noise"
+  ],
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "honestConclusion": "Not a visual pass. Water_Mat_1 cannot be the visible river surface. A floating Louis chunk blocks SHOT_05. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

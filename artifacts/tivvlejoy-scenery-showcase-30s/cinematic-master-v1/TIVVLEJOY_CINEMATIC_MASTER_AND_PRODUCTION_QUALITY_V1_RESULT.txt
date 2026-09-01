@@ -1,0 +1,124 @@
+TIVVLEJOY_CINEMATIC_MASTER_AND_PRODUCTION_QUALITY_V1_RESULT
+starting branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+starting SHA: 9ec4004b6c3cda11f33ed0b55aee21c32669bd08
+final branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+final SHA: 31af76291c949144a6f6cf5667bceecd20d2e3fe
+PR state: OPEN / DRAFT / UNMERGED / NOT READY  (#169)
+
+SOURCE STRUCTURE:
+V44 structural state preserved: YES
+Camera C: preserved (2.2, -21.4, 3.40) look (-3.4, -10.2, 1.75) 32 mm
+water lock: preserved (CYCLES, IOR 1.33, transmission 0.80, metallic 0, specular 0.50, prism 18 cm, volume 0.18, WATER_WIDTH_SCALE 0.30, BED_WIDTH_SCALE 0.68, HDRI reflection Z 0.48, Light Path MAXIMUM(Is Glossy Ray, Is Reflection Ray), v34_candidate_d / Water_Mat_1)
+Louis lock: preserved (TJ_LouisFaceFill energy 260 at (1, 24, 15), color (1.0, 0.90, 0.78))
+riverbank state: V44 hero-bank structure unchanged
+meadow state: V44 meadow structure unchanged
+
+HERO:
+shot: SHOT_02
+resolution: 1080 × 1920
+engine: CYCLES (CPU fallback; GPU requested by HERO_STILL)
+samples: 192
+denoise: Cycles denoise ON
+render time: 07:20
+
+CAMERA:
+position: (2.2, -21.4, 3.40)
+look: (-3.4, -10.2, 1.75)
+lens: 32 mm
+DOF: OFF (camera use_dof locked false; environment hero, no miniature blur)
+composition notes: creek-first Camera C preserved. Cabin stays a destination, not the frame center. Louis occupies the sky wedge. Empty TJ_CAM_DOLLY / TJ_CAM_TRACK exist for later motion; Camera C was not reparented.
+
+LIGHTING:
+sun/key: TJ_KeySun energy 3.85, angle 6.4°, euler (45, 10, 38), color (1.0, 0.93, 0.79)
+HDRI/environment: purchased sk2 Image0001, camera yaw −0.65 rad so painted wisps enter SHOT_02, strength 1.18. SkyMachine 2D plates rejected (too cyan for the creek).
+fill: TJ_SkyFill 400, cool (0.82, 0.88, 0.97)
+bounce: TJ_GroundBounce 420, warm (1.0, 0.83, 0.58)
+separation: sun from upper-right / tree-filtered; no studio rim
+shadow treatment: opened vs V44 crushed cabin (cabin luma ~31 → ~63) but eaves still go near-black
+foliage backlight: OFF (transmission mix rejected after earlier neon/card risk)
+
+ATMOSPHERE:
+method: mist + compositor, sky holdout (mist < 0.90). No world volume scatter.
+density: 0.0 volume
+distance treatment: mist start 16 m, depth 50 m, quadratic, compositor scale 0.50
+mountain treatment: lifted vs V44 (mountain luma ~20 → ~106) but still not a true far range
+volumetric treatment: none
+light shafts: none (not beautiful enough to keep)
+
+COLOR:
+color management: AgX + AgX - Base Contrast
+exposure: 0.32
+contrast: Base Contrast (Medium High crushed V44 cabin; Medium Contrast does not exist in 4.2)
+saturation: unmanaged beyond AgX
+highlight rolloff: AgX default
+shadow treatment: fill + bounce only; RGB-curve lift rejected after it flattened p5
+warm/cool treatment: warm sun / cooler sky fill; haze (0.74, 0.80, 0.88)
+
+WATER:
+reflection treatment: locked HDRI foil (gamma 1.85, reflection strength 0.50, Z 0.48) with warmer dim/multiply so the sheet is less teal
+transmission/depth: IOR 1.33 / transmission 0.80 / volume 0.18 unchanged
+creek-bed visibility: present, not a mirror sheet
+highlight treatment: broken but still modest
+bank integration: V44 bank unchanged; water still reads as a separate material from the lumps
+
+VEGETATION:
+lighting: volume still weak; left grove stays dark
+volume: FAIL — purchased needle cards remain cards
+transmission: not applied
+scatter/readability: V44 scatter unchanged
+repetition fixes: none this stage (not a scenery rebuild)
+
+MATERIAL INTEGRATION:
+cabin: roof tiling still obvious; walls still flat beige; porch still crushed
+soil: lumpy procedural meadow carrier
+rock: wet-stone roughness 0.42 only
+vegetation: pack-like pines
+mountain: purchased Louis, some aerial lift, still pack-like
+water: physical lock held; not yet beautiful
+
+DEPTH:
+foreground: creek / bank / hero rock / small pine — highest local contrast
+midground: creek path to cabin
+background: meadow / trees / Louis
+mountain atmospheric separation: better than V44 black mountains, weaker than a feature still. Sky holdout saved the HDRI from grey fog (p5 failure).
+
+FINISHING:
+denoise: Cycles ON
+glare: none
+vignette: none
+lens treatment: none
+grain: none
+
+FINAL CINEMATIC SELF-ASSESSMENT:
+professional first impression: NO
+focal hierarchy: PARTIAL — creek is still the route; cabin secondary; mountain present
+lighting: PARTIAL — motivated outdoor sun, but still harsh and locally crushed
+atmospheric depth: PARTIAL — mountains no longer black, not yet distant
+asset integration: NO
+water: PARTIAL — less cyan plastic than V44, not beautiful
+vegetation: NO — cards
+color: PARTIAL — blue sky + earth, not orange-teal cliché, still generic
+default-Blender appearance: YES — FAIL
+game-engine appearance: YES — FAIL
+procedural appearance: YES — lumpy bank / tiled roof — FAIL
+promotional-still quality: NO
+substantially better than previous previews: NO as a premium still. Limited technical gains vs V44: opened cabin, painted sky wisps, less crushed mountains, less teal water. The world still looks like placed asset packs in a viewport.
+
+FINAL 1080x1920 HERO PATH:
+artifacts/tivvlejoy-scenery-showcase-30s/cinematic-master-v1/SHOT_02_CINEMATIC_MASTER_1080x1920.png
+
+BEFORE COMPARISON PATH:
+artifacts/tivvlejoy-scenery-showcase-30s/cinematic-master-v1/SHOT_02_BEFORE_V44.png
+
+AFTER COMPARISON PATH:
+artifacts/tivvlejoy-scenery-showcase-30s/cinematic-master-v1/SHOT_02_AFTER_CINEMATIC_MASTER.png
+
+REUSABLE PRESET CANDIDATES:
+NOT packaged. None are visually approved.
+experimental only: TJ_CINEMATIC_DAYLIGHT_V1, TJ_ATMOSPHERIC_DEPTH_V1 (mist + sky holdout), TJ_ENVIRONMENT_COLOR_V1 (AgX Base Contrast), TJ_WATER_FILM_RESPONSE_V1 (lock held, look not approved)
+
+live pods: []
+paid CREATE count: 0
+actual RunPod spend: $0
+paid final render triggered: NO
+worker image built/pinned: NO

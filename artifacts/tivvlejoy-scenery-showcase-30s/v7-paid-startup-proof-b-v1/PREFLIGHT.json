@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "blockers": [],
+  "quote": {
+    "id": "NVIDIA GeForce RTX 4090",
+    "displayName": "RTX 4090",
+    "vramGb": 24,
+    "secureUsdPerHr": 0.74,
+    "stockStatus": "Low"
+  },
+  "digest": "sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24",
+  "publicPull": {
+    "ok": true,
+    "anonymousManifestStatus": 200,
+    "layerCount": 29,
+    "compressedBytes": 2164911704
+  },
+  "dockerArgs": "node ./src/v7-proof-a-boot.js",
+  "at": "2026-08-31T10:57:14.501349+00:00"
+}

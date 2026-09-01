@@ -1,0 +1,18 @@
+{
+  "requestedGpuSku": "NVIDIA GeForce RTX 4090",
+  "assignedGpuName": "RTX 4090",
+  "runpodGpuDisplayName": "RTX 4090",
+  "rawNvidiaSmi": "NOT_CAPTURED",
+  "rawMemoryTotal": "NOT_CAPTURED",
+  "rawMemoryFree": "NOT_CAPTURED",
+  "vramTotalMiB": null,
+  "vramFreeMiB": null,
+  "gib": null,
+  "decimalGb": null,
+  "modelCheck": true,
+  "modelCheckEvidence": "RunPod machine.gpuDisplayName=RTX 4090; worker passed assertRtx4090 and reached VISUAL_PROOF_RENDER",
+  "capacityCheck24500": true,
+  "capacityCheckEvidence": "Worker passed HOST_AND_LAUNCH_CONTRACT (24500 MiB integer floor + RTX 4090 identity) and started SHOT_01 frame 48. Raw nvidia-smi was not uploaded on the success path.",
+  "gpuTelemetryUploadedByWorker": null,
+  "source": "runpod_machine_plus_worker_stage_progression"
+}

@@ -1,0 +1,26 @@
+{
+  "units": "nvidia-smi --format=csv,noheader,nounits memory.* is MiB",
+  "exact24GiB": {
+    "mib": 24576,
+    "gib": 24.0,
+    "decimalGb": 25.7731584
+  },
+  "documentedRtx4090Class": {
+    "rawMemoryTotal": "24564",
+    "rawMemoryFree": "NOT_CAPTURED_FROM_POD_zq4lfe0xyknzc7",
+    "mib": 24564,
+    "gib": 23.98828125,
+    "decimalGb": 25.760577024,
+    "source": "scripts/blender/scenery/worker_memory_contract_v1.py comment plus contract tests; not captured from the failed V2 pod"
+  },
+  "approvedFloor": {
+    "mib": 24500,
+    "gib": 23.92578125,
+    "decimalGb": 25.690112,
+    "safetyMarginBelowDocumented4090Mib": 64,
+    "marginAbove20GiBMib": 4020,
+    "marginAbove16GiBMib": 8100
+  },
+  "twentyGiB": {"mib": 20480, "gib": 20.0, "decimalGb": 21.47483648},
+  "sixteenGiB": {"mib": 16384, "gib": 16.0, "decimalGb": 17.179869184}
+}

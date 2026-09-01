@@ -1,0 +1,32 @@
+{
+  "schema": "TIVVLEJOY_GHCR_STARTUP_AUDIT_V2",
+  "digest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+  "unauthenticatedManifestStatus": 401,
+  "anonymousTokenHttp": 200,
+  "anonymousManifestStatus": 200,
+  "unauthenticatedRuntimeCanPullExactDigest": true,
+  "registryAuthRequiredForPublicPull": false,
+  "architecture": "amd64",
+  "linuxAmd64": true,
+  "entrypoint": [
+    "/opt/nvidia/nvidia_entrypoint.sh"
+  ],
+  "cmd": [
+    "node",
+    "./src/scenery-showcase-entry-v2.js"
+  ],
+  "layerCount": 25,
+  "compressedBytes": 2164906933,
+  "largestLayerBytes": [
+    1374295401,
+    483575131,
+    161941275,
+    57593640,
+    50645229,
+    30439778,
+    4623694,
+    1537806
+  ],
+  "coldPullExpectationSeconds": 90,
+  "twentyMinutesPlausibleForPullOnly": true
+}

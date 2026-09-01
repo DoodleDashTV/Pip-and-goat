@@ -1,0 +1,117 @@
+RUN_1_BEGIN
+{"event":"BOOTSTRAP_ENTERED","pid":1,"argv":"node ./src/v7-proof-a-boot.js"}
+{"event":"NODE_AVAILABLE","version":"v20.20.2"}
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.4.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
+   Use the NVIDIA Container Toolkit to start this container with GPU support; see
+   https://docs.nvidia.com/datacenter/cloud-native/ .
+
+{"ts":"2026-08-30T22:13:09.301Z","event":"IMAGE_PROCESS_STARTED"}
+{"ts":"2026-08-30T22:13:09.303Z","event":"NODE_ENTRY_STARTED","argv0":"/opt/ddp-worker/src/v7-proof-a-boot.js","version":"v20.20.2"}
+{"ts":"2026-08-30T22:13:09.304Z","event":"WORKER_MODULE_LOADED","proof":true,"r2Skipped":true,"blenderSkipped":true}
+{"ts":"2026-08-30T22:13:09.306Z","event":"WORKER_LISTENING","port":18080,"bind":"0.0.0.0"}
+{"ts":"2026-08-30T22:13:09.306Z","event":"WORKER_READY","seconds":240}
+{"ts":"2026-08-30T22:13:24.315Z","event":"HEARTBEAT","beat":1,"uptimeMs":15007}
+{"ts":"2026-08-30T22:13:39.322Z","event":"HEARTBEAT","beat":2,"uptimeMs":30014}
+{"ts":"2026-08-30T22:13:54.337Z","event":"HEARTBEAT","beat":3,"uptimeMs":45030}
+{"ts":"2026-08-30T22:14:09.338Z","event":"HEARTBEAT","beat":4,"uptimeMs":60031}
+{"ts":"2026-08-30T22:14:24.353Z","event":"HEARTBEAT","beat":5,"uptimeMs":75046}
+{"ts":"2026-08-30T22:14:39.354Z","event":"HEARTBEAT","beat":6,"uptimeMs":90047}
+{"ts":"2026-08-30T22:14:54.370Z","event":"HEARTBEAT","beat":7,"uptimeMs":105062}
+{"ts":"2026-08-30T22:15:09.371Z","event":"HEARTBEAT","beat":8,"uptimeMs":120063}
+{"ts":"2026-08-30T22:15:24.379Z","event":"HEARTBEAT","beat":9,"uptimeMs":135072}
+{"ts":"2026-08-30T22:15:39.382Z","event":"HEARTBEAT","beat":10,"uptimeMs":150075}
+{"ts":"2026-08-30T22:15:54.388Z","event":"HEARTBEAT","beat":11,"uptimeMs":165081}
+{"ts":"2026-08-30T22:16:09.398Z","event":"HEARTBEAT","beat":12,"uptimeMs":180090}
+RUN_2_BEGIN
+{"event":"BOOTSTRAP_ENTERED","pid":1,"argv":"node ./src/v7-proof-a-boot.js"}
+{"event":"NODE_AVAILABLE","version":"v20.20.2"}
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.4.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
+   Use the NVIDIA Container Toolkit to start this container with GPU support; see
+   https://docs.nvidia.com/datacenter/cloud-native/ .
+
+{"ts":"2026-08-30T22:16:10.683Z","event":"IMAGE_PROCESS_STARTED"}
+{"ts":"2026-08-30T22:16:10.685Z","event":"NODE_ENTRY_STARTED","argv0":"/opt/ddp-worker/src/v7-proof-a-boot.js","version":"v20.20.2"}
+{"ts":"2026-08-30T22:16:10.686Z","event":"WORKER_MODULE_LOADED","proof":true,"r2Skipped":true,"blenderSkipped":true}
+{"ts":"2026-08-30T22:16:10.688Z","event":"WORKER_LISTENING","port":18080,"bind":"0.0.0.0"}
+{"ts":"2026-08-30T22:16:10.689Z","event":"WORKER_READY","seconds":240}
+{"ts":"2026-08-30T22:16:25.697Z","event":"HEARTBEAT","beat":1,"uptimeMs":15007}
+{"ts":"2026-08-30T22:16:40.704Z","event":"HEARTBEAT","beat":2,"uptimeMs":30014}
+{"ts":"2026-08-30T22:16:55.719Z","event":"HEARTBEAT","beat":3,"uptimeMs":45030}
+{"ts":"2026-08-30T22:17:10.719Z","event":"HEARTBEAT","beat":4,"uptimeMs":60030}
+{"ts":"2026-08-30T22:17:25.734Z","event":"HEARTBEAT","beat":5,"uptimeMs":75045}
+{"ts":"2026-08-30T22:17:40.735Z","event":"HEARTBEAT","beat":6,"uptimeMs":90046}
+{"ts":"2026-08-30T22:17:55.738Z","event":"HEARTBEAT","beat":7,"uptimeMs":105048}
+{"ts":"2026-08-30T22:18:10.744Z","event":"HEARTBEAT","beat":8,"uptimeMs":120054}
+{"ts":"2026-08-30T22:18:25.760Z","event":"HEARTBEAT","beat":9,"uptimeMs":135070}
+{"ts":"2026-08-30T22:18:40.768Z","event":"HEARTBEAT","beat":10,"uptimeMs":150071}
+{"ts":"2026-08-30T22:18:55.764Z","event":"HEARTBEAT","beat":11,"uptimeMs":165075}
+{"ts":"2026-08-30T22:19:10.775Z","event":"HEARTBEAT","beat":12,"uptimeMs":180085}
+RUN_3_BEGIN
+{"event":"BOOTSTRAP_ENTERED","pid":1,"argv":"node ./src/v7-proof-a-boot.js"}
+{"event":"NODE_AVAILABLE","version":"v20.20.2"}
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.4.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
+   Use the NVIDIA Container Toolkit to start this container with GPU support; see
+   https://docs.nvidia.com/datacenter/cloud-native/ .
+
+{"ts":"2026-08-30T22:19:12.017Z","event":"IMAGE_PROCESS_STARTED"}
+{"ts":"2026-08-30T22:19:12.019Z","event":"NODE_ENTRY_STARTED","argv0":"/opt/ddp-worker/src/v7-proof-a-boot.js","version":"v20.20.2"}
+{"ts":"2026-08-30T22:19:12.020Z","event":"WORKER_MODULE_LOADED","proof":true,"r2Skipped":true,"blenderSkipped":true}
+{"ts":"2026-08-30T22:19:12.022Z","event":"WORKER_LISTENING","port":18080,"bind":"0.0.0.0"}
+{"ts":"2026-08-30T22:19:12.023Z","event":"WORKER_READY","seconds":240}
+{"ts":"2026-08-30T22:19:27.031Z","event":"HEARTBEAT","beat":1,"uptimeMs":15008}
+{"ts":"2026-08-30T22:19:42.036Z","event":"HEARTBEAT","beat":2,"uptimeMs":30013}
+{"ts":"2026-08-30T22:19:57.041Z","event":"HEARTBEAT","beat":3,"uptimeMs":45018}
+{"ts":"2026-08-30T22:20:12.052Z","event":"HEARTBEAT","beat":4,"uptimeMs":60029}
+{"ts":"2026-08-30T22:20:27.068Z","event":"HEARTBEAT","beat":5,"uptimeMs":75044}
+{"ts":"2026-08-30T22:20:42.068Z","event":"HEARTBEAT","beat":6,"uptimeMs":90044}
+{"ts":"2026-08-30T22:20:57.084Z","event":"HEARTBEAT","beat":7,"uptimeMs":105060}
+{"ts":"2026-08-30T22:21:12.083Z","event":"HEARTBEAT","beat":8,"uptimeMs":120060}
+{"ts":"2026-08-30T22:21:27.099Z","event":"HEARTBEAT","beat":9,"uptimeMs":135076}
+{"ts":"2026-08-30T22:21:42.099Z","event":"HEARTBEAT","beat":10,"uptimeMs":150076}
+{"ts":"2026-08-30T22:21:57.115Z","event":"HEARTBEAT","beat":11,"uptimeMs":165091}
+{"ts":"2026-08-30T22:22:12.114Z","event":"HEARTBEAT","beat":12,"uptimeMs":180091}

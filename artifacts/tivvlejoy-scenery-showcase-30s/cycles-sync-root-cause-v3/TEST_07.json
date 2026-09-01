@@ -1,0 +1,164 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_07",
+  "parts": [
+    "grass"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 257769472,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093257.3255079,
+    "rss": 271167488,
+    "hwm": 271167488,
+    "memTotal": 16791945216,
+    "memAvailable": 15479500800,
+    "memFree": 14911143936,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861741568,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 3,
+    "images": 3,
+    "vertices": 31071,
+    "faces": 20195
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093257.4114501,
+    "rss": 289497088,
+    "hwm": 289497088,
+    "memTotal": 16791945216,
+    "memAvailable": 15466926080,
+    "memFree": 14898561024,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861737472,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 3,
+    "images": 4,
+    "vertices": 31071,
+    "faces": 20195
+  },
+  "hwm": 289497088,
+  "deltaRss": 18329600,
+  "peakFromHwm": 289497088,
+  "error": null,
+  "pngBytes": 4067,
+  "png": true,
+  "images": {
+    "count": 3,
+    "rawBytes": 4325376,
+    "largest": [
+      {
+        "name": "bq_Stem_Diffuse.jpg",
+        "width": 256,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 2097152,
+        "users": 2,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Stem_Normal.jpg",
+        "width": 256,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 2097152,
+        "users": 2,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Flower_Festuca-glauca_Diffuse.png",
+        "width": 128,
+        "height": 256,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 131072,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      }
+    ]
+  },
+  "modifiers": [],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [
+      {
+        "name": "bq_Grass_Festuca_glauca_A_spring",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 31071
+      }
+    ],
+    "count": 1
+  },
+  "instances": {
+    "uniqueMeshes": 1,
+    "objects": 2,
+    "shared": [],
+    "singleUser": 1
+  },
+  "beech": null,
+  "evalGeom": {
+    "ok": true,
+    "objects": [],
+    "evalVerts": 0,
+    "evalFaces": 0,
+    "rssBefore": 278159360,
+    "rssAfter": 278163456,
+    "rssJump": 4096,
+    "aborted": false
+  },
+  "counts": {
+    "objects": 2,
+    "meshes": 1,
+    "materials": 3,
+    "images": 4,
+    "vertices": 31071,
+    "faces": 20195
+  }
+}

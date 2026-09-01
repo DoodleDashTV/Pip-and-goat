@@ -1,0 +1,37 @@
+name: TivvleJoy Scenery Live Pod Status
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-live-pod-status.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - name: Read exact pod status
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS https://api.runpod.io/graphql \
+            -H 'content-type: application/json' \
+            -H "authorization: Bearer $RUNPOD_API_KEY" \
+            --data '{"query":"query { myself { pods { id name desiredStatus costPerHr gpuCount machineId lastStatusChange runtime { uptimeInSeconds } machine { gpuDisplayName } } } }"}' \
+            -o pods.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('pods.json'))
+          if p.get('errors'):
+              raise SystemExit('RunPod query failed')
+          pods=((p.get('data') or {}).get('myself') or {}).get('pods') or []
+          matches=[x for x in pods if x.get('name')=='tivvlejoy-scenery-showcase-30s-v1']
+          print(json.dumps([{k:x.get(k) for k in ('id','name','desiredStatus','costPerHr','gpuCount','machineId','lastStatusChange','runtime','machine')} for x in matches]))
+          PY

@@ -1,0 +1,56 @@
+# TivvleJoy Original-14 scenery showcase worker.
+# Thin child over the verified V6 image; no purchased bytes or credentials baked in.
+FROM ghcr.io/doodledashtv/ddp-runpod-blender@sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353
+
+WORKDIR /opt/ddp-worker
+
+COPY workers/runpod-blender/src/scenery-showcase-original14-roles.js ./src/scenery-showcase-original14-roles.js
+COPY workers/runpod-blender/src/scenery-showcase-original14.js ./src/scenery-showcase-original14.js
+COPY workers/runpod-blender/src/scenery-showcase-original14-entry.js ./src/scenery-showcase-original14-entry.js
+COPY scripts/blender/scenery/showcase_original14_select.py ./blender/scenery/showcase_original14_select.py
+COPY scripts/blender/scenery/showcase_original14_30s.py ./blender/scenery/showcase_original14_30s.py
+COPY scripts/blender/scenery/cinematic_standards.py ./blender/scenery/cinematic_standards.py
+COPY scripts/blender/scenery/cinematic_shots.py ./blender/scenery/cinematic_shots.py
+COPY scripts/blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_creek_profile.py
+COPY scripts/blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/cinematic_valley_world_v1.py
+COPY workers/runpod-blender/src/scenery-render-profiles.js ./src/scenery-render-profiles.js
+
+ENV SCENERY_SHOWCASE_BLENDER_SCRIPT=/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py \
+    SCENERY_SHOWCASE_EXECUTION_MODE=dry-run \
+    PAID_EXECUTION_AUTHORIZED=false \
+    CLOUD_RENDER_ENABLED=false \
+    SCENERY_SHOWCASE_RENDER_PROFILE=LOOKDEV_FAST \
+    SCENERY_SHOWCASE_INTERNAL_RESOLUTION=540x960 \
+    SCENERY_SHOWCASE_FINAL_RESOLUTION=1080x1920 \
+    SCENERY_SHOWCASE_FINAL_NATIVE_RESOLUTION=1080x1920 \
+    SCENERY_SHOWCASE_ALLOW_UPSCALE=false \
+    SCENERY_SHOWCASE_EEVEE_SAMPLES=12 \
+    SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES=55 \
+    SCENERY_SHOWCASE_MAX_RUNTIME_MINUTES=75 \
+    SCENERY_SHOWCASE_MAX_INPUT_BYTES=4294967296
+
+ARG TIVVLEJOY_SCENERY_SOURCE_COMMIT=unknown
+ARG TIVVLEJOY_SCENERY_BUILD_TIME=unknown
+ENV TIVVLEJOY_SCENERY_SOURCE_COMMIT=${TIVVLEJOY_SCENERY_SOURCE_COMMIT} \
+    TIVVLEJOY_SCENERY_BUILD_TIME=${TIVVLEJOY_SCENERY_BUILD_TIME}
+
+LABEL org.opencontainers.image.title="tivvlejoy-scenery-original14-worker" \
+      org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat" \
+      org.opencontainers.image.revision="${TIVVLEJOY_SCENERY_SOURCE_COMMIT}" \
+      tivvlejoy.scenery.original.source.count="14" \
+      tivvlejoy.scenery.renderable.source.count="11" \
+      tivvlejoy.scenery.unity.preservation.count="3" \
+      tivvlejoy.scenery.internal.resolution="540x960" \
+      tivvlejoy.scenery.final.resolution="1080x1920" \
+      tivvlejoy.scenery.fps="30" \
+      tivvlejoy.scenery.frame.count="900" \
+      tivvlejoy.scenery.commercial.assets.baked="false"
+
+RUN node --check ./src/scenery-showcase-original14-roles.js && \
+    node --check ./src/scenery-showcase-original14.js && \
+    node --check ./src/scenery-showcase-original14-entry.js && \
+    node --check ./src/scenery-render-profiles.js && \
+    python3 -m py_compile ./blender/scenery/showcase_original14_select.py ./blender/scenery/showcase_original14_30s.py ./blender/scenery/cinematic_standards.py ./blender/scenery/cinematic_shots.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_valley_world_v1.py && \
+    blender --version | head -n 1 | grep -F 'Blender 4.2.2'
+
+CMD ["node", "./src/scenery-showcase-original14-entry.js"]

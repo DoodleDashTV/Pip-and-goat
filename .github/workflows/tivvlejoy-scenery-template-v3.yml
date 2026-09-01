@@ -1,0 +1,117 @@
+# Registered second push; template mutation only, never a Pod create.
+name: TivvleJoy Scenery Template V3
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-template-v3.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tivvlejoy-scenery-template-v3
+  cancel-in-progress: false
+
+jobs:
+  template:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+      IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673
+      TEMPLATE_NAME: TivvleJoy Scenery Showcase 30s V3
+    steps:
+      - name: Verify or create one scenery template only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RUNPOD_API_KEY"
+          mkdir -p artifacts/tivvlejoy-scenery-template-v3
+
+          curl --fail --silent --show-error --max-time 60 \
+            -H "Authorization: Bearer $RUNPOD_API_KEY" \
+            https://rest.runpod.io/v1/templates > before.json
+
+          python3 - <<'PY' > decision.json
+          import json, os
+          raw=json.load(open('before.json'))
+          items=raw if isinstance(raw,list) else raw.get('templates',[]) if isinstance(raw,dict) else []
+          name=os.environ['TEMPLATE_NAME']; image=os.environ['IMAGE']
+          exact=[x for x in items if isinstance(x,dict) and x.get('name')==name and x.get('imageName')==image]
+          same_name=[x for x in items if isinstance(x,dict) and x.get('name')==name]
+          if len(exact)>1:
+              raise SystemExit('AMBIGUOUS_EXACT_TEMPLATE')
+          if same_name and not exact:
+              raise SystemExit('TEMPLATE_NAME_COLLISION')
+          print(json.dumps({'exactCount':len(exact),'templateId':exact[0].get('id') if exact else None}))
+          PY
+
+          exact_count=$(python3 -c "import json; print(json.load(open('decision.json'))['exactCount'])")
+          post_count=0
+          if [ "$exact_count" = '0' ]; then
+            python3 - <<'PY' > create-body.json
+          import json, os
+          print(json.dumps({
+            'name': os.environ['TEMPLATE_NAME'],
+            'imageName': os.environ['IMAGE'],
+            'category': 'NVIDIA',
+            'containerDiskInGb': 60,
+            'dockerEntrypoint': [],
+            'dockerStartCmd': [],
+            'env': {},
+            'isPublic': False,
+            'isServerless': False,
+            'ports': [],
+            'readme': 'TivvleJoy real purchased-scenery 30s proof. Digest-pinned Blender 4.2.2 worker. Runtime R2/job env is injected by the guarded launcher.',
+            'volumeInGb': 20,
+            'volumeMountPath': '',
+          }))
+          PY
+            code=$(curl --silent --show-error --max-time 90 -o create-result.json -w '%{http_code}' \
+              -X POST https://rest.runpod.io/v1/templates \
+              -H "Authorization: Bearer $RUNPOD_API_KEY" \
+              -H 'Content-Type: application/json' \
+              --data-binary @create-body.json)
+            test "$code" = '201' -o "$code" = '200'
+            post_count=1
+          fi
+
+          curl --fail --silent --show-error --max-time 60 \
+            -H "Authorization: Bearer $RUNPOD_API_KEY" \
+            https://rest.runpod.io/v1/templates > after.json
+
+          POST_COUNT="$post_count" python3 - <<'PY'
+          import json, os
+          raw=json.load(open('after.json'))
+          items=raw if isinstance(raw,list) else raw.get('templates',[]) if isinstance(raw,dict) else []
+          name=os.environ['TEMPLATE_NAME']; image=os.environ['IMAGE']
+          exact=[x for x in items if isinstance(x,dict) and x.get('name')==name and x.get('imageName')==image]
+          assert len(exact)==1, len(exact)
+          t=exact[0]
+          tid=t.get('id'); assert isinstance(tid,str) and tid
+          result={
+            'schema':'TIVVLEJOY_SCENERY_TEMPLATE_V3',
+            'status':'TEMPLATE_READY',
+            'templateId':tid,
+            'name':name,
+            'imageName':image,
+            'templatePostCount':int(os.environ['POST_COUNT']),
+            'podPostCount':0,
+            'gpuLaunched':False,
+            'paidComputeUsd':0,
+            'runtimeEnvStoredInTemplate':False,
+          }
+          open('artifacts/tivvlejoy-scenery-template-v3/template.json','w').write(json.dumps(result,indent=2)+'\n')
+          print(json.dumps(result))
+          PY
+
+      - name: Upload sanitized template evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-template-v3
+          path: artifacts/tivvlejoy-scenery-template-v3/template.json
+          if-no-files-found: error
+          retention-days: 30

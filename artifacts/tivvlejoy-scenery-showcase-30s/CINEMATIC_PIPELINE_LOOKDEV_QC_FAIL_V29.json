@@ -1,0 +1,54 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T21:46:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "denoiseEnabledInAssemblerWhenSamplesAtLeast32": true,
+  "commit": "8d978bb",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev34",
+  "previewArtifacts": {
+    "opening": "/tmp/o14-lookdev/cinematic-lookdev34/shot_01_.png",
+    "worstCaseRiver": "/tmp/o14-lookdev/cinematic-lookdev34/shot_02_.png",
+    "forest": "/tmp/o14-lookdev/cinematic-lookdev34/shot_03_.png",
+    "middleVillage": "/tmp/o14-lookdev/cinematic-lookdev34/shot_04_.png",
+    "compression": "/tmp/o14-lookdev/cinematic-lookdev34/shot_05_.png",
+    "ending": "/tmp/o14-lookdev/cinematic-lookdev34/shot_06_.png"
+  },
+  "measurements": {
+    "SHOT_01": {"meanLum": 109.0, "midBminusG": -8.0, "botBminusG": -20.5},
+    "SHOT_02": {"meanLum": 120.2, "midBminusG": -1.5, "botBminusG": -13.4},
+    "SHOT_03": {"meanLum": 89.3, "midBminusG": -0.2, "botBminusG": -16.2},
+    "SHOT_04": {"meanLum": 104.4, "midBminusG": -14.6, "botBminusG": -15.5},
+    "SHOT_05": {"meanLum": 122.5, "midBminusG": 2.3, "botBminusG": -12.0},
+    "SHOT_06": {"meanLum": 93.2, "midBminusG": -12.8, "botBminusG": -13.1}
+  },
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/street/ridge/cart hold. Stream still reads as a light winding path, not water.",
+    "SHOT_02": "FAIL — along-channel from z=3.1. Surface is still a sharp-edged glossy ribbon (ice/plastic/path), not a stream in a bed.",
+    "SHOT_03": "PARTIAL — framed forest opening holds.",
+    "SHOT_04": "PARTIAL — street/cart/fence/mountains hold. Foreground stream is a flat light ribbon.",
+    "SHOT_05": "PARTIAL — village-against-ridge compression holds.",
+    "SHOT_06": "PARTIAL — street/cart/fence hold."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape"
+  ],
+  "progressThisRepair": {
+    "painted_meadow_stream": "removed",
+    "visible_horizontal_purchased_tint_ribbon": true,
+    "louis_rivermask_drives_roughness": true,
+    "water_gn_hidden": true,
+    "metallic_off": true,
+    "raised_24cm_shelf": "removed_in_lookdev33",
+    "still_fails_as_water": true
+  },
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "smallestNextAction": "Keep iterating the water locally as a two-layer channel: dark wet bed in the terrain plus a thinner, rougher film. Do not CREATE. Do not return FINAL_RESULT.",
+  "honestConclusion": "Not a visual pass. Stale bridge is repaired. River still fails. Paid CREATE count is zero."
+}

@@ -1,0 +1,945 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_05",
+  "parts": [
+    "gravel"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 258461696,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093256.391968,
+    "rss": 259211264,
+    "hwm": 259215360,
+    "memTotal": 16791945216,
+    "memAvailable": 15450157056,
+    "memFree": 14881861632,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861786624,
+    "objects": 53,
+    "meshes": 52,
+    "materials": 2,
+    "images": 0,
+    "vertices": 624,
+    "faces": 1040
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093256.5289834,
+    "rss": 385839104,
+    "hwm": 385839104,
+    "memTotal": 16791945216,
+    "memAvailable": 15361699840,
+    "memFree": 14793396224,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861778432,
+    "objects": 53,
+    "meshes": 52,
+    "materials": 2,
+    "images": 1,
+    "vertices": 624,
+    "faces": 1040
+  },
+  "hwm": 385839104,
+  "deltaRss": 126627840,
+  "peakFromHwm": 385839104,
+  "error": null,
+  "pngBytes": 4133,
+  "png": true,
+  "images": {
+    "count": 0,
+    "rawBytes": 0,
+    "largest": []
+  },
+  "modifiers": [
+    {
+      "name": "TJ_V3_Gravel_0",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_1",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_10",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_11",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_12",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_13",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_14",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_15",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_16",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_17",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_18",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_19",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_2",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_20",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_21",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_22",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_23",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_24",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_25",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_26",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_27",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_28",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_29",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_3",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_30",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_31",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_32",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_33",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_34",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_35",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_36",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_37",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_38",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_39",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_4",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_40",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_41",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_42",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_43",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_44",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_45",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_46",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_47",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_48",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_49",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_5",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_50",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_51",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_6",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_7",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_8",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    },
+    {
+      "name": "TJ_V3_Gravel_9",
+      "hide_render": false,
+      "baseVerts": 12,
+      "baseFaces": 20,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "TJ_V7_RockSmooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    }
+  ],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [],
+    "count": 0
+  },
+  "instances": {
+    "uniqueMeshes": 52,
+    "objects": 53,
+    "shared": [],
+    "singleUser": 52
+  },
+  "beech": null,
+  "evalGeom": {
+    "skipped": true,
+    "reason": "too_many_visible_meshes",
+    "visible": 52
+  },
+  "counts": {
+    "objects": 53,
+    "meshes": 52,
+    "materials": 2,
+    "images": 1,
+    "vertices": 624,
+    "faces": 1040
+  }
+}

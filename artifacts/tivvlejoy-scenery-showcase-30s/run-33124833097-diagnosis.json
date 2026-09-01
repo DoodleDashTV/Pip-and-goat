@@ -1,0 +1,41 @@
+{
+  "schema": "TIVVLEJOY_REAL_SCENERY_30S_FAILURE_REPORT_V1",
+  "workflowRunId": 33124833097,
+  "workflow": "TivvleJoy Real Scenery 30s Paid Render",
+  "headSha": "323b8607958a270db994a7f107b930fed2b8feb3",
+  "exactFailingStage": "STARTUP_WATCHDOG",
+  "workflowConclusion": "failure",
+  "createEntered": true,
+  "createRequests": 1,
+  "retryCreate": false,
+  "thisWasTheOneAllowedRetry": true,
+  "podId": "zy7whd3zpch2rq",
+  "podName": "tivvlejoy-scenery-showcase-30s-v1",
+  "gpu": "RTX 4090",
+  "cloudType": "SECURE",
+  "rateUsdPerHr": 0.74,
+  "desiredStatusWhileWaiting": "RUNNING",
+  "runtimeUptimeSeconds": null,
+  "startupStatusJsonWritten": false,
+  "statusJsonWritten": false,
+  "renderFramesProduced": 0,
+  "mp4Present": false,
+  "poll": {
+    "survivedTransientBridgeResets": true,
+    "lastObserved": "i=60 state=NONE startup=NO",
+    "watchdogFiredAt": "2026-08-27T23:18:10Z"
+  },
+  "cleanup": {
+    "matchedBefore": 1,
+    "terminatedCount": 1,
+    "remainingActiveExactName": 0,
+    "billingCleanupConfirmed": true
+  },
+  "recheck": {
+    "activePods": 0,
+    "exactNameActive": 0,
+    "billingCleanupConfirmed": true
+  },
+  "anotherRetryAllowed": false,
+  "minimalPatchNext": "Lengthen the startup watchdog past a cold GHCR pull of the pinned Blender scenery image, write PROCESS_STARTED from scenery-showcase.js before discovery, and bake the dry-showcase water-prefix change into showcase_30s.py so dockerArgs is not required for startup."
+}

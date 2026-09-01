@@ -1,0 +1,65 @@
+name: TivvleJoy Scenery Showcase Bridge Preflight
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-showcase-bridge-preflight.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tivvlejoy-scenery-showcase-bridge-preflight
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRIDGE_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s
+      SCENERY_AUTHORIZATION: TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V1
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - name: Verify bridge without paid mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RUNPOD_API_KEY"
+          code=$(curl -sS -o preflight.json -w '%{http_code}' \
+            --request POST "$BRIDGE_URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $SCENERY_AUTHORIZATION" \
+            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+            --data '{"action":"preflight"}')
+          test "$code" = '200'
+          python3 - <<'PY'
+          import json
+          p=json.load(open('preflight.json'))
+          assert p.get('paidMutationPerformed') is False
+          assert p.get('ready') is True
+          assets=p.get('assets') or {}
+          assert assets.get('ok') is True
+          assert assets.get('satisfiedRoleCount') == 12
+          runpod=p.get('runpod') or {}
+          rate=float(runpod.get('rate'))
+          assert 0 < rate <= 0.8
+          print(json.dumps({
+            'ready': p.get('ready'),
+            'satisfiedRoleCount': assets.get('satisfiedRoleCount'),
+            'missingRoles': assets.get('missingRoles'),
+            'secureUsdPerHr': rate,
+            'stockStatus': runpod.get('stockStatus'),
+            'paidMutationPerformed': p.get('paidMutationPerformed'),
+          }))
+          PY
+
+      - name: Upload sanitized evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-showcase-bridge-preflight
+          path: preflight.json
+          if-no-files-found: error
+          retention-days: 14

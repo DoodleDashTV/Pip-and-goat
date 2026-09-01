@@ -1,0 +1,34 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:53:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "b088a42",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev17",
+  "shots": {
+    "SHOT_01": "FAIL — white river reads as a road, not water. Village cluster and Louis ridge remain.",
+    "SHOT_02": "FAIL — dark bank plus a bright white stripe. Reads as asphalt, not a stream.",
+    "SHOT_03": "PARTIAL — forest frame from the previous pass; not re-broken here.",
+    "SHOT_04": "PARTIAL — street is clear (cabins, cart, fence, ridge). Foreground river is a flat grey/white path.",
+    "SHOT_05": "PARTIAL — compression still holds; river remains a light strip.",
+    "SHOT_06": "FAIL — street readable; river still a light band."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "White NGON pool card is gone",
+    "SHOT_04 is a street again instead of a tree crowd"
+  ],
+  "regression": "Metallic water without the pool still reads as a white road from the establish and discovery cameras.",
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Green CI does not authorize CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

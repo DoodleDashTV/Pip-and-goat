@@ -1,0 +1,97 @@
+{
+  "schema": "TJ_HDRI_QUALIFY_V4",
+  "tag": "ISO_H15",
+  "mode": "isolate",
+  "hdri": "h15",
+  "installed": "/tmp/o14-lookdev/expanded-original14/sky_hdri/HDRi_JPG_Pack/sk2/Image0001.jpg",
+  "resolution": [
+    64,
+    64
+  ],
+  "samples": 1,
+  "emptyRss": 260083712,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788095602.626717,
+    "rss": 260878336,
+    "hwm": 260878336,
+    "memTotal": 16791945216,
+    "memAvailable": 15525572608,
+    "memFree": 11089731584,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 252315873280,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 1,
+    "vertices": 0,
+    "faces": 0
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788095611.1745172,
+    "rss": 306073600,
+    "hwm": 5699858432,
+    "memTotal": 16791945216,
+    "memAvailable": 15315599360,
+    "memFree": 10879451136,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 252315865088,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 2,
+    "vertices": 0,
+    "faces": 0
+  },
+  "hwm": 5699858432,
+  "renderSeconds": 8.547524213790894,
+  "error": null,
+  "png": true,
+  "pngBytes": 4489,
+  "pngPath": "/workspace/artifacts/tivvlejoy-scenery-showcase-30s/hdri-qualify-v4/ISO_H15.png",
+  "images": {
+    "count": 2,
+    "rawBytes": 450000000,
+    "largest": [
+      {
+        "name": "Image0001.jpg",
+        "width": 15000,
+        "height": 7500,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 450000000,
+        "users": 1,
+        "referenced": true,
+        "role": "hdri"
+      },
+      {
+        "name": "Render Result",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      }
+    ]
+  },
+  "counts": {
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 2,
+    "vertices": 0,
+    "faces": 0
+  }
+}

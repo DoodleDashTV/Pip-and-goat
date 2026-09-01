@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-29T11:50:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "startingSha": "7b3b7b47627e32aecec936e18d470537e4dfc9ea",
+  "commit": "e9807fe",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev88",
+  "heroStill": "/tmp/o14-lookdev/cinematic-lookdev88/shot_02_.png",
+  "heroGate": "PASS",
+  "sixShotGate": "FAIL",
+  "v34WaterArchitecturePreserved": true,
+  "cameraDistanceShaderGate": false,
+  "humanApproved": false,
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "whyNotReady": "SHOT_03 now reads dense forest and SHOT_05 now reads telephoto mountain compression. E/F/J/L/T are not all visual PASS. Window01 cards remain cyan on SHOT_01/02. Do not CREATE."
+}

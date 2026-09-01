@@ -1,0 +1,52 @@
+{
+  "schema": "TIVVLEJOY_V7_PURCHASED_ASSET_VISIBILITY_LEDGER_V1",
+  "pixelSuiteRun": false,
+  "status": "DECLARED_COMPOSITION_ONLY",
+  "shots": {
+    "SHOT_01": [
+      "purchased meadow/flora regions",
+      "Louis mountains",
+      "H8/HDRI lighting",
+      "village dirt negative space"
+    ],
+    "SHOT_02": [
+      "Camera C corridor",
+      "Water D film",
+      "hero rocks",
+      "forest/flora",
+      "cavity collars"
+    ],
+    "SHOT_03": [
+      "downstream river",
+      "banks",
+      "forest midground"
+    ],
+    "SHOT_04": [
+      "purchased village cabins",
+      "props",
+      "forest edge"
+    ],
+    "SHOT_05": [
+      "Louis mountains hero",
+      "forest",
+      "sky/HDRI"
+    ],
+    "SHOT_06": [
+      "village + forest + mountain reveal"
+    ]
+  },
+  "locksPreserved": {
+    "original14": "14/14",
+    "louisMiB": 512.1,
+    "botaniqFull": "excluded",
+    "waterD": true,
+    "cameraC": [
+      2.2,
+      -21.4,
+      3.4
+    ],
+    "h8Only": true
+  },
+  "pixelPass": false,
+  "note": "Geometry repairs exist in cinematic_valley_world_v1.py / cinematic_creek_profile.py. V44 E/F/J remain FAIL until 540x960 Cycles/32 frames are rendered and judged."
+}

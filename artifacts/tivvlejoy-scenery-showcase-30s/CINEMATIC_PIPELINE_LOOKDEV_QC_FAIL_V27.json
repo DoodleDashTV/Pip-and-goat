@@ -1,0 +1,46 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T21:38:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "denoise": true,
+  "commit": "54922da",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev32",
+  "measurements": {
+    "SHOT_01": {"meanLum": 108.8, "midBminusG": -8.0, "botBminusG": -20.5},
+    "SHOT_02": {"meanLum": 120.3, "midBminusG": -0.1, "botBminusG": -11.6},
+    "SHOT_03": {"meanLum": 89.3, "midBminusG": -0.2, "botBminusG": -16.2},
+    "SHOT_04": {"meanLum": 103.4, "midBminusG": -14.6, "botBminusG": -15.7},
+    "SHOT_05": {"meanLum": 122.4, "midBminusG": 2.3, "botBminusG": -12.2},
+    "SHOT_06": {"meanLum": 93.2, "midBminusG": -12.8, "botBminusG": -12.0}
+  },
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/street/ridge hold. Stream is now a separate light ribbon, not a painted floor band.",
+    "SHOT_02": "FAIL — along-channel. Water is a raised glossy strip with a hard terrain shelf (bed 24cm below the ribbon). Reads as ice/plastic, not a stream in a bed.",
+    "SHOT_03": "PARTIAL — framed forest opening holds.",
+    "SHOT_04": "PARTIAL — street/cart/fence/mountains hold. Foreground stream is a bright blue ribbon.",
+    "SHOT_05": "PARTIAL — village-against-ridge compression holds. Thin foreground stream.",
+    "SHOT_06": "PARTIAL — street/cart/fence hold. Stream is a bottom sliver."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape"
+  ],
+  "progressVsV26": {
+    "painted_floor_stream": "removed",
+    "visible_horizontal_ribbon": true,
+    "louis_rivermask_used": true,
+    "water_mat_tint": true,
+    "raised_shelf_lip": "still_present",
+    "grazing_ice_gloss": "still_present",
+    "excessive_noise": "improved_by_32_sample_denoise_not_cleared_as_a_pass"
+  },
+  "nextCorrection": "Seat the ribbon just above a shallow dish (BED_BELOW_WATER=0.045). Neutralize gloss color and cap fresnel at 0.34. Reduce Water_Mat blue influence.",
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. The stream is no longer painted on the meadow, but it still fails as a raised glossy strip. Do not CREATE."
+}

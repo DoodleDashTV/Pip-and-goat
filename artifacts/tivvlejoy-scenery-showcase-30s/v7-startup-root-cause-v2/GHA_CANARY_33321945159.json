@@ -1,0 +1,16 @@
+{
+  "schema": "TIVVLEJOY_WORKER_STARTUP_CANARY_V1_GHA_FALSE_NEGATIVE",
+  "runId": 33321945159,
+  "commit": "fb35098329ca92895971eaeb0e201579b03a8b8c",
+  "okReported": false,
+  "docker": true,
+  "publicPull": true,
+  "nodeExtraArgvExit": 0,
+  "blenderExtraArgvExit": 0,
+  "nodeStartDetected": true,
+  "blender422Detected": false,
+  "cause": "NVIDIA nvidia_entrypoint.sh prints a CUDA license banner before exec. The canary kept only the first 400 stdout characters, which is the banner, so Blender 4.2.2 after the banner was missed. Both docker run probes exited 0.",
+  "gpuRequired": false,
+  "runpodContacted": false,
+  "paidCreate": 0
+}

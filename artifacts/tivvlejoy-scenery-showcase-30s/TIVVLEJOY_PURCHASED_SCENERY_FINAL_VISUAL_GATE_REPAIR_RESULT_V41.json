@@ -1,0 +1,100 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_FINAL_VISUAL_GATE_REPAIR_V41_RESULT",
+  "inspectedAt": "2026-08-29T14:36:00Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "e2195398fafc6406e144e35a39e9d6469d0ea8c6",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "finalSha": "dabd0e424a1ff621dd110eb01c68f031ae4ff907",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "number": 169,
+    "base": "cursor/tivvlejoy-ep001-animation-worker-payload-v1-73f1"
+  },
+  "livePodProof": {
+    "endpoint": "https://rest.runpod.io/v1/pods",
+    "response": [],
+    "relevantPodAlive": false
+  },
+  "paidWorkflowState": {
+    "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
+    "inProgress": false,
+    "createPerformed": false
+  },
+  "v34WaterLockVerification": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.8,
+    "metallic": 0.0,
+    "specular": 0.5,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "WATER_WIDTH_SCALE": 0.3,
+    "BED_WIDTH_SCALE": 0.68,
+    "lightPathHdriReflectionControl": true,
+    "hdriReflectionRotationZ": 0.48,
+    "cameraDistanceShaderGating": false,
+    "lookdev100Proof": "v34_candidate_d / Water_Mat_1"
+  },
+  "shotAssessments": {
+    "SHOT_01": "Valley/cabin establish preserved. Windows stay dark recesses. Louis range remains the background. Meadow has stronger tan/olive continents than V40 but still reads procedural at 540 px.",
+    "SHOT_02": "Creek-first hero preserved. Cabin off-axis. Windows dark (0 cyan in the cabin band). Waterline dark-pixel ratio dropped vs V40, but a grass/water isoline and leftover bank triangles remain. A Louis peak now sits in Camera C's sky-gap ray (t\u224859, s\u22488.6, z\u224812.4 m) yet still reads as a dark upper-right sliver, not an immediate mountain range.",
+    "SHOT_03": "Dense west-grove forest passage preserved. Cabin absent. No regression.",
+    "SHOT_04": "Village/path reveal preserved. Cabins, cart, fence, layered Louis range. Openings dark.",
+    "SHOT_05": "120 mm telephoto pines-against-Louis preserved. Hero peak at (28, 16, 0.48) was not moved.",
+    "SHOT_06": "Tree-framed scenic payoff with a readable Louis mass. Distinct from 03 and 05."
+  },
+  "gates": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PARTIAL",
+    "F": "PARTIAL",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "PARTIAL",
+    "K": "PASS",
+    "L": "PASS",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "T": "PARTIAL",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "gateNotesEFTJ": {
+    "E": "Elongated Voronoi + 40\u201380 m continents + vertex-painted regions + flat earth/needle beds improved SHOT_01 versus V40. At 540 px the far field still looks like a procedural carpet, and the SHOT_02 midground stays a mostly even olive plane with a few isolated tan mounds.",
+    "F": "Water-mesh bite and a phase-shifted grass lip no longer share one contour. Lower-frame near-black pixels fell from ~37% (V40) to ~0.4% (lookdev99/100). The visible water/grass cut around the hero rocks is still traceable.",
+    "J": "Soil-scar slabs were removed and remaining shelves sit on the bank. Leftover triangular voids around the hero rocks still keep the wet-bank from reading as fully eroded soil/shelf/rock/water.",
+    "T": "AABB-south sitting parked the GrassyMountain1 peak outside Camera C. Peak-siting plus an 0.80 height cap now lands a purchased Louis peak in the sky-gap ray, but Camera C's downward 32 mm frustum only has ~8\u00b0 of sky above the cabin, so the face still reads as a dark sliver. SHOT_05 hero peak untouched."
+  },
+  "meadowRepairMethod": "Stretched 2D Voronoi ecological cells, broad 0.009-scale lush/dry continents, TJ_EcoMask winner-take-all metre-scale regions, and flat elongated earth/needle disks on the SHOT_01 floor and SHOT_02 midground. Purchased meadow texture mix stays 0.22.",
+  "wetBankGeometryRepairMethod": "hero_grass_lip is phase-shifted from hero_waterline_bite so terrain and water do not share an isoline. WATER_WIDTH_SCALE stays 0.30; only local water-mesh pinch moves. Soften passes cut 5\u21922 and skip the waterline. Soil-scar overlays removed after they read as black slabs. Thin damp tongues sit on the bank, not in cavities.",
+  "shot02LouisMethod": "sit_louis_peak places authored peaks on Camera C's sky-gap ray. MeadowRange1 foothill at (-10, 24, scale 0.16, rot_z 0.40). GrassyMountain1 cropped to its upper 20% cap and sat at (-18.5, 36, scale 0.78, rot_z 0.42) so the peak is in-frustum at t\u224858.7, s\u22488.6, z\u224812.4 m. SHOT_05 GrassyMountain2 stays (28, 16, 0.48, rot_z 0.42).",
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev-v41-final/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev-v41-final/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev-v41-final/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev-v41-final/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev-v41-final/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev-v41-final/shot_06_.png"
+  },
+  "passCount": 18,
+  "totalGates": 22,
+  "workerImageBuildStatus": "NOT_BUILT_VISUAL_GATE_FAILED",
+  "workerImageDigest": null,
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "readiness": "NOT_PAID_RENDER_READY",
+  "remainingBlocker": "E/F/J/T remain PARTIAL from lookdev100/101 pixels. SHOT_02 still lacks an immediately readable Louis range in the 8\u00b0 sky band above the cabin. Meadow still too even at 540 px. Waterline still traceable around hero rocks. Do not CREATE.",
+  "nextPaidPrepStep": "Do not CREATE. Keep PR 169 draft. Next lookdev pass must put a wide sunlit purchased-Louis face into Camera C's 6 m right-of-cabin sky corridor without moving the locked SHOT_05 peak, then re-judge E/F/J from 540 px stills."
+}

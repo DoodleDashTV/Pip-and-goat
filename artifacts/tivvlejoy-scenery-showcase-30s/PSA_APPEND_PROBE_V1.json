@@ -1,0 +1,14 @@
+{
+  "schema": "TIVVLEJOY_ADDON_COMPAT_PROBE_V1",
+  "packageId": "SRC_PHYSICAL_STARLIGHT_1_9_4",
+  "version": "1.9.4",
+  "blender": "4.2.2",
+  "addonEnabled": false,
+  "embeddedScriptsAutoExecuted": false,
+  "appendFromPackagedBlend": true,
+  "ok": true,
+  "appendedWorlds": ["Atmosphere", "World"],
+  "appendedNodeGroupsSample": [". PSA_AdvancedStars", ". PSA_calculate_fog_world"],
+  "visiblyUsed": false,
+  "reasonNotVisiblyUsed": "Addon was not enabled headlessly. Packaged atmosphere.blend datablocks append, but live PSA sun/atmosphere drivers were not activated. HDRI remains the primary look-dev environment to avoid double lighting."
+}

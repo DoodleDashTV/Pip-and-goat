@@ -1,0 +1,37 @@
+TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V1
+
+DO NOT CREATE THIS AUTHORIZATION.
+Issuable now: NO
+
+This is the next safe paid step after local pixel gates, the FINAL launcher,
+recoverability, and a newly pinned cinematic FINAL digest all genuinely pass.
+
+I authorize exactly one paid RunPod CREATE for an exact-final-scene visual proof.
+
+Branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+Required content ancestor: f833d3dfcfaa7e97d5254bbe6b3b1b02f64fce01
+Required historical ancestor: d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c
+PR #169 stays OPEN / DRAFT / UNMERGED / NOT READY.
+
+Image: the newly published cinematic FINAL digest only. None exists yet.
+CMD must be: node ./src/scenery-showcase-original14-entry.js
+Blender script: cinematic_valley_world_v1.py
+Water variant: D
+Hero rebuild: v3
+Scene: locked purchased Original-14 + Louis, H8 only, no Botaniq Full.
+
+Render: representative frames from all six shots.
+Engine: Cycles GPU.
+No EEVEE, no upscale, no reduced native frames.
+One CREATE. No retry. Automatic termination after pass or fail.
+Recommended hard ceiling: $0.50 USD.
+
+Do not reuse:
+TIVVLEJOY_V7_PROOF_A Water C authorizations
+TIVVLEJOY_V7_LARGER_MEMORY_PAID_PROOF_A_EXECUTION_V1
+TIVVLEJOY_V7_PAID_PROOF_A_RETRY_AUTHORIZATION_V1
+TIVVLEJOY_V7_PAID_STARTUP_PROOF_AUTHORIZATION_V1
+TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_AUTHORIZATION_V1
+or any standing PAID_AUTHORIZATION_V2/V3/V4/V5/ORIGINAL14 file.
+
+This authorization does not authorize the 900-frame FINAL video.

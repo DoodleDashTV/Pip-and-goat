@@ -1,0 +1,84 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_RIVER_FINISH_AND_WATER_READABILITY_RESULT_V32",
+  "startingSha": "deed17b045fbcd1af954082e2d788dedb4860d75",
+  "visualWorkSha": "3e75df7ec15cad4c9cd5eeee91a85fed31b67e0d",
+  "finalSha": "fa47a56778751d9211fe8b7e0a6e5c57fcf645d4",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "v31GeometryPreserved": true,
+  "exactLocalChangesSinceDeed17b0": [
+    "scripts/blender/scenery/cinematic_valley_world_v1.py only",
+    "6158891 kill Principled Fresnel; dark glossy sheen; geometric swell; blotched wet mask",
+    "e029139 restore modest transmission after ink overcorrection; fade bed edge; wider olive damp",
+    "0f9c59e stop crushing Water_Mat_1 tint; flow streaks; raise sheen",
+    "092556e TJ_CreekFill glossy/shadow off; soften wet bump",
+    "746c2cd south-bank waterline dressing; rougher sheen; mud damp color",
+    "1290606 / 3701296 camera-distance gated transmission and sheen",
+    "0a1f91b darken sunlit tan damp-band",
+    "3e75df7 keep dark bed opaque (no transparent rim)"
+  ],
+  "reasonWaterAppearedPaleGlossy": "A millimetre-thin horizontal Principled with IOR 1.22, specular 0.28, and transmission 0.58 Fresnel-reflected the purchased HDRI. AgX Medium High Contrast plus exposure 0.30 punched those hits into a white ribbon. After specular was killed, two later mistakes recreated paleness: constant transmission from the crane looked through the film at the sky, and a too-light damp-band albedo lit up as tan sand beside the water.",
+  "finalWaterMaterialSolution": {
+    "specularIorLevel": 0.0,
+    "ior": 1.0,
+    "metallic": 0.0,
+    "body": "dark teal from Water_Mat_1 hue, no longer crushed to ~0.02",
+    "transmission": "Camera Data View Distance: ~0.38 close / ~0.04 far; near-zero distance treated as far",
+    "sheen": "dark glossy mix, roughness 0.38-0.58, mix ~0.15 close / ~0.03 far",
+    "surface": "object-space swell + ripple bump plus ±5-8cm geometric vertex swell and a 3cm dish",
+    "lighting": "TJ_CreekFill energy 55, visible_glossy=false, fill shadows off"
+  },
+  "finalBankTransitionSolution": {
+    "channelGeometry": "V31 sculpt_channel_height / WATER_WIDTH_SCALE 0.30 / BED_WIDTH_SCALE 0.68 unchanged",
+    "wetMask": "blotched, south fade pushed onto the camera-facing lip",
+    "dampColor": "olive-mud (0.068, 0.052, 0.028), not sandy tan",
+    "bed": "opaque dark olive rim; no transparent edge",
+    "dressing": "irregular small south-bank trees on the shoulder, not a continuous outline"
+  },
+  "shot02BeforeAfter": {
+    "before": "/tmp/o14-lookdev/cinematic-lookdev43/shot_02_.png",
+    "after": "/tmp/o14-lookdev/cinematic-lookdev53/shot_02_.png",
+    "assessment": "BEFORE: bright sky-film ribbon in a correct trough. AFTER: dark teal film with dim glints in the same trough. Still not grass→damp bank→exposed bed→translucent moving water. Knife lip remains."
+  },
+  "waterHiddenGeometryRegression": {
+    "result": "PASS",
+    "path": "/tmp/o14-lookdev/cinematic-lookdev53-geom/shot_02_.png",
+    "note": "Carved channel still present. Bed kept opaque so the empty trough does not flash pale. Do not rebuild the channel."
+  },
+  "previewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev53/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev53/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev52/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev52/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev52/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev52/shot_06_.png"
+  },
+  "visualGatesAN": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PARTIAL",
+    "E": "PASS",
+    "F": "FAIL",
+    "G": "PARTIAL",
+    "H": "PARTIAL",
+    "I": "PARTIAL",
+    "J": "PARTIAL",
+    "K": "PARTIAL",
+    "L": "FAIL",
+    "M": "PASS",
+    "N": "PASS"
+  },
+  "purchasedAssetsAuthoritative": true,
+  "latestGate": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V32.json",
+  "latestGateResult": "FAIL",
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "nextLocalRepair": "Keep V31 geometry. Make the dark teal film read as liquid from SHOT_02 (bed-through + irregular wet lip) without letting crane/village cameras go pale again."
+}

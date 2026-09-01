@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-29T14:36:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 32,
+  "startingSha": "e2195398fafc6406e144e35a39e9d6469d0ea8c6",
+  "commit": "dabd0e424a1ff621dd110eb01c68f031ae4ff907",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev-v41-final",
+  "heroStill": "/tmp/o14-lookdev/cinematic-lookdev-v41-final/shot_02_.png",
+  "heroGate": "PASS",
+  "sixShotGate": "FAIL",
+  "v34WaterArchitecturePreserved": true,
+  "cameraDistanceShaderGate": false,
+  "humanApproved": false,
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "whyNotReady": "E/F/J/T are not visual PASS at 540 px. Locked gates and SHOT_05 hero peak remain intact. Do not CREATE."
+}

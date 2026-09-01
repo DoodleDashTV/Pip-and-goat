@@ -1,0 +1,77 @@
+# Zero-cost worker startup canary. Never contacts RunPod. Never creates a GPU pod.
+name: TivvleJoy Worker Startup Canary V1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-worker-startup-canary-v1.yml'
+      - 'scripts/cloud/v7-proof-a-paid/**'
+      - 'workers/runpod-blender/src/v7-proof-a-boot.js'
+      - 'config/cloud/scenery-showcase-worker-image.json'
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: tivvlejoy-worker-startup-canary-v1
+  cancel-in-progress: true
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Registry and launcher canary
+        run: |
+          set -euo pipefail
+          python3 scripts/blender/scenery/worker_memory_contract_v1_test.py
+          python3 scripts/cloud/v7-proof-a-paid/startup_canary_v1_test.py
+          python3 scripts/cloud/v7-proof-a-paid/startup_canary_v1.py
+          python3 scripts/cloud/v7-proof-a-paid/startup_proof_v1.py --fast
+          node --check workers/runpod-blender/src/v7-proof-a-boot.js
+          node workers/runpod-blender/test/v7-proof-a-boot.test.js
+          node workers/runpod-blender/test/v7-proof-a-startup-proof.test.js
+          node workers/runpod-blender/test/v7-production-lifetime-scan.test.js
+
+      - name: Anonymous container start on the pinned digest
+        run: |
+          set -euo pipefail
+          IMAGE=$(python3 -c 'import json; print(json.load(open("config/cloud/scenery-showcase-worker-image.json"))["ref"])')
+          mkdir -p artifacts/tivvlejoy-scenery-showcase-30s/v7-startup-root-cause-v2
+          start=$(date +%s)
+          docker pull "$IMAGE"
+          end=$(date +%s)
+          # nvidia_entrypoint.sh prints a CUDA license banner before exec.
+          # Search the full stream; do not grep only the first line.
+          docker run --rm --network none "$IMAGE" node -e "console.log('NODE_ENTRY_STARTED')" | tee /tmp/node-canary.txt
+          grep -F 'NODE_ENTRY_STARTED' /tmp/node-canary.txt
+          docker run --rm --network none "$IMAGE" blender --version | tee /tmp/blender-canary.txt
+          grep -F 'Blender 4.2.2' /tmp/blender-canary.txt
+          python3 - <<PY
+          import json
+          p={
+            'schema':'TIVVLEJOY_WORKER_STARTUP_CANARY_V1_CONTAINER',
+            'anonymousPull':True,
+            'pullSeconds':${end}-${start},
+            'nodeStart':True,
+            'blender422':True,
+            'runpodContacted':False,
+            'paidCreate':0,
+          }
+          open('artifacts/tivvlejoy-scenery-showcase-30s/v7-startup-root-cause-v2/CONTAINER_CANARY.json','w').write(json.dumps(p,indent=2)+'\n')
+          print(json.dumps(p))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tivvlejoy-worker-startup-canary-v1
+          path: artifacts/tivvlejoy-scenery-showcase-30s/v7-startup-root-cause-v2
+          if-no-files-found: error
+          retention-days: 14

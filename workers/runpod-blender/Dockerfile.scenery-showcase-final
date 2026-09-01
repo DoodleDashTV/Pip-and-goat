@@ -1,0 +1,74 @@
+# TivvleJoy cinematic FINAL scenery worker.
+# Camera C / six-shot contract is fail-closed in this image.
+# Thin child over the verified Original-14 parent; no purchased bytes or credentials baked in.
+# Pixel E/F/J remain BLOCKED_PENDING_PAID_PIXEL_PROOF. Image publication is allowed.
+# Parent digest only: sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353
+# Supply PARENT_IMAGE at build time. Do not bake a registry user into this file.
+ARG PARENT_IMAGE
+FROM ${PARENT_IMAGE}
+
+WORKDIR /opt/ddp-worker
+
+COPY scripts/blender/scenery/ ./blender/scenery/
+COPY workers/runpod-blender/src/scenery-showcase-original14-roles.js ./src/scenery-showcase-original14-roles.js
+COPY workers/runpod-blender/src/scenery-showcase-original14.js ./src/scenery-showcase-original14.js
+COPY workers/runpod-blender/src/scenery-showcase-original14-entry.js ./src/scenery-showcase-original14-entry.js
+COPY workers/runpod-blender/src/scenery-render-profiles.js ./src/scenery-render-profiles.js
+COPY workers/runpod-blender/src/final-launch-contract-v1.js ./src/final-launch-contract-v1.js
+COPY workers/runpod-blender/src/frame-checkpoint-v1.js ./src/frame-checkpoint-v1.js
+COPY workers/runpod-blender/src/visual-proof-contract-v1.js ./src/visual-proof-contract-v1.js
+
+ENV SCENERY_SHOWCASE_BLENDER_SCRIPT=/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py \
+    TIVVLEJOY_SCENERY_SCRIPTS_ROOT=/opt/ddp-worker/blender/scenery \
+    SCENERY_SHOWCASE_EXECUTION_MODE=dry-run \
+    PAID_EXECUTION_AUTHORIZED=false \
+    CLOUD_RENDER_ENABLED=false \
+    SCENERY_SHOWCASE_RENDER_PROFILE=FINAL \
+    SCENERY_SHOWCASE_INTERNAL_RESOLUTION=1080x1920 \
+    SCENERY_SHOWCASE_FINAL_RESOLUTION=1080x1920 \
+    SCENERY_SHOWCASE_FINAL_NATIVE_RESOLUTION=1080x1920 \
+    SCENERY_SHOWCASE_ALLOW_UPSCALE=false \
+    SCENERY_SHOWCASE_BLENDER_TIMEOUT_MINUTES=1440 \
+    SCENERY_SHOWCASE_MAX_RUNTIME_MINUTES=1440 \
+    SCENERY_SHOWCASE_MAX_INPUT_BYTES=4294967296
+
+ARG TIVVLEJOY_SCENERY_SOURCE_COMMIT=unknown
+ARG TIVVLEJOY_SCENERY_BUILD_TIME=unknown
+ENV TIVVLEJOY_SCENERY_SOURCE_COMMIT=${TIVVLEJOY_SCENERY_SOURCE_COMMIT} \
+    TIVVLEJOY_SCENERY_BUILD_TIME=${TIVVLEJOY_SCENERY_BUILD_TIME}
+
+LABEL org.opencontainers.image.title="tivvlejoy-scenery-final-worker" \
+      tivvlejoy.scenery.original.source.count="14" \
+      tivvlejoy.scenery.renderable.source.count="11" \
+      tivvlejoy.scenery.unity.preservation.count="3" \
+      tivvlejoy.scenery.internal.resolution="1080x1920" \
+      tivvlejoy.scenery.final.resolution="1080x1920" \
+      tivvlejoy.scenery.fps="30" \
+      tivvlejoy.scenery.frame.count="900" \
+      tivvlejoy.scenery.samples="256" \
+      tivvlejoy.scenery.engine="CYCLES" \
+      tivvlejoy.scenery.water.variant="D" \
+      tivvlejoy.scenery.hero.rebuild="v3" \
+      tivvlejoy.scenery.camera.contract="six-shot-camera-c-lock-v1" \
+      tivvlejoy.scenery.vram.floor.mib="24500" \
+      tivvlejoy.scenery.failed.visual.proof.digest="sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6" \
+      tivvlejoy.scenery.failed.extract.digest="sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca" \
+      tivvlejoy.scenery.commercial.assets.baked="false"
+
+RUN node --check ./src/scenery-showcase-original14-roles.js && \
+    node --check ./src/scenery-showcase-original14.js && \
+    node --check ./src/scenery-showcase-original14-entry.js && \
+    node --check ./src/scenery-render-profiles.js && \
+    node --check ./src/final-launch-contract-v1.js && \
+    node --check ./src/frame-checkpoint-v1.js && \
+    node --check ./src/visual-proof-contract-v1.js && \
+    python3 -m py_compile ./blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/runtime_roots_v1.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_hero_rebuild_v3.py ./blender/scenery/cinematic_camera_contract_v1.py ./blender/scenery/cinematic_shots.py ./blender/scenery/cinematic_required_extract_v1.py ./blender/scenery/cinematic_ecokit_image_resolve_v1.py ./blender/scenery/showcase_original14_select.py && \
+    python3 ./blender/scenery/cinematic_camera_contract_v1_test.py && \
+    python3 ./blender/scenery/cinematic_required_extract_v1_test.py && \
+    blender --background --factory-startup --python-exit-code 1 --python ./blender/scenery/cinematic_camera_contract_blender_v1.py && \
+    grep -F "require('./scenery-showcase-original14.js')" ./src/scenery-showcase-original14-entry.js >/dev/null && \
+    ! grep -F "scenery-showcase-entry-v2.js" ./src/scenery-showcase-original14-entry.js && \
+    ! grep -F "v7-proof-a-boot.js" ./src/scenery-showcase-original14-entry.js && \
+    blender --version | head -n 1 | grep -F 'Blender 4.2.2'
+
+CMD ["node", "./src/scenery-showcase-original14-entry.js"]

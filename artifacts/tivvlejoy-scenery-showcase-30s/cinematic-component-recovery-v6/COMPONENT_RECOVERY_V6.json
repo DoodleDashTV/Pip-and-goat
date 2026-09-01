@@ -1,0 +1,14 @@
+{
+  "schema": "TIVVLEJOY_COMPONENT_RECOVERY_V6",
+  "fullHeroAssembled": false,
+  "paidCreate": 0,
+  "livePods": [],
+  "runPodSpendUsd": 0,
+  "resolution": "540x960",
+  "samples": 28,
+  "phoneSize": "180x320",
+  "waterLockPreserved": true,
+  "selectedWaterTest": "C",
+  "selectedWaterTestPassed": false,
+  "verdict": "CINEMATIC_V6_COMPONENT_QUALITY_FAILED"
+}

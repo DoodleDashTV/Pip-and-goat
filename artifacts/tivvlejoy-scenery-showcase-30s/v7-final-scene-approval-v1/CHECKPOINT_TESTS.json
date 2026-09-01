@@ -1,0 +1,14 @@
+{
+  "schema": "TIVVLEJOY_V7_FRAME_CHECKPOINT_TEST_V1",
+  "module": "workers/runpod-blender/src/frame-checkpoint-v1.js",
+  "tests": "workers/runpod-blender/test/frame-checkpoint-v1.test.js",
+  "result": "PASS",
+  "proved": [
+    "upload + SHA-256 readback",
+    "resume only when hash + render identity match",
+    "filename-only resume forbidden",
+    "encode blocked until frames 1-900 verified",
+    "MP4 SHA-256 upload + readback"
+  ],
+  "noAutomaticSecondCreate": true
+}

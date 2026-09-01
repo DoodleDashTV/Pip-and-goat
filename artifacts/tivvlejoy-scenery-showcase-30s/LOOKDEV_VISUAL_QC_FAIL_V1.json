@@ -1,0 +1,36 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_LOOKDEV_VISUAL_QC_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T17:03:20Z",
+  "engine": "CYCLES_CPU",
+  "resolution": "360x640",
+  "samples": 16,
+  "commit": "652bc24",
+  "stillsDir": "/tmp/o14-lookdev/stills21",
+  "stills": {
+    "0001": "Meadow contrast now reads, but as a rectangular Voronoi quilt (fg std 38). Establish river is still a sky strip (133,168,185). Forest still near-black.",
+    "0450": "Closer beat, cart and dirt visible. Foreground collapsed to one dark green patch (std 7). Still a kit layout.",
+    "0900": "River center teal (69,111,124). Neon pine tips noted. Cabins still sit on a plane."
+  },
+  "whatImprovedVersusRejectedCabinOrbit": [
+    "Camera beats 1 / 450 / 900 are distinct",
+    "Dirt lane reads in closer beats",
+    "Meadow shader now has measurable contrast (too hard / quilt-like)"
+  ],
+  "rejectionMatches": [
+    "still reads as an asset test, not a finished cinematic shot",
+    "ground reads as tiled patches, not a valley meadow",
+    "establish river is a sky-mirror ribbon",
+    "forest reads as a near-black rectangular wall"
+  ],
+  "honestConclusion": "Hard Voronoi was the wrong fix. Soften the meadow, matte the river, lift tree objects. Paid path idle. Do not CREATE. Do not present as approval.",
+  "paidRenderAuthorized": false,
+  "paidProgressCheck": {
+    "checkedAt": "2026-08-28T17:03:20Z",
+    "activeExactNamePods": 0,
+    "billingCleanupConfirmed": true,
+    "createPerformed": false,
+    "livePinnedDigest": "sha256:236664936427f47824472df3965e66f42ee061bf5e14fe29921d6d579a3cdf06",
+    "reasonNoCreate": "Look-dev FAIL; live pin is rejected cabin-orbit image; green CI is not paid authorization"
+  }
+}

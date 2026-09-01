@@ -1,0 +1,145 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_FINAL_BLOCKER_REMOVAL_V40_RESULT",
+  "inspectedAt": "2026-08-29T13:26:00Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "0666606ff6cfa166b8268845ad9b8f234f996e1f",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "finalSha": "e86be5ec60082eb862870f8d2d46ce5b2ae1794a",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "number": 169,
+    "base": "cursor/tivvlejoy-ep001-animation-worker-payload-v1-73f1"
+  },
+  "livePodProof": {
+    "endpoint": "https://rest.runpod.io/v1/pods",
+    "response": [],
+    "relevantPodAlive": false
+  },
+  "paidWorkflowState": {
+    "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
+    "inProgress": false,
+    "authorizationFilePresent": true,
+    "authorizationFileTouchedThisPass": false,
+    "createPerformed": false
+  },
+  "v34WaterLockVerification": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.8,
+    "metallic": 0.0,
+    "specular": 0.5,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "WATER_WIDTH_SCALE": 0.3,
+    "BED_WIDTH_SCALE": 0.68,
+    "lightPathHdriReflectionControl": true,
+    "hdriReflectionRotationZ": 0.48,
+    "cameraDistanceShaderGating": false,
+    "lookdev92Proof": "v34_candidate_d / TJ_CinematicRiver_D / Water_Mat_1"
+  },
+  "shotAssessments": {
+    "SHOT_01": "Valley/cabin establish preserved. Cyan window cards are gone; openings read as dark recesses. Louis range still occupies the background. Far meadow is greener than V39 but still too even. Right cabin stays very dark.",
+    "SHOT_02": "Creek-first liquid-diagonal hero is preserved. Cabin stays off-axis. Building04 cyan through-hole is gone (cabin-region window blobs 72 in lookdev90 to 0 in lookdev91). A dark ridge sits behind the cabin but does not instantly read as the purchased Louis mountain package. Bank/soil mix improved but the waterline still looks too tidy at 540 px.",
+    "SHOT_03": "Dense west-grove forest passage preserved. Cabin absent. No regression from V39.",
+    "SHOT_04": "Village/path reveal, distinct from 03/05. Cabins, cart, fence, layered Louis range visible. Openings read dark.",
+    "SHOT_05": "120 mm telephoto pines-against-Louis compression preserved. Hero peak at (28, 16, 0.48) was not moved west.",
+    "SHOT_06": "Tree-framed scenic payoff with a readable Louis mass. Distinct from 03 and 05."
+  },
+  "gatesEFLJT": {
+    "E": "PARTIAL",
+    "F": "PARTIAL",
+    "J": "PARTIAL",
+    "L": "PASS",
+    "T": "PARTIAL"
+  },
+  "gateNotesEFLJT": {
+    "E": "lookdev92 far meadow has larger soil/needle islands than V39 but still reads as a mostly even procedural field at 540 px.",
+    "F": "SHOT_02 grass-to-water is less of a knife than V39, but the wet edge around the hero rocks is still too clean.",
+    "J": "Soil scars were enlarged then shrunk after they read as black slabs. The soil/shelf/rock/water chain is still not organic enough at image scale.",
+    "L": "SHOT_01/02 no longer show cyan/blue placeholder window cards. Openings read as dark recessed voids. Purchased mountains remain obvious on 01/04/05/06.",
+    "T": "SHOT_01/04/05/06 keep FG/MG/BG. SHOT_02 still cannot show a clearly readable Louis layer; the creek-gap peak remains a dark silhouette, not an instant purchased-mountain read."
+  },
+  "regressionPreviouslyPassed": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "K": "PASS",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "windowFixMethod": {
+    "rootCause": "SHOT_01/02 cyan was a through-hole / HDRI punch on Building04 log courses, not leftover emission. Window01 faces on north cabins were already remapped.",
+    "method": [
+      "Well-inset dark diffuse interior volume in every Building (no Principled Fresnel)",
+      "Window-band interior liners below the roof",
+      "Building04 south/east exterior log-colored plugs",
+      "Recessed plates behind remaining Window01 faces, then those faces deleted"
+    ],
+    "pixelProof": "lookdev90 SHOT_02 cabin-region cyan blobs=72; lookdev91/92 cabin wall cards=0. Remaining SHOT_02 cyan hits are 8 px sky slivers through left pines, not window rectangles."
+  },
+  "shot02MountainDepthMethod": {
+    "method": [
+      "Move first Louis peak to (0.0, 20.0, 0.62) so the west flank sits on camera C right-of-cabin",
+      "Rotate that peak (rot_z=2.65) and lift +3.4 m so a face can clear the cabin roof",
+      "Open the x≈0 y≈20 saddle; hide trees in the -6.5..8.5 x 10..34 corridor",
+      "Keep SHOT_05 hero peak at (28.0, 16.0, 0.48)"
+    ],
+    "pixelResult": "A dark ridge is now in the SHOT_02 sky, but it still reads as silhouette, not a purchased Louis mountain layer."
+  },
+  "meadowBankNaturalizationMethod": {
+    "method": [
+      "Single large-scale soil noise (0.009) with a high threshold so dirt is islands, not a sand flood",
+      "Patchy hero wet-edge mask instead of a continuous tan isoline",
+      "Larger wet-bank grass/earth mix patches (hole noise 0.42 / 0.95)",
+      "Hero soil scars kept visible but no longer black slabs"
+    ],
+    "pixelResult": "Breakup is present and larger than V39, but E/F/J still fail a 540 px cinematic read."
+  },
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev-v40-final/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev-v40-final/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev-v40-final/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev-v40-final/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev-v40-final/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev-v40-final/shot_06_.png"
+  },
+  "sourceStills": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev92/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev92/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev93/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev93/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev92/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev93/shot_06_.png"
+  },
+  "sceneIdentity": {
+    "proofPath": "/tmp/o14-lookdev/cinematic-usage92.json",
+    "profile": "LOOKDEV_FAST",
+    "engine": "CYCLES",
+    "resolution": "540x960",
+    "samples": 32,
+    "waterVariant": "D",
+    "frameRange": [1, 900]
+  },
+  "workerImageBuildStatus": "NOT_BUILT_VISUAL_GATE_FAILED",
+  "workerImageDigest": null,
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "readiness": "NOT_PAID_RENDER_READY",
+  "remainingBlocker": "E/F/J remain PARTIAL: far meadow and SHOT_02 wet-bank/soil-water chain still look too even at 540 px. T remains PARTIAL: SHOT_02 mountain is only a dark silhouette, not an instantly readable Louis layer. L is PASS (cyan window cards removed). Do not CREATE. Do not pin a worker image."
+}

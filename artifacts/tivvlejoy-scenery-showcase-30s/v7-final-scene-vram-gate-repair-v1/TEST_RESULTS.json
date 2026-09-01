@@ -1,0 +1,20 @@
+{
+  "task": "TIVVLEJOY_V7_FINAL_SCENE_VRAM_GATE_ROOT_CAUSE_AND_RETRY_PREFLIGHT_V1",
+  "repairCommit": "e5e4d36323e65dfc32963d0c5c357d3c32bafc46",
+  "paidCreate": 0,
+  "runpodCreateContacted": false,
+  "results": {
+    "final-launch-contract-v1.test.js": "PASS",
+    "visual-proof-contract-v1.test.js": "PASS",
+    "frame-checkpoint-v1.test.js": "PASS",
+    "cinematic_camera_contract_v1_test": "PASS",
+    "cinematic_water_lock_v1_test": "PASS",
+    "inspect_published_final_image_test": "PASS",
+    "preflight_issuable_after_new_digest": true
+  },
+  "ci": {
+    "finalImageWorkflow": "33453053455",
+    "headSha": "e5e4d36323e65dfc32963d0c5c357d3c32bafc46",
+    "conclusion": "success"
+  }
+}

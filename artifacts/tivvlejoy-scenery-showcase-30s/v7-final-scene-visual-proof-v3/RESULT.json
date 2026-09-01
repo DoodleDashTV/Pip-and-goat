@@ -1,0 +1,82 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3_RESULT",
+  "status": "FAILED_AFTER_CREATE",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3",
+  "digest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "imageSourceSha": "e5e4d36323e65dfc32963d0c5c357d3c32bafc46",
+  "requiredLauncherSha": "3e974a14ea813118f8096794b909fd27a3274e1e",
+  "paidCreate": 1,
+  "runpodSpendUsd": 0.0238,
+  "hourlyRateUsd": 0.74,
+  "runtimeSeconds": 115.9,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "podId": "kthjs7wmtootc3",
+  "podName": "tj-v7-fsvp-3",
+  "jobId": "v7-final-visual-proof-v3",
+  "startupAt": "2026-09-01T00:17:39.233239+00:00",
+  "renderAttemptAt": "2026-09-01T00:18:43.997Z",
+  "failedAt": "2026-09-01T00:18:50.470Z",
+  "workerStatus": {
+    "status": "FAILED",
+    "stage": "VISUAL_PROOF",
+    "code": "BLENDER_FAILED",
+    "message": "required files missing: Flora_Mat&GN&Models.blend, Rock_Models.blend"
+  },
+  "hostTelemetry": {
+    "requestedGpuSku": "NVIDIA GeForce RTX 4090",
+    "assignedGpuName": "RTX 4090",
+    "rawNvidiaSmi": "NOT_CAPTURED",
+    "vramTotalMiB": null,
+    "vramFreeMiB": null,
+    "gib": null,
+    "decimalGb": null,
+    "modelCheck": true,
+    "capacityCheck24500": true,
+    "capacityCheckEvidence": "Worker passed HOST_AND_LAUNCH_CONTRACT and reached VISUAL_PROOF_RENDER / SHOT_01 frame 48."
+  },
+  "camerasRendered": [],
+  "cameraResolvedAtProofFrames": {
+    "SHOT_01_48": "NOT_RENDERED",
+    "SHOT_02_210": "NOT_RENDERED",
+    "SHOT_03_360": "NOT_RENDERED",
+    "SHOT_04_520": "NOT_RENDERED",
+    "SHOT_05_680": "NOT_RENDERED",
+    "SHOT_06_860": "NOT_RENDERED",
+    "HERO_SHOT_02_210": "NOT_RENDERED"
+  },
+  "cameraC": {
+    "required": "TJ_SHOT_02_CAM",
+    "location": [2.2, -21.4, 3.4],
+    "look": [-3.4, -10.2, 1.75],
+    "lens": 32.0,
+    "frame210Rendered": false,
+    "v3CompAUsed": false,
+    "verifiedFromPixels": false
+  },
+  "proofImages": [],
+  "pixelSuiteRun": false,
+  "gates": {
+    "E": "NOT_RUN",
+    "F": "NOT_RUN",
+    "J": "NOT_RUN",
+    "reason": "No stills. Blender failed before any PNG."
+  },
+  "cleanup": {
+    "confirmed": true,
+    "livePods": []
+  },
+  "retry": false,
+  "secondCreate": false,
+  "encode900": false,
+  "merged": false,
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "V7_FINAL_SCENE_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION": "NO",
+  "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true
+}

@@ -1,0 +1,108 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_00",
+  "parts": [
+    "empty"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 260513792,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093244.4302025,
+    "rss": 260771840,
+    "hwm": 260771840,
+    "memTotal": 16791945216,
+    "memAvailable": 15498452992,
+    "memFree": 14930391040,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861843968,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 0,
+    "vertices": 0,
+    "faces": 0
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093244.5193348,
+    "rss": 278310912,
+    "hwm": 278310912,
+    "memTotal": 16791945216,
+    "memAvailable": 15485870080,
+    "memFree": 14917808128,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861839872,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 1,
+    "vertices": 0,
+    "faces": 0
+  },
+  "hwm": 278310912,
+  "deltaRss": 17539072,
+  "peakFromHwm": 278310912,
+  "error": null,
+  "pngBytes": 4067,
+  "png": true,
+  "images": {
+    "count": 0,
+    "rawBytes": 0,
+    "largest": []
+  },
+  "modifiers": [],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [],
+    "count": 0
+  },
+  "instances": {
+    "uniqueMeshes": 0,
+    "objects": 1,
+    "shared": [],
+    "singleUser": 0
+  },
+  "beech": null,
+  "evalGeom": null,
+  "counts": {
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 1,
+    "vertices": 0,
+    "faces": 0
+  }
+}

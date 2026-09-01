@@ -1,0 +1,85 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_INSPECT_V1",
+  "status": "PUBLISHED_IMMUTABLE_DIGEST",
+  "digest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "sourceCommit": "e5e4d36323e65dfc32963d0c5c357d3c32bafc46",
+  "sourceBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "requiredContentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
+  "parentDigest": "sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353",
+  "architecture": "amd64",
+  "os": "linux",
+  "platform": "linux/amd64",
+  "Entrypoint": [
+    "/opt/nvidia/nvidia_entrypoint.sh"
+  ],
+  "Cmd": [
+    "node",
+    "./src/scenery-showcase-original14-entry.js"
+  ],
+  "WorkingDir": "/opt/ddp-worker",
+  "blenderVersion": "4.2.2",
+  "launcher": "node ./src/scenery-showcase-original14-entry.js",
+  "forbiddenCmdsAbsent": true,
+  "scriptsRoot": "/opt/ddp-worker/blender/scenery",
+  "checkpointModule": true,
+  "visualProofModule": true,
+  "cameraContractModule": true,
+  "sixShotCameraContract": true,
+  "cameraCLock": true,
+  "blenderCameraContract": {
+    "ok": true,
+    "frame210": "TJ_SHOT_02_CAM",
+    "cameraC": {
+      "location": [
+        2.2,
+        -21.4,
+        3.4
+      ],
+      "look": [
+        -3.4,
+        -10.2,
+        1.75
+      ],
+      "lens": 32.0
+    },
+    "v3CompAUsed": false,
+    "cameras": [
+      "TJ_SHOT_01_CAM",
+      "TJ_SHOT_02_CAM",
+      "TJ_SHOT_03_CAM",
+      "TJ_SHOT_04_CAM",
+      "TJ_SHOT_05_CAM",
+      "TJ_SHOT_06_CAM"
+    ],
+    "cuts": [
+      {
+        "frame": 1,
+        "camera": "TJ_SHOT_01_CAM"
+      },
+      {
+        "frame": 151,
+        "camera": "TJ_SHOT_02_CAM"
+      },
+      {
+        "frame": 301,
+        "camera": "TJ_SHOT_03_CAM"
+      },
+      {
+        "frame": 451,
+        "camera": "TJ_SHOT_04_CAM"
+      },
+      {
+        "frame": 601,
+        "camera": "TJ_SHOT_05_CAM"
+      },
+      {
+        "frame": 751,
+        "camera": "TJ_SHOT_06_CAM"
+      }
+    ]
+  },
+  "failedVisualProofDigestIneligible": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+  "paidGpuLaunchCount": 0,
+  "runpodContacted": false,
+  "credentialsIncluded": false
+}

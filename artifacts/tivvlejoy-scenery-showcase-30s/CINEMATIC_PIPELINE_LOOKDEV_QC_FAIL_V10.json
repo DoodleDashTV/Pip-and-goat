@@ -1,0 +1,35 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:48:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "6e14531",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev15",
+  "shots": {
+    "SHOT_01": "FAIL — Louis ridge and haze are in; river is a silvery ribbon; village is still a cabin cluster on a flat floor.",
+    "SHOT_02": "PARTIAL — cabin, trees, and a wavy reflective surface compose a discovery frame. Banks are still a hard polygonal trench. Noise is heavy.",
+    "SHOT_03": "PARTIAL — pine branches now frame a valley opening. First time this shot reads as a passage. Midground trench is a dark strip, not water.",
+    "SHOT_04": "FAIL — far-bank trees jumped into the street and crowd the reveal. River is a grey strip on a flat floor.",
+    "SHOT_05": "PARTIAL — village-against-ridge compression holds. River is still a bright blue ribbon.",
+    "SHOT_06": "FAIL — trees and a cart dominate; cabin is a corner crop. River strip at the bottom."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "SHOT_03 is a framed forest opening instead of a black trunk or empty meadow",
+    "SHOT_02 aims at the far-bank cabin and the water has visible ripple/reflection instead of dead plastic",
+    "Louis LP ranges and Texture.png meadow remain",
+    "SHOT_05 stays a compression shot"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Green CI on earlier SHAs does not authorize CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

@@ -1,0 +1,23 @@
+ts=2026-08-30T03:50:34Z
+hostname=cursor
+blender=Blender 4.2.2 LTS
+head=a1cefd1c797ae56149ffb12febfd1341bd8c7694
+branch=cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+--- mem ---
+MemTotal:       16398384 kB
+MemFree:        10705620 kB
+MemAvailable:   15505448 kB
+Buffers:           44224 kB
+Cached:          4948240 kB
+SwapCached:            0 kB
+Active:           761864 kB
+Inactive:        4646772 kB
+--- disk ---
+Filesystem        1B-blocks       Used    Available Use% Mounted on
+overlay        270436077568 4811304960 251864178688   2% /
+--- workspace du ---
+4464102016
+--- tmp sources ---
+452381212	/tmp/o14-v4-source
+2818519	/tmp/o14-lookdev
+1311586892	/tmp/blender-4.2.2-linux-x64

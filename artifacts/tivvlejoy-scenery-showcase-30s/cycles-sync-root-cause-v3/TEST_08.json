@@ -1,0 +1,176 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_08",
+  "parts": [
+    "fern"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 258543616,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093257.7399824,
+    "rss": 269746176,
+    "hwm": 269750272,
+    "memTotal": 16791945216,
+    "memAvailable": 15454568448,
+    "memFree": 14886195200,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861733376,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 2,
+    "images": 4,
+    "vertices": 19458,
+    "faces": 11818
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093257.8269403,
+    "rss": 287813632,
+    "hwm": 287813632,
+    "memTotal": 16791945216,
+    "memAvailable": 15446179840,
+    "memFree": 14877806592,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861729280,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 2,
+    "images": 5,
+    "vertices": 19458,
+    "faces": 11818
+  },
+  "hwm": 287813632,
+  "deltaRss": 18067456,
+  "peakFromHwm": 287813632,
+  "error": null,
+  "pngBytes": 4067,
+  "png": true,
+  "images": {
+    "count": 4,
+    "rawBytes": 4194304,
+    "largest": [
+      {
+        "name": "bq_Stem_Diffuse.jpg",
+        "width": 256,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 2097152,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Stem_Normal.jpg",
+        "width": 256,
+        "height": 2048,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 2097152,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Fern_Diffuse.png",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "bq_Fern_Normal.jpg",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      }
+    ]
+  },
+  "modifiers": [],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [
+      {
+        "name": "bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn",
+        "hide_render": true,
+        "hide_viewport": true,
+        "collections": [
+          "Scene Collection"
+        ],
+        "verts": 19458
+      }
+    ],
+    "count": 1
+  },
+  "instances": {
+    "uniqueMeshes": 1,
+    "objects": 2,
+    "shared": [],
+    "singleUser": 1
+  },
+  "beech": null,
+  "evalGeom": {
+    "ok": true,
+    "objects": [],
+    "evalVerts": 0,
+    "evalFaces": 0,
+    "rssBefore": 272363520,
+    "rssAfter": 272363520,
+    "rssJump": 0,
+    "aborted": false
+  },
+  "counts": {
+    "objects": 2,
+    "meshes": 1,
+    "materials": 2,
+    "images": 5,
+    "vertices": 19458,
+    "faces": 11818
+  }
+}

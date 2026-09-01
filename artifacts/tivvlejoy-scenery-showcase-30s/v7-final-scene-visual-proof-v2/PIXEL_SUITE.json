@@ -1,0 +1,11 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_V2_PIXEL_SUITE",
+  "pixelSuiteRun": false,
+  "reason": "WORKER_FAILED_BEFORE_STILLS",
+  "workerCode": "FINAL_HOST_CONTRACT_FAILED",
+  "workerMessage": "VRAM_BELOW_24GIB",
+  "images": [],
+  "E": "NOT_RUN",
+  "F": "NOT_RUN",
+  "J": "NOT_RUN"
+}

@@ -1,0 +1,287 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_V37_VISUAL_GATE_RESULT",
+  "inspectedAt": "2026-08-29T10:49:32Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "6265235adc2ab901e9aa69c20b2558fb574d5446",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "visualWorkShas": [
+    "cf30de059fde0609c739076276806789e078cdc2",
+    "869d4ec8124328c822581cb6e81faa9fe2f26554",
+    "fc104dededa4f5779c697e7045ff57ccae4a1753",
+    "c75a124165e194eb4fcafeea28a58c75afdd1ece",
+    "404d2c73119fbe1a6fda0c1483de557465fde4c5"
+  ],
+  "finalSha": "404d2c73119fbe1a6fda0c1483de557465fde4c5",
+  "ancestorContainsRequiredCheckpoint": true,
+  "pr169": {
+    "number": 169,
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "title": "TivvleJoy cinematic scenery pipeline \u2014 look-dev still FAIL, no paid CREATE"
+  },
+  "livePodProof": {
+    "endpoint": "https://rest.runpod.io/v1/pods",
+    "response": [],
+    "relevantPodAlive": false
+  },
+  "paidWorkflowState": {
+    "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
+    "inProgress": false,
+    "latestRuns": [
+      {
+        "createdAt": "2026-08-28T11:28:05Z",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "createdAt": "2026-08-28T11:24:20Z",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "createdAt": "2026-08-28T10:08:34Z",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ],
+    "authorizationFilePresent": false
+  },
+  "v37PublishedCameraVerification": {
+    "publishedCheckpointCameraC": {
+      "start": {
+        "location": [
+          0.2,
+          -23.2,
+          3.05
+        ],
+        "look": [
+          -5.8,
+          -5.2,
+          0.2
+        ],
+        "lens": 34.0
+      },
+      "end": {
+        "location": [
+          1.8,
+          -22.0,
+          3.15
+        ],
+        "look": [
+          -3.8,
+          -3.8,
+          0.35
+        ],
+        "lens": 36.0
+      },
+      "renderedAs": "/tmp/o14-lookdev/cinematic-lookdev73/shot_02_.png",
+      "verdict": "FAIL \u2014 cabin still first; creek is a bottom-right sliver"
+    },
+    "activeAuthoredCameraC": {
+      "start": {
+        "location": [
+          1.4,
+          -19.8,
+          2.72
+        ],
+        "look": [
+          -3.6,
+          -10.4,
+          -0.52
+        ],
+        "lens": 32.0
+      },
+      "end": {
+        "location": [
+          2.8,
+          -18.8,
+          2.82
+        ],
+        "look": [
+          -1.8,
+          -9.2,
+          -0.32
+        ],
+        "lens": 34.0
+      },
+      "whyChanged": "Published V37 C kept the cabin as the first read. Pitching into the creek made water lead. A later 0.4 m look-z lift tried to keep a horizon without returning to lookdev73."
+    },
+    "cabinOffAxis": true,
+    "cameraPitchesTowardCreek": true,
+    "cinematicCreekProfileModuleAvailable": true,
+    "threeNorthBankSlumpsPresent": true,
+    "crestSmoothingDoesNotEraseSlumps": true,
+    "continuousNorthWetBandRemoved": true,
+    "troughBedWaterWidthUnchanged": true
+  },
+  "v34WaterLockVerification": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.8,
+    "metallic": 0.0,
+    "specular": 0.5,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "dualScaleRippleNormals": true,
+    "purchasedHdriKept": true,
+    "lightPathHdriReflectionControl": true,
+    "WATER_WIDTH_SCALE": 0.3,
+    "BED_WIDTH_SCALE": 0.68,
+    "v31ChannelPreserved": true,
+    "waterOnlyInDeepestChannel": true,
+    "cameraDistanceShaderGating": false,
+    "perCameraMaterialHacks": false,
+    "lookdev80Proof": {
+      "waterVariant": "D",
+      "riverMaterial": "Water_Mat_1",
+      "surface": "TJ_CinematicRiver_D",
+      "hdriReflectionControl": true,
+      "hdriLightPath": [
+        "Is Glossy Ray",
+        "Is Reflection Ray"
+      ],
+      "hdriCameraRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "hdriReflectionRotationZ": 0.48,
+      "waterArchitecture": "v34_candidate_d",
+      "cameraDistanceShaderGate": false
+    }
+  },
+  "correctionsMade": [
+    "Pitched authored camera C into the creek (cf30de0) after lookdev73 failed the creek-first gate.",
+    "Lifted SHOT_02 look.z slightly (869d4ec) so a horizon could exist without recentering the cabin.",
+    "Replaced the SHOT_03 empty-north-meadow aim with a west-tree-line look toward the village.",
+    "Pulled SHOT_03 farther southwest after lookdev77/78 rendered black from on-lens pines.",
+    "Moved the west forest clump off the new sightline and planted only side-frame trees (c75a124)."
+  ],
+  "shot02IterationPaths": {
+    "lookdev73_publishedV37C": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev73/shot_02_.png",
+      "verdict": "FAIL \u2014 cabin dominates; creek is a thin lower-right band"
+    },
+    "lookdev74_pitchedC": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev74/shot_02_.png",
+      "verdict": "HERO PASS \u2014 creek-first diagonal liquid; rocks pierce; cabin off-axis; mountains weak"
+    },
+    "lookdev76_horizonLift": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev76/shot_02_.png",
+      "verdict": "HERO PASS held; background mountains still mostly occluded by cabin/hill"
+    },
+    "lookdev80_sixSheetHero": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev80/shot_02_.png",
+      "verdict": "HERO PASS held after forest-layout change"
+    }
+  },
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev80/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev80/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev80/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev80/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev80/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev80/shot_06_.png"
+  },
+  "sixShotHumanRead": {
+    "SHOT_01": "Usable valley establish. Creek liquid in the lower band, village, trees, mountains, sky. White rectangular placeholder remains in a left-cabin opening.",
+    "SHOT_02": "Creek-first hero. Diagonal liquid, ripples, rocks entering water, irregular banks, off-axis cabin. Background mountains/sky still weakly readable.",
+    "SHOT_03": "No longer empty meadow or black occlusion. FG pine, MG cabin, BG mountains. Forest density is still thin for a passage shot.",
+    "SHOT_04": "Strong village reveal: FG creek/rocks, MG cabins/cart/fence, BG mountains.",
+    "SHOT_05": "Long-lens frame still reads like another village establish with a creek corner, not a distinct compressed mountain hero.",
+    "SHOT_06": "Village close with cart, cabins, mountains. Creek is only a bottom sliver."
+  },
+  "gatesAV": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PARTIAL",
+    "F": "PARTIAL",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "PARTIAL",
+    "K": "PASS",
+    "L": "PARTIAL",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "T": "PARTIAL",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "gateNotes": {
+    "A": "lookdev80 SHOT_02 shows water inside the carved channel; trough/width lock unchanged.",
+    "B": "lookdev74/76/80: a viewer names the creek first, not the cabin.",
+    "C": "Water remains the 0.30 film in the V31 deep channel.",
+    "D": "Dark wet bed and dark translucent volume remain visible around rocks.",
+    "E": "North slumps and soil tongues are present; far grass still looks fairly uniform from some angles.",
+    "F": "No continuous knife-lip in the hero; some grass-to-water edges stay sharp.",
+    "G": "SHOT_02 is a diagonal creek body, not a ribbon. SHOT_03 no longer treats the creek as a distant trench.",
+    "H": "Creek does not read as a road. Village dirt path is dressing, not painted meadow water.",
+    "I": "Controlled sky reflections, ripples, and depth; no white foil on the hero.",
+    "J": "Rocks, soil tongues, and saplings break the bank; a clean grass contour can still be traced in places.",
+    "K": "SHOT_02 is a cinematic creek-hero frame with cabin as destination.",
+    "L": "Six stills exist and are locally clean, but SHOT_03 is thin, SHOT_05 is not a distinct compression, and a white cabin placeholder remains.",
+    "M": "Visible purchased scenery: Cabin01A\u201304B, Cart01, Gate01, Fence01, Tree01\u201303, Louis LP mountains, Sky HDRI, Water_Mat_1 donor, meadow Texture.png.",
+    "N": "Free local 540x960 32-sample denoised Cycles CPU stills. No 900-frame render.",
+    "O": "Same V34 D material on every shot. No per-camera water hacks.",
+    "P": "Water now leads the hero instead of sitting under the cabin.",
+    "Q": "Light Path HDRI control still prevents foil on the pitched camera.",
+    "R": "cameraDistanceShaderGate remains false in code and lookdev80 proof.",
+    "S": "Foreground rocks visibly meet and pierce the water in SHOT_02 and SHOT_04.",
+    "T": "SHOT_01/04/06 have FG/MG/BG. SHOT_02 background mountains remain weak behind the cabin hill.",
+    "U": "Hero creek travels as a diagonal leading line through the lower half of SHOT_02.",
+    "V": "Clearly better than the V35 grazing stripe and the V36 cabin-first C frame."
+  },
+  "purchasedAssetsVisiblyUsed": [
+    "village_blender Cabin01A\u201304B",
+    "village_blender Cart01 Gate01 Fence01",
+    "village_blender Tree01 Tree02 Tree03",
+    "village_project Water_Mat_1 tint donor",
+    "background_mountains LP Meadow/Grassy ranges",
+    "sky_hdri Image0001.jpg",
+    "Louis LP meadow Texture.png on valley carrier",
+    "RiverMask roughness on water"
+  ],
+  "sceneIdentity": {
+    "proofPath": "/tmp/o14-lookdev/cinematic-usage80.json",
+    "profile": "LOOKDEV_FAST",
+    "engine": "CYCLES",
+    "resolution": "540x960",
+    "samples": 32,
+    "denoiseRuntime": "enabled_when_samples_gte_32",
+    "frameRange": [
+      1,
+      900
+    ],
+    "fps": 30,
+    "heroStillFrames": {
+      "SHOT_01": 48,
+      "SHOT_02": 210,
+      "SHOT_03": 360,
+      "SHOT_04": 520,
+      "SHOT_05": 680,
+      "SHOT_06": 860
+    },
+    "waterVariant": "D",
+    "forestCopies": 88
+  },
+  "workerImageBuildStatus": "NOT_BUILT_OR_PINNED_VISUAL_APPROVAL_REQUIRED",
+  "workerImageDigest": null,
+  "maximumEstimatedRenderCostUsd": null,
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "finalResultReturned": false,
+  "readiness": "NOT_PAID_RENDER_READY",
+  "remainingBlocker": "Mandatory visual gates E/F/J/L/T are PARTIAL. SHOT_02 still lacks a readable mountain/sky background; SHOT_03 is a thin cabin peek rather than a dense forest passage; SHOT_05 is not a distinct long-lens compression; a white placeholder remains in a cabin opening on SHOT_01/05. Human visual readability is not complete. Do not CREATE."
+}

@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "elapsedSec": 1.967,
+  "peakRssMiB": 33.9,
+  "libraryCount": 2,
+  "textureCount": 1134,
+  "textureTree": {
+    "schema": "TIVVLEJOY_ECOKIT_TEXTURE_TREE_V1",
+    "counts": {
+      "texturesDir": 27,
+      "assetsLibrary": 1107,
+      "total": 1134,
+      "texturesDirExists": true,
+      "assetsLibraryExists": true,
+      "texturesDirPath": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/Textures",
+      "assetsLibraryPath": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/assets library"
+    },
+    "requiredImageNames": [
+      "Tree Trunk_1.png",
+      "Tree Trunk_2.png",
+      "Tree Trunk_3.png",
+      "03-2.png",
+      "Flora_1.png",
+      "Moss_2.png",
+      "firefly_1.png",
+      "firefly_2.png",
+      "Grass_3_020.png",
+      "01-8.png",
+      "Rock_Model_Large_010.png"
+    ],
+    "missingNamed": [],
+    "blockers": [],
+    "ok": true
+  },
+  "libraries": [
+    {
+      "name": "Flora_Mat&GN&Models.blend",
+      "bytes": 669989781,
+      "sha256": "ce663a3e7b70b566d05092c6d86a94d727dbb5232068369de002ada4c1124589"
+    },
+    {
+      "name": "Rock_Models.blend",
+      "bytes": 258365184,
+      "sha256": "ea72ac8e65b278c8bfc351d55efa6d8aef2eeec13068cec42cf79db1f23f592c"
+    }
+  ]
+}

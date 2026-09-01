@@ -1,0 +1,12 @@
+{
+  "schema": "TIVVLEJOY_V7_VISUAL_PROOF_IDENTITY_V1",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V1",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "localSha": "7f2fa6f3324e11f5787c82a7e17a36ccc78ecff8",
+  "remoteTip": "7f2fa6f3324e11f5787c82a7e17a36ccc78ecff8",
+  "requiredImageCommit": "577cafe897c122c6b6bf85f03c0b2e6b24e79665",
+  "requiredImageCommitIsAncestor": true,
+  "requiredContentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
+  "requiredContentAncestorIsAncestor": true,
+  "at": "2026-08-31T22:45:29.308932+00:00"
+}

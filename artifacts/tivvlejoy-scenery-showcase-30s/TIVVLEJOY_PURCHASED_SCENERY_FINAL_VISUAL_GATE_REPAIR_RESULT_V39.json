@@ -1,0 +1,226 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_FINAL_VISUAL_GATE_REPAIR_RESULT_V39",
+  "inspectedAt": "2026-08-29T11:50:00Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "7b3b7b47627e32aecec936e18d470537e4dfc9ea",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "finalSha": "e9807fed5e465f1f53c2cc10d8fddcef6c24805d",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "livePodProof": {
+    "endpoint": "https://rest.runpod.io/v1/pods",
+    "response": [],
+    "relevantPodAlive": false
+  },
+  "paidWorkflowState": {
+    "name": "TivvleJoy Real Scenery Original14 Paid Render V1",
+    "inProgress": false,
+    "authorizationFilePresent": false,
+    "createPerformed": false
+  },
+  "v34WaterLockVerification": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.8,
+    "metallic": 0.0,
+    "specular": 0.5,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "WATER_WIDTH_SCALE": 0.3,
+    "BED_WIDTH_SCALE": 0.68,
+    "lightPathHdriReflectionControl": true,
+    "hdriReflectionRotationZ": 0.48,
+    "cameraDistanceShaderGating": false,
+    "lookdev88Proof": "v34_candidate_d / TJ_CinematicRiver_D / Water_Mat_1"
+  },
+  "shotAssessments": {
+    "SHOT_01": "Cinematic valley/cabin establish. Louis mountains now occupy the background. Purchased cabins, cart, pines, creek, and HDRI are visible. Window punch remains on the left cabin. Far grass still reads as a carpet.",
+    "SHOT_02": "Creek-first liquid-diagonal hero is preserved. Cabin stays an off-axis destination. Background mountain is only a faint right-horizon silhouette, not a clear third layer. One cyan window card remains. Bank-to-water edges still too sharp.",
+    "SHOT_03": "Unmistakable dense forest passage. Cabin is absent. Purchased pines, sapling, trunks, and canopy occupy the frame. First read is forest, not village. Floor still too uniform and the grove is dark.",
+    "SHOT_04": "Village/path reveal, distinct from 03/05. Cabins, cart, fence, and Louis range are visible. Central street tree is weak. Windows are dark at this distance. Grass still even.",
+    "SHOT_05": "Unmistakable 120 mm telephoto compression: purchased pines stacked against a dominant Louis mountain mass. Not a village establish. Mountains occupy a major part of the frame.",
+    "SHOT_06": "East-side scenic payoff: pines frame a readable Louis mass and sky. Distinct from the compressed SHOT_05 stack and from the SHOT_03 interior passage. Still tree-heavy rather than a full landscape beauty plate."
+  },
+  "gatesEFLJT": {
+    "E": "PARTIAL",
+    "F": "PARTIAL",
+    "J": "PARTIAL",
+    "L": "PARTIAL",
+    "T": "PARTIAL"
+  },
+  "gateNotesEFLJT": {
+    "E": "lookdev88 far meadow still reads as a uniform procedural carpet despite larger soil/needle islands.",
+    "F": "SHOT_02 grass-to-water contacts remain a clean cut around the hero rocks.",
+    "J": "Rocks meet water, but the soil/vegetation/shelf chain is not yet organic at image scale.",
+    "L": "SHOT_03 is now a dense forest passage and SHOT_05 is now telephoto mountain compression. L is not a full PASS because SHOT_01/02 still show cyan window cards and far grass/banks still fail the cinematic reel test.",
+    "T": "SHOT_01/04/05/06 have readable FG/MG/BG and visible Louis masses. SHOT_02 still cannot show a clear mountain layer behind the creek hero."
+  },
+  "regressionPreviouslyPassed": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "K": "PASS",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "whiteWindow": {
+    "rootCause": "Building01\u201304 slot 1 uses untextured Window01* default grey (0.8,0.8,0.8) with no image. Cabin/Building Principled emission was 1.0. After zeroing emission and remapping Window* to matte TJ_CabinDaylightGlass, SHOT_01/02 still show a cyan-blue rectangle. That remaining punch is the flat window opening catching the Sky HDRI / reading as a hole, not a leftover 1.0 EMI node.",
+    "correctionsTried": [
+      "Zeroed all Building/Window Principled and Emission node strengths",
+      "Remapped Window01* to TJ_CabinDaylightGlass (dark, roughness 0.96, transmission 0, emission 0.02 warm)",
+      "Hid Building*_LOD0 only (hiding Roof/Tree LOD regressed roofs and emptied SHOT_03)",
+      "Tried slot-placed and AABB interior cubes; both leaked as tan cards and did not kill the cyan punch"
+    ],
+    "lookdev88Status": "Cyan window card still visible on SHOT_01 and SHOT_02. SHOT_04 windows read dark. Not pixel-PASS.",
+    "exactNames": [
+      "Window01",
+      "Window01.001",
+      "Window01.002",
+      "Window01.003",
+      "Building01\u201304 slot 1"
+    ]
+  },
+  "forestPassConstruction": {
+    "camera": {
+      "start": [
+        -50.0,
+        -22.0,
+        2.85
+      ],
+      "look": [
+        -58.0,
+        -4.0,
+        1.55
+      ],
+      "lens": 50.0
+    },
+    "layout": "Irregular west grove looking away from the village. Near occluders small; mid/far trunk-scale variation; saplings; soil scars; fallen trunks.",
+    "bugFixed": "lookdev84 hid Tree*_LOD0; every forest copy inherited hide_render. Forced tree unhide.",
+    "pixelResult": "lookdev88 SHOT_03 reads dense cinematic forest, not a cabin peek."
+  },
+  "telephotoConstruction": {
+    "camera": {
+      "start": [
+        38.0,
+        -122.0,
+        16.0
+      ],
+      "look": [
+        26.0,
+        24.0,
+        12.5
+      ],
+      "lens": 120.0
+    },
+    "mountains": {
+      "peaks": [
+        [
+          -14.0,
+          28.0,
+          0.5
+        ],
+        [
+          28.0,
+          16.0,
+          0.48
+        ],
+        [
+          46.0,
+          52.0,
+          0.3
+        ]
+      ],
+      "foothills": [
+        [
+          4.0,
+          24.0,
+          0.22
+        ],
+        [
+          36.0,
+          28.0,
+          0.18
+        ]
+      ],
+      "groundSnappedAfterRotation": true
+    },
+    "midgroundPines": [
+      [
+        22.0,
+        10.0,
+        1.18
+      ],
+      [
+        32.0,
+        8.0,
+        0.78
+      ],
+      [
+        18.0,
+        6.0,
+        0.46
+      ]
+    ],
+    "pixelResult": "lookdev88 SHOT_05 reads as long-lens mountain compression with purchased pines stacked against Louis mass."
+  },
+  "grassBankNaturalization": [
+    "Larger meadow soil/needle islands (noise 0.055/0.14, stronger mix)",
+    "Wider wet-bank fade and extra far-bank tongues",
+    "Extra creek-profile slumps/tongues",
+    "More hero soil scars along a wider X range",
+    "Did not change V34 IOR, width, trough, or HDRI rotation"
+  ],
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev88/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev88/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev88/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev88/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev88/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev88/shot_06_.png"
+  },
+  "purchasedAssetsVisiblyUsed": [
+    "Cabin01A\u201304B village architecture on SHOT_01/02/04",
+    "Cart01 Gate01 Fence01",
+    "Tree01 Tree02 Tree03 dense west grove and SHOT_05 stack",
+    "Water_Mat_1 donor / V34 variant D creek",
+    "Louis LP Meadow/Grassy closer peaks",
+    "Sky HDRI + Light Path reflection control",
+    "meadow Texture.png"
+  ],
+  "sceneIdentity": {
+    "proofPath": "/tmp/o14-lookdev/cinematic-usage88.json",
+    "profile": "LOOKDEV_FAST",
+    "engine": "CYCLES",
+    "resolution": "540x960",
+    "samples": 32,
+    "waterVariant": "D",
+    "frameRange": [
+      1,
+      900
+    ]
+  },
+  "workerImageBuildStatus": "NOT_BUILT_VISUAL_GATE_FAILED",
+  "workerImageDigest": null,
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "finalResultReturned": false,
+  "readiness": "NOT_PAID_RENDER_READY",
+  "remainingBlocker": "E/F/J remain PARTIAL on far grass and wet-bank edges. L is only PARTIAL: SHOT_03/05 intents now read correctly, but SHOT_01/02 still show cyan Window01 cards. T remains PARTIAL because locked creek camera C still cannot show a clear Louis layer. Do not CREATE. Do not pin a worker image."
+}

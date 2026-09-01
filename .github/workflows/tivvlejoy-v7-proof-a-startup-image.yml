@@ -1,0 +1,202 @@
+# Zero-cost overlay image + persistent startup-contract proof. Never contacts RunPod.
+name: TivvleJoy V7 Proof A Startup Image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-v7-proof-a-startup-image.yml'
+      - 'workers/runpod-blender/Dockerfile.v7-proof-a-startup'
+      - 'workers/runpod-blender/src/v7-pid1-bootstrap.sh'
+      - 'workers/runpod-blender/src/v7-proof-a-boot.js'
+      - 'scripts/cloud/v7-proof-a-paid/docker_args_v1.py'
+      - 'scripts/cloud/v7-proof-a-paid/startup_proof_v1.py'
+      - 'workers/runpod-blender/test/v7-proof-a-startup-proof.test.js'
+      - 'workers/runpod-blender/test/v7-persist-12m.test.js'
+      - 'workers/runpod-blender/test/v7-production-lifetime-scan.test.js'
+      - 'config/cloud/scenery-showcase-worker-image.json'
+
+concurrency:
+  group: tivvlejoy-v7-proof-a-startup-image
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-proof-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Offline dockerArgs and boot contract
+        run: |
+          set -euo pipefail
+          python3 scripts/cloud/v7-proof-a-paid/startup_proof_v1.py --fast
+          node --check workers/runpod-blender/src/v7-proof-a-boot.js
+          node workers/runpod-blender/test/v7-proof-a-boot.test.js
+          node workers/runpod-blender/test/v7-production-lifetime-scan.test.js
+          node workers/runpod-blender/test/v7-proof-a-startup-proof.test.js
+
+      - name: Resolve parent digest and image names
+        run: |
+          set -euo pipefail
+          owner="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          parent="$(python3 -c 'import json; print(json.load(open("config/cloud/scenery-showcase-worker-image.json"))["ref"])')"
+          echo "PARENT_REF=${parent}" >> "$GITHUB_ENV"
+          echo "PARENT_DIGEST=${parent#*@}" >> "$GITHUB_ENV"
+          echo "IMAGE_REPO=ghcr.io/${owner}/ddp-runpod-blender" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=v7-proof-a-startup-${GITHUB_SHA}" >> "$GITHUB_ENV"
+
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Reproduce bash -c crash on the failed digest
+        run: |
+          set -euo pipefail
+          docker pull "${PARENT_REF}"
+          set +e
+          docker run --rm --entrypoint /bin/bash "${PARENT_REF}" -c \
+            "node -e (async()=>{console.log(JSON.stringify({event:'IMAGE_PROCESS_STARTED'}));const r2=require('x')})()" \
+            > /tmp/broken-bash.txt 2>&1
+          status=$?
+          set -e
+          test "$status" -ne 0
+          grep -E 'syntax error near unexpected token|Unexpected end of input' /tmp/broken-bash.txt
+
+      - name: Build overlay without pushing
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: workers/runpod-blender/Dockerfile.v7-proof-a-startup
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            PARENT_REF=${{ env.PARENT_REF }}
+            SOURCE_SHA=${{ github.sha }}
+            PARENT_DIGEST=${{ env.PARENT_DIGEST }}
+          provenance: false
+          sbom: false
+
+      - name: Persistent 12-minute container proof
+        run: |
+          set -euo pipefail
+          IMAGE="${IMAGE_REPO}:${IMAGE_TAG}"
+          mkdir -p artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1
+          mkdir -p artifacts/tivvlejoy-scenery-showcase-30s/v7-worker-marker-timeout-v1
+          port=18081
+          docker rm -f v7-persist-proof >/dev/null 2>&1 || true
+          docker run -d --name v7-persist-proof \
+            -e PAID_EXECUTION_AUTHORIZED=false \
+            -e V7_HEALTH_PORT=18080 \
+            -e V7_HEALTH_BIND=0.0.0.0 \
+            -e V7_BOOT_ID=gha-persist-12m \
+            -p "127.0.0.1:${port}:18080" \
+            "$IMAGE" node ./src/v7-proof-a-boot.js
+          ready=0
+          for _ in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:${port}/startup-proof" | grep -F 'WORKER_READY'; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = 1
+          first="$(curl -fsS "http://127.0.0.1:${port}/startup-proof")"
+          echo "$first" > artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1/FIRST_READY.json
+          python3 - <<'PY'
+          import json, time, urllib.request, os
+          port = 18081
+          first = json.load(open("artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1/FIRST_READY.json"))
+          pid = first["pid"]
+          boot = first["bootId"]
+          beats = first.get("heartbeatCount") or 0
+          started = time.time()
+          while time.time() - started < 720:
+              body = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/startup-proof", timeout=5).read().decode())
+              assert body["ok"] is True
+              assert body["pid"] == pid
+              assert body["bootId"] == boot
+              assert body["heartbeatCount"] >= beats
+              beats = body["heartbeatCount"]
+              time.sleep(15)
+          last = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/startup-proof", timeout=5).read().decode())
+          assert last["uptimeMs"] >= 720000
+          assert last["heartbeatCount"] >= 2
+          open("artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1/LAST_READY.json","w").write(json.dumps(last, indent=2)+"\n")
+          print(json.dumps({"pid": pid, "bootId": boot, "beats": last["heartbeatCount"], "uptimeMs": last["uptimeMs"]}))
+          PY
+          docker logs v7-persist-proof | tee artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1/CONTAINER_TRANSCRIPT.txt
+          grep -F 'BOOTSTRAP_ENTERED' artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1/CONTAINER_TRANSCRIPT.txt
+          ! grep -F 'R2_CLIENT_STARTED' artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1/CONTAINER_TRANSCRIPT.txt
+          docker stop v7-persist-proof
+          docker rm v7-persist-proof
+
+      - name: Publish overlay digest
+        id: publish
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: workers/runpod-blender/Dockerfile.v7-proof-a-startup
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            PARENT_REF=${{ env.PARENT_REF }}
+            SOURCE_SHA=${{ github.sha }}
+            PARENT_DIGEST=${{ env.PARENT_DIGEST }}
+          provenance: false
+          sbom: false
+
+      - name: Write pin evidence
+        env:
+          PUBLISHED_DIGEST: ${{ steps.publish.outputs.digest }}
+        run: |
+          set -euo pipefail
+          test -n "${PUBLISHED_DIGEST}"
+          mkdir -p artifacts/tivvlejoy-scenery-showcase-30s/v7-worker-marker-timeout-v1
+          python3 - <<'PY'
+          import json, os
+          p = {
+            "schema": "TIVVLEJOY_V7_PROOF_A_STARTUP_IMAGE_V1",
+            "status": "PUBLISHED_IMMUTABLE_DIGEST",
+            "sourceCommit": os.environ["GITHUB_SHA"],
+            "parentRefDigest": os.environ["PARENT_REF"].split("@", 1)[-1],
+            "imageRepository": os.environ["IMAGE_REPO"],
+            "tag": os.environ["IMAGE_TAG"],
+            "digest": os.environ["PUBLISHED_DIGEST"],
+            "ref": f"{os.environ['IMAGE_REPO']}@{os.environ['PUBLISHED_DIGEST']}",
+            "blenderVersion": "4.2.2",
+            "workerEntrypoint": "v7-proof-a-boot.js",
+            "pid1": "v7-pid1-bootstrap.sh",
+            "dockerArgs": "node ./src/v7-proof-a-boot.js",
+            "persist": "indefinite",
+            "startupProofHttp": "/startup-proof",
+            "commercialAssetsBaked": False,
+            "paidCreate": 0,
+            "runpodContacted": False,
+          }
+          open("artifacts/tivvlejoy-scenery-showcase-30s/v7-worker-marker-timeout-v1/STARTUP_IMAGE.json", "w").write(json.dumps(p, indent=2) + "\n")
+          print(json.dumps(p))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tivvlejoy-v7-proof-a-startup-image
+          path: |
+            artifacts/tivvlejoy-scenery-showcase-30s/v7-worker-marker-timeout-v1
+            artifacts/tivvlejoy-scenery-showcase-30s/v7-persist-observability-v1
+          if-no-files-found: error
+          retention-days: 14

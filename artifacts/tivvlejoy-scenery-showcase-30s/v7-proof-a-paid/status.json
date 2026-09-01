@@ -1,0 +1,8 @@
+{
+  "schema": "TIVVLEJOY_V7_PROOF_A_PAID_STATUS_V1",
+  "status": "FAILED",
+  "code": "CONTAINER_NEVER_STARTED",
+  "message": "SECURE RTX 4090 pod stayed in pre-runtime (negative uptime) for 20 minutes. No worker process, memory contract, or PNG. Terminating to stay under $0.40. No retry.",
+  "pngWritten": false,
+  "ended": "2026-08-30T15:49:16.379208+00:00"
+}

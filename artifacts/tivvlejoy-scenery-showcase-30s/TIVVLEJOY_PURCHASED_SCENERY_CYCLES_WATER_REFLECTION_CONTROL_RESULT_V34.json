@@ -1,0 +1,166 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_CYCLES_WATER_REFLECTION_CONTROL_RESULT_V34",
+  "startingSha": "afc2115d04cfc82a566fa1a922c7246d78549c06",
+  "visualWorkSha": "3ae8916a8b414fcbda148efcce47ca1d3de30540",
+  "finalSha": "d5fb958b89b7803b5348bd38e865343666b94a34",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "creekGeometryLocked": true,
+  "locked": [
+    "WATER_SURFACE_Z=-1.15",
+    "BED_CENTER_Z=-1.62",
+    "WATER_WIDTH_SCALE=0.30",
+    "BED_WIDTH_SCALE=0.68",
+    "18cm water prism",
+    "asymmetric banks",
+    "river spline location"
+  ],
+  "cyclesWorldNodeChanges": {
+    "purchasedHdriKept": true,
+    "cameraDiffuseBackground": "unchanged TJ_PurchasedSkyWorld HDRI, strength 1.05",
+    "glossyReflectionBackground": "same HDRI color, Gamma 1.85, mix 0.40 toward muted sky (0.22,0.32,0.40), multiply (0.50,0.58,0.56), Background strength 0.50",
+    "selector": "ShaderNodeMixShader driven by Light Path",
+    "lightPathOutputsUsed": ["Is Glossy Ray", "Is Reflection Ray"],
+    "combine": "MAXIMUM(Is Glossy Ray, Is Reflection Ray)",
+    "notDone": [
+      "HDRI not removed",
+      "not replaced with generic world",
+      "reflection rays not replaced with flat black"
+    ]
+  },
+  "normalHdriBehavior": "Camera rays and diffuse still see the purchased Sky HDRI at full authored look (cabins, forest, terrain, sky unchanged).",
+  "reflectionRayHdriBehavior": "Glossy/reflection rays see the same HDRI with highlight compression so the hottest sky values cannot become a solid white foil. Sky variation, darker vegetation, and small highlights remain.",
+  "abWaterTest": {
+    "dir": "/tmp/o14-lookdev/cinematic-lookdev-v34ab",
+    "A": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-v34ab/variant_a_shot_02_.png",
+      "setup": "V33 baseline water (IOR 1.0 / spec 0 / transparent+emission mix) + unrestricted HDRI",
+      "humanRead": "Silvery/plastic strip. Worse at the new SHOT_02 pitch. Not liquid."
+    },
+    "B": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-v34ab/variant_b_shot_02_.png",
+      "setup": "Real IOR 1.33 + transmission 0.86 + unrestricted HDRI",
+      "humanRead": "White/silver foil ribbon. Confirms unrestricted HDRI + real water optics is the V32 failure mode."
+    },
+    "C": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-v34ab/variant_c_shot_02_.png",
+      "setup": "Real IOR 1.33 + transmission + Light Path HDRI control",
+      "humanRead": "WINNER of the four. No solid white ribbon. Broken ripple highlights + some bed. Still hot at 14deg; knife remains."
+    },
+    "D": {
+      "path": "/tmp/o14-lookdev/cinematic-lookdev-v34ab/variant_d_shot_02_.png",
+      "setup": "C plus rougher ripple/absorption; later lookdev60 tightened further",
+      "humanRead": "Same family as C. Water-region luma 50 vs B 64. Not a full ribbon; not yet hero-pass liquid."
+    },
+    "winner": "C as the diagnostic winner; production default stays D (C + tuned roughness/volume + hanging-grass crest)",
+    "controlWorks": true,
+    "whyCBeatsB": "Same camera, same IOR/transmission. Only the World Light Path split changed. Water-region mean luma dropped ~14 points and the solid white ribbon disappeared."
+  },
+  "finalWaterShader": {
+    "label": "D",
+    "type": "Cycles Principled BSDF on 18cm closed prism",
+    "ior": 1.33,
+    "specularIorLevel": 0.50,
+    "transmissionWeight": 0.80,
+    "metallic": 0.0,
+    "roughness": [0.14, 0.28],
+    "volumeAbsorption": {"color": [0.07, 0.15, 0.12], "density": 0.18},
+    "tint": "Water_Mat_1-derived deep teal, vertex-color shallow mix",
+    "emission": 0.0,
+    "v33CompensationsRemoved": [
+      "IOR 1.0",
+      "specular 0",
+      "transmission 0",
+      "teal emission body",
+      "hand-built dark glossy mix as the primary reflection"
+    ],
+    "surfaceNormals": {
+      "lowFrequency": "object-space noise scale 0.36 (broad undulation)",
+      "highFrequency": "object-space noise scale 7.4 (small ripples), weight reduced on D",
+      "flow": "anisotropic mapping scale (0.42, 3.1, 1.0) along +X creek direction"
+    },
+    "cameraDistanceGating": "REMOVED on B/C/D. A (V33 baseline) also has no distance gate in this pass."
+  },
+  "knifeLipGeometryRepair": {
+    "result": "FAIL_still_visible",
+    "attempted": [
+      "terrain grid 320 -> 400 for more crest verts",
+      "deeper south-only erosion notches",
+      "hanging grass/soil shelf meshes over the south drop",
+      "existing Mix Shader patches, tufts, stones"
+    ],
+    "remaining": "SHOT_02 still sees a hard grass-to-trough silhouette. Extra shelves did not erase the 2m wall at 14deg."
+  },
+  "shot02CameraChange": {
+    "changed": true,
+    "why": "Small pitch into the trough so the creek, both banks, cabin, and vegetation stay in frame with slightly less dead-grazing.",
+    "start": {"location": [-11.6, -19.5, 3.06], "look": [3.0, -12.0, -1.42], "lens": 36.0},
+    "end": {"location": [-4.6, -19.1, 3.10], "look": [11.2, -11.4, -1.30], "lens": 38.0},
+    "constraints": "location.z still in [1.6, 3.2]; camera still aimed at the creek"
+  },
+  "shot02BeforeAfter": {
+    "before": "/tmp/o14-lookdev/cinematic-lookdev59/shot_02_.png",
+    "after": "/tmp/o14-lookdev/cinematic-lookdev60/shot_02_.png",
+    "abWinner": "/tmp/o14-lookdev/cinematic-lookdev-v34ab/variant_c_shot_02_.png",
+    "hideWater": "/tmp/o14-lookdev/cinematic-lookdev60-geom/shot_02_.png",
+    "assessment": "HDRI control is real (C vs B). Hero SHOT_02 is not yet unmistakably cinematic liquid and the knife lip remains."
+  },
+  "shot02Result": "FAIL — do not six-shot as a pass",
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "NOT_RENDERED_V34_shot02_hero_gate_failed",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev60/shot_02_.png",
+    "SHOT_03": "NOT_RENDERED_V34_shot02_hero_gate_failed",
+    "SHOT_04": "NOT_RENDERED_V34_shot02_hero_gate_failed",
+    "SHOT_05": "NOT_RENDERED_V34_shot02_hero_gate_failed",
+    "SHOT_06": "NOT_RENDERED_V34_shot02_hero_gate_failed"
+  },
+  "gatesAR": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PARTIAL",
+    "E": "PASS",
+    "F": "FAIL",
+    "G": "PARTIAL",
+    "H": "PARTIAL",
+    "I": "PARTIAL",
+    "J": "PARTIAL",
+    "K": "FAIL",
+    "L": "FAIL",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PARTIAL",
+    "P": "FAIL",
+    "Q": "PARTIAL",
+    "R": "PASS"
+  },
+  "gateNotes": {
+    "A": "Hide-water lookdev60-geom still shows the carved creek.",
+    "B": "C crop can read as liquid ripples; hero frame is not instantly water.",
+    "C": "Water still ~30% of channel.",
+    "D": "Exposed bed beside water; through-water still weak at 14deg (expected grazing).",
+    "E": "3D banks remain.",
+    "F": "Knife grass lip still obvious.",
+    "G": "C/D no longer a solid white ribbon; still a creek-shaped strip.",
+    "H": "Trough helps; fail-water still risks path read.",
+    "I": "Broken highlights exist under HDRI control; not yet beautiful liquid storytelling.",
+    "J": "Hanging grass/shelves started; lip still hard.",
+    "K": "SHOT_02 not cinematic enough.",
+    "L": "Six-shot skipped.",
+    "M": "Purchased HDRI and scenery remain authoritative.",
+    "N": "Clean enough to judge.",
+    "O": "One D material, no distance gate; only SHOT_02 stressed.",
+    "P": "Water does not yet improve the frame.",
+    "Q": "C vs B proves Light Path control stops the solid foil without a black world. Highlights still too hot at 14deg.",
+    "R": "No camera-distance shader gating on the production liquid."
+  },
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "nextLocalRepair": "Keep locked trough and the Light Path HDRI split. Soften remaining glossy hotspots without returning to IOR 1.0. The knife is still a 2m south-wall silhouette from SHOT_02 — more physical crest breakup, not another material tint. Do not CREATE a paid pod."
+}

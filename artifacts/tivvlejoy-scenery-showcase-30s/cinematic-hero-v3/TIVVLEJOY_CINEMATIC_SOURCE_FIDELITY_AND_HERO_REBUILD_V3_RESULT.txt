@@ -1,0 +1,172 @@
+TIVVLEJOY_CINEMATIC_SOURCE_FIDELITY_AND_HERO_REBUILD_V3_RESULT
+
+starting branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+starting SHA: 0e4d80d6ae2b5e78acd1c34c46e10ec145a625e2
+final branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+final SHA: 8725a85f51e5e4b8c64403fda714b6348d7be4d7
+PR state: #169 OPEN / DRAFT / UNMERGED / NOT READY
+
+SOURCE AUDIT SUMMARY:
+
+The V2 extract cache skipped the real originals. Local zips contain unused
+.blend sources the 180MB extract cap dropped:
+
+- Forest Nature Stylized_Forest_Nature_Kit.blend 494MB + 2048/4096 TGA
+- EcoKit Flora_Mat&GN&Models.blend 670MB (Tree_GN, Tree_1–5, Flora_Terrain)
+- EcoKit Rock_Models.blend 258MB
+- Village Cabin01_NRM 12MB / Straw01_NRM / Wood01_NRM (never extracted)
+- HDRI pack 22x ~70MB .hdr (JPG-only was extracted)
+- Botaniq Full and 3DT mountains: catalogued, NOT in local cache
+- GeoScatter biomes: presets only, no vegetation library
+
+TREES:
+best original: EcoKit Tree_1_001–Tree_5_001 in Flora_Mat&GN&Models.blend
+format: native Blender 4.x .blend + Geometry Nodes + SimpleDeform
+quality: 85k–292k verts, 22k–76k faces, 16–34 m native, trunk+leaf materials
+cards: leaves still use Leaf Blade cards; trunks are true 3D
+textures: packed in the 670MB blend; append-without-images produced magenta
+hero suitable: NO at camera distance — volume exists, leaf cards + broken mats fail
+
+GROUND VEGETATION:
+best original: EcoKit Fern_1/2 (3680 verts), Bushes_1, Grass_3 clumps
+format: .blend + GN
+quality: ferns volumetric; Grass_0 is 4–12 vert cards
+hero suitable: NO for extreme foreground; ferns OK midground only
+
+MEADOW/TERRAIN:
+best source: no purchased terrain sculpt. Louis meadow image + authored V3 grid
+quality: V3 landforms are broad (bed→gravel→soil→meadow) not Voronoi
+hero suitable: NO — still reads as colored planes / jagged biome edges
+
+CABIN:
+best source: Village Cabin01A–05A .blend + 4096 Cabin01_ALB + unused NRM/SPE
+textures: ALB 4096, NRM 12MB, SPE present; V2 never loaded NRM
+geometry: stylized game-kit LOD buildings
+hero suitable: NO at SHOT_02 distance — roof cards / flat walls remain
+
+ROCKS:
+best source: EcoKit Rock_Model_Large_001–010 (21–33 m native) + Nature 4K
+quality: true 3D, high-poly
+hero suitable: YES if scaled to 1–2 m (V3 first pass planted 20 m boulders)
+
+RIVER/BANK:
+best source/system: locked EcoKit Water_Mat_1 + authored V3 intersection
+quality: physics lock kept; presentation still a dark ribbon
+hero suitable: NO
+
+MOUNTAIN:
+best source: Louis Grassy.blend / LP_GrassyMountain1
+quality: purchased identity kept
+hero suitable: YES as distant mass; integration still pack-like
+
+HDRI/LIGHTING:
+best source: sk2 Image0001.jpg (working). 70MB 0001.hdr crushed the frame
+quality: JPG daylight is the usable plate
+
+CRITICAL SOURCE ASSET BLOCKERS:
+- Botaniq Full vegetation library missing from local cache
+- EcoKit tree leaves remain cards; materials do not survive hero 1080
+- Village cabin is a game-kit LOD and cannot survive creek-hero distance
+- No purchased volumetric grass / meadow system (GeoScatter presets only)
+- No purchased authored riverbank terrain
+
+LEGACY OBJECTS DISABLED:
+184 village trees, 21 meadow eco disks, 17 procedural lumps, V2 Nature plants
+
+TJ_HERO_V3_WORLD:
+foreground: fitted EcoKit rocks + fern/grass clumps + authored bank
+midground: EcoKit Tree_1/2/3 grove, cabin, fence, soil/path
+background: Louis LP_GrassyMountain1
+
+CREEK/BANK:
+construction: authored 72×80 grid, meadow→soil→gravel→bed
+bed: below water at z≈−1.50
+shore: still a hard color edge at 1080
+rocks: scaled to ~1.65 m after 20 m boulders ate the camera
+cavities: no V44 lumps in hero overlay
+
+VEGETATION:
+hero trees: EcoKit Tree_1–5 originals (not Nature FBX cards)
+forest: left grove, mountain gap kept
+ground vegetation: ferns/bushes/Grass_3
+billboard visibility: YES — leaf blades, roof thatch, noisy canopies
+
+MEADOW:
+physical ecology: biome vertex colors (lush/short/path/soil)
+terrain: broad rolls, not Voronoi
+negative space: worn path exists; reads as a jagged brown cutout
+
+CABIN:
+materials: NRM/SPE attached where found
+roof: still card thatch / tiling
+walls: still flat
+porch: still crushed
+grounding: sits on overlay; contact not sold
+
+MOUNTAINS:
+integration: still a second pack
+atmosphere: mist restrained; mountain still grey-faceted
+
+WATER:
+reflection: dark, cheap color spots
+transmission: physics lock kept (IOR 1.33 / T 0.80 / metallic 0 / spec 0.50 / 18 cm / vol 0.18)
+bed visibility: weak
+highlights: localized, not beautiful
+beauty: NO
+
+COMPOSITION CANDIDATES:
+A: (2.05, -21.6, 3.05) look (-3.35, -10.6, 1.45) 32 mm — creek-leading
+B: (1.35, -18.4, 2.28) look (-3.90, -10.0, 0.95) 35 mm — lower water, loses mountain
+C: (3.10, -23.2, 3.85) look (-2.40, -9.2, 1.85) 30 mm — more sky, cabin/fence flatten
+
+SELECTED: A
+why: only A keeps creek-first / cabin secondary / mountain payoff
+
+LIGHTING CANDIDATES:
+A: warm morning — sun 2.55, euler (34,12,62), fill 520
+B: late afternoon — sun 4.20, euler (54,8,-24), fill 260
+C: clean daylight — sun 3.55, euler (44,10,32), fill 410
+
+SELECTED: C
+why: least crushed of the three. None make the assets premium.
+
+QUALITY CROPS:
+foreground: FAIL — neon grass plane, dark water, noisy fern, orange proxies
+midground: FAIL — magenta trunk, grey canopy blob, tiled roof, zigzag soil
+background: FAIL — faceted Louis, card thatch, empty atmosphere
+
+FINAL CAMERA:
+position: (2.05, -21.6, 3.05)
+look: (-3.35, -10.6, 1.45)
+lens: 32 mm
+vs previous Camera C: −0.15 x, −0.2 y, −0.35 z; look +0.05 / −0.4 / −0.30
+
+FINAL 1080x1920 HERO PATH:
+artifacts/tivvlejoy-scenery-showcase-30s/cinematic-hero-v3/SHOT_02_CINEMATIC_HERO_V3_1080x1920.png
+
+FINAL SELF-ASSESSMENT:
+professional first impression: NO
+premium animated-feature environment: NO
+promotional-still quality: NO
+asset integration: NO
+vegetation quality: NO
+water beauty: NO
+atmospheric depth: NO
+default-Blender appearance: YES
+game-engine appearance: YES
+procedural appearance: YES
+asset-pack appearance: YES
+visible billboard vegetation: YES
+obvious texture tiling: YES
+
+Phone-size read: still cheap / blocky / not cinematic.
+
+live pods: []
+paid CREATE: 0
+RunPod spend: $0
+motion proof: NO
+final video: NO
+
+CINEMATIC_HERO_V3_VISUAL_QUALITY_FAILED
+CINEMATIC_SOURCE_ASSET_UPGRADE_REQUIRED
+FINAL_VIDEO_RENDER_NOT_AUTHORIZED

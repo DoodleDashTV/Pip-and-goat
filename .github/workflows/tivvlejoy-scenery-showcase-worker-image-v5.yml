@@ -1,0 +1,111 @@
+name: TivvleJoy Scenery Showcase Worker Image V5
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - 'workers/runpod-blender/Dockerfile.scenery-showcase-v5'
+      - 'workers/runpod-blender/scenery-showcase-v5-patch.py'
+      - '.github/workflows/tivvlejoy-scenery-showcase-worker-image-v5.yml'
+
+concurrency:
+  group: tivvlejoy-scenery-showcase-worker-v5-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-publish-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXPECTED_BRANCH: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+      EXPECTED_PARENT_DIGEST: sha256:1bef7ad588e74f6a59ef1a8e0ebcebc67cb94e75868d930a57fa8f07d30f44a6
+    steps:
+      - name: Refuse any other branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${EXPECTED_BRANCH}"
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Zero-cost syntax and safety checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile workers/runpod-blender/scenery-showcase-v5-patch.py
+          grep -F "FROM ghcr.io/doodledashtv/ddp-runpod-blender@${EXPECTED_PARENT_DIGEST}" workers/runpod-blender/Dockerfile.scenery-showcase-v5
+          grep -F 'tivvlejoy.scenery.required.role.count="10"' workers/runpod-blender/Dockerfile.scenery-showcase-v5
+          grep -F 'tivvlejoy.scenery.nature.required="false"' workers/runpod-blender/Dockerfile.scenery-showcase-v5
+          grep -F 'tivvlejoy.scenery.water.required="false"' workers/runpod-blender/Dockerfile.scenery-showcase-v5
+          ! grep -R -nE 'RUNPOD_API_KEY\s*=|R2_SECRET_ACCESS_KEY\s*=|OBJECT_STORAGE_SECRET_ACCESS_KEY\s*=' workers/runpod-blender/Dockerfile.scenery-showcase-v5 workers/runpod-blender/scenery-showcase-v5-patch.py
+      - name: Resolve image repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          echo "IMAGE_REPO=ghcr.io/${owner}/ddp-runpod-blender" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=scenery-showcase-v5-${GITHUB_SHA}" >> "$GITHUB_ENV"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish thin scenery V5 image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: workers/runpod-blender/Dockerfile.scenery-showcase-v5
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            TIVVLEJOY_SCENERY_SOURCE_COMMIT=${{ github.sha }}
+            TIVVLEJOY_SCENERY_BUILD_TIME=${{ github.event.head_commit.timestamp }}
+          provenance: false
+          sbom: false
+      - name: Verify immutable published digest
+        shell: bash
+        env:
+          PUBLISHED_DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          test -n "${PUBLISHED_DIGEST}"
+          case "${PUBLISHED_DIGEST}" in sha256:*) ;; *) echo 'Missing sha256 digest'; exit 1 ;; esac
+          docker buildx imagetools inspect "${IMAGE_REPO}:${IMAGE_TAG}" >/tmp/scenery-v5-image-inspect.txt
+          grep -F "${PUBLISHED_DIGEST}" /tmp/scenery-v5-image-inspect.txt
+          mkdir -p artifacts/scenery-showcase-worker-v5
+          python3 - <<'PY'
+          import json, os
+          evidence={
+            'schema':'TIVVLEJOY_SCENERY_SHOWCASE_WORKER_IMAGE_V5','status':'PUBLISHED_IMMUTABLE_DIGEST',
+            'sourceCommit':os.environ['GITHUB_SHA'],'sourceBranch':os.environ['GITHUB_REF_NAME'],
+            'parentDigest':os.environ['EXPECTED_PARENT_DIGEST'],'imageRepository':os.environ['IMAGE_REPO'],
+            'tag':os.environ['IMAGE_TAG'],'digest':os.environ['PUBLISHED_DIGEST'],
+            'ref':f"{os.environ['IMAGE_REPO']}@{os.environ['PUBLISHED_DIGEST']}",
+            'blenderVersion':'4.2.2','requiredRoleCount':10,'natureLibraryRequired':False,'waterSystemRequired':False,
+            'resolution':'1080x1920','fps':30,'frameCount':900,'commercialAssetsBaked':False,
+            'paidGpuLaunchCount':0,'runpodContacted':False,'credentialsIncluded':False,
+            'repairs':['guard_blend_imports','avoid_unused_library_materials','remove_obsolete_water_acceptance','stderr_first_diagnostics']
+          }
+          open('artifacts/scenery-showcase-worker-v5/image.json','w').write(json.dumps(evidence,indent=2)+'\n')
+          print(json.dumps(evidence))
+          PY
+      - name: Upload sanitized V5 image evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-showcase-worker-image-v5
+          path: artifacts/scenery-showcase-worker-v5/image.json
+          if-no-files-found: error
+          retention-days: 14

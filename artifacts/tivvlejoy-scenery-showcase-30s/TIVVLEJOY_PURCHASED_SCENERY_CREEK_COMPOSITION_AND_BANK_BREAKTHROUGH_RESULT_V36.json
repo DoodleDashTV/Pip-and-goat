@@ -1,0 +1,169 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_CREEK_COMPOSITION_AND_BANK_BREAKTHROUGH_RESULT_V36",
+  "startingSha": "bf24890a1590966739696bd85a7a40428101c6be",
+  "visualWorkSha": "50874ca40cba204ce59566621a5fc6ec57dbb713",
+  "finalSha": "18ad32ba194069492b0e658a90e6cf76067e2bd6",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "v34WaterArchitecturePreserved": true,
+  "lockedPreserved": {
+    "engine": "CYCLES",
+    "ior": 1.33,
+    "transmission": 0.80,
+    "metallic": 0.0,
+    "waterThicknessM": 0.18,
+    "volumeAbsorption": 0.18,
+    "dualScaleRippleNormals": true,
+    "lightPathHdriReflectionControl": true,
+    "cameraDistanceShaderGating": false,
+    "purchasedHdriKept": true,
+    "purchasedSceneryKept": true,
+    "creekLocationUnchanged": true,
+    "waterOnlyInDeepestChannel": true,
+    "WATER_WIDTH_SCALE": 0.30,
+    "BED_WIDTH_SCALE": 0.68,
+    "southBankRunM": 12.0
+  },
+  "cameraCandidates": {
+    "searchDir": "/tmp/o14-lookdev/cinematic-hero-search36b",
+    "invalidFirstBatch": "/tmp/o14-lookdev/cinematic-hero-search36 — all five files were identical SHOT_02 because timeline markers rebound the camera",
+    "A": {
+      "path": "/tmp/o14-lookdev/cinematic-hero-search36b/hero_a_three_quarter_downstream_.png",
+      "camera": {"location": [-24.0, -26.0, 7.2], "look": [6.0, -10.0, -0.50], "lens": 28.0},
+      "verdict": "REJECT — elevated 3/4 still reads as a horizontal dark ribbon with a knife lip"
+    },
+    "B": {
+      "path": "/tmp/o14-lookdev/cinematic-hero-search36b/hero_b_low_upstream_stones_.png",
+      "camera": {"location": [14.0, -16.5, 2.25], "look": [-10.0, -10.0, -1.00], "lens": 35.0},
+      "verdict": "REJECT — upstream ditch/ribbon; cabin buried; rocks sit on grass"
+    },
+    "C": {
+      "path": "/tmp/o14-lookdev/cinematic-hero-search36b/hero_c_across_creek_opposite_bank_.png",
+      "camera": {"location": [0.5, -24.0, 3.40], "look": [-6.0, -2.0, 1.20], "lens": 36.0},
+      "verdict": "WINNER — diagonal creek, FG rock entering water, cabin destination, trees, mountains"
+    },
+    "D": {
+      "path": "/tmp/o14-lookdev/cinematic-hero-search36b/hero_d_elevated_oblique_bed_cabin_.png",
+      "camera": {"location": [-20.0, -32.0, 10.5], "look": [-4.0, -8.0, -0.80], "lens": 26.0},
+      "verdict": "REJECT as hero — good world overview, still a trench/ribbon; technical not cinematic"
+    },
+    "E": {
+      "path": "/tmp/o14-lookdev/cinematic-hero-search36b/hero_e_creek_leading_line_village_.png",
+      "camera": {"location": [-32.0, -22.0, 5.0], "look": [-6.0, -6.0, 0.60], "lens": 30.0},
+      "verdict": "REJECT — diagonal but foil-hot and trench-like"
+    }
+  },
+  "chosenHeroCamera": {
+    "id": "C",
+    "why": "Only candidate that put the creek on a diagonal, showed a rock meeting water, and used the purchased cabin as a destination instead of repeating the V35 grazing stripe.",
+    "start": {"location": [0.5, -24.0, 3.40], "look": [-6.0, -2.0, 1.20], "lens": 36.0},
+    "end": {"location": [2.2, -22.8, 3.50], "look": [-3.8, -0.6, 1.35], "lens": 38.0}
+  },
+  "retiredShot02": {
+    "status": "retired",
+    "oldStart": {"location": [-6.2, -20.4, 4.45], "look": [9.0, -11.2, -1.16], "lens": 38.0},
+    "reason": "Failed composition template. Horizontal/grazing stripe. No production value."
+  },
+  "bankGeometryChanges": [
+    "south 12m run kept",
+    "hero-x overlapping pockets/slumps on the south inner bank",
+    "hero-x notches on the north grass shelf (the lip hero C actually sees)",
+    "overall trough location/depth unchanged"
+  ],
+  "grassTransitionChanges": [
+    "stronger wet-mask soil in hero x on both banks",
+    "irregular TJ_HeroSoil_* dirt shelves on the south hero bank",
+    "still not a full grass-scatter thin: the carrier is a textured grid, not card grass"
+  ],
+  "waterlineChanges": [
+    "extra south bays/widenings on the water film inside hero x",
+    "hero-frustum stones plus two north-side piercers",
+    "more waterline trees overlapping the edge in hero x"
+  ],
+  "rockWaterInteractions": {
+    "lookdev70": "FG boulders readable, some half-submerged",
+    "lookdev72": "rocks line the lower creek; several meet the water"
+  },
+  "reflectionChanges": {
+    "hdriCameraRotation": [0.0, 0.0, 0.0],
+    "hdriReflectionRotationZ": 0.48,
+    "changed": false,
+    "why": "Candidate C already worked with the locked reflection environment. E was the foil-hot one; it was rejected."
+  },
+  "heroPreviewPath": "/tmp/o14-lookdev/cinematic-lookdev72/shot_02_.png",
+  "heroIterationPaths": {
+    "lookdev70": "/tmp/o14-lookdev/cinematic-lookdev70/shot_02_.png",
+    "lookdev71": "/tmp/o14-lookdev/cinematic-lookdev71/shot_02_.png",
+    "lookdev72": "/tmp/o14-lookdev/cinematic-lookdev72/shot_02_.png"
+  },
+  "humanReadabilityResult": {
+    "immediatelyCreekWithWater": "NO — first read is the cabin; the creek is a supporting band in the lower third",
+    "attractiveEnoughForTivvleJoy": "PARTIAL — cabin/trees/mountains are attractive; the creek is not yet the compositional lead",
+    "betterThanV35Shot02": true
+  },
+  "sixFinalPreviewPaths": {
+    "SHOT_01": "NOT_RENDERED_V36_hero_gate_failed",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev72/shot_02_.png",
+    "SHOT_03": "NOT_RENDERED_V36_hero_gate_failed",
+    "SHOT_04": "NOT_RENDERED_V36_hero_gate_failed",
+    "SHOT_05": "NOT_RENDERED_V36_hero_gate_failed",
+    "SHOT_06": "NOT_RENDERED_V36_hero_gate_failed"
+  },
+  "gatesAV": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PARTIAL",
+    "E": "PARTIAL",
+    "F": "FAIL",
+    "G": "FAIL",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "PARTIAL",
+    "K": "PARTIAL",
+    "L": "FAIL",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PARTIAL",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "T": "PASS",
+    "U": "PARTIAL",
+    "V": "PASS"
+  },
+  "gateNotes": {
+    "A": "V31 channel and 12m south run remain.",
+    "B": "A viewer names the cabin first, not a creek.",
+    "C": "Water still the 0.30 film in the deep channel.",
+    "D": "Bed exists; this camera mostly shows dark surface + rocks.",
+    "E": "Local notches exist; the far grassy mound is still too smooth.",
+    "F": "Grass-to-creek edge is still traceable.",
+    "G": "Lower-third water still reads as a ribbon.",
+    "H": "Does not look like a road.",
+    "I": "Sky reflections, no white foil on C.",
+    "J": "Rocks help; grass still stops too cleanly.",
+    "K": "Cabin presentation is cinematic; the creek is not yet the hero.",
+    "L": "Six-shot skipped.",
+    "M": "Purchased cabin, fence, trees, HDRI, mountains.",
+    "N": "32-sample denoised 540x960.",
+    "O": "Same V34 D material, no per-camera hacks.",
+    "P": "Water/rocks add a foreground, but do not yet make the frame.",
+    "Q": "C avoided the foil sector; HDRI was not rotated.",
+    "R": "No camera-distance shader gating.",
+    "S": "Rocks meet the water in the hero frustum.",
+    "T": "FG rocks/creek, MG cabin, BG trees/mountains.",
+    "U": "Slight angle only; not a strong leading line.",
+    "V": "Demonstrably better than the V35 grazing stripe."
+  },
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "nextLocalRepair": "Keep camera C and V34 D. Grow the creek’s share of the frame without recentering on the cabin, and break the remaining grass isoline with more soil/vegetation overlap on the visible banks. Do not CREATE."
+}

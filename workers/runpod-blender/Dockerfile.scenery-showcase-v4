@@ -1,0 +1,38 @@
+# TivvleJoy 30-second real purchased-scenery proof V4.
+# Thin child of the proven V3 image. No credentials or commercial asset bytes
+# are baked into this image. The only change is a build-time, deterministic
+# reduction of dry-proof roles: nature_library and water_system are omitted.
+FROM ghcr.io/doodledashtv/ddp-runpod-blender@sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673
+
+WORKDIR /opt/ddp-worker
+COPY workers/runpod-blender/scenery-showcase-v4-patch.py /tmp/scenery-showcase-v4-patch.py
+RUN python3 /tmp/scenery-showcase-v4-patch.py && rm /tmp/scenery-showcase-v4-patch.py
+
+ARG TIVVLEJOY_SCENERY_SOURCE_COMMIT=unknown
+ARG TIVVLEJOY_SCENERY_BUILD_TIME=unknown
+ENV TIVVLEJOY_SCENERY_SOURCE_COMMIT=${TIVVLEJOY_SCENERY_SOURCE_COMMIT} \
+    TIVVLEJOY_SCENERY_BUILD_TIME=${TIVVLEJOY_SCENERY_BUILD_TIME}
+
+LABEL org.opencontainers.image.title="tivvlejoy-scenery-showcase-worker-v4" \
+      org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat" \
+      org.opencontainers.image.revision="${TIVVLEJOY_SCENERY_SOURCE_COMMIT}" \
+      tivvlejoy.scenery.showcase="30s-v4-reduced-dry-proof" \
+      tivvlejoy.scenery.parent.digest="sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673" \
+      tivvlejoy.scenery.required.role.count="10" \
+      tivvlejoy.scenery.nature.required="false" \
+      tivvlejoy.scenery.water.required="false" \
+      tivvlejoy.scenery.purchased.only="true" \
+      tivvlejoy.scenery.commercial.assets.baked="false"
+
+# Build must prove the reduced role contract is actually baked, syntax remains
+# valid, the dry wrapper is still selected, and Blender is unchanged.
+RUN node --check ./src/scenery-showcase.js && \
+    python3 -m py_compile ./blender/scenery/showcase_30s.py ./blender/scenery/showcase_30s_dry.py && \
+    grep -F "'world_shaders'," ./src/scenery-showcase.js >/dev/null && \
+    ! sed -n '/const REQUIRED_ROLES = \[/,/^\];/p' ./src/scenery-showcase.js | grep -F "'nature_library'" && \
+    ! sed -n '/const REQUIRED_ROLES = \[/,/^\];/p' ./src/scenery-showcase.js | grep -F "'water_system'" && \
+    grep -F 'required_prefixes = {"mountain", "forest", "village", "tavern", "sky", "world"}' ./blender/scenery/showcase_30s.py >/dev/null && \
+    test "$SCENERY_SHOWCASE_BLENDER_SCRIPT" = '/opt/ddp-worker/blender/scenery/showcase_30s_dry.py' && \
+    blender --version | head -n 1 | grep -F 'Blender 4.2.2'
+
+CMD ["node", "./src/scenery-showcase-entry-v2.js"]

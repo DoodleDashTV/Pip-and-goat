@@ -1,0 +1,147 @@
+# Zero-RunPod cinematic FINAL worker image. Never contacts RunPod.
+name: TivvleJoy Scenery FINAL Worker Image V1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - 'workers/runpod-blender/Dockerfile.scenery-showcase-final'
+      - 'workers/runpod-blender/src/scenery-showcase-original14.js'
+      - 'workers/runpod-blender/src/scenery-showcase-original14-entry.js'
+      - 'workers/runpod-blender/src/scenery-showcase-original14-roles.js'
+      - 'workers/runpod-blender/src/final-launch-contract-v1.js'
+      - 'workers/runpod-blender/src/frame-checkpoint-v1.js'
+      - 'workers/runpod-blender/src/visual-proof-contract-v1.js'
+      - 'workers/runpod-blender/src/scenery-render-profiles.js'
+      - 'scripts/blender/scenery/cinematic_valley_world_v1.py'
+      - 'scripts/blender/scenery/cinematic_camera_contract_v1.py'
+      - 'scripts/blender/scenery/cinematic_camera_contract_v1_test.py'
+      - 'scripts/blender/scenery/cinematic_camera_contract_blender_v1.py'
+      - 'scripts/blender/scenery/cinematic_hero_rebuild_v3.py'
+      - 'scripts/blender/scenery/cinematic_shots.py'
+      - 'scripts/blender/scenery/runtime_roots_v1.py'
+      - 'scripts/blender/scenery/cinematic_required_extract_v1.py'
+      - 'scripts/blender/scenery/cinematic_required_extract_v1_test.py'
+      - 'scripts/blender/scenery/cinematic_ecokit_image_resolve_v1.py'
+      - 'scripts/blender/scenery/showcase_original14_select.py'
+      - 'scripts/blender/scenery/showcase_original14_30s.py'
+      - 'scripts/cloud/v7-final-image-build-v1/inspect_published_final_image.py'
+      - 'scripts/cloud/v7-final-image-build-v1/inspect_published_final_image_test.py'
+      - '.github/workflows/tivvlejoy-scenery-showcase-worker-image-final-v1.yml'
+
+concurrency:
+  group: tivvlejoy-scenery-final-worker-v1-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-publish-inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPECTED_BRANCH: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+      EXPECTED_PARENT_DIGEST: sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353
+      REQUIRED_CONTENT_ANCESTOR: d5654510599f5b42919a949c5c4503c5ec1442f1
+    steps:
+      - name: Refuse any other branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "${EXPECTED_BRANCH}"
+
+      - name: Checkout triggering SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Require hardened content ancestor
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "${REQUIRED_CONTENT_ANCESTOR}" "${GITHUB_SHA}"
+
+      - name: Zero-cost launcher and inspect contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check workers/runpod-blender/src/scenery-showcase-original14-entry.js
+          node --check workers/runpod-blender/src/scenery-showcase-original14.js
+          node --check workers/runpod-blender/src/final-launch-contract-v1.js
+          node --check workers/runpod-blender/src/frame-checkpoint-v1.js
+          node --check workers/runpod-blender/src/visual-proof-contract-v1.js
+          node --test workers/runpod-blender/test/final-launch-contract-v1.test.js
+          node --test workers/runpod-blender/test/frame-checkpoint-v1.test.js
+          node --test workers/runpod-blender/test/visual-proof-contract-v1.test.js
+          python3 scripts/blender/scenery/cinematic_camera_contract_v1_test.py
+          python3 scripts/blender/scenery/cinematic_visual_gate_contracts_v1_test.py
+          python3 scripts/blender/scenery/cinematic_required_extract_v1_test.py
+          python3 scripts/blender/scenery/showcase_original14_select_test.py
+          python3 scripts/blender/scenery/lookdev_large_source_intake_test.py
+          python3 scripts/cloud/v7-final-image-build-v1/inspect_published_final_image_test.py
+          grep -F 'CMD ["node", "./src/scenery-showcase-original14-entry.js"]' workers/runpod-blender/Dockerfile.scenery-showcase-final
+          ! grep -n 'scenery-showcase-entry-v2.js' workers/runpod-blender/src/scenery-showcase-original14-entry.js
+          ! grep -n 'v7-proof-a-boot.js' workers/runpod-blender/src/scenery-showcase-original14-entry.js
+          ! grep -nE 'RUNPOD_API_KEY\s*=|R2_SECRET_ACCESS_KEY\s*=' workers/runpod-blender/Dockerfile.scenery-showcase-final workers/runpod-blender/src/scenery-showcase-original14.js
+
+      - name: Resolve parent image at runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          echo "IMAGE_REPO=ghcr.io/${owner}/ddp-runpod-blender" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=scenery-final-${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "PARENT_IMAGE=ghcr.io/${owner}/ddp-runpod-blender@${EXPECTED_PARENT_DIGEST}" >> "$GITHUB_ENV"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish FINAL image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: workers/runpod-blender/Dockerfile.scenery-showcase-final
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            PARENT_IMAGE=${{ env.PARENT_IMAGE }}
+            TIVVLEJOY_SCENERY_SOURCE_COMMIT=${{ github.sha }}
+            TIVVLEJOY_SCENERY_BUILD_TIME=${{ github.event.head_commit.timestamp }}
+          provenance: false
+          sbom: false
+
+      - name: Inspect published digest and runtime identity
+        shell: bash
+        env:
+          PUBLISHED_DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          test -n "${PUBLISHED_DIGEST}"
+          case "${PUBLISHED_DIGEST}" in sha256:*) ;; *) echo 'Missing sha256 digest'; exit 1 ;; esac
+          docker buildx imagetools inspect "${IMAGE_REPO}@${PUBLISHED_DIGEST}" | tee /tmp/final-imagetools.txt
+          grep -F "${PUBLISHED_DIGEST}" /tmp/final-imagetools.txt
+          docker pull "${IMAGE_REPO}@${PUBLISHED_DIGEST}"
+          python3 scripts/cloud/v7-final-image-build-v1/inspect_published_final_image.py
+
+      - name: Upload digest-only inspect evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-final-worker-image-v1
+          path: artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1/IMAGE_INSPECT.json
+          if-no-files-found: error
+          retention-days: 30

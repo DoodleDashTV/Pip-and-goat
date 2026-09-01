@@ -1,0 +1,141 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_04",
+  "parts": [
+    "bed"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 257683456,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093255.897724,
+    "rss": 259231744,
+    "hwm": 259231744,
+    "memTotal": 16791945216,
+    "memAvailable": 15441014784,
+    "memFree": 14872756224,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861798912,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 0,
+    "vertices": 4608,
+    "faces": 4473
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093255.996358,
+    "rss": 295088128,
+    "hwm": 295088128,
+    "memTotal": 16791945216,
+    "memAvailable": 15411990528,
+    "memFree": 14843727872,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861790720,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 1,
+    "vertices": 4608,
+    "faces": 4473
+  },
+  "hwm": 295088128,
+  "deltaRss": 35856384,
+  "peakFromHwm": 295088128,
+  "error": null,
+  "pngBytes": 6936,
+  "png": true,
+  "images": {
+    "count": 0,
+    "rawBytes": 0,
+    "largest": []
+  },
+  "modifiers": [
+    {
+      "name": "TJ_V7_Bed",
+      "hide_render": false,
+      "baseVerts": 4608,
+      "baseFaces": 4473,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "smooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    }
+  ],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [],
+    "count": 0
+  },
+  "instances": {
+    "uniqueMeshes": 1,
+    "objects": 2,
+    "shared": [],
+    "singleUser": 1
+  },
+  "beech": null,
+  "evalGeom": {
+    "ok": true,
+    "objects": [
+      {
+        "name": "TJ_V7_Bed",
+        "evalVerts": 18161,
+        "evalFaces": 17892,
+        "baseVerts": 4608
+      }
+    ],
+    "evalVerts": 18161,
+    "evalFaces": 17892,
+    "rssBefore": 259231744,
+    "rssAfter": 264011776,
+    "rssJump": 4780032,
+    "aborted": false
+  },
+  "counts": {
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 1,
+    "vertices": 4608,
+    "faces": 4473
+  }
+}

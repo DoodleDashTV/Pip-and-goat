@@ -1,0 +1,10 @@
+{
+  "jobId": "v7-final-visual-proof-v3",
+  "status": "FAILED",
+  "stage": "VISUAL_PROOF",
+  "code": "BLENDER_FAILED",
+  "message": "Blender exited 1: {\"event\": \"cinematic_world_progress\", \"stage\": \"CINEMATIC_WORLD_START\", \"profile\": \"LOOKDEV_FAST\", \"waterVariant\": \"D\"}\nBlender 4.2.2 LTS (hash c03d7d98a413 built 2024-09-24 00:09:56)\nTraceback (most recent call last):\n  File \"/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py\", line 4528, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py\", line 4023, in main\n    receipts = require_files(extract_root, [\"Flora_Mat&GN&Models.blend\", \"Rock_Models.blend\"])\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/ddp-worker/blender/scenery/runtime_roots_v1.py\", line 119, in require_files\n    raise RuntimeRootError(\"REQUIRED_FILE_MISSING\", \"required files missing: \" + \", \".join(missing))\nruntime_roots_v1.RuntimeRootError: required files missing: Flora_Mat&GN&Models.blend, Rock_Models.blend\n\nError: script failed, file: '/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.py', exiting.\n\nBlender quit\n",
+  "gpuTelemetry": null,
+  "commercialAssetsPublished": false,
+  "at": "2026-09-01T00:18:50.470Z"
+}

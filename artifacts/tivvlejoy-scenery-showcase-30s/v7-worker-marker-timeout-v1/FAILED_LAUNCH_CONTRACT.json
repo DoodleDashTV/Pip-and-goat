@@ -1,0 +1,43 @@
+{
+  "schema": "TIVVLEJOY_V7_FAILED_LAUNCH_CONTRACT_V1",
+  "podId": "0msnqqdigglatj",
+  "imageDigest": "sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+  "oci": {
+    "os": "linux",
+    "architecture": "amd64",
+    "variant": null,
+    "Entrypoint": ["/opt/nvidia/nvidia_entrypoint.sh"],
+    "Cmd": ["node", "./src/scenery-showcase-entry-v2.js"],
+    "WorkingDir": "/opt/ddp-worker",
+    "User": null
+  },
+  "containerDiskInGb": 40,
+  "volumeInGb": 0,
+  "gpuTypeId": "NVIDIA GeForce RTX 4090",
+  "minMemoryInGb": 32,
+  "dockerArgs": "node -e (async()=>{...const r2=require...})()",
+  "dockerArgsTokenCountIfSpaceSplit": 6,
+  "environmentVariableNames": [
+    "R2_ENDPOINT",
+    "R2_REGION",
+    "R2_BUCKET",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "OBJECT_STORAGE_PROVIDER",
+    "CLOUD_RENDER_ENABLED",
+    "PAID_EXECUTION_AUTHORIZED",
+    "V7_PROOF_A_PREFIX",
+    "V7_ENTRY_KEY",
+    "R2_CONNECT_TIMEOUT_MS",
+    "R2_REQUEST_TIMEOUT_MS",
+    "R2_MAX_ATTEMPTS",
+    "RUNPOD_GPU_HOURLY_RATE"
+  ],
+  "runpodRetained": {
+    "restPod": 404,
+    "restPods": [],
+    "graphqlMyselfPods": [],
+    "containerLogs": null,
+    "terminationReason": "launcher fail-closed WORKER_MARKER_TIMEOUT; provider state gone"
+  }
+}

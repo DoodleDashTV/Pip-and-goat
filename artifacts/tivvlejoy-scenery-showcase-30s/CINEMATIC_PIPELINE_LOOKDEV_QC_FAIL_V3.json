@@ -1,0 +1,42 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T17:40:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "2f296e1",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev6",
+  "contactSheet": "/opt/cursor/artifacts/tivvlejoy-cinematic-pipeline/CONTACT_SHEET_LOOKDEV_FAST_V3.png",
+  "architectureProgress": [
+    "SHOT_01 shows tan river banks on a winding strip instead of a bare sickle plane",
+    "SHOT_03 is no longer a black frame inside the nature-kit dump",
+    "SHOT_05 still shows Louis peaks instead of a pine wall",
+    "Water_Mat_1 is a darkened tint only; the tiled shader is not mixed onto the surface",
+    "River still reads as a blue ribbon, not water"
+  ],
+  "shots": {
+    "SHOT_01": "FAIL — valley stack is the most readable yet (banks, flanks, peaks, sky) but the meadow is still a pale quilt and the river is still a blue ribbon.",
+    "SHOT_02": "FAIL — tan bank strip is visible; the water body is still a flat blue polygon, not purchased water.",
+    "SHOT_03": "FAIL — no longer black; it is a crushed pine silhouette peeking at a cabin, not a forest passage with an opening.",
+    "SHOT_04": "FAIL — two cabins, cart, fence; still a pad cluster with crushed shadows.",
+    "SHOT_05": "FAIL — long-lens peaks exist, but there is no village/forest compression or atmosphere.",
+    "SHOT_06": "FAIL — another cabin-and-cart pad shot."
+  },
+  "automaticFailuresHit": [
+    "flat_lime_or_pale_green_ground",
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "low_poly_asset_test_appearance",
+    "excessive_noise"
+  ],
+  "automaticFailuresClearedThisPass": [
+    "SHOT_03_black_void_inside_canopy_dump"
+  ],
+  "eeveeVersusCycles": "EEVEE aborted on this host (missing libEGL). Cycles CPU used for LOOKDEV_FAST. No GPU A/B yet.",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "greenCiDoesNotAuthorizePaidCreate": true,
+  "honestConclusion": "Green CI is not a visual pass. Architecture moved again. Images still fail the cinematic visual gate. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

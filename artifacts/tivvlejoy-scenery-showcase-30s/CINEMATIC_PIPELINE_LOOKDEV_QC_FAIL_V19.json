@@ -1,0 +1,34 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:28:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "655b0ba",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev24",
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/village/ridge hold. Sampled river region is still meadow-green; the band reads as a dark textured ribbon.",
+    "SHOT_02": "PARTIAL — first luma split: water lum 78 vs ground 91, cooler (B-G +7.6). Still a regular ripple sheet, not a stream.",
+    "SHOT_03": "PARTIAL — framed opening holds.",
+    "SHOT_04": "FAIL — village street is shot across a ribbed water carpet that fills the lower frame.",
+    "SHOT_05": "PARTIAL — compression holds.",
+    "SHOT_06": "FAIL — same river carpet plus a toy-scale pine in the foreground."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "measured": {
+    "shot02_water_mid_lum": 78.3,
+    "shot02_ground_right_lum": 91.2,
+    "shot02_water_b_minus_g": 7.6,
+    "shot04_fg_river_rgb": [69.7, 81.7, 67.4]
+  },
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Dark slate helped SHOT_02 separate from the meadow, but Wave Bands still look like a ribbed path and the village cameras stand on that path. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

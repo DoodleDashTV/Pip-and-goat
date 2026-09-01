@@ -1,0 +1,17 @@
+{
+  "schema": "TIVVLEJOY_V7_PAID_STARTUP_PROOF_TIMELINE_V1",
+  "events": [
+    {"ts": "2026-08-30T22:40:41.633618+00:00", "stage": "IDENTITY_PASSED"},
+    {"ts": "2026-08-30T22:40:42.386293+00:00", "stage": "CREATE_ENTERED"},
+    {"ts": "2026-08-30T22:40:42.952559+00:00", "stage": "POD_CREATED", "podId": "fegncnyyr98pfi"},
+    {"ts": "2026-08-30T22:40:42.759000+00:00", "stage": "HOST_ASSIGNED", "desiredStatus": "RUNNING", "costPerHr": 0.74},
+    {"ts": "2026-08-30T22:41:50.000000+00:00", "stage": "CONTAINER_STARTED", "uptimeInSeconds": 17, "note": "first GraphQL uptime>=0 sample"},
+    {"ts": "2026-08-30T22:42:53.932562+00:00", "stage": "WORKER_READY", "pid": 51, "via": "runpod-proxy-18080"},
+    {"ts": "2026-08-30T22:44:45.000000+00:00", "stage": "OBSERVE_UPTIME_197", "uptimeInSeconds": 197, "pid": 51},
+    {"ts": "2026-08-30T22:45:53.738679+00:00", "stage": "OBSERVE_180S_MET", "readySpanSeconds": 180, "pid": 51},
+    {"ts": "2026-08-30T22:46:09.280269+00:00", "stage": "LAST_READY_200", "pid": 51},
+    {"ts": "2026-08-30T22:46:24.765143+00:00", "stage": "READY_LOST", "note": "V7_STARTUP_PROOF_SECONDS=300 process exit"},
+    {"ts": "2026-08-30T22:46:48.002013+00:00", "stage": "UPTIME_RESET", "uptimeInSeconds": 5},
+    {"ts": "2026-08-30T22:47:13.335485+00:00", "stage": "TERMINATE_REQUESTED"}
+  ]
+}

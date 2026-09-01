@@ -1,0 +1,72 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_V4_ZERO_PAID_PREFLIGHT_V1",
+  "paidCreate": 0,
+  "runpodSpendUsd": 0,
+  "livePods": [],
+  "v3AuthorizationReused": false,
+  "v4AuthorizationCreated": false,
+  "encode900": false,
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "vramFloorMib": 24500,
+  "vramComparison": "vramTotalMiB < REQUIRED_VRAM_MIB",
+  "v3CompAUsed": false,
+  "cameraC": {
+    "location": [2.2, -21.4, 3.4],
+    "look": [-3.4, -10.2, 1.75],
+    "lens": 32.0,
+    "camera": "TJ_SHOT_02_CAM"
+  },
+  "heroStillFrames": {
+    "SHOT_01": 48,
+    "SHOT_02": 210,
+    "SHOT_03": 360,
+    "SHOT_04": 520,
+    "SHOT_05": 680,
+    "SHOT_06": 860
+  },
+  "waterD": {
+    "ior": 1.33,
+    "transmission": 0.8,
+    "prismM": 0.18,
+    "volumeDensity": 0.18,
+    "WATER_WIDTH_SCALE": 0.3,
+    "BED_WIDTH_SCALE": 0.68,
+    "HDRI_REFLECTION_ROTATION_Z": 0.48
+  },
+  "original14Roles": 14,
+  "requiredLibraries": [
+    {
+      "name": "Flora_Mat&GN&Models.blend",
+      "member": "Stylised EcoKit/Flora_Mat&GN&Models.blend",
+      "runtimePath": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend",
+      "bytes": 669989781,
+      "sha256": "ce663a3e7b70b566d05092c6d86a94d727dbb5232068369de002ada4c1124589",
+      "status": "OK"
+    },
+    {
+      "name": "Rock_Models.blend",
+      "member": "Stylised EcoKit/Rock_Models.blend",
+      "runtimePath": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/Rock_Models.blend",
+      "bytes": 258365184,
+      "sha256": "ea72ac8e65b278c8bfc351d55efa6d8aef2eeec13068cec42cf79db1f23f592c",
+      "status": "OK"
+    }
+  ],
+  "image": {
+    "oldDigest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+    "oldDigestIneligible": true,
+    "newDigest": "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749",
+    "sourceCommit": "b8ec9a4195d3f56caf6398ea642ec04596819c71",
+    "platform": "linux/amd64",
+    "inspectStatus": "PUBLISHED_IMMUTABLE_DIGEST",
+    "requiredLibraryExtract": true,
+    "v3CompAUsed": false
+  },
+  "V4_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION": "YES",
+  "blockers": []
+}

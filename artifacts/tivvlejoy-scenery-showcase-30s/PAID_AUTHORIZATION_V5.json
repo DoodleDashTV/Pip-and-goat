@@ -1,0 +1,20 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V5",
+  "authorized": true,
+  "executionId": "scenery-showcase-30s-v5-20260828",
+  "templateId": "c9dot3k4s6",
+  "workerImage": "ghcr.io/doodledashtv/ddp-runpod-blender@sha256:5b0fc9f8f26f0c557d131ac8d3897dfa799a7bf01a3d5207da473658170af152",
+  "launchTransport": "RUNPOD_REST_TEMPLATE",
+  "maxCreates": 1,
+  "noRetry": true,
+  "maxHourlyUsd": 0.8,
+  "hardCostUsd": 2.0,
+  "startupWatchdogMinutes": 20,
+  "maxRuntimeMinutes": 120,
+  "requiredRoleCount": 10,
+  "natureLibraryRequired": false,
+  "waterSystemRequired": false,
+  "purchasedSceneryOnly": true,
+  "commercialAssetsPublished": false,
+  "authorizationSource": "user-standing-authorization-until-video-made"
+}

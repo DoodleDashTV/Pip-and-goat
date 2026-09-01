@@ -1,0 +1,97 @@
+# Registered second push; this workflow never contacts RunPod.
+name: TivvleJoy Scenery Image Pull Diagnostic
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-image-pull-diagnostic.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tivvlejoy-scenery-image-pull-diagnostic
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673
+      BASE_IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6
+    steps:
+      - name: Anonymous pull exact V2 image
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/tivvlejoy-scenery-image-pull
+          start=$(date +%s)
+          if timeout 1200 docker pull "$IMAGE" > artifacts/tivvlejoy-scenery-image-pull/pull.log 2>&1; then
+            result=SUCCESS
+          else
+            rc=$?
+            result=FAILED
+            echo "docker pull failed rc=$rc"
+            cat artifacts/tivvlejoy-scenery-image-pull/pull.log
+            exit "$rc"
+          fi
+          end=$(date +%s)
+          seconds=$((end-start))
+          bytes=$(docker image inspect "$IMAGE" --format '{{.Size}}')
+          layers=$(docker image inspect "$IMAGE" --format '{{len .RootFS.Layers}}')
+          python3 - <<PY
+          import json
+          p={
+            'schema':'TIVVLEJOY_SCENERY_IMAGE_PULL_DIAGNOSTIC_V1',
+            'image':'$IMAGE',
+            'anonymousPull':'$result',
+            'pullSeconds':$seconds,
+            'localImageBytes':int('$bytes'),
+            'layerCount':int('$layers'),
+            'runpodContacted':False,
+            'paidMutationPerformed':False,
+          }
+          open('artifacts/tivvlejoy-scenery-image-pull/result.json','w').write(json.dumps(p,indent=2)+'\n')
+          print(json.dumps(p))
+          PY
+
+      - name: Inspect image and largest local layers
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker image inspect "$IMAGE" > artifacts/tivvlejoy-scenery-image-pull/image-inspect.json
+          docker history --no-trunc "$IMAGE" > artifacts/tivvlejoy-scenery-image-pull/history.txt
+          docker history --format '{{.Size}}\t{{.CreatedBy}}' "$IMAGE" | head -n 40 > artifacts/tivvlejoy-scenery-image-pull/history-summary.txt
+          cat artifacts/tivvlejoy-scenery-image-pull/history-summary.txt
+
+      - name: Verify exact base is locally resolvable
+        shell: bash
+        run: |
+          set -euo pipefail
+          start=$(date +%s)
+          timeout 600 docker pull "$BASE_IMAGE" > artifacts/tivvlejoy-scenery-image-pull/base-pull.log 2>&1
+          end=$(date +%s)
+          seconds=$((end-start))
+          bytes=$(docker image inspect "$BASE_IMAGE" --format '{{.Size}}')
+          python3 - <<PY
+          import json
+          p=json.load(open('artifacts/tivvlejoy-scenery-image-pull/result.json'))
+          p['baseImage']='$BASE_IMAGE'
+          p['baseAnonymousPull']='SUCCESS'
+          p['basePullSecondsAfterChildCached']=$seconds
+          p['baseLocalImageBytes']=int('$bytes')
+          open('artifacts/tivvlejoy-scenery-image-pull/result.json','w').write(json.dumps(p,indent=2)+'\n')
+          print(json.dumps(p))
+          PY
+
+      - name: Upload diagnostic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-image-pull-diagnostic
+          path: artifacts/tivvlejoy-scenery-image-pull
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6

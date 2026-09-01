@@ -1,0 +1,124 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_03",
+  "parts": [
+    "water"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 257933312,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093255.4447148,
+    "rss": 258392064,
+    "hwm": 258396160,
+    "memTotal": 16791945216,
+    "memAvailable": 15426727936,
+    "memFree": 14858469376,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861811200,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 0,
+    "vertices": 160,
+    "faces": 158
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093255.5255902,
+    "rss": 278032384,
+    "hwm": 278032384,
+    "memTotal": 16791945216,
+    "memAvailable": 15418339328,
+    "memFree": 14850080768,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861803008,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 1,
+    "vertices": 160,
+    "faces": 158
+  },
+  "hwm": 278032384,
+  "deltaRss": 19640320,
+  "peakFromHwm": 278032384,
+  "error": null,
+  "pngBytes": 5364,
+  "png": true,
+  "images": {
+    "count": 0,
+    "rawBytes": 0,
+    "largest": []
+  },
+  "modifiers": [],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [],
+    "count": 0
+  },
+  "instances": {
+    "uniqueMeshes": 1,
+    "objects": 2,
+    "shared": [],
+    "singleUser": 1
+  },
+  "beech": null,
+  "evalGeom": {
+    "ok": true,
+    "objects": [
+      {
+        "name": "TJ_V7_Water",
+        "evalVerts": 160,
+        "evalFaces": 158,
+        "baseVerts": 160
+      }
+    ],
+    "evalVerts": 160,
+    "evalFaces": 158,
+    "rssBefore": 258400256,
+    "rssAfter": 258465792,
+    "rssJump": 65536,
+    "aborted": false
+  },
+  "counts": {
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 1,
+    "vertices": 160,
+    "faces": 158
+  }
+}

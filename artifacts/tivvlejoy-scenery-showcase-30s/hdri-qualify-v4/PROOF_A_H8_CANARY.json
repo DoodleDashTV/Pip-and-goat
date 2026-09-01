@@ -1,0 +1,20 @@
+{
+  "schema": "TJ_PROOF_A_H8_CANARY_V4",
+  "attempted": true,
+  "resolution": [360, 640],
+  "samples": 16,
+  "denoise": false,
+  "hdri": "H8",
+  "hdriPath": "/tmp/tj_hdri_diag_8k.jpg",
+  "preflightPassed": true,
+  "beforeCyclesRss": 584314880,
+  "beforeCyclesAvailable": 15376609280,
+  "peakRssKiB": 14204388,
+  "peakRssBytes": 14545293312,
+  "killedAtAvailableKiB": 1412648,
+  "watchdog": "RSS>14GiB or available<700MiB",
+  "png": false,
+  "path": null,
+  "blenderLog": "Cycles sync climbed from 0.56 GiB to 13.55 GiB in ~160s. No PNG. Watchdog terminated Blender to avoid kernel OOM.",
+  "finding": "H8 isolated save does not reduce full Proof A Cycles hold. Geometry/BVH dominates."
+}

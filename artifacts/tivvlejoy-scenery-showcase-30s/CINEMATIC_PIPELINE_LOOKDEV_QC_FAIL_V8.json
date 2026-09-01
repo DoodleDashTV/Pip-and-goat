@@ -1,0 +1,34 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:38:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "5e384a1",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev13",
+  "shots": {
+    "SHOT_01": "FAIL — green Texture.png meadow and Louis ridge are in, but the river is still a light-blue tape and the village is a cabin cluster on a flat floor.",
+    "SHOT_02": "FAIL — cabin/cart/trees compose a discovery frame; water is still a light-blue strip on a slab.",
+    "SHOT_03": "FAIL — no longer a black trunk or foothill interior, but also no forest. Empty meadow plus dark peaks.",
+    "SHOT_04": "PARTIAL — street, cart, two cabins, ridge. River tape. Flat olive floor.",
+    "SHOT_05": "PARTIAL — village-against-ridge compression holds. River tape and slab ground remain.",
+    "SHOT_06": "FAIL — three cabins on a lime pad with a blue strip and a hard seam to the peaks."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "flat_lime_or_pale_green_ground",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "Meadow uses Louis Texture.png instead of Vegetation.png frost",
+    "SHOT_03 is no longer inside a foothill",
+    "SHOT_05 stays a compression shot, not a chimney portrait",
+    "Louis LP ranges remain the backdrop"
+  ],
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "honestConclusion": "Not a visual pass. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT. A local 900-frame encode would not pass. Next: narrower dark stream in overlapping banks, and trees as a SHOT_03 gate rather than an empty meadow."
+}

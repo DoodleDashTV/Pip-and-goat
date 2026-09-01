@@ -1,0 +1,33 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:36:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "9d2570f",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev12",
+  "shots": {
+    "SHOT_01": "FAIL — layered Louis ridge is in, but Vegetation.png speckled the floor into frost-quilt and the river is still a blue strip.",
+    "SHOT_02": "FAIL — cabin and cart are in frame; water is still a teal tape with a hard edge.",
+    "SHOT_03": "FAIL — camera looks into a west Louis foothill. Black mass, not a forest passage.",
+    "SHOT_04": "PARTIAL — street + cart + two cabins + ridge. Ground blotchy. River a noisy teal plane.",
+    "SHOT_05": "PARTIAL — chimney crop is gone; this is finally a village-against-ridge compression. Ground and river still fail.",
+    "SHOT_06": "FAIL — three cabins on a blotchy pad with a blue strip and a hard seam to the peaks."
+  },
+  "automaticFailuresHit": [
+    "flat_lime_or_pale_green_ground",
+    "river_reads_as_road_path_or_blue_tape",
+    "village_as_small_asset_cluster",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "SHOT_05 is no longer a chimney portrait",
+    "Eight cabins exist; SHOT_04/06 show more than a two-box pad",
+    "Louis ranges read as a mountain backdrop"
+  ],
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "honestConclusion": "Not a visual pass. Do not CREATE. Next: Texture.png only (never Vegetation.png), foothills north of the forest camera, and less grazing-sky mirror on the river."
+}

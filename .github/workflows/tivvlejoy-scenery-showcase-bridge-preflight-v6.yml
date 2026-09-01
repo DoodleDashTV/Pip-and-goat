@@ -1,0 +1,70 @@
+name: TivvleJoy Scenery Showcase Bridge Preflight V6
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-showcase-bridge-preflight-v6.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRIDGE_URL: https://pip-and-goat-git-cursor-tivvlejoy-a91ad2-doodledashtvs-projects.vercel.app/api/scenery/showcase-30s-v6
+      AUTH: TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V6
+      EXPECTED_TEMPLATE_ID: kpuairdt8y
+      EXPECTED_IMAGE: ghcr.io/doodledashtv/ddp-runpod-blender@sha256:d0564b2ff8002f680b3b853f85e6e324a543b8c0323d3e0ca36eeb3ffe34d353
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - name: Check live V6 bridge without paid mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RUNPOD_API_KEY"
+          code=$(curl --max-time 90 -sS -o preflight.json -w '%{http_code}' \
+            --request POST "$BRIDGE_URL" \
+            --header 'content-type: application/json' \
+            --header "x-tivvlejoy-scenery-authorization: $AUTH" \
+            --header "x-tivvlejoy-runpod-key: $RUNPOD_API_KEY" \
+            --data '{"action":"preflight"}')
+          cat preflight.json
+          python3 - <<'PY'
+          import json, os
+          p=json.load(open('preflight.json'))
+          if p.get('ready') is True:
+              assert p.get('schema') == 'TIVVLEJOY_SCENERY_SHOWCASE_30S_PREFLIGHT_V8'
+              assert p.get('paidMutationPerformed') is False
+              assert p.get('workerImage') == os.environ['EXPECTED_IMAGE']
+              assert p.get('workerImagePinned') is True
+              assert p.get('launchTransport') == 'RUNPOD_REST_TEMPLATE'
+              assert p.get('sourceFirstSelection') is True
+              assert p.get('perAssetProgress') is True
+              assert int(p.get('activePodCount')) == 0
+              assert int(p.get('requiredRoleCount')) == 10
+              t=p.get('template') or {}
+              assert t.get('templateId') == os.environ['EXPECTED_TEMPLATE_ID']
+              assert t.get('imageName') == os.environ['EXPECTED_IMAGE']
+              rate=float((p.get('runpod') or {}).get('rate'))
+              assert 0 < rate <= 0.8
+              state={'state':'READY_FOR_ONE_CREATE','ready':True,'activePodCount':0,'rate':rate,'paidMutationPerformed':False}
+          else:
+              # While V5 is alive, V6 MUST be blocked rather than overlapping billing.
+              err=str(p.get('error') or '')
+              assert 'ACTIVE_RUNPOD_POD_PRESENT' in err, p
+              state={'state':'BLOCKED_BY_EXISTING_ACTIVE_POD','ready':False,'paidMutationPerformed':False}
+          print(json.dumps(state))
+          open('preflight-v6-safe.json','w').write(json.dumps(state,indent=2)+'\n')
+          PY
+          test "$code" = '200' -o "$code" = '400'
+      - name: Upload sanitized V6 preflight evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-scenery-showcase-bridge-preflight-v6
+          path: preflight-v6-safe.json
+          if-no-files-found: error
+          retention-days: 14

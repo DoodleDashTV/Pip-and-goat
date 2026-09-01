@@ -1,0 +1,15 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_TEMPLATE_V3",
+  "status": "TEMPLATE_READY",
+  "templateId": "6yz7wkmu34",
+  "name": "TivvleJoy Scenery Showcase 30s V3",
+  "imageName": "ghcr.io/doodledashtv/ddp-runpod-blender@sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673",
+  "workerEntrypoint": "scenery-showcase-entry-v2.js",
+  "runtimeEnvStoredInTemplate": false,
+  "provenTemplateLifecyclePattern": true,
+  "templateWorkflowRunId": 33129543294,
+  "artifactId": 9669697724,
+  "podPostCountDuringTemplateVerification": 0,
+  "gpuLaunchedDuringTemplateVerification": false,
+  "paidComputeUsd": 0
+}

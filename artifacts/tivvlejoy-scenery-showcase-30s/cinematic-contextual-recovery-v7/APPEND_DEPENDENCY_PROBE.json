@@ -1,0 +1,75 @@
+{
+  "schema": "TJ_APPEND_DEPENDENCY_PROBE_V1",
+  "blend": "bq_Tree_Fagus-sylvatica_A_summer.blend",
+  "sourceObjectCount": 1,
+  "sourceImageCount": 4,
+  "requested": [
+    "bq_Tree_Fagus-sylvatica_A_summer"
+  ],
+  "loadedObjects": [
+    "bq_Tree_Fagus-sylvatica_A_summer"
+  ],
+  "explicitAllImages": false,
+  "materialsOnObject": [
+    "bq_Bark_Fagus-sylvatica",
+    "bq_Leaf_Fagus-sylvatica"
+  ],
+  "imagesOnNodes": [
+    {
+      "name": "bq_Bark_Fagus-sylvatica_Diffuse.jpg",
+      "size": [
+        512,
+        2048
+      ],
+      "hasPixels": true
+    },
+    {
+      "name": "bq_Bark_Fagus-sylvatica_Normal.jpg",
+      "size": [
+        512,
+        2048
+      ],
+      "hasPixels": true
+    },
+    {
+      "name": "bq_Leaf_Fagus-sylvatica_Normal.jpg",
+      "size": [
+        2048,
+        2048
+      ],
+      "hasPixels": true
+    },
+    {
+      "name": "bq_Leaf_Fagus-sylvatica_Diffuse.png",
+      "size": [
+        2048,
+        2048
+      ],
+      "hasPixels": true
+    }
+  ],
+  "integrity": {
+    "ok": true,
+    "missingTextureMaterials": [],
+    "materialCount": 2,
+    "imageCount": 5
+  },
+  "audit": {
+    "loadedCount": 5,
+    "estimatedRawBytes": 41943040,
+    "unreferencedCount": 0
+  },
+  "amplification": {
+    "schema": "TJ_MEMORY_SAFE_ASSET_LOADER_V1",
+    "requestedObjectCount": 1,
+    "loadedObjectCount": 1,
+    "loadedImageCount": 5,
+    "loadedMaterialCount": 2,
+    "sourceImageCount": 4,
+    "explicitAllImages": false,
+    "warnings": [],
+    "blockers": [],
+    "code": null,
+    "ok": true
+  }
+}

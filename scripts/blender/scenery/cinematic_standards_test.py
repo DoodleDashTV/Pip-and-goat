@@ -1,0 +1,423 @@
+#!/usr/bin/env python3
+"""Deterministic cinematic pipeline contract tests."""
+from __future__ import annotations
+
+import math
+
+from cinematic_camera_contract_v1_test import (  # noqa: E402
+    test_camera_c_lock_exact,
+    test_evaluate_ok,
+    test_frame_210_uses_shot_02_camera,
+    test_six_approved_shot_cameras,
+    test_stills_path_no_longer_hijacks_v3_comp_a,
+    test_timeline_camera_changes_at_cuts,
+    test_v3_comp_a_cannot_replace_camera_c,
+    test_visual_proof_uses_same_cameras_as_final,
+    test_water_d_unchanged,
+    test_worker_entry_does_not_launch_forbidden_cmds,
+)
+from cinematic_shots import (
+    SHOTS,
+    assert_shot_plan,
+    camera_name,
+    default_shot_cameras,
+    frame_to_shot,
+    hero_search_cameras,
+    lookdev_frames,
+    marker_frames,
+    shot_standard_payload,
+)
+from cinematic_standards import (
+    AUTOMATIC_VISUAL_FAILURES,
+    FINAL_NATIVE_RESOLUTION,
+    MASTER_COLLECTIONS,
+    PROFILES,
+    assert_final_contract,
+    assert_no_proof_quality_in_final,
+    ffmpeg_final_args,
+    ffmpeg_has_upscale,
+    is_final_profile,
+    normalize_profile,
+    profile_defaults,
+    require_visual_approval_before_paid_final,
+    visible_use_record,
+)
+from cinematic_hero_rebuild_v3_test import (  # noqa: E402
+    test_authored_bank_is_a_profile_not_noise,
+    test_channel_has_a_creek,
+    test_negative_space_path_exists,
+)
+from cinematic_riverbank_v1_test import (  # noqa: E402
+    test_biome_progresses_from_bed_to_meadow,
+    test_controls_change_width_and_depth,
+    test_dressing_sits_on_the_real_waterline,
+    test_macro_events_are_few_and_irregular,
+    test_no_high_frequency_lumps,
+    test_no_landward_cavity,
+    test_shoreline_is_terrain_water_intersection,
+)
+from cinematic_meadow_v1_test import (  # noqa: E402
+    test_density_falls_with_distance_but_not_to_a_plane,
+    test_negative_space_exists,
+    test_zones_are_physical_and_varied,
+)
+from cinematic_shoreline_v1_test import (  # noqa: E402
+    test_color_does_not_step_at_waterline,
+    test_cues_sit_on_real_waterline,
+    test_transition_has_real_width_and_overlap,
+)
+from cinematic_meadow_v2_test import (  # noqa: E402
+    test_communities_overlap,
+    test_foundation_is_a_field_not_dots,
+)
+from cinematic_v6_issues_test import test_all_recurring_issues_require_root_cause  # noqa: E402
+from cinematic_water_lock_v1_test import test_abc_preserve_lock, test_lock_is_physical_d  # noqa: E402
+from cinematic_louis_apron_v1_test import (  # noqa: E402
+    test_conservative_removes_fewer_than_south_only,
+    test_visible_south_face_is_kept,
+)
+from cinematic_style_unifier_v1_test import (  # noqa: E402
+    test_detects_botaniq_by_image_not_just_prefix,
+    test_spec_does_not_flatten_or_photoreal_louis,
+)
+from cinematic_shoreline_v2_test import (  # noqa: E402
+    test_events_are_five_plus_and_irregular,
+    test_physical_slots_occupy_the_waterline,
+)
+from cinematic_creek_bed_v2_test import test_three_reveal_zones_and_mixed_stone  # noqa: E402
+from cinematic_meadow_v3_test import (  # noqa: E402
+    test_fields_overlap_and_have_negative_space,
+    test_foundation_dominates_the_wedge,
+)
+from cinematic_style_unifier_v2_test import test_v2_keeps_stylized_not_photoreal  # noqa: E402
+from v7_resource_probe_test import (  # noqa: E402
+    test_meminfo_and_disk_are_dicts,
+    test_snapshot_has_resource_fields,
+)
+from runtime_memory_preflight_v1_test import (  # noqa: E402
+    test_allows_healthy_headroom,
+    test_predicted_cycles_increment_blocks,
+    test_blocks_the_confirmed_16gib_pre_cycles_state,
+    test_budget_scales_from_detected_memory,
+    test_detect_system_memory_parses_proc_text,
+    test_preflight_stores_geometry_and_component_history,
+)
+from cycles_memory_predictor_v1_test import (  # noqa: E402
+    test_measured_v3_history_keeps_hdri_as_largest_isolated_peak,
+    test_predictor_adds_isolated_deltas_with_slack,
+    test_unknown_parts_are_ignored,
+)
+from worker_memory_contract_v1_test import (  # noqa: E402
+    test_accepts_32gib_4090_proof_a,
+    test_blocks_paid_create_flag,
+    test_rejects_16gib_cursor_vm,
+)
+from memory_safe_asset_loader_v1_test import (  # noqa: E402
+    test_dependency_preservation_allows_referenced_images,
+    test_exact_object_append_policy_is_ok,
+    test_hidden_library_master_excludes_instances,
+    test_image_raw_bytes,
+    test_no_explicit_all_image_append,
+    test_severe_amplification_blocks_when_budget_threatened,
+    test_unreferenced_library_dump_warns,
+)
+from owned_building_audit import audit_summary  # noqa: E402
+from cinematic_creek_profile import (
+    hero_grass_lip,
+    hero_north_notch_depth,
+    hero_north_wet_tongue,
+    hero_macro_event,
+    hero_shore_event,
+    hero_south_emerge,
+    hero_south_water_factor,
+    hero_south_wet_tongue,
+    hero_waterline_bite,
+)
+
+
+def test_profiles_are_separated():
+    assert PROFILES == ("BLOCKOUT", "LOOKDEV_FAST", "HERO_STILL", "FINAL")
+    assert is_final_profile("final") is True
+    assert is_final_profile("LOOKDEV_FAST") is False
+    lookdev = profile_defaults("LOOKDEV_FAST")
+    assert lookdev["canLabelFinal"] is False
+    assert lookdev["resolution"] in {"540x960", "720x1280"}
+    final = profile_defaults("FINAL")
+    assert final["resolution"] == FINAL_NATIVE_RESOLUTION
+    assert final["allowUpscale"] is False
+    assert final["imageSequenceRequired"] is True
+    assert final["cyclesDevice"] == "GPU"
+    assert final["denoise"] is True
+
+
+def test_final_rejects_upscale_and_540():
+    try:
+        assert_final_contract({"profile": "FINAL", "resolution": "540x960", "allowUpscale": True, "upscaleFilter": "lanczos"})
+        raise AssertionError("540 FINAL should fail")
+    except ValueError as exc:
+        assert "1080x1920" in str(exc) or "upscale" in str(exc)
+    try:
+        assert_final_contract({"profile": "LOOKDEV_FAST", "canLabelFinal": True, "label": "FINAL_1080P"})
+        raise AssertionError("lookdev labeled FINAL should fail")
+    except ValueError:
+        pass
+    assert_final_contract(profile_defaults("FINAL"))
+
+
+def test_final_ffmpeg_has_no_scale_filter():
+    args = ffmpeg_final_args()
+    assert ffmpeg_has_upscale(args) is False
+    assert ffmpeg_has_upscale(["-vf", "scale=1080:1920:flags=lanczos"]) is True
+
+
+def test_lookdev_cannot_be_final_even_if_encoded():
+    config = profile_defaults("LOOKDEV_FAST")
+    config["label"] = "FINAL"
+    try:
+        assert_final_contract(config)
+        raise AssertionError("expected lookdev FINAL label to fail")
+    except ValueError:
+        pass
+
+
+def test_cycles_cpu_force_fails_final():
+    config = profile_defaults("FINAL")
+    config["cyclesDevice"] = "CPU"
+    try:
+        assert_final_contract(config)
+        raise AssertionError("forced CPU FINAL should fail")
+    except ValueError as exc:
+        assert "CPU" in str(exc)
+
+
+def test_proof_quality_flags_fail_final():
+    try:
+        assert_no_proof_quality_in_final({"lanczos_upscale_to_1080": True, "target_faces_per_mesh_8000": True})
+        raise AssertionError("proof flags should fail")
+    except ValueError as exc:
+        assert "lanczos_upscale_to_1080" in str(exc)
+
+
+def test_six_shot_plan():
+    assert_shot_plan()
+    assert marker_frames() == [1, 151, 301, 451, 601, 751]
+    assert frame_to_shot(1)["id"] == "SHOT_01"
+    assert frame_to_shot(210)["id"] == "SHOT_02"
+    assert frame_to_shot(900)["id"] == "SHOT_06"
+    assert camera_name("SHOT_05") == "TJ_SHOT_05_CAM"
+    cameras = default_shot_cameras()
+    assert len(cameras) == 6
+    lenses = [cam["start"]["lens"] for cam in cameras]
+    assert min(lenses) <= 28.0
+    assert max(lenses) >= 100.0
+    assert len(set(lenses)) >= 5
+    shot05 = next(cam for cam in cameras if cam["id"] == "SHOT_05")
+    assert shot05["start"]["location"][2] >= 12.0
+    assert abs(shot05["start"]["location"][0]) >= 16.0
+    assert shot05["start"]["location"][1] <= -100.0
+    assert shot05["start"]["look"][2] >= 8.0
+    assert shot05["start"]["lens"] >= 100.0
+    shot03 = next(cam for cam in cameras if cam["id"] == "SHOT_03")
+    assert shot03["start"]["location"][0] <= -40.0
+    assert shot03["start"]["look"][0] <= -40.0
+    # Dense forest: look deeper into the west grove, not toward the village street.
+    assert shot03["start"]["look"][1] <= 6.0
+    assert shot03["start"]["location"][2] <= 6.0
+    assert shot03["start"]["location"][1] <= -12.0
+    shot02 = next(cam for cam in cameras if cam["id"] == "SHOT_02")
+    # V42 still keeps camera C creek-first and off-axis, but allows a micro
+    # pitch-up so a Louis face can occupy the sky beside the cabin.
+    assert shot02["start"]["location"][1] < -16.0
+    assert shot02["start"]["look"][1] > shot02["start"]["location"][1]
+    assert shot02["start"]["location"][2] < 6.0
+    assert shot02["start"]["look"][2] <= 2.8
+    assert 30.0 <= shot02["start"]["lens"] <= 36.0
+    direction = tuple(
+        shot02["start"]["look"][i] - shot02["start"]["location"][i]
+        for i in range(3)
+    )
+    horizontal = math.hypot(direction[0], direction[1])
+    pitch = math.degrees(math.atan2(direction[2], horizontal))
+    assert pitch <= -6.0
+    assert pitch >= -14.0
+    # Stay on the creek. Looking past y=-4 turns SHOT_02 into a cabin shot.
+    assert shot02["start"]["look"][1] <= -8.0
+    assert shot02["start"]["look"][1] >= -12.5
+    # Cabin01 is near x=-9.2; it must stay a destination, not the frame center.
+    assert abs(shot02["start"]["look"][0] - (-9.2)) >= 3.0
+    assert len(lookdev_frames()) == 12
+    payload = shot_standard_payload()
+    assert payload["cutsNotInterpolated"] is True
+    assert SHOTS[4]["lensMin"] == 85.0
+    heroes = hero_search_cameras()
+    assert [item["id"] for item in heroes] == ["A", "B", "C", "D", "E"]
+    zs = [item["location"][2] for item in heroes]
+    assert max(zs) - min(zs) >= 6.0
+    xs = [item["location"][0] for item in heroes]
+    assert max(xs) - min(xs) >= 20.0
+    hero_c = next(item for item in heroes if item["id"] == "C")
+    assert hero_c["location"] == shot02["start"]["location"]
+    assert hero_c["look"] == shot02["start"]["look"]
+    assert hero_c["lens"] == shot02["start"]["lens"]
+
+
+def test_v37_north_bank_breakup_is_broad_and_discontinuous():
+    samples = [hero_north_notch_depth(x, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(samples) >= 0.45
+    assert min(samples) <= 0.42
+    assert max(samples) - min(samples) >= 0.28
+    assert hero_north_notch_depth(-14.0, 0.0) == 0.0
+    assert hero_north_notch_depth(10.0, 0.0) == 0.0
+    tongues = [hero_north_wet_tongue(x, -8.0 + x * 0.1, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(tongues) - min(tongues) >= 0.35
+    assert all(0.0 <= value <= 1.0 for value in tongues)
+    south = [hero_south_wet_tongue(x, -14.0, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(south) - min(south) >= 0.28
+    assert all(0.0 <= value <= 1.0 for value in south)
+    bites = [hero_waterline_bite(x, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(bites) >= 0.35
+    assert min(bites) <= -0.20
+    assert max(bites) - min(bites) >= 0.70
+    assert hero_waterline_bite(-14.0, 0.0) == 0.0
+    assert hero_waterline_bite(10.0, 0.0) == 0.0
+    lips = [hero_grass_lip(x, x * 0.8) for x in (-11, -9, -7, -5, -3, -1, 1, 3, 5, 7)]
+    assert max(lips) >= 0.30
+    assert min(lips) <= -0.15
+    assert max(lips) - min(lips) >= 0.55
+    assert hero_grass_lip(-14.0, 0.0) == 0.0
+    # Grass and water must not share one isoline.
+    assert abs(hero_grass_lip(-7.6, 0.0) - hero_waterline_bite(-7.6, 0.0)) >= 0.20
+    kinds = {hero_macro_event(x)["kind"] for x in (-9.6, -6.6, -3.6, -0.6, 2.4, 5.6)}
+    assert len(kinds) >= 5
+    assert hero_macro_event(-6.6)["emerge"] > hero_macro_event(-3.6)["emerge"]
+    assert hero_macro_event(-14.0)["kind"] == "none"
+    assert hero_shore_event(-14.0)["kind"] == "none"
+    assert hero_south_water_factor(-6.6) > hero_south_water_factor(-3.6)
+    assert 0.72 <= hero_south_water_factor(-6.6) <= 1.48
+    assert hero_south_water_factor(-14.0) == 1.0
+    film = 1.80
+    assert hero_south_emerge(-6.6, film) > hero_south_emerge(-3.6, film)
+    assert hero_south_emerge(-9.6, film) < film * hero_south_water_factor(-9.6)
+    assert hero_south_emerge(-14.0, film) < film
+
+
+def test_visible_use_requires_rendered_pixels():
+    loaded_only = visible_use_record("PSA", downloaded=True, extracted=True, datablockLoaded=True)
+    assert loaded_only["visiblyUsed"] is False
+    used = visible_use_record(
+        "village_blender",
+        downloaded=True,
+        extracted=True,
+        datablockLoaded=True,
+        renderedPixels=True,
+        shotIds=["SHOT_04"],
+        evidence="cryptomatte:Cabin01A",
+    )
+    assert used["visiblyUsed"] is True
+
+
+def test_visual_approval_required_before_paid_final():
+    try:
+        require_visual_approval_before_paid_final(None)
+        raise AssertionError("missing receipt should fail")
+    except ValueError:
+        pass
+    try:
+        require_visual_approval_before_paid_final({"result": "FAIL", "humanApproved": False})
+        raise AssertionError("FAIL receipt should fail")
+    except ValueError:
+        pass
+    require_visual_approval_before_paid_final({
+        "result": "PASS",
+        "humanApproved": True,
+        "recipeIdentity": "valley-v1",
+        "authorizedRecipeIdentity": "valley-v1",
+    })
+
+
+def test_master_collections_and_gate_list():
+    assert "WORLD_RIVER" in MASTER_COLLECTIONS
+    assert "WORLD_CAMERAS" in MASTER_COLLECTIONS
+    assert len(MASTER_COLLECTIONS) == 14
+    assert "river_reads_as_road_path_or_blue_tape" in AUTOMATIC_VISUAL_FAILURES
+    assert "upscaled_softness" in AUTOMATIC_VISUAL_FAILURES
+
+
+if __name__ == "__main__":
+    test_profiles_are_separated()
+    test_final_rejects_upscale_and_540()
+    test_final_ffmpeg_has_no_scale_filter()
+    test_lookdev_cannot_be_final_even_if_encoded()
+    test_cycles_cpu_force_fails_final()
+    test_proof_quality_flags_fail_final()
+    test_six_shot_plan()
+    test_v37_north_bank_breakup_is_broad_and_discontinuous()
+    test_visible_use_requires_rendered_pixels()
+    test_visual_approval_required_before_paid_final()
+    test_master_collections_and_gate_list()
+    test_channel_has_a_creek()
+    test_authored_bank_is_a_profile_not_noise()
+    test_negative_space_path_exists()
+    test_biome_progresses_from_bed_to_meadow()
+    test_shoreline_is_terrain_water_intersection()
+    test_no_landward_cavity()
+    test_macro_events_are_few_and_irregular()
+    test_no_high_frequency_lumps()
+    test_controls_change_width_and_depth()
+    test_dressing_sits_on_the_real_waterline()
+    test_zones_are_physical_and_varied()
+    test_negative_space_exists()
+    test_density_falls_with_distance_but_not_to_a_plane()
+    test_transition_has_real_width_and_overlap()
+    test_color_does_not_step_at_waterline()
+    test_cues_sit_on_real_waterline()
+    test_foundation_is_a_field_not_dots()
+    test_communities_overlap()
+    test_all_recurring_issues_require_root_cause()
+    test_lock_is_physical_d()
+    test_abc_preserve_lock()
+    test_visible_south_face_is_kept()
+    test_conservative_removes_fewer_than_south_only()
+    test_spec_does_not_flatten_or_photoreal_louis()
+    test_detects_botaniq_by_image_not_just_prefix()
+    test_events_are_five_plus_and_irregular()
+    test_physical_slots_occupy_the_waterline()
+    test_three_reveal_zones_and_mixed_stone()
+    test_foundation_dominates_the_wedge()
+    test_fields_overlap_and_have_negative_space()
+    test_v2_keeps_stylized_not_photoreal()
+    test_snapshot_has_resource_fields()
+    test_meminfo_and_disk_are_dicts()
+    test_budget_scales_from_detected_memory()
+    test_blocks_the_confirmed_16gib_pre_cycles_state()
+    test_allows_healthy_headroom()
+    test_predicted_cycles_increment_blocks()
+    test_detect_system_memory_parses_proc_text()
+    test_preflight_stores_geometry_and_component_history()
+    test_exact_object_append_policy_is_ok()
+    test_no_explicit_all_image_append()
+    test_dependency_preservation_allows_referenced_images()
+    test_unreferenced_library_dump_warns()
+    test_severe_amplification_blocks_when_budget_threatened()
+    test_image_raw_bytes()
+    test_hidden_library_master_excludes_instances()
+    test_predictor_adds_isolated_deltas_with_slack()
+    test_measured_v3_history_keeps_hdri_as_largest_isolated_peak()
+    test_unknown_parts_are_ignored()
+    test_rejects_16gib_cursor_vm()
+    test_accepts_32gib_4090_proof_a()
+    test_blocks_paid_create_flag()
+    test_six_approved_shot_cameras()
+    test_timeline_camera_changes_at_cuts()
+    test_camera_c_lock_exact()
+    test_frame_210_uses_shot_02_camera()
+    test_v3_comp_a_cannot_replace_camera_c()
+    test_water_d_unchanged()
+    test_visual_proof_uses_same_cameras_as_final()
+    test_stills_path_no_longer_hijacks_v3_comp_a()
+    test_worker_entry_does_not_launch_forbidden_cmds()
+    test_evaluate_ok()
+    summary = audit_summary()
+    assert summary["purchasePerformed"] is False
+    assert summary["status"] == "OWNED_BUILDING_ASSET_UPGRADE_REQUIRED"
+    print("cinematic_standards_test PASS")

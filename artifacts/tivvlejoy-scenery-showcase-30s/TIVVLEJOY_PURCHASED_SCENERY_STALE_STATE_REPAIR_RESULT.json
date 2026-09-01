@@ -1,0 +1,74 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_STALE_STATE_REPAIR_RESULT",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "42c21872d404e73f9bcdfca71233134445d93ce6",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "finalSha": "1e3317b3a879d4b45682049d4cd76fef78ca2f42",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "mergeable": "MERGEABLE"
+  },
+  "livePodProof": {
+    "exactName": "tivvlejoy-scenery-original14-30s-v1",
+    "exactNameCount": 0,
+    "totalRelevantLivePods": 0,
+    "createPerformed": false,
+    "cleanupBillingConfirmed": true
+  },
+  "staleBridgeBefore": {
+    "startupResult": "RUNNING",
+    "stage": "BLENDER_RENDER",
+    "frame": 248,
+    "totalFrames": 900,
+    "status": null,
+    "downloadUrl": null,
+    "at": "2026-08-28T15:29:20.189Z"
+  },
+  "staleBridgeAfter": {
+    "startupResult": "STALE_RECONCILED",
+    "terminalState": "CANCELLED",
+    "status": "CANCELLED",
+    "statusCode": "STALE_CABIN_ORBIT_RECONCILED_NO_LIVE_POD",
+    "topLevelFrame": null,
+    "historicalFrame": 248,
+    "downloadUrl": null,
+    "historicalKey": "jobs/scenery-showcase-original14-30s-v1-20260828/startup-status.historical-killed-cabin-orbit-20260828T152920Z.json",
+    "liveGetPresents248AsLive": false
+  },
+  "purchasedAssetsUsed": [
+    "SRC_VILLAGE_BLEND_ZIP cabins/cart/fence/gate/trees",
+    "SRC_VILLAGE_TEXTURES_ZIP remapped albedos",
+    "SRC_VILLAGE_PROJECT_ZIP Water_Mat_1 tint donor; Water_GN hidden",
+    "SRC_FOREST_MODEL_PACKAGE far-flank nature dumps",
+    "SRC_SKY_HDRI_JPG_PACK world sky",
+    "SRC_LOUIS_BG_MOUNTAINS_V1 LP meadow ranges and grassy peaks; RiverMask.png roughness"
+  ],
+  "v26FailuresBeforeCorrection": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "correctionsMade": [
+    "Preserved historical 248/900 startup bytes and marked live bridge STALE_RECONCILED/CANCELLED",
+    "Removed painted meadow water BSDF",
+    "Showed a horizontal purchased-tint ribbon in a shallow dish",
+    "Used Louis RiverMask for roughness, Water_Mat tint only",
+    "32-sample denoised local stills"
+  ],
+  "previewArtifactPaths": {
+    "opening": "/tmp/o14-lookdev/cinematic-lookdev34/shot_01_.png",
+    "middle": "/tmp/o14-lookdev/cinematic-lookdev34/shot_04_.png",
+    "ending": "/tmp/o14-lookdev/cinematic-lookdev34/shot_06_.png",
+    "worstCase": "/tmp/o14-lookdev/cinematic-lookdev34/shot_02_.png"
+  },
+  "latestGate": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V29.json",
+  "latestGateResult": "FAIL",
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "readiness": "NOT_READY",
+  "blocker": "Visual gate still fails river_reads_as_road_path_or_blue_tape on free local stills. Not an external credential blocker.",
+  "paidRenderReadyAwaitingAuthorization": false,
+  "finalResultReturned": false
+}

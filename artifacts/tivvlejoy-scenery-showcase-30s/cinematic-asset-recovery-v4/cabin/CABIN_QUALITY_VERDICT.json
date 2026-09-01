@@ -1,0 +1,28 @@
+{
+  "source": "/tmp/o14-v4-source/SRC_VILLAGE_BLEND_ZIP/Village (Blender 4.2.2)/Cabin04A.blend",
+  "mapsPresent": {
+    "alb": true,
+    "nrm": true,
+    "spe": true
+  },
+  "sample": {
+    "name": "Roof04_LOD0",
+    "verts": 2403,
+    "faces": 1042,
+    "dims": [
+      21.667,
+      13.511,
+      4.2
+    ],
+    "thinCardLikely": false,
+    "materials": [
+      "Straw01"
+    ],
+    "modifiers": [
+      "EDGE_SPLIT"
+    ]
+  },
+  "still": "/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinematic-asset-recovery-v4/cabin/CABIN_QUALITY_CROP.png",
+  "status": "CABIN_ASSET_UPGRADE_REQUIRED",
+  "reason": "Village Cabin*A remains a game-kit LOD. Maps do not add porch/roof/wall geometry."
+}

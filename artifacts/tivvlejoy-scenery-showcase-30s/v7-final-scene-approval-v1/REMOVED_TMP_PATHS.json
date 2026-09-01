@@ -1,0 +1,32 @@
+{
+  "schema": "TIVVLEJOY_V7_REMOVED_LOOKDEV_TMP_PATHS_V1",
+  "finalPathFilesCleared": [
+    "scripts/blender/scenery/cinematic_hero_rebuild_v2.py",
+    "scripts/blender/scenery/cinematic_hero_rebuild_v3.py",
+    "scripts/blender/scenery/cinematic_hero_rebuild_v5.py",
+    "scripts/blender/scenery/cinematic_valley_world_v1.py",
+    "scripts/blender/scenery/fail_fast_verify_v1.py"
+  ],
+  "runtimeRoots": {
+    "module": "scripts/blender/scenery/runtime_roots_v1.py",
+    "env": [
+      "TIVVLEJOY_SCENERY_ASSETS_ROOT",
+      "TIVVLEJOY_SCENERY_OUTPUT_ROOT",
+      "TIVVLEJOY_SCENERY_SCRIPTS_ROOT"
+    ],
+    "forbidden": [
+      "/tmp/o14-lookdev",
+      "/tmp/o14-v3-source",
+      "/tmp/o14-v4-source",
+      "/tmp/lookdev"
+    ],
+    "failClosedMissingFiles": true
+  },
+  "intentionallyUnchangedLookdevOnly": [
+    "scripts/blender/scenery/cinematic_component_recovery_v6.py",
+    "scripts/blender/scenery/v4_hdri_qualify.py",
+    "scripts/cloud/v7-proof-a-paid/launch.py",
+    "scripts/cloud/v7-proof-a-paid/entry.js",
+    "scripts/cloud/v7-proof-a-paid/prepare_sources.py"
+  ]
+}

@@ -1,0 +1,55 @@
+# TivvleJoy 30-second scenery showcase worker.
+#
+# Thin child image over the already-proven immutable Blender 4.2.2 worker.
+# No credentials or commercial scenery bytes are baked into this image.
+FROM ghcr.io/doodledashtv/ddp-runpod-blender@sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6
+
+WORKDIR /opt/ddp-worker
+
+# Only the scenery-specific execution layer changes. Reuse the proven base
+# runtime (Blender 4.2.2, ffmpeg, AWS SDK, R2 client, GL/EGL stack, render core).
+COPY workers/runpod-blender/src/scenery-showcase-roles.js ./src/scenery-showcase-roles.js
+COPY workers/runpod-blender/src/scenery-showcase.js ./src/scenery-showcase.js
+COPY workers/runpod-blender/src/scenery-showcase-entry-v2.js ./src/scenery-showcase-entry-v2.js
+COPY scripts/blender/scenery/showcase_30s.py ./blender/scenery/showcase_30s.py
+COPY scripts/blender/scenery/showcase_30s_dry.py ./blender/scenery/showcase_30s_dry.py
+
+ENV SCENERY_SHOWCASE_BLENDER_SCRIPT=/opt/ddp-worker/blender/scenery/showcase_30s_dry.py \
+    SCENERY_SHOWCASE_EXECUTION_MODE=dry-run \
+    PAID_EXECUTION_AUTHORIZED=false \
+    CLOUD_RENDER_ENABLED=false \
+    SCENERY_SHOWCASE_EEVEE_SAMPLES=48 \
+    SCENERY_SHOWCASE_MAX_RUNTIME_MINUTES=120 \
+    SCENERY_SHOWCASE_MAX_INPUT_BYTES=5368709120
+
+ARG TIVVLEJOY_SCENERY_SOURCE_COMMIT=unknown
+ARG TIVVLEJOY_SCENERY_BUILD_TIME=unknown
+
+ENV TIVVLEJOY_SCENERY_SOURCE_COMMIT=${TIVVLEJOY_SCENERY_SOURCE_COMMIT} \
+    TIVVLEJOY_SCENERY_BUILD_TIME=${TIVVLEJOY_SCENERY_BUILD_TIME}
+
+LABEL org.opencontainers.image.title="tivvlejoy-scenery-showcase-worker" \
+      org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat" \
+      org.opencontainers.image.revision="${TIVVLEJOY_SCENERY_SOURCE_COMMIT}" \
+      tivvlejoy.scenery.showcase="30s-v2-cold-start-hardened" \
+      tivvlejoy.scenery.base.digest="sha256:78f1b16286b0ffc331a787d74297593fa98c455fb24fcecf48d5be5bdeec48b6" \
+      tivvlejoy.scenery.blender="4.2.2" \
+      tivvlejoy.scenery.resolution="1080x1920" \
+      tivvlejoy.scenery.fps="30" \
+      tivvlejoy.scenery.frame.count="900" \
+      tivvlejoy.scenery.dry.river.omitted="true" \
+      tivvlejoy.scenery.requires.private.r2="true" \
+      tivvlejoy.scenery.requires.paid.authorization="true" \
+      tivvlejoy.scenery.commercial.assets.baked="false"
+
+# Fail the image build if the scripts are not syntactically valid or the
+# inherited runtime is not the expected Blender release.
+RUN node --check ./src/scenery-showcase-roles.js && \
+    node --check ./src/scenery-showcase.js && \
+    node --check ./src/scenery-showcase-entry-v2.js && \
+    python3 -m py_compile ./blender/scenery/showcase_30s.py ./blender/scenery/showcase_30s_dry.py && \
+    blender --version | head -n 1 | grep -F 'Blender 4.2.2'
+
+# No runtime dockerArgs patching is required. The baked entry wrapper records
+# PROCESS_STARTED and the baked Blender wrapper omits only the unverified river.
+CMD ["node", "./src/scenery-showcase-entry-v2.js"]

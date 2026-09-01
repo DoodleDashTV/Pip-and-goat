@@ -1,0 +1,39 @@
+# Zero-cost worker-equivalent scenery role selection check. Never creates a Pod.
+name: TivvleJoy Scenery Role Selection Check
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - 'workers/runpod-blender/src/scenery-showcase-roles.js'
+      - 'workers/runpod-blender/src/scenery-showcase.js'
+      - 'workers/runpod-blender/test/scenery-showcase-roles.test.js'
+      - '.github/workflows/tivvlejoy-scenery-role-selection.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tivvlejoy-scenery-role-selection
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Run worker-equivalent role selection tests
+        working-directory: workers/runpod-blender
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check ./src/scenery-showcase-roles.js
+          node --check ./src/scenery-showcase.js
+          node --test ./test/scenery-showcase-roles.test.js

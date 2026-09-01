@@ -1,0 +1,28 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:50:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "c03f8cb",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev28",
+  "shots": {
+    "SHOT_01": "PARTIAL — valley/village/ridge still the strongest establish.",
+    "SHOT_02": "FAIL — hard-edged water cut on a slab.",
+    "SHOT_03": "PARTIAL — framed opening from earlier passes.",
+    "SHOT_04": "FAIL — west-to-east facade look landed on the shadowed cabin wall. Dark-cabin crop.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "FAIL — closer dark-cabin wall. Lost the street."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Looking across the street at a facade put 04/06 on the unlit wall. Restore the south-looking street that already showed cabins/cart/fence, and lift it so the river is a crossing not a carpet. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_DIAGNOSIS_V1",
+  "sourceGate": "CINEMATIC_PIPELINE_LOOKDEV_QC_FAIL_V26.json",
+  "sourceStillsDir": "/tmp/o14-lookdev/cinematic-lookdev31",
+  "inspectedAt": "2026-08-28T21:34:00Z",
+  "failures": [
+    {
+      "failingMetric": "river_reads_as_road_path_or_blue_tape",
+      "observedValue": "SHOT_02 16-sample and 48-sample-denoised stills are a blue/slate rippled region on the same mesh as the meadow, with a sharp terrain edge. SHOT_01 stream is a dark rippled band painted into the valley floor.",
+      "requiredThreshold": "Unmistakable water: reflections, irregular banks, volume/depth. Must not read as a road, painted path, or blue tape.",
+      "visibleDefect": "Painted vertex-mask mix on TJ_Ground_ValleyCarrier. No separate water plane above a bed. 48-sample denoise at /tmp/o14-lookdev/cinematic-lookdev31-shot02-48/shot_02_.png still fails.",
+      "sceneLevelRootCause": "embed_stream_on_floor mixed a dark-slate Principled + capped gloss into the meadow using TJ_RiverMask. The purchased water ribbon was hidden underground (spline z≈-0.7 + 0.10 offset vs terrain bed ≈-0.42). Louis RiverMask.png was loaded by Cycles but skipped by the albedo walker. Grain was not the water defect.",
+      "exactProposedCorrection": "Cut a deeper flat bed under WATER_SURFACE_Z=-0.16. Show a horizontal TJ_River_PurchasedWater ribbon at that Z, narrower than the banks (half-width 1.48). Drive the visible surface with cinematic_river_material using Water_Mat tint + optional Louis RiverMask roughness. Meadow only gets wet-earth banks, not a water BSDF. Keep metallic=0. Keep Water_GN hidden."
+    },
+    {
+      "failingMetric": "excessive_noise",
+      "observedValue": "16-sample Cycles CPU grain across SHOT_01–06, strongest on water and tree shadows.",
+      "requiredThreshold": "Clean enough to judge materials, banks, and reflections.",
+      "visibleDefect": "LOOKDEV_FAST default 16 samples with denoise=false.",
+      "sceneLevelRootCause": "Profile contract leaves denoise off below 32 samples. Raising SHOT_02 to 48+denoise cleaned grain and the river still failed.",
+      "exactProposedCorrection": "Keep the water architecture fix independent of samples. Gate stills at 32 samples so the world assembler auto-enables denoise. Do not treat more samples as the water fix. Do not CREATE."
+    }
+  ],
+  "purchasedAssetsAvailable": {
+    "conditionedTrue": [
+      "SRC_VILLAGE_BLEND_ZIP",
+      "SRC_VILLAGE_TEXTURES_ZIP",
+      "SRC_VILLAGE_PROJECT_ZIP",
+      "SRC_VILLAGE_FBX_ZIP",
+      "SRC_FOREST_MODEL_PACKAGE",
+      "SRC_FOREST_STYLISED_ECOKIT",
+      "SRC_SKY_HDRI_JPG_PACK",
+      "SRC_LOUIS_BG_MOUNTAINS_V1"
+    ],
+    "blockedOrNotAutoEnabled": [
+      "SRC_3DT_MOUNTAIN_PACK missing_from_local_cache",
+      "botaniq_full missing",
+      "botaniq_geoscatter presets_only_no_meshes",
+      "gaffer inspected_not_auto_enabled",
+      "physical_starlight inspected_not_auto_enabled"
+    ],
+    "doNotUse": [
+      "cabin_orbit_placeholder",
+      "procedural_placeholder_terrain_as_finished_environment",
+      "gray_box_scenery",
+      "generic_primitives_as_hero",
+      "Water_GN_as_visible_sheet",
+      "Water_Mat_ice_tiles_on_grazing_plane"
+    ]
+  },
+  "paidRenderAuthorized": false,
+  "createPerformed": false
+}

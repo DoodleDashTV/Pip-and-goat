@@ -1,0 +1,109 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_STRUCTURAL_REBUILD_V44_RESULT",
+  "inspectedAt": "2026-08-29T18:20:00Z",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "745d2be1ec5ea27739657f0b12e435088990a0d2",
+  "finalBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "finalSha": "2081590311a68539dfc367cd7631004ca8b66cf1",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "number": 169,
+    "base": "cursor/tivvlejoy-ep001-animation-worker-payload-v1-73f1"
+  },
+  "lockVerification": {
+    "cameraC": {"position": [2.2, -21.4, 3.4], "look": [-3.4, -10.2, 1.75], "focalLengthMm": 32.0},
+    "cameraCChanged": false,
+    "louisChanged": false,
+    "shot05HeroMountainChanged": false,
+    "waterLock": "CYCLES IOR 1.33 transmission 0.80 metallic 0 specular 0.50 prism 18cm volume 0.18 WATER_WIDTH_SCALE 0.30 BED_WIDTH_SCALE 0.68 HDRI Z 0.48 Light Path MAXIMUM(Is Glossy Ray, Is Reflection Ray) v34_candidate_d / Water_Mat_1"
+  },
+  "oldHeroBank": {
+    "disabledDeleted": [
+      "TJ_HeroBankSolid (retired; builder returns [])",
+      "V41-V43 overlay lips / under-rock dips / hero mid-stream saplings at z=0",
+      "8-vert faceted TJ_HeroMacroRock mesh"
+    ],
+    "whyPreviousArchitectureFailed": "Separate bank solids, overlay shelves, and under-rock dips drifted from the locked film. At 540 px Camera C still saw a followable soil/water isoline and at least one contact cavity. Adding more rocks/grass/Voronoi did not break the line."
+  },
+  "newHeroBank": {
+    "constructionMethod": "One south-bank heightfield from bed through water to meadow. Macro events move only the terrain∩water intersection. No separate lip mesh.",
+    "terrainUnderWaterMethod": "dist < emerge ramps to bed; water mesh south edge is derived as emerge+0.50 so the film stays under risen bank. Visible shoreline is Z=WATER_SURFACE_Z on the heightfield.",
+    "macroShorelineEvents": ["boulder -9.6", "bay -6.6", "point -3.6", "boulder -0.6", "gravel 2.4", "cut 5.6"],
+    "leftShorelineInterruption": "Three left convex stones plus grass clumps on the intersection. Pixels: line still followable between/behind stones.",
+    "heroRockIntegration": "Closed icospheres elongated along shore, seated at emerge+0.16–0.24 m, soil collar clamped above water.",
+    "cavityRootCause": "Camera C still sees a dark triangular slot at the left rock / film / bank triple point. Foreshortened wet shelf plus residual contact gap reads as a void even after the faceted underside was removed.",
+    "cavityFix": "Convex closed stones; positive 2D soil collar; height clamp to water+0.05 inside the collar. Not sufficient: visible cavity count remains 1.",
+    "visibleCavityCount": 1
+  },
+  "gatesFJ": {
+    "Fbefore": "FAIL — left waterline a followable contour",
+    "Fafter": "FAIL — rocks interrupt some segments; left isoline still traceable",
+    "Fstatus": "FAIL",
+    "Jbefore": "FAIL — 1 cavity, mounds + razor edge",
+    "Jafter": "FAIL — 1 cavity remains; bank still reads as mounds + razor soil/water edge",
+    "Jstatus": "FAIL"
+  },
+  "oldMeadow": {
+    "removedReplaced": [
+      "7–13× tilted Grass01 cards",
+      "centimetre eco disks / shader freckles as the E strategy"
+    ]
+  },
+  "newMeadow": {
+    "macroPhysicalAreas": ["dense_mid", "tall_wild", "short_sparse", "needle_edge", "earth plates", "worn village dirt"],
+    "realVegetationChanges": "Natural-scale Grass01 1.15–2.70 in metre-scale clumps; no 7–13× cards; Camera C corridor still keep-out",
+    "negativeSpace": "Macro earth/needle plates 8–14 m; village dirt/path remains open",
+    "terrainForm": "0.55 m low-frequency meadow rolls, almost none under cabins",
+    "cameraReadableDifferences": "SHOT_01 at 540 px still reads as one yellowish-green plane plus the village dirt clearing. Distinct height/coverage/silhouette regions do not occupy meaningful image area."
+  },
+  "gatesE": {
+    "Ebefore": "FAIL — one green plane",
+    "Eafter": "FAIL — still one meadow surface at image scale",
+    "Estatus": "FAIL"
+  },
+  "T": "PASS PRESERVED",
+  "gates": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "FAIL",
+    "F": "FAIL",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "FAIL",
+    "K": "PASS",
+    "L": "PASS",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PASS",
+    "P": "PASS",
+    "Q": "PASS",
+    "R": "PASS",
+    "S": "PASS",
+    "T": "PASS",
+    "U": "PASS",
+    "V": "PASS"
+  },
+  "total": "19/22 PASS",
+  "final540PxPaths": {
+    "SHOT_01": "/tmp/o14-lookdev/cinematic-lookdev-v44-e/shot_01_.png",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev-v44-e/shot_02_.png",
+    "SHOT_03": "/tmp/o14-lookdev/cinematic-lookdev-v44-e/shot_03_.png",
+    "SHOT_04": "/tmp/o14-lookdev/cinematic-lookdev-v44-e/shot_04_.png",
+    "SHOT_05": "/tmp/o14-lookdev/cinematic-lookdev-v44-e/shot_05_.png",
+    "SHOT_06": "/tmp/o14-lookdev/cinematic-lookdev-v44-e/shot_06_.png"
+  },
+  "paid": {
+    "livePods": [],
+    "paidWorkflow": "none",
+    "paidCreateCount": 0,
+    "actualRunPodSpend": 0,
+    "workerImageState": "untouched"
+  },
+  "acceptance": "LOCAL_VISUAL_ACCEPTANCE_INCOMPLETE"
+}

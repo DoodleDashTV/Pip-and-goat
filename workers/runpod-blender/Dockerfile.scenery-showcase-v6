@@ -1,0 +1,31 @@
+# TivvleJoy V6: source-first selection + progress visibility over verified V5.
+FROM ghcr.io/doodledashtv/ddp-runpod-blender@sha256:5b0fc9f8f26f0c557d131ac8d3897dfa799a7bf01a3d5207da473658170af152
+
+WORKDIR /opt/ddp-worker
+COPY workers/runpod-blender/scenery-showcase-v6-patch.py /tmp/scenery-showcase-v6-patch.py
+RUN python3 /tmp/scenery-showcase-v6-patch.py && rm /tmp/scenery-showcase-v6-patch.py
+
+ARG TIVVLEJOY_SCENERY_SOURCE_COMMIT=unknown
+ARG TIVVLEJOY_SCENERY_BUILD_TIME=unknown
+ENV TIVVLEJOY_SCENERY_SOURCE_COMMIT=${TIVVLEJOY_SCENERY_SOURCE_COMMIT} \
+    TIVVLEJOY_SCENERY_BUILD_TIME=${TIVVLEJOY_SCENERY_BUILD_TIME}
+
+LABEL org.opencontainers.image.title="tivvlejoy-scenery-showcase-worker-v6" \
+      org.opencontainers.image.source="https://github.com/DoodleDashTV/Pip-and-goat" \
+      org.opencontainers.image.revision="${TIVVLEJOY_SCENERY_SOURCE_COMMIT}" \
+      tivvlejoy.scenery.showcase="30s-v6-source-first-visible-roles" \
+      tivvlejoy.scenery.parent.digest="sha256:5b0fc9f8f26f0c557d131ac8d3897dfa799a7bf01a3d5207da473658170af152" \
+      tivvlejoy.scenery.required.role.count="10" \
+      tivvlejoy.scenery.purchased.only="true" \
+      tivvlejoy.scenery.commercial.assets.baked="false"
+
+RUN node --check ./src/scenery-showcase.js && \
+    node --check ./src/scenery-showcase-roles.js && \
+    python3 -m py_compile ./blender/scenery/showcase_30s.py ./blender/scenery/showcase_30s_dry.py && \
+    grep -F "MATERIALIZE_PRIVATE_ASSETS" ./src/scenery-showcase.js >/dev/null && \
+    grep -F "Prefer the original purchased source package" ./src/scenery-showcase-roles.js >/dev/null && \
+    grep -F '"background": (225.0' ./blender/scenery/showcase_30s.py >/dev/null && \
+    grep -F 'TJ_VillagePath_FromPurchasedTextures' ./blender/scenery/showcase_30s.py >/dev/null && \
+    blender --version | head -n 1 | grep -F 'Blender 4.2.2'
+
+CMD ["node", "./src/scenery-showcase-entry-v2.js"]

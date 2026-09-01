@@ -1,0 +1,30 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_PREFLIGHT_V1",
+  "authorizationName": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V1",
+  "authorizationCreated": false,
+  "authorizationConsumed": false,
+  "issuable": true,
+  "image": {
+    "status": "PUBLISHED_IMMUTABLE_DIGEST",
+    "digest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+    "cmd": [
+      "node",
+      "./src/scenery-showcase-original14-entry.js"
+    ],
+    "published": true
+  },
+  "jobKind": "VISUAL_PROOF",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "hostRamGiB": 24,
+  "vramGiB": 24,
+  "diskGiB": 60,
+  "createCount": 1,
+  "retry": false,
+  "automaticSecondCreate": false,
+  "hardSpendUsd": 0.5,
+  "hardRuntimeMinutes": 40,
+  "expectedUsdAtCeiling": 0.4933,
+  "encode900": false,
+  "runpodContacted": false,
+  "paidCreate": 0
+}

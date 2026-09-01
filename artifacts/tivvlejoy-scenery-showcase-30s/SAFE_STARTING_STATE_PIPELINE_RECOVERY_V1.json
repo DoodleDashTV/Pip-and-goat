@@ -1,0 +1,39 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_WORLD_AND_VIDEO_PIPELINE_RECOVERY_V1",
+  "phase": "PHASE_1_SAFE_START",
+  "recordedAt": "2026-08-28T17:06:30Z",
+  "inspectedHeadBeforePrompt": "a6da28a1fad05097845b358e863677dcd1d6fa8b",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "localHead": "56664f929de787c3870e5e5c4f4e8abaf4f42706",
+  "remoteHead": "56664f929de787c3870e5e5c4f4e8abaf4f42706",
+  "preservedCommitsAfterInspectedHead": [
+    "5914fe2",
+    "652bc24",
+    "56664f9"
+  ],
+  "pr169": {
+    "number": 169,
+    "state": "OPEN",
+    "draft": true,
+    "unmerged": true,
+    "notReady": true,
+    "base": "cursor/tivvlejoy-ep001-animation-worker-payload-v1-73f1"
+  },
+  "paidResourceState": {
+    "runpodApiKeyPresent": true,
+    "activePodCount": 0,
+    "exactNameActivePods": 0,
+    "createPerformed": false,
+    "paidWorkflowsRunning": 0,
+    "lastPaidWorkflows": "completed/failure only; none in_progress",
+    "standingAuthUsableForThisIdentity": false,
+    "reasonAuthRejected": "Auth JSON is the exhausted 540x960 Lanczos proof path; live pin is rejected cabin-orbit digest"
+  },
+  "actionsForbiddenThisPrompt": [
+    "paid RunPod CREATE",
+    "merge or mark PR 169 ready",
+    "modify Production",
+    "commit purchased bytes",
+    "bake licensed assets into GHCR"
+  ]
+}

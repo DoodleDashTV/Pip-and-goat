@@ -1,0 +1,389 @@
+{
+  "schema": "TIVVLEJOY_CONDITIONING_BATCH_V1",
+  "blender": "4.2.2",
+  "licensedBytesCommitted": false,
+  "receipts": [
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_VILLAGE_BLEND_ZIP",
+      "role": "village_blender",
+      "blender": "4.2.2",
+      "sourceSha256": "c836125e3f63bd7c1e9f992f919ccd903956ee43f8d9a3a0a84423e8365f8ee9",
+      "byteSize": 7282543,
+      "inspectedAt": "2026-08-28T17:11:41Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 33,
+      "extensionCounts": {
+        ".blend": 33
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 33,
+      "blendNames": [
+        "Barrel01.blend",
+        "Bed01.blend",
+        "Book01.blend",
+        "Bookcase01.blend",
+        "Bucket01.blend",
+        "Cabin01A.blend",
+        "Cabin01B.blend",
+        "Cabin02A.blend",
+        "Cabin02B.blend",
+        "Cabin03A.blend",
+        "Cabin03B.blend",
+        "Cabin04A.blend"
+      ],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_VILLAGE_TEXTURES_ZIP",
+      "role": "village_textures",
+      "blender": "4.2.2",
+      "sourceSha256": "eb24e201513963bbce5d5fca19ea7060a383b5891773321cad1e364f281f8bea",
+      "byteSize": 72051550,
+      "inspectedAt": "2026-08-28T17:11:41Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 135,
+      "extensionCounts": {
+        ".png": 77,
+        ".meta": 57,
+        "[dir]": 1
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 0,
+      "blendNames": [],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_VILLAGE_PROJECT_ZIP",
+      "role": "village_project",
+      "blender": "4.2.2",
+      "sourceSha256": "f6b54526339dcf9ead4e823f1b83d149fadcc60cbc8fad1c85f1487dc6a4a9ce",
+      "byteSize": 92573162,
+      "inspectedAt": "2026-08-28T17:11:41Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 3,
+      "extensionCounts": {
+        "[dir]": 1,
+        ".blend": 1,
+        ".psd": 1
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 1,
+      "blendNames": [
+        "Project File.blend"
+      ],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_VILLAGE_FBX_ZIP",
+      "role": "village_fbx",
+      "blender": "4.2.2",
+      "sourceSha256": "1d5eefbea277aeb9f2dcc546e72eeec5ca364b83468740c6d27285ac50c355ad",
+      "byteSize": 2148090,
+      "inspectedAt": "2026-08-28T17:11:41Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 34,
+      "extensionCounts": {
+        "[dir]": 1,
+        ".fbx": 33
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 0,
+      "blendNames": [],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_FOREST_MODEL_PACKAGE",
+      "role": "forest_nature",
+      "blender": "4.2.2",
+      "sourceSha256": "b974fb8b9539e9c80e7942913c878c13305ec67f63ff0a24569ee67cd5948181",
+      "byteSize": 692830820,
+      "inspectedAt": "2026-08-28T17:11:41Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 204,
+      "extensionCounts": {
+        ".blend": 1,
+        ".fbx": 1,
+        ".mtl": 1,
+        ".obj": 1,
+        "[dir]": 45,
+        ".tga": 155
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 1,
+      "blendNames": [
+        "Stylized_Forest_Nature_Kit.blend"
+      ],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "role": "forest_ecokit",
+      "blender": "4.2.2",
+      "sourceSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+      "byteSize": 669481428,
+      "inspectedAt": "2026-08-28T17:11:42Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 1145,
+      "extensionCounts": {
+        "[dir]": 3,
+        ".png": 1134,
+        ".txt": 1,
+        ".txt~": 1,
+        ".blend": 6
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 6,
+      "blendNames": [
+        "Flora_Mat&GN&Models.blend",
+        "Rock_GN.blend",
+        "Rock_Mat.blend",
+        "Rock_Models.blend",
+        "Swarm.blend",
+        "Water_Mat&GN.blend"
+      ],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_LOUIS_BG_MOUNTAINS_V1",
+      "role": "background_mountains",
+      "blender": "4.2.2",
+      "sourceSha256": "15ad64f9c44f99f199502546884b70df3272b643569a610b9d16291ae708ed67",
+      "byteSize": 536976191,
+      "inspectedAt": "2026-08-28T17:11:42Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 42,
+      "extensionCounts": {
+        ".txt": 1,
+        ".txt~": 1,
+        ".blend": 3,
+        "[dir]": 1,
+        ".jpg": 36
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 3,
+      "blendNames": [
+        "Grassy.blend",
+        "Meadow.blend",
+        "SnowyMountains.blend"
+      ],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_SKY_HDRI_JPG_PACK",
+      "role": "sky_hdri",
+      "blender": "4.2.2",
+      "sourceSha256": "615078f20a9759d16d27ca569cb71b4e212f185ec2953709d0249d14e9c48acf",
+      "byteSize": 943197192,
+      "inspectedAt": "2026-08-28T17:11:43Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 47,
+      "extensionCounts": {
+        "[dir]": 5,
+        ".hdr": 22,
+        ".jpg": 20
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 0,
+      "blendNames": [],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_PHYSICAL_STARLIGHT_1_9_4",
+      "role": "physical_starlight",
+      "blender": "4.2.2",
+      "sourceSha256": "3b865e63e406f485e9054a8ebaded94a117c3fc4cb25a0d30b1d12cb7d993dd2",
+      "byteSize": 33199209,
+      "inspectedAt": "2026-08-28T17:11:43Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 32,
+      "extensionCounts": {
+        ".toml": 1,
+        ".py": 11,
+        ".blend": 3,
+        ".json": 11,
+        ".exr": 2,
+        ".png": 3,
+        ".md": 1
+      },
+      "embeddedScriptCount": 11,
+      "blendCount": 3,
+      "blendNames": [
+        "atmosphere.blend",
+        "GenerateStarmapComposite.blend",
+        "PSA_new_stars.blend"
+      ],
+      "embeddedScripts": [
+        "bake.py",
+        "fog.py",
+        "handlers.py",
+        "helpers.py",
+        "preferences.py",
+        "properties.py",
+        "sunlight.py",
+        "ui.py",
+        "variables.py",
+        "versions.py",
+        "__init__.py"
+      ],
+      "status": "INSPECTED_NOT_ENABLED",
+      "conditioned": false,
+      "reason": "Purchased add-on scripts were inspected and not auto-enabled. Useful baked scene data may be appended from packaged .blend files without running addon.py."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_GAFFER_3_2_10",
+      "role": "gaffer",
+      "blender": "4.2.2",
+      "sourceSha256": "a80aa8e593c64059c2f25ed665b6ab4f158cf37e90ebc1456619c78d8f169449",
+      "byteSize": 214512,
+      "inspectedAt": "2026-08-28T17:11:43Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 35,
+      "extensionCounts": {
+        "[dir]": 3,
+        ".py": 8,
+        ".png": 22,
+        ".blend": 1,
+        ".txt": 1
+      },
+      "embeddedScriptCount": 8,
+      "blendCount": 1,
+      "blendNames": [
+        "number_icons.blend"
+      ],
+      "embeddedScripts": [
+        "addon_updater.py",
+        "addon_updater_ops.py",
+        "constants.py",
+        "functions.py",
+        "operators.py",
+        "resize.py",
+        "ui.py",
+        "__init__.py"
+      ],
+      "status": "INSPECTED_NOT_ENABLED",
+      "conditioned": false,
+      "reason": "Purchased add-on scripts were inspected and not auto-enabled. Useful baked scene data may be appended from packaged .blend files without running addon.py."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_BOTANIQ_GEOSCATTER_BIOMES",
+      "role": "botaniq_geoscatter_biomes",
+      "blender": "4.2.2",
+      "sourceSha256": "637c316d76c13a1bca59bb7b002e200a1917a12b887097d8b202ce8e62eb8360",
+      "byteSize": 5603659,
+      "inspectedAt": "2026-08-28T17:11:43Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 503,
+      "extensionCounts": {
+        "[dir]": 14,
+        ".userhave": 1,
+        ".biome": 66,
+        ".jpg": 66,
+        ".preset": 356
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 0,
+      "blendNames": [],
+      "embeddedScripts": [],
+      "status": "PRESETS_ONLY",
+      "conditioned": false,
+      "reason": "Geo-Scatter biome presets are present; botaniq Full vegetation library is not."
+    },
+    {
+      "schema": "TIVVLEJOY_CONDITIONED_SOURCE_RECEIPT_V1",
+      "sourceId": "SRC_STYLIZED_TAVERN_INTERIOR",
+      "role": "stylized_tavern",
+      "blender": "4.2.2",
+      "sourceSha256": "dca7cf0a25e42739a0424385d92e29a7b7fbe5014a231568cf8cd976b90c52eb",
+      "byteSize": 1883236,
+      "inspectedAt": "2026-08-28T17:11:43Z",
+      "embeddedScriptsAutoExecuted": false,
+      "addonEnabled": false,
+      "licensedBytesCommitted": false,
+      "memberCount": 2,
+      "extensionCounts": {
+        ".blend": 2
+      },
+      "embeddedScriptCount": 0,
+      "blendCount": 2,
+      "blendNames": [
+        "Stylized Tavern Interior.blend",
+        "._Stylized Tavern Interior.blend"
+      ],
+      "embeddedScripts": [],
+      "status": "HASHED_AND_INSPECTED",
+      "conditioned": true,
+      "reason": "Source hashed and listed. Geometry/material append happens in the private world builder."
+    },
+    {
+      "sourceId": "SRC_3DT_MOUNTAIN_PACK",
+      "role": "mountains_3dt",
+      "status": "MISSING",
+      "reason": "source file not present: SRC_3DT_MOUNTAIN_PACK.zip",
+      "conditioned": false
+    },
+    {
+      "sourceId": "SRC_BOTANIQ_FULL",
+      "role": "botaniq_full",
+      "status": "MISSING",
+      "reason": "source file not present: SRC_BOTANIQ_FULL.zip",
+      "conditioned": false
+    }
+  ]
+}

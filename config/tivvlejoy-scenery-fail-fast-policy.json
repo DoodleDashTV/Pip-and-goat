@@ -1,0 +1,78 @@
+{
+  "schema": "TIVVLEJOY_SCENERY_FAIL_FAST_POLICY_V1",
+  "version": 1,
+  "silentFallbacksAllowed": false,
+  "maxIncrementalRepairAttemptsBeforeRootCauseAudit": 2,
+  "requiredSourceStates": [
+    "PURCHASED",
+    "LOCATED",
+    "MATERIALIZED",
+    "OPENED_IN_BLENDER",
+    "MATERIALS_RESOLVED",
+    "TEXTURES_RESOLVED",
+    "PRODUCTION_USABLE"
+  ],
+  "assetDistanceClasses": ["HERO", "MIDGROUND", "BACKGROUND", "REJECT"],
+  "requiredPreAssemblyChecks": [
+    "source_provenance",
+    "hidden_limits",
+    "dependencies",
+    "asset_distance_quality",
+    "component_proofs"
+  ],
+  "requiredComponentProofs": [
+    "vegetation",
+    "ground_meadow",
+    "water_bank",
+    "building",
+    "mountain_background"
+  ],
+  "requiredProductionStages": [
+    "TECHNICALLY_VALID",
+    "VISUALLY_VALIDATED",
+    "TEMPORALLY_VALIDATED",
+    "WORKER_PARITY_VALIDATED",
+    "PRODUCTION_READY"
+  ],
+  "heroFallbackPolicy": "PROHIBITED",
+  "backgroundFallbackPolicy": "EXPLICITLY_DECLARED_ONLY",
+  "paidFinalRequires": [
+    "all_required_sources_production_usable",
+    "zero_undeclared_fallbacks",
+    "zero_hidden_limit_blockers",
+    "dependencies_pass",
+    "component_proofs_pass",
+    "human_visual_approval",
+    "motion_temporal_approval",
+    "worker_parity_pass"
+  ],
+  "runtimeMemoryPreflight": {
+    "schema": "TIVVLEJOY_RUNTIME_MEMORY_PREFLIGHT_V1",
+    "failCode": "RUNTIME_MEMORY_BUDGET_EXCEEDED",
+    "rssFractionBlock": 0.68,
+    "availableFractionRequired": 0.25,
+    "availableAbsFloorBytes": 3221225472,
+    "availableAbsCeilBytes": 8589934592,
+    "blockCyclesWhenExceeded": true
+  },
+  "sourceDependencyAmplification": {
+    "schema": "TJ_MEMORY_SAFE_ASSET_LOADER_V1",
+    "explicitAllImageAppend": false,
+    "imageRatioWarn": 24,
+    "objectRatioWarn": 12,
+    "warningCode": "SOURCE_DEPENDENCY_AMPLIFICATION_WARNING",
+    "blockCode": "SOURCE_DEPENDENCY_AMPLIFICATION_BLOCK"
+  },
+  "degradationReportRequired": true,
+  "degradationReportMustBeEmptyForHeroAssets": true,
+  "workerParityFields": [
+    "source_identity",
+    "blender_version",
+    "render_engine",
+    "shader_identity",
+    "texture_identity",
+    "color_management",
+    "render_profile",
+    "output_profile"
+  ]
+}

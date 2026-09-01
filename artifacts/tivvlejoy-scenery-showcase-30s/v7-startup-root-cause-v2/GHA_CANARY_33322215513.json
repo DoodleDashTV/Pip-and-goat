@@ -1,0 +1,18 @@
+{
+  "schema": "TIVVLEJOY_WORKER_STARTUP_CANARY_V1_GHA_PASS",
+  "runId": 33322215513,
+  "commit": "1c7a2fee84ff9b1340681b738b1d7a4f368b0d8f",
+  "ok": true,
+  "docker": true,
+  "publicPull": true,
+  "nvidiaBanner": true,
+  "nodeStart": true,
+  "blender422": true,
+  "nodeMarker": "NODE_ENTRY_STARTED",
+  "blenderVersionLine": "Blender 4.2.2 LTS",
+  "gpuRequired": false,
+  "nvidiaDriverOnRunner": false,
+  "runpodContacted": false,
+  "paidCreate": 0,
+  "priorFalseNegativeRunId": 33321945159
+}

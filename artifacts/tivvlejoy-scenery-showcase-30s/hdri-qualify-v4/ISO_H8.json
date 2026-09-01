@@ -1,0 +1,97 @@
+{
+  "schema": "TJ_HDRI_QUALIFY_V4",
+  "tag": "ISO_H8",
+  "mode": "isolate",
+  "hdri": "h8",
+  "installed": "/tmp/tj_hdri_diag_8k.jpg",
+  "resolution": [
+    64,
+    64
+  ],
+  "samples": 1,
+  "emptyRss": 261410816,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788095611.9092963,
+    "rss": 262201344,
+    "hwm": 262201344,
+    "memTotal": 16791945216,
+    "memAvailable": 15413141504,
+    "memFree": 10976985088,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 252315860992,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 1,
+    "vertices": 0,
+    "faces": 0
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788095613.908403,
+    "rss": 302850048,
+    "hwm": 1912504320,
+    "memTotal": 16791945216,
+    "memAvailable": 15266406400,
+    "memFree": 10830233600,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 252315852800,
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 2,
+    "vertices": 0,
+    "faces": 0
+  },
+  "hwm": 1912504320,
+  "renderSeconds": 1.998896598815918,
+  "error": null,
+  "png": true,
+  "pngBytes": 4223,
+  "pngPath": "/workspace/artifacts/tivvlejoy-scenery-showcase-30s/hdri-qualify-v4/ISO_H8.png",
+  "images": {
+    "count": 2,
+    "rawBytes": 134217728,
+    "largest": [
+      {
+        "name": "tj_hdri_diag_8k.jpg",
+        "width": 8192,
+        "height": 4096,
+        "channels": 4,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 134217728,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      },
+      {
+        "name": "Render Result",
+        "width": 0,
+        "height": 0,
+        "channels": 0,
+        "packed": false,
+        "isFloat": false,
+        "rawBytes": 0,
+        "users": 1,
+        "referenced": true,
+        "role": "texture"
+      }
+    ]
+  },
+  "counts": {
+    "objects": 1,
+    "meshes": 0,
+    "materials": 0,
+    "images": 2,
+    "vertices": 0,
+    "faces": 0
+  }
+}

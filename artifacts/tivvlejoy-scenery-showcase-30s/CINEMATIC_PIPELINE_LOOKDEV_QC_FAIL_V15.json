@@ -1,0 +1,31 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T19:02:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "cc595eb",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev20",
+  "shots": {
+    "SHOT_01": "FAIL — valley stack holds; river is still a thin blue thread with tan banks.",
+    "SHOT_02": "PARTIAL — first time this is actually a river shot: winding teal channel, cabin on the left bank. Surface is still a flat plane with jagged edges, not water.",
+    "SHOT_03": "PARTIAL — forest frame from earlier passes.",
+    "SHOT_04": "PARTIAL — street holds.",
+    "SHOT_05": "PARTIAL — compression from earlier passes.",
+    "SHOT_06": "PARTIAL — street readable."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "SHOT_02 looks along the channel instead of treating water as a stripe under the cabin"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. SHOT_02 finally has the right subject. The surface still does not read as water. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

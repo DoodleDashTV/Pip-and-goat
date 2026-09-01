@@ -1,0 +1,141 @@
+{
+  "schema": "TJ_CYCLES_SYNC_DECOMPOSE_V3",
+  "tag": "TEST_02",
+  "parts": [
+    "terrain"
+  ],
+  "libMode": "park",
+  "subdiv": "all",
+  "hdriMode": "full",
+  "cycles": {
+    "engine": "CYCLES",
+    "resolution": [
+      64,
+      64
+    ],
+    "device": "CPU",
+    "feature_set": "SUPPORTED",
+    "use_denoising": false,
+    "tile_size": 2048,
+    "use_auto_tile": true,
+    "max_bounces": 12,
+    "transparent_max_bounces": 8,
+    "transmission_bounces": 12,
+    "volume_bounces": 0,
+    "use_adaptive_sampling": true,
+    "use_light_tree": true,
+    "debug_use_spatial_splits": false,
+    "debug_use_compact_bvh": false,
+    "debug_use_hair_bvh": true,
+    "use_camera_cull": false,
+    "use_distance_cull": false,
+    "dicing_rate": 1.0,
+    "max_subdivisions": 12
+  },
+  "emptyRss": 258183168,
+  "before": {
+    "event": "resource_snapshot",
+    "label": "before_cycles",
+    "ts": 1788093254.8331835,
+    "rss": 266719232,
+    "hwm": 266719232,
+    "memTotal": 16791945216,
+    "memAvailable": 15375822848,
+    "memFree": 14807715840,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861823488,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 0,
+    "vertices": 11200,
+    "faces": 10989
+  },
+  "after": {
+    "event": "resource_snapshot",
+    "label": "after_cycles",
+    "ts": 1788093254.9548185,
+    "rss": 331005952,
+    "hwm": 331005952,
+    "memTotal": 16791945216,
+    "memAvailable": 15350181888,
+    "memFree": 14781947904,
+    "swapTotal": 0,
+    "swapFree": 0,
+    "diskTotal": 270436077568,
+    "diskFree": 251861815296,
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 1,
+    "vertices": 11200,
+    "faces": 10989
+  },
+  "hwm": 331005952,
+  "deltaRss": 64286720,
+  "peakFromHwm": 331005952,
+  "error": null,
+  "pngBytes": 7053,
+  "png": true,
+  "images": {
+    "count": 0,
+    "rawBytes": 0,
+    "largest": []
+  },
+  "modifiers": [
+    {
+      "name": "TJ_V7_BankTerrain",
+      "hide_render": false,
+      "baseVerts": 11200,
+      "baseFaces": 10989,
+      "modifiers": [
+        {
+          "type": "SUBSURF",
+          "name": "smooth",
+          "show_viewport": true,
+          "show_render": true,
+          "levels": 1,
+          "render_levels": 1
+        }
+      ]
+    }
+  ],
+  "hiddenMasters": {
+    "hiddenMeshObjects": [],
+    "count": 0
+  },
+  "instances": {
+    "uniqueMeshes": 1,
+    "objects": 2,
+    "shared": [],
+    "singleUser": 1
+  },
+  "beech": null,
+  "evalGeom": {
+    "ok": true,
+    "objects": [
+      {
+        "name": "TJ_V7_BankTerrain",
+        "evalVerts": 44377,
+        "evalFaces": 43956,
+        "baseVerts": 11200
+      }
+    ],
+    "evalVerts": 44377,
+    "evalFaces": 43956,
+    "rssBefore": 266719232,
+    "rssAfter": 275656704,
+    "rssJump": 8937472,
+    "aborted": false
+  },
+  "counts": {
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "images": 1,
+    "vertices": 11200,
+    "faces": 10989
+  }
+}

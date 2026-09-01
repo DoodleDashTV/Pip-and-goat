@@ -1,0 +1,115 @@
+{
+  "schema": "TIVVLEJOY_V7_STARTUP_PROOF_V1",
+  "brokenNodeE": {
+    "bashCStatus": 2,
+    "bashCStderr": "bash: -c: line 1: syntax error near unexpected token `('\nbash: -c: line 1: `node -e (async()=>{console.log(JSON.stringify({event:'IMAGE_PROCESS_STARTED'}));console.log(JSON.stringify({event:'NODE_ENTRY_STARTED'}));const r2=require('/opt/ddp",
+    "tokenCount": 6,
+    "argvStatus": 1,
+    "argvStderr": "[eval]:1\n(async()=>{console.log(JSON.stringify({event:'IMAGE_PROCESS_STARTED'}));console.log(JSON.stringify({event:'NODE_ENTRY_STARTED'}));const\n                                                                                               ",
+    "bashSyntaxError": true,
+    "argvTruncated": true
+  },
+  "fileShapedArgs": {
+    "status": 0,
+    "hasImageProcess": true
+  },
+  "pid1": {
+    "status": 0,
+    "stdout": [
+      "{\"event\":\"BOOTSTRAP_ENTERED\",\"pid\":25450,\"argv\":\"node -e console.log(JSON.stringify({event:'CHILD'}))\"}",
+      "{\"event\":\"NODE_AVAILABLE\",\"version\":\"v22.14.0\"}",
+      "{\"event\":\"CHILD\"}"
+    ]
+  },
+  "seconds": 180,
+  "threeRuns": [
+    {
+      "run": 1,
+      "ready": true,
+      "healthOk": true,
+      "stayedAliveSeconds": 180.3,
+      "exitAfterTerminate": 0,
+      "markers": [
+        "{\"ts\":\"2026-08-30T22:10:00.218Z\",\"event\":\"IMAGE_PROCESS_STARTED\"}",
+        "{\"ts\":\"2026-08-30T22:10:00.220Z\",\"event\":\"NODE_ENTRY_STARTED\",\"argv0\":\"/workspace/workers/runpod-blender/src/v7-proof-a-boot.js\",\"version\":\"v22.14.0\"}",
+        "{\"ts\":\"2026-08-30T22:10:00.220Z\",\"event\":\"WORKER_MODULE_LOADED\",\"proof\":true,\"r2Skipped\":true,\"blenderSkipped\":true}",
+        "{\"ts\":\"2026-08-30T22:10:00.226Z\",\"event\":\"WORKER_LISTENING\",\"port\":18081,\"bind\":\"127.0.0.1\"}",
+        "{\"ts\":\"2026-08-30T22:10:00.226Z\",\"event\":\"WORKER_READY\",\"seconds\":210}",
+        "{\"ts\":\"2026-08-30T22:10:15.241Z\",\"event\":\"HEARTBEAT\",\"beat\":1,\"uptimeMs\":15015}",
+        "{\"ts\":\"2026-08-30T22:10:30.242Z\",\"event\":\"HEARTBEAT\",\"beat\":2,\"uptimeMs\":30016}",
+        "{\"ts\":\"2026-08-30T22:10:45.258Z\",\"event\":\"HEARTBEAT\",\"beat\":3,\"uptimeMs\":45032}",
+        "{\"ts\":\"2026-08-30T22:11:00.258Z\",\"event\":\"HEARTBEAT\",\"beat\":4,\"uptimeMs\":60032}",
+        "{\"ts\":\"2026-08-30T22:11:15.274Z\",\"event\":\"HEARTBEAT\",\"beat\":5,\"uptimeMs\":75048}",
+        "{\"ts\":\"2026-08-30T22:11:30.273Z\",\"event\":\"HEARTBEAT\",\"beat\":6,\"uptimeMs\":90047}",
+        "{\"ts\":\"2026-08-30T22:11:45.289Z\",\"event\":\"HEARTBEAT\",\"beat\":7,\"uptimeMs\":105063}",
+        "{\"ts\":\"2026-08-30T22:12:00.290Z\",\"event\":\"HEARTBEAT\",\"beat\":8,\"uptimeMs\":120063}",
+        "{\"ts\":\"2026-08-30T22:12:15.304Z\",\"event\":\"HEARTBEAT\",\"beat\":9,\"uptimeMs\":135078}",
+        "{\"ts\":\"2026-08-30T22:12:30.305Z\",\"event\":\"HEARTBEAT\",\"beat\":10,\"uptimeMs\":150079}",
+        "{\"ts\":\"2026-08-30T22:12:45.320Z\",\"event\":\"HEARTBEAT\",\"beat\":11,\"uptimeMs\":165093}",
+        "{\"ts\":\"2026-08-30T22:13:00.319Z\",\"event\":\"HEARTBEAT\",\"beat\":12,\"uptimeMs\":180093}"
+      ],
+      "blenderInvoked": false,
+      "r2Invoked": false
+    },
+    {
+      "run": 2,
+      "ready": true,
+      "healthOk": true,
+      "stayedAliveSeconds": 180.2,
+      "exitAfterTerminate": 0,
+      "markers": [
+        "{\"ts\":\"2026-08-30T22:13:00.486Z\",\"event\":\"IMAGE_PROCESS_STARTED\"}",
+        "{\"ts\":\"2026-08-30T22:13:00.487Z\",\"event\":\"NODE_ENTRY_STARTED\",\"argv0\":\"/workspace/workers/runpod-blender/src/v7-proof-a-boot.js\",\"version\":\"v22.14.0\"}",
+        "{\"ts\":\"2026-08-30T22:13:00.487Z\",\"event\":\"WORKER_MODULE_LOADED\",\"proof\":true,\"r2Skipped\":true,\"blenderSkipped\":true}",
+        "{\"ts\":\"2026-08-30T22:13:00.492Z\",\"event\":\"WORKER_LISTENING\",\"port\":18082,\"bind\":\"127.0.0.1\"}",
+        "{\"ts\":\"2026-08-30T22:13:00.492Z\",\"event\":\"WORKER_READY\",\"seconds\":210}",
+        "{\"ts\":\"2026-08-30T22:13:15.508Z\",\"event\":\"HEARTBEAT\",\"beat\":1,\"uptimeMs\":15015}",
+        "{\"ts\":\"2026-08-30T22:13:30.508Z\",\"event\":\"HEARTBEAT\",\"beat\":2,\"uptimeMs\":30015}",
+        "{\"ts\":\"2026-08-30T22:13:45.508Z\",\"event\":\"HEARTBEAT\",\"beat\":3,\"uptimeMs\":45016}",
+        "{\"ts\":\"2026-08-30T22:14:00.523Z\",\"event\":\"HEARTBEAT\",\"beat\":4,\"uptimeMs\":60031}",
+        "{\"ts\":\"2026-08-30T22:14:15.539Z\",\"event\":\"HEARTBEAT\",\"beat\":5,\"uptimeMs\":75047}",
+        "{\"ts\":\"2026-08-30T22:14:30.539Z\",\"event\":\"HEARTBEAT\",\"beat\":6,\"uptimeMs\":90046}",
+        "{\"ts\":\"2026-08-30T22:14:45.553Z\",\"event\":\"HEARTBEAT\",\"beat\":7,\"uptimeMs\":105061}",
+        "{\"ts\":\"2026-08-30T22:15:00.554Z\",\"event\":\"HEARTBEAT\",\"beat\":8,\"uptimeMs\":120062}",
+        "{\"ts\":\"2026-08-30T22:15:15.570Z\",\"event\":\"HEARTBEAT\",\"beat\":9,\"uptimeMs\":135077}",
+        "{\"ts\":\"2026-08-30T22:15:30.569Z\",\"event\":\"HEARTBEAT\",\"beat\":10,\"uptimeMs\":150077}",
+        "{\"ts\":\"2026-08-30T22:15:45.584Z\",\"event\":\"HEARTBEAT\",\"beat\":11,\"uptimeMs\":165092}",
+        "{\"ts\":\"2026-08-30T22:16:00.584Z\",\"event\":\"HEARTBEAT\",\"beat\":12,\"uptimeMs\":180092}"
+      ],
+      "blenderInvoked": false,
+      "r2Invoked": false
+    },
+    {
+      "run": 3,
+      "ready": true,
+      "healthOk": true,
+      "stayedAliveSeconds": 180.2,
+      "exitAfterTerminate": 0,
+      "markers": [
+        "{\"ts\":\"2026-08-30T22:16:00.730Z\",\"event\":\"IMAGE_PROCESS_STARTED\"}",
+        "{\"ts\":\"2026-08-30T22:16:00.732Z\",\"event\":\"NODE_ENTRY_STARTED\",\"argv0\":\"/workspace/workers/runpod-blender/src/v7-proof-a-boot.js\",\"version\":\"v22.14.0\"}",
+        "{\"ts\":\"2026-08-30T22:16:00.732Z\",\"event\":\"WORKER_MODULE_LOADED\",\"proof\":true,\"r2Skipped\":true,\"blenderSkipped\":true}",
+        "{\"ts\":\"2026-08-30T22:16:00.737Z\",\"event\":\"WORKER_LISTENING\",\"port\":18083,\"bind\":\"127.0.0.1\"}",
+        "{\"ts\":\"2026-08-30T22:16:00.737Z\",\"event\":\"WORKER_READY\",\"seconds\":210}",
+        "{\"ts\":\"2026-08-30T22:16:15.752Z\",\"event\":\"HEARTBEAT\",\"beat\":1,\"uptimeMs\":15015}",
+        "{\"ts\":\"2026-08-30T22:16:30.752Z\",\"event\":\"HEARTBEAT\",\"beat\":2,\"uptimeMs\":30015}",
+        "{\"ts\":\"2026-08-30T22:16:45.768Z\",\"event\":\"HEARTBEAT\",\"beat\":3,\"uptimeMs\":45031}",
+        "{\"ts\":\"2026-08-30T22:17:00.768Z\",\"event\":\"HEARTBEAT\",\"beat\":4,\"uptimeMs\":60031}",
+        "{\"ts\":\"2026-08-30T22:17:15.784Z\",\"event\":\"HEARTBEAT\",\"beat\":5,\"uptimeMs\":75047}",
+        "{\"ts\":\"2026-08-30T22:17:30.784Z\",\"event\":\"HEARTBEAT\",\"beat\":6,\"uptimeMs\":90047}",
+        "{\"ts\":\"2026-08-30T22:17:45.798Z\",\"event\":\"HEARTBEAT\",\"beat\":7,\"uptimeMs\":105061}",
+        "{\"ts\":\"2026-08-30T22:18:00.798Z\",\"event\":\"HEARTBEAT\",\"beat\":8,\"uptimeMs\":120061}",
+        "{\"ts\":\"2026-08-30T22:18:15.814Z\",\"event\":\"HEARTBEAT\",\"beat\":9,\"uptimeMs\":135077}",
+        "{\"ts\":\"2026-08-30T22:18:30.814Z\",\"event\":\"HEARTBEAT\",\"beat\":10,\"uptimeMs\":150077}",
+        "{\"ts\":\"2026-08-30T22:18:45.828Z\",\"event\":\"HEARTBEAT\",\"beat\":11,\"uptimeMs\":165091}",
+        "{\"ts\":\"2026-08-30T22:19:00.828Z\",\"event\":\"HEARTBEAT\",\"beat\":12,\"uptimeMs\":180091}"
+      ],
+      "blenderInvoked": false,
+      "r2Invoked": false
+    }
+  ],
+  "blenderInvoked": false,
+  "r2Invoked": false,
+  "runpodCreate": 0,
+  "ok": true
+}

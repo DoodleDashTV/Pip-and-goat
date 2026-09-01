@@ -1,0 +1,61 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_IMAGE_BUILD_AND_VISUAL_PROOF_PREFLIGHT_V1_RESULT",
+  "status": "V7_FINAL_SCENE_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION",
+  "authorization": "TIVVLEJOY_V7_FINAL_IMAGE_BUILD_AND_VISUAL_PROOF_PREFLIGHT_V1",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "startingSha": "59547b7d6628a4c7fc3fbf93c78f5d5932e3be35",
+  "contentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
+  "historicalAncestors": [
+    "f833d3dfcfaa7e97d5254bbe6b3b1b02f64fce01",
+    "d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c"
+  ],
+  "workflowCommit": "577cafe897c122c6b6bf85f03c0b2e6b24e79665",
+  "finalSha": "ed072f30f48e3b7b64ebc69229d0bd0255c04c1f",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "paidCreate": 0,
+  "runpodSpendUsd": 0,
+  "livePods": [],
+  "runpodContacted": false,
+  "image": {
+    "status": "PUBLISHED_IMMUTABLE_DIGEST",
+    "digest": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+    "platform": "linux/amd64",
+    "Entrypoint": ["/opt/nvidia/nvidia_entrypoint.sh"],
+    "Cmd": ["node", "./src/scenery-showcase-original14-entry.js"],
+    "WorkingDir": "/opt/ddp-worker",
+    "blenderVersion": "4.2.2",
+    "sourceCommit": "577cafe897c122c6b6bf85f03c0b2e6b24e79665",
+    "requiredContentAncestor": "d5654510599f5b42919a949c5c4503c5ec1442f1",
+    "scriptsRoot": "/opt/ddp-worker/blender/scenery",
+    "checkpointModule": true,
+    "visualProofModule": true
+  },
+  "gates": {
+    "E": "BLOCKED_PENDING_PAID_PIXEL_PROOF",
+    "F": "BLOCKED_PENDING_PAID_PIXEL_PROOF",
+    "J": "BLOCKED_PENDING_PAID_PIXEL_PROOF",
+    "pixelSuiteRun": false
+  },
+  "stagedAuthorizationName": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V1",
+  "stagedAuthorizationCreated": false,
+  "stagedAuthorizationIssuableNow": true,
+  "visualProof": {
+    "jobKind": "VISUAL_PROOF",
+    "preview": "540x960 Cycles 32 denoise ON six isolated shots",
+    "hero": "SHOT_02 frame 210 1080x1920 Cycles 256 denoise ON",
+    "cameraC": [2.2, -21.4, 3.4],
+    "waterVariant": "D",
+    "hardSpendUsd": 0.5,
+    "hardRuntimeMinutes": 40,
+    "createCount": 1,
+    "retry": false
+  },
+  "V7_FINAL_SCENE_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION": "YES",
+  "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true
+}

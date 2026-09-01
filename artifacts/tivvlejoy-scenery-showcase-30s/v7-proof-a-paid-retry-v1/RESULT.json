@@ -1,0 +1,35 @@
+{
+  "schema": "TIVVLEJOY_V7_PAID_PROOF_A_RETRY_AUTHORIZATION_V1_RESULT",
+  "status": "V7_PROOF_A_PAID_EXECUTION_FAILED",
+  "authorization": "TIVVLEJOY_V7_PAID_PROOF_A_RETRY_AUTHORIZATION_V1",
+  "podId": "0msnqqdigglatj",
+  "createPerformed": 1,
+  "stage": "CONTAINER_STARTED",
+  "statusPayload": null,
+  "receipt": null,
+  "markers": null,
+  "spend": {
+    "runtimeSeconds": 282.6,
+    "actualUsd": 0.0581,
+    "rateUsdPerHr": 0.74
+  },
+  "cleanup": {
+    "podTerminated": true,
+    "livePods": []
+  },
+  "finalVideoAuthorized": false,
+  "retryAuthorized": false,
+  "at": "2026-08-30T21:23:51.178972+00:00",
+  "error": "RuntimeError:WORKER_MARKER_TIMEOUT",
+  "blocker": "WORKER_MARKER_TIMEOUT",
+  "startingBranch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "requiredStartingSha": "47e1e2b11ff16b23ea34cc9b55e5e165036d865b",
+  "launchSha": "6db7be2ca4bf006dd7735e9fb09a7c313c9673f1",
+  "nodeStarted": false,
+  "r2Started": false,
+  "blenderStarted": false,
+  "cyclesStarted": false,
+  "renderingStarted": false,
+  "pngWritten": false,
+  "finalVideoAuthorized": false
+}

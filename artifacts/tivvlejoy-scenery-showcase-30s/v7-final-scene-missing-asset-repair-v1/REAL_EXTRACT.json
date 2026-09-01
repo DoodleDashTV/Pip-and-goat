@@ -1,0 +1,36 @@
+{
+  "schema": "TIVVLEJOY_V7_REQUIRED_LIBRARY_REAL_EXTRACT_V1",
+  "paidCreate": 0,
+  "runpodSpendUsd": 0,
+  "runpodContacted": false,
+  "ecokitZipSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+  "ecokitZipBytes": 669481428,
+  "ecokitZipShaMatch": true,
+  "extractRoot": "/tmp/v4-preflight-extract",
+  "libraries": [
+    {
+      "name": "Flora_Mat&GN&Models.blend",
+      "archive": "Stylised EcoKit.zip",
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "member": "Stylised EcoKit/Flora_Mat&GN&Models.blend",
+      "destination": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend",
+      "bytes": 669989781,
+      "compressSize": 180314388,
+      "sha256": "ce663a3e7b70b566d05092c6d86a94d727dbb5232068369de002ada4c1124589",
+      "status": "OK",
+      "exceedsLegacy180MiBCap": true
+    },
+    {
+      "name": "Rock_Models.blend",
+      "archive": "Stylised EcoKit.zip",
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "member": "Stylised EcoKit/Rock_Models.blend",
+      "destination": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/Rock_Models.blend",
+      "bytes": 258365184,
+      "compressSize": 75406740,
+      "sha256": "ea72ac8e65b278c8bfc351d55efa6d8aef2eeec13068cec42cf79db1f23f592c",
+      "status": "OK",
+      "exceedsLegacy180MiBCap": true
+    }
+  ]
+}

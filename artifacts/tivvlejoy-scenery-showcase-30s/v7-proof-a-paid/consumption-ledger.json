@@ -1,0 +1,8 @@
+{
+  "schema": "TIVVLEJOY_V7_PROOF_A_CONSUMPTION_LEDGER_V1",
+  "authorization": "TIVVLEJOY_V7_LARGER_MEMORY_PAID_PROOF_A_EXECUTION_V1",
+  "paidCreateAllowance": 1,
+  "createPerformed": 1,
+  "consumedAt": "2026-08-30T15:29:05.791319+00:00",
+  "podName": "tj-v7-proof-a-lm-v1"
+}

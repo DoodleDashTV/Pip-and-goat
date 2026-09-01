@@ -1,0 +1,60 @@
+name: TivvleJoy Scenery Paid V4 Contract Check
+
+on:
+  push:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - '.github/workflows/tivvlejoy-scenery-showcase-paid-render-v4.yml'
+      - '.github/workflows/tivvlejoy-scenery-paid-v4-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Validate paid V4 workflow is fail-closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          f=Path('.github/workflows/tivvlejoy-scenery-showcase-paid-render-v4.yml')
+          auth=Path('artifacts/tivvlejoy-scenery-showcase-30s/PAID_AUTHORIZATION_V4.json')
+          text=f.read_text()
+          required=[
+            str(auth),
+            'TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V4',
+            'nasqriytzc',
+            'sha256:1bef7ad588e74f6a59ef1a8e0ebcebc67cb94e75868d930a57fa8f07d30f44a6',
+            'scenery-showcase-30s-v4-20260828',
+            'RUNPOD_REST_TEMPLATE',
+            'One authorized REST template CREATE',
+            'Always terminate exact V4 showcase pod',
+            "assert int(p.get('createRequests')) == 1",
+            "assert p.get('retryCreate') is False",
+            "assert int(p.get('requiredRoleCount')) == 10",
+            "assert p.get('commercialAssetsPublished') is False",
+            "assert p.get('billingCleanupConfirmed') is True",
+            "assert int(p.get('remainingActiveExactName') or 0) == 0",
+          ]
+          for needle in required: assert needle in text, needle
+          assert text.count('{"action":"launch"}') == 1, text.count('{"action":"launch"}')
+          start=text.index('- name: One authorized REST template CREATE')
+          end=text.index('- name: Watch provisioning worker Blender and render status')
+          launch=text[start:end]
+          assert '--retry' not in launch, 'Launch POST must never retry'
+          on_block=text[text.index('\non:\n'):text.index('\npermissions:\n')]
+          assert 'workflow_dispatch' not in on_block
+          assert 'schedule:' not in on_block
+          assert not auth.exists(), 'V4 authorization unexpectedly exists'
+          print('TIVVLEJOY_SCENERY_PAID_V4_CONTRACT_PASS: no paid mutation performed')
+          PY

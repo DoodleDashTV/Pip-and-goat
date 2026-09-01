@@ -1,0 +1,53 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2_RESULT",
+  "status": "FAILED_AFTER_CREATE",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2",
+  "digest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+  "failedDigestNotLaunched": "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+  "paidCreate": 1,
+  "runpodSpendUsd": 0.0288,
+  "hourlyRateUsd": 0.74,
+  "runtimeSeconds": 140.3,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "podId": "zq4lfe0xyknzc7",
+  "podName": "tj-v7-fsvp-2",
+  "jobId": "v7-final-visual-proof-v2",
+  "workerStatus": {
+    "status": "FAILED",
+    "stage": "HOST_AND_LAUNCH_CONTRACT",
+    "code": "FINAL_HOST_CONTRACT_FAILED",
+    "message": "VRAM_BELOW_24GIB"
+  },
+  "camerasRendered": [],
+  "cameraC": {
+    "required": "TJ_SHOT_02_CAM",
+    "frame210Rendered": false,
+    "v3CompAUsed": false
+  },
+  "proofImages": [],
+  "pixelSuiteRun": false,
+  "gates": {
+    "E": "NOT_RUN",
+    "F": "NOT_RUN",
+    "J": "NOT_RUN",
+    "reason": "No stills. Worker failed host VRAM contract before Blender."
+  },
+  "cleanup": {
+    "confirmed": true,
+    "livePods": []
+  },
+  "retry": false,
+  "secondCreate": false,
+  "encode900": false,
+  "merged": false,
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "V7_FINAL_SCENE_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION": "NO",
+  "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true
+}

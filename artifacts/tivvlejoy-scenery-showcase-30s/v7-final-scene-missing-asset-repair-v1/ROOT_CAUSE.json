@@ -1,0 +1,75 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_MISSING_ASSET_ROOT_CAUSE_V1",
+  "paidCreate": 0,
+  "runpodSpendUsd": 0,
+  "livePods": [],
+  "v3Pod": "kthjs7wmtootc3",
+  "v3Digest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "v3DigestIneligible": true,
+  "v3AuthorizationReused": false,
+  "rootCause": {
+    "id": "PRODUCTION_180_MIB_BLEND_EXTRACT_CAP",
+    "file": "scripts/blender/scenery/showcase_original14_select.py",
+    "function": "should_extract_member",
+    "lines": "440-463",
+    "evidence": "MAX_EXTRACT_BYTES['.blend'] = 180 * 1024 * 1024. Production intake (default) returns False when size > cap. V3 expand_asset never passed intake='lookdev'. Flora documented 670 MiB and Rock 258365184 both exceed the cap, so extract_selected never wrote them. require_files then raised inside already-started Blender."
+  },
+  "perFile": {
+    "Flora_Mat&GN&Models.blend": {
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "role": "forest_ecokit",
+      "archive": "Stylised EcoKit.zip",
+      "archiveSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+      "archiveBytes": 669481428,
+      "member": "Stylised EcoKit/Flora_Mat&GN&Models.blend",
+      "documentedBytes": 669989781,
+      "skipDecision": "should_extract_member returned False because 670 MiB > 180 MiB production .blend cap",
+      "not": [
+        "case mismatch of the required basename",
+        "download failure after MATERIALIZE_ORIGINAL_14",
+        "async extract finishing after Blender",
+        "cleanup deleting the files",
+        "role_limit 24 dropping .blend files (blends sort ahead of pngs)"
+      ]
+    },
+    "Rock_Models.blend": {
+      "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+      "role": "forest_ecokit",
+      "archive": "Stylised EcoKit.zip",
+      "archiveSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+      "member": "Stylised EcoKit/Rock_Models.blend",
+      "documentedBytes": 258365184,
+      "sourceStagePath": "/tmp/o14-v4-source/SRC_FOREST_STYLISED_ECOKIT/Stylised EcoKit/Rock_Models.blend",
+      "skipDecision": "should_extract_member returned False because 246.4 MiB > 180 MiB production .blend cap",
+      "not": [
+        "case mismatch of the required basename",
+        "download failure after MATERIALIZE_ORIGINAL_14",
+        "async extract finishing after Blender",
+        "cleanup deleting the files",
+        "role_limit 24 dropping .blend files (blends sort ahead of pngs)"
+      ]
+    }
+  },
+  "v3Failure": {
+    "code": "BLENDER_FAILED",
+    "message": "required files missing: Flora_Mat&GN&Models.blend, Rock_Models.blend",
+    "blender": "cinematic_valley_world_v1.py main() line 4023 require_files",
+    "resolver": "runtime_roots_v1.py require_files line 119",
+    "hostAndLaunchContract": "PASS",
+    "vramGate": "PASS_DO_NOT_REOPEN"
+  },
+  "hypothesesRuledOut": {
+    "historical180MibCap": "CONFIRMED_ROOT_CAUSE",
+    "replacementCap": "same 180 MiB cap still present for unknown .blend files",
+    "zipStreamingTruncation": "no extract occurred; files were never opened",
+    "nestedDirectoryFlattening": "member paths keep Stylised EcoKit/ prefix; require_files searches by basename",
+    "basenameCollisions": "unique purchased names",
+    "caseSensitiveMismatch": "zip and require_files use Flora_Mat&GN&Models.blend and Rock_Models.blend",
+    "allowlistMismatch": "lookdev already allowlisted these members; production did not use lookdev intake",
+    "diskSpaceOrTimeout": "Blender started and failed in ~7s on require_files",
+    "asyncExtractAfterBlender": "extract is synchronous inside expand_asset before require_files",
+    "cleanupBeforeBlender": "V3 reached VISUAL_PROOF_RENDER; files were never extracted so cleanup did not delete them",
+    "silentSkip": "CONFIRMED: should_extract_member returns False with no error",
+    "roleLimit24": "secondary risk after the cap is lifted; force-include now keeps required members"
+  }
+}

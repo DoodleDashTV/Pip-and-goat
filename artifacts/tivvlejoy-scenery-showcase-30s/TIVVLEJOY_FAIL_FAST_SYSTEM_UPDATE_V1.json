@@ -1,0 +1,40 @@
+{
+  "schema": "TIVVLEJOY_FAIL_FAST_SYSTEM_UPDATE_V1",
+  "status": "INSTALLED_FAIL_CLOSED",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "policy": "config/tivvlejoy-scenery-fail-fast-policy.json",
+  "guardrailModule": "scripts/blender/scenery/pipeline_guardrails.py",
+  "guardrailTests": "scripts/blender/scenery/pipeline_guardrails_test.py",
+  "cloudGuardrail": "scripts/cloud/scenery-showcase-30s/quality-guardrails.ts",
+  "paidPreflight": "scripts/cloud/scenery-showcase-30s/preflight.ts",
+  "ciWorkflow": ".github/workflows/tivvlejoy-scenery-fail-fast-guardrails.yml",
+  "standard": "docs/tivvlejoy-scenery-fail-fast-standard.md",
+  "rules": {
+    "silentHeroFallbacks": "PROHIBITED",
+    "backgroundFallbacks": "DECLARED_AND_APPROVED_ONLY",
+    "rootCauseAuditAfterFailedIncrementalAttempts": 2,
+    "sourceLifecycle": [
+      "PURCHASED",
+      "LOCATED",
+      "MATERIALIZED",
+      "OPENED_IN_BLENDER",
+      "MATERIALS_RESOLVED",
+      "TEXTURES_RESOLVED",
+      "PRODUCTION_USABLE"
+    ],
+    "assetDistanceClasses": ["HERO", "MIDGROUND", "BACKGROUND", "REJECT"],
+    "requiredComponentProofs": ["vegetation", "ground_meadow", "water_bank", "building", "mountain_background"],
+    "productionStages": ["TECHNICALLY_VALID", "VISUALLY_VALIDATED", "TEMPORALLY_VALIDATED", "WORKER_PARITY_VALIDATED", "PRODUCTION_READY"]
+  },
+  "paidFinal": {
+    "readinessReceipt": "artifacts/tivvlejoy-scenery-showcase-30s/PRODUCTION_READINESS_V1.json",
+    "missingReceiptBehavior": "BLOCK",
+    "invalidReceiptBehavior": "BLOCK",
+    "explicitAuthorizationStillRequired": true
+  },
+  "paidMutationPerformed": false,
+  "runpodCreateCount": 0,
+  "runpodSpendUsd": 0,
+  "pr": 169,
+  "prMustRemain": "OPEN_DRAFT_UNMERGED_NOT_READY"
+}

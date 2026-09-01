@@ -1,0 +1,105 @@
+{
+  "sources": [
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/deciduous/bq_Tree_Salix-babylonica_C_summer.blend",
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/deciduous/bq_Tree_Fagus-sylvatica_C_summer.blend",
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/shrubs/bq_Shrub_Corylus-avellana_C_spring-summer.blend",
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/plants/bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn.blend",
+    "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/grass/bq_Grass_Carex-oshimensis_B_spring.blend"
+  ],
+  "planted": [
+    {
+      "role": "hero_tree",
+      "source": "bq_Tree_Salix-babylonica_C_summer.blend",
+      "name": "bq_Tree_Salix-babylonica_C_summer",
+      "verts": 512208,
+      "faces": 192066,
+      "dims": [
+        5.341,
+        4.451,
+        7.2
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Bark_Salix-babylonica",
+        "bq_Leaf_Salix-babylonica"
+      ],
+      "modifiers": []
+    },
+    {
+      "role": "support_tree",
+      "source": "bq_Tree_Fagus-sylvatica_C_summer.blend",
+      "name": "bq_Tree_Fagus-sylvatica_C_summer",
+      "verts": 257893,
+      "faces": 230951,
+      "dims": [
+        6.416,
+        6.491,
+        5.2
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Bark_Fagus-sylvatica",
+        "bq_Leaf_Fagus-sylvatica"
+      ],
+      "modifiers": []
+    },
+    {
+      "role": "shrub_fern",
+      "source": "bq_Shrub_Corylus-avellana_C_spring-summer.blend",
+      "name": "bq_Shrub_Corylus-avellana_C_spring-summer",
+      "verts": 141461,
+      "faces": 103445,
+      "dims": [
+        1.889,
+        1.53,
+        1.35
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Bark_Corylus-avellana",
+        "bq_Leaf_Corylus-avellana"
+      ],
+      "modifiers": []
+    },
+    {
+      "role": "grass",
+      "source": "bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn.blend",
+      "name": "bq_Plant_Dryopteris-carthusiana_D_spring-summer-autumn",
+      "verts": 19635,
+      "faces": 11991,
+      "dims": [
+        1.378,
+        1.676,
+        0.7
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Leaf_Fern",
+        "bq_Stem_Fern"
+      ],
+      "modifiers": []
+    },
+    {
+      "role": "ground_cover",
+      "source": "bq_Grass_Carex-oshimensis_B_spring.blend",
+      "name": "bq_Grass_Carex-oshimensis_B_spring",
+      "verts": 183753,
+      "faces": 120100,
+      "dims": [
+        1.341,
+        1.315,
+        0.28
+      ],
+      "thinCardLikely": false,
+      "materials": [
+        "bq_Grass_Carex-oshimensis"
+      ],
+      "modifiers": []
+    }
+  ],
+  "cardsVisibleLikely": false,
+  "cardNames": [],
+  "still": "/workspace/artifacts/tivvlejoy-scenery-showcase-30s/cinematic-asset-recovery-v4/vegetation/VEGETATION_QUALITY_CROP.png",
+  "foregroundSuitable": true,
+  "status": "VEGETATION_SOURCE_BLOCKER_RESOLVED"
+}

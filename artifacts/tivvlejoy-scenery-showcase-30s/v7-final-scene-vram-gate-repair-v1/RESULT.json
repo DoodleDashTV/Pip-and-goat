@@ -1,0 +1,46 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VRAM_GATE_ROOT_CAUSE_AND_RETRY_PREFLIGHT_V1_RESULT",
+  "definitiveRootCause": "A",
+  "definitiveRootCauseDetail": "Image-embedded exact 24 GiB floor (24576 MiB) rejected a normal RTX 4090 class. Documented nvidia-smi total is 24564 MiB. Assigned nvidia-smi values were not captured from pod zq4lfe0xyknzc7.",
+  "failedRun": {
+    "requestedGpuSku": "NVIDIA GeForce RTX 4090",
+    "assignedGpuName": "NOT_CAPTURED",
+    "rawMemoryTotal": "NOT_CAPTURED",
+    "rawMemoryFree": "NOT_QUERIED",
+    "documentedClassMemoryTotalMib": 24564,
+    "documentedClassGiB": 23.98828125,
+    "documentedClassDecimalGb": 25.760577024,
+    "configuredMinimumMiBBefore": 24576,
+    "comparisonBefore": "Number(vramMiB) < 24576",
+    "responsibleFile": "workers/runpod-blender/src/final-launch-contract-v1.js",
+    "responsibleFunction": "assertHostResources",
+    "responsibleLineOnFailedImage": 118,
+    "workerStatus": {
+      "code": "FINAL_HOST_CONTRACT_FAILED",
+      "message": "VRAM_BELOW_24GIB"
+    }
+  },
+  "gateAfter": {
+    "requiredVramMib": 24500,
+    "comparison": "vramTotalMiB < REQUIRED_VRAM_MIB",
+    "gpuIdentity": "/rtx\\s*4090/i fail-closed",
+    "safetyMarginBelowDocumented4090Mib": 64,
+    "marginAbove20GiBMib": 4020
+  },
+  "imageDecision": "IMAGE_EMBEDDED_REBUILT",
+  "ineligibleDigests": [
+    "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+    "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+  ],
+  "validImmutableDigest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "imageSourceCommit": "e5e4d36323e65dfc32963d0c5c357d3c32bafc46",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "paidCreate": 0,
+  "runpodCreateContacted": false,
+  "livePods": [],
+  "pr169": "OPEN / DRAFT / UNMERGED / NOT READY",
+  "v3PaidVisualProofAuthorizationSafelyIssuable": true,
+  "v3AuthorizationIssued": false,
+  "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true
+}

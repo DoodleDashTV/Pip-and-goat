@@ -1,0 +1,33 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_VISUAL_GATE_V1",
+  "result": "FAIL",
+  "inspectedAt": "2026-08-28T18:55:00Z",
+  "profile": "LOOKDEV_FAST",
+  "engine": "CYCLES_CPU",
+  "resolution": "540x960",
+  "samples": 16,
+  "commit": "fe6efa3",
+  "stillsDir": "/tmp/o14-lookdev/cinematic-lookdev18",
+  "shots": {
+    "SHOT_01": "FAIL — white-road regression is gone. River is a narrow flat blue ribbon again.",
+    "SHOT_02": "FAIL — cabin discovery holds; water is a bluish-grey strip, not a stream.",
+    "SHOT_03": "PARTIAL — forest frame from earlier passes.",
+    "SHOT_04": "PARTIAL — street (cabins, cart, fence, ridge). Blue strip at the bottom.",
+    "SHOT_05": "PARTIAL — compression holds.",
+    "SHOT_06": "PARTIAL — street readable."
+  },
+  "automaticFailuresHit": [
+    "river_reads_as_road_path_or_blue_tape",
+    "excessive_noise"
+  ],
+  "whatMoved": [
+    "Metallic white-road river is gone",
+    "SHOT_04 street remains clear",
+    "Paid CREATE refused after inspect"
+  ],
+  "greenCI": "not_a_visual_pass",
+  "paidRenderAuthorized": false,
+  "createPerformed": false,
+  "finishedVideoExists": false,
+  "honestConclusion": "Not a visual pass. Timer inspect showed 0 pods and a stale rejected-pin bridge. Do not CREATE. Do not return TIVVLEJOY_PURCHASED_SCENERY_30S_FINAL_RESULT."
+}

@@ -1,0 +1,52 @@
+TIVVLEJOY_V7_FINAL_VIDEO_RENDER_AUTHORIZATION_V1
+
+DO NOT ISSUE THIS AUTHORIZATION YET.
+Issuable only after the blockers in BLOCKERS.json are cleared and an immutable
+cinematic FINAL worker digest is published and pinned.
+
+I authorize exactly one paid RunPod CREATE for the TivvleJoy V7 final 30-second
+cinematic video.
+
+Branch: cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+Required ancestor: d1e3c15242b1f59bc7e5f187a5daa5c31be93e1c
+PR #169 stays OPEN / DRAFT / UNMERGED / NOT READY.
+
+Image: the newly published cinematic FINAL digest only.
+Do not use Proof B overlay sha256:fca7f9afc0d3e239a8302b381e2407148386782684e8ef2ee9e97d75d7cddf24.
+Do not use scenery-showcase EEVEE digest sha256:7e8bf43653ebd81d1f3fd4452bb2181a1dc11fd97c0ee69789d67b072eebf673.
+CMD must be: node ./src/scenery-showcase-original14-entry.js
+Blender script: cinematic_valley_world_v1.py
+Profile: FINAL
+--water-variant D
+--hero-rebuild must load the locked V44/V3 scene, not lookdev /tmp paths.
+
+GPU: exactly one SECURE RTX 4090.
+Maximum hourly rate: $0.80.
+Maximum total spend: $20.00 USD.
+Maximum runtime: 1440 minutes.
+Host RAM must be >= 24 GiB at boot or fail closed.
+
+Output: 900 native 1080x1920 frames, 30 fps, 9:16, Cycles GPU 256 samples,
+denoising on, 16-bit PNG sequence, libx264 CRF 17 medium yuv420p +faststart.
+No EEVEE, no 48-sample override, no Lanczos upscale, no placeholder assets,
+no silent quality reduction.
+
+CREATE count: 1.
+No retries.
+No additional CREATE.
+No image rebuild inside this authorization.
+No second pod.
+
+Terminate and delete the pod immediately after pass or failure.
+Cleanup may retry; CREATE may not.
+
+Ledger key must be unique to this authorization. A second launch must fail
+closed on LEDGER_ALREADY_EXISTS.
+
+Do not reuse:
+TIVVLEJOY_V7_PAID_STARTUP_PROOF_B_AUTHORIZATION_V1
+TIVVLEJOY_V7_PAID_STARTUP_PROOF_AUTHORIZATION_V1
+TIVVLEJOY_V7_PAID_PROOF_A_RETRY_AUTHORIZATION_V1
+TIVVLEJOY_V7_LARGER_MEMORY_PAID_PROOF_A_EXECUTION_V1
+TIVVLEJOY_SCENERY_SHOWCASE_30S_PAID_EXECUTION_AUTHORIZATION_V1
+or any PAID_AUTHORIZATION_V2/V3/V4/V5/ORIGINAL14 file.

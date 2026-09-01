@@ -1,0 +1,204 @@
+{
+  "schema": "TIVVLEJOY_PURCHASED_SCENERY_CREEK_HERO_FINISH_RESULT_V35",
+  "startingSha": "ea11651498083666651a04231ad0edd4e8fc2da2",
+  "visualWorkSha": "efd9ef0396b5337386e55c3e0f5e3846fe56f04a",
+  "finalSha": "85f9b3327ff74f70c5003c3abda97c182b7cb646",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false,
+    "urlNote": "PR 169 remains OPEN / DRAFT / UNMERGED / NOT READY"
+  },
+  "v34WaterArchitecturePreserved": true,
+  "lockedPreserved": {
+    "ior": 1.33,
+    "transmissiveCyclesWater": true,
+    "waterThicknessM": 0.18,
+    "cameraDistanceShaderGating": false,
+    "lightPathHdriReflectionControl": true,
+    "purchasedHdriKept": true,
+    "creekTroughLocationUnchanged": true,
+    "WATER_WIDTH_SCALE": 0.30,
+    "BED_WIDTH_SCALE": 0.68,
+    "v31CarvedChannel": true,
+    "asymmetricCreekGeometry": true,
+    "WATER_SURFACE_Z": -1.15,
+    "BED_CENTER_Z": -1.62
+  },
+  "notDone": [
+    "did not return to IOR 1.0",
+    "did not turn specular completely off",
+    "did not restore camera-distance shader hacks",
+    "did not remove the purchased HDRI",
+    "did not rebuild the whole trough",
+    "did not launch RunPod",
+    "did not CREATE",
+    "did not start the 900-frame render",
+    "did not spend money",
+    "did not productize TIVVLEJOY_CINEMATIC_WATER_SYSTEM_V1"
+  ],
+  "southBankGeometryChanges": {
+    "oldVisibleBankRunM": 4.40,
+    "newVisibleBankRunM": 12.0,
+    "northBankRunM": 2.20,
+    "terrainSubdiv": 400,
+    "stages": [
+      "upper terrain: healthy grass (wet mask 0)",
+      "upper bank: sparse grass / soil pockets over 12m run",
+      "mid bank: damp earth, shelves, erosion gullies/lobes",
+      "lower bank: dark wet soil toward the bed",
+      "waterline: irregular bays on south half-width + lumpy wet stones",
+      "water: V34 Candidate D 18cm prism"
+    ],
+    "innerIsolineWork": [
+      "organic south bays on channel_profile (4.0-8.2m clamp kept)",
+      "south gullies/lobes on the inner cut (not saw teeth)",
+      "dark-bed mesh south edge dropped under the water so it cannot draw a raised knife lip",
+      "dark-bed south lip pinch on the mesh",
+      "wider grass/earth Mix Shader feather",
+      "large soil/grass blotches on the south wet mask"
+    ],
+    "remaining": "From SHOT_02 the grass-to-trough color/height cut is still readable as one lip. The 12m run is underfoot; the camera still sees the inner isoline."
+  },
+  "bankDressingChanges": [
+    "disabled crest-grass cubes (mint slabs from SHOT_02)",
+    "hanging-grass shelf meshes stay off",
+    "rectangular bank patches stay off",
+    "thinned mid-bank / crest trees in the SHOT_02 frustum",
+    "kept a few small waterline grasses that sit near left*0.48",
+    "reduced oversized foreground trees that ate the frame"
+  ],
+  "waterlineInteractionAdditions": [
+    "lumpy wet-stone meshes (not cubes/spheres) at WATER_SURFACE_Z + 0.05 in the SHOT_02 x range",
+    "isoline-breaker rocks on the south BED_WIDTH_SCALE cut",
+    "two wet islands in the water film",
+    "one large near-camera bank boulder"
+  ],
+  "waterlineReadability": {
+    "lookdev65": "PASS — large wet stones were readable; one entered the dark channel",
+    "lookdev67_68": "FAIL — stones sit on grass or fall out of the water hero band"
+  },
+  "shallowWaterTreatment": {
+    "method": "physical: vertex-color TJ_RiverDepth drives transmission (edge higher) and roughness; 18cm prism; no camera-distance gate",
+    "variantD": {
+      "trans": 0.80,
+      "volumeDensity": 0.18,
+      "rough": [0.14, 0.28],
+      "bumpHi": 0.07
+    },
+    "note": "A brief trans 0.84 / volume 0.14 probe was reverted. Downward cameras showed the bed as mud; V34 D values were restored."
+  },
+  "reflectionAdjustments": {
+    "selector": "MAXIMUM(Is Glossy Ray, Is Reflection Ray) Mix Shader",
+    "cameraDiffuse": "purchased Sky HDRI unchanged, rotation (0,0,0), strength 1.05",
+    "glossyPath": "same HDRI image, Gamma 1.85, mix 0.32 toward muted sky (0.22,0.32,0.40), multiply (0.50,0.58,0.56), Background strength 0.50",
+    "v34BaselineMixFac": 0.40,
+    "whyMixFacChanged": "Slightly less mute so reflection forms can vary. Compression (gamma + multiply + strength) kept to prevent foil.",
+    "result": "Lookdev67 showed silvery-blue sky reflection without a solid white sheet. Lookdev68 from a more easterly camera went foil-hot again."
+  },
+  "hdriOrientationChanges": {
+    "recordedBeforeAnyChange": {
+      "HDRI_CAMERA_ROTATION": [0.0, 0.0, 0.0],
+      "HDRI_REFLECTION_ROTATION_Z": 0.48
+    },
+    "cameraWorldOrientationChanged": false,
+    "reflectionOnlyRotationZ": 0.48,
+    "reflectionOnlyRotationChangedThisPass": false,
+    "reverted": false,
+    "note": "Did not rotate the purchased HDRI for the camera/diffuse world. Reflection-only Z 0.48 is the V34/V35 lock."
+  },
+  "shot02PreviousPath": "/tmp/o14-lookdev/cinematic-lookdev62/shot_02_.png",
+  "shot02V34Path": "/tmp/o14-lookdev/cinematic-lookdev60/shot_02_.png",
+  "shot02FinalPath": "/tmp/o14-lookdev/cinematic-lookdev68/shot_02_.png",
+  "shot02BestThisPass": {
+    "path": "/tmp/o14-lookdev/cinematic-lookdev67/shot_02_.png",
+    "why": "Most liquid-looking V34-controlled reflection while still showing cabin + bank. Water is still a right-edge ribbon, not a hero creek."
+  },
+  "shot02IterationPaths": {
+    "lookdev64": "/tmp/o14-lookdev/cinematic-lookdev64/shot_02_.png",
+    "lookdev65": "/tmp/o14-lookdev/cinematic-lookdev65/shot_02_.png",
+    "lookdev66": "/tmp/o14-lookdev/cinematic-lookdev66/shot_02_.png",
+    "lookdev67": "/tmp/o14-lookdev/cinematic-lookdev67/shot_02_.png",
+    "lookdev68": "/tmp/o14-lookdev/cinematic-lookdev68/shot_02_.png"
+  },
+  "shot02FinalCamera": {
+    "start": {"location": [-6.2, -20.4, 4.45], "look": [9.0, -11.2, -1.16], "lens": 38.0},
+    "end": {"location": [-1.0, -19.6, 4.30], "look": [15.2, -10.6, -1.00], "lens": 42.0},
+    "note": "Latest authored camera. Lookdev67 framing (cabin-left, water-right) was more attractive; lookdev68 tried to center the creek and reintroduced foil."
+  },
+  "humanHeroAssessment": {
+    "question": "If a person saw this image with no explanation, would they immediately say that is a creek with water?",
+    "answer": "NO",
+    "lookdev68": "Silver foil stripe + hard grass lip. Not a creek hero.",
+    "lookdev67": "Silvery-blue ribbon can be read as water, but it is a side stripe beside a dominant cabin, not an unmistakable cinematic creek.",
+    "lookdev65": "Stones help, but the water reads as a muddy trench because the camera looked through the prism.",
+    "heroQuality": {
+      "intentionalAndBeautiful": false,
+      "waterAddsVisualValue": false,
+      "bankNaturallyEroded": false,
+      "visibleDepth": "partial",
+      "objectsVisiblyEnterWater": "only on lookdev65",
+      "cabinsAttractivelyPresented": "partial — cabin is clear, often too dominant",
+      "fgMgBgSeparation": "partial",
+      "acceptableInHighQualityTivvleJoyVideo": false
+    }
+  },
+  "sixPreviewPaths": {
+    "SHOT_01": "NOT_RENDERED_V35_shot02_hero_gate_failed",
+    "SHOT_02": "/tmp/o14-lookdev/cinematic-lookdev68/shot_02_.png",
+    "SHOT_03": "NOT_RENDERED_V35_shot02_hero_gate_failed",
+    "SHOT_04": "NOT_RENDERED_V35_shot02_hero_gate_failed",
+    "SHOT_05": "NOT_RENDERED_V35_shot02_hero_gate_failed",
+    "SHOT_06": "NOT_RENDERED_V35_shot02_hero_gate_failed"
+  },
+  "gatesAT": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PARTIAL",
+    "E": "PARTIAL",
+    "F": "FAIL",
+    "G": "FAIL",
+    "H": "PARTIAL",
+    "I": "PARTIAL",
+    "J": "FAIL",
+    "K": "FAIL",
+    "L": "FAIL",
+    "M": "PASS",
+    "N": "PASS",
+    "O": "PARTIAL",
+    "P": "FAIL",
+    "Q": "PARTIAL",
+    "R": "PASS",
+    "S": "PARTIAL",
+    "T": "PARTIAL"
+  },
+  "gateNotes": {
+    "A": "Carved V31 channel and 12m south run remain.",
+    "B": "Not instantly liquid on the latest hero frame. Foil on lookdev68; mud on lookdev65; ribbon on lookdev67.",
+    "C": "Water film still WATER_WIDTH_SCALE 0.30 inside the wider bed.",
+    "D": "Exposed wet bed exists; downward cameras show it as mud, grazing cameras hide it.",
+    "E": "12m three-stage south slope is in the mesh; SHOT_02 still often reads the inner cut as a wall.",
+    "F": "Continuous grass/trough isoline still obvious from SHOT_02.",
+    "G": "Water still reads as a ribbon/strip, not a creek surface the eye follows.",
+    "H": "Less road than earlier passes; trench/path risk remains when water fails.",
+    "I": "V34 Light Path control still prevents unrestricted-HDRI white sheets on some cameras; not enough scene-storytelling, and lookdev68 went hot.",
+    "J": "Bank dressing and soil blotches are not yet a natural eroded waterline.",
+    "K": "SHOT_02 is not a cinematic creek hero.",
+    "L": "Six-shot skipped because the hero gate failed.",
+    "M": "Purchased cabins, trees, HDRI, meadow albedo remain authoritative.",
+    "N": "32-sample denoised 540x960 is clean enough to judge.",
+    "O": "Same D material, no per-camera shader hacks; different cameras already change the liquid read (Fresnel vs transmission).",
+    "P": "Water does not yet improve the image.",
+    "Q": "Architecture still prevents the V34-B unrestricted foil mode. Lookdev68 shows residual foil at a new azimuth.",
+    "R": "No camera-distance shader gating.",
+    "S": "Lookdev65 stones entered the channel; later cameras lost that read.",
+    "T": "Cabin / bank / water layering exists but is not cinematic; creek is not the compositional lead."
+  },
+  "paidCreateCount": 0,
+  "actualSpendUsd": 0,
+  "paidRenderAuthorized": false,
+  "paidRenderReadyAwaitingAuthorization": false,
+  "nextLocalRepair": "Keep V34 Candidate D and the 12m south run. The remaining hero problem is SHOT_02 seeing the inner grass isoline and either grazing-foil or nadir-mud. Compose a camera that sees stones piercing a Fresnel surface AND a broken soil waterline, without recentering so far that HDRI highlights sheet. Do not CREATE."
+}
