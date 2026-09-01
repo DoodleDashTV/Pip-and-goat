@@ -13,6 +13,15 @@
   "sourcePackLocked": true,
   "sourcePackSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
   "currentGate": "DEPENDENCY_AUDIT_PASS",
+  "currentGateStatus": "BLOCKED",
+  "currentGateBlocker": "PRIVATE_ASSET_CREDENTIALS_NOT_CONFIGURED",
+  "missingSecretNames": [
+    "R2_ENDPOINT",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "R2_BUCKET"
+  ],
+  "blenderAuditExecuted": false,
   "characterState": "WAITING_FOR_ARTIST_RIGS",
   "paidCreateCount": 0,
   "paidSpendUsd": 0,
