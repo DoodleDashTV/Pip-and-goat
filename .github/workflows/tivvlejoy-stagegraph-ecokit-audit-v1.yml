@@ -23,11 +23,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: tivvlejoy-stagegraph-ecokit-audit-v1
+  group: tivvlejoy-stagegraph-ecokit-audit-v1-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
   audit:
+    # Pull requests register and validate this workflow, but private purchased
+    # assets are only materialized in a trusted branch push or manual dispatch.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
