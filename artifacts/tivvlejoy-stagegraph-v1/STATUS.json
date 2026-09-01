@@ -9,8 +9,10 @@
     "merged": false,
     "productionEligible": false
   },
-  "selectedCertificationCandidate": "SRC_FOREST_MODEL_PACKAGE",
-  "currentGate": "SOURCE_PACK_LOCKED",
+  "selectedCertificationCandidate": "SRC_FOREST_STYLISED_ECOKIT",
+  "sourcePackLocked": true,
+  "sourcePackSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+  "currentGate": "DEPENDENCY_AUDIT_PASS",
   "characterState": "WAITING_FOR_ARTIST_RIGS",
   "paidCreateCount": 0,
   "paidSpendUsd": 0,
