@@ -1,0 +1,10 @@
+{
+  "schema": "TIVVLEJOY_ORIGINAL14_STARTUP_V1",
+  "jobId": "v7-final-visual-proof-v4",
+  "result": "RUNNING",
+  "stage": "MATERIALIZE_ORIGINAL_14",
+  "index": 2,
+  "total": 14,
+  "sourceId": "SRC_VILLAGE_TEXTURES_ZIP",
+  "at": "2026-09-01T01:22:08.214Z"
+}

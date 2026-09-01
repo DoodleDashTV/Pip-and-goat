@@ -1,0 +1,254 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V4_RESULT",
+  "status": "COMPLETE",
+  "authorization": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V4",
+  "digest": "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749",
+  "paidCreate": 1,
+  "runpodSpendUsd": 0.4229,
+  "runtimeSeconds": 2057.2,
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "ready": false
+  },
+  "encode900": false,
+  "pixelSuite": {
+    "run": true,
+    "geometry": {"E": "PASS", "F": "PASS", "J": "PASS"},
+    "pixels": {"E": "REVIEW", "F": "REVIEW", "J": "REVIEW"},
+    "visualApprovalReceipt": "NOT_PASS"
+  },
+  "cleanup": {
+    "confirmed": true,
+    "livePods": []
+  },
+  "retry": false,
+  "secondCreate": false,
+  "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": true,
+  "merged": false,
+  "at": "2026-09-01T01:22:11.760507+00:00",
+  "outputs": {
+    "files": {
+      "preview-SHOT_01-shot_01_.png": {
+        "bytes": 609264,
+        "sha256": "0bdbc153615f5719469e8e71985b03b3064f0d4ce181a70a7c7550fbd0a992bf",
+        "matches": true,
+        "shot": "SHOT_01",
+        "kind": "preview",
+        "viewable": "preview_SHOT_01.png"
+      },
+      "preview-SHOT_02-shot_02_.png": {
+        "bytes": 708037,
+        "sha256": "0bbbd748401eed9377acfa281cd5901e47c71c5c4125eb853853c5568949d4de",
+        "matches": true,
+        "shot": "SHOT_02",
+        "kind": "preview",
+        "viewable": "preview_SHOT_02.png"
+      },
+      "preview-SHOT_03-shot_03_.png": {
+        "bytes": 526620,
+        "sha256": "3392b4669a4119c2cfc0c7770f2cb006b11dd20f963a55da7d130cc0713c229b",
+        "matches": true,
+        "shot": "SHOT_03",
+        "kind": "preview",
+        "viewable": "preview_SHOT_03.png"
+      },
+      "preview-SHOT_04-shot_04_.png": {
+        "bytes": 628673,
+        "sha256": "9ebe063b353b561056572ae2f7174b80ad6e9738b7d1a9c0231e81a9ed26c7d2",
+        "matches": true,
+        "shot": "SHOT_04",
+        "kind": "preview",
+        "viewable": "preview_SHOT_04.png"
+      },
+      "preview-SHOT_05-shot_05_.png": {
+        "bytes": 644057,
+        "sha256": "87c205533ccbbaeb050ef67ca1a581b25f75cfdd7b57cb9efc3b1144bdb87046",
+        "matches": true,
+        "shot": "SHOT_05",
+        "kind": "preview",
+        "viewable": "preview_SHOT_05.png"
+      },
+      "preview-SHOT_06-shot_06_.png": {
+        "bytes": 563376,
+        "sha256": "ccc67ff9636048427fa8018810839cd40bc1928ef5bdb5b0c19e6cc40d017ba8",
+        "matches": true,
+        "shot": "SHOT_06",
+        "kind": "preview",
+        "viewable": "preview_SHOT_06.png"
+      },
+      "hero-SHOT_02-shot_02_.png": {
+        "bytes": 9144486,
+        "sha256": "3283e4867ef14975649d2e67532f03b8cc1b1c3a326e40cef054e72840033b4e",
+        "matches": true,
+        "shot": "SHOT_02",
+        "kind": "hero",
+        "viewable": "hero_SHOT_02.png"
+      }
+    },
+    "status": {
+      "jobId": "v7-final-visual-proof-v4",
+      "status": "COMPLETE",
+      "stage": "VISUAL_PROOF_COMPLETE",
+      "encode900": false,
+      "uploaded": [
+        {
+          "shot": "SHOT_01",
+          "kind": "preview",
+          "name": "shot_01_.png",
+          "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_01/shot_01_.png",
+          "sha256": "0bdbc153615f5719469e8e71985b03b3064f0d4ce181a70a7c7550fbd0a992bf",
+          "bytes": 609264
+        },
+        {
+          "shot": "SHOT_02",
+          "kind": "preview",
+          "name": "shot_02_.png",
+          "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_02/shot_02_.png",
+          "sha256": "0bbbd748401eed9377acfa281cd5901e47c71c5c4125eb853853c5568949d4de",
+          "bytes": 708037
+        },
+        {
+          "shot": "SHOT_03",
+          "kind": "preview",
+          "name": "shot_03_.png",
+          "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_03/shot_03_.png",
+          "sha256": "3392b4669a4119c2cfc0c7770f2cb006b11dd20f963a55da7d130cc0713c229b",
+          "bytes": 526620
+        },
+        {
+          "shot": "SHOT_04",
+          "kind": "preview",
+          "name": "shot_04_.png",
+          "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_04/shot_04_.png",
+          "sha256": "9ebe063b353b561056572ae2f7174b80ad6e9738b7d1a9c0231e81a9ed26c7d2",
+          "bytes": 628673
+        },
+        {
+          "shot": "SHOT_05",
+          "kind": "preview",
+          "name": "shot_05_.png",
+          "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_05/shot_05_.png",
+          "sha256": "87c205533ccbbaeb050ef67ca1a581b25f75cfdd7b57cb9efc3b1144bdb87046",
+          "bytes": 644057
+        },
+        {
+          "shot": "SHOT_06",
+          "kind": "preview",
+          "name": "shot_06_.png",
+          "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_06/shot_06_.png",
+          "sha256": "ccc67ff9636048427fa8018810839cd40bc1928ef5bdb5b0c19e6cc40d017ba8",
+          "bytes": 563376
+        },
+        {
+          "shot": "SHOT_02",
+          "kind": "hero",
+          "name": "shot_02_.png",
+          "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/hero/SHOT_02/shot_02_.png",
+          "sha256": "3283e4867ef14975649d2e67532f03b8cc1b1c3a326e40cef054e72840033b4e",
+          "bytes": 9144486
+        }
+      ],
+      "originalSourceCount": 14,
+      "renderableSourceCount": 11,
+      "selectionProofKey": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/original14-selection-proof.json",
+      "materializedBytes": 3002049687,
+      "at": "2026-09-01T01:22:00.303Z"
+    },
+    "startup": {
+      "schema": "TIVVLEJOY_ORIGINAL14_STARTUP_V1",
+      "jobId": "v7-final-visual-proof-v4",
+      "result": "RUNNING",
+      "stage": "MATERIALIZE_ORIGINAL_14",
+      "index": 2,
+      "total": 14,
+      "sourceId": "SRC_VILLAGE_TEXTURES_ZIP",
+      "at": "2026-09-01T01:22:08.214Z"
+    }
+  },
+  "podId": "fzvlf0d20nzfbs",
+  "hostTelemetry": {
+    "requestedGpuSku": "NVIDIA GeForce RTX 4090",
+    "assignedGpuName": "RTX 4090",
+    "rawNvidiaSmi": "NOT_CAPTURED",
+    "vramTotalMiB": null,
+    "vramFreeMiB": null,
+    "gib": null,
+    "decimalGb": null,
+    "modelCheck": true,
+    "capacityCheck24500": false,
+    "runpodGpuDisplayName": "RTX 4090",
+    "source": "worker_log_or_runpod_machine"
+  },
+  "workerStatus": {
+    "jobId": "v7-final-visual-proof-v4",
+    "status": "COMPLETE",
+    "stage": "VISUAL_PROOF_COMPLETE",
+    "encode900": false,
+    "uploaded": [
+      {
+        "shot": "SHOT_01",
+        "kind": "preview",
+        "name": "shot_01_.png",
+        "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_01/shot_01_.png",
+        "sha256": "0bdbc153615f5719469e8e71985b03b3064f0d4ce181a70a7c7550fbd0a992bf",
+        "bytes": 609264
+      },
+      {
+        "shot": "SHOT_02",
+        "kind": "preview",
+        "name": "shot_02_.png",
+        "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_02/shot_02_.png",
+        "sha256": "0bbbd748401eed9377acfa281cd5901e47c71c5c4125eb853853c5568949d4de",
+        "bytes": 708037
+      },
+      {
+        "shot": "SHOT_03",
+        "kind": "preview",
+        "name": "shot_03_.png",
+        "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_03/shot_03_.png",
+        "sha256": "3392b4669a4119c2cfc0c7770f2cb006b11dd20f963a55da7d130cc0713c229b",
+        "bytes": 526620
+      },
+      {
+        "shot": "SHOT_04",
+        "kind": "preview",
+        "name": "shot_04_.png",
+        "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_04/shot_04_.png",
+        "sha256": "9ebe063b353b561056572ae2f7174b80ad6e9738b7d1a9c0231e81a9ed26c7d2",
+        "bytes": 628673
+      },
+      {
+        "shot": "SHOT_05",
+        "kind": "preview",
+        "name": "shot_05_.png",
+        "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_05/shot_05_.png",
+        "sha256": "87c205533ccbbaeb050ef67ca1a581b25f75cfdd7b57cb9efc3b1144bdb87046",
+        "bytes": 644057
+      },
+      {
+        "shot": "SHOT_06",
+        "kind": "preview",
+        "name": "shot_06_.png",
+        "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_06/shot_06_.png",
+        "sha256": "ccc67ff9636048427fa8018810839cd40bc1928ef5bdb5b0c19e6cc40d017ba8",
+        "bytes": 563376
+      },
+      {
+        "shot": "SHOT_02",
+        "kind": "hero",
+        "name": "shot_02_.png",
+        "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/hero/SHOT_02/shot_02_.png",
+        "sha256": "3283e4867ef14975649d2e67532f03b8cc1b1c3a326e40cef054e72840033b4e",
+        "bytes": 9144486
+      }
+    ],
+    "originalSourceCount": 14,
+    "renderableSourceCount": 11,
+    "selectionProofKey": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/original14-selection-proof.json",
+    "materializedBytes": 3002049687,
+    "at": "2026-09-01T01:22:00.303Z"
+  }
+}

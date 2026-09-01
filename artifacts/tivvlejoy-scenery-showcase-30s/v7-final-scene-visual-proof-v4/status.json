@@ -1,0 +1,69 @@
+{
+  "jobId": "v7-final-visual-proof-v4",
+  "status": "COMPLETE",
+  "stage": "VISUAL_PROOF_COMPLETE",
+  "encode900": false,
+  "uploaded": [
+    {
+      "shot": "SHOT_01",
+      "kind": "preview",
+      "name": "shot_01_.png",
+      "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_01/shot_01_.png",
+      "sha256": "0bdbc153615f5719469e8e71985b03b3064f0d4ce181a70a7c7550fbd0a992bf",
+      "bytes": 609264
+    },
+    {
+      "shot": "SHOT_02",
+      "kind": "preview",
+      "name": "shot_02_.png",
+      "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_02/shot_02_.png",
+      "sha256": "0bbbd748401eed9377acfa281cd5901e47c71c5c4125eb853853c5568949d4de",
+      "bytes": 708037
+    },
+    {
+      "shot": "SHOT_03",
+      "kind": "preview",
+      "name": "shot_03_.png",
+      "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_03/shot_03_.png",
+      "sha256": "3392b4669a4119c2cfc0c7770f2cb006b11dd20f963a55da7d130cc0713c229b",
+      "bytes": 526620
+    },
+    {
+      "shot": "SHOT_04",
+      "kind": "preview",
+      "name": "shot_04_.png",
+      "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_04/shot_04_.png",
+      "sha256": "9ebe063b353b561056572ae2f7174b80ad6e9738b7d1a9c0231e81a9ed26c7d2",
+      "bytes": 628673
+    },
+    {
+      "shot": "SHOT_05",
+      "kind": "preview",
+      "name": "shot_05_.png",
+      "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_05/shot_05_.png",
+      "sha256": "87c205533ccbbaeb050ef67ca1a581b25f75cfdd7b57cb9efc3b1144bdb87046",
+      "bytes": 644057
+    },
+    {
+      "shot": "SHOT_06",
+      "kind": "preview",
+      "name": "shot_06_.png",
+      "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/preview/SHOT_06/shot_06_.png",
+      "sha256": "ccc67ff9636048427fa8018810839cd40bc1928ef5bdb5b0c19e6cc40d017ba8",
+      "bytes": 563376
+    },
+    {
+      "shot": "SHOT_02",
+      "kind": "hero",
+      "name": "shot_02_.png",
+      "key": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/visual-proof/hero/SHOT_02/shot_02_.png",
+      "sha256": "3283e4867ef14975649d2e67532f03b8cc1b1c3a326e40cef054e72840033b4e",
+      "bytes": 9144486
+    }
+  ],
+  "originalSourceCount": 14,
+  "renderableSourceCount": 11,
+  "selectionProofKey": "tivvlejoy-assets/showcases/v7-final-visual-proof-v4/original14-selection-proof.json",
+  "materializedBytes": 3002049687,
+  "at": "2026-09-01T01:22:00.303Z"
+}

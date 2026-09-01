@@ -1,0 +1,13 @@
+{
+  "requestedGpuSku": "NVIDIA GeForce RTX 4090",
+  "assignedGpuName": "RTX 4090",
+  "rawNvidiaSmi": "NOT_CAPTURED",
+  "vramTotalMiB": null,
+  "vramFreeMiB": null,
+  "gib": null,
+  "decimalGb": null,
+  "modelCheck": true,
+  "capacityCheck24500": false,
+  "runpodGpuDisplayName": "RTX 4090",
+  "source": "worker_log_or_runpod_machine"
+}

@@ -13,7 +13,7 @@
   "createCount": 1,
   "retry": false,
   "encode900": false,
-  "consumed": false,
+  "consumed": true,
   "v2MustNotBeReused": true,
   "v3MustNotBeReused": true,
   "ineligibleDigests": [
@@ -22,5 +22,15 @@
     "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
   ],
   "requiredLibraryExtract": true,
-  "frames": [48, 210, 360, 520, 680, 860]
+  "frames": [
+    48,
+    210,
+    360,
+    520,
+    680,
+    860
+  ],
+  "consumedAt": "2026-09-01T00:47:54.748536+00:00",
+  "podId": "fzvlf0d20nzfbs",
+  "createPerformed": 1
 }
