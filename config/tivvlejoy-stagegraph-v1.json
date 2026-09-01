@@ -11,9 +11,11 @@
     "draftHeight": 960
   },
   "firstCertificationCandidate": {
-    "sourceId": "SRC_FOREST_MODEL_PACKAGE",
-    "filename": "Stylized_Forest_Nature_Kit.zip",
-    "reason": "Single Blender-compatible purchased environment pack; isolates scenery quality before cross-pack assembly"
+    "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+    "filename": "Stylised EcoKit.zip",
+    "sourceSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+    "sourceBytes": 669481428,
+    "reason": "Single Blender-native purchased pack with exact source, library, and 1,134-texture extraction evidence; isolates vendor-quality reproduction before cross-pack assembly"
   },
   "beautyProof": {
     "frames": 1,
