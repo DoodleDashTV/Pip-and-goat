@@ -1,6 +1,14 @@
 name: TivvleJoy StageGraph EcoKit Audit V1
 
 on:
+  pull_request:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - ".github/workflows/tivvlejoy-stagegraph-ecokit-audit-v1.yml"
+      - "scripts/cloud/stagegraph-v1/**"
+      - "scripts/blender/stagegraph/**"
+      - "config/tivvlejoy-stagegraph-v1.json"
   push:
     branches:
       - cursor/tivvlejoy-stagegraph-v1-73f1
