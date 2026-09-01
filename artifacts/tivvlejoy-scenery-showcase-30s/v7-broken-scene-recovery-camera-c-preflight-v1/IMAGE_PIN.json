@@ -1,0 +1,15 @@
+{
+  "schema": "TIVVLEJOY_V7_BROKEN_SCENE_RECOVERY_IMAGE_PIN_V1",
+  "oldDigest": "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749",
+  "newDigest": "sha256:a5fb640ed0961b862203ca77881d19cb1772e962e602ca5ade1e688975b19cfe",
+  "sourceCommit": "4b98f69c56f17ef39c4139f827d9dc319e3639e2",
+  "workflowRunId": 33460509339,
+  "workflowName": "TivvleJoy Scenery FINAL Worker Image V1",
+  "requiredTextureTreeExtract": true,
+  "cameraCLock": true,
+  "v3CompAUsed": false,
+  "oldDigestIneligible": true,
+  "authorizationCreated": false,
+  "paidCreate": 0,
+  "runpodContacted": false
+}
