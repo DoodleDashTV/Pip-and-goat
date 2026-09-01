@@ -23,22 +23,25 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from preflight import AUTH_NAME, HARD_RUNTIME_MINUTES, HARD_SPEND_USD, USD_PER_HOUR  # noqa: E402
+from preflight import AUTH_NAME, HARD_RUNTIME_MINUTES, HARD_SPEND_USD, USD_PER_HOUR, PREVIOUS_AUTH_NAME  # noqa: E402
 
 PIN = REPO / "config/cloud/scenery-showcase-final-image.json"
 INSPECT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1/IMAGE_INSPECT.json"
-STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2/STAGED.json"
-OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2"
+STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v3/STAGED.json"
+OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v3"
+AUTH_FILE = OUT / "AUTHORIZATION.json"
+V2_LEDGER = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2/consumption-ledger.json"
 
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
 REQUIRED_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 REQUIRED_IMAGE_COMMIT = "e5e4d36323e65dfc32963d0c5c357d3c32bafc46"
+REQUIRED_LAUNCHER_SHA = "3e974a14ea813118f8096794b909fd27a3274e1e"
 REQUIRED_CONTENT_ANCESTOR = "d5654510599f5b42919a949c5c4503c5ec1442f1"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
-POD_NAME = "tj-v7-fsvp-2"
-JOB_ID = "v7-final-visual-proof-v2"
+POD_NAME = "tj-v7-fsvp-3"
+JOB_ID = "v7-final-visual-proof-v3"
 CMD = ["node", "./src/scenery-showcase-original14-entry.js"]
 CAMERA_C = (2.2, -21.4, 3.40)
 CAMERA_C_LOOK = (-3.4, -10.2, 1.75)
@@ -311,6 +314,8 @@ def identity() -> dict:
         "remoteTip": remote,
         "requiredImageCommit": REQUIRED_IMAGE_COMMIT,
         "requiredImageCommitIsAncestor": git_ok("merge-base", "--is-ancestor", REQUIRED_IMAGE_COMMIT, remote),
+        "requiredLauncherSha": REQUIRED_LAUNCHER_SHA,
+        "requiredLauncherShaIsAncestor": git_ok("merge-base", "--is-ancestor", REQUIRED_LAUNCHER_SHA, remote),
         "requiredContentAncestor": REQUIRED_CONTENT_ANCESTOR,
         "requiredContentAncestorIsAncestor": git_ok("merge-base", "--is-ancestor", REQUIRED_CONTENT_ANCESTOR, remote),
         "at": utc_now(),
@@ -354,14 +359,30 @@ def fail_closed_checks() -> dict:
     contract = output_contract()
     if ident["branch"] != REQUIRED_BRANCH:
         blockers.append("BRANCH_MISMATCH")
+    if AUTH_NAME != "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3":
+        blockers.append("V2_AUTHORIZATION_REUSED")
+    if AUTH_NAME == PREVIOUS_AUTH_NAME:
+        blockers.append("V2_AUTHORIZATION_REUSED")
     if not ident["requiredImageCommitIsAncestor"]:
         blockers.append("IMAGE_COMMIT_NOT_ANCESTOR")
+    if not ident.get("requiredLauncherShaIsAncestor"):
+        blockers.append("LAUNCHER_SHA_NOT_ANCESTOR")
     if not ident["requiredContentAncestorIsAncestor"]:
         blockers.append("REQUIRED_ANCESTOR_MISSING")
     if pin["digest"] == FAILED_DIGEST or REQUIRED_DIGEST == FAILED_DIGEST:
         blockers.append("FAILED_DIGEST_INELIGIBLE")
     if pin["digest"] == FAILED_VRAM_DIGEST or REQUIRED_DIGEST == FAILED_VRAM_DIGEST:
         blockers.append("VRAM_GATE_DIGEST_INELIGIBLE")
+    auth = json.loads(AUTH_FILE.read_text()) if AUTH_FILE.is_file() else {}
+    if auth.get("name") != AUTH_NAME or auth.get("digest") != REQUIRED_DIGEST or auth.get("requiredLauncherSha") != REQUIRED_LAUNCHER_SHA:
+        blockers.append("V3_AUTHORIZATION_NOT_BOUND")
+    if auth.get("consumed"):
+        blockers.append("V3_AUTHORIZATION_ALREADY_CONSUMED")
+    v2 = json.loads(V2_LEDGER.read_text()) if V2_LEDGER.is_file() else {}
+    if v2.get("authorization") != PREVIOUS_AUTH_NAME or int(v2.get("createPerformed") or 0) != 1:
+        blockers.append("V2_CONSUMPTION_NOT_PROVEN")
+    if JOB_ID.endswith("v2") or POD_NAME.endswith("-2"):
+        blockers.append("V2_JOB_REUSED")
     if not pin["digest"] or not pin["digestMatch"]:
         blockers.append("DIGEST_NOT_PINNED")
     inspect = json.loads(INSPECT.read_text()) if INSPECT.is_file() else {}
@@ -614,21 +635,105 @@ def download_outputs() -> dict:
         try:
             r2_download(client, key, dest)
             digest = sha256_file(dest)
+            viewable = OUT / "images" / f"{row.get('kind')}_{row.get('shot')}.png"
+            if dest.suffix.lower() == ".png":
+                viewable.write_bytes(dest.read_bytes())
             local["files"][name] = {
                 "bytes": dest.stat().st_size,
                 "sha256": digest,
                 "matches": digest == row.get("sha256"),
                 "shot": row.get("shot"),
                 "kind": row.get("kind"),
+                "viewable": str(viewable.name) if dest.suffix.lower() == ".png" else None,
             }
         except Exception as exc:
             local["files"][name] = {"error": type(exc).__name__}
+        usage_key = str(key or "").rsplit("/", 1)[0] + "/usage.json"
+        usage_dest = OUT / "usage" / f"{row.get('kind')}-{row.get('shot')}-usage.json"
+        try:
+            if key:
+                r2_download(client, usage_key, usage_dest)
+                local["files"][usage_dest.name] = {"bytes": usage_dest.stat().st_size}
+        except Exception:
+            pass
+    if (status or {}).get("gpuTelemetry"):
+        write_json(OUT / "WORKER_GPU_TELEMETRY.json", status["gpuTelemetry"])
+        local["gpuTelemetry"] = status["gpuTelemetry"]
     return local
+
+
+def mark_auth_consumed(pod_id: str | None) -> None:
+    auth = json.loads(AUTH_FILE.read_text()) if AUTH_FILE.is_file() else {}
+    auth["consumed"] = True
+    auth["consumedAt"] = utc_now()
+    auth["podId"] = pod_id
+    auth["createPerformed"] = 1
+    write_json(AUTH_FILE, auth)
+
+
+def capture_host_telemetry(pod_id: str | None, pods: list[dict] | None = None) -> dict:
+    pods = pods if pods is not None else (list_pods() if pod_id else [])
+    exact = next((p for p in pods if p.get("id") == pod_id), None) if pod_id else None
+    assigned = ((exact or {}).get("machine") or {}).get("gpuDisplayName") or ""
+    logs = ""
+    if pod_id:
+        try:
+            req = urllib.request.Request(
+                f"https://rest.runpod.io/v1/pods/{pod_id}",
+                headers={
+                    "Authorization": "Bearer " + os.environ["RUNPOD_API_KEY"],
+                    "User-Agent": "DoodleDashProduction/1.0",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                body = json.loads(resp.read().decode() or "{}")
+            logs = str(body.get("logs") or body.get("containerLog") or "")
+        except Exception:
+            logs = ""
+    telemetry = None
+    raw = ""
+    for line in logs.splitlines():
+        if "gpu_telemetry" in line or "nvidia-smi" in line:
+            raw = line
+            try:
+                telemetry = json.loads(line)
+            except Exception:
+                telemetry = {"raw": line}
+            break
+    parsed = telemetry or {}
+    total = parsed.get("vramTotalMiB")
+    free = parsed.get("vramFreeMiB")
+    model = parsed.get("gpuModel") or assigned
+    converted = parsed.get("converted") or {}
+    if total is None and converted.get("mib") is not None:
+        total = converted.get("mib")
+    payload = {
+        "requestedGpuSku": GPU_TYPE,
+        "assignedGpuName": assigned or model or "NOT_CAPTURED",
+        "rawNvidiaSmi": parsed.get("raw") or raw or "NOT_CAPTURED",
+        "vramTotalMiB": total,
+        "vramFreeMiB": free,
+        "gib": None if total is None else (float(total) / 1024.0),
+        "decimalGb": None if total is None else (float(total) * 1024 * 1024) / 1e9,
+        "modelCheck": bool(model) and bool(__import__("re").search(r"rtx\s*4090", str(model), __import__("re").I)),
+        "capacityCheck24500": Number_is_finite(total) and int(total) >= 24500,
+        "runpodGpuDisplayName": assigned or None,
+        "source": "worker_log_or_runpod_machine",
+    }
+    write_json(OUT / "HOST_TELEMETRY.json", payload)
+    return payload
+
+
+def Number_is_finite(value) -> bool:
+    try:
+        return value is not None and float(value) == float(value)
+    except Exception:
+        return False
 
 
 def write_result(status: str, **extra) -> None:
     payload = {
-        "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2_RESULT",
+        "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3_RESULT",
         "status": status,
         "authorization": AUTH_NAME,
         "digest": REQUIRED_DIGEST,
@@ -734,6 +839,7 @@ def main() -> int:
             },
         )
         log("pod_confirmed", podId=pod_id)
+        mark_auth_consumed(pod_id)
         client = r2_client()
         observed_rate = rate
         hard_deadline = started + min(HARD_RUNTIME_MINUTES * 60, (HARD_SPEND_USD / max(observed_rate, 0.01)) * 3600 * 0.97)
@@ -749,6 +855,7 @@ def main() -> int:
             if status and status.get("status") in {"COMPLETE", "FAILED"}:
                 break
             pods = list_pods()
+            capture_host_telemetry(pod_id, pods)
             exact = next((p for p in pods if p.get("id") == pod_id), None)
             if exact and float(exact.get("costPerHr") or 0) > 0:
                 observed_rate = float(exact["costPerHr"])
@@ -766,6 +873,10 @@ def main() -> int:
         outputs = download_outputs()
         runtime = time.time() - started
         spend = round((runtime / 3600.0) * observed_rate, 4)
+        telemetry = capture_host_telemetry(pod_id)
+        if (outputs.get("status") or {}).get("gpuTelemetry"):
+            telemetry = {**telemetry, **{"worker": outputs["status"]["gpuTelemetry"]}}
+            write_json(OUT / "HOST_TELEMETRY.json", telemetry)
         write_result(
             "COMPLETE",
             paidCreate=create_performed,
@@ -773,11 +884,23 @@ def main() -> int:
             runtimeSeconds=round(runtime, 1),
             outputs=outputs,
             podId=pod_id,
+            hostTelemetry=telemetry,
+            workerStatus=outputs.get("status"),
         )
         return 0
     except Exception as exc:
         runtime = time.time() - started
         spend = round((runtime / 3600.0) * float((checks.get("quote") or {}).get("secureUsdPerHr") or 0), 4)
+        outputs = {}
+        try:
+            outputs = download_outputs()
+        except Exception:
+            outputs = {}
+        telemetry = {}
+        try:
+            telemetry = capture_host_telemetry(pod_id)
+        except Exception:
+            telemetry = {}
         write_result(
             "FAILED_AFTER_CREATE" if create_performed else "FAILED_CLOSED_BEFORE_CREATE",
             reason=type(exc).__name__,
@@ -786,6 +909,9 @@ def main() -> int:
             runpodSpendUsd=spend if create_performed else 0,
             runtimeSeconds=round(runtime, 1),
             podId=pod_id,
+            outputs=outputs,
+            hostTelemetry=telemetry,
+            workerStatus=(outputs or {}).get("status"),
         )
         log("failed", error=type(exc).__name__)
         return 2

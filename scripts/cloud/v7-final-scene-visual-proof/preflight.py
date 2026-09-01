@@ -11,10 +11,12 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 PIN = REPO / "config/cloud/scenery-showcase-final-image.json"
-AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2"
-NEXT_AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3"
+AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3"
+PREVIOUS_AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2"
 FAILED_CAMERA_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+AUTH_FILE = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v3/AUTHORIZATION.json"
+V2_LEDGER = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2/consumption-ledger.json"
 HARD_SPEND_USD = 0.50
 HARD_RUNTIME_MINUTES = 40
 USD_PER_HOUR = 0.74
@@ -41,17 +43,22 @@ def main() -> int:
         and pin.get("cameraContract") == "six-shot-camera-c-lock-v1"
     )
     expected_usd = round((HARD_RUNTIME_MINUTES / 60.0) * USD_PER_HOUR, 4)
+    auth = json.loads(AUTH_FILE.read_text()) if AUTH_FILE.exists() else {}
+    v2 = json.loads(V2_LEDGER.read_text()) if V2_LEDGER.exists() else {}
+    v2_consumed = v2.get("authorization") == PREVIOUS_AUTH_NAME and int(v2.get("createPerformed") or 0) == 1
+    created = auth.get("name") == AUTH_NAME and str(auth.get("digest") or "") == digest
+    consumed = created and bool(auth.get("consumed"))
     payload = {
         "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_PREFLIGHT_V1",
         "authorizationName": AUTH_NAME,
-        "previousAuthorization": AUTH_NAME,
-        "nextAuthorizationName": NEXT_AUTH_NAME,
-        "authorizationCreated": False,
-        "authorizationConsumed": False,
-        "v2ConsumedFailedAfterCreate": True,
-        "issuable": launchable,
-        "v3AuthorizationSafelyIssuable": launchable,
-        "v3AuthorizationIssued": False,
+        "previousAuthorization": PREVIOUS_AUTH_NAME,
+        "nextAuthorizationName": AUTH_NAME,
+        "authorizationCreated": created,
+        "authorizationConsumed": consumed,
+        "v2ConsumedFailedAfterCreate": v2_consumed,
+        "issuable": launchable and created and not consumed and v2_consumed,
+        "v3AuthorizationSafelyIssuable": launchable and not consumed,
+        "v3AuthorizationIssued": created,
         "image": {
             "status": pin.get("status"),
             "digest": digest or None,

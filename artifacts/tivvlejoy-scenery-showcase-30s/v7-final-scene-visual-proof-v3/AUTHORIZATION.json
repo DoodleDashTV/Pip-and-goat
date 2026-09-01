@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3",
+  "name": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3",
+  "digest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "requiredLauncherSha": "3e974a14ea813118f8096794b909fd27a3274e1e",
+  "imageSourceSha": "e5e4d36323e65dfc32963d0c5c357d3c32bafc46",
+  "branch": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "maxUsdPerHour": 0.74,
+  "maxRuntimeMinutes": 40,
+  "maxSpendUsd": 0.50,
+  "createCount": 1,
+  "retry": false,
+  "encode900": false,
+  "consumed": false,
+  "v2MustNotBeReused": true,
+  "ineligibleDigests": [
+    "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+    "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+  ]
+}
