@@ -1,0 +1,43 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_V1",
+  "status": "IMPLEMENTATION_STARTED",
+  "canonicalBlender": "4.3.x",
+  "output": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "episodeSeconds": 60,
+    "draftWidth": 540,
+    "draftHeight": 960
+  },
+  "firstCertificationCandidate": {
+    "sourceId": "SRC_FOREST_MODEL_PACKAGE",
+    "filename": "Stylized_Forest_Nature_Kit.zip",
+    "reason": "Single Blender-compatible purchased environment pack; isolates scenery quality before cross-pack assembly"
+  },
+  "beautyProof": {
+    "frames": 1,
+    "videoEncode": false,
+    "paidCreateCount": 1,
+    "retryCount": 0,
+    "maxSpendUsd": 15,
+    "authorizationPresent": false
+  },
+  "productionBudget": {
+    "secureRtx4090UsdPerHour": 0.74,
+    "maximumAverageSecondsPerFrame": 5,
+    "monthlyBudgetUsd": 500,
+    "monthlyEpisodeTarget": 120,
+    "maximumAverageTotalUsdPerEpisode": 4.1667
+  },
+  "characterGate": {
+    "state": "WAITING_FOR_ARTIST_RIGS",
+    "pipApproved": false,
+    "goatApproved": false,
+    "characterWorkAuthorized": false
+  },
+  "finalRender": {
+    "authorized": false,
+    "reason": "Scenery, stage, character, performance, animatic, beauty-still, and render-preflight receipts are incomplete"
+  }
+}
