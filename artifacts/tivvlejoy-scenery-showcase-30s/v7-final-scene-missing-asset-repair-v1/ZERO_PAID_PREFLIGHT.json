@@ -43,31 +43,30 @@
     {
       "name": "Flora_Mat&GN&Models.blend",
       "member": "Stylised EcoKit/Flora_Mat&GN&Models.blend",
-      "runtimePathTemplate": "{extractRoot}/forest_ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend",
-      "documentedBytes": 702545920,
-      "minBytes": 188743681,
-      "maxBytes": 838860800
+      "runtimePath": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend",
+      "bytes": 669989781,
+      "sha256": "ce663a3e7b70b566d05092c6d86a94d727dbb5232068369de002ada4c1124589",
+      "status": "OK"
     },
     {
       "name": "Rock_Models.blend",
       "member": "Stylised EcoKit/Rock_Models.blend",
-      "runtimePathTemplate": "{extractRoot}/forest_ecokit/Stylised EcoKit/Rock_Models.blend",
-      "documentedBytes": 258365184,
-      "minBytes": 188743681,
-      "maxBytes": 419430400
+      "runtimePath": "/tmp/v4-preflight-extract/forest_ecokit/Stylised EcoKit/Rock_Models.blend",
+      "bytes": 258365184,
+      "sha256": "ea72ac8e65b278c8bfc351d55efa6d8aef2eeec13068cec42cf79db1f23f592c",
+      "status": "OK"
     }
   ],
-  "syntheticExtractProof": "cinematic_required_extract_v1_test.test_extract_and_verify_runtime_paths",
-  "realPurchasedBytesOnThisVm": false,
   "image": {
     "oldDigest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
     "oldDigestIneligible": true,
-    "newDigest": null,
-    "status": "PENDING_REQUIRED_LIBRARY_EXTRACT_IMAGE"
+    "newDigest": "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749",
+    "sourceCommit": "b8ec9a4195d3f56caf6398ea642ec04596819c71",
+    "platform": "linux/amd64",
+    "inspectStatus": "PUBLISHED_IMMUTABLE_DIGEST",
+    "requiredLibraryExtract": true,
+    "v3CompAUsed": false
   },
-  "V4_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION": "NO",
-  "blockers": [
-    "EXTRACT_REPAIR_IMAGE_NOT_PUBLISHED",
-    "NEW_IMMUTABLE_DIGEST_NOT_PINNED"
-  ]
+  "V4_VISUAL_PROOF_READY_AWAITING_AUTHORIZATION": "YES",
+  "blockers": []
 }

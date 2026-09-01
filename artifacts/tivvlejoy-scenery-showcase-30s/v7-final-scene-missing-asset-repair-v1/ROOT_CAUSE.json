@@ -22,7 +22,7 @@
       "archiveSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
       "archiveBytes": 669481428,
       "member": "Stylised EcoKit/Flora_Mat&GN&Models.blend",
-      "documentedBytes": 702545920,
+      "documentedBytes": 669989781,
       "skipDecision": "should_extract_member returned False because 670 MiB > 180 MiB production .blend cap",
       "not": [
         "case mismatch of the required basename",
