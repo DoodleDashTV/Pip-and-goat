@@ -21,6 +21,15 @@ from mathutils import Vector
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
+from cinematic_required_extract_v1 import (  # noqa: E402
+    REQUIRED_LIBRARIES,
+    RequiredLibraryError,
+    apply_role_limit_keep_required,
+    is_required_cinematic_library,
+    required_size_ok,
+    sha256_file,
+    verify_required_libraries,
+)
 from showcase_original14_select import (  # noqa: E402
     GEOMETRY_EXTS,
     IMAGE_EXTS,
@@ -126,27 +135,78 @@ def extract_selected(
     try:
         with zipfile.ZipFile(zip_path) as zf:
             infos = [i for i in zf.infolist() if not i.is_dir()]
+            required_infos = [i for i in infos if is_required_cinematic_library(i.filename)]
+            if role == 'forest_ecokit':
+                present = {Path(str(i.filename).replace('\\', '/')).name for i in infos}
+                missing = [spec['name'] for spec in REQUIRED_LIBRARIES if spec['name'] not in present]
+                if missing:
+                    raise RequiredLibraryError('REQUIRED_LIBRARY_NOT_IN_ZIP', ','.join(missing))
+            for info in required_infos:
+                size = int(info.file_size or 0)
+                if not required_size_ok(info.filename, size):
+                    raise RequiredLibraryError(
+                        'REQUIRED_LIBRARY_SIZE',
+                        f'{Path(info.filename).name} size {size} outside required range',
+                        member=info.filename,
+                        bytes=size,
+                    )
             wanted = [
                 i for i in infos
                 if Path(i.filename).suffix.lower() in SUPPORT_EXTS
                 and should_extract_member(i.filename, int(i.file_size or 0), role, intake=intake)
             ]
+            for info in required_infos:
+                if info not in wanted:
+                    wanted.append(info)
             # Prefer individual purchased geometry over combined dumps / huge images.
             wanted.sort(key=lambda i: extract_sort_key(i.filename, int(i.file_size or 0), role))
-            role_limit = extract_role_limit(role)
-            for info in wanted[:role_limit]:
+            limited = apply_role_limit_keep_required(wanted, required_infos, extract_role_limit(role))
+            for info in limited:
                 target = safe_member_path(destination, info.filename)
                 if target is None:
+                    if is_required_cinematic_library(info.filename):
+                        raise RequiredLibraryError('REQUIRED_LIBRARY_UNSAFE_PATH', info.filename)
                     continue
                 target.parent.mkdir(parents=True, exist_ok=True)
+                expected = int(info.file_size or 0)
+                if target.exists() and target.is_file() and target.stat().st_size == expected and expected > 0:
+                    extracted.append(target)
+                    continue
                 with zf.open(info) as src, open(target, 'wb') as dst:
+                    written = 0
                     while True:
                         chunk = src.read(4 * 1024 * 1024)
                         if not chunk:
                             break
                         dst.write(chunk)
+                        written += len(chunk)
+                if is_required_cinematic_library(info.filename) and written != expected:
+                    raise RequiredLibraryError(
+                        'REQUIRED_LIBRARY_TRUNCATED',
+                        f'{target.name} wrote {written} expected {expected}',
+                        destination=str(target),
+                    )
                 extracted.append(target)
-    except zipfile.BadZipFile:
+                if is_required_cinematic_library(info.filename):
+                    print(json.dumps({
+                        'event': 'required_library_extracted',
+                        'archive': str(zip_path.name),
+                        'member': info.filename,
+                        'destination': str(target),
+                        'bytes': target.stat().st_size,
+                        'sha256': sha256_file(target),
+                        'status': 'OK',
+                    }), flush=True)
+            extracted_names = {path.name for path in extracted}
+            for info in required_infos:
+                if Path(info.filename).name not in extracted_names:
+                    raise RequiredLibraryError(
+                        'REQUIRED_LIBRARY_SKIPPED',
+                        f'required member not extracted: {info.filename}',
+                    )
+    except zipfile.BadZipFile as exc:
+        if role == 'forest_ecokit':
+            raise RequiredLibraryError('REQUIRED_LIBRARY_BAD_ZIP', str(zip_path.name)) from exc
         return []
 
     # One nested ZIP level covers update/support bundles without recursively unpacking everything.
@@ -159,9 +219,14 @@ def extract_selected(
 
 def expand_asset(asset: dict, root: Path) -> list[Path]:
     p = Path(asset['localPath'])
+    dest = root / re.sub(r'[^A-Za-z0-9_-]+', '_', str(asset.get('role') or 'asset'))
     if p.suffix.lower() != '.zip':
-        return [p]
-    return extract_selected(p, root / re.sub(r'[^A-Za-z0-9_-]+', '_', asset['role']), asset['role'])
+        files = [p]
+    else:
+        files = extract_selected(p, dest, asset['role'])
+    if str(asset.get('role') or '') == 'forest_ecokit':
+        verify_required_libraries(root)
+    return files
 
 
 def select_blend_names(names: list[str], role: str, limit: int = 10, allow_water: bool = False) -> list[str]:

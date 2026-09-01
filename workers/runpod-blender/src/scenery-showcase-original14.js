@@ -119,6 +119,31 @@ async function runVisualProof({
   if (receipts.some((row) => !row.exists || !Number(row.bytes))) {
     throw Object.assign(new Error('required visual-proof inputs missing before Blender'), { code: 'REQUIRED_FILE_MISSING', receipts });
   }
+  const scriptsRoot = strip(env.TIVVLEJOY_SCENERY_SCRIPTS_ROOT) || '/opt/ddp-worker/blender/scenery';
+  const extractPreflight = spawnSync(
+    'python3',
+    [
+      path.join(scriptsRoot, 'cinematic_required_extract_v1.py'),
+      '--extract-and-verify',
+      '--assets-json',
+      JSON.stringify(renderable),
+      '--extract-root',
+      extractRoot,
+    ],
+    { encoding: 'utf8', timeout: 30 * 60_000, maxBuffer: 8 * 1024 * 1024 },
+  );
+  log('required_library_preflight', {
+    status: extractPreflight.status,
+    stdout: String(extractPreflight.stdout || '').slice(0, 2000),
+    stderr: String(extractPreflight.stderr || '').slice(0, 400),
+  });
+  if (Number(extractPreflight.status) !== 0) {
+    throw Object.assign(new Error(String(extractPreflight.stdout || extractPreflight.stderr || 'required library preflight failed').slice(0, 1400)), {
+      code: 'REQUIRED_LIBRARY_MISSING',
+    });
+  }
+  const preflightPath = path.join(extractRoot, 'REQUIRED_LIBRARY_PREFLIGHT.json');
+  try { fs.writeFileSync(preflightPath, String(extractPreflight.stdout || '{}')); } catch {}
   const gl = resolveHeadlessGlConfig({ env });
   const renderEnv = applyHeadlessGlEnv(env, gl);
   renderEnv.TIVVLEJOY_SCENERY_ASSETS_ROOT = extractRoot;

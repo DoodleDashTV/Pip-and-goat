@@ -15,6 +15,8 @@ AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V3"
 PREVIOUS_AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V2"
 FAILED_CAMERA_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+FAILED_EXTRACT_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
+NEXT_AUTH_NAME = "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_AUTHORIZATION_V4"
 AUTH_FILE = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v3/AUTHORIZATION.json"
 V2_LEDGER = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2/consumption-ledger.json"
 HARD_SPEND_USD = 0.50
@@ -33,8 +35,11 @@ def main() -> int:
         and digest not in ineligible
         and digest != FAILED_CAMERA_DIGEST
         and digest != FAILED_VRAM_DIGEST
+        and digest != FAILED_EXTRACT_DIGEST
         and FAILED_CAMERA_DIGEST in ineligible
         and FAILED_VRAM_DIGEST in ineligible
+        and FAILED_EXTRACT_DIGEST in ineligible
+        and pin.get("requiredLibraryFailClosed") is True
         and pin.get("vramFloorMib") == 24500
         and cmd == ["node", "./src/scenery-showcase-original14-entry.js"]
         and pin.get("workerEntrypoint") == "scenery-showcase-original14-entry.js"
@@ -52,12 +57,13 @@ def main() -> int:
         "schema": "TIVVLEJOY_V7_FINAL_SCENE_VISUAL_PROOF_PREFLIGHT_V1",
         "authorizationName": AUTH_NAME,
         "previousAuthorization": PREVIOUS_AUTH_NAME,
-        "nextAuthorizationName": AUTH_NAME,
+        "nextAuthorizationName": NEXT_AUTH_NAME,
         "authorizationCreated": created,
         "authorizationConsumed": consumed,
         "v2ConsumedFailedAfterCreate": v2_consumed,
-        "issuable": launchable and created and not consumed and v2_consumed,
-        "v3AuthorizationSafelyIssuable": launchable and not consumed,
+        "issuable": False,
+        "v3AuthorizationSafelyIssuable": False,
+        "v4AuthorizationSafelyIssuable": False,
         "v3AuthorizationIssued": created,
         "image": {
             "status": pin.get("status"),

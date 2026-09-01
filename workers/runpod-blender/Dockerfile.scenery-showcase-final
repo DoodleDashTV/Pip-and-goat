@@ -52,6 +52,7 @@ LABEL org.opencontainers.image.title="tivvlejoy-scenery-final-worker" \
       tivvlejoy.scenery.camera.contract="six-shot-camera-c-lock-v1" \
       tivvlejoy.scenery.vram.floor.mib="24500" \
       tivvlejoy.scenery.failed.visual.proof.digest="sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6" \
+      tivvlejoy.scenery.failed.extract.digest="sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca" \
       tivvlejoy.scenery.commercial.assets.baked="false"
 
 RUN node --check ./src/scenery-showcase-original14-roles.js && \
@@ -61,8 +62,9 @@ RUN node --check ./src/scenery-showcase-original14-roles.js && \
     node --check ./src/final-launch-contract-v1.js && \
     node --check ./src/frame-checkpoint-v1.js && \
     node --check ./src/visual-proof-contract-v1.js && \
-    python3 -m py_compile ./blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/runtime_roots_v1.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_hero_rebuild_v3.py ./blender/scenery/cinematic_camera_contract_v1.py ./blender/scenery/cinematic_shots.py && \
+    python3 -m py_compile ./blender/scenery/cinematic_valley_world_v1.py ./blender/scenery/runtime_roots_v1.py ./blender/scenery/cinematic_creek_profile.py ./blender/scenery/cinematic_hero_rebuild_v3.py ./blender/scenery/cinematic_camera_contract_v1.py ./blender/scenery/cinematic_shots.py ./blender/scenery/cinematic_required_extract_v1.py ./blender/scenery/showcase_original14_select.py && \
     python3 ./blender/scenery/cinematic_camera_contract_v1_test.py && \
+    python3 ./blender/scenery/cinematic_required_extract_v1_test.py && \
     blender --background --factory-startup --python-exit-code 1 --python ./blender/scenery/cinematic_camera_contract_blender_v1.py && \
     grep -F "require('./scenery-showcase-original14.js')" ./src/scenery-showcase-original14-entry.js >/dev/null && \
     ! grep -F "scenery-showcase-entry-v2.js" ./src/scenery-showcase-original14-entry.js && \

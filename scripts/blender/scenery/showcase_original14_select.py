@@ -450,6 +450,9 @@ def should_extract_member(
     if ext not in SUPPORT_EXTS:
         return False
     size = int(file_size or 0)
+    from cinematic_required_extract_v1 import is_required_cinematic_library, required_size_ok
+    if is_required_cinematic_library(filename):
+        return required_size_ok(filename, size)
     cap = MAX_EXTRACT_BYTES.get(ext)
     if role == 'background_mountains' and ext == '.blend':
         cap = 600 * 1024 * 1024

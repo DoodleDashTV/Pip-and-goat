@@ -46,10 +46,12 @@ def test_extract_skips_huge_obj_and_keeps_individual_assets():
     assert should_extract_member('Pine_Tree_01.fbx', 3 * 1024 * 1024, 'forest_nature') is True
     assert should_extract_member('house_a.blend', 40 * 1024 * 1024, 'village_blender') is True
     assert should_extract_member('huge_dump.obj', 90 * 1024 * 1024, 'forest_nature') is False
-    # Production still skips the purchased originals that exceed 180 MiB.
+    # Unknown huge dumps stay skipped. Required EcoKit libraries must extract.
     assert should_extract_member('Stylized_Forest_Nature_Kit.blend', 494 * 1024 * 1024, 'forest_nature') is False
-    assert should_extract_member('Flora_Mat&GN&Models.blend', 670 * 1024 * 1024, 'forest_ecokit') is False
-    assert should_extract_member('Rock_Models.blend', 258 * 1024 * 1024, 'forest_ecokit') is False
+    assert should_extract_member('Flora_Mat&GN&Models.blend', 670 * 1024 * 1024, 'forest_ecokit') is True
+    assert should_extract_member('Rock_Models.blend', 258365184, 'forest_ecokit') is True
+    assert should_extract_member('Flora_Mat&GN&Models.blend', 100, 'forest_ecokit') is False
+    assert should_extract_member('unknown_kit.blend', 400 * 1024 * 1024, 'forest_ecokit') is False
     assert should_extract_member('sk2/0001.hdr', 67 * 1024 * 1024, 'sky_hdri') is False
 
 

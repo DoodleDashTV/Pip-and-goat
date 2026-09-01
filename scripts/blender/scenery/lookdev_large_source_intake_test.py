@@ -15,8 +15,10 @@ from lookdev_large_source_intake import (
 from showcase_original14_select import should_extract_member
 
 
-def test_production_cap_still_blocks_large_blends():
-    assert should_extract_member('Flora_Mat&GN&Models.blend', 670 * 1024 * 1024, 'forest_ecokit') is False
+def test_production_cap_still_blocks_unknown_large_blends():
+    # Required EcoKit libraries now pass production extract. Unknown huge blends stay capped.
+    assert should_extract_member('Flora_Mat&GN&Models.blend', 670 * 1024 * 1024, 'forest_ecokit') is True
+    assert should_extract_member('unknown_kit.blend', 400 * 1024 * 1024, 'forest_ecokit') is False
     assert lookdev_should_extract_member('Flora_Mat&GN&Models.blend', 670 * 1024 * 1024, 'forest_ecokit') is True
 
 
@@ -77,7 +79,7 @@ def test_bad_zip_fails_integrity(tmp_path: Path):
 
 if __name__ == '__main__':
     from tempfile import TemporaryDirectory
-    test_production_cap_still_blocks_large_blends()
+    test_production_cap_still_blocks_unknown_large_blends()
     test_lookdev_refuses_scripts_and_dumps()
     with TemporaryDirectory() as tmp:
         root = Path(tmp)

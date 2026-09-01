@@ -132,6 +132,8 @@ def test_water_d_unchanged() -> None:
     assert '"trans": 0.80' in valley
     assert '"volume_density": 0.18' in valley
     assert "WATER_WIDTH_SCALE = 0.30" in valley
+    assert "BED_WIDTH_SCALE = 0.68" in valley
+    assert "HDRI_REFLECTION_ROTATION_Z = 0.48" in valley
 
 
 def test_visual_proof_uses_same_cameras_as_final() -> None:

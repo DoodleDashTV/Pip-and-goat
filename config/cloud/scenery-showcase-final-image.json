@@ -1,12 +1,15 @@
 {
   "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_V1",
-  "status": "PUBLISHED_IMMUTABLE_DIGEST",
-  "reason": "VRAM_GATE_REPAIRED_24500_MIB_FLOOR",
+  "status": "PENDING_REQUIRED_LIBRARY_EXTRACT_IMAGE",
+  "reason": "FC8A9AAA_CANNOT_MATERIALIZE_FLORA_AND_ROCK_LIBRARIES",
+  "requiredLibraryFailClosed": true,
   "ineligibleDigests": [
     "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
-    "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+    "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+    "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
   ],
-  "digest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "failedExtractDigest": "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca",
+  "digest": "",
   "dockerfile": "workers/runpod-blender/Dockerfile.scenery-showcase-final",
   "workerEntrypoint": "scenery-showcase-original14-entry.js",
   "cmd": ["node", "./src/scenery-showcase-original14-entry.js"],

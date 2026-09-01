@@ -22,6 +22,10 @@ on:
       - 'scripts/blender/scenery/cinematic_hero_rebuild_v3.py'
       - 'scripts/blender/scenery/cinematic_shots.py'
       - 'scripts/blender/scenery/runtime_roots_v1.py'
+      - 'scripts/blender/scenery/cinematic_required_extract_v1.py'
+      - 'scripts/blender/scenery/cinematic_required_extract_v1_test.py'
+      - 'scripts/blender/scenery/showcase_original14_select.py'
+      - 'scripts/blender/scenery/showcase_original14_30s.py'
       - 'scripts/cloud/v7-final-image-build-v1/inspect_published_final_image.py'
       - 'scripts/cloud/v7-final-image-build-v1/inspect_published_final_image_test.py'
       - '.github/workflows/tivvlejoy-scenery-showcase-worker-image-final-v1.yml'
@@ -76,6 +80,9 @@ jobs:
           node --test workers/runpod-blender/test/visual-proof-contract-v1.test.js
           python3 scripts/blender/scenery/cinematic_camera_contract_v1_test.py
           python3 scripts/blender/scenery/cinematic_visual_gate_contracts_v1_test.py
+          python3 scripts/blender/scenery/cinematic_required_extract_v1_test.py
+          python3 scripts/blender/scenery/showcase_original14_select_test.py
+          python3 scripts/blender/scenery/lookdev_large_source_intake_test.py
           python3 scripts/cloud/v7-final-image-build-v1/inspect_published_final_image_test.py
           grep -F 'CMD ["node", "./src/scenery-showcase-original14-entry.js"]' workers/runpod-blender/Dockerfile.scenery-showcase-final
           ! grep -n 'scenery-showcase-entry-v2.js' workers/runpod-blender/src/scenery-showcase-original14-entry.js

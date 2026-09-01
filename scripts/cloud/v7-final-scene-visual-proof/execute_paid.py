@@ -34,7 +34,9 @@ V2_LEDGER = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visu
 
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
-REQUIRED_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
+FAILED_EXTRACT_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
+# Empty until a new linux/amd64 digest that materializes Flora+Rock is pinned.
+REQUIRED_DIGEST = ""
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 REQUIRED_IMAGE_COMMIT = "e5e4d36323e65dfc32963d0c5c357d3c32bafc46"
 REQUIRED_LAUNCHER_SHA = "3e974a14ea813118f8096794b909fd27a3274e1e"
@@ -263,6 +265,7 @@ def output_contract() -> dict:
     ineligible = json.loads(PIN.read_text()).get("ineligibleDigests") or []
     failed_ineligible = FAILED_DIGEST in ineligible
     vram_failed_ineligible = FAILED_VRAM_DIGEST in ineligible
+    extract_failed_ineligible = FAILED_EXTRACT_DIGEST in ineligible
     blockers = []
     if hijack:
         blockers.extend(["CAMERA_C_REPLACED_BY_V3_COMP_A", "SIX_SHOT_CAMERAS_NOT_USED"])
@@ -274,6 +277,8 @@ def output_contract() -> dict:
         blockers.append("FAILED_DIGEST_NOT_MARKED_INELIGIBLE")
     if not vram_failed_ineligible:
         blockers.append("VRAM_GATE_DIGEST_NOT_MARKED_INELIGIBLE")
+    if not extract_failed_ineligible:
+        blockers.append("EXTRACT_FAILED_DIGEST_NOT_MARKED_INELIGIBLE")
     if "--v3-camera" not in proof or "V3_CAMERA_FORBIDDEN" not in proof:
         blockers.append("VISUAL_PROOF_ALLOWS_V3_CAMERA")
     return {
@@ -285,6 +290,8 @@ def output_contract() -> dict:
         "failedDigestIneligible": failed_ineligible,
         "failedVramDigest": FAILED_VRAM_DIGEST,
         "failedVramDigestIneligible": vram_failed_ineligible,
+        "failedExtractDigest": FAILED_EXTRACT_DIGEST,
+        "failedExtractDigestIneligible": extract_failed_ineligible,
         "heroRebuildForcesV3CompCameras": hijack,
         "v3CompA": list(V3_COMP_A),
         "cameraCPresentInShotLock": camera_c_locked,
@@ -373,6 +380,10 @@ def fail_closed_checks() -> dict:
         blockers.append("FAILED_DIGEST_INELIGIBLE")
     if pin["digest"] == FAILED_VRAM_DIGEST or REQUIRED_DIGEST == FAILED_VRAM_DIGEST:
         blockers.append("VRAM_GATE_DIGEST_INELIGIBLE")
+    if pin["digest"] == FAILED_EXTRACT_DIGEST or REQUIRED_DIGEST == FAILED_EXTRACT_DIGEST:
+        blockers.append("EXTRACT_FAILED_DIGEST_INELIGIBLE")
+    if not REQUIRED_DIGEST or not REQUIRED_DIGEST.startswith("sha256:") or len(REQUIRED_DIGEST) != 71:
+        blockers.append("EXTRACT_REPAIR_DIGEST_NOT_PINNED")
     auth = json.loads(AUTH_FILE.read_text()) if AUTH_FILE.is_file() else {}
     if auth.get("name") != AUTH_NAME or auth.get("digest") != REQUIRED_DIGEST or auth.get("requiredLauncherSha") != REQUIRED_LAUNCHER_SHA:
         blockers.append("V3_AUTHORIZATION_NOT_BOUND")

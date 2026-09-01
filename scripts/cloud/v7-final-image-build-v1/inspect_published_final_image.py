@@ -14,6 +14,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1/IMAGE_INSPECT.json"
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
+FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+FAILED_EXTRACT_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
+INELIGIBLE_DIGESTS = (FAILED_DIGEST, FAILED_VRAM_DIGEST, FAILED_EXTRACT_DIGEST)
 REQUIRED_FILES = (
     "./src/scenery-showcase-original14-entry.js",
     "./src/scenery-showcase-original14.js",
@@ -25,6 +28,8 @@ REQUIRED_FILES = (
     "./blender/scenery/cinematic_camera_contract_blender_v1.py",
     "./blender/scenery/cinematic_shots.py",
     "./blender/scenery/runtime_roots_v1.py",
+    "./blender/scenery/cinematic_required_extract_v1.py",
+    "./blender/scenery/showcase_original14_select.py",
 )
 REQUIRED_SUBSTRINGS = (
     ("./blender/scenery/cinematic_shots.py", "TJ_SHOT_02_CAM"),
@@ -33,6 +38,12 @@ REQUIRED_SUBSTRINGS = (
     ("./src/scenery-showcase-original14-entry.js", "require('./scenery-showcase-original14.js')"),
     ("./src/visual-proof-contract-v1.js", "TJ_SHOT_02_CAM"),
     ("./src/frame-checkpoint-v1.js", "checkpoint"),
+    ("./src/scenery-showcase-original14.js", "--extract-and-verify"),
+    ("./src/scenery-showcase-original14.js", "REQUIRED_LIBRARY_MISSING"),
+    ("./blender/scenery/cinematic_required_extract_v1.py", "Flora_Mat&GN&Models.blend"),
+    ("./blender/scenery/cinematic_required_extract_v1.py", "Rock_Models.blend"),
+    ("./blender/scenery/showcase_original14_select.py", "is_required_cinematic_library"),
+    ("./src/final-launch-contract-v1.js", "REQUIRED_VRAM_MIB = 24500"),
 )
 FORBIDDEN_SUBSTRINGS = (
     ("./src/scenery-showcase-original14-entry.js", "scenery-showcase-entry-v2.js"),
@@ -92,7 +103,7 @@ def image_ref() -> str:
     digest = os.environ["PUBLISHED_DIGEST"]
     if not digest.startswith("sha256:") or len(digest) != 71:
         raise SystemExit("PUBLISHED_DIGEST_INVALID")
-    if digest == FAILED_DIGEST:
+    if digest in INELIGIBLE_DIGESTS:
         raise SystemExit("FAILED_VISUAL_PROOF_DIGEST_INELIGIBLE")
     repo = os.environ["IMAGE_REPO"]
     return f"{repo}@{digest}"
@@ -237,6 +248,9 @@ def inspect_image() -> dict:
             "cuts": camera.get("cuts"),
         },
         "failedVisualProofDigestIneligible": FAILED_DIGEST,
+        "failedVramDigestIneligible": FAILED_VRAM_DIGEST,
+        "failedExtractDigestIneligible": FAILED_EXTRACT_DIGEST,
+        "requiredLibraryExtract": True,
         "paidGpuLaunchCount": 0,
         "runpodContacted": False,
         "credentialsIncluded": False,
