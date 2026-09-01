@@ -9,7 +9,8 @@ Broken-scene recovery. Not a render authorization. PR #169 stays OPEN, DRAFT, UN
 
 ## 2. Final branch and SHA
 
-Recorded at commit time on the same PR #169 branch.
+- Branch: `cursor/tivvlejoy-scenery-showcase-30s-v1-73f1`
+- SHA: `cdcf90d17ac556f66519629c6890d3345248d574`
 
 ## 3. PR #169 state
 
