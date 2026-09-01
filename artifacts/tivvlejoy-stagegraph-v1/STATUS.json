@@ -1,0 +1,20 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_V1_STATUS",
+  "status": "IMPLEMENTATION_STARTED",
+  "sourceBranchBase": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
+  "sourceBaseSha": "c3a79522f33123a1ce8775de93341829b167f920",
+  "pr169": {
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "productionEligible": false
+  },
+  "selectedCertificationCandidate": "SRC_FOREST_MODEL_PACKAGE",
+  "currentGate": "SOURCE_PACK_LOCKED",
+  "characterState": "WAITING_FOR_ARTIST_RIGS",
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "beautyFrameAuthorizationPresent": false,
+  "finalRenderAuthorized": false,
+  "productionReady": false
+}
