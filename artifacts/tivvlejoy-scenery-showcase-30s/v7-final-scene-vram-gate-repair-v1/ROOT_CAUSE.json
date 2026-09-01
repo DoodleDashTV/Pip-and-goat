@@ -1,0 +1,42 @@
+{
+  "schema": "TIVVLEJOY_V7_FINAL_SCENE_VRAM_GATE_ROOT_CAUSE_V1",
+  "failedLauncherCommit": "fefd79a691335185ec1799465c864147ae2235e6",
+  "supersedingCommitAtInvestigationStart": "53645d0d7a45c6ef7690d9cd62665a61b39a2e41",
+  "failedImageDigest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+  "location": "IMAGE_EMBEDDED",
+  "requestedGpuSku": "NVIDIA GeForce RTX 4090",
+  "runpodCreateGpuTypeId": "NVIDIA GeForce RTX 4090",
+  "cloudType": "SECURE",
+  "assignedGpuNameFromNvidiaSmi": "NOT_CAPTURED",
+  "runpodMachineGpuDisplayNameAfterTerminate": "UNAVAILABLE",
+  "rawNvidiaSmi": {
+    "memory.total": "NOT_CAPTURED",
+    "memory.free": "NOT_QUERIED"
+  },
+  "configuredMinimumMiBBefore": 24576,
+  "comparisonBefore": "Number(vramMiB) < 24 * 1024",
+  "responsible": [
+    {
+      "file": "workers/runpod-blender/src/final-launch-contract-v1.js",
+      "function": "assertHostResources",
+      "line": 118,
+      "code": "if (Number(vramMiB) < REQUIRED_VRAM_MIB) blockers.push('VRAM_BELOW_24GIB')",
+      "threw": "FINAL_HOST_CONTRACT_FAILED / VRAM_BELOW_24GIB"
+    },
+    {
+      "file": "workers/runpod-blender/src/scenery-showcase-original14.js",
+      "function": "measureVram",
+      "line": 86,
+      "note": "queried only name,memory.total; discarded raw line; returned Number(parts[1]) || 0"
+    }
+  ],
+  "statusJsonProvesHostResourcesNotModelCheck": true,
+  "workerStatusCode": "FINAL_HOST_CONTRACT_FAILED",
+  "workerStatusMessage": "VRAM_BELOW_24GIB",
+  "conclusion": "A",
+  "conclusionDetail": "The exact 24 GiB integer floor (24576 MiB) is embedded in the worker image and runs before the RTX 4090 model check. A normal 4090 nvidia-smi total of 24564 MiB is already documented in this repo and is 12 MiB below that floor. This run did not persist nvidia-smi stdout, so 24564 is the documented class value, not a captured value from pod zq4lfe0xyknzc7. B is not supported: CREATE requested Secure 4090. C is not the primary cause: nounits memory.total is MiB. D is not supported: a 4090 is a 24 GB class GPU.",
+  "documentedClassTotalMiB": 24564,
+  "newFloorMiB": 24500,
+  "safetyMarginMiBBelowDocumented4090": 64,
+  "marginAbove20GiBMiB": 4020
+}

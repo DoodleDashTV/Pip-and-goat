@@ -31,7 +31,8 @@ STAGED = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-
 OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visual-proof-v2"
 
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
-REQUIRED_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
+REQUIRED_DIGEST = ""  # set only after the VRAM-gate image is pinned
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 REQUIRED_IMAGE_COMMIT = "c54aecdfc7e6da4f008b5dce8ba47cfe6cb04cfc"
 REQUIRED_CONTENT_ANCESTOR = "d5654510599f5b42919a949c5c4503c5ec1442f1"
@@ -353,8 +354,8 @@ def fail_closed_checks() -> dict:
         blockers.append("REQUIRED_ANCESTOR_MISSING")
     if pin["digest"] == FAILED_DIGEST or REQUIRED_DIGEST == FAILED_DIGEST:
         blockers.append("FAILED_DIGEST_INELIGIBLE")
-    if REQUIRED_DIGEST != "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b":
-        blockers.append("LOCKED_V2_DIGEST_MISMATCH")
+    if pin["digest"] == FAILED_VRAM_DIGEST or REQUIRED_DIGEST == FAILED_VRAM_DIGEST:
+        blockers.append("VRAM_GATE_DIGEST_INELIGIBLE")
     if not pin["digest"] or not pin["digestMatch"]:
         blockers.append("DIGEST_NOT_PINNED")
     inspect = json.loads(INSPECT.read_text()) if INSPECT.is_file() else {}

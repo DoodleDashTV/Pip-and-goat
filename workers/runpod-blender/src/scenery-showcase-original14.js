@@ -83,10 +83,16 @@ function runBlender({env,args,timeoutMs,logPath,onTick}) {
   });
 }
 function measureVram() {
-  const res = spawnSync('nvidia-smi', ['--query-gpu=name,memory.total', '--format=csv,noheader,nounits'], { encoding: 'utf8', timeout: 15_000 });
-  if (res.status !== 0) return { gpuModel: null, vramMiB: 0 };
-  const parts = String(res.stdout || '').trim().split('\n')[0].split(',').map((p) => p.trim());
-  return { gpuModel: parts[0] || null, vramMiB: Number(parts[1]) || 0 };
+  const res = spawnSync(
+    'nvidia-smi',
+    ['--query-gpu=name,memory.total,memory.free', '--format=csv,noheader,nounits'],
+    { encoding: 'utf8', timeout: 15_000 },
+  );
+  const parsed = contract.parseNvidiaSmiTelemetry(res.stdout, { status: res.status, stderr: res.stderr });
+  if (!parsed.ok) {
+    throw Object.assign(new Error(parsed.code), { code: parsed.code, telemetry: parsed });
+  }
+  return parsed;
 }
 function measureDiskFree(dir) {
   if (typeof fs.statfsSync === 'function') {
@@ -275,8 +281,13 @@ async function main() {
     stage='HOST_AND_LAUNCH_CONTRACT';
     const gpu=measureVram();
     const diskFree=measureDiskFree(workspace);
-    contract.assertHostResources({ memTotal: os.totalmem(), vramMiB: gpu.vramMiB, diskFree });
-    contract.assertRtx4090(gpu);
+    log('gpu_telemetry', { gpuModel: gpu.gpuModel, vramTotalMiB: gpu.vramTotalMiB, vramFreeMiB: gpu.vramFreeMiB, converted: gpu.converted });
+    try {
+      contract.assertHostResources({ memTotal: os.totalmem(), vramTotalMiB: gpu.vramTotalMiB, diskFree });
+      contract.assertRtx4090(gpu);
+    } catch (error) {
+      throw Object.assign(error, { telemetry: gpu });
+    }
     const extractRoot=path.join(workspace,'expanded-original14');
     await fsp.mkdir(extractRoot,{recursive:true});
     env.TIVVLEJOY_SCENERY_ASSETS_ROOT=extractRoot;
@@ -397,7 +408,7 @@ async function main() {
     log('original14_showcase_complete',{jobId,frameCount:info.frames,artifactSha256,materializedBytes:selection.totalBytes});
     return 0;
   } catch(error) {
-    const failed={jobId,status:'FAILED',stage,code:error.code||'ORIGINAL14_SHOWCASE_FAILED',message:String(error.message||error).slice(0,1400),commercialAssetsPublished:false,at:new Date().toISOString()};
+    const failed={jobId,status:'FAILED',stage,code:error.code||'ORIGINAL14_SHOWCASE_FAILED',message:String(error.message||error).slice(0,1400),gpuTelemetry:error.telemetry||null,commercialAssetsPublished:false,at:new Date().toISOString()};
     try { await writeJson(statusKey,failed); } catch(writeError) { log('failed_status_write_error',{message:String(writeError.message||writeError).slice(0,300)}); }
     log('original14_showcase_failed',{stage,code:failed.code,message:failed.message});
     return 1;

@@ -8,7 +8,13 @@ const FINAL_SCRIPT = '/opt/ddp-worker/blender/scenery/cinematic_valley_world_v1.
 const FINAL_ENTRY = 'node ./src/scenery-showcase-original14-entry.js';
 const FORBIDDEN_CMDS = ['scenery-showcase-entry-v2.js', 'v7-proof-a-boot.js'];
 const REQUIRED_HOST_RAM = 24 * 1024 * 1024 * 1024;
-const REQUIRED_VRAM_MIB = 24 * 1024;
+// Exact 24 GiB is 24576 MiB. nvidia-smi on a normal RTX 4090 reports ~24564 MiB
+// (documented in worker_memory_contract_v1.py). The failed V2 pod used
+// `Number(vramMiB) < 24576`, which rejects that class. Floor is 24500 MiB:
+// 64 MiB below the documented 24564 reading, 4020 MiB above a 20 GiB GPU.
+const DOCUMENTED_RTX4090_NVIDIA_SMI_TOTAL_MIB = 24564;
+const REQUIRED_VRAM_MIB = 24500;
+const REQUIRED_VRAM_COMPARISON = 'vramTotalMiB < REQUIRED_VRAM_MIB';
 const REQUIRED_DISK = 60 * 1024 * 1024 * 1024;
 const FINAL_TIMEOUT_MINUTES = 1440;
 
@@ -112,15 +118,66 @@ function resolveFinalWorkerEnv(env = {}) {
   };
 }
 
-function assertHostResources({ memTotal = 0, vramMiB = 0, diskFree = 0 } = {}) {
+function convertMib(mib) {
+  const totalMiB = Number(mib);
+  if (!Number.isFinite(totalMiB)) {
+    throw Object.assign(new Error('VRAM MiB is not a number'), { code: 'GPU_TELEMETRY_MALFORMED' });
+  }
+  return {
+    mib: totalMiB,
+    gib: totalMiB / 1024,
+    decimalGb: (totalMiB * 1024 * 1024) / 1e9,
+  };
+}
+
+function parseNvidiaSmiTelemetry(stdout, { status = 0, stderr = '' } = {}) {
+  if (Number(status) !== 0) {
+    return { ok: false, code: 'GPU_TELEMETRY_MISSING', error: String(stderr || 'nvidia-smi failed').slice(0, 300) };
+  }
+  const line = String(stdout || '').trim().split('\n')[0] || '';
+  if (!line) {
+    return { ok: false, code: 'GPU_TELEMETRY_MISSING', error: 'empty nvidia-smi stdout' };
+  }
+  const parts = line.split(',').map((part) => part.trim());
+  if (parts.length < 3) {
+    return { ok: false, code: 'GPU_TELEMETRY_MALFORMED', error: 'nvidia-smi must report name,memory.total,memory.free', raw: line };
+  }
+  const gpuModel = parts[0];
+  const vramTotalMiB = Number(parts[1]);
+  const vramFreeMiB = Number(parts[2]);
+  if (!gpuModel || !Number.isFinite(vramTotalMiB) || !Number.isFinite(vramFreeMiB) || vramTotalMiB <= 0) {
+    return { ok: false, code: 'GPU_TELEMETRY_MALFORMED', error: 'ambiguous nvidia-smi fields', raw: line };
+  }
+  const total = Math.trunc(vramTotalMiB);
+  const free = Math.trunc(vramFreeMiB);
+  return {
+    ok: true,
+    gpuModel,
+    vramTotalMiB: total,
+    vramFreeMiB: free,
+    vramMiB: total,
+    units: 'MiB',
+    converted: convertMib(total),
+    raw: line,
+  };
+}
+
+function vramTotalMiBFrom(row = {}) {
+  const value = row.vramTotalMiB ?? row.vramMiB;
+  return Number.isFinite(Number(value)) ? Math.trunc(Number(value)) : NaN;
+}
+
+function assertHostResources({ memTotal = 0, vramMiB = 0, vramTotalMiB, diskFree = 0 } = {}) {
   const blockers = [];
+  const totalMiB = vramTotalMiBFrom({ vramMiB, vramTotalMiB });
   if (Number(memTotal) < REQUIRED_HOST_RAM) blockers.push('HOST_RAM_BELOW_24GIB');
-  if (Number(vramMiB) < REQUIRED_VRAM_MIB) blockers.push('VRAM_BELOW_24GIB');
+  if (!Number.isFinite(totalMiB)) blockers.push('GPU_TELEMETRY_MALFORMED');
+  else if (totalMiB < REQUIRED_VRAM_MIB) blockers.push('VRAM_BELOW_24GIB');
   if (Number(diskFree) < REQUIRED_DISK) blockers.push('DISK_BELOW_60GIB');
   if (blockers.length) {
     throw Object.assign(new Error(blockers.join(',')), { code: 'FINAL_HOST_CONTRACT_FAILED', blockers });
   }
-  return { ok: true };
+  return { ok: true, vramTotalMiB: totalMiB };
 }
 
 function assertBotaniqExcluded(selectedKeys = []) {
@@ -131,14 +188,18 @@ function assertBotaniqExcluded(selectedKeys = []) {
   return { ok: true };
 }
 
-function assertRtx4090({ gpuModel = '', vramMiB = 0 } = {}) {
+function assertRtx4090({ gpuModel = '', vramMiB = 0, vramTotalMiB } = {}) {
   if (!/rtx\s*4090/i.test(String(gpuModel))) {
     throw Object.assign(new Error('RTX 4090 required'), { code: 'GPU_NOT_RTX_4090' });
   }
-  if (Number(vramMiB) < REQUIRED_VRAM_MIB) {
-    throw Object.assign(new Error('VRAM below 24 GiB'), { code: 'VRAM_BELOW_24GIB' });
+  const totalMiB = vramTotalMiBFrom({ vramMiB, vramTotalMiB });
+  if (!Number.isFinite(totalMiB)) {
+    throw Object.assign(new Error('GPU telemetry malformed'), { code: 'GPU_TELEMETRY_MALFORMED' });
   }
-  return { ok: true };
+  if (totalMiB < REQUIRED_VRAM_MIB) {
+    throw Object.assign(new Error('VRAM below RTX 4090 class floor'), { code: 'VRAM_BELOW_24GIB' });
+  }
+  return { ok: true, gpuModel, vramTotalMiB: totalMiB };
 }
 
 function assertZeroLivePods(livePods = []) {
@@ -181,7 +242,11 @@ module.exports = {
   FINAL_TIMEOUT_MINUTES,
   REQUIRED_HOST_RAM,
   REQUIRED_VRAM_MIB,
+  REQUIRED_VRAM_COMPARISON,
+  DOCUMENTED_RTX4090_NVIDIA_SMI_TOTAL_MIB,
   REQUIRED_DISK,
+  convertMib,
+  parseNvidiaSmiTelemetry,
   buildBlenderArgs,
   assertFinalBlenderArgs,
   assertWorkerCmd,

@@ -50,6 +50,7 @@ LABEL org.opencontainers.image.title="tivvlejoy-scenery-final-worker" \
       tivvlejoy.scenery.water.variant="D" \
       tivvlejoy.scenery.hero.rebuild="v3" \
       tivvlejoy.scenery.camera.contract="six-shot-camera-c-lock-v1" \
+      tivvlejoy.scenery.vram.floor.mib="24500" \
       tivvlejoy.scenery.failed.visual.proof.digest="sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6" \
       tivvlejoy.scenery.commercial.assets.baked="false"
 

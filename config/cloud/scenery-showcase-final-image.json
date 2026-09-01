@@ -1,11 +1,12 @@
 {
   "schema": "TIVVLEJOY_SCENERY_SHOWCASE_FINAL_IMAGE_V1",
-  "status": "PUBLISHED_IMMUTABLE_DIGEST",
-  "reason": "CAMERA_CONTRACT_REPAIRED_PIXEL_GATES_BLOCKED_PENDING_PAID_PIXEL_PROOF",
+  "status": "VRAM_GATE_REPAIR_PENDING_NEW_DIGEST",
+  "reason": "EMBEDDED_VRAM_GATE_REJECTED_NORMAL_RTX4090_CLASS",
   "ineligibleDigests": [
-    "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
+    "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6",
+    "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
   ],
-  "digest": "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b",
+  "digest": null,
   "dockerfile": "workers/runpod-blender/Dockerfile.scenery-showcase-final",
   "workerEntrypoint": "scenery-showcase-original14-entry.js",
   "cmd": ["node", "./src/scenery-showcase-original14-entry.js"],
