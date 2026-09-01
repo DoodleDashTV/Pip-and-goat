@@ -16,7 +16,8 @@ OUT = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-image-build-v1/I
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
 FAILED_EXTRACT_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
-INELIGIBLE_DIGESTS = (FAILED_DIGEST, FAILED_VRAM_DIGEST, FAILED_EXTRACT_DIGEST)
+FAILED_VISUAL_DIGEST = "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749"
+INELIGIBLE_DIGESTS = (FAILED_DIGEST, FAILED_VRAM_DIGEST, FAILED_EXTRACT_DIGEST, FAILED_VISUAL_DIGEST)
 REQUIRED_FILES = (
     "./src/scenery-showcase-original14-entry.js",
     "./src/scenery-showcase-original14.js",
@@ -29,6 +30,8 @@ REQUIRED_FILES = (
     "./blender/scenery/cinematic_shots.py",
     "./blender/scenery/runtime_roots_v1.py",
     "./blender/scenery/cinematic_required_extract_v1.py",
+    "./blender/scenery/cinematic_ecokit_image_resolve_v1.py",
+    "./blender/scenery/cinematic_hero_rebuild_v3.py",
     "./blender/scenery/showcase_original14_select.py",
 )
 REQUIRED_SUBSTRINGS = (
@@ -42,6 +45,9 @@ REQUIRED_SUBSTRINGS = (
     ("./src/scenery-showcase-original14.js", "REQUIRED_LIBRARY_MISSING"),
     ("./blender/scenery/cinematic_required_extract_v1.py", "Flora_Mat&GN&Models.blend"),
     ("./blender/scenery/cinematic_required_extract_v1.py", "Rock_Models.blend"),
+    ("./blender/scenery/cinematic_required_extract_v1.py", "REQUIRED_TEXTURE_PREFIXES"),
+    ("./blender/scenery/cinematic_ecokit_image_resolve_v1.py", "assets library"),
+    ("./blender/scenery/cinematic_hero_rebuild_v3.py", "resolve_appended_ecokit_images"),
     ("./blender/scenery/showcase_original14_select.py", "is_required_cinematic_library"),
     ("./src/final-launch-contract-v1.js", "REQUIRED_VRAM_MIB = 24500"),
 )
@@ -250,7 +256,9 @@ def inspect_image() -> dict:
         "failedVisualProofDigestIneligible": FAILED_DIGEST,
         "failedVramDigestIneligible": FAILED_VRAM_DIGEST,
         "failedExtractDigestIneligible": FAILED_EXTRACT_DIGEST,
+        "failedVisualDigestIneligible": FAILED_VISUAL_DIGEST,
         "requiredLibraryExtract": True,
+        "requiredTextureTreeExtract": True,
         "paidGpuLaunchCount": 0,
         "runpodContacted": False,
         "credentialsIncluded": False,

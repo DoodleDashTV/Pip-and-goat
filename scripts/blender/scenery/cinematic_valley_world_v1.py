@@ -2548,8 +2548,7 @@ def place_louis_lp_ridge(files: list[Path], collection: bpy.types.Collection) ->
     # V42 Camera C looks farther, so a FULL purchased Louis mass can sit in
     # the right-of-look corridor. Do not crop to a 20% cap — that was a sliver.
     if meadow1 is not None:
-        # Foothill in front of the SHOT_02 Louis face. Keep most of the mass.
-        extract_louis_height_cap(meadow1, 0.22)
+        # Do not height-cap. Cutting z < 0.22*zmax left a floating sheet in Camera C.
         sit_louis_peak(meadow1, -7.2, 30.0, scale=0.16, rot_z=0.36, z_lift=0.0)
         clip_louis_world_apron(meadow1, south_y=15.5)
         link_exclusive(meadow1, collection)

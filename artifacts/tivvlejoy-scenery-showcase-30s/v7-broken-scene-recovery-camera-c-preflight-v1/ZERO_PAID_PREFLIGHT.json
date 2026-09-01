@@ -1,0 +1,66 @@
+{
+  "schema": "TIVVLEJOY_V7_BROKEN_SCENE_RECOVERY_ZERO_PAID_PREFLIGHT_V1",
+  "paidCreateCount": 0,
+  "runpodSpendUsd": 0.0,
+  "livePods": [],
+  "blenderAvailable": false,
+  "dockerAvailable": false,
+  "localCyclesDiagnostic": null,
+  "hostMemory": {
+    "totalMiB": 16014,
+    "usedMiB": 1233,
+    "availableMiB": 14780,
+    "swapMiB": 0
+  },
+  "extractValidation": {
+    "zip": "Stylised EcoKit.zip",
+    "zipSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+    "textureCount": 1134,
+    "texturesDir": 27,
+    "assetsLibrary": 1107,
+    "missingNamed": [],
+    "blockers": [],
+    "ok": true,
+    "elapsedSec": 1.967,
+    "peakRssMiB": 33.9
+  },
+  "sceneEval": {
+    "attempted": false,
+    "failurePhase": "BLENDER_UNAVAILABLE",
+    "component": "Blender 4.2.2 binary absent on this host; Flora_Mat&GN&Models.blend is 640 MiB and the full Original-14 + EcoKit texture tree is unsafe to evaluate in 15 GiB RAM",
+    "measuredPeakRssMiB": 33.9,
+    "minimumRamGiB": 32
+  },
+  "gates": {
+    "cinematic_required_extract_v1_test": "PASS",
+    "showcase_original14_select_test": "PASS",
+    "cinematic_visual_gate_contracts_v1_test": "PASS",
+    "cinematic_camera_contract_v1_test": "PASS",
+    "inspect_published_final_image_test": "PASS",
+    "lookdev_large_source_intake_test": "PASS",
+    "geometry_E": "PASS",
+    "geometry_F": "PASS",
+    "geometry_J": "PASS",
+    "pixel_E": "NOT_RUN_NO_BLENDER",
+    "pixel_F": "NOT_RUN_NO_BLENDER",
+    "pixel_J": "NOT_RUN_NO_BLENDER",
+    "humanVisualApproval": "NOT_PASS"
+  },
+  "textureMaterialTotals": {
+    "missingRequiredTextureFiles": 0,
+    "unreadableImageDatablocks": "NOT_EVALUATED_NO_BLENDER",
+    "defaultPinkFallbackSurfaces": "NOT_EVALUATED_NO_BLENDER",
+    "defaultWhiteFoliageFallbacks": "NOT_EVALUATED_NO_BLENDER",
+    "brokenOpaqueAlphaCards": "NOT_EVALUATED_NO_BLENDER",
+    "unassignedVisibleMaterialSlots": "NOT_EVALUATED_NO_BLENDER"
+  },
+  "geometryTotals": {
+    "floatingTerrainSheets": "CODE_REPAIRED_NOT_REEVALUATED",
+    "cameraCVisibleIntersections": "CODE_REPAIRED_NOT_REEVALUATED"
+  },
+  "v4ImageIneligible": true,
+  "newWorkerImageRequired": true,
+  "READY_FOR_SINGLE_CAMERA_C_PAID_PROOF_AUTHORIZATION": "NO",
+  "V7_FINAL_VIDEO_RENDER_READY_AWAITING_AUTHORIZATION": "NO",
+  "FINAL_VIDEO_RENDER_NOT_AUTHORIZED": "YES"
+}

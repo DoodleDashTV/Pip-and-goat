@@ -7,9 +7,20 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+from cinematic_ecokit_image_resolve_v1 import (
+    DOCUMENTED_ASSETS_LIBRARY_COUNT,
+    DOCUMENTED_TEXTURE_COUNT,
+    DOCUMENTED_TEXTURES_DIR_COUNT,
+    REQUIRED_IMAGE_NAMES,
+    REQUIRED_TEXTURE_PREFIXES,
+    is_required_ecokit_texture,
+    resolve_ecokit_image,
+    verify_ecokit_texture_tree,
+)
 from cinematic_required_extract_v1 import (
     DOCUMENTED_FLORA_BYTES,
     DOCUMENTED_ROCK_BYTES,
+    ECOKIT_EXTRACT_ROLE_LIMIT,
     ECOKIT_ROLE,
     ECOKIT_ZIP_SHA256,
     FLORA_MEMBER,
@@ -22,11 +33,13 @@ from cinematic_required_extract_v1 import (
     apply_role_limit_keep_required,
     expected_runtime_path,
     extract_required_from_zip,
+    is_required_cinematic_dependency,
     is_required_cinematic_library,
     original14_manifest,
     required_size_ok,
     sha256_file,
     verify_required_libraries,
+    verify_required_textures,
 )
 from showcase_original14_select import MAX_EXTRACT_BYTES, extract_role_limit, should_extract_member
 from cinematic_shots import default_shot_cameras, hero_still_frames
@@ -56,12 +69,19 @@ def test_historical_180mib_cap_is_the_v3_skip():
 
 
 def test_role_limit_cannot_drop_required():
-    assert extract_role_limit(ECOKIT_ROLE) == 24
+    assert extract_role_limit(ECOKIT_ROLE) == ECOKIT_EXTRACT_ROLE_LIMIT == 2000
     small = [f"small_{i:02d}.png" for i in range(24)]
     wanted = small + [FLORA_NAME, ROCK_NAME]
     kept = apply_role_limit_keep_required(wanted, [FLORA_NAME, ROCK_NAME], 24)
     assert FLORA_NAME in kept
     assert ROCK_NAME in kept
+    textures = [f"Stylised EcoKit/Textures/{i:04d}.png" for i in range(30)]
+    limited = apply_role_limit_keep_required(small, textures, 24)
+    assert all(item in limited for item in textures)
+    assert is_required_ecokit_texture("Stylised EcoKit/Textures/Tree Trunk_2.png") is True
+    assert is_required_ecokit_texture("Stylised EcoKit/assets library/Grass_3_020.png") is True
+    assert is_required_ecokit_texture("Village (Textures)/Cabin01_ALB.png") is False
+    assert is_required_cinematic_dependency("Stylised EcoKit/Textures/Flora_1.png") is True
 
 
 def test_extract_tiny_required_fails_closed():
@@ -149,6 +169,68 @@ def test_missing_truncated_wrong_case_wrong_hash_fail():
             assert "HASH_MISMATCH" in str(exc)
 
 
+def test_extract_textures_and_resolve_paths():
+    originals = [(spec, spec["minBytes"]) for spec in REQUIRED_LIBRARIES]
+    try:
+        for spec in REQUIRED_LIBRARIES:
+            spec["minBytes"] = 8
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            zip_path = root / "Stylised EcoKit.zip"
+            dest = root / ECOKIT_ROLE
+            flora = b"FLORA-REQUIRED-LIBRARY-BYTES"
+            rock = b"ROCK-REQUIRED-LIBRARY-BYTES"
+            textures = {
+                "Stylised EcoKit/Textures/Tree Trunk_1.png": b"T1" * 40,
+                "Stylised EcoKit/Textures/Tree Trunk_2.png": b"T2" * 40,
+                "Stylised EcoKit/Textures/Tree Trunk_3.png": b"T3" * 40,
+                "Stylised EcoKit/Textures/03-2.png": b"03" * 40,
+                "Stylised EcoKit/Textures/Flora_1.png": b"FL" * 40,
+                "Stylised EcoKit/Textures/Moss_2.png": b"MO" * 40,
+                "Stylised EcoKit/Textures/firefly_1.png": b"F1" * 40,
+                "Stylised EcoKit/Textures/firefly_2.png": b"F2" * 40,
+                "Stylised EcoKit/Textures/01-8.png": b"18" * 40,
+                "Stylised EcoKit/assets library/Grass_3_020.png": b"GR" * 40,
+                "Stylised EcoKit/assets library/Rock_Model_Large_010.png": b"RK" * 40,
+            }
+            extras = {
+                f"Stylised EcoKit/Textures/extra_{i:02d}.png": b"EX" * 40
+                for i in range(DOCUMENTED_TEXTURES_DIR_COUNT - 9)
+            }
+            extras.update({
+                f"Stylised EcoKit/assets library/card_{i:04d}.png": b"CD" * 40
+                for i in range(DOCUMENTED_ASSETS_LIBRARY_COUNT - 2)
+            })
+            with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_STORED) as zf:
+                zf.writestr(FLORA_MEMBER, flora)
+                zf.writestr(ROCK_MEMBER, rock)
+                for name, data in {**textures, **extras}.items():
+                    zf.writestr(name, data)
+            receipts = extract_required_from_zip(zip_path, dest)
+            assert (dest / "Stylised EcoKit/Textures/Tree Trunk_2.png").is_file()
+            assert (dest / "Stylised EcoKit/assets library/Grass_3_020.png").is_file()
+            assert any(row.get("kind") == "texture" and row["name"] == "Tree Trunk_2.png" for row in receipts)
+            report = verify_required_textures(dest)
+            assert report["ok"] is True
+            assert report["counts"]["total"] == DOCUMENTED_TEXTURE_COUNT
+            found = resolve_ecokit_image("//Textures\\Tree Trunk_2.png", dest, blend_dir=dest / "Stylised EcoKit")
+            assert found is not None
+            assert found.name == "Tree Trunk_2.png"
+            vendor = resolve_ecokit_image(
+                r"\Stylised Natural Environment Library\assets library\Grass_3_020.png",
+                dest,
+            )
+            assert vendor is not None
+            assert vendor.name == "Grass_3_020.png"
+            parent_rel = resolve_ecokit_image("//..\\Textures\\Tree Trunk_1.png", dest, blend_dir=dest / "Stylised EcoKit")
+            assert parent_rel is not None
+            missing = [name for name in REQUIRED_IMAGE_NAMES if name not in {Path(p).name for p in textures}]
+            assert missing == []
+    finally:
+        for spec, value in originals:
+            spec["minBytes"] = value
+
+
 def test_original14_manifest_and_locks():
     manifest = original14_manifest()
     assert manifest["count"] == 14
@@ -156,6 +238,18 @@ def test_original14_manifest_and_locks():
     assert manifest["roles"][-2] == ECOKIT_ROLE
     assert manifest["ecokitZipSha256"] == ECOKIT_ZIP_SHA256
     assert {row["name"] for row in manifest["requiredLibraries"]} == {FLORA_NAME, ROCK_NAME}
+    assert manifest["requiredTextureCount"] == DOCUMENTED_TEXTURE_COUNT == 1134
+    assert manifest["requiredTexturesDirCount"] == DOCUMENTED_TEXTURES_DIR_COUNT == 27
+    assert manifest["requiredAssetsLibraryCount"] == DOCUMENTED_ASSETS_LIBRARY_COUNT == 1107
+    assert set(REQUIRED_TEXTURE_PREFIXES) <= set(manifest["requiredTexturePrefixes"])
+    assert "Tree Trunk_2.png" in manifest["requiredImageNames"]
+    assert "01-8.png" in manifest["requiredImageNames"]
+    valley = (HERE / "cinematic_valley_world_v1.py").read_text()
+    assert "extract_louis_height_cap(meadow1, 0.22)" not in valley
+    hero = (HERE / "cinematic_hero_rebuild_v3.py").read_text()
+    assert "resolve_appended_ecokit_images" in hero
+    assert "enable_ecokit_cutout_alpha" in hero
+    assert "TJ_Ground_ValleyFloor_PurchasedMeadow" in hero
     frames = hero_still_frames()
     assert frames == {
         "SHOT_01": 48,
@@ -194,6 +288,7 @@ def main() -> int:
     test_role_limit_cannot_drop_required()
     test_extract_tiny_required_fails_closed()
     test_extract_and_verify_runtime_paths()
+    test_extract_textures_and_resolve_paths()
     test_missing_truncated_wrong_case_wrong_hash_fail()
     test_original14_manifest_and_locks()
     print("cinematic_required_extract_v1_test PASS")

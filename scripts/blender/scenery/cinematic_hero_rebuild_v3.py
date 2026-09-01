@@ -13,9 +13,16 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
+from cinematic_ecokit_image_resolve_v1 import resolve_ecokit_image, verify_ecokit_texture_tree
 from cinematic_hero_v3_land import authored_height
 from cinematic_master_look_v1 import apply_cinematic_daylight, apply_compositor_finish
 from runtime_roots_v1 import find_named, require_named, resolve_assets_root
+from showcase_original14_30s import (
+    _connect_image_alpha,
+    audit_missing_image_datablocks,
+    enable_ecokit_cutout_alpha,
+    remap_missing_images,
+)
 
 
 def _assets_root() -> Path:
@@ -156,6 +163,12 @@ def hide_legacy_visuals() -> dict:
             obj.hide_viewport = True
             hidden["trees"] += 1
         if name.startswith("TJ_MeadowEco_"):
+            obj.hide_render = True
+            obj.hide_viewport = True
+            hidden["eco"] += 1
+        if name in ("TJ_Ground_ValleyFloor_PurchasedMeadow", "TJ_Ground_DirtPath"):
+            # Duplicate terrain sheet under the authored V3 hero land. Not a
+            # hide-outside-frustum trick: both occupy the Camera C corridor.
             obj.hide_render = True
             obj.hide_viewport = True
             hidden["eco"] += 1
@@ -304,7 +317,7 @@ def plant_forest(library: dict, col: bpy.types.Collection) -> dict:
     bushes = library.get("bushes") or []
     grass = library.get("grass") or []
     planted = []
-    # Designed grove — left of creek, not a wall, mountain gap kept open.
+    # Camera C (2.2, -21.4) -> (-3.4, -10.2). Designed groves, not a sky wall.
     tree_plan = (
         (0, (-14.8, -11.2), 0.40, 0.35),
         (2, (-17.6, -7.4), 0.46, 1.20),
@@ -314,6 +327,23 @@ def plant_forest(library: dict, col: bpy.types.Collection) -> dict:
         (0, (8.8, -6.8), 0.30, -1.05),
         (1, (-10.6, -15.6), 0.22, 1.70),
         (2, (-13.2, -3.2), 0.26, 0.40),
+        (3, (-15.6, -8.8), 0.34, 1.05),
+        (4, (-11.2, -9.4), 0.24, -0.70),
+        (0, (-18.8, -4.6), 0.42, 0.55),
+        (1, (-9.4, -4.2), 0.20, 2.40),
+        (2, (6.6, -9.8), 0.26, 0.90),
+        (3, (9.8, -3.6), 0.34, -1.40),
+        (4, (-13.8, 0.4), 0.38, 0.20),
+        (0, (-16.6, 2.8), 0.44, 1.55),
+        (1, (7.4, -1.2), 0.28, 2.20),
+        (2, (-8.2, 1.6), 0.22, -0.35),
+        (3, (-20.2, -8.0), 0.36, 0.75),
+        (4, (10.6, 1.8), 0.32, 1.10),
+        (0, (-12.0, 4.2), 0.40, -1.15),
+        (1, (-6.8, 3.4), 0.18, 0.45),
+        (2, (5.2, 2.6), 0.24, 1.85),
+        (3, (-18.0, 6.0), 0.48, 0.10),
+        (4, (-14.4, 7.2), 0.36, 2.05),
     )
     for i, (idx, loc, scale, yaw) in enumerate(tree_plan):
         if not trees:
@@ -331,6 +361,13 @@ def plant_forest(library: dict, col: bpy.types.Collection) -> dict:
         ((1.1, -16.6), 0.38, 2.2),
         ((-7.4, -13.8), 0.30, 0.8),
         ((-11.6, -12.4), 0.36, -0.5),
+        ((-6.6, -17.2), 0.28, 1.1),
+        ((-0.6, -16.8), 0.32, 2.5),
+        ((2.4, -15.0), 0.26, 0.2),
+        ((-8.8, -15.4), 0.34, -1.2),
+        ((-4.0, -14.2), 0.30, 0.9),
+        ((-10.2, -14.6), 0.28, 1.8),
+        ((3.6, -16.2), 0.24, -0.6),
     )
     for i, (loc, scale, yaw) in enumerate(fern_plan):
         if not ferns:
@@ -345,6 +382,13 @@ def plant_forest(library: dict, col: bpy.types.Collection) -> dict:
         ((-9.8, -9.6), 0.55, 0.3),
         ((6.4, -8.2), 0.48, -0.9),
         ((-15.2, -8.8), 0.62, 1.4),
+        ((-7.2, -11.4), 0.40, 2.1),
+        ((-3.6, -10.6), 0.36, 0.6),
+        ((4.8, -10.8), 0.44, -1.3),
+        ((-12.6, -7.2), 0.50, 1.0),
+        ((8.2, -5.4), 0.42, 0.2),
+        ((-5.8, -7.8), 0.38, 2.4),
+        ((-11.0, -5.0), 0.46, -0.4),
     )
     for i, (loc, scale, yaw) in enumerate(bush_plan):
         if not bushes:
@@ -366,6 +410,18 @@ def plant_forest(library: dict, col: bpy.types.Collection) -> dict:
         ((5.0, -11.8), 1.1, 2.4),
         ((-3.0, -8.4), 1.0, 0.9),
         ((-10.4, -6.2), 1.15, -1.2),
+        ((-5.4, -17.6), 1.4, 0.4),
+        ((1.8, -17.0), 1.3, 1.6),
+        ((-7.8, -12.2), 1.2, 2.2),
+        ((4.2, -14.8), 1.1, -0.8),
+        ((-2.2, -12.6), 1.0, 0.3),
+        ((-9.6, -13.0), 1.25, 1.4),
+        ((2.6, -11.2), 1.05, 2.6),
+        ((-13.4, -13.6), 1.15, 0.8),
+        ((-0.4, -9.6), 0.95, -1.0),
+        ((6.0, -13.2), 1.05, 0.5),
+        ((-6.0, -6.8), 1.1, 1.9),
+        ((-4.8, -4.6), 0.9, 0.1),
     )
     for i, (loc, scale, yaw) in enumerate(grass_plan):
         if not grass:
@@ -396,6 +452,14 @@ def plant_rocks(rocks: list, col: bpy.types.Collection) -> dict:
         (2, (-10.2, -15.0), 0.44, 0.15, 0.12, False),
         (1, (4.8, -12.4), 0.38, -0.45, 0.10, False),
         (3, (-7.2, -10.8), 0.42, 1.55, 0.08, False),
+        (4, (0.4, -18.0), 0.46, 0.70, 0.20, True),
+        (5, (-3.8, -18.8), 0.50, 1.90, 0.22, True),
+        (6, (2.2, -13.8), 0.32, -1.10, 0.12, True),
+        (7, (-9.2, -13.2), 0.36, 0.40, 0.10, False),
+        (0, (-1.8, -17.6), 0.40, 2.20, 0.18, True),
+        (1, (5.6, -16.0), 0.44, 0.25, 0.14, True),
+        (2, (-6.0, -12.0), 0.30, 1.30, 0.08, False),
+        (3, (-4.8, -10.2), 0.34, -0.60, 0.06, False),
     )
     for i, (idx, loc, scale, yaw, bury, wet) in enumerate(plan):
         if not rocks:
@@ -453,28 +517,23 @@ def retune_cabin_with_source_maps() -> dict:
         bsdf = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
         if bsdf is None:
             continue
-        tex = next((node for node in nodes if node.type == "TEX_IMAGE" and node.image), None)
-        if nrm_img is not None and "Normal" in bsdf.inputs:
+        if nrm_img is not None and "Normal" in bsdf.inputs and not bsdf.inputs["Normal"].links:
             nrm = nodes.new("ShaderNodeTexImage")
             nrm.image = nrm_img
             normal = nodes.new("ShaderNodeNormalMap")
             normal.inputs["Strength"].default_value = 0.35 if kind == "straw" else 0.55
             links.new(nrm.outputs["Color"], normal.inputs["Color"])
             links.new(normal.outputs["Normal"], bsdf.inputs["Normal"])
-        if spe_img is not None and "Roughness" in bsdf.inputs:
+        if spe_img is not None and "Roughness" in bsdf.inputs and not bsdf.inputs["Roughness"].links:
             spe = nodes.new("ShaderNodeTexImage")
             spe.image = spe_img
             invert = nodes.new("ShaderNodeInvert")
             links.new(spe.outputs["Color"], invert.inputs["Color"])
             links.new(invert.outputs["Color"], bsdf.inputs["Roughness"])
-        elif "Roughness" in bsdf.inputs:
+        elif "Roughness" in bsdf.inputs and not bsdf.inputs["Roughness"].links:
             bsdf.inputs["Roughness"].default_value = 0.82 if kind == "straw" else 0.58
-        if tex is not None:
-            mapping = nodes.new("ShaderNodeMapping")
-            mapping.inputs["Scale"].default_value = (0.42, 0.42, 0.42) if kind == "straw" else (0.92, 0.92, 0.92)
-            coord = nodes.new("ShaderNodeTexCoord")
-            links.new(coord.outputs["UV"], mapping.inputs["Vector"])
-            links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+        if kind == "straw":
+            _connect_image_alpha(mat)
         touched.append(mat.name)
     _log("v3_cabin_source_maps", materials=touched)
     return {"materials": touched}
@@ -552,9 +611,49 @@ def apply_light_mood(mood: str) -> dict:
     return cfg
 
 
+def resolve_appended_ecokit_images() -> dict:
+    root = _assets_root()
+    tree = verify_ecokit_texture_tree(root)
+    if not tree["ok"]:
+        raise FileNotFoundError("EcoKit texture tree incomplete: " + ",".join(tree["blockers"]))
+    flora_dir = FLORA_BLEND().parent
+    remapped = 0
+    missing = []
+    for img in bpy.data.images:
+        if getattr(img, "packed_file", None):
+            continue
+        raw = str(getattr(img, "filepath", "") or img.name)
+        try:
+            abs_path = bpy.path.abspath(raw)
+        except Exception:
+            abs_path = raw
+        on_disk = False
+        try:
+            on_disk = Path(abs_path).is_file() and Path(abs_path).stat().st_size > 64
+        except Exception:
+            on_disk = False
+        if on_disk:
+            continue
+        found = resolve_ecokit_image(raw, root, blend_dir=flora_dir)
+        if found is None:
+            missing.append(img.name)
+            continue
+        img.filepath = str(found)
+        try:
+            img.reload()
+        except Exception:
+            pass
+        remapped += 1
+    _log("v3_ecokit_images_resolved", remapped=remapped, missing=missing[:16], textureTree=tree["counts"])
+    if missing:
+        raise FileNotFoundError("EcoKit image datablocks unresolved: " + ",".join(missing[:12]))
+    return {"remapped": remapped, "missing": missing, "textureTree": tree}
+
+
 def load_ecokit_library() -> dict:
     flora = _append_objects(FLORA_BLEND(), TREE_NAMES + FLORA_NAMES)
     rocks = _append_objects(ROCK_BLEND(), ROCK_NAMES)
+    resolve_appended_ecokit_images()
     library = {"trees": [], "ferns": [], "bushes": [], "grass": [], "rocks": rocks}
     for obj in flora:
         low = obj.name.lower()
@@ -580,6 +679,13 @@ def apply_hero_rebuild_v3(
     terrain = build_hero_terrain(col)
     forest = plant_forest(library, col)
     rocks = plant_rocks(library.get("rocks") or [], col)
+    planted = [
+        obj for obj in bpy.data.objects
+        if obj.name.startswith("TJ_V3_") and obj.type == "MESH"
+    ]
+    alpha = enable_ecokit_cutout_alpha(planted)
+    remap_missing_images([])
+    images = audit_missing_image_datablocks()
     cabin = retune_cabin_with_source_maps()
     hdri = install_real_hdri()
     cams = setup_comp_cameras() if install_compare_cameras else []
@@ -591,6 +697,8 @@ def apply_hero_rebuild_v3(
         terrain=terrain,
         forest=forest,
         plantedRocks=rocks,
+        cutoutAlpha=alpha,
+        imageAudit=images,
         hdri=hdri,
         cameras=cams,
         light=light.get("note"),

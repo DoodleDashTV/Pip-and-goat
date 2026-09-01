@@ -36,6 +36,7 @@ V3_LEDGER = REPO / "artifacts/tivvlejoy-scenery-showcase-30s/v7-final-scene-visu
 FAILED_DIGEST = "sha256:b176ca65f36290ead95b7e24717751a89cb6e1bb49ea0351d4934f1c3b065bf6"
 FAILED_VRAM_DIGEST = "sha256:1807fac1b13db900251c57ad4d5de7b0dab24cee660b31aa94cd9d0c0183498b"
 FAILED_EXTRACT_DIGEST = "sha256:fc8a9aaa0f921fb200db959acdc301ea400bd5e2cb421be510c909d6c7cf49ca"
+FAILED_VISUAL_DIGEST = "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749"
 REQUIRED_DIGEST = "sha256:b66c0a8e6bc83ef7aeb15dcf2801ec004575fc1bcee7c727cf1956e591635749"
 REQUIRED_BRANCH = "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1"
 REQUIRED_IMAGE_COMMIT = "b8ec9a4195d3f56caf6398ea642ec04596819c71"
@@ -266,6 +267,7 @@ def output_contract() -> dict:
     failed_ineligible = FAILED_DIGEST in ineligible
     vram_failed_ineligible = FAILED_VRAM_DIGEST in ineligible
     extract_failed_ineligible = FAILED_EXTRACT_DIGEST in ineligible
+    visual_failed_ineligible = FAILED_VISUAL_DIGEST in ineligible
     blockers = []
     if hijack:
         blockers.extend(["CAMERA_C_REPLACED_BY_V3_COMP_A", "SIX_SHOT_CAMERAS_NOT_USED"])
@@ -279,11 +281,16 @@ def output_contract() -> dict:
         blockers.append("VRAM_GATE_DIGEST_NOT_MARKED_INELIGIBLE")
     if not extract_failed_ineligible:
         blockers.append("EXTRACT_FAILED_DIGEST_NOT_MARKED_INELIGIBLE")
+    if not visual_failed_ineligible:
+        blockers.append("VISUAL_FAILED_DIGEST_NOT_MARKED_INELIGIBLE")
     if "--v3-camera" not in proof or "V3_CAMERA_FORBIDDEN" not in proof:
         blockers.append("VISUAL_PROOF_ALLOWS_V3_CAMERA")
     worker = (REPO / "workers/runpod-blender/src/scenery-showcase-original14.js").read_text()
     if "--extract-and-verify" not in worker or "REQUIRED_LIBRARY_MISSING" not in worker:
         blockers.append("REQUIRED_LIBRARY_PREFLIGHT_MISSING")
+    extract_src = (REPO / "scripts/blender/scenery/cinematic_required_extract_v1.py").read_text()
+    if "REQUIRED_TEXTURE_PREFIXES" not in extract_src or "assets library" not in extract_src:
+        blockers.append("REQUIRED_TEXTURE_TREE_EXTRACT_MISSING")
     return {
         "schema": "TIVVLEJOY_V7_VISUAL_PROOF_OUTPUT_CONTRACT_V1",
         "stagedCameraC": list(CAMERA_C),
@@ -295,6 +302,8 @@ def output_contract() -> dict:
         "failedVramDigestIneligible": vram_failed_ineligible,
         "failedExtractDigest": FAILED_EXTRACT_DIGEST,
         "failedExtractDigestIneligible": extract_failed_ineligible,
+        "failedVisualDigest": FAILED_VISUAL_DIGEST,
+        "failedVisualDigestIneligible": visual_failed_ineligible,
         "heroRebuildForcesV3CompCameras": hijack,
         "v3CompA": list(V3_COMP_A),
         "cameraCPresentInShotLock": camera_c_locked,
@@ -385,6 +394,8 @@ def fail_closed_checks() -> dict:
         blockers.append("VRAM_GATE_DIGEST_INELIGIBLE")
     if pin["digest"] == FAILED_EXTRACT_DIGEST or REQUIRED_DIGEST == FAILED_EXTRACT_DIGEST:
         blockers.append("EXTRACT_FAILED_DIGEST_INELIGIBLE")
+    if pin["digest"] == FAILED_VISUAL_DIGEST or REQUIRED_DIGEST == FAILED_VISUAL_DIGEST:
+        blockers.append("VISUAL_FAILED_DIGEST_INELIGIBLE")
     if not REQUIRED_DIGEST or not REQUIRED_DIGEST.startswith("sha256:") or len(REQUIRED_DIGEST) != 71:
         blockers.append("EXTRACT_REPAIR_DIGEST_NOT_PINNED")
     auth = json.loads(AUTH_FILE.read_text()) if AUTH_FILE.is_file() else {}

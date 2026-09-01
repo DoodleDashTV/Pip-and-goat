@@ -24,6 +24,7 @@ on:
       - 'scripts/blender/scenery/runtime_roots_v1.py'
       - 'scripts/blender/scenery/cinematic_required_extract_v1.py'
       - 'scripts/blender/scenery/cinematic_required_extract_v1_test.py'
+      - 'scripts/blender/scenery/cinematic_ecokit_image_resolve_v1.py'
       - 'scripts/blender/scenery/showcase_original14_select.py'
       - 'scripts/blender/scenery/showcase_original14_30s.py'
       - 'scripts/cloud/v7-final-image-build-v1/inspect_published_final_image.py'

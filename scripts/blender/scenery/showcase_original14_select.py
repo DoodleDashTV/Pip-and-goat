@@ -401,8 +401,15 @@ def extract_role_limit(role: str) -> int:
     if role == 'village_textures':
         # Cabin01_ALB is 4.6 MiB and was previously dropped for Grass01 cards.
         return 40
-    if role in {'forest_nature', 'forest_ecokit'}:
+    if role == 'forest_nature':
         return 24
+    if role == 'forest_ecokit':
+        # V4 kept this at 24. extract_sort_key puts the six .blend files
+        # first, so at most 18 of 1134 purchased EcoKit PNGs were written.
+        # Flora/Rock then loaded with missing sibling Textures/ and
+        # assets library/ pixels. Extract the complete purchased tree.
+        from cinematic_required_extract_v1 import ECOKIT_EXTRACT_ROLE_LIMIT
+        return ECOKIT_EXTRACT_ROLE_LIMIT
     if role in {'village_fbx', 'village_blender'}:
         # Village (Blender 4.2.2).zip has 33 kit .blends. The previous 28-file
         # cap dropped the five largest Cabin*A buildings.

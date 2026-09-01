@@ -21,14 +21,17 @@ from mathutils import Vector
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
+from cinematic_ecokit_image_resolve_v1 import resolve_ecokit_image  # noqa: E402
 from cinematic_required_extract_v1 import (  # noqa: E402
     REQUIRED_LIBRARIES,
     RequiredLibraryError,
     apply_role_limit_keep_required,
+    is_required_cinematic_dependency,
     is_required_cinematic_library,
     required_size_ok,
     sha256_file,
     verify_required_libraries,
+    verify_required_textures,
 )
 from showcase_original14_select import (  # noqa: E402
     GEOMETRY_EXTS,
@@ -135,13 +138,15 @@ def extract_selected(
     try:
         with zipfile.ZipFile(zip_path) as zf:
             infos = [i for i in zf.infolist() if not i.is_dir()]
-            required_infos = [i for i in infos if is_required_cinematic_library(i.filename)]
+            required_infos = [i for i in infos if is_required_cinematic_dependency(i.filename)]
             if role == 'forest_ecokit':
                 present = {Path(str(i.filename).replace('\\', '/')).name for i in infos}
                 missing = [spec['name'] for spec in REQUIRED_LIBRARIES if spec['name'] not in present]
                 if missing:
                     raise RequiredLibraryError('REQUIRED_LIBRARY_NOT_IN_ZIP', ','.join(missing))
             for info in required_infos:
+                if not is_required_cinematic_library(info.filename):
+                    continue
                 size = int(info.file_size or 0)
                 if not required_size_ok(info.filename, size):
                     raise RequiredLibraryError(
@@ -164,7 +169,7 @@ def extract_selected(
             for info in limited:
                 target = safe_member_path(destination, info.filename)
                 if target is None:
-                    if is_required_cinematic_library(info.filename):
+                    if is_required_cinematic_dependency(info.filename):
                         raise RequiredLibraryError('REQUIRED_LIBRARY_UNSAFE_PATH', info.filename)
                     continue
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -226,6 +231,7 @@ def expand_asset(asset: dict, root: Path) -> list[Path]:
         files = extract_selected(p, dest, asset['role'])
     if str(asset.get('role') or '') == 'forest_ecokit':
         verify_required_libraries(root)
+        verify_required_textures(root)
     return files
 
 
@@ -576,16 +582,18 @@ def index_extracted_images(files: list[Path]) -> dict[str, Path]:
 
 def remap_missing_images(files: list[Path]) -> int:
     index = index_extracted_images(files)
-    if not index:
-        return 0
+    extract_root = None
+    try:
+        from runtime_roots_v1 import resolve_assets_root
+        extract_root = resolve_assets_root()
+    except Exception:
+        extract_root = None
     remapped = 0
     for img in bpy.data.images:
         if getattr(img, 'packed_file', None):
             continue
         raw = str(getattr(img, 'filepath', '') or img.name)
         name = Path(raw.replace('\\', '/')).name.lower()
-        if not name or name not in index:
-            continue
         try:
             abs_path = bpy.path.abspath(raw)
         except Exception:
@@ -597,8 +605,23 @@ def remap_missing_images(files: list[Path]) -> int:
             on_disk = False
         if on_disk:
             continue
+        target = None
+        if extract_root is not None:
+            blend_dir = None
+            try:
+                if abs_path:
+                    parent = Path(str(abs_path).replace('\\', '/')).parent
+                    if parent.name:
+                        blend_dir = parent
+            except Exception:
+                blend_dir = None
+            target = resolve_ecokit_image(raw, extract_root, blend_dir=blend_dir)
+        if target is None and name and name in index:
+            target = index[name]
+        if target is None:
+            continue
         try:
-            img.filepath = str(index[name])
+            img.filepath = str(target)
             img.reload()
             remapped += 1
         except Exception as exc:
@@ -1265,11 +1288,43 @@ def place_mountain_ridge(members: list[bpy.types.Object], origin: Vector) -> int
     return placed
 
 
+def _connect_image_alpha(mat) -> int:
+    marked = 0
+    if not mat or not getattr(mat, 'use_nodes', False) or not mat.node_tree:
+        return 0
+    bsdf = next((node for node in mat.node_tree.nodes if node.type == 'BSDF_PRINCIPLED'), None)
+    if bsdf is None or 'Alpha' not in bsdf.inputs:
+        return 0
+    try:
+        mat.blend_method = 'HASHED'
+        if hasattr(mat, 'shadow_method'):
+            mat.shadow_method = 'HASHED'
+        if hasattr(mat, 'alpha_threshold'):
+            mat.alpha_threshold = 0.28
+    except Exception:
+        pass
+    for node in mat.node_tree.nodes:
+        if node.type != 'TEX_IMAGE' or not node.image:
+            continue
+        already = any(
+            link.from_node == node and link.to_socket == bsdf.inputs['Alpha']
+            for link in mat.node_tree.links
+        )
+        if already:
+            continue
+        try:
+            mat.node_tree.links.new(node.outputs['Alpha'], bsdf.inputs['Alpha'])
+            marked += 1
+        except Exception:
+            pass
+    return marked
+
+
 def enable_foliage_alpha(objects: list[bpy.types.Object]) -> int:
     marked = 0
-    # Do not clip tree/pine atlases. That punched neon tips and crushed canopies.
+    # Do not clip tree/pine atlases on village kit names. That punched neon tips.
     words = ('leaf', 'leaves', 'foliage', 'bush', 'grass', 'fern', 'plant')
-    skip = ('tree', 'pine', 'canopy', 'trunk')
+    skip = ('pine', 'trunk')
     for obj in objects:
         if not obj or obj.type != 'MESH':
             continue
@@ -1277,33 +1332,64 @@ def enable_foliage_alpha(objects: list[bpy.types.Object]) -> int:
         if any(word in name for word in skip) or not any(w in name for w in words):
             continue
         for slot in obj.material_slots:
-            mat = slot.material
-            if not mat or not getattr(mat, 'use_nodes', False) or not mat.node_tree:
-                continue
-            try:
-                mat.blend_method = 'CLIP'
-                if hasattr(mat, 'alpha_threshold'):
-                    mat.alpha_threshold = 0.35
-            except Exception:
-                pass
-            bsdf = mat.node_tree.nodes.get('Principled BSDF')
-            if not bsdf or 'Alpha' not in bsdf.inputs:
-                continue
-            for node in mat.node_tree.nodes:
-                if node.type != 'TEX_IMAGE' or not node.image:
-                    continue
-                already = any(
-                    link.from_node == node and link.to_socket == bsdf.inputs['Alpha']
-                    for link in mat.node_tree.links
-                )
-                if already:
-                    continue
-                try:
-                    mat.node_tree.links.new(node.outputs['Alpha'], bsdf.inputs['Alpha'])
-                    marked += 1
-                except Exception:
-                    pass
+            marked += _connect_image_alpha(slot.material)
     return marked
+
+
+def enable_ecokit_cutout_alpha(objects: list) -> int:
+    """Connect purchased EcoKit card alpha. Object names include Tree_*."""
+    marked = 0
+    skip_mat = ('trunk', 'bark', 'wood', 'rock', 'stone', 'soil')
+    for obj in objects:
+        if not obj or getattr(obj, 'type', '') != 'MESH':
+            continue
+        for slot in obj.material_slots:
+            mat = slot.material
+            if mat is None:
+                continue
+            low = (mat.name or '').lower()
+            if any(word in low for word in skip_mat):
+                continue
+            marked += _connect_image_alpha(mat)
+    return marked
+
+
+def audit_missing_image_datablocks() -> dict:
+    missing = []
+    unread = []
+    for img in bpy.data.images:
+        if getattr(img, 'packed_file', None):
+            continue
+        raw = str(getattr(img, 'filepath', '') or '')
+        if not raw:
+            continue
+        try:
+            abs_path = bpy.path.abspath(raw)
+        except Exception:
+            abs_path = raw
+        path = Path(str(abs_path).replace('\\', '/'))
+        if not path.is_file() or path.stat().st_size <= 0:
+            missing.append({'name': img.name, 'filepath': raw, 'resolved': str(path)})
+            continue
+        size_x = int(getattr(img, 'size', [0, 0])[0] or 0)
+        if size_x <= 0:
+            unread.append({'name': img.name, 'filepath': raw, 'resolved': str(path)})
+    report = {
+        'schema': 'TIVVLEJOY_IMAGE_DATABLOCK_AUDIT_V1',
+        'missing': missing,
+        'unreadable': unread,
+        'missingCount': len(missing),
+        'unreadableCount': len(unread),
+        'ok': not missing and not unread,
+    }
+    print(json.dumps({'event': 'image_datablock_audit', **{k: report[k] for k in ('missingCount', 'unreadableCount', 'ok')}}), flush=True)
+    if not report['ok']:
+        raise RequiredLibraryError(
+            'REQUIRED_IMAGE_DATABLOCKS_MISSING',
+            f"missing={len(missing)} unreadable={len(unread)}",
+            report=report,
+        )
+    return report
 
 
 def duplicate_mesh_in_world(src, location, scale: float = 1.0):
