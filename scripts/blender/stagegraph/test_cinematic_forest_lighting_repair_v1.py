@@ -64,3 +64,5 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         self.assertIn("verify_locks", source)
         self.assertIn("CINEMATIC_CAMERA_LOCATION_CHANGED", source)
         self.assertIn("repair_flora_shader_light_response", source)
+        self.assertIn("install_cycles_safe_flora_surfaces", source)
+        self.assertIn("TJ_CinematicCyclesPrincipled_V1", source)

@@ -40,9 +40,13 @@ CANOPY_RIM_ENERGY = 260.0
 
 TRANSLUCENCY_FACTOR = 0.26
 TRANSLUCENT_COLOR = (0.24, 0.38, 0.14, 1.0)
+CYCLES_PRINCIPLED = "TJ_CinematicCyclesPrincipled_V1"
+CYCLES_COLOR_LIFT = "TJ_CinematicCyclesColorLift_V1"
+CYCLES_LEAF_LIFT = (1.18, 1.28, 1.06, 1.0)
+CYCLES_FALLEN_LIFT = (1.02, 1.06, 1.08, 1.0)
 
-GROUND_EARTH = (0.048, 0.044, 0.032)
-GROUND_MOSS = (0.042, 0.078, 0.040)
+GROUND_EARTH = (0.040, 0.048, 0.032)
+GROUND_MOSS = (0.038, 0.088, 0.042)
 GROUND_DAMP = (0.034, 0.032, 0.026)
 GROUND_ROCK = (0.062, 0.060, 0.054)
 
@@ -638,6 +642,99 @@ def repair_flora_shader_light_response() -> dict:
     }
 
 
+def _active_cycles_output(material):
+    if not material.use_nodes or material.node_tree is None:
+        return None
+    outputs = [node for node in material.node_tree.nodes if node.type == "OUTPUT_MATERIAL"]
+    if not outputs:
+        return None
+    active = next((node for node in outputs if getattr(node, "is_active_output", False)), outputs[0])
+    return active
+
+
+def _first_image_node(material):
+    if not material.use_nodes or material.node_tree is None:
+        return None
+    return next((node for node in material.node_tree.nodes if node.type == "TEX_IMAGE" and getattr(node, "image", None)), None)
+
+
+def _flora_group_node(material):
+    if not material.use_nodes or material.node_tree is None:
+        return None
+    return next(
+        (
+            node for node in material.node_tree.nodes
+            if node.type == "GROUP" and node.node_tree is not None and str(node.node_tree.name).startswith("Flora_Shader")
+        ),
+        None,
+    )
+
+
+def install_cycles_safe_flora_surfaces() -> dict:
+    import bpy
+
+    changed = []
+    skipped = []
+    for material in bpy.data.materials:
+        target = _flora_light_intensity_target(material.name)
+        if target is None:
+            continue
+        output = _active_cycles_output(material)
+        if output is None or "Surface" not in output.inputs:
+            skipped.append({"name": material.name, "reason": "NO_OUTPUT"})
+            continue
+        nodes = material.node_tree.nodes
+        links = material.node_tree.links
+        image_node = _first_image_node(material)
+        group = _flora_group_node(material)
+        principled = nodes.get(CYCLES_PRINCIPLED)
+        if principled is None:
+            principled = nodes.new("ShaderNodeBsdfPrincipled")
+            principled.name = CYCLES_PRINCIPLED
+            principled.label = CYCLES_PRINCIPLED
+        principled.location = (output.location.x - 360, output.location.y + 40)
+        lift = nodes.get(CYCLES_COLOR_LIFT)
+        if lift is None:
+            lift = _new_mix_color(nodes, CYCLES_COLOR_LIFT)
+        try:
+            lift.blend_type = "MULTIPLY"
+        except Exception:
+            pass
+        lift.location = (principled.location.x - 220, principled.location.y + 40)
+        _mix_factor(lift).default_value = 1.0
+        lift_color = CYCLES_FALLEN_LIFT if "fallen" in material.name.lower() else CYCLES_LEAF_LIFT
+        _set_rgba(_mix_color_sockets(lift)[1], lift_color)
+        if image_node is not None:
+            links.new(image_node.outputs["Color"], _mix_color_sockets(lift)[0])
+        elif group is not None and "Color_1" in group.inputs:
+            _set_rgba(_mix_color_sockets(lift)[0], list(group.inputs["Color_1"].default_value))
+        else:
+            _set_rgba(_mix_color_sockets(lift)[0], (0.18, 0.32, 0.10, 1.0))
+        lift_out = lift.outputs.get("Result") or lift.outputs.get("Color") or lift.outputs[0]
+        links.new(lift_out, principled.inputs["Base Color"])
+        if "Roughness" in principled.inputs:
+            principled.inputs["Roughness"].default_value = 0.68
+        if "Specular IOR Level" in principled.inputs:
+            principled.inputs["Specular IOR Level"].default_value = 0.22
+        if image_node is not None and "Alpha" in image_node.outputs and "Alpha" in principled.inputs:
+            links.new(image_node.outputs["Alpha"], principled.inputs["Alpha"])
+        # Keep the purchased Flora_Shader on unused EEVEE outputs; Cycles uses Principled.
+        for link in list(links):
+            if link.to_socket == output.inputs["Surface"]:
+                links.remove(link)
+        links.new(principled.outputs["BSDF"], output.inputs["Surface"])
+        _tag(principled)
+        _tag(lift)
+        changed.append(material.name)
+    return {
+        "materialsChanged": len(changed),
+        "names": changed,
+        "skipped": skipped,
+        "texturesOverwritten": False,
+        "vendorGroupPreserved": True,
+    }
+
+
 def repair_foliage_translucency(scene) -> dict:
     from forest_canopy_lighting_repair_v1 import (
         COLOR_NODE,
@@ -753,6 +850,7 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
     lights = retune_existing_lights(scene)
     background = add_background_separation(scene)
     flora = repair_flora_shader_light_response()
+    cycles_flora = install_cycles_safe_flora_surfaces()
     foliage = repair_foliage_translucency(scene)
     depth = apply_depth_cues(scene)
     return {
@@ -767,6 +865,7 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
         "lights": lights,
         "backgroundSeparation": background,
         "floraShader": flora,
+        "cyclesFlora": cycles_flora,
         "foliage": foliage,
         "depth": depth,
         "emissionShadersAdded": False,
