@@ -53,6 +53,35 @@ test('blender success still cannot satisfy vendor-reference human approval', () 
   assert.equal(verdict.blockers.includes('HUMAN_APPROVAL_REQUIRED'), true);
 });
 
+test('fresh authorization request is not a live CREATE grant and does not approve the rejected image', () => {
+  const request = load('VENDOR_REFERENCE_AUTHORIZATION_REQUEST.json');
+  const consumed = load('VENDOR_REFERENCE_AUTHORIZATION.json');
+  const decision = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json');
+  const status = load('STATUS.json');
+  assert.equal(request.authorized, false);
+  assert.equal(request.actorClass, 'SYSTEM');
+  assert.equal(request.requestedActorClass, 'HUMAN');
+  assert.equal(request.requestedScope, 'EXACTLY_ONE_VENDOR_REFERENCE_FRAME');
+  assert.equal(request.createCount, 1);
+  assert.equal(request.retryCount, 0);
+  assert.equal(request.encodeVideo, false);
+  assert.equal(request.beautyFrame, false);
+  assert.equal(request.finalRender, false);
+  assert.equal(request.approveRejectedImage, false);
+  assert.equal(request.rejectedImageSha256, 'a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400');
+  assert.equal(request.materialPath, 'REPAIRED_IN_MEMORY_ECOKIT_CYCLES_OUTPUT');
+  assert.equal(request.requiredBaseSha, '0b1ab9e57432b811352a7013c971629afbbf8d1d');
+  assert.equal(contract.sha256Canonical(request.proposedAuthorizationCore), request.proposedAuthorizationCoreSha256);
+  assert.equal(request.proposedAuthorizationCoreSha256, '270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161');
+  assert.notEqual(request.proposedAuthorizationCoreSha256, consumed.authorizationSha256);
+  assert.equal(consumed.consumed, true);
+  assert.equal(decision.decision, 'REJECTED');
+  assert.equal(status.vendorReferenceReproducedApproved, false);
+  assert.equal(status.freshVendorReferenceAuthorizationPresent, false);
+  const verdict = contract.receiptVerdict('VENDOR_REFERENCE_REPRODUCED', request);
+  assert.equal(verdict.valid, false);
+});
+
 test('human visual REJECT receipt cannot clear VENDOR_REFERENCE_REPRODUCED', () => {
   const decision = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json');
   assert.equal(decision.actorClass, 'HUMAN');

@@ -32,7 +32,8 @@ test('active recipe receipt is bound to the exact machine-readable recipe and re
   assert.equal(active.formalStageGraphApproval, false);
   assert.equal(active.state, 'ZERO_PAID_REPAIR_COMPLETE');
   assert.equal(active.rootCause, 'ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES');
-  assert.equal(active.nextAction, 'REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION');
+  assert.equal(active.nextAction, 'AWAIT_HUMAN_VENDOR_REFERENCE_FRAME_AUTHORIZATION');
+  assert.equal(active.authorizationRequestPath, 'artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_AUTHORIZATION_REQUEST.json');
 });
 
 test('execution sequence can only use explicitly allowed actions', () => {

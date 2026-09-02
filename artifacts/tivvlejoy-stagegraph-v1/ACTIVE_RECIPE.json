@@ -16,5 +16,6 @@
   "formalStageGraphApproval": false,
   "rootCause": "ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES",
   "resultReceiptPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json",
-  "nextAction": "REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION"
+  "nextAction": "AWAIT_HUMAN_VENDOR_REFERENCE_FRAME_AUTHORIZATION",
+  "authorizationRequestPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_AUTHORIZATION_REQUEST.json"
 }

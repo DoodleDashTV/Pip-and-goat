@@ -20,7 +20,7 @@
   "vendorReferencePreflightArtifactSha256": "4a4d1926266f15d51f2c5f1f9b3f7669410ec1af7402280cbe519c312b47a138",
   "currentGate": "VENDOR_REFERENCE_REPRODUCED",
   "currentGateStatus": "HUMAN_VISUAL_REJECTED",
-  "currentGateBlocker": "FRESH_AUTHORIZATION_REQUIRED_AFTER_VISUAL_REJECTION",
+  "currentGateBlocker": "HUMAN_AUTHORIZATION_REQUIRED_FOR_REPAIRED_VENDOR_REFERENCE_FRAME",
   "vendorReferenceReproducedApproved": false,
   "humanVisualReviewRequired": false,
   "humanVisualDecision": "REJECTED",
@@ -47,6 +47,11 @@
   "paidCreateCount": 1,
   "paidSpendUsd": 0.0292,
   "vendorReferenceFrameAuthorizationPresent": true,
+  "vendorReferenceFrameAuthorizationConsumed": true,
+  "freshVendorReferenceAuthorizationPresent": false,
+  "freshVendorReferenceAuthorizationRequested": true,
+  "authorizationRequestPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_AUTHORIZATION_REQUEST.json",
+  "authorizationRequestSha256": "27cacae07edcc4997fe692852c66ac83cc0283fca998a82621379fa7eed19afa",
   "beautyFrameAuthorizationPresent": false,
   "finalRenderAuthorized": false,
   "productionReady": false,
@@ -69,5 +74,5 @@
   "recipeExecutionResult": "PASS",
   "recipeResultPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json",
   "recipeResultSha256": "d0f4b69c4a10aa469fe144ec09dc7a9c8658a5794f4f9cd2a4d6dcb790f9d7b7",
-  "nextRequiredHumanDecision": "REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION"
+  "nextRequiredHumanDecision": "HUMAN_MUST_ISSUE_EXACTLY_ONE_VENDOR_REFERENCE_FRAME_AUTHORIZATION"
 }
