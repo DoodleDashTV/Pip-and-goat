@@ -27,27 +27,29 @@ CONTRACT = REPO / "workers/runpod-blender/src/stagegraph-production-contract-v1.
 
 AUTH_NAME = "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_EXECUTION_AUTHORIZATION_V1"
 REQUIRED_BRANCH = "cursor/tivvlejoy-stagegraph-v1-73f1"
-REQUIRED_BASE_SHA = "0b1ab9e57432b811352a7013c971629afbbf8d1d"
+REQUIRED_BASE_SHA = "ae766f1b8daf4ecbad7ff2e6be81e42661e755b4"
 SOURCE_ID = "SRC_FOREST_STYLISED_ECOKIT"
 SOURCE_SHA256 = "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a"
 AUDIT_SHA256 = "3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0"
 PREFLIGHT_SHA256 = "f61bc077b6122e24ccb098b1b7b15c753e84c8a393d5a2e237923f0942e3d8c7"
 HDRI_SHA256 = "c41f736d1278b7a61684fa76bd34983c5722e3536ed1d04a7c96c8024c99f65e"
-AUTH_SHA256 = "270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161"
-PREVIOUS_AUTH_SHA256 = "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d"
-REJECTED_IMAGE_SHA256 = "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400"
+AUTH_SHA256 = "12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031"
+PREVIOUS_AUTH_SHA256 = "270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161"
+FIRST_AUTH_SHA256 = "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d"
+REJECTED_IMAGE_SHA256 = "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2"
+PREVIOUS_REJECTED_IMAGE_SHA256 = "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400"
 SCENE = "TJ_VENDOR_REFERENCE_GOLDEN_FOREST"
 GPU_TYPE = "NVIDIA GeForce RTX 4090"
-POD_NAME = "tj-sg-vr-2"
+POD_NAME = "tj-sg-vr-3"
 MAX_SPEND = 1.00
 MAX_PRICE = 0.74
 MIN_RAM_GB = 32
 MIN_VRAM_GB = 24
 CONTAINER_DISK_GB = 60
 IMAGE_NAME = "nvidia/cuda:12.4.1-base-ubuntu22.04"
-PREFIX = "tivvlejoy-assets/executions/stagegraph-vendor-reference-repaired-v1"
-LEDGER_NAME = "VENDOR_REFERENCE_CONSUMPTION_LEDGER_V2.json"
-FRAME_NAME = "VENDOR_REFERENCE_FRAME_REPAIRED.png"
+PREFIX = "tivvlejoy-assets/executions/stagegraph-vendor-reference-exposure-v1"
+LEDGER_NAME = "VENDOR_REFERENCE_CONSUMPTION_LEDGER_V3.json"
+FRAME_NAME = "VENDOR_REFERENCE_FRAME_EXPOSURE_REPAIRED.png"
 FOLIAGE_WARNING = "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS"
 HARD_RUNTIME_S = 70 * 60
 FAIL_CLOSED_CODES = (
@@ -283,9 +285,9 @@ def verify_identity() -> dict:
     if FOLIAGE_WARNING not in (status.get("auditWarnings") or []) or FOLIAGE_WARNING not in (audit.get("blenderAudit", {}).get("warnings") or []):
         blockers.append("FOLIAGE_ALPHA_WARNING_MISSING")
     historical_creates = int(status.get("paidCreateCount") or 0)
-    if historical_creates > 1:
+    if historical_creates > 2:
         blockers.append("PAID_CREATE_ALREADY_CONSUMED")
-    if historical_creates != 1:
+    if historical_creates != 2:
         blockers.append("UNEXPECTED_HISTORICAL_CREATE_COUNT")
     if target.get("renderPolicy", {}).get("videoEncode") is not False or plan.get("videoEncode") is not False:
         blockers.append("VIDEO_ENCODE_NOT_FORBIDDEN")
@@ -293,7 +295,7 @@ def verify_identity() -> dict:
         blockers.append("AUTHORIZATION_SCHEMA_MISMATCH")
     if auth.get("consumed") is True:
         blockers.append("AUTHORIZATION_ALREADY_CONSUMED")
-    if auth.get("authorizationSha256") == PREVIOUS_AUTH_SHA256 or auth.get("previousAuthorizationSha256") != PREVIOUS_AUTH_SHA256:
+    if auth.get("authorizationSha256") in {PREVIOUS_AUTH_SHA256, FIRST_AUTH_SHA256} or auth.get("previousAuthorizationSha256") != PREVIOUS_AUTH_SHA256:
         blockers.append("PREVIOUS_AUTHORIZATION_NOT_REUSABLE")
     if float(auth.get("maxSpendUsd") or 0) != 1:
         blockers.append("AUTHORIZATION_SPEND_MISMATCH")
@@ -314,8 +316,12 @@ def verify_identity() -> dict:
         blockers.append("RENDERER_GPU_CONTRACT_MISSING")
     if "prepare_ecokit_cycles_alpha" not in renderer:
         blockers.append("RENDERER_CYCLES_ALPHA_REPAIR_MISSING")
+    if "apply_color_management" not in renderer or "assert_composition_locked" not in renderer:
+        blockers.append("RENDERER_EXPOSURE_LOOKDEV_MISSING")
     if not (HERE.parent.parent / "blender/stagegraph/ecokit_cycles_alpha_v1.py").is_file():
         blockers.append("CYCLES_ALPHA_REPAIR_MODULE_MISSING")
+    if not (HERE.parent.parent / "blender/stagegraph/vendor_reference_lookdev_v1.py").is_file():
+        blockers.append("EXPOSURE_LOOKDEV_MODULE_MISSING")
     if "assertBeautyFrameAuthorization" not in contract or "EXACTLY_ONE_VENDOR_REFERENCE_FRAME" not in contract:
         blockers.append("RENDERER_CONTRACT_MISSING")
     if status.get("currentGate") != "VENDOR_REFERENCE_REPRODUCED":
@@ -326,8 +332,12 @@ def verify_identity() -> dict:
         blockers.append("REJECTED_IMAGE_INELIGIBLE_FOR_REUSE")
     if status.get("rejectedVendorReferenceImageSha256") != REJECTED_IMAGE_SHA256:
         blockers.append("REJECTED_IMAGE_BINDING_MISMATCH")
+    if status.get("previousRejectedVendorReferenceImageSha256") != PREVIOUS_REJECTED_IMAGE_SHA256:
+        blockers.append("PREVIOUS_REJECTED_IMAGE_BINDING_MISMATCH")
     if status.get("zeroPaidRepairImplemented") is not True:
         blockers.append("ZERO_PAID_REPAIR_NOT_IMPLEMENTED")
+    if status.get("zeroPaidExposureRepairImplemented") is not True:
+        blockers.append("ZERO_PAID_EXPOSURE_REPAIR_NOT_IMPLEMENTED")
     if status.get("freshVendorReferenceAuthorizationPresent") is not True:
         blockers.append("FRESH_AUTHORIZATION_REQUIRED_AFTER_VISUAL_REJECTION")
     if status.get("humanVisualDecision") != "REJECTED":
@@ -425,6 +435,7 @@ def upload_bundle(client) -> dict:
         REPO / "scripts/cloud/stagegraph-v1/pod_entry_vendor_reference_v1.py",
         REPO / "scripts/blender/stagegraph/vendor_reference_render_v1.py",
         REPO / "scripts/blender/stagegraph/ecokit_cycles_alpha_v1.py",
+        REPO / "scripts/blender/stagegraph/vendor_reference_lookdev_v1.py",
         REPO / "scripts/blender/stagegraph/asset_certify_blender_v1.py",
         REPO / "scripts/blender/stagegraph/asset_certify_contract_v1.py",
         AUTH_FILE,
@@ -556,7 +567,7 @@ def update_status(execution: dict) -> None:
     status["currentGateStatus"] = "FRAME_RENDERED_AWAITING_HUMAN_VISUAL_APPROVAL"
     status["currentGateBlocker"] = "HUMAN_VISUAL_APPROVAL_REQUIRED"
     previous_spend = float(status.get("paidSpendUsd") or 0)
-    status["paidCreateCount"] = 2
+    status["paidCreateCount"] = 3
     status["paidSpendUsd"] = execution.get("actualSpendUsd")
     status["totalAccountedSpendUsd"] = round(previous_spend + float(execution.get("actualSpendUsd") or 0), 4)
     status["vendorReferenceFrameAuthorizationPresent"] = True
@@ -566,6 +577,8 @@ def update_status(execution: dict) -> None:
     status["vendorReferenceExecutionSha256"] = execution.get("executionReceiptSha256")
     status["vendorReferenceImageSha256"] = execution.get("imageSha256")
     status["rejectedVendorReferenceImageSha256"] = REJECTED_IMAGE_SHA256
+    status["previousRejectedVendorReferenceImageSha256"] = PREVIOUS_REJECTED_IMAGE_SHA256
+    status["rejectedVendorReferenceImageSha256s"] = [PREVIOUS_REJECTED_IMAGE_SHA256, REJECTED_IMAGE_SHA256]
     status["rejectedVendorReferenceIneligible"] = True
     status["vendorReferenceReproducedApproved"] = False
     status["humanVisualReviewRequired"] = True
@@ -581,7 +594,7 @@ def update_status(execution: dict) -> None:
     status["productionReady"] = False
     status["anotherVendorReferenceFrameRequired"] = False
     status["freshPaidAuthorizationRequired"] = False
-    status["nextRequiredHumanDecision"] = "HUMAN_VISUAL_REVIEW_OF_REPAIRED_VENDOR_REFERENCE_FRAME"
+    status["nextRequiredHumanDecision"] = "HUMAN_VISUAL_REVIEW_OF_EXPOSURE_REPAIRED_VENDOR_REFERENCE_FRAME"
     write_json(STATUS_FILE, status)
 
 
@@ -707,15 +720,18 @@ def main() -> int:
         if not status or status.get("status") != "COMPLETE":
             raise RuntimeError("HARD_RUNTIME_OR_COST_DEADLINE_OR_FAILED")
         rejected_path = ART / "VENDOR_REFERENCE_FRAME.png"
-        if rejected_path.is_file() and sha256_file(rejected_path) != REJECTED_IMAGE_SHA256:
+        if rejected_path.is_file() and sha256_file(rejected_path) != PREVIOUS_REJECTED_IMAGE_SHA256:
             raise RuntimeError("REJECTED_FRAME_FILE_TAMPERED")
+        exposure_rejected_path = ART / "VENDOR_REFERENCE_FRAME_REPAIRED.png"
+        if exposure_rejected_path.is_file() and sha256_file(exposure_rejected_path) != REJECTED_IMAGE_SHA256:
+            raise RuntimeError("EXPOSURE_REJECTED_FRAME_FILE_TAMPERED")
         image_path = ART / FRAME_NAME
         r2_download(client, f"{PREFIX}/VENDOR_REFERENCE_FRAME.png", image_path)
-        render_receipt_path = ART / "VENDOR_REFERENCE_RENDER_RECEIPT_REPAIRED.json"
+        render_receipt_path = ART / "VENDOR_REFERENCE_RENDER_RECEIPT_EXPOSURE.json"
         r2_download(client, f"{PREFIX}/VENDOR_REFERENCE_RENDER_RECEIPT.json", render_receipt_path)
         image_sha = sha256_file(image_path)
         render_receipt = load_json(render_receipt_path)
-        if image_sha == REJECTED_IMAGE_SHA256:
+        if image_sha in {REJECTED_IMAGE_SHA256, PREVIOUS_REJECTED_IMAGE_SHA256}:
             raise RuntimeError("REJECTED_IMAGE_INELIGIBLE_FOR_REUSE")
         if render_receipt.get("artifactSha256") != image_sha:
             raise RuntimeError("DOWNLOADED_IMAGE_SHA256_MISMATCH")

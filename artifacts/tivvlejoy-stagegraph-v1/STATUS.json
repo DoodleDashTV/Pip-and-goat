@@ -53,7 +53,7 @@
   "paidCreateCount": 2,
   "paidSpendUsd": 0.0676,
   "vendorReferenceFrameAuthorizationPresent": true,
-  "vendorReferenceFrameAuthorizationConsumed": true,
+  "vendorReferenceFrameAuthorizationConsumed": false,
   "freshVendorReferenceAuthorizationPresent": true,
   "freshVendorReferenceAuthorizationRequested": true,
   "authorizationRequestPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_AUTHORIZATION_REQUEST.json",
@@ -62,7 +62,11 @@
   "finalRenderAuthorized": false,
   "productionReady": false,
   "consumedVendorReferenceAuthorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
-  "vendorReferenceFrameAuthorizationSha256": "270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161",
+  "consumedVendorReferenceAuthorizationSha256s": [
+    "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
+    "270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161"
+  ],
+  "vendorReferenceFrameAuthorizationSha256": "12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031",
   "vendorReferenceExecutionSha256": "597afbe1e6cbe28db6e7c4d3e21832e360baaca316fc1c2f55281a7551d4350c",
   "vendorReferenceImageSha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2",
   "visualReviewRisks": [
@@ -79,7 +83,7 @@
   "zeroPaidExposureRepairImplemented": true,
   "zeroPaidValidationPass": true,
   "anotherVendorReferenceFrameRequired": true,
-  "freshPaidAuthorizationRequired": true,
+  "freshPaidAuthorizationRequired": false,
   "activeRecipeId": "VENDOR_REFERENCE_EXPOSURE_REPAIR_V1",
   "activeRecipeSha256": "c46b399dc501b58b394b643c6e15c8a08c23887908444c4ebeab89bd06744334",
   "activeRecipeState": "ZERO_PAID_REPAIR_COMPLETE",

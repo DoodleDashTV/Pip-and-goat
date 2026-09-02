@@ -29,8 +29,8 @@ test('locked vendor-reference authorization hashes and authorizes exactly one fr
     requiredBaseSha: auth.requiredBaseSha,
   };
   assert.equal(contract.sha256Canonical(core), auth.authorizationSha256);
-  assert.equal(auth.authorizationSha256, '270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161');
-  assert.equal(auth.consumed, true);
+  assert.equal(auth.authorizationSha256, '12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031');
+  assert.equal(auth.consumed, false);
   assert.equal(auth.encodeVideo, false);
   assert.equal(auth.retryCount, 0);
   assert.equal(auth.beautyFrame, false);
@@ -62,6 +62,7 @@ test('blender success still cannot satisfy vendor-reference human approval', () 
 test('fresh authorization request is not a live CREATE grant and does not approve the rejected image', () => {
   const request = load('VENDOR_REFERENCE_AUTHORIZATION_REQUEST.json');
   const consumed = load('VENDOR_REFERENCE_AUTHORIZATION_CONSUMED_V1.json');
+  const consumedV2 = load('VENDOR_REFERENCE_AUTHORIZATION_CONSUMED_V2.json');
   const live = load('VENDOR_REFERENCE_AUTHORIZATION.json');
   const decision = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json');
   const decisionV2 = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION_V2.json');
@@ -84,8 +85,12 @@ test('fresh authorization request is not a live CREATE grant and does not approv
   assert.notEqual(request.proposedAuthorizationCoreSha256, consumed.authorizationSha256);
   assert.equal(consumed.consumed, true);
   assert.equal(consumed.authorizationSha256, '23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d');
-  assert.equal(live.authorizationSha256, request.proposedAuthorizationCoreSha256);
-  assert.equal(live.consumed, true);
+  assert.equal(consumedV2.consumed, true);
+  assert.equal(consumedV2.authorizationSha256, '270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161');
+  assert.equal(live.authorizationSha256, '12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031');
+  assert.notEqual(live.authorizationSha256, request.proposedAuthorizationCoreSha256);
+  assert.equal(live.consumed, false);
+  assert.equal(live.previousAuthorizationSha256, consumedV2.authorizationSha256);
   assert.equal(decision.decision, 'REJECTED');
   assert.equal(decisionV2.decision, 'REJECTED');
   assert.equal(decisionV2.imageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
