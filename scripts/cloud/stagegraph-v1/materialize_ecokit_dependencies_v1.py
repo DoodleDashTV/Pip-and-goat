@@ -35,7 +35,7 @@ def create_texture_case_alias(ecokit_root: Path) -> None:
     alias.symlink_to(source.name, target_is_directory=True)
 
 
-def find_unique_key(client, bucket: str, basename: str) -> str:
+def find_candidate_keys(client, bucket: str, basename: str) -> list[str]:
     matches = []
     paginator = client.get_paginator("list_objects_v2")
     for page in paginator.paginate(Bucket=bucket, Prefix=PREFIX):
@@ -43,9 +43,9 @@ def find_unique_key(client, bucket: str, basename: str) -> str:
             key = str(item.get("Key") or "")
             if PurePosixPath(key).name == basename:
                 matches.append(key)
-    if len(matches) != 1:
-        raise RuntimeError("OWNED_HDRI_NOT_UNIQUE")
-    return matches[0]
+    if not matches or len(matches) > 16:
+        raise RuntimeError("OWNED_HDRI_CANDIDATE_COUNT_INVALID")
+    return matches
 
 
 def download_owned_hdri(destination: Path) -> None:
@@ -59,12 +59,16 @@ def download_owned_hdri(destination: Path) -> None:
         region_name="auto",
     )
     bucket = os.environ["R2_BUCKET"]
-    key = find_unique_key(client, bucket, HDRI_BASENAME)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    with destination.open("wb") as handle:
-        client.download_fileobj(bucket, key, handle)
-    if sha256_file(destination) != HDRI_SHA256:
-        raise RuntimeError("OWNED_HDRI_IDENTITY_MISMATCH")
+    candidate = destination.with_suffix(destination.suffix + ".candidate")
+    for key in find_candidate_keys(client, bucket, HDRI_BASENAME):
+        with candidate.open("wb") as handle:
+            client.download_fileobj(bucket, key, handle)
+        if sha256_file(candidate) == HDRI_SHA256:
+            candidate.replace(destination)
+            return
+    candidate.unlink(missing_ok=True)
+    raise RuntimeError("OWNED_HDRI_IDENTITY_MISMATCH")
 
 
 def main() -> int:
