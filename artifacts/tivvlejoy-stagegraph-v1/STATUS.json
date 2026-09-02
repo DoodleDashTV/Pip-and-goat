@@ -1,6 +1,6 @@
 {
   "schema": "TIVVLEJOY_STAGEGRAPH_V1_STATUS",
-  "status": "VENDOR_REFERENCE_FRAME_RENDERED_AWAITING_HUMAN_VISUAL_APPROVAL",
+  "status": "VENDOR_REFERENCE_FRAME_REJECTED",
   "sourceBranchBase": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
   "sourceBaseSha": "c3a79522f33123a1ce8775de93341829b167f920",
   "pr169": {
@@ -19,10 +19,13 @@
   "vendorReferencePreflightWorkflowRunId": 33656796364,
   "vendorReferencePreflightArtifactSha256": "4a4d1926266f15d51f2c5f1f9b3f7669410ec1af7402280cbe519c312b47a138",
   "currentGate": "VENDOR_REFERENCE_REPRODUCED",
-  "currentGateStatus": "HUMAN_VISUAL_REVIEW_REQUIRED",
-  "currentGateBlocker": "HUMAN_VISUAL_APPROVAL_REQUIRED",
+  "currentGateStatus": "HUMAN_VISUAL_REJECTED",
+  "currentGateBlocker": "FRESH_AUTHORIZATION_REQUIRED_AFTER_VISUAL_REJECTION",
   "vendorReferenceReproducedApproved": false,
-  "humanVisualReviewRequired": true,
+  "humanVisualReviewRequired": false,
+  "humanVisualDecision": "REJECTED",
+  "rejectedVendorReferenceImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "rejectedVendorReferenceIneligible": true,
   "missingSecretNames": [],
   "blenderAuditExecuted": true,
   "blenderVersion": "4.3.2",
@@ -54,5 +57,10 @@
     "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS",
     "TREE_MASSES_APPEAR_AS_OPAQUE_BLACK_SILHOUETTES_IN_RENDERED_FRAME"
   ],
-  "totalAccountedSpendUsd": 0.0296
+  "totalAccountedSpendUsd": 0.0296,
+  "zeroPaidRootCause": "ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES",
+  "zeroPaidRepairImplemented": true,
+  "zeroPaidValidationPass": true,
+  "anotherVendorReferenceFrameRequired": true,
+  "freshPaidAuthorizationRequired": true
 }

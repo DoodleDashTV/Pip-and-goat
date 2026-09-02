@@ -1,0 +1,41 @@
+{
+  "contractId": "TIVVLEJOY_STAGEGRAPH_PRODUCTION_CONTRACT_V1",
+  "inspectKind": "ECOKIT_DUAL_MATERIAL_OUTPUT",
+  "sourceSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
+  "blender": "4.3.2",
+  "paid": false,
+  "vendorBlendSaved": false,
+  "warningSource": "Material '…' could not be converted because of non-trivial alpha blending (need manual adjustment)",
+  "loadTimeConversionWarnings": 48,
+  "kitAsPurchased": {
+    "totalMaterials": 60,
+    "foliageCutoutCount": 55,
+    "dualOutput": 48,
+    "eeveeActive": 47,
+    "cyclesActive": 1,
+    "backslashImagePaths": 0,
+    "unusedImageAlphaMaterials": [],
+    "nonTrivialBlendMaterialsAfterLoad": [],
+    "missingImages": [
+      "sunny_vondelpark_2k.hdr"
+    ],
+    "missingImageNote": "Vendor HDRI path only; already substituted by owned tj_hdri_diag_8k.jpg during prepare.",
+    "blendMethodAfterLoad": "HASHED",
+    "surfaceRenderMethodAfterLoad": "DITHERED",
+    "rootCauseCandidates": {
+      "unusedImageAlphaWouldRenderBlackRgb": false,
+      "eeveeBlendModeOnFoliage": false,
+      "unresolvedImagePaths": false,
+      "windowsBackslashPaths": false,
+      "eeveeMaterialOutputActiveForCycles": true
+    }
+  },
+  "afterInMemoryRepair": {
+    "eeveeActive": 0,
+    "cyclesActive": 48,
+    "cyclesOutputsActivated": 47,
+    "blendHashed": 19,
+    "transparentMaxBounces": 24
+  },
+  "rootCause": "ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES"
+}

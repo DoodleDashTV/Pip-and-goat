@@ -126,6 +126,15 @@ jobs:
             --image-bindings-json "$(cat /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json)" \
             --prepare-only \
             --receipt /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_PREFLIGHT.json
+      - name: Inspect EcoKit foliage materials after prepare
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/inspect_ecokit_materials_v1.py \
+            -- \
+            --source-id SRC_FOREST_STYLISED_ECOKIT \
+            --out /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIAL_INSPECT.json
       - name: Upload sanitized receipts only
         if: always()
         uses: actions/upload-artifact@v4
@@ -139,6 +148,7 @@ jobs:
             /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
             /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_ALPHA_DIAGNOSTIC.json
             /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_PREFLIGHT.json
+            /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIAL_INSPECT.json
           if-no-files-found: error
           retention-days: 30
 

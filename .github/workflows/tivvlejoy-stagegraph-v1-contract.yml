@@ -38,9 +38,9 @@ jobs:
         run: node workers/runpod-blender/src/stagegraph-recipe-runner-v1.js plan recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json > /tmp/tivvlejoy-recipe-plan.json
       - name: Validate Blender asset-audit contract
         working-directory: scripts/blender/stagegraph
-        run: python -m unittest -v test_asset_certify_contract_v1.py
+        run: python -m unittest -v test_asset_certify_contract_v1.py test_ecokit_cycles_alpha_v1.py
       - name: Validate vendor-reference authorization and fail-closed executor
         working-directory: scripts/cloud/stagegraph-v1
         run: python -m unittest -v test_execute_vendor_reference_frame_v1.py
       - name: Syntax-check Blender StageGraph entrypoints
-        run: python -m py_compile scripts/blender/stagegraph/asset_certify_blender_v1.py scripts/blender/stagegraph/asset_inventory_blender_v1.py scripts/blender/stagegraph/vendor_reference_render_v1.py scripts/cloud/stagegraph-v1/execute_vendor_reference_frame_v1.py scripts/cloud/stagegraph-v1/pod_entry_vendor_reference_v1.py
+        run: python -m py_compile scripts/blender/stagegraph/asset_certify_blender_v1.py scripts/blender/stagegraph/asset_inventory_blender_v1.py scripts/blender/stagegraph/vendor_reference_render_v1.py scripts/blender/stagegraph/ecokit_cycles_alpha_v1.py scripts/blender/stagegraph/inspect_ecokit_materials_v1.py scripts/cloud/stagegraph-v1/execute_vendor_reference_frame_v1.py scripts/cloud/stagegraph-v1/pod_entry_vendor_reference_v1.py

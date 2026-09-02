@@ -52,3 +52,15 @@ test('blender success still cannot satisfy vendor-reference human approval', () 
   assert.equal(verdict.valid, false);
   assert.equal(verdict.blockers.includes('HUMAN_APPROVAL_REQUIRED'), true);
 });
+
+test('human visual REJECT receipt cannot clear VENDOR_REFERENCE_REPRODUCED', () => {
+  const decision = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json');
+  assert.equal(decision.actorClass, 'HUMAN');
+  assert.equal(decision.decision, 'REJECTED');
+  assert.equal(decision.visualApproval, false);
+  assert.equal(decision.imageSha256, 'a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400');
+  const verdict = contract.receiptVerdict('VENDOR_REFERENCE_REPRODUCED', decision);
+  assert.equal(verdict.valid, false);
+  assert.equal(verdict.blockers.includes('RECEIPT_NOT_PASS'), true);
+  assert.equal(verdict.blockers.includes('HUMAN_DECISION_NOT_APPROVED'), true);
+});

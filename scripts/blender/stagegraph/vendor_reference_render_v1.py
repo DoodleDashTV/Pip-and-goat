@@ -17,6 +17,13 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from asset_certify_blender_v1 import apply_image_bindings
+from ecokit_cycles_alpha_v1 import (
+    activate_all_ecokit_cycles_outputs,
+    configure_cycles_transparency,
+    count_dual_material_outputs,
+    prepare_ecokit_cycles_alpha,
+    remap_backslash_image_paths,
+)
 
 SOURCE_SHA256 = "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a"
 AUDIT_SHA256 = "3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0"
@@ -245,8 +252,7 @@ def configure_render(scene, require_cycles: bool = False):
     if scene.render.engine == "CYCLES" and hasattr(scene, "cycles"):
         scene.cycles.samples = 128
         scene.cycles.use_denoising = True
-        scene.cycles.max_bounces = 8
-        scene.cycles.transparent_max_bounces = 8
+        configure_cycles_transparency(scene)
     scene.view_settings.view_transform = "AgX"
     scene.view_settings.exposure = 0.0
 
@@ -362,7 +368,14 @@ def main():
         raise RuntimeError("DEPENDENCY_AUDIT_SHA256_MISMATCH")
 
     bindings = apply_image_bindings(json.loads(args.image_bindings_json))
+    path_remap = remap_backslash_image_paths()
+    cycles_outputs = activate_all_ecokit_cycles_outputs()
     scene, camera, placed = build_scene(args)
+    root = scene.collection.children.get("TJ_VENDOR_REFERENCE_ROOT")
+    placed_objects = list(root.objects) if root is not None else []
+    alpha_repair = prepare_ecokit_cycles_alpha(placed_objects)
+    transparency = configure_cycles_transparency(scene) if scene.render.engine == "CYCLES" else {}
+    dual_after = count_dual_material_outputs()
 
     receipt = {
         "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_PREFLIGHT_V1",
@@ -380,8 +393,19 @@ def main():
         "placed": placed,
         "ownedHdriBasename": Path(args.owned_hdri).name,
         "dependencyBindings": bindings,
+        "backslashImagePathsRemapped": len(path_remap),
+        "ecokitCyclesAlpha": {
+            "materialsRepaired": alpha_repair.get("materialsRepaired"),
+            "alphaLinksAdded": alpha_repair.get("alphaLinksAdded"),
+            "blendHashed": alpha_repair.get("blendHashed"),
+            "cyclesOutputsActivated": int(cycles_outputs),
+            "warnings": alpha_repair.get("warnings"),
+            "transparentMaxBounces": transparency.get("transparentMaxBounces"),
+            "dualMaterialOutputsAfterRepair": dual_after,
+        },
         "authorizationRequiredForRender": True,
         "paidCreateCount": 0,
+        "visualApproval": False,
     }
 
     if not args.prepare_only:

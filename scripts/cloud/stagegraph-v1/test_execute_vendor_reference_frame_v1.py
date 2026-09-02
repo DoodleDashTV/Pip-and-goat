@@ -68,6 +68,27 @@ class VendorReferenceExecutorTest(unittest.TestCase):
         self.assertIn("enable_cycles_gpu", source)
         self.assertIn("CYCLES_UNAVAILABLE", source)
         self.assertIn("visualApproval", source)
+        self.assertIn("prepare_ecokit_cycles_alpha", source)
+        self.assertIn("remap_backslash_image_paths", source)
+        self.assertIn("count_dual_material_outputs", source)
+
+    def test_consumed_auth_and_visual_reject_block_another_create(self):
+        auth = json.loads((REPO / "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_AUTHORIZATION.json").read_text())
+        status = json.loads((REPO / "artifacts/tivvlejoy-stagegraph-v1/STATUS.json").read_text())
+        decision = json.loads((REPO / "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json").read_text())
+        self.assertTrue(auth["consumed"])
+        self.assertEqual(status["paidCreateCount"], 1)
+        self.assertEqual(status["humanVisualDecision"], "REJECTED")
+        self.assertTrue(status["freshPaidAuthorizationRequired"])
+        self.assertTrue(status["rejectedVendorReferenceIneligible"])
+        self.assertEqual(decision["imageSha256"], "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400")
+        self.assertFalse(decision["vendorReferenceReproducedApproved"])
+        source = (REPO / "scripts/cloud/stagegraph-v1/execute_vendor_reference_frame_v1.py").read_text()
+        self.assertIn("AUTHORIZATION_ALREADY_CONSUMED", source)
+        self.assertIn("PAID_CREATE_ALREADY_CONSUMED", source)
+        self.assertIn("VENDOR_REFERENCE_VISUALLY_REJECTED", source)
+        self.assertIn("FRESH_AUTHORIZATION_REQUIRED_AFTER_VISUAL_REJECTION", source)
+        self.assertIn("REJECTED_IMAGE_INELIGIBLE_FOR_REUSE", source)
 
 
 if __name__ == "__main__":

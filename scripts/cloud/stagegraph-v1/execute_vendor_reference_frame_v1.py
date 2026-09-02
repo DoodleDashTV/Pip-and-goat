@@ -302,6 +302,13 @@ def verify_identity() -> dict:
         blockers.append("CURRENT_GATE_MISMATCH")
     if status.get("beautyFrameAuthorizationPresent") or status.get("finalRenderAuthorized"):
         blockers.append("LATER_PAID_STAGE_ALREADY_PRESENT")
+    if status.get("humanVisualDecision") == "REJECTED" or status.get("vendorReferenceReproducedApproved") is False:
+        if status.get("rejectedVendorReferenceIneligible") is True:
+            blockers.append("REJECTED_IMAGE_INELIGIBLE_FOR_REUSE")
+    if status.get("freshPaidAuthorizationRequired") is True:
+        blockers.append("FRESH_AUTHORIZATION_REQUIRED_AFTER_VISUAL_REJECTION")
+    if status.get("humanVisualDecision") == "REJECTED":
+        blockers.append("VENDOR_REFERENCE_VISUALLY_REJECTED")
 
     ledger = ART / "VENDOR_REFERENCE_CONSUMPTION_LEDGER.json"
     if ledger.exists() and int(load_json(ledger).get("createPerformed") or 0) != 0:

@@ -1,0 +1,38 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_ROOT_CAUSE_V1",
+  "result": "IDENTIFIED",
+  "paidCreatePerformed": false,
+  "boundRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "definitiveRootCause": "ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES",
+  "summary": "Purchased EcoKit foliage materials expose separate EEVEE and Cycles shader outputs. Blender 4.3.2 left the EEVEE output active on 47 of 48 dual-output materials. Cycles therefore evaluated the EEVEE alpha-blend branch, which 4.3.2 cannot convert (non-trivial alpha blending). Cutout cards then rendered as opaque black silhouettes.",
+  "ruledOut": {
+    "colorSpace": false,
+    "assetDuplicationDestroyedMaterials": false,
+    "windowsBackslashPaths": false,
+    "missingPrincipledAlphaOnLeafCards": false,
+    "sceneWorldLightingAsPrimaryCause": false
+  },
+  "confirmed": {
+    "renderEngineCompatibility": true,
+    "alphaBlendModeConversionFailure": true,
+    "activeMaterialOutputSelection": true,
+    "dualEeveeCyclesShaderGroups": true
+  },
+  "measuredBeforeRepair": {
+    "dualOutputMaterials": 48,
+    "eeveeOutputActive": 47,
+    "cyclesOutputActive": 1,
+    "blenderConversionWarnings": "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS"
+  },
+  "measuredAfterZeroPaidRepair": {
+    "eeveeOutputActive": 0,
+    "cyclesOutputActive": 48,
+    "cyclesOutputsActivated": 47,
+    "blendHashed": 19,
+    "transparentMaxBounces": 24,
+    "prepareOnly": "PASS",
+    "rendered": false,
+    "loadTimeConversionWarningsStillEmit": true
+  },
+  "vendorBlendSaved": false
+}
