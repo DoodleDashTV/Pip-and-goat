@@ -30,7 +30,7 @@ test('locked vendor-reference authorization hashes and authorizes exactly one fr
   };
   assert.equal(contract.sha256Canonical(core), auth.authorizationSha256);
   assert.equal(auth.authorizationSha256, '270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161');
-  assert.equal(auth.consumed, false);
+  assert.equal(auth.consumed, true);
   assert.equal(auth.encodeVideo, false);
   assert.equal(auth.retryCount, 0);
   assert.equal(auth.beautyFrame, false);
@@ -84,11 +84,13 @@ test('fresh authorization request is not a live CREATE grant and does not approv
   assert.equal(consumed.consumed, true);
   assert.equal(consumed.authorizationSha256, '23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d');
   assert.equal(live.authorizationSha256, request.proposedAuthorizationCoreSha256);
-  assert.equal(live.consumed, false);
+  assert.equal(live.consumed, true);
   assert.equal(decision.decision, 'REJECTED');
   assert.equal(status.vendorReferenceReproducedApproved, false);
   assert.equal(status.freshVendorReferenceAuthorizationPresent, true);
   assert.equal(status.rejectedVendorReferenceIneligible, true);
+  assert.equal(status.vendorReferenceImageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
+  assert.notEqual(status.vendorReferenceImageSha256, status.rejectedVendorReferenceImageSha256);
   const verdict = contract.receiptVerdict('VENDOR_REFERENCE_REPRODUCED', request);
   assert.equal(verdict.valid, false);
 });

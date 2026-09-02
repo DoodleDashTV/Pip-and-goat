@@ -17,7 +17,7 @@
   "requiredBranch": "cursor/tivvlejoy-stagegraph-v1-73f1",
   "requiredBaseSha": "0b1ab9e57432b811352a7013c971629afbbf8d1d",
   "authorizationSha256": "270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161",
-  "consumed": false,
+  "consumed": true,
   "visualApproval": false,
   "vendorReferenceReproducedApproved": false,
   "humanVisualDecisionRequired": true,
@@ -27,5 +27,7 @@
   "previousAuthorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
   "previousAuthorizationReusable": false,
   "issuedFromRequestSha256": "27cacae07edcc4997fe692852c66ac83cc0283fca998a82621379fa7eed19afa",
-  "createPerformed": 0
+  "createPerformed": 1,
+  "consumedAt": "2026-09-02T19:34:57.540928+00:00",
+  "podId": "0y3pur4vyjtm50"
 }
