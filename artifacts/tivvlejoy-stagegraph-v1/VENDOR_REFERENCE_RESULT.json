@@ -1,0 +1,9 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_RESULT_V1",
+  "status": "CHECKS_PASSED_CREATE_NOT_ARMED",
+  "authorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
+  "paidCreate": 0,
+  "actualSpendUsd": 0,
+  "blockers": [],
+  "at": "2026-09-02T17:08:44.911844+00:00"
+}

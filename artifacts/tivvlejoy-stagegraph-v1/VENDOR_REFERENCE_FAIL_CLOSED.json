@@ -1,0 +1,40 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_FAIL_CLOSED_V1",
+  "ok": true,
+  "blockers": [],
+  "authorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
+  "branch": "cursor/tivvlejoy-stagegraph-v1-73f1",
+  "headSha": "bb1712e01d52ac3ad71099632cd9b9f85fc076e0",
+  "requiredBaseSha": "bb1712e01d52ac3ad71099632cd9b9f85fc076e0",
+  "receiptFileSha256": {
+    "STATUS.json": "06b966f20da41bed7ee4baec053d8db6cc2423f3c0e8d0f892d6efb2265507c6",
+    "SOURCE_PACK_LOCKED.json": "9f9b830ee45c793f519327490e7110afcf62b06b110033a1327ea18e7373cdd5",
+    "DEPENDENCY_AUDIT_PASS.json": "135d06c03b3c6788fdfebb64bc7e0a89b6b599a6b9c4c7923b07913c559276e6",
+    "VENDOR_REFERENCE_PREFLIGHT_PASS.json": "9cadfae47be1f1e2337c552a560918de4c9c872deb3933de7ad5370e5d2cb163",
+    "VENDOR_REFERENCE_TARGET.json": "1c83bc73f622cdd073e4c5a62d75bafe8f22bf6684a3711e6d5be289d7fbefa0",
+    "VENDOR_REFERENCE_SCENE_PLAN.json": "aa64faf7fd9e381a9252739de0fd4fc37cc9cc278aec8fb0a67d3d779d36b5f4",
+    "VENDOR_REFERENCE_AUTHORIZATION.json": "e5409ca0c9e7449dcf5fa334425b5d199d685a333129d34777b45f0494757f0f"
+  },
+  "quote": {
+    "id": "NVIDIA GeForce RTX 4090",
+    "displayName": "RTX 4090",
+    "vramGb": 24,
+    "secureUsdPerHr": 0.74,
+    "stockStatus": "Medium"
+  },
+  "livePodCount": 0,
+  "livePodNames": [],
+  "authorized": {
+    "authorized": true,
+    "frames": 1,
+    "retryCount": 0,
+    "encodeVideo": false,
+    "maxSpendUsd": 1
+  },
+  "missingEnvNames": [],
+  "createCount": 1,
+  "retry": false,
+  "encodeVideo": false,
+  "paidCreate": 0,
+  "at": "2026-09-02T17:08:44.911627+00:00"
+}

@@ -228,11 +228,15 @@ def configure_camera(scene, collection):
     return camera
 
 
-def configure_render(scene):
+def configure_render(scene, require_cycles: bool = False):
     try:
         scene.render.engine = "CYCLES"
     except Exception:
+        if require_cycles:
+            raise RuntimeError("CYCLES_UNAVAILABLE")
         scene.render.engine = "BLENDER_EEVEE_NEXT"
+    if require_cycles and scene.render.engine != "CYCLES":
+        raise RuntimeError("CYCLES_UNAVAILABLE")
     scene.render.resolution_x = 1280
     scene.render.resolution_y = 720
     scene.render.resolution_percentage = 100
@@ -245,6 +249,46 @@ def configure_render(scene):
         scene.cycles.transparent_max_bounces = 8
     scene.view_settings.view_transform = "AgX"
     scene.view_settings.exposure = 0.0
+
+
+def enable_cycles_gpu(scene) -> str:
+    import bpy
+
+    if scene.render.engine != "CYCLES" or not hasattr(scene, "cycles"):
+        raise RuntimeError("CYCLES_UNAVAILABLE")
+    addon = bpy.context.preferences.addons.get("cycles")
+    if addon is None:
+        raise RuntimeError("CYCLES_GPU_DEVICE_MISSING")
+    prefs = addon.preferences
+    scene.cycles.device = "GPU"
+    for compute in ("OPTIX", "CUDA"):
+        try:
+            prefs.compute_device_type = compute
+            if hasattr(prefs, "get_devices"):
+                prefs.get_devices()
+        except Exception:
+            continue
+        enabled = 0
+        for device in getattr(prefs, "devices", []) or []:
+            device_type = str(getattr(device, "type", ""))
+            if device_type == "CPU":
+                device.use = False
+            elif device_type in {compute, "OPTIX", "CUDA"}:
+                device.use = True
+                enabled += 1
+        if enabled:
+            return compute
+    raise RuntimeError("CYCLES_GPU_DEVICE_MISSING")
+
+
+def png_dimensions(path: Path) -> list[int]:
+    header = path.read_bytes()[:24]
+    if header[:8] != b"\x89PNG\r\n\x1a\n":
+        raise RuntimeError("OUTPUT_NOT_PNG")
+    import struct
+
+    width, height = struct.unpack(">II", header[16:24])
+    return [int(width), int(height)]
 
 
 def build_scene(args):
@@ -347,16 +391,26 @@ def main():
         out = Path(args.out)
         out.parent.mkdir(parents=True, exist_ok=True)
         scene.render.filepath = str(out)
+        configure_render(scene, require_cycles=True)
+        gpu_compute = enable_cycles_gpu(scene)
         bpy.context.window.scene = scene
         bpy.ops.render.render(write_still=True)
         if not out.is_file():
             raise RuntimeError("VENDOR_REFERENCE_FRAME_MISSING")
+        dimensions = png_dimensions(out)
+        if dimensions != [1280, 720]:
+            raise RuntimeError("VENDOR_REFERENCE_DIMENSION_MISMATCH")
         receipt.update({
             "rendered": True,
+            "renderEngine": scene.render.engine,
             "artifactSha256": sha256_file(out),
             "authorizationScope": AUTH_SCOPE,
             "maxSpendUsd": max_spend,
             "paidCreateCount": 1,
+            "gpuComputeDevice": gpu_compute,
+            "imageDimensions": dimensions,
+            "visualApproval": False,
+            "humanVisualDecisionRequired": True,
         })
 
     receipt_path = Path(args.receipt)
