@@ -91,5 +91,13 @@
   "recipeExecutionResult": "PASS",
   "recipeResultPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_EXPOSURE_REPAIR_RESULT.json",
   "recipeResultSha256": "5d41c48a16ccc8d45eb802f3136ccf01d10548b13ab140668ad50d498313cfa4",
-  "nextRequiredHumanDecision": "HUMAN_VISUAL_REVIEW_OF_EXPOSURE_REPAIRED_VENDOR_REFERENCE_FRAME"
+  "nextRequiredHumanDecision": "HUMAN_VISUAL_REVIEW_OF_CINEMATIC_LIGHTING_PROOF",
+  "cinematicForestLightingRepairImplemented": true,
+  "cinematicForestLightingRepairStatus": "PARTIAL_NOT_PASSED",
+  "cinematicForestLightingProofPath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_CINEMATIC_LIGHTING_PROOF_V2.png",
+  "cinematicForestLightingProofSha256": "7811dc62fcec3e8c9b5c5df7f20d08942fd6cb6401eb3525c04a56783c771c12",
+  "cinematicForestLightingProofResolution": [1280, 720],
+  "cinematicCameraChanged": false,
+  "cinematicGeometryRebuilt": false,
+  "cinematicAnimationRendered": false
 }

@@ -850,7 +850,6 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
     lights = retune_existing_lights(scene)
     background = add_background_separation(scene)
     flora = repair_flora_shader_light_response()
-    cycles_flora = install_cycles_safe_flora_surfaces()
     foliage = repair_foliage_translucency(scene)
     depth = apply_depth_cues(scene)
     return {
@@ -865,7 +864,6 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
         "lights": lights,
         "backgroundSeparation": background,
         "floraShader": flora,
-        "cyclesFlora": cycles_flora,
         "foliage": foliage,
         "depth": depth,
         "emissionShadersAdded": False,
