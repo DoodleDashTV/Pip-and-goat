@@ -72,6 +72,7 @@ class VendorReferenceExecutorTest(unittest.TestCase):
         self.assertIn("remap_backslash_image_paths", source)
         self.assertIn("count_dual_material_outputs", source)
         self.assertIn("vendor_reference_lookdev_v1", source)
+        self.assertIn("cinematic_forest_lighting_repair_v1", source)
         self.assertEqual(RENDERER.ACTIVE_LOOKDEV["id"], "VENDOR_REFERENCE_LOOKDEV_EXPOSURE_REPAIR_V2")
         self.assertEqual(RENDERER.SEED, 7301)
         self.assertEqual(RENDERER.CAMERA_LOCATION, (0.0, -12.5, 2.15))
@@ -126,11 +127,13 @@ class VendorReferenceExecutorTest(unittest.TestCase):
         self.assertIn("ecokit_cycles_alpha_v1.py", source)
         self.assertIn("vendor_reference_lookdev_v1.py", source)
         self.assertIn("forest_canopy_lighting_repair_v1.py", source)
+        self.assertIn("cinematic_forest_lighting_repair_v1.py", source)
         self.assertIn("VENDOR_REFERENCE_FRAME_EXPOSURE_REPAIRED.png", source)
         renderer_source = (REPO / "scripts/blender/stagegraph/vendor_reference_render_v1.py").read_text()
         self.assertIn("apply_separation_lights", renderer_source)
         self.assertIn("apply_color_management", renderer_source)
         self.assertIn("assert_composition_locked", renderer_source)
+        self.assertIn("apply_cinematic_forest_lighting_repair", renderer_source)
 
 
 if __name__ == "__main__":

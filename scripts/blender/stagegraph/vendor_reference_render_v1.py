@@ -26,6 +26,7 @@ from ecokit_cycles_alpha_v1 import (
     prepare_ecokit_cycles_alpha,
     remap_backslash_image_paths,
 )
+from cinematic_forest_lighting_repair_v1 import apply_cinematic_forest_lighting_repair
 from forest_canopy_lighting_repair_v1 import apply_forest_canopy_lighting_repair
 from vendor_reference_lookdev_v1 import (
     ACTIVE_LOOKDEV,
@@ -351,6 +352,7 @@ def main():
     dual_after = count_dual_material_outputs()
     lookdev = lookdev_receipt(ACTIVE_LOOKDEV)
     canopy_repair = apply_forest_canopy_lighting_repair(scene)
+    cinematic_repair = apply_cinematic_forest_lighting_repair(scene)
 
     receipt = {
         "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_PREFLIGHT_V1",
@@ -389,6 +391,17 @@ def main():
             "globalExposureDelta": canopy_repair.get("globalExposureDelta"),
             "materialsChanged": (canopy_repair.get("materials") or {}).get("materialsChanged"),
             "verify": canopy_repair.get("verify"),
+            "vendorBlendSaved": False,
+        },
+        "cinematicForestLightingRepair": {
+            "feature": "cinematic_forest_lighting_repair_v1",
+            "applied": True,
+            "colorManagement": cinematic_repair.get("colorManagement"),
+            "world": cinematic_repair.get("world"),
+            "ground": cinematic_repair.get("ground"),
+            "cameraChanged": cinematic_repair.get("cameraChanged"),
+            "geometryRebuilt": cinematic_repair.get("geometryRebuilt"),
+            "emissionShadersAdded": cinematic_repair.get("emissionShadersAdded"),
             "vendorBlendSaved": False,
         },
         "authorizationRequiredForRender": True,
