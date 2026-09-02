@@ -1,21 +1,22 @@
 {
   "schema": "TIVVLEJOY_ACTIVE_RECIPE_V1",
-  "recipeId": "VENDOR_REFERENCE_ALPHA_REPAIR_V1",
-  "recipePath": "recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json",
-  "recipeCanonicalSha256": "fc0c713ac026c7b327a7860a0efda30a9d71623fecb8818f64cf36b6312e7f92",
-  "recipeFileSha256": "7adc5a7a5cd12765d37fb0a0d386f001224607d7757d3b1438391eba5f35e56e",
+  "recipeId": "VENDOR_REFERENCE_EXPOSURE_REPAIR_V1",
+  "recipePath": "recipes/tivvlejoy-stagegraph/006_vendor_reference_exposure_repair_v1.json",
+  "recipeCanonicalSha256": "c46b399dc501b58b394b643c6e15c8a08c23887908444c4ebeab89bd06744334",
+  "recipeFileSha256": "ca315984fe8b149c02d4b8c30e5ef62906fe790fa9fc6b84777e6e7ea57838fc",
   "activatedBy": "HUMAN",
   "state": "ZERO_PAID_REPAIR_COMPLETE",
-  "executedBy": "TIVVLEJOY_RECIPE_EXECUTION_COMMAND_V1",
+  "executedBy": "HUMAN_VISUAL_REJECT_AND_EXPOSURE_REPAIR_REQUEST",
   "budget": {
     "maxPaidCreateCount": 0,
     "maxSpendUsd": 0
   },
-  "rejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "rejectedImageSha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2",
+  "previousRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
   "formalStageGraphGate": "VENDOR_REFERENCE_REPRODUCED",
   "formalStageGraphApproval": false,
-  "rootCause": "ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES",
-  "resultReceiptPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json",
-  "nextAction": "AWAIT_HUMAN_VENDOR_REFERENCE_FRAME_AUTHORIZATION",
-  "authorizationRequestPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_AUTHORIZATION_REQUEST.json"
+  "rootCause": "LOOKDEV_EXPOSURE_AND_SHADOW_LIFT_INSUFFICIENT",
+  "resultReceiptPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_EXPOSURE_REPAIR_RESULT.json",
+  "nextAction": "RETURN_EXPOSURE_REPAIRED_VENDOR_REFERENCE_FRAME",
+  "authorizationRequestPath": null
 }

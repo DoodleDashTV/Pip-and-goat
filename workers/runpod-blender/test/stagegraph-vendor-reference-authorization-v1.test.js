@@ -64,6 +64,7 @@ test('fresh authorization request is not a live CREATE grant and does not approv
   const consumed = load('VENDOR_REFERENCE_AUTHORIZATION_CONSUMED_V1.json');
   const live = load('VENDOR_REFERENCE_AUTHORIZATION.json');
   const decision = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json');
+  const decisionV2 = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION_V2.json');
   const status = load('STATUS.json');
   assert.equal(request.authorized, false);
   assert.equal(request.actorClass, 'SYSTEM');
@@ -86,23 +87,36 @@ test('fresh authorization request is not a live CREATE grant and does not approv
   assert.equal(live.authorizationSha256, request.proposedAuthorizationCoreSha256);
   assert.equal(live.consumed, true);
   assert.equal(decision.decision, 'REJECTED');
+  assert.equal(decisionV2.decision, 'REJECTED');
+  assert.equal(decisionV2.imageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
   assert.equal(status.vendorReferenceReproducedApproved, false);
+  assert.equal(status.humanVisualDecision, 'REJECTED');
   assert.equal(status.freshVendorReferenceAuthorizationPresent, true);
   assert.equal(status.rejectedVendorReferenceIneligible, true);
   assert.equal(status.vendorReferenceImageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
-  assert.notEqual(status.vendorReferenceImageSha256, status.rejectedVendorReferenceImageSha256);
+  assert.equal(status.rejectedVendorReferenceImageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
+  assert.equal(status.previousRejectedVendorReferenceImageSha256, 'a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400');
   const verdict = contract.receiptVerdict('VENDOR_REFERENCE_REPRODUCED', request);
   assert.equal(verdict.valid, false);
 });
 
 test('human visual REJECT receipt cannot clear VENDOR_REFERENCE_REPRODUCED', () => {
   const decision = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json');
+  const decisionV2 = load('VENDOR_REFERENCE_VISUAL_REVIEW_DECISION_V2.json');
   assert.equal(decision.actorClass, 'HUMAN');
   assert.equal(decision.decision, 'REJECTED');
   assert.equal(decision.visualApproval, false);
   assert.equal(decision.imageSha256, 'a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400');
+  assert.equal(decisionV2.actorClass, 'HUMAN');
+  assert.equal(decisionV2.decision, 'REJECTED');
+  assert.equal(decisionV2.visualApproval, false);
+  assert.equal(decisionV2.imageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
   const verdict = contract.receiptVerdict('VENDOR_REFERENCE_REPRODUCED', decision);
+  const verdictV2 = contract.receiptVerdict('VENDOR_REFERENCE_REPRODUCED', decisionV2);
   assert.equal(verdict.valid, false);
   assert.equal(verdict.blockers.includes('RECEIPT_NOT_PASS'), true);
   assert.equal(verdict.blockers.includes('HUMAN_DECISION_NOT_APPROVED'), true);
+  assert.equal(verdictV2.valid, false);
+  assert.equal(verdictV2.blockers.includes('RECEIPT_NOT_PASS'), true);
+  assert.equal(verdictV2.blockers.includes('HUMAN_DECISION_NOT_APPROVED'), true);
 });

@@ -33,11 +33,15 @@
     "TreeLeaf Animation"
   ],
   "lookdev": {
-    "ambient": "verified TivvleJoy-owned HDRI substitution",
-    "key": "warm low-angle directional sunlight",
-    "atmosphere": "subtle depth haze, never milk-fog",
-    "color": "warm golden foreground/midground with cooler receding background",
-    "alphaRiskCheck": "inspect grass, leaf, vine and branch silhouettes for opaque-card or conversion artifacts"
+    "ambient": "verified TivvleJoy-owned HDRI substitution, strength lifted from 0.28 to 0.58",
+    "key": "warm low-angle directional sunlight with reduced red cast; sun direction unchanged",
+    "fill": "stronger cool camera-side fill to lift crushed shadows",
+    "separation": "cooler canopy rim and clearing bounce for foreground/midground/background readability",
+    "atmosphere": "lighter depth haze, never milk-fog, never solid-black canopy",
+    "color": "readable warm golden foreground/midground with cooler receding background; muddy red cast reduced",
+    "colorManagement": "AgX exposure +0.65 and gamma 1.06",
+    "alphaRiskCheck": "inspect grass, leaf, vine and branch silhouettes for opaque-card or conversion artifacts",
+    "compositionLock": "same camera, seed, placement counts, and sun direction as rejected 6f31cb68 frame"
   },
   "sceneRules": [
     "Do not reuse the old failed multi-pack V4 scene.",

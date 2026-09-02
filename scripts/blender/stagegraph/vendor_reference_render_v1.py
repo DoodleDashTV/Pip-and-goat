@@ -24,11 +24,28 @@ from ecokit_cycles_alpha_v1 import (
     prepare_ecokit_cycles_alpha,
     remap_backslash_image_paths,
 )
+from vendor_reference_lookdev_v1 import (
+    ACTIVE_LOOKDEV,
+    CAMERA_LENS_MM,
+    CAMERA_LOCATION,
+    CAMERA_LOOK_AT,
+    SEED,
+    apply_atmosphere_material,
+    apply_color_management,
+    apply_cycles_bounce_lift,
+    apply_ground_material,
+    apply_key_and_fill_lights,
+    apply_separation_lights,
+    apply_world,
+    assert_composition_locked,
+    lookdev_receipt,
+)
 
 SOURCE_SHA256 = "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a"
 AUDIT_SHA256 = "3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0"
 AUTH_SCOPE = "EXACTLY_ONE_VENDOR_REFERENCE_FRAME"
-SEED = 7301
+if SEED != 7301:
+    raise RuntimeError("COMPOSITION_SEED_CHANGED")
 
 TREE_COLLECTIONS = ["Tree_1", "Tree_2", "Tree_3", "Tree_4", "Tree_5"]
 GRASS_COLLECTIONS = [f"Grass_{i}" for i in range(9)]
@@ -121,13 +138,7 @@ def make_ground(collection):
         [(0, 1, 2, 3)],
         collection,
     )
-    material = bpy.data.materials.new("TJ_VendorGround_Mat")
-    material.use_nodes = True
-    bsdf = material.node_tree.nodes.get("Principled BSDF")
-    if bsdf:
-        bsdf.inputs["Base Color"].default_value = (0.055, 0.035, 0.018, 1.0)
-        bsdf.inputs["Roughness"].default_value = 0.92
-    obj.data.materials.append(material)
+    apply_ground_material(obj)
     return obj
 
 
@@ -157,80 +168,37 @@ def aim_at(obj, target):
 
 
 def make_world(scene, hdri_path: Path):
-    import bpy
-
-    world = bpy.data.worlds.new("TJ_VendorReference_World")
-    world.use_nodes = True
-    nodes = world.node_tree.nodes
-    links = world.node_tree.links
-    nodes.clear()
-    output = nodes.new("ShaderNodeOutputWorld")
-    background = nodes.new("ShaderNodeBackground")
-    background.inputs["Strength"].default_value = 0.28
-    environment = nodes.new("ShaderNodeTexEnvironment")
-    environment.image = bpy.data.images.load(str(hdri_path), check_existing=True)
-    links.new(environment.outputs["Color"], background.inputs["Color"])
-    links.new(background.outputs["Background"], output.inputs["Surface"])
-    scene.world = world
+    apply_world(scene, hdri_path)
 
 
 def add_lighting(collection):
-    import bpy
-
-    sun_data = bpy.data.lights.new("TJ_GoldenSun", type="SUN")
-    sun_data.energy = 3.4
-    sun_data.angle = math.radians(7.0)
-    sun_data.color = (1.0, 0.52, 0.24)
-    sun = bpy.data.objects.new("TJ_GoldenSun", sun_data)
-    collection.objects.link(sun)
-    sun.rotation_euler = (math.radians(58), math.radians(-8), math.radians(-42))
-
-    area_data = bpy.data.lights.new("TJ_SoftFill", type="AREA")
-    area_data.energy = 240.0
-    area_data.shape = "DISK"
-    area_data.size = 7.0
-    area_data.color = (0.43, 0.56, 0.78)
-    area = bpy.data.objects.new("TJ_SoftFill", area_data)
-    collection.objects.link(area)
-    area.location = (0, -4, 8)
-    aim_at(area, (0, 10, 2))
+    apply_key_and_fill_lights(collection)
+    apply_separation_lights(collection)
 
 
 def add_atmosphere(collection):
-    import bpy
-
     vertices = [
         (-18, -8, 0), (18, -8, 0), (18, 36, 0), (-18, 36, 0),
         (-18, -8, 18), (18, -8, 18), (18, 36, 18), (-18, 36, 18),
     ]
     faces = [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (4, 0, 3, 7)]
     volume = make_mesh_object("TJ_Atmosphere", vertices, faces, collection)
-    mat = bpy.data.materials.new("TJ_Atmosphere_Mat")
-    mat.use_nodes = True
-    nodes = mat.node_tree.nodes
-    links = mat.node_tree.links
-    nodes.clear()
-    output = nodes.new("ShaderNodeOutputMaterial")
-    principled = nodes.new("ShaderNodeVolumePrincipled")
-    principled.inputs["Density"].default_value = 0.009
-    principled.inputs["Anisotropy"].default_value = 0.3
-    links.new(principled.outputs["Volume"], output.inputs["Volume"])
-    volume.data.materials.append(mat)
+    apply_atmosphere_material(volume)
 
 
 def configure_camera(scene, collection):
     import bpy
 
     camera_data = bpy.data.cameras.new("TJ_VendorReference_Camera")
-    camera_data.lens = 42.0
+    camera_data.lens = CAMERA_LENS_MM
     camera_data.sensor_width = 36.0
     camera_data.dof.use_dof = True
     camera_data.dof.focus_distance = 20.0
     camera_data.dof.aperture_fstop = 4.0
     camera = bpy.data.objects.new("TJ_VendorReference_Camera", camera_data)
     collection.objects.link(camera)
-    camera.location = (0.0, -12.5, 2.15)
-    aim_at(camera, (0.0, 9.5, 2.6))
+    camera.location = CAMERA_LOCATION
+    aim_at(camera, CAMERA_LOOK_AT)
     scene.camera = camera
     return camera
 
@@ -253,8 +221,8 @@ def configure_render(scene, require_cycles: bool = False):
         scene.cycles.samples = 128
         scene.cycles.use_denoising = True
         configure_cycles_transparency(scene)
-    scene.view_settings.view_transform = "AgX"
-    scene.view_settings.exposure = 0.0
+        apply_cycles_bounce_lift(scene)
+    apply_color_management(scene)
 
 
 def enable_cycles_gpu(scene) -> str:
@@ -355,7 +323,8 @@ def build_scene(args):
     scatter(florals, "floral", 16, 2.0, 19.0, 0.35, 0.9, exclusion=2.4)
     scatter(leaves, "fallenLeaves", 65, -1.0, 20.0, 0.18, 0.45, exclusion=1.4)
 
-    return scene, camera, dict(placed)
+    composition = assert_composition_locked(camera, dict(placed))
+    return scene, camera, dict(placed), composition
 
 
 def main():
@@ -370,12 +339,14 @@ def main():
     bindings = apply_image_bindings(json.loads(args.image_bindings_json))
     path_remap = remap_backslash_image_paths()
     cycles_outputs = activate_all_ecokit_cycles_outputs()
-    scene, camera, placed = build_scene(args)
+    scene, camera, placed, composition = build_scene(args)
     root = scene.collection.children.get("TJ_VENDOR_REFERENCE_ROOT")
     placed_objects = list(root.objects) if root is not None else []
     alpha_repair = prepare_ecokit_cycles_alpha(placed_objects)
     transparency = configure_cycles_transparency(scene) if scene.render.engine == "CYCLES" else {}
+    bounce_lift = apply_cycles_bounce_lift(scene) if scene.render.engine == "CYCLES" else {}
     dual_after = count_dual_material_outputs()
+    lookdev = lookdev_receipt(ACTIVE_LOOKDEV)
 
     receipt = {
         "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_PREFLIGHT_V1",
@@ -402,6 +373,11 @@ def main():
             "warnings": alpha_repair.get("warnings"),
             "transparentMaxBounces": transparency.get("transparentMaxBounces"),
             "dualMaterialOutputsAfterRepair": dual_after,
+        },
+        "lookdev": {
+            **lookdev,
+            "diffuseBounces": bounce_lift.get("diffuseBounces", lookdev.get("diffuseBounces")),
+            "composition": composition,
         },
         "authorizationRequiredForRender": True,
         "paidCreateCount": 0,
