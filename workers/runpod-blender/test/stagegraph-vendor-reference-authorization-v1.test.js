@@ -30,7 +30,7 @@ test('locked vendor-reference authorization hashes and authorizes exactly one fr
   };
   assert.equal(contract.sha256Canonical(core), auth.authorizationSha256);
   assert.equal(auth.authorizationSha256, '12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031');
-  assert.equal(auth.consumed, false);
+  assert.equal(auth.consumed, true);
   assert.equal(auth.encodeVideo, false);
   assert.equal(auth.retryCount, 0);
   assert.equal(auth.beautyFrame, false);
@@ -89,16 +89,16 @@ test('fresh authorization request is not a live CREATE grant and does not approv
   assert.equal(consumedV2.authorizationSha256, '270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161');
   assert.equal(live.authorizationSha256, '12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031');
   assert.notEqual(live.authorizationSha256, request.proposedAuthorizationCoreSha256);
-  assert.equal(live.consumed, false);
+  assert.equal(live.consumed, true);
   assert.equal(live.previousAuthorizationSha256, consumedV2.authorizationSha256);
   assert.equal(decision.decision, 'REJECTED');
   assert.equal(decisionV2.decision, 'REJECTED');
   assert.equal(decisionV2.imageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
   assert.equal(status.vendorReferenceReproducedApproved, false);
-  assert.equal(status.humanVisualDecision, 'REJECTED');
+  assert.equal(status.humanVisualDecision, null);
   assert.equal(status.freshVendorReferenceAuthorizationPresent, true);
   assert.equal(status.rejectedVendorReferenceIneligible, true);
-  assert.equal(status.vendorReferenceImageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
+  assert.equal(status.vendorReferenceImageSha256, 'e873e483e817962afde700dcf4072655736f5dde271b2723a1ebdfc9046f12ad');
   assert.equal(status.rejectedVendorReferenceImageSha256, '6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2');
   assert.equal(status.previousRejectedVendorReferenceImageSha256, 'a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400');
   const verdict = contract.receiptVerdict('VENDOR_REFERENCE_REPRODUCED', request);

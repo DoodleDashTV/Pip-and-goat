@@ -2,25 +2,25 @@
   "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_FAIL_CLOSED_V1",
   "ok": true,
   "blockers": [],
-  "authorizationSha256": "270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161",
+  "authorizationSha256": "12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031",
   "branch": "cursor/tivvlejoy-stagegraph-v1-73f1",
-  "headSha": "2159495570f139137455ec4056056063300a23c5",
-  "requiredBaseSha": "0b1ab9e57432b811352a7013c971629afbbf8d1d",
+  "headSha": "d7f99d1bb697c8931f745dc70a719346bfc38d4e",
+  "requiredBaseSha": "ae766f1b8daf4ecbad7ff2e6be81e42661e755b4",
   "receiptFileSha256": {
-    "STATUS.json": "fecf4219ebc3d0f12b8b9202de34f7a0044fa1bf1e20150e2bff41cdb96a6278",
+    "STATUS.json": "ffa3e96b1224e0e9a763202fd35a7c52f30ae30d3577e25227a54e50197fc5a2",
     "SOURCE_PACK_LOCKED.json": "9f9b830ee45c793f519327490e7110afcf62b06b110033a1327ea18e7373cdd5",
     "DEPENDENCY_AUDIT_PASS.json": "135d06c03b3c6788fdfebb64bc7e0a89b6b599a6b9c4c7923b07913c559276e6",
     "VENDOR_REFERENCE_PREFLIGHT_PASS.json": "9cadfae47be1f1e2337c552a560918de4c9c872deb3933de7ad5370e5d2cb163",
     "VENDOR_REFERENCE_TARGET.json": "1c83bc73f622cdd073e4c5a62d75bafe8f22bf6684a3711e6d5be289d7fbefa0",
-    "VENDOR_REFERENCE_SCENE_PLAN.json": "aa64faf7fd9e381a9252739de0fd4fc37cc9cc278aec8fb0a67d3d779d36b5f4",
-    "VENDOR_REFERENCE_AUTHORIZATION.json": "cd7054cc09c7d0a9e5eaa99090a341ec6f5c874d8a43cf478989870e01ab00fc"
+    "VENDOR_REFERENCE_SCENE_PLAN.json": "97099dc78f6b6d46847895fc09cafcfb9a1e30c7e60433079d3ae0190e77f579",
+    "VENDOR_REFERENCE_AUTHORIZATION.json": "9347d3bd5f5e94f437757f0aed1f3a92c9e8b60e0ad1dc715bfbc847cc4f077f"
   },
   "quote": {
     "id": "NVIDIA GeForce RTX 4090",
     "displayName": "RTX 4090",
     "vramGb": 24,
     "secureUsdPerHr": 0.74,
-    "stockStatus": "Low"
+    "stockStatus": "High"
   },
   "livePodCount": 0,
   "livePodNames": [],
@@ -36,5 +36,5 @@
   "retry": false,
   "encodeVideo": false,
   "paidCreate": 0,
-  "at": "2026-09-02T19:34:54.926859+00:00"
+  "at": "2026-09-02T20:30:47.803498+00:00"
 }
