@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tivvlejoy.local/schemas/tivvlejoy-recipe-v1.schema.json",
+  "title": "TivvleJoy Recipe V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "recipeId",
+    "version",
+    "goal",
+    "inputs",
+    "allowedActions",
+    "forbiddenActions",
+    "budget",
+    "execution",
+    "successConditions",
+    "stopConditions",
+    "outputs"
+  ],
+  "properties": {
+    "schema": { "const": "TIVVLEJOY_RECIPE_V1" },
+    "recipeId": { "type": "string", "pattern": "^[A-Z0-9_]+_V[0-9]+$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "goal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "target", "expectedResult"],
+      "properties": {
+        "action": { "type": "string" },
+        "target": { "type": "string" },
+        "expectedResult": { "type": "string" }
+      }
+    },
+    "inputs": { "type": "object" },
+    "failure": { "type": "object" },
+    "allowedActions": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "forbiddenActions": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxPaidCreateCount", "maxSpendUsd"],
+      "properties": {
+        "maxPaidCreateCount": { "type": "integer", "minimum": 0 },
+        "maxSpendUsd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "failClosed", "requireEvidenceForRootCause"],
+      "properties": {
+        "sequence": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "failClosed": { "const": true },
+        "requireEvidenceForRootCause": { "type": "boolean" }
+      }
+    },
+    "successConditions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "stopConditions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receiptPath", "requiredFields"],
+      "properties": {
+        "receiptPath": { "type": "string" },
+        "requiredFields": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } }
+      }
+    }
+  }
+}
