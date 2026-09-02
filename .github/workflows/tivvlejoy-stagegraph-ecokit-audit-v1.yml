@@ -46,38 +46,6 @@ jobs:
       - name: Unit-test fail-closed materialization
         working-directory: scripts/cloud/stagegraph-v1
         run: python -m unittest -v test_materialize_ecokit_v1.py
-      - name: Check private asset credentials
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          required = (
-              "R2_ENDPOINT",
-              "R2_ACCESS_KEY_ID",
-              "R2_SECRET_ACCESS_KEY",
-              "R2_BUCKET",
-          )
-          missing = [name for name in required if not os.environ.get(name)]
-          if missing:
-              out = Path("/tmp/tivvlejoy-stagegraph/ASSET_AUDIT_BLOCKED.json")
-              out.parent.mkdir(parents=True, exist_ok=True)
-              out.write_text(json.dumps({
-                  "schema": "TIVVLEJOY_STAGEGRAPH_ASSET_AUDIT_BLOCKED_V1",
-                  "status": "BLOCKED",
-                  "gate": "DEPENDENCY_AUDIT_PASS",
-                  "reason": "PRIVATE_ASSET_CREDENTIALS_NOT_CONFIGURED",
-                  "missingSecretNames": missing,
-                  "sourceAssetPublished": False,
-                  "paidMutationPerformed": False,
-                  "paidCreateCount": 0,
-                  "paidSpendUsd": 0
-              }, indent=2) + "\n")
-              print("EcoKit audit blocked: required private-asset credentials are not configured.")
-              raise SystemExit(2)
-          print("Private asset credential names are configured.")
-          PY
       - name: Install private object-store client
         run: python -m pip install --disable-pip-version-check boto3==1.40.14
       - name: Materialize exact EcoKit source
@@ -86,6 +54,13 @@ jobs:
             --archive /tmp/tivvlejoy-ecokit.zip \
             --extract-root /tmp/tivvlejoy-ecokit \
             --receipt /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIALIZATION.json
+      - name: Bind declared owned dependencies
+        run: |
+          python scripts/cloud/stagegraph-v1/materialize_ecokit_dependencies_v1.py \
+            --ecokit-root "/tmp/tivvlejoy-ecokit/Stylised EcoKit" \
+            --hdri /tmp/tivvlejoy-owned-light/tj_hdri_diag_8k.jpg \
+            --bindings /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json \
+            --receipt /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
       - name: Install immutable Blender 4.3.2
         run: |
           curl --fail --location --retry 4 --output /tmp/blender.tar.xz \
@@ -104,12 +79,16 @@ jobs:
             --source-id SRC_FOREST_STYLISED_ECOKIT \
             --source-sha256 8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a \
             --skipped-archive-members-json '[]' \
+            --image-bindings-json "$(cat /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json)" \
             --out /tmp/tivvlejoy-stagegraph/ASSET_AUDIT.json
       - name: Upload sanitized receipts only
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tivvlejoy-stagegraph-ecokit-audit-v1
-          path: /tmp/tivvlejoy-stagegraph/*.json
+          path: |
+            /tmp/tivvlejoy-stagegraph/ASSET_AUDIT*.json
+            /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIALIZATION.json
+            /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
           if-no-files-found: error
           retention-days: 30
