@@ -5,6 +5,8 @@ on:
     paths:
       - "workers/runpod-blender/src/stagegraph-production-contract-v1.js"
       - "workers/runpod-blender/test/stagegraph-production-contract-v1.test.js"
+      - "workers/runpod-blender/test/stagegraph-current-receipts-v1.test.js"
+      - "artifacts/tivvlejoy-stagegraph-v1/*.json"
       - "scripts/blender/stagegraph/**"
       - "config/tivvlejoy-stagegraph-v1.json"
       - ".github/workflows/tivvlejoy-stagegraph-v1-contract.yml"
@@ -25,10 +27,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Validate Node production gates
-        run: node --test workers/runpod-blender/test/stagegraph-production-contract-v1.test.js
+      - name: Validate Node production gates and committed receipts
+        run: node --test workers/runpod-blender/test/stagegraph-production-contract-v1.test.js workers/runpod-blender/test/stagegraph-current-receipts-v1.test.js
       - name: Validate Blender asset-audit contract
         working-directory: scripts/blender/stagegraph
         run: python -m unittest -v test_asset_certify_contract_v1.py
-      - name: Syntax-check Blender audit entrypoint
-        run: python -m py_compile scripts/blender/stagegraph/asset_certify_blender_v1.py
+      - name: Syntax-check Blender StageGraph entrypoints
+        run: python -m py_compile scripts/blender/stagegraph/asset_certify_blender_v1.py scripts/blender/stagegraph/asset_inventory_blender_v1.py scripts/blender/stagegraph/vendor_reference_render_v1.py

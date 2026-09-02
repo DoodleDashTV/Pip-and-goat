@@ -90,6 +90,20 @@ jobs:
             -- \
             --source-id SRC_FOREST_STYLISED_ECOKIT \
             --out /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
+      - name: Build vendor-reference scene in prepare-only mode
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/vendor_reference_render_v1.py \
+            -- \
+            --source-id SRC_FOREST_STYLISED_ECOKIT \
+            --source-sha256 8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a \
+            --dependency-audit-sha256 3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0 \
+            --owned-hdri /tmp/tivvlejoy-owned-light/tj_hdri_diag_8k.jpg \
+            --image-bindings-json "$(cat /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json)" \
+            --prepare-only \
+            --receipt /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_PREFLIGHT.json
       - name: Upload sanitized receipts only
         if: always()
         uses: actions/upload-artifact@v4
@@ -100,6 +114,7 @@ jobs:
             /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
             /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIALIZATION.json
             /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
+            /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_PREFLIGHT.json
           if-no-files-found: error
           retention-days: 30
 
