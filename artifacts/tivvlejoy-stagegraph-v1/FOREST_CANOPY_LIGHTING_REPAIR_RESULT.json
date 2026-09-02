@@ -1,0 +1,37 @@
+{
+  "schema": "TIVVLEJOY_FOREST_CANOPY_LIGHTING_REPAIR_RESULT_V1",
+  "status": "PASS",
+  "visualApproval": false,
+  "vendorReferenceReproducedApproved": false,
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "rootCause": [
+    "CAMERA_FACING_FOREST_IS_BACKLIT_BY_KEY_SUN",
+    "EXISTING_BOUNCE_SITS_NEAR_GROUND_AND_PREFERS_TERRAIN",
+    "HDRI_AMBIENT_FILL_IS_TOO_WEAK_FOR_CANOPY_SHADOW_SIDE",
+    "LEAF_CARDS_HAVE_NO_TRANSLUCENCY_SO_BACKLIGHT_READS_OPAQUE_BLACK"
+  ],
+  "proof": {
+    "before": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_BEFORE.png",
+    "beforeSha256": "532dc7e4ff881601a785178999c9a8f773ec50807d38529209270304365e5295",
+    "after": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_AFTER.png",
+    "afterSha256": "b47cee18e12f066e2f9208495fc08bacfb86210ec088afd63fc94cac8c11e754",
+    "samples": 12,
+    "device": "CPU",
+    "beforeSeconds": 305.39,
+    "afterSeconds": 195.76
+  },
+  "metrics": {
+    "canopyMeanDelta": 12.09,
+    "canopyBlackFracBefore": 0.7049,
+    "canopyBlackFracAfter": 0.1855,
+    "canopyGreenReadableBefore": 0.0132,
+    "canopyGreenReadableAfter": 0.2616,
+    "groundMeanBefore": 51.85,
+    "groundMeanAfter": 42.48,
+    "fullMeanDelta": 1.59
+  },
+  "globalExposureDelta": 0.0,
+  "vendorBlendSaved": false,
+  "compositionLocked": true
+}

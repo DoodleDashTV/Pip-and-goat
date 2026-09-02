@@ -1,0 +1,105 @@
+{
+  "schema": "TIVVLEJOY_RECIPE_RESULT_V1",
+  "recipeId": "VENDOR_REFERENCE_EXPOSURE_REPAIR_V1",
+  "recipeSha256": "c46b399dc501b58b394b643c6e15c8a08c23887908444c4ebeab89bd06744334",
+  "recipeFileSha256": "ca315984fe8b149c02d4b8c30e5ef62906fe790fa9fc6b84777e6e7ea57838fc",
+  "recipePath": "recipes/tivvlejoy-stagegraph/006_vendor_reference_exposure_repair_v1.json",
+  "planSha256": "78b5eba9266e2e9cc7725c2270d387de020e301e33d2d03fceaf143628f08965",
+  "executedBy": "HUMAN_VISUAL_REJECT_AND_EXPOSURE_REPAIR_REQUEST",
+  "result": "PASS",
+  "rootCause": "LOOKDEV_EXPOSURE_AND_SHADOW_LIFT_INSUFFICIENT",
+  "rootCauseEvidence": {
+    "boundRejectedImageSha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2",
+    "previousRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+    "rejectedLookdev": {
+      "hdriStrength": 0.28,
+      "exposure": 0.0,
+      "sunColor": [1.0, 0.52, 0.24],
+      "fillEnergy": 240.0,
+      "rimEnabled": false,
+      "atmosphereDensity": 0.009
+    },
+    "afterInMemoryRepair": {
+      "lookdevId": "VENDOR_REFERENCE_LOOKDEV_EXPOSURE_REPAIR_V2",
+      "hdriStrength": 0.58,
+      "exposure": 0.65,
+      "gamma": 1.06,
+      "sunEnergy": 5.4,
+      "sunColor": [1.0, 0.76, 0.55],
+      "fillEnergy": 520.0,
+      "rimEnabled": true,
+      "bounceEnabled": true,
+      "groundColor": [0.102, 0.08, 0.054],
+      "atmosphereDensity": 0.0048,
+      "diffuseBounces": 8,
+      "compositionLocked": true,
+      "rendered": false
+    },
+    "vendorBlendSaved": false
+  },
+  "receiptsConsumed": [
+    "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json",
+    "recipes/tivvlejoy-stagegraph/006_vendor_reference_exposure_repair_v1.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_VISUAL_REVIEW_DECISION_V2.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_HANDOFF_REPAIRED.json",
+    "artifacts/tivvlejoy-stagegraph-v1/STATUS.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_FRAME_REPAIRED.png"
+  ],
+  "actionsExecuted": [
+    "VERIFY_INPUT_RECEIPTS",
+    "REPRODUCE_OR_ISOLATE_FAILURE_ZERO_PAID",
+    "IDENTIFY_ROOT_CAUSE",
+    "APPLY_MINIMUM_REPAIR",
+    "RUN_ZERO_PAID_TESTS",
+    "WRITE_REPAIR_RECEIPT",
+    "UPDATE_STATUS",
+    "STOP"
+  ],
+  "filesChanged": [
+    "scripts/blender/stagegraph/vendor_reference_lookdev_v1.py",
+    "scripts/blender/stagegraph/vendor_reference_render_v1.py",
+    "scripts/blender/stagegraph/test_vendor_reference_lookdev_v1.py",
+    "recipes/tivvlejoy-stagegraph/006_vendor_reference_exposure_repair_v1.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_EXPOSURE_REPAIR_RESULT.json",
+    "artifacts/tivvlejoy-stagegraph-v1/STATUS.json",
+    "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json"
+  ],
+  "testsRun": [
+    "stagegraph-recipe-runner-v1.js plan",
+    "test_vendor_reference_lookdev_v1.py",
+    "test_ecokit_cycles_alpha_v1.py",
+    "test_execute_vendor_reference_frame_v1.py",
+    "stagegraph-production-contract-v1.test.js",
+    "stagegraph-current-receipts-v1.test.js",
+    "stagegraph-vendor-reference-authorization-v1.test.js",
+    "stagegraph-recipe-contract-v1.test.js"
+  ],
+  "testResults": {
+    "stagegraph-recipe-runner-v1.js plan": "PASS",
+    "test_vendor_reference_lookdev_v1.py": "PASS",
+    "test_ecokit_cycles_alpha_v1.py": "PASS",
+    "test_execute_vendor_reference_frame_v1.py": "PASS",
+    "stagegraph-production-contract-v1.test.js": "PASS",
+    "stagegraph-current-receipts-v1.test.js": "PASS",
+    "stagegraph-vendor-reference-authorization-v1.test.js": "PASS",
+    "stagegraph-recipe-contract-v1.test.js": "PASS"
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "nextAction": "RETURN_EXPOSURE_REPAIRED_VENDOR_REFERENCE_FRAME",
+  "anotherVendorReferenceFrameRequired": true,
+  "freshPaidAuthorizationRequired": true,
+  "vendorReferenceReproducedApproved": false,
+  "visualApproval": false,
+  "compositionLocked": true,
+  "forbiddenActionsAvoided": [
+    "CREATE_PAID_POD",
+    "RENDER_PAID_FRAME",
+    "ENCODE_VIDEO",
+    "AUTHORIZE_BEAUTY_FRAME",
+    "MARK_VISUAL_APPROVAL",
+    "MODIFY_CHARACTER_RIGS",
+    "CHANGE_CAMERA_OR_PLACEMENT",
+    "AUTO_RETRY"
+  ]
+}

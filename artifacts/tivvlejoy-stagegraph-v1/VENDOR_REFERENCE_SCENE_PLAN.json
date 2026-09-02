@@ -1,0 +1,62 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_SCENE_PLAN_V1",
+  "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+  "referenceTarget": "TOP_GOLDEN_FOREST_PANEL",
+  "objective": "Reproduce the purchased EcoKit's advertised environment quality before any TivvleJoy 9:16 adaptation.",
+  "renderEngine": "CYCLES",
+  "frameCount": 1,
+  "videoEncode": false,
+  "composition": {
+    "name": "GOLDEN_FOREST_CLEARING",
+    "aspectPolicy": "MATCH_VENDOR_REFERENCE_BEFORE_9_16",
+    "cameraIntent": "low human-eye forest camera with layered foreground trunks, a readable warm clearing, and deep background falloff",
+    "depthLayers": ["FOREGROUND_OCCLUDERS", "MIDGROUND_HERO_FLORA", "BACKGROUND_TREE_MASS", "ATMOSPHERIC_FALLOFF"]
+  },
+  "verifiedNativeCollections": {
+    "trees": ["Tree_1", "Tree_2", "Tree_3", "Tree_4", "Tree_5"],
+    "grass": ["Grass_0", "Grass_1", "Grass_2", "Grass_3", "Grass_4", "Grass_5", "Grass_6", "Grass_7", "Grass_8"],
+    "ferns": ["Fern_1", "Fern_2", "Fern_3", "Fern_4", "Fern_5"],
+    "bushes": ["Bushes_1", "Bushes_2"],
+    "fallenLeaves": ["Fallen Leaf_0", "Fallen Leaf_1"],
+    "floral": ["Floral_1", "Floral_2"],
+    "branches": ["Branch_0", "Branch_1"],
+    "vines": ["Vines_1", "Vines_2"]
+  },
+  "verifiedGeometryNodes": [
+    "Flora_GN_Paint",
+    "Flora_GN_Terrain",
+    "Tree_GN_001",
+    "Tree_GN_002",
+    "Vines_GN_1",
+    "Vines_GN_2",
+    "Flora Animation",
+    "TreeLeaf Animation"
+  ],
+  "lookdev": {
+    "ambient": "verified TivvleJoy-owned HDRI substitution, strength lifted from 0.28 to 0.58",
+    "key": "warm low-angle directional sunlight with reduced red cast; sun direction unchanged",
+    "fill": "stronger cool camera-side fill to lift crushed shadows",
+    "separation": "cooler canopy rim and clearing bounce for foreground/midground/background readability",
+    "atmosphere": "lighter depth haze, never milk-fog, never solid-black canopy",
+    "color": "readable warm golden foreground/midground with cooler receding background; muddy red cast reduced",
+    "colorManagement": "AgX exposure +0.65 and gamma 1.06",
+    "alphaRiskCheck": "inspect grass, leaf, vine and branch silhouettes for opaque-card or conversion artifacts",
+    "compositionLock": "same camera, seed, placement counts, and sun direction as rejected 6f31cb68 frame"
+  },
+  "sceneRules": [
+    "Do not reuse the old failed multi-pack V4 scene.",
+    "Do not populate from unverified generic primitives except invisible/support geometry such as ground or atmosphere volumes.",
+    "Do not force 9:16 until the vendor-reference reproduction passes human review.",
+    "Use native purchased EcoKit assets as the visible environment content.",
+    "Preserve clear foreground/midground/background separation and a readable focal clearing.",
+    "Reject catalog-grid placement, uniform scatter, obvious repetition, floating vegetation, or flat frontal lighting."
+  ],
+  "authorization": {
+    "requiredScope": "EXACTLY_ONE_VENDOR_REFERENCE_FRAME",
+    "createCount": 1,
+    "retryCount": 0,
+    "maxSpendUsdCeiling": 15,
+    "present": false
+  },
+  "status": "READY_FOR_RENDERER_IMPLEMENTATION"
+}

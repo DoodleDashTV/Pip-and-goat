@@ -1,0 +1,56 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_ROOT_CAUSE_V2",
+  "result": "IDENTIFIED",
+  "paidCreatePerformed": false,
+  "boundRejectedImageSha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2",
+  "previousRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "definitiveRootCause": "LOOKDEV_EXPOSURE_AND_SHADOW_LIFT_INSUFFICIENT",
+  "summary": "The alpha-repaired frame still used the original dark lookdev: HDRI strength 0.28, AgX exposure 0.0, a strongly red key sun, a weak fill, no rim/bounce separation, a near-black red ground, and a denser atmosphere volume. That crushed shadow detail, collapsed the canopy into a black mass, hid midground/background form, and added a muddy red cast. Foliage alpha is no longer the primary blocker.",
+  "ruledOut": {
+    "ecokitEeveeOutputStillActive": false,
+    "compositionOrCameraDrift": false,
+    "placementCountChange": false,
+    "vendorBlendMutation": false,
+    "colorSpaceAsPrimaryCause": false
+  },
+  "confirmed": {
+    "hdriStrengthTooLow": true,
+    "displayExposureZero": true,
+    "keySunOverlyRed": true,
+    "fillTooWeakForReadableShadows": true,
+    "noCanopyRimOrClearingBounce": true,
+    "groundAlbedoTooDarkAndRed": true,
+    "atmosphereDensityCrushingDepth": true
+  },
+  "measuredRejectedLookdev": {
+    "lookdevId": "VENDOR_REFERENCE_LOOKDEV_REJECTED_EXPOSURE_V1",
+    "hdriStrength": 0.28,
+    "exposure": 0.0,
+    "gamma": 1.0,
+    "sunEnergy": 3.4,
+    "sunColor": [1.0, 0.52, 0.24],
+    "fillEnergy": 240.0,
+    "rimEnabled": false,
+    "bounceEnabled": false,
+    "groundColor": [0.055, 0.035, 0.018],
+    "atmosphereDensity": 0.009,
+    "diffuseBounces": 4
+  },
+  "measuredAfterZeroPaidRepair": {
+    "lookdevId": "VENDOR_REFERENCE_LOOKDEV_EXPOSURE_REPAIR_V2",
+    "hdriStrength": 0.58,
+    "exposure": 0.65,
+    "gamma": 1.06,
+    "sunEnergy": 5.4,
+    "sunColor": [1.0, 0.76, 0.55],
+    "fillEnergy": 520.0,
+    "rimEnabled": true,
+    "bounceEnabled": true,
+    "groundColor": [0.102, 0.08, 0.054],
+    "atmosphereDensity": 0.0048,
+    "diffuseBounces": 8,
+    "compositionLocked": true,
+    "rendered": false
+  },
+  "vendorBlendSaved": false
+}

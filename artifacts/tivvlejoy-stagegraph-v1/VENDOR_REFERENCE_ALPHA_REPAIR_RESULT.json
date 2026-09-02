@@ -1,0 +1,102 @@
+{
+  "schema": "TIVVLEJOY_RECIPE_RESULT_V1",
+  "recipeId": "VENDOR_REFERENCE_ALPHA_REPAIR_V1",
+  "recipeSha256": "fc0c713ac026c7b327a7860a0efda30a9d71623fecb8818f64cf36b6312e7f92",
+  "recipeFileSha256": "7adc5a7a5cd12765d37fb0a0d386f001224607d7757d3b1438391eba5f35e56e",
+  "recipePath": "recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json",
+  "planSha256": "559947ca3c1f966895f73e5ab441cf0ff8df741a9b2dff5815b4d6e64052eea4",
+  "executedBy": "TIVVLEJOY_RECIPE_EXECUTION_COMMAND_V1",
+  "result": "PASS",
+  "rootCause": "ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES",
+  "rootCauseEvidence": {
+    "boundRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+    "rejectedImageFileSha256Verified": true,
+    "blender": "4.3.2",
+    "kitAsPurchased": {
+      "dualOutput": 48,
+      "eeveeActive": 47,
+      "cyclesActive": 1,
+      "loadTimeConversionWarnings": true
+    },
+    "afterInMemoryRepair": {
+      "dualOutput": 48,
+      "eeveeActive": 0,
+      "cyclesActive": 48,
+      "cyclesOutputsActivated": 47,
+      "blendHashed": 19,
+      "transparentMaxBounces": 24,
+      "prepareOnly": "PASS",
+      "rendered": false
+    },
+    "vendorBlendSaved": false
+  },
+  "receiptsConsumed": [
+    "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json",
+    "recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json",
+    "artifacts/tivvlejoy-stagegraph-v1/SOURCE_PACK_LOCKED.json",
+    "artifacts/tivvlejoy-stagegraph-v1/DEPENDENCY_AUDIT_PASS.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_PREFLIGHT_PASS.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_RENDER_RECEIPT.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_HANDOFF.json",
+    "artifacts/tivvlejoy-stagegraph-v1/STATUS.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_FRAME.png"
+  ],
+  "actionsExecuted": [
+    "VERIFY_INPUT_RECEIPTS",
+    "REPRODUCE_OR_ISOLATE_FAILURE_ZERO_PAID",
+    "IDENTIFY_ROOT_CAUSE",
+    "APPLY_MINIMUM_REPAIR",
+    "RUN_ZERO_PAID_TESTS",
+    "RUN_ZERO_PAID_PREFLIGHT",
+    "WRITE_REPAIR_RECEIPT",
+    "UPDATE_STATUS",
+    "STOP"
+  ],
+  "filesChanged": [
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json",
+    "artifacts/tivvlejoy-stagegraph-v1/STATUS.json",
+    "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json"
+  ],
+  "testsRun": [
+    "stagegraph-recipe-runner-v1.js plan",
+    "test_ecokit_cycles_alpha_v1.py",
+    "test_asset_certify_contract_v1.py",
+    "test_execute_vendor_reference_frame_v1.py",
+    "stagegraph-production-contract-v1.test.js",
+    "stagegraph-current-receipts-v1.test.js",
+    "stagegraph-vendor-reference-authorization-v1.test.js",
+    "stagegraph-recipe-contract-v1.test.js",
+    "foliage_alpha_diagnose_v1.py",
+    "inspect_ecokit_materials_v1.py",
+    "vendor_reference_render_v1.py --prepare-only"
+  ],
+  "testResults": {
+    "stagegraph-recipe-runner-v1.js plan": "PASS",
+    "test_ecokit_cycles_alpha_v1.py": "PASS",
+    "test_asset_certify_contract_v1.py": "PASS",
+    "test_execute_vendor_reference_frame_v1.py": "PASS",
+    "stagegraph-production-contract-v1.test.js": "PASS",
+    "stagegraph-current-receipts-v1.test.js": "PASS",
+    "stagegraph-vendor-reference-authorization-v1.test.js": "PASS",
+    "stagegraph-recipe-contract-v1.test.js": "PASS",
+    "foliage_alpha_diagnose_v1.py": "PASS",
+    "inspect_ecokit_materials_v1.py": "PASS",
+    "vendor_reference_render_v1.py --prepare-only": "PASS"
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "nextAction": "REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION",
+  "anotherVendorReferenceFrameRequired": true,
+  "freshPaidAuthorizationRequired": true,
+  "vendorReferenceReproducedApproved": false,
+  "visualApproval": false,
+  "forbiddenActionsAvoided": [
+    "CREATE_PAID_POD",
+    "RENDER_PAID_FRAME",
+    "ENCODE_VIDEO",
+    "AUTHORIZE_BEAUTY_FRAME",
+    "MARK_VISUAL_APPROVAL",
+    "MODIFY_CHARACTER_RIGS",
+    "AUTO_RETRY"
+  ]
+}

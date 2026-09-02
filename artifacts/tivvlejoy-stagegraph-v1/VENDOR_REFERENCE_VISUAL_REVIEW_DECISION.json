@@ -1,0 +1,23 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_VISUAL_REVIEW_DECISION_V1",
+  "stage": "VENDOR_REFERENCE_REPRODUCED",
+  "actorClass": "HUMAN",
+  "decision": "REJECTED",
+  "visualApproval": false,
+  "vendorReferenceReproducedApproved": false,
+  "result": "REJECT",
+  "imageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "boundImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "executionReceiptSha256": "159085e4c5efef4f1e5916ba70ca3a4cbf4e6e3ec64af36ee0faf94404b4dcb5",
+  "authorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
+  "rejectionReasons": [
+    "TREE_MASSES_APPEAR_AS_OPAQUE_BLACK_SILHOUETTES_IN_RENDERED_FRAME",
+    "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS"
+  ],
+  "claimedApprovalLabel": null,
+  "approvalSha256": null,
+  "paidCreatePerformed": false,
+  "beautyFrameStarted": false,
+  "videoEncodeStarted": false,
+  "ineligibleForReuse": true
+}

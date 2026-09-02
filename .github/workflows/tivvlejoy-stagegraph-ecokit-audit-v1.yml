@@ -1,0 +1,155 @@
+name: TivvleJoy StageGraph EcoKit Audit V1
+
+on:
+  pull_request:
+    branches:
+      - cursor/tivvlejoy-scenery-showcase-30s-v1-73f1
+    paths:
+      - ".github/workflows/tivvlejoy-stagegraph-ecokit-audit-v1.yml"
+      - "scripts/cloud/stagegraph-v1/**"
+      - "scripts/blender/stagegraph/**"
+      - "workers/runpod-blender/src/stagegraph-recipe-*.js"
+      - "recipes/tivvlejoy-stagegraph/**"
+      - "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json"
+      - "config/tivvlejoy-stagegraph-v1.json"
+  push:
+    branches:
+      - cursor/tivvlejoy-stagegraph-v1-73f1
+    paths:
+      - ".github/workflows/tivvlejoy-stagegraph-ecokit-audit-v1.yml"
+      - "scripts/cloud/stagegraph-v1/**"
+      - "scripts/blender/stagegraph/**"
+      - "workers/runpod-blender/src/stagegraph-recipe-*.js"
+      - "recipes/tivvlejoy-stagegraph/**"
+      - "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json"
+      - "config/tivvlejoy-stagegraph-v1.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tivvlejoy-stagegraph-ecokit-audit-v1-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    # Pull requests register and validate this workflow, but private purchased
+    # assets are only materialized in a trusted branch push or manual dispatch.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate active zero-paid repair recipe before touching assets
+        run: |
+          node workers/runpod-blender/src/stagegraph-recipe-runner-v1.js \
+            plan recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json \
+            > /tmp/tivvlejoy-recipe-plan.json
+      - name: Unit-test fail-closed materialization
+        working-directory: scripts/cloud/stagegraph-v1
+        run: python -m unittest -v test_materialize_ecokit_v1.py
+      - name: Install private object-store client
+        run: python -m pip install --disable-pip-version-check boto3==1.40.14
+      - name: Materialize exact EcoKit source
+        run: |
+          python scripts/cloud/stagegraph-v1/materialize_ecokit_v1.py \
+            --archive /tmp/tivvlejoy-ecokit.zip \
+            --extract-root /tmp/tivvlejoy-ecokit \
+            --receipt /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIALIZATION.json
+      - name: Bind declared owned dependencies
+        run: |
+          python scripts/cloud/stagegraph-v1/materialize_ecokit_dependencies_v1.py \
+            --ecokit-root "/tmp/tivvlejoy-ecokit/Stylised EcoKit" \
+            --hdri /tmp/tivvlejoy-owned-light/tj_hdri_diag_8k.jpg \
+            --bindings /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json \
+            --receipt /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
+      - name: Install immutable Blender 4.3.2
+        run: |
+          curl --fail --location --retry 4 --output /tmp/blender.tar.xz \
+            https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz
+          echo "4da1c956673c0485e63054e563ee69198cc8f80d8157dd7592dffc8a6a5592e6  /tmp/blender.tar.xz" | sha256sum --check
+          mkdir -p /tmp/blender
+          tar -xJf /tmp/blender.tar.xz --strip-components=1 -C /tmp/blender
+          /tmp/blender/blender --version
+      - name: Run read-only native Blender dependency audit
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/asset_certify_blender_v1.py \
+            -- \
+            --source-id SRC_FOREST_STYLISED_ECOKIT \
+            --source-sha256 8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a \
+            --skipped-archive-members-json '[]' \
+            --image-bindings-json "$(cat /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json)" \
+            --out /tmp/tivvlejoy-stagegraph/ASSET_AUDIT.json
+      - name: Inventory native assets for vendor-frame planning
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/asset_inventory_blender_v1.py \
+            -- \
+            --source-id SRC_FOREST_STYLISED_ECOKIT \
+            --out /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
+      - name: Diagnose foliage alpha and material paths with zero paid render spend
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/foliage_alpha_diagnose_v1.py \
+            -- \
+            --out /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_ALPHA_DIAGNOSTIC.json
+      - name: Build vendor-reference scene in prepare-only mode
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/vendor_reference_render_v1.py \
+            -- \
+            --source-id SRC_FOREST_STYLISED_ECOKIT \
+            --source-sha256 8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a \
+            --dependency-audit-sha256 3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0 \
+            --owned-hdri /tmp/tivvlejoy-owned-light/tj_hdri_diag_8k.jpg \
+            --image-bindings-json "$(cat /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json)" \
+            --prepare-only \
+            --receipt /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_PREFLIGHT.json
+      - name: Inspect EcoKit foliage materials after prepare
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/inspect_ecokit_materials_v1.py \
+            -- \
+            --source-id SRC_FOREST_STYLISED_ECOKIT \
+            --out /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIAL_INSPECT.json
+      - name: Upload sanitized receipts only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tivvlejoy-stagegraph-ecokit-audit-v1
+          path: |
+            /tmp/tivvlejoy-recipe-plan.json
+            /tmp/tivvlejoy-stagegraph/ASSET_AUDIT*.json
+            /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
+            /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIALIZATION.json
+            /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
+            /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_ALPHA_DIAGNOSTIC.json
+            /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_PREFLIGHT.json
+            /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIAL_INSPECT.json
+          if-no-files-found: error
+          retention-days: 30
+
+# Trusted rerun marker: repository R2 secrets configured 2026-09-02.

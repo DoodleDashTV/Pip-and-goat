@@ -1,0 +1,40 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_VISUAL_REVIEW_DECISION_V2",
+  "stage": "VENDOR_REFERENCE_REPRODUCED",
+  "actorClass": "HUMAN",
+  "decision": "REJECTED",
+  "visualApproval": false,
+  "vendorReferenceReproducedApproved": false,
+  "result": "REJECT",
+  "imageSha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2",
+  "boundImageSha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2",
+  "imagePath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_FRAME_REPAIRED.png",
+  "executionReceiptSha256": "597afbe1e6cbe28db6e7c4d3e21832e360baaca316fc1c2f55281a7551d4350c",
+  "authorizationSha256": "270865630a301bf39d7067b0545c56a489d37c77c0633dc605d2d95ff7934161",
+  "previousRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "previousRejectedImageIneligible": true,
+  "rejectionReasons": [
+    "OVERALL_EXPOSURE_TOO_DARK_FOR_VENDOR_REFERENCE_APPROVAL",
+    "SHADOW_AREAS_CRUSHED",
+    "CANOPY_READS_AS_NEAR_SOLID_BLACK_MASS",
+    "MIDGROUND_BACKGROUND_DETAIL_NOT_CLEAR_ENOUGH",
+    "MUDDY_RED_CAST"
+  ],
+  "notes": "Frame is improved versus the first rejected alpha-failure frame, but still too dark for vendor-reference reproduction approval.",
+  "nextRepairRequirements": [
+    "PRESERVE_COMPOSITION_FRAMING_AND_SCENE_LAYOUT",
+    "INCREASE_OVERALL_EXPOSURE_BRIGHTNESS_MODERATELY",
+    "LIFT_SHADOW_DETAIL_AND_BLACK_LEVELS",
+    "KEEP_MOODY_LOOK_WITHOUT_SOLID_BLACK_CANOPY",
+    "IMPROVE_FOREGROUND_MIDGROUND_BACKGROUND_SEPARATION",
+    "REDUCE_MUDDY_RED_CAST",
+    "RETURN_ACTUAL_EXPORTED_PNG"
+  ],
+  "claimedApprovalLabel": null,
+  "approvalSha256": null,
+  "paidCreatePerformed": false,
+  "beautyFrameStarted": false,
+  "videoEncodeStarted": false,
+  "downstreamStarted": false,
+  "ineligibleForReuse": true
+}

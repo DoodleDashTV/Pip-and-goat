@@ -1,0 +1,13 @@
+{
+  "podId": "97bo45oeszxoat",
+  "podName": "tj-sg-vr-3",
+  "imageName": "nvidia/cuda:12.4.1-base-ubuntu22.04",
+  "quotedUsdPerHr": 0.74,
+  "bundle": {
+    "bundleKey": "tivvlejoy-assets/executions/stagegraph-vendor-reference-exposure-v1/inputs/bundle.tgz",
+    "bundleSha256": "f22a4ab43b63a35f18f52b1ce65422435f9efead507191f9c56a84e9b66f3ac2",
+    "entryKey": "tivvlejoy-assets/executions/stagegraph-vendor-reference-exposure-v1/inputs/pod_entry_vendor_reference_v1.py",
+    "entrySha256": "fcf58050bd425c6b3c5551b889e3de0d642a503fb4fdc09b419cf2faa1c119b8"
+  },
+  "at": "2026-09-02T20:30:50.627996+00:00"
+}

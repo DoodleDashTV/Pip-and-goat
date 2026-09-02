@@ -1,0 +1,12 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_RESULT_V1",
+  "status": "RENDERED_AWAITING_HUMAN_VISUAL_APPROVAL",
+  "authorizationSha256": "12618427bd4c083d50c5affb7f13fafa032061a465dec3f42e3793eb4abbd031",
+  "paidCreate": 1,
+  "actualSpendUsd": 0.0606,
+  "runtimeSeconds": 294.6,
+  "imageSha256": "e873e483e817962afde700dcf4072655736f5dde271b2723a1ebdfc9046f12ad",
+  "podId": "97bo45oeszxoat",
+  "gpu": "RTX 4090",
+  "at": "2026-09-02T20:35:43.916524+00:00"
+}

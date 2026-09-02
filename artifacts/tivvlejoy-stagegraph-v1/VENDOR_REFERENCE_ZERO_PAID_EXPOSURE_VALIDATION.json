@@ -1,0 +1,37 @@
+{
+  "contractId": "TIVVLEJOY_STAGEGRAPH_PRODUCTION_CONTRACT_V1",
+  "validationKind": "ZERO_PAID_AFTER_EXPOSURE_LOOKDEV_REPAIR",
+  "paid": false,
+  "paidCreateLaunched": false,
+  "paidRetryLaunched": false,
+  "beautyFrameStarted": false,
+  "videoWorkStarted": false,
+  "rejectedImageSha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2",
+  "previousRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "rejectedImageIneligibleForReuse": true,
+  "compositionLocked": true,
+  "checks": {
+    "vendorReferenceLookdevUnit": {
+      "ok": true,
+      "script": "scripts/blender/stagegraph/test_vendor_reference_lookdev_v1.py",
+      "interpreter": "python3"
+    },
+    "ecokitCyclesAlphaUnit": {
+      "ok": true,
+      "script": "scripts/blender/stagegraph/test_ecokit_cycles_alpha_v1.py",
+      "interpreter": "python3"
+    },
+    "stagegraphContractJs": {
+      "ok": true,
+      "script": "workers/runpod-blender/test/stagegraph-production-contract-v1.test.js"
+    },
+    "recipeContractJs": {
+      "ok": true,
+      "script": "workers/runpod-blender/test/stagegraph-recipe-contract-v1.test.js"
+    },
+    "executorIdentityAfterSecondReject": {
+      "ok": true,
+      "script": "scripts/cloud/stagegraph-v1/test_execute_vendor_reference_frame_v1.py"
+    }
+  }
+}

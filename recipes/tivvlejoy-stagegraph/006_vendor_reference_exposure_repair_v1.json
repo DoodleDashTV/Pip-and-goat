@@ -1,0 +1,110 @@
+{
+  "schema": "TIVVLEJOY_RECIPE_V1",
+  "recipeId": "VENDOR_REFERENCE_EXPOSURE_REPAIR_V1",
+  "version": 1,
+  "goal": {
+    "action": "REPAIR",
+    "target": "VENDOR_REFERENCE_LOOKDEV",
+    "expectedResult": "SAME_COMPOSITION_EXPOSURE_AND_SHADOW_LIFT_READY_FOR_FRESH_FRAME"
+  },
+  "inputs": {
+    "branch": "cursor/tivvlejoy-stagegraph-v1-73f1",
+    "receipts": [
+      "artifacts/tivvlejoy-stagegraph-v1/SOURCE_PACK_LOCKED.json",
+      "artifacts/tivvlejoy-stagegraph-v1/DEPENDENCY_AUDIT_PASS.json",
+      "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_PREFLIGHT_PASS.json",
+      "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_RENDER_RECEIPT_REPAIRED.json",
+      "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_HANDOFF_REPAIRED.json",
+      "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_VISUAL_REVIEW_DECISION_V2.json",
+      "artifacts/tivvlejoy-stagegraph-v1/STATUS.json"
+    ],
+    "rejectedArtifact": {
+      "path": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_FRAME_REPAIRED.png",
+      "sha256": "6f31cb689488813d54608aff0b0c959835204fb54f62e1d2e321d3957827c3b2"
+    },
+    "previousRejectedArtifact": {
+      "path": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_FRAME.png",
+      "sha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400"
+    }
+  },
+  "failure": {
+    "codes": [
+      "OVERALL_EXPOSURE_TOO_DARK_FOR_VENDOR_REFERENCE_APPROVAL",
+      "SHADOW_AREAS_CRUSHED",
+      "CANOPY_READS_AS_NEAR_SOLID_BLACK_MASS",
+      "MIDGROUND_BACKGROUND_DETAIL_NOT_CLEAR_ENOUGH",
+      "MUDDY_RED_CAST"
+    ]
+  },
+  "allowedActions": [
+    "VERIFY_INPUT_RECEIPTS",
+    "REPRODUCE_OR_ISOLATE_FAILURE_ZERO_PAID",
+    "IDENTIFY_ROOT_CAUSE",
+    "APPLY_MINIMUM_REPAIR",
+    "RUN_ZERO_PAID_TESTS",
+    "WRITE_REPAIR_RECEIPT",
+    "UPDATE_STATUS",
+    "STOP"
+  ],
+  "forbiddenActions": [
+    "CREATE_PAID_POD",
+    "RENDER_PAID_FRAME",
+    "ENCODE_VIDEO",
+    "AUTHORIZE_BEAUTY_FRAME",
+    "MARK_VISUAL_APPROVAL",
+    "MODIFY_CHARACTER_RIGS",
+    "CHANGE_CAMERA_OR_PLACEMENT",
+    "AUTO_RETRY"
+  ],
+  "budget": {
+    "maxPaidCreateCount": 0,
+    "maxSpendUsd": 0
+  },
+  "execution": {
+    "sequence": [
+      "VERIFY_INPUT_RECEIPTS",
+      "REPRODUCE_OR_ISOLATE_FAILURE_ZERO_PAID",
+      "IDENTIFY_ROOT_CAUSE",
+      "APPLY_MINIMUM_REPAIR",
+      "RUN_ZERO_PAID_TESTS",
+      "WRITE_REPAIR_RECEIPT",
+      "UPDATE_STATUS",
+      "STOP"
+    ],
+    "failClosed": true,
+    "requireEvidenceForRootCause": true
+  },
+  "successConditions": [
+    "ROOT_CAUSE_IDENTIFIED",
+    "ZERO_PAID_TESTS_PASS",
+    "COMPOSITION_LOCKED",
+    "NO_PAID_CREATE",
+    "NO_VIDEO_RENDER",
+    "REJECTED_IMAGE_REMAINS_UNAPPROVED"
+  ],
+  "stopConditions": [
+    "PAID_ACTION_REQUIRED",
+    "RECEIPT_HASH_MISMATCH",
+    "SOURCE_PACK_MISMATCH",
+    "ROOT_CAUSE_NOT_PROVEN",
+    "COMPOSITION_CHANGED",
+    "UNEXPECTED_ASSET_MUTATION",
+    "ACTION_NOT_WHITELISTED"
+  ],
+  "outputs": {
+    "receiptPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_EXPOSURE_REPAIR_RESULT.json",
+    "requiredFields": [
+      "schema",
+      "recipeId",
+      "recipeSha256",
+      "result",
+      "rootCause",
+      "filesChanged",
+      "testsRun",
+      "testResults",
+      "paidCreateCount",
+      "paidSpendUsd",
+      "nextAction"
+    ]
+  }
+}
