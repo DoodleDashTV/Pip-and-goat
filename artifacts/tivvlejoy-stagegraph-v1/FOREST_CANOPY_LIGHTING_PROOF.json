@@ -1,0 +1,156 @@
+{
+  "after": {
+    "bytes": 1401425,
+    "dimensions": [
+      1280,
+      720
+    ],
+    "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_AFTER.png",
+    "seconds": 195.76,
+    "sha256": "b47cee18e12f066e2f9208495fc08bacfb86210ec088afd63fc94cac8c11e754"
+  },
+  "before": {
+    "bytes": 1401473,
+    "dimensions": [
+      1280,
+      720
+    ],
+    "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_BEFORE.png",
+    "seconds": 305.39,
+    "sha256": "532dc7e4ff881601a785178999c9a8f773ec50807d38529209270304365e5295"
+  },
+  "beforeDiagnose": {
+    "cameraFacingIsBacklit": true,
+    "cameraLightDot": 0.5248,
+    "exposure": 0.6499999761581421,
+    "foliageMaterialCount": 6,
+    "foliageWithTranslucency": 0,
+    "hdriStrength": 0.5799999833106995,
+    "rootCauseCandidates": [
+      "CAMERA_FACING_FOREST_IS_BACKLIT_BY_KEY_SUN",
+      "EXISTING_BOUNCE_SITS_NEAR_GROUND_AND_PREFERS_TERRAIN",
+      "HDRI_AMBIENT_FILL_IS_TOO_WEAK_FOR_CANOPY_SHADOW_SIDE",
+      "LEAF_CARDS_HAVE_NO_TRANSLUCENCY_SO_BACKLIGHT_READS_OPAQUE_BLACK"
+    ]
+  },
+  "camera": {
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "name": "TJ_VendorReference_Camera"
+  },
+  "composition": {
+    "cameraLensMm": 42.0,
+    "cameraLocation": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "cameraLookAt": [
+      0.0,
+      9.5,
+      2.6
+    ],
+    "fillLocation": [
+      0.0,
+      -4.0,
+      8.0
+    ],
+    "placed": {
+      "bushes": 24,
+      "fallenLeaves": 65,
+      "ferns": 28,
+      "floral": 16,
+      "grass": 70,
+      "trees": 14
+    },
+    "sceneLayoutUnchanged": true,
+    "seed": 7301,
+    "sunRotationDeg": [
+      58.0,
+      -8.0,
+      -42.0
+    ]
+  },
+  "device": "CPU",
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "placed": {
+    "bushes": 24,
+    "fallenLeaves": 65,
+    "ferns": 28,
+    "floral": 16,
+    "grass": 70,
+    "trees": 14
+  },
+  "renderEngine": "CYCLES",
+  "repair": {
+    "globalExposureDelta": 0.0,
+    "lighting": {
+      "collection": "TJ_FOREST_LIGHTING_REPAIR_V1",
+      "duplicateGeneratedLights": 0,
+      "exposureChanged": false,
+      "fill": {
+        "aim": [
+          0.0,
+          12.0,
+          6.0
+        ],
+        "color": [
+          0.699999988079071,
+          0.8199999928474426,
+          1.0
+        ],
+        "energy": 780.0,
+        "lightLinking": true,
+        "location": [
+          0.0,
+          -9.3,
+          12.65
+        ],
+        "name": "TJ_ForestCanopyFill_V1",
+        "size": 22.0
+      },
+      "receiverCount": 82,
+      "rim": {
+        "energy": 210.0,
+        "lightLinking": true,
+        "location": [
+          8.5,
+          6.0,
+          9.6751
+        ],
+        "name": "TJ_ForestCanopyRim_V1"
+      }
+    },
+    "materialsChanged": 6,
+    "vendorBlendSaved": false,
+    "verify": {
+      "cameraLensMm": 42.0,
+      "cameraLocation": [
+        0.0,
+        -12.5,
+        2.15
+      ],
+      "collectionPresent": true,
+      "duplicateFill": false,
+      "exposure": 0.6499999761581421,
+      "fillPresent": true,
+      "foliageMixCount": 6,
+      "generatedLightNames": [
+        "TJ_ForestCanopyFill_V1",
+        "TJ_ForestCanopyRim_V1"
+      ],
+      "ok": true,
+      "rimPresent": true
+    }
+  },
+  "result": "RENDERED",
+  "samples": 12,
+  "schema": "TIVVLEJOY_FOREST_CANOPY_LIGHTING_PROOF_V1",
+  "vendorBlendSaved": false,
+  "visualApproval": false
+}

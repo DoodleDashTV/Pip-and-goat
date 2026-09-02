@@ -1,0 +1,271 @@
+{
+  "ao": {
+    "aoFactor": 1.0,
+    "useAmbientOcclusion": false
+  },
+  "bounds": {
+    "canopyZMax": 26.818,
+    "canopyZMedian": 0.177,
+    "max": [
+      435.409,
+      36.0,
+      26.818
+    ],
+    "min": [
+      -18.0,
+      -462.134,
+      -0.273
+    ]
+  },
+  "camera": {
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "look": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "name": "TJ_VendorReference_Camera"
+  },
+  "cameraFacingIsBacklit": true,
+  "cameraLightDot": 0.5248,
+  "colorManagement": {
+    "exposure": 0.6499999761581421,
+    "gamma": 1.059999942779541,
+    "look": "None",
+    "viewTransform": "AgX"
+  },
+  "cycles": {
+    "aoBounces": 1,
+    "diffuseBounces": 8,
+    "samples": 12
+  },
+  "foliage": [
+    {
+      "blendMethod": "HASHED",
+      "hasPrincipled": false,
+      "hasTranslucent": false,
+      "meanTextureLuma": null,
+      "name": "Leaf Blade",
+      "nodeTypes": [
+        "GROUP",
+        "MAPPING",
+        "OUTPUT_MATERIAL",
+        "TEX_IMAGE",
+        "UVMAP",
+        "VALTORGB"
+      ],
+      "shadowMethod": null,
+      "transmission": null
+    },
+    {
+      "blendMethod": "HASHED",
+      "hasPrincipled": false,
+      "hasTranslucent": false,
+      "meanTextureLuma": null,
+      "name": "Vines_1.001",
+      "nodeTypes": [
+        "BSDF_DIFFUSE",
+        "OUTPUT_MATERIAL"
+      ],
+      "shadowMethod": null,
+      "transmission": null
+    },
+    {
+      "blendMethod": "HASHED",
+      "hasPrincipled": false,
+      "hasTranslucent": false,
+      "meanTextureLuma": null,
+      "name": "Vines_1-2.001",
+      "nodeTypes": [
+        "ATTRIBUTE",
+        "GROUP",
+        "MAPPING",
+        "OUTPUT_MATERIAL",
+        "TEX_IMAGE",
+        "VALTORGB"
+      ],
+      "shadowMethod": null,
+      "transmission": null
+    },
+    {
+      "blendMethod": "HASHED",
+      "hasPrincipled": false,
+      "hasTranslucent": false,
+      "meanTextureLuma": null,
+      "name": "Leaf Blade_1-1.001",
+      "nodeTypes": [
+        "ATTRIBUTE",
+        "GROUP",
+        "MAPPING",
+        "OUTPUT_MATERIAL",
+        "TEX_IMAGE",
+        "VALTORGB"
+      ],
+      "shadowMethod": null,
+      "transmission": null
+    },
+    {
+      "blendMethod": "HASHED",
+      "hasPrincipled": false,
+      "hasTranslucent": false,
+      "meanTextureLuma": null,
+      "name": "Leaf Blade_Mat_1.008",
+      "nodeTypes": [
+        "GROUP",
+        "MAPPING",
+        "OUTPUT_MATERIAL",
+        "TEX_IMAGE",
+        "UVMAP",
+        "VALTORGB"
+      ],
+      "shadowMethod": null,
+      "transmission": null
+    },
+    {
+      "blendMethod": "HASHED",
+      "hasPrincipled": false,
+      "hasTranslucent": false,
+      "meanTextureLuma": null,
+      "name": "Fallen Leaf_Mat_1.009",
+      "nodeTypes": [
+        "ATTRIBUTE",
+        "GROUP",
+        "MAPPING",
+        "OUTPUT_MATERIAL",
+        "TEX_IMAGE",
+        "VALTORGB"
+      ],
+      "shadowMethod": null,
+      "transmission": null
+    }
+  ],
+  "foliageMaterialCount": 6,
+  "foliageWithTranslucency": 0,
+  "lights": [
+    {
+      "color": [
+        1.0,
+        0.76,
+        0.55
+      ],
+      "energy": 5.400000095367432,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "TJ_GoldenSun",
+      "ours": false,
+      "rotationDeg": [
+        58.0,
+        -8.0,
+        -42.0
+      ],
+      "size": 0.0,
+      "travel": [
+        0.6223,
+        0.5809,
+        -0.5248
+      ],
+      "type": "SUN"
+    },
+    {
+      "color": [
+        0.62,
+        0.74,
+        0.92
+      ],
+      "energy": 520.0,
+      "location": [
+        0.0,
+        -4.0,
+        8.0
+      ],
+      "name": "TJ_SoftFill",
+      "ours": false,
+      "rotationDeg": [
+        66.801,
+        -0.0,
+        0.0
+      ],
+      "size": 7.0,
+      "travel": [
+        0.0,
+        0.9191,
+        -0.3939
+      ],
+      "type": "AREA"
+    },
+    {
+      "color": [
+        0.68,
+        0.8,
+        1.0
+      ],
+      "energy": 1.850000023841858,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "TJ_CanopyRim",
+      "ours": false,
+      "rotationDeg": [
+        38.0,
+        10.0,
+        138.0
+      ],
+      "size": 0.0,
+      "travel": [
+        -0.3103,
+        -0.5491,
+        -0.776
+      ],
+      "type": "SUN"
+    },
+    {
+      "color": [
+        0.78,
+        0.82,
+        0.7
+      ],
+      "energy": 210.0,
+      "location": [
+        0.0,
+        8.0,
+        1.4
+      ],
+      "name": "TJ_ClearingBounce",
+      "ours": false,
+      "rotationDeg": [
+        -78.69,
+        180.0,
+        0.0
+      ],
+      "size": 9.0,
+      "travel": [
+        -0.0,
+        -0.9806,
+        0.1961
+      ],
+      "type": "AREA"
+    }
+  ],
+  "rootCauseCandidates": [
+    "CAMERA_FACING_FOREST_IS_BACKLIT_BY_KEY_SUN",
+    "EXISTING_BOUNCE_SITS_NEAR_GROUND_AND_PREFERS_TERRAIN",
+    "HDRI_AMBIENT_FILL_IS_TOO_WEAK_FOR_CANOPY_SHADOW_SIDE",
+    "LEAF_CARDS_HAVE_NO_TRANSLUCENCY_SO_BACKLIGHT_READS_OPAQUE_BLACK"
+  ],
+  "scene": "TJ_VENDOR_REFERENCE_GOLDEN_FOREST",
+  "schema": "TIVVLEJOY_FOREST_CANOPY_LIGHTING_DIAGNOSE_V1",
+  "world": {
+    "hdriRotation": null,
+    "hdriStrength": 0.5799999833106995
+  }
+}
