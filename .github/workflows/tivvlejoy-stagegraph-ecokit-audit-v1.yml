@@ -24,7 +24,7 @@ permissions:
 
 concurrency:
   group: tivvlejoy-stagegraph-ecokit-audit-v1-${{ github.event_name }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   audit:
