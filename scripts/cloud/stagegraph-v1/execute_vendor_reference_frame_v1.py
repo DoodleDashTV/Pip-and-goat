@@ -322,6 +322,8 @@ def verify_identity() -> dict:
         blockers.append("CYCLES_ALPHA_REPAIR_MODULE_MISSING")
     if not (HERE.parent.parent / "blender/stagegraph/vendor_reference_lookdev_v1.py").is_file():
         blockers.append("EXPOSURE_LOOKDEV_MODULE_MISSING")
+    if not (HERE.parent.parent / "blender/forest_canopy_lighting_repair_v1.py").is_file():
+        blockers.append("FOREST_CANOPY_LIGHTING_REPAIR_MODULE_MISSING")
     if "assertBeautyFrameAuthorization" not in contract or "EXACTLY_ONE_VENDOR_REFERENCE_FRAME" not in contract:
         blockers.append("RENDERER_CONTRACT_MISSING")
     if status.get("currentGate") != "VENDOR_REFERENCE_REPRODUCED":
@@ -436,6 +438,7 @@ def upload_bundle(client) -> dict:
         REPO / "scripts/blender/stagegraph/vendor_reference_render_v1.py",
         REPO / "scripts/blender/stagegraph/ecokit_cycles_alpha_v1.py",
         REPO / "scripts/blender/stagegraph/vendor_reference_lookdev_v1.py",
+        REPO / "scripts/blender/forest_canopy_lighting_repair_v1.py",
         REPO / "scripts/blender/stagegraph/asset_certify_blender_v1.py",
         REPO / "scripts/blender/stagegraph/asset_certify_contract_v1.py",
         AUTH_FILE,

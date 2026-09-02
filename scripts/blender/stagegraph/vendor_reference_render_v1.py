@@ -15,6 +15,8 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
+if str(SCRIPT_DIR.parent) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR.parent))
 
 from asset_certify_blender_v1 import apply_image_bindings
 from ecokit_cycles_alpha_v1 import (
@@ -24,6 +26,7 @@ from ecokit_cycles_alpha_v1 import (
     prepare_ecokit_cycles_alpha,
     remap_backslash_image_paths,
 )
+from forest_canopy_lighting_repair_v1 import apply_forest_canopy_lighting_repair
 from vendor_reference_lookdev_v1 import (
     ACTIVE_LOOKDEV,
     CAMERA_LENS_MM,
@@ -347,6 +350,7 @@ def main():
     bounce_lift = apply_cycles_bounce_lift(scene) if scene.render.engine == "CYCLES" else {}
     dual_after = count_dual_material_outputs()
     lookdev = lookdev_receipt(ACTIVE_LOOKDEV)
+    canopy_repair = apply_forest_canopy_lighting_repair(scene)
 
     receipt = {
         "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_PREFLIGHT_V1",
@@ -378,6 +382,14 @@ def main():
             **lookdev,
             "diffuseBounces": bounce_lift.get("diffuseBounces", lookdev.get("diffuseBounces")),
             "composition": composition,
+        },
+        "forestCanopyLightingRepair": {
+            "feature": "forest_canopy_lighting_repair_v1",
+            "applied": True,
+            "globalExposureDelta": canopy_repair.get("globalExposureDelta"),
+            "materialsChanged": (canopy_repair.get("materials") or {}).get("materialsChanged"),
+            "verify": canopy_repair.get("verify"),
+            "vendorBlendSaved": False,
         },
         "authorizationRequiredForRender": True,
         "paidCreateCount": 0,

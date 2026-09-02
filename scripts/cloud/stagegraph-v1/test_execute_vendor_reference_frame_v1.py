@@ -125,6 +125,7 @@ class VendorReferenceExecutorTest(unittest.TestCase):
         self.assertIn("REJECTED_IMAGE_INELIGIBLE_FOR_REUSE", source)
         self.assertIn("ecokit_cycles_alpha_v1.py", source)
         self.assertIn("vendor_reference_lookdev_v1.py", source)
+        self.assertIn("forest_canopy_lighting_repair_v1.py", source)
         self.assertIn("VENDOR_REFERENCE_FRAME_EXPOSURE_REPAIRED.png", source)
         renderer_source = (REPO / "scripts/blender/stagegraph/vendor_reference_render_v1.py").read_text()
         self.assertIn("apply_separation_lights", renderer_source)
