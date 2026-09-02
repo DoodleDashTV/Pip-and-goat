@@ -1,0 +1,17 @@
+{
+  "schema": "TIVVLEJOY_ACTIVE_RECIPE_V1",
+  "recipeId": "VENDOR_REFERENCE_ALPHA_REPAIR_V1",
+  "recipePath": "recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json",
+  "recipeCanonicalSha256": "fc0c713ac026c7b327a7860a0efda30a9d71623fecb8818f64cf36b6312e7f92",
+  "recipeFileSha256": "7adc5a7a5cd12765d37fb0a0d386f001224607d7757d3b1438391eba5f35e56e",
+  "activatedBy": "HUMAN",
+  "state": "READY_TO_EXECUTE_ZERO_PAID",
+  "budget": {
+    "maxPaidCreateCount": 0,
+    "maxSpendUsd": 0
+  },
+  "rejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "formalStageGraphGate": "VENDOR_REFERENCE_REPRODUCED",
+  "formalStageGraphApproval": false,
+  "nextAction": "EXECUTE_RECIPE_VIA_STAGEGRAPH_RECIPE_RUNNER"
+}
