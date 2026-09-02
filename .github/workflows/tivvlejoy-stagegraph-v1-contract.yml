@@ -4,11 +4,16 @@ on:
   pull_request:
     paths:
       - "workers/runpod-blender/src/stagegraph-production-contract-v1.js"
+      - "workers/runpod-blender/src/stagegraph-recipe-contract-v1.js"
+      - "workers/runpod-blender/src/stagegraph-recipe-runner-v1.js"
       - "workers/runpod-blender/test/stagegraph-production-contract-v1.test.js"
       - "workers/runpod-blender/test/stagegraph-current-receipts-v1.test.js"
+      - "workers/runpod-blender/test/stagegraph-recipe-contract-v1.test.js"
+      - "recipes/tivvlejoy-stagegraph/**"
       - "artifacts/tivvlejoy-stagegraph-v1/*.json"
       - "scripts/blender/stagegraph/**"
       - "config/tivvlejoy-stagegraph-v1.json"
+      - "config/tivvlejoy-recipe-v1.schema.json"
       - ".github/workflows/tivvlejoy-stagegraph-v1-contract.yml"
   workflow_dispatch:
 
@@ -27,8 +32,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Validate Node production gates and committed receipts
-        run: node --test workers/runpod-blender/test/stagegraph-production-contract-v1.test.js workers/runpod-blender/test/stagegraph-current-receipts-v1.test.js workers/runpod-blender/test/stagegraph-vendor-reference-authorization-v1.test.js
+      - name: Validate Node production gates, recipes, and committed receipts
+        run: node --test workers/runpod-blender/test/stagegraph-production-contract-v1.test.js workers/runpod-blender/test/stagegraph-current-receipts-v1.test.js workers/runpod-blender/test/stagegraph-vendor-reference-authorization-v1.test.js workers/runpod-blender/test/stagegraph-recipe-contract-v1.test.js
+      - name: Validate active recipe execution plan
+        run: node workers/runpod-blender/src/stagegraph-recipe-runner-v1.js plan recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json > /tmp/tivvlejoy-recipe-plan.json
       - name: Validate Blender asset-audit contract
         working-directory: scripts/blender/stagegraph
         run: python -m unittest -v test_asset_certify_contract_v1.py
