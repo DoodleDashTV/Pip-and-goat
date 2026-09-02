@@ -8,6 +8,9 @@ on:
       - ".github/workflows/tivvlejoy-stagegraph-ecokit-audit-v1.yml"
       - "scripts/cloud/stagegraph-v1/**"
       - "scripts/blender/stagegraph/**"
+      - "workers/runpod-blender/src/stagegraph-recipe-*.js"
+      - "recipes/tivvlejoy-stagegraph/**"
+      - "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json"
       - "config/tivvlejoy-stagegraph-v1.json"
   push:
     branches:
@@ -16,6 +19,9 @@ on:
       - ".github/workflows/tivvlejoy-stagegraph-ecokit-audit-v1.yml"
       - "scripts/cloud/stagegraph-v1/**"
       - "scripts/blender/stagegraph/**"
+      - "workers/runpod-blender/src/stagegraph-recipe-*.js"
+      - "recipes/tivvlejoy-stagegraph/**"
+      - "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json"
       - "config/tivvlejoy-stagegraph-v1.json"
   workflow_dispatch:
 
@@ -40,9 +46,17 @@ jobs:
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Validate active zero-paid repair recipe before touching assets
+        run: |
+          node workers/runpod-blender/src/stagegraph-recipe-runner-v1.js \
+            plan recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json \
+            > /tmp/tivvlejoy-recipe-plan.json
       - name: Unit-test fail-closed materialization
         working-directory: scripts/cloud/stagegraph-v1
         run: python -m unittest -v test_materialize_ecokit_v1.py
@@ -90,6 +104,14 @@ jobs:
             -- \
             --source-id SRC_FOREST_STYLISED_ECOKIT \
             --out /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
+      - name: Diagnose foliage alpha and material paths with zero paid render spend
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/foliage_alpha_diagnose_v1.py \
+            -- \
+            --out /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_ALPHA_DIAGNOSTIC.json
       - name: Build vendor-reference scene in prepare-only mode
         run: |
           /tmp/blender/blender \
@@ -110,10 +132,12 @@ jobs:
         with:
           name: tivvlejoy-stagegraph-ecokit-audit-v1
           path: |
+            /tmp/tivvlejoy-recipe-plan.json
             /tmp/tivvlejoy-stagegraph/ASSET_AUDIT*.json
             /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
             /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIALIZATION.json
             /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
+            /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_ALPHA_DIAGNOSTIC.json
             /tmp/tivvlejoy-stagegraph/VENDOR_REFERENCE_PREFLIGHT.json
           if-no-files-found: error
           retention-days: 30
