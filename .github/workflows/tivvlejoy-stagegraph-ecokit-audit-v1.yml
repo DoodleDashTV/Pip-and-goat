@@ -81,6 +81,15 @@ jobs:
             --skipped-archive-members-json '[]' \
             --image-bindings-json "$(cat /tmp/tivvlejoy-stagegraph/IMAGE_BINDINGS.json)" \
             --out /tmp/tivvlejoy-stagegraph/ASSET_AUDIT.json
+      - name: Inventory native assets for vendor-frame planning
+        run: |
+          /tmp/blender/blender \
+            --factory-startup \
+            -b "/tmp/tivvlejoy-ecokit/Stylised EcoKit/Flora_Mat&GN&Models.blend" \
+            --python scripts/blender/stagegraph/asset_inventory_blender_v1.py \
+            -- \
+            --source-id SRC_FOREST_STYLISED_ECOKIT \
+            --out /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
       - name: Upload sanitized receipts only
         if: always()
         uses: actions/upload-artifact@v4
@@ -88,6 +97,7 @@ jobs:
           name: tivvlejoy-stagegraph-ecokit-audit-v1
           path: |
             /tmp/tivvlejoy-stagegraph/ASSET_AUDIT*.json
+            /tmp/tivvlejoy-stagegraph/ASSET_INVENTORY.json
             /tmp/tivvlejoy-stagegraph/ECOKIT_MATERIALIZATION.json
             /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
           if-no-files-found: error

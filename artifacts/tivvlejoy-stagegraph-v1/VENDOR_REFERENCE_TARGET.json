@@ -1,0 +1,40 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_TARGET_V1",
+  "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
+  "creator": "MeiU",
+  "officialProductPage": "https://superhivemarket.com/products/stylized-ecokit",
+  "officialDocsPage": "https://superhivemarket.com/products/stylized-ecokit/docs",
+  "referenceImage": {
+    "url": "https://public-files.gumroad.com/2oyah1rp84htjhpjoflvflpj03da",
+    "description": "Creator-published four-panel Stylized EcoKit environment artwork",
+    "targetPanel": "TOP_GOLDEN_FOREST_PANEL",
+    "usage": "VISUAL_REFERENCE_ONLY_NOT_REPUBLISHED_IN_REPOSITORY"
+  },
+  "qualityMarkers": [
+    "dense layered stylized flora",
+    "strong warm directional light through trees",
+    "clear foreground-midground-background depth",
+    "controlled atmospheric falloff",
+    "convincing foliage alpha edges without opaque cards",
+    "coherent stylized material response",
+    "natural asset variation without obvious tiling or scatter repetition"
+  ],
+  "vendorCapabilitiesToPreserve": [
+    "flora models",
+    "rock models",
+    "water elements",
+    "Geometry Nodes",
+    "scatter workflows",
+    "procedural customization"
+  ],
+  "renderPolicy": {
+    "frameCount": 1,
+    "videoEncode": false,
+    "retryCount": 0,
+    "matchReferenceCompositionBeforeTivvleJoy916Adaptation": true,
+    "useOwnedLightingDependencyBinding": true,
+    "requireHumanVisualDecision": true
+  },
+  "status": "TARGET_LOCKED_PRE_RENDER",
+  "paidAuthorizationPresent": false
+}
