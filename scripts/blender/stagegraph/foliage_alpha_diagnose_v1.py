@@ -8,6 +8,12 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from ecokit_cycles_alpha_v1 import count_dual_material_outputs, is_cycles_output, is_eevee_output
+
 COLLECTION_GROUPS = {
     "trees": ["Tree_1", "Tree_2", "Tree_3", "Tree_4", "Tree_5"],
     "grass": [f"Grass_{i}" for i in range(9)],
@@ -112,6 +118,19 @@ def material_summary(material):
         summary["suspicions"].append("RGBA_IMAGE_WITHOUT_TRANSPARENT_OR_PRINCIPLED_ALPHA_PATH")
     if summary["surfaceRenderMethod"] in {"DITHERED", "BLENDED"} and not alpha_linked_anywhere:
         summary["suspicions"].append("TRANSPARENT_RENDER_METHOD_WITHOUT_ALPHA_LINK")
+    if material.use_nodes and material.node_tree is not None:
+        outputs = [node for node in material.node_tree.nodes if node.type == "OUTPUT_MATERIAL"]
+        links = list(material.node_tree.links)
+        summary["dualMaterialOutputs"] = len(outputs) >= 2
+        summary["activeOutput"] = None
+        for node in outputs:
+            if not getattr(node, "is_active_output", False):
+                continue
+            if is_eevee_output(node, links):
+                summary["activeOutput"] = "EEVEE"
+                summary["suspicions"].append("EEVEE_MATERIAL_OUTPUT_ACTIVE_FOR_CYCLES")
+            elif is_cycles_output(node, links):
+                summary["activeOutput"] = "CYCLES"
 
     return summary
 
@@ -173,6 +192,7 @@ def main():
         "materialCount": len(materials),
         "suspiciousMaterialCount": len(suspicious),
         "suspiciousMaterials": suspicious,
+        "dualMaterialOutputs": count_dual_material_outputs(),
         "materials": materials,
     }
 

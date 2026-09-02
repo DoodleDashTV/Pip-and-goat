@@ -1,0 +1,78 @@
+{
+  "schema": "TIVVLEJOY_RECIPE_RESULT_V1",
+  "recipeId": "VENDOR_REFERENCE_ALPHA_REPAIR_V1",
+  "recipeSha256": "fc0c713ac026c7b327a7860a0efda30a9d71623fecb8818f64cf36b6312e7f92",
+  "result": "PASS",
+  "rootCause": "ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES",
+  "rootCauseEvidence": {
+    "boundRejectedImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+    "blender": "4.3.2",
+    "kitAsPurchased": {
+      "dualOutput": 48,
+      "eeveeActive": 47,
+      "cyclesActive": 1,
+      "loadTimeConversionWarnings": true
+    },
+    "afterInMemoryRepair": {
+      "dualOutput": 48,
+      "eeveeActive": 0,
+      "cyclesActive": 48,
+      "cyclesOutputsActivated": 47,
+      "blendHashed": 19,
+      "transparentMaxBounces": 24,
+      "prepareOnly": "PASS",
+      "rendered": false
+    },
+    "vendorBlendSaved": false
+  },
+  "filesChanged": [
+    "scripts/blender/stagegraph/ecokit_cycles_alpha_v1.py",
+    "scripts/blender/stagegraph/inspect_ecokit_materials_v1.py",
+    "scripts/blender/stagegraph/test_ecokit_cycles_alpha_v1.py",
+    "scripts/blender/stagegraph/vendor_reference_render_v1.py",
+    "scripts/blender/stagegraph/foliage_alpha_diagnose_v1.py",
+    "scripts/cloud/stagegraph-v1/execute_vendor_reference_frame_v1.py",
+    "scripts/cloud/stagegraph-v1/test_execute_vendor_reference_frame_v1.py",
+    ".github/workflows/tivvlejoy-stagegraph-v1-contract.yml",
+    ".github/workflows/tivvlejoy-stagegraph-ecokit-audit-v1.yml",
+    "workers/runpod-blender/test/stagegraph-vendor-reference-authorization-v1.test.js",
+    "workers/runpod-blender/test/stagegraph-recipe-contract-v1.test.js",
+    "artifacts/tivvlejoy-stagegraph-v1/STATUS.json",
+    "artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_VISUAL_REVIEW_DECISION.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ROOT_CAUSE.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ZERO_PAID_VALIDATION.json",
+    "artifacts/tivvlejoy-stagegraph-v1/ECOKIT_MATERIAL_INSPECT_DUAL_OUTPUT.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_PREFLIGHT_AFTER_REPAIR.json",
+    "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json"
+  ],
+  "testsRun": [
+    "test_ecokit_cycles_alpha_v1.py",
+    "test_asset_certify_contract_v1.py",
+    "test_execute_vendor_reference_frame_v1.py",
+    "stagegraph-production-contract-v1.test.js",
+    "stagegraph-current-receipts-v1.test.js",
+    "stagegraph-vendor-reference-authorization-v1.test.js",
+    "stagegraph-recipe-contract-v1.test.js",
+    "vendor_reference_render_v1.py --prepare-only",
+    "inspect_ecokit_materials_v1.py"
+  ],
+  "testResults": {
+    "test_ecokit_cycles_alpha_v1.py": "PASS",
+    "test_asset_certify_contract_v1.py": "PASS",
+    "test_execute_vendor_reference_frame_v1.py": "PASS",
+    "stagegraph-production-contract-v1.test.js": "PASS",
+    "stagegraph-current-receipts-v1.test.js": "PASS",
+    "stagegraph-vendor-reference-authorization-v1.test.js": "PASS",
+    "stagegraph-recipe-contract-v1.test.js": "PASS",
+    "vendor_reference_render_v1.py --prepare-only": "PASS",
+    "inspect_ecokit_materials_v1.py": "PASS"
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "nextAction": "REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION",
+  "anotherVendorReferenceFrameRequired": true,
+  "freshPaidAuthorizationRequired": true,
+  "vendorReferenceReproducedApproved": false,
+  "visualApproval": false
+}

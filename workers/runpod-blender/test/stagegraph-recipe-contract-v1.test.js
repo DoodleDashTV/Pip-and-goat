@@ -30,7 +30,9 @@ test('active recipe receipt is bound to the exact machine-readable recipe and re
   assert.equal(active.rejectedImageSha256, recipe.inputs.rejectedArtifact.sha256);
   assert.deepEqual(active.budget, recipe.budget);
   assert.equal(active.formalStageGraphApproval, false);
-  assert.equal(active.state, 'READY_TO_EXECUTE_ZERO_PAID');
+  assert.equal(active.state, 'ZERO_PAID_REPAIR_COMPLETE');
+  assert.equal(active.rootCause, 'ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES');
+  assert.equal(active.nextAction, 'REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION');
 });
 
 test('execution sequence can only use explicitly allowed actions', () => {
@@ -54,6 +56,19 @@ test('sequence fails closed if Cursor invents an undeclared action', () => {
   const verdict = contract.validateRecipe(mutated);
   assert.equal(verdict.valid, false);
   assert.equal(verdict.blockers.includes('SEQUENCE_ACTION_NOT_ALLOWED:DO_WHATEVER_SEEMS_BEST'), true);
+});
+
+test('committed alpha-repair result receipt is a valid zero-paid PASS', () => {
+  const resultPath = path.join(repoRoot, 'artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json');
+  const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  const verdict = contract.validateResultReceipt(recipe, result);
+  assert.equal(verdict.valid, true, verdict.blockers.join(','));
+  assert.equal(result.result, 'PASS');
+  assert.equal(result.rootCause, 'ECOKIT_EEVEE_MATERIAL_OUTPUT_ACTIVE_IN_CYCLES');
+  assert.equal(result.paidCreateCount, 0);
+  assert.equal(result.paidSpendUsd, 0);
+  assert.equal(result.nextAction, 'REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION');
+  assert.equal(result.vendorReferenceReproducedApproved, false);
 });
 
 test('PASS result requires evidence and cannot exceed zero-paid budget', () => {
