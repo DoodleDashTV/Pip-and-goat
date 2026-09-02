@@ -12,8 +12,8 @@ BG_FILL_NAME = "TJ_CinematicBgSeparation_V1"
 # High side-key: penetrate canopy gaps, side-light trunks, keep readable shadow direction.
 SUN_TRAVEL = (0.4682, 0.4007, -0.7875)
 SUN_ROTATION_DEG = (38.0, 2.0, -52.0)
-SUN_ENERGY = 9.4
-SUN_COLOR = (1.0, 0.88, 0.72)
+SUN_ENERGY = 8.8
+SUN_COLOR = (1.0, 0.91, 0.80)
 SUN_ANGLE_DEG = 4.5
 
 FILL_ENERGY = 260.0
@@ -32,20 +32,22 @@ BOUNCE_LOCATION = (0.0, 8.2, 4.2)
 BOUNCE_AIM = (0.0, 8.0, 9.0)
 BOUNCE_SIZE = 12.0
 
-CANOPY_FILL_ENERGY = 620.0
+CANOPY_FILL_ENERGY = 880.0
 CANOPY_FILL_COLOR = (0.66, 0.80, 1.0)
-CANOPY_RIM_ENERGY = 240.0
+CANOPY_FILL_LOCATION = (0.0, -6.0, 11.2)
+CANOPY_FILL_AIM = (0.0, 8.5, 6.0)
+CANOPY_RIM_ENERGY = 260.0
 
 TRANSLUCENCY_FACTOR = 0.26
 TRANSLUCENT_COLOR = (0.24, 0.38, 0.14, 1.0)
 
-GROUND_EARTH = (0.056, 0.048, 0.034)
-GROUND_MOSS = (0.046, 0.070, 0.038)
-GROUND_DAMP = (0.036, 0.033, 0.027)
-GROUND_ROCK = (0.068, 0.064, 0.056)
+GROUND_EARTH = (0.048, 0.044, 0.032)
+GROUND_MOSS = (0.042, 0.078, 0.040)
+GROUND_DAMP = (0.034, 0.032, 0.026)
+GROUND_ROCK = (0.062, 0.060, 0.054)
 
-HDRI_LIGHT_STRENGTH = 1.42
-HDRI_CAMERA_STRENGTH = 0.78
+HDRI_LIGHT_STRENGTH = 1.55
+HDRI_CAMERA_STRENGTH = 0.96
 GROUND_BOUNCE_COLOR = (0.11, 0.14, 0.08, 1.0)
 CAMERA_HAZE_COLOR = (0.36, 0.48, 0.62, 1.0)
 SKY_CAMERA_TINT = (0.90, 0.94, 1.04, 1.0)
@@ -54,20 +56,25 @@ ATMOSPHERE_DENSITY = 0.0019
 ATMOSPHERE_COLOR = (0.70, 0.79, 0.90, 1.0)
 ATMOSPHERE_ANISOTROPY = 0.44
 
-EXPOSURE = 0.22
+EXPOSURE = 0.40
 GAMMA = 1.0
 VIEW_TRANSFORM = "AgX"
 PREFERRED_LOOKS = (
-    "AgX - Medium High Contrast",
-    "Medium High Contrast",
-    "AgX - High Contrast",
+    "AgX - Base Contrast",
     "None",
+    "AgX - Medium High Contrast",
 )
 
-MIST_START = 14.0
-MIST_DEPTH = 42.0
-MIST_STRENGTH = 0.38
-MIST_COLOR = (0.52, 0.60, 0.70, 1.0)
+MIST_START = 28.0
+MIST_DEPTH = 55.0
+MIST_STRENGTH = 0.16
+MIST_COLOR = (0.58, 0.66, 0.76, 1.0)
+
+FLORA_AO_DISTANCE = 0.18
+FLORA_AO_VALUE = 0.12
+FLORA_CANOPY_LIGHT_INTENSITY = 0.72
+FLORA_GRASS_LIGHT_INTENSITY = 0.58
+FLORA_FALLEN_LIGHT_INTENSITY = 0.26
 
 DIFFUSE_BOUNCES = 12
 GLOSSY_BOUNCES = 4
@@ -516,6 +523,8 @@ def retune_existing_lights(scene) -> dict:
             canopy_fill,
             energy=CANOPY_FILL_ENERGY,
             color=CANOPY_FILL_COLOR,
+            location=CANOPY_FILL_LOCATION,
+            aim=CANOPY_FILL_AIM,
         )
     canopy_rim = scene.objects.get("TJ_ForestCanopyRim_V1")
     if canopy_rim is not None:
@@ -559,6 +568,73 @@ def add_background_separation(scene) -> dict:
         "energy": float(fill.data.energy),
         "receiverCount": len(receivers.objects),
         "lightLinking": linked,
+    }
+
+
+def _flora_light_intensity_target(name: str) -> float | None:
+    low = str(name or "").lower()
+    if any(word in low for word in ("trunk", "bark", "wood", "rock", "stone", "water", "ground")):
+        return None
+    if "fallen" in low:
+        return FLORA_FALLEN_LIGHT_INTENSITY
+    if any(word in low for word in ("grass", "moss")):
+        return FLORA_GRASS_LIGHT_INTENSITY
+    if any(word in low for word in ("leaf", "vine", "treeleaf", "fern", "bush", "floral", "foliage")):
+        return FLORA_CANOPY_LIGHT_INTENSITY
+    return None
+
+
+def repair_flora_shader_light_response() -> dict:
+    import bpy
+
+    groups_changed = []
+    for group in bpy.data.node_groups:
+        if not str(group.name).startswith("Flora_Shader"):
+            continue
+        ao_nodes = 0
+        for node in group.nodes:
+            if node.type != "AMBIENT_OCCLUSION":
+                continue
+            if "Distance" in node.inputs:
+                node.inputs["Distance"].default_value = FLORA_AO_DISTANCE
+            if hasattr(node, "only_local"):
+                node.only_local = True
+            ao_nodes += 1
+        if ao_nodes:
+            _tag(group)
+            groups_changed.append({"name": group.name, "aoNodes": ao_nodes, "distance": FLORA_AO_DISTANCE})
+
+    materials_changed = []
+    for material in bpy.data.materials:
+        target = _flora_light_intensity_target(material.name)
+        if target is None or not material.use_nodes or material.node_tree is None:
+            continue
+        touched = False
+        for node in material.node_tree.nodes:
+            if node.type != "GROUP" or node.node_tree is None:
+                continue
+            if not str(node.node_tree.name).startswith("Flora_Shader"):
+                continue
+            if "Light Intensity" in node.inputs:
+                current = float(node.inputs["Light Intensity"].default_value)
+                node.inputs["Light Intensity"].default_value = max(current, target)
+                touched = True
+            if "AO Value" in node.inputs:
+                node.inputs["AO Value"].default_value = FLORA_AO_VALUE
+                touched = True
+            if "Emi" in node.inputs:
+                node.inputs["Emi"].default_value = 0.0
+        if touched:
+            _tag(material)
+            materials_changed.append(material.name)
+    return {
+        "groupsChanged": groups_changed,
+        "materialsChanged": len(materials_changed),
+        "names": materials_changed,
+        "aoDistance": FLORA_AO_DISTANCE,
+        "aoValue": FLORA_AO_VALUE,
+        "texturesOverwritten": False,
+        "emissionEnabled": False,
     }
 
 
@@ -676,6 +752,7 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
     atmosphere = apply_atmosphere_lookdev(scene)
     lights = retune_existing_lights(scene)
     background = add_background_separation(scene)
+    flora = repair_flora_shader_light_response()
     foliage = repair_foliage_translucency(scene)
     depth = apply_depth_cues(scene)
     return {
@@ -689,6 +766,7 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
         "atmosphere": atmosphere,
         "lights": lights,
         "backgroundSeparation": background,
+        "floraShader": flora,
         "foliage": foliage,
         "depth": depth,
         "emissionShadersAdded": False,

@@ -134,6 +134,7 @@ def main():
             "world": cinematic.get("world"),
             "ground": cinematic.get("ground"),
             "lights": cinematic.get("lights"),
+            "floraShader": cinematic.get("floraShader"),
             "foliage": cinematic.get("foliage"),
             "atmosphere": cinematic.get("atmosphere"),
             "cameraChanged": cinematic.get("cameraChanged"),
