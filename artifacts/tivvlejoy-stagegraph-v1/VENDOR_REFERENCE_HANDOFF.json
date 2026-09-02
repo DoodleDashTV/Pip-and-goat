@@ -1,0 +1,37 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_FRAME_RESULT_HANDOFF_V1",
+  "stopState": "HUMAN_VISUAL_REVIEW_REQUIRED",
+  "paidCreatePerformed": false,
+  "imageExists": true,
+  "imagePath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_FRAME.png",
+  "imageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "imageBytes": 1070797,
+  "imageDimensions": [1280, 720],
+  "executionReceiptSha256": "159085e4c5efef4f1e5916ba70ca3a4cbf4e6e3ec64af36ee0faf94404b4dcb5",
+  "authorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
+  "imageSha256MatchesExecutionReceipt": true,
+  "actualSpendUsd": 0.0292,
+  "totalAccountedSpendUsd": 0.0296,
+  "spendWithinCeiling": true,
+  "maxSpendUsd": 1.0,
+  "createCount": 1,
+  "retryCount": 0,
+  "paidResourcesLive": [],
+  "cleanupConfirmed": true,
+  "vendorReferenceReproducedApproved": false,
+  "visualApproval": false,
+  "humanVisualDecisionRequired": true,
+  "humanApprovalOrRejectionMustBindToImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "beautyFrameStarted": false,
+  "videoEncodeStarted": false,
+  "foliageMaterialWarnings": [
+    "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS"
+  ],
+  "visualReviewRisks": [
+    "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS",
+    "TREE_MASSES_APPEAR_AS_OPAQUE_BLACK_SILHOUETTES_IN_RENDERED_FRAME"
+  ],
+  "currentGate": "VENDOR_REFERENCE_REPRODUCED",
+  "branch": "cursor/tivvlejoy-stagegraph-v1-73f1",
+  "headShaAtHandoffPrep": "f22243327a70bcd5ee9c186b3af900d0cb57bbe0"
+}
