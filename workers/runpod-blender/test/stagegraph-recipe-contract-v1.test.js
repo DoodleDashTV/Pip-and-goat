@@ -1,0 +1,75 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { test } = require('node:test');
+const contract = require('../src/stagegraph-recipe-contract-v1');
+
+const repoRoot = path.resolve(__dirname, '../../..');
+const recipePath = path.join(repoRoot, 'recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json');
+const recipe = JSON.parse(fs.readFileSync(recipePath, 'utf8'));
+
+test('real alpha-repair recipe is valid and zero-paid', () => {
+  const verdict = contract.validateRecipe(recipe);
+  assert.equal(verdict.valid, true, verdict.blockers.join(','));
+  assert.equal(recipe.budget.maxPaidCreateCount, 0);
+  assert.equal(recipe.budget.maxSpendUsd, 0);
+  assert.equal(recipe.forbiddenActions.includes('CREATE_PAID_POD'), true);
+  assert.equal(recipe.forbiddenActions.includes('RENDER_PAID_FRAME'), true);
+  assert.equal(recipe.inputs.rejectedArtifact.sha256, 'a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400');
+});
+
+test('execution sequence can only use explicitly allowed actions', () => {
+  const plan = contract.buildExecutionPlan(recipe);
+  assert.equal(plan.failClosed, true);
+  assert.deepEqual(plan.sequence, recipe.execution.sequence);
+  assert.equal(plan.outputReceiptPath, 'artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json');
+});
+
+test('zero-paid recipe fails closed if a paid action is introduced', () => {
+  const mutated = structuredClone(recipe);
+  mutated.allowedActions.push('CREATE_PAID_POD');
+  const verdict = contract.validateRecipe(mutated);
+  assert.equal(verdict.valid, false);
+  assert.equal(verdict.blockers.includes('ZERO_PAID_RECIPE_ALLOWS_PAID_ACTION:CREATE_PAID_POD'), true);
+});
+
+test('sequence fails closed if Cursor invents an undeclared action', () => {
+  const mutated = structuredClone(recipe);
+  mutated.execution.sequence.splice(-1, 0, 'DO_WHATEVER_SEEMS_BEST');
+  const verdict = contract.validateRecipe(mutated);
+  assert.equal(verdict.valid, false);
+  assert.equal(verdict.blockers.includes('SEQUENCE_ACTION_NOT_ALLOWED:DO_WHATEVER_SEEMS_BEST'), true);
+});
+
+test('PASS result requires evidence and cannot exceed zero-paid budget', () => {
+  const recipeSha256 = contract.validateRecipe(recipe).recipeSha256;
+  const base = {
+    schema: contract.RESULT_SCHEMA,
+    recipeId: recipe.recipeId,
+    recipeSha256,
+    result: 'PASS',
+    rootCause: 'ALPHA_PATH_TEST_ROOT_CAUSE',
+    rootCauseEvidence: { test: 'evidence' },
+    filesChanged: [],
+    testsRun: ['UNIT_TEST'],
+    testResults: { UNIT_TEST: 'PASS' },
+    paidCreateCount: 0,
+    paidSpendUsd: 0,
+    nextAction: 'REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION'
+  };
+  assert.equal(contract.validateResultReceipt(recipe, base).valid, true);
+
+  const paid = { ...base, paidCreateCount: 1, paidSpendUsd: 0.01 };
+  const paidVerdict = contract.validateResultReceipt(recipe, paid);
+  assert.equal(paidVerdict.valid, false);
+  assert.equal(paidVerdict.blockers.includes('RESULT_PAID_CREATE_BUDGET_EXCEEDED'), true);
+  assert.equal(paidVerdict.blockers.includes('RESULT_SPEND_BUDGET_EXCEEDED'), true);
+
+  const noEvidence = { ...base };
+  delete noEvidence.rootCauseEvidence;
+  const noEvidenceVerdict = contract.validateResultReceipt(recipe, noEvidence);
+  assert.equal(noEvidenceVerdict.valid, false);
+  assert.equal(noEvidenceVerdict.blockers.includes('PASS_ROOT_CAUSE_EVIDENCE_REQUIRED'), true);
+});
