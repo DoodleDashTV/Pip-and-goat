@@ -1,6 +1,6 @@
 {
   "schema": "TIVVLEJOY_STAGEGRAPH_V1_STATUS",
-  "status": "IMPLEMENTATION_STARTED",
+  "status": "DEPENDENCY_AUDIT_PASSED",
   "sourceBranchBase": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
   "sourceBaseSha": "c3a79522f33123a1ce8775de93341829b167f920",
   "pr169": {
@@ -12,16 +12,20 @@
   "selectedCertificationCandidate": "SRC_FOREST_STYLISED_ECOKIT",
   "sourcePackLocked": true,
   "sourcePackSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
-  "currentGate": "DEPENDENCY_AUDIT_PASS",
-  "currentGateStatus": "BLOCKED",
-  "currentGateBlocker": "PRIVATE_ASSET_CREDENTIALS_NOT_CONFIGURED",
-  "missingSecretNames": [
-    "R2_ENDPOINT",
-    "R2_ACCESS_KEY_ID",
-    "R2_SECRET_ACCESS_KEY",
-    "R2_BUCKET"
+  "dependencyAuditPass": true,
+  "dependencyAuditSha256": "3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0",
+  "dependencyAuditWorkflowRunId": 33655349843,
+  "dependencyAuditArtifactSha256": "21c552576c568905ebe1a1f3a860c8c5a4704ef99d0115b424832706dcdc89d6",
+  "currentGate": "VENDOR_REFERENCE_FRAME",
+  "currentGateStatus": "AWAITING_FRESH_AUTHORIZATION",
+  "currentGateBlocker": "EXACTLY_ONE_VENDOR_REFERENCE_FRAME_REQUIRES_FRESH_AUTHORIZATION",
+  "missingSecretNames": [],
+  "blenderAuditExecuted": true,
+  "blenderVersion": "4.3.2",
+  "auditWarnings": [
+    "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS"
   ],
-  "blenderAuditExecuted": false,
+  "auditBlockers": [],
   "characterState": "WAITING_FOR_ARTIST_RIGS",
   "paidCreateCount": 0,
   "paidSpendUsd": 0,
