@@ -1,6 +1,6 @@
 {
   "schema": "TIVVLEJOY_STAGEGRAPH_V1_STATUS",
-  "status": "VENDOR_REFERENCE_PREFLIGHT_PASSED",
+  "status": "VENDOR_REFERENCE_FRAME_RENDERED_AWAITING_HUMAN_VISUAL_APPROVAL",
   "sourceBranchBase": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
   "sourceBaseSha": "c3a79522f33123a1ce8775de93341829b167f920",
   "pr169": {
@@ -19,26 +19,38 @@
   "vendorReferencePreflightWorkflowRunId": 33656796364,
   "vendorReferencePreflightArtifactSha256": "4a4d1926266f15d51f2c5f1f9b3f7669410ec1af7402280cbe519c312b47a138",
   "currentGate": "VENDOR_REFERENCE_REPRODUCED",
-  "currentGateStatus": "PREFLIGHT_PASS_AWAITING_FRESH_AUTHORIZATION",
-  "currentGateBlocker": "EXACTLY_ONE_VENDOR_REFERENCE_FRAME_REQUIRES_FRESH_HUMAN_AUTHORIZATION",
+  "currentGateStatus": "FRAME_RENDERED_AWAITING_HUMAN_VISUAL_APPROVAL",
+  "currentGateBlocker": "HUMAN_VISUAL_APPROVAL_REQUIRED",
   "missingSecretNames": [],
   "blenderAuditExecuted": true,
   "blenderVersion": "4.3.2",
   "preflightScene": {
     "name": "TJ_VENDOR_REFERENCE_GOLDEN_FOREST",
     "renderEngine": "CYCLES",
-    "resolution": [1280, 720],
-    "rendered": false
+    "resolution": [
+      1280,
+      720
+    ],
+    "rendered": true,
+    "visualApproval": false
   },
   "auditWarnings": [
     "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS"
   ],
   "auditBlockers": [],
   "characterState": "WAITING_FOR_ARTIST_RIGS",
-  "paidCreateCount": 0,
-  "paidSpendUsd": 0,
-  "vendorReferenceFrameAuthorizationPresent": false,
+  "paidCreateCount": 1,
+  "paidSpendUsd": 0.0292,
+  "vendorReferenceFrameAuthorizationPresent": true,
   "beautyFrameAuthorizationPresent": false,
   "finalRenderAuthorized": false,
-  "productionReady": false
+  "productionReady": false,
+  "vendorReferenceFrameAuthorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
+  "vendorReferenceExecutionSha256": "159085e4c5efef4f1e5916ba70ca3a4cbf4e6e3ec64af36ee0faf94404b4dcb5",
+  "vendorReferenceImageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "visualReviewRisks": [
+    "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS",
+    "TREE_MASSES_APPEAR_AS_OPAQUE_BLACK_SILHOUETTES_IN_RENDERED_FRAME"
+  ],
+  "totalAccountedSpendUsd": 0.0296
 }

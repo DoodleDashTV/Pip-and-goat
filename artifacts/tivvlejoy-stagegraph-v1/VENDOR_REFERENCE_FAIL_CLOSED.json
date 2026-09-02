@@ -4,7 +4,7 @@
   "blockers": [],
   "authorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
   "branch": "cursor/tivvlejoy-stagegraph-v1-73f1",
-  "headSha": "bb1712e01d52ac3ad71099632cd9b9f85fc076e0",
+  "headSha": "4cb0eb164e851ba3214bf802941eb9e98ec4f1f9",
   "requiredBaseSha": "bb1712e01d52ac3ad71099632cd9b9f85fc076e0",
   "receiptFileSha256": {
     "STATUS.json": "06b966f20da41bed7ee4baec053d8db6cc2423f3c0e8d0f892d6efb2265507c6",
@@ -20,7 +20,7 @@
     "displayName": "RTX 4090",
     "vramGb": 24,
     "secureUsdPerHr": 0.74,
-    "stockStatus": "Medium"
+    "stockStatus": "Low"
   },
   "livePodCount": 0,
   "livePodNames": [],
@@ -36,5 +36,5 @@
   "retry": false,
   "encodeVideo": false,
   "paidCreate": 0,
-  "at": "2026-09-02T17:08:44.911627+00:00"
+  "at": "2026-09-02T17:10:14.153126+00:00"
 }

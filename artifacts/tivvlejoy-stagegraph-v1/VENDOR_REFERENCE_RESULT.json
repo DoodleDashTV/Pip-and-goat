@@ -1,9 +1,12 @@
 {
   "schema": "TIVVLEJOY_STAGEGRAPH_VENDOR_REFERENCE_RESULT_V1",
-  "status": "CHECKS_PASSED_CREATE_NOT_ARMED",
+  "status": "RENDERED_AWAITING_HUMAN_VISUAL_APPROVAL",
   "authorizationSha256": "23d6bc4471cd36eb124baab87b673648176333aff57d4a9c0d3e7157ec034c5d",
-  "paidCreate": 0,
-  "actualSpendUsd": 0,
-  "blockers": [],
-  "at": "2026-09-02T17:08:44.911844+00:00"
+  "paidCreate": 1,
+  "actualSpendUsd": 0.0292,
+  "runtimeSeconds": 142.2,
+  "imageSha256": "a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400",
+  "podId": "4sz09msbcg53xg",
+  "gpu": "RTX 4090",
+  "at": "2026-09-02T17:12:38.189033+00:00"
 }
