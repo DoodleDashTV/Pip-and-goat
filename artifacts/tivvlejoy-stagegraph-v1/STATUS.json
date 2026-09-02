@@ -62,5 +62,12 @@
   "zeroPaidRepairImplemented": true,
   "zeroPaidValidationPass": true,
   "anotherVendorReferenceFrameRequired": true,
-  "freshPaidAuthorizationRequired": true
+  "freshPaidAuthorizationRequired": true,
+  "activeRecipeId": "VENDOR_REFERENCE_ALPHA_REPAIR_V1",
+  "activeRecipeSha256": "fc0c713ac026c7b327a7860a0efda30a9d71623fecb8818f64cf36b6312e7f92",
+  "activeRecipeState": "ZERO_PAID_REPAIR_COMPLETE",
+  "recipeExecutionResult": "PASS",
+  "recipeResultPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_ALPHA_REPAIR_RESULT.json",
+  "recipeResultSha256": "d0f4b69c4a10aa469fe144ec09dc7a9c8658a5794f4f9cd2a4d6dcb790f9d7b7",
+  "nextRequiredHumanDecision": "REQUEST_FRESH_VENDOR_REFERENCE_FRAME_AUTHORIZATION"
 }
