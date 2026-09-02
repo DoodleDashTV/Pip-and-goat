@@ -16,6 +16,39 @@ if str(SCRIPT_DIR) not in sys.path:
 from asset_certify_contract_v1 import SCHEMA, evaluate_audit
 
 
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(4 * 1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def apply_image_bindings(bindings: list[dict]) -> list[dict]:
+    """Bind declared replacements in memory only; never save the vendor scene."""
+    import bpy
+
+    applied = []
+    for binding in bindings:
+        original = str(binding.get("original") or "")
+        replacement = Path(str(binding.get("replacement") or ""))
+        expected_sha = str(binding.get("replacementSha256") or "").removeprefix("sha256:")
+        if not original or not replacement.is_file() or _sha256(replacement) != expected_sha:
+            raise RuntimeError("IMAGE_BINDING_IDENTITY_MISMATCH")
+        matched = [image for image in bpy.data.images if image.filepath == original]
+        if not matched:
+            raise RuntimeError("IMAGE_BINDING_SOURCE_NOT_FOUND")
+        for image in matched:
+            image.filepath = str(replacement)
+        applied.append({
+            "originalBasename": Path(original.replace("\\", "/")).name,
+            "replacementBasename": replacement.name,
+            "replacementSha256": expected_sha,
+            "policy": str(binding.get("policy") or "DECLARED_REPLACEMENT"),
+        })
+    return applied
+
+
 def _exists(filepath: str) -> bool:
     if not filepath:
         return False
@@ -27,7 +60,7 @@ def _exists(filepath: str) -> bool:
         return Path(filepath).exists()
 
 
-def collect(source_id: str, source_sha256: str, skipped_archive_members: list[str]):
+def collect(source_id: str, source_sha256: str, skipped_archive_members: list[str], dependency_bindings: list[dict]):
     import bpy
 
     missing_images = [image.filepath for image in bpy.data.images if image.source == "FILE" and not image.packed_file and not _exists(image.filepath)]
@@ -72,6 +105,7 @@ def collect(source_id: str, source_sha256: str, skipped_archive_members: list[st
         "missingNodeGroups": sorted(set(missing_node_groups)),
         "materialsWithoutOutput": sorted(set(materials_without_output)),
         "skippedArchiveMembers": sorted(set(skipped_archive_members)),
+        "dependencyBindings": dependency_bindings,
         "externalDependenciesMaterialized": not any([missing_images, missing_libraries, missing_fonts, missing_clips, missing_volumes]),
         "colorManagementVerified": bool(bpy.context.scene.view_settings.view_transform),
         "geometryNodesVerified": not missing_node_groups,
@@ -87,6 +121,7 @@ def parse_args():
     parser.add_argument("--source-id", required=True)
     parser.add_argument("--source-sha256", default="")
     parser.add_argument("--skipped-archive-members-json", default="[]")
+    parser.add_argument("--image-bindings-json", default="[]")
     parser.add_argument("--out", required=True)
     return parser.parse_args(raw)
 
@@ -94,7 +129,8 @@ def parse_args():
 def main():
     args = parse_args()
     skipped = json.loads(args.skipped_archive_members_json)
-    audit, verdict = collect(args.source_id, args.source_sha256, skipped)
+    bindings = apply_image_bindings(json.loads(args.image_bindings_json))
+    audit, verdict = collect(args.source_id, args.source_sha256, skipped, bindings)
     payload = {"audit": audit, "verdict": verdict}
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
