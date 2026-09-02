@@ -1,6 +1,6 @@
 {
   "schema": "TIVVLEJOY_STAGEGRAPH_V1_STATUS",
-  "status": "DEPENDENCY_AUDIT_PASSED",
+  "status": "VENDOR_REFERENCE_PREFLIGHT_PASSED",
   "sourceBranchBase": "cursor/tivvlejoy-scenery-showcase-30s-v1-73f1",
   "sourceBaseSha": "c3a79522f33123a1ce8775de93341829b167f920",
   "pr169": {
@@ -14,14 +14,22 @@
   "sourcePackSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
   "dependencyAuditPass": true,
   "dependencyAuditSha256": "3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0",
-  "dependencyAuditWorkflowRunId": 33655349843,
-  "dependencyAuditArtifactSha256": "21c552576c568905ebe1a1f3a860c8c5a4704ef99d0115b424832706dcdc89d6",
-  "currentGate": "VENDOR_REFERENCE_FRAME",
-  "currentGateStatus": "AWAITING_FRESH_AUTHORIZATION",
-  "currentGateBlocker": "EXACTLY_ONE_VENDOR_REFERENCE_FRAME_REQUIRES_FRESH_AUTHORIZATION",
+  "vendorReferencePreflightPass": true,
+  "vendorReferencePreflightSha256": "f61bc077b6122e24ccb098b1b7b15c753e84c8a393d5a2e237923f0942e3d8c7",
+  "vendorReferencePreflightWorkflowRunId": 33656796364,
+  "vendorReferencePreflightArtifactSha256": "4a4d1926266f15d51f2c5f1f9b3f7669410ec1af7402280cbe519c312b47a138",
+  "currentGate": "VENDOR_REFERENCE_REPRODUCED",
+  "currentGateStatus": "PREFLIGHT_PASS_AWAITING_FRESH_AUTHORIZATION",
+  "currentGateBlocker": "EXACTLY_ONE_VENDOR_REFERENCE_FRAME_REQUIRES_FRESH_HUMAN_AUTHORIZATION",
   "missingSecretNames": [],
   "blenderAuditExecuted": true,
   "blenderVersion": "4.3.2",
+  "preflightScene": {
+    "name": "TJ_VENDOR_REFERENCE_GOLDEN_FOREST",
+    "renderEngine": "CYCLES",
+    "resolution": [1280, 720],
+    "rendered": false
+  },
   "auditWarnings": [
     "NON_TRIVIAL_ALPHA_BLENDING_WARNINGS_PRESENT_FOR_FOLIAGE_MATERIALS"
   ],
@@ -29,6 +37,7 @@
   "characterState": "WAITING_FOR_ARTIST_RIGS",
   "paidCreateCount": 0,
   "paidSpendUsd": 0,
+  "vendorReferenceFrameAuthorizationPresent": false,
   "beautyFrameAuthorizationPresent": false,
   "finalRenderAuthorized": false,
   "productionReady": false
