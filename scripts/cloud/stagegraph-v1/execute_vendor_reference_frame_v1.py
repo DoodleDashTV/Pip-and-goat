@@ -367,23 +367,22 @@ def verify_identity() -> dict:
     return payload
 
 
-def docker_start_cmd() -> str:
-    return (
-        "/bin/bash -lc 'set -euo pipefail; "
+def docker_start_cmd() -> list[str]:
+    bootstrap = (
+        "set -euo pipefail; "
         "export DEBIAN_FRONTEND=noninteractive; "
         "apt-get update; "
         "apt-get install -y python3 python3-pip curl xz-utils "
         "libgl1 libxi6 libxrender1 libxkbcommon0 libsm6 libxxf86vm1 libxfixes3 libx11-6 libxext6; "
         "pip3 install --disable-pip-version-check boto3==1.40.14; "
-        "python3 -c \""
-        "import os,boto3; "
-        "c=boto3.client(\\\"s3\\\",endpoint_url=os.environ[\\\"R2_ENDPOINT\\\"],"
-        "aws_access_key_id=os.environ[\\\"R2_ACCESS_KEY_ID\\\"],"
-        "aws_secret_access_key=os.environ[\\\"R2_SECRET_ACCESS_KEY\\\"],region_name=\\\"auto\\\"); "
-        "c.download_file(os.environ[\\\"R2_BUCKET\\\"],os.environ[\\\"SG_ENTRY_KEY\\\"],\\\"/tmp/sg-entry.py\\\")"
-        "\"; "
-        "python3 /tmp/sg-entry.py'"
+        "python3 -c 'import os,boto3; "
+        "c=boto3.client(\"s3\",endpoint_url=os.environ[\"R2_ENDPOINT\"],"
+        "aws_access_key_id=os.environ[\"R2_ACCESS_KEY_ID\"],"
+        "aws_secret_access_key=os.environ[\"R2_SECRET_ACCESS_KEY\"],region_name=\"auto\"); "
+        "c.download_file(os.environ[\"R2_BUCKET\"],os.environ[\"SG_ENTRY_KEY\"],\"/tmp/sg-entry.py\")'; "
+        "python3 /tmp/sg-entry.py"
     )
+    return ["/bin/bash", "-lc", bootstrap]
 
 
 def upload_bundle(client) -> dict:
@@ -436,24 +435,34 @@ def create_pod(rate: float, bundle: dict) -> str:
     payload = {
         "name": POD_NAME,
         "imageName": IMAGE_NAME,
-        "gpuTypeId": GPU_TYPE,
+        "gpuTypeIds": [GPU_TYPE],
         "gpuCount": 1,
         "cloudType": "SECURE",
-        "minMemoryInGb": MIN_RAM_GB,
+        "computeType": "GPU",
+        "interruptible": False,
+        "minRAMPerGPU": MIN_RAM_GB,
         "containerDiskInGb": CONTAINER_DISK_GB,
         "volumeInGb": 0,
-        "dockerArgs": docker_start_cmd(),
-        "env": [{"key": k, "value": v} for k, v in env.items()],
+        "dockerStartCmd": docker_start_cmd(),
+        "env": env,
     }
-    data = runpod_gql(
-        """
-        mutation ($input: PodFindAndDeployOnDemandInput!) {
-          podFindAndDeployOnDemand(input: $input) { id }
-        }
-        """,
-        {"input": payload},
+    req = urllib.request.Request(
+        "https://rest.runpod.io/v1/pods",
+        data=json.dumps(payload).encode(),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + os.environ["RUNPOD_API_KEY"],
+            "User-Agent": "DoodleDashProduction/1.0",
+        },
+        method="POST",
     )
-    pod_id = ((data.get("podFindAndDeployOnDemand") or {}).get("id")) or ""
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            body = json.loads(resp.read().decode() or "{}")
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode()[:400]
+        raise RuntimeError(f"RUNPOD_REST_CREATE_{exc.code}:{detail}") from exc
+    pod_id = str(body.get("id") or "")
     if not pod_id:
         raise RuntimeError("CREATE_RETURNED_NO_ID")
     return pod_id
