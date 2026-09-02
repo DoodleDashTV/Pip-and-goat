@@ -2,6 +2,7 @@
   "schema": "TIVVLEJOY_STAGEGRAPH_RECEIPT_V1",
   "stage": "DEPENDENCY_AUDIT_PASS",
   "result": "PASS",
+  "artifactSha256": "3c6804cbda061ed16a5d7027618089583ea7e99d2d0b96a6d2541bff89bbfdf0",
   "sourceId": "SRC_FOREST_STYLISED_ECOKIT",
   "sourceSha256": "8370295466ae2255d6e0c0b4b36bb7f8cddbef8e9cdf5e5b847016254073c79a",
   "trustedWorkflow": {
