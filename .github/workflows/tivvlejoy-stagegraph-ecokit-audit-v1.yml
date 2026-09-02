@@ -92,3 +92,5 @@ jobs:
             /tmp/tivvlejoy-stagegraph/DEPENDENCY_BINDING.json
           if-no-files-found: error
           retention-days: 30
+
+# Trusted rerun marker: repository R2 secrets configured 2026-09-02.
