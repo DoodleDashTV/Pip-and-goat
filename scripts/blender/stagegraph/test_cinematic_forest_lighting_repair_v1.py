@@ -10,7 +10,9 @@ from cinematic_forest_lighting_repair_v1 import (
     EXPOSURE,
     FLORA_AO_DISTANCE,
     FLORA_AO_VALUE,
+    FLORA_BUSH_LIGHT_INTENSITY,
     FLORA_CANOPY_LIGHT_INTENSITY,
+    FLORA_GRASS_LIGHT_INTENSITY,
     GAMMA,
     GROUND_EARTH,
     GROUND_MOSS,
@@ -41,6 +43,7 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         self.assertLess(EXPOSURE, 0.65)
         self.assertEqual(GAMMA, 1.0)
         self.assertLess(HDRI_CAMERA_STRENGTH, HDRI_LIGHT_STRENGTH)
+        self.assertLessEqual(HDRI_CAMERA_STRENGTH, 0.55)
         self.assertEqual(PREFERRED_LOOKS[0], "AgX - Base Contrast")
 
     def test_ground_recipe_is_earth_moss_not_orange(self):
@@ -58,6 +61,8 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         self.assertGreater(FLORA_AO_VALUE, 0.0)
         self.assertLess(FLORA_AO_VALUE, 0.3)
         self.assertGreaterEqual(FLORA_CANOPY_LIGHT_INTENSITY, 0.55)
+        self.assertLess(FLORA_BUSH_LIGHT_INTENSITY, FLORA_CANOPY_LIGHT_INTENSITY)
+        self.assertLess(FLORA_GRASS_LIGHT_INTENSITY, FLORA_CANOPY_LIGHT_INTENSITY)
         source = (ROOT / "cinematic_forest_lighting_repair_v1.py").read_text(encoding="utf-8")
         self.assertNotIn("ShaderNodeEmission", source)
         self.assertNotIn("BSDF_EMISSION", source)

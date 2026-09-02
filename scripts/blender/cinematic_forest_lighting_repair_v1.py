@@ -12,11 +12,11 @@ BG_FILL_NAME = "TJ_CinematicBgSeparation_V1"
 # High side-key: penetrate canopy gaps, side-light trunks, keep readable shadow direction.
 SUN_TRAVEL = (0.4682, 0.4007, -0.7875)
 SUN_ROTATION_DEG = (38.0, 2.0, -52.0)
-SUN_ENERGY = 8.8
-SUN_COLOR = (1.0, 0.91, 0.80)
-SUN_ANGLE_DEG = 4.5
+SUN_ENERGY = 9.2
+SUN_COLOR = (1.0, 0.94, 0.86)
+SUN_ANGLE_DEG = 4.2
 
-FILL_ENERGY = 260.0
+FILL_ENERGY = 140.0
 FILL_COLOR = (0.58, 0.74, 1.0)
 FILL_LOCATION = (0.0, -7.2, 11.5)
 FILL_AIM = (0.0, 8.0, 5.5)
@@ -32,35 +32,35 @@ BOUNCE_LOCATION = (0.0, 8.2, 4.2)
 BOUNCE_AIM = (0.0, 8.0, 9.0)
 BOUNCE_SIZE = 12.0
 
-CANOPY_FILL_ENERGY = 880.0
+CANOPY_FILL_ENERGY = 640.0
 CANOPY_FILL_COLOR = (0.66, 0.80, 1.0)
 CANOPY_FILL_LOCATION = (0.0, -6.0, 11.2)
 CANOPY_FILL_AIM = (0.0, 8.5, 6.0)
 CANOPY_RIM_ENERGY = 260.0
 
-TRANSLUCENCY_FACTOR = 0.26
-TRANSLUCENT_COLOR = (0.24, 0.38, 0.14, 1.0)
+TRANSLUCENCY_FACTOR = 0.28
+TRANSLUCENT_COLOR = (0.28, 0.44, 0.16, 1.0)
 CYCLES_PRINCIPLED = "TJ_CinematicCyclesPrincipled_V1"
 CYCLES_COLOR_LIFT = "TJ_CinematicCyclesColorLift_V1"
 CYCLES_LEAF_LIFT = (1.18, 1.28, 1.06, 1.0)
 CYCLES_FALLEN_LIFT = (1.02, 1.06, 1.08, 1.0)
 
-GROUND_EARTH = (0.040, 0.048, 0.032)
-GROUND_MOSS = (0.038, 0.088, 0.042)
-GROUND_DAMP = (0.034, 0.032, 0.026)
-GROUND_ROCK = (0.062, 0.060, 0.054)
+GROUND_EARTH = (0.032, 0.042, 0.028)
+GROUND_MOSS = (0.034, 0.095, 0.042)
+GROUND_DAMP = (0.026, 0.034, 0.026)
+GROUND_ROCK = (0.052, 0.056, 0.050)
 
-HDRI_LIGHT_STRENGTH = 1.55
-HDRI_CAMERA_STRENGTH = 0.96
-GROUND_BOUNCE_COLOR = (0.11, 0.14, 0.08, 1.0)
-CAMERA_HAZE_COLOR = (0.36, 0.48, 0.62, 1.0)
-SKY_CAMERA_TINT = (0.90, 0.94, 1.04, 1.0)
+HDRI_LIGHT_STRENGTH = 1.50
+HDRI_CAMERA_STRENGTH = 0.46
+GROUND_BOUNCE_COLOR = (0.09, 0.14, 0.08, 1.0)
+CAMERA_HAZE_COLOR = (0.16, 0.24, 0.36, 1.0)
+SKY_CAMERA_TINT = (0.58, 0.70, 0.88, 1.0)
 
 ATMOSPHERE_DENSITY = 0.0019
 ATMOSPHERE_COLOR = (0.70, 0.79, 0.90, 1.0)
 ATMOSPHERE_ANISOTROPY = 0.44
 
-EXPOSURE = 0.40
+EXPOSURE = 0.32
 GAMMA = 1.0
 VIEW_TRANSFORM = "AgX"
 PREFERRED_LOOKS = (
@@ -69,16 +69,17 @@ PREFERRED_LOOKS = (
     "AgX - Medium High Contrast",
 )
 
-MIST_START = 28.0
-MIST_DEPTH = 55.0
-MIST_STRENGTH = 0.16
-MIST_COLOR = (0.58, 0.66, 0.76, 1.0)
+MIST_START = 34.0
+MIST_DEPTH = 60.0
+MIST_STRENGTH = 0.07
+MIST_COLOR = (0.36, 0.46, 0.56, 1.0)
 
-FLORA_AO_DISTANCE = 0.18
-FLORA_AO_VALUE = 0.12
-FLORA_CANOPY_LIGHT_INTENSITY = 0.72
-FLORA_GRASS_LIGHT_INTENSITY = 0.58
-FLORA_FALLEN_LIGHT_INTENSITY = 0.26
+FLORA_AO_DISTANCE = 0.08
+FLORA_AO_VALUE = 0.04
+FLORA_CANOPY_LIGHT_INTENSITY = 1.15
+FLORA_BUSH_LIGHT_INTENSITY = 0.40
+FLORA_GRASS_LIGHT_INTENSITY = 0.32
+FLORA_FALLEN_LIGHT_INTENSITY = 0.12
 
 DIFFUSE_BOUNCES = 12
 GLOSSY_BOUNCES = 4
@@ -555,7 +556,7 @@ def add_background_separation(scene) -> dict:
     fill.data.type = "AREA"
     fill.data.shape = "DISK"
     fill.data.size = 16.0
-    fill.data.energy = 170.0
+    fill.data.energy = 80.0
     fill.data.color = (0.64, 0.76, 1.0)
     fill.location = (0.0, 29.0, 9.5)
     _aim_at(fill, (0.0, 20.0, 6.0))
@@ -583,7 +584,9 @@ def _flora_light_intensity_target(name: str) -> float | None:
         return FLORA_FALLEN_LIGHT_INTENSITY
     if any(word in low for word in ("grass", "moss")):
         return FLORA_GRASS_LIGHT_INTENSITY
-    if any(word in low for word in ("leaf", "vine", "treeleaf", "fern", "bush", "floral", "foliage")):
+    if any(word in low for word in ("bush", "floral")):
+        return FLORA_BUSH_LIGHT_INTENSITY
+    if any(word in low for word in ("leaf", "vine", "treeleaf", "fern", "foliage")):
         return FLORA_CANOPY_LIGHT_INTENSITY
     return None
 
@@ -620,14 +623,30 @@ def repair_flora_shader_light_response() -> dict:
             if not str(node.node_tree.name).startswith("Flora_Shader"):
                 continue
             if "Light Intensity" in node.inputs:
-                current = float(node.inputs["Light Intensity"].default_value)
-                node.inputs["Light Intensity"].default_value = max(current, target)
+                node.inputs["Light Intensity"].default_value = float(target)
                 touched = True
             if "AO Value" in node.inputs:
                 node.inputs["AO Value"].default_value = FLORA_AO_VALUE
                 touched = True
             if "Emi" in node.inputs:
                 node.inputs["Emi"].default_value = 0.0
+            if "Color_1" in node.inputs:
+                red, green, blue, alpha = list(node.inputs["Color_1"].default_value)
+                if "fallen" in material.name.lower():
+                    node.inputs["Color_1"].default_value = (
+                        min(red * 0.72, green * 0.90),
+                        green * 0.92,
+                        min(1.0, max(blue * 1.20, green * 0.35)),
+                        alpha,
+                    )
+                elif target >= FLORA_CANOPY_LIGHT_INTENSITY:
+                    node.inputs["Color_1"].default_value = (
+                        red * 1.04,
+                        min(0.82, green * 1.10),
+                        min(1.0, blue * 1.12),
+                        alpha,
+                    )
+                touched = True
         if touched:
             _tag(material)
             materials_changed.append(material.name)
@@ -733,6 +752,64 @@ def install_cycles_safe_flora_surfaces() -> dict:
         "texturesOverwritten": False,
         "vendorGroupPreserved": True,
     }
+
+
+TRUNK_LIFT_NODE = "TJ_CinematicTrunkLift_V1"
+TRUNK_COLOR_LIFT = (1.38, 1.24, 1.12, 1.0)
+
+
+def repair_trunk_readability() -> dict:
+    import bpy
+
+    changed = []
+    for material in bpy.data.materials:
+        low = str(material.name or "").lower()
+        if not any(word in low for word in ("trunk", "bark", "wood", "stipe")):
+            continue
+        if any(word in low for word in ("leaf", "grass", "water", "ground")):
+            continue
+        if not material.use_nodes or material.node_tree is None:
+            continue
+        nodes = material.node_tree.nodes
+        links = material.node_tree.links
+        target = None
+        color_in = None
+        for node in nodes:
+            if node.type == "BSDF_PRINCIPLED" and "Base Color" in node.inputs:
+                target = node
+                color_in = node.inputs["Base Color"]
+                break
+            if node.type == "BSDF_DIFFUSE" and "Color" in node.inputs:
+                target = node
+                color_in = node.inputs["Color"]
+                break
+        if target is None or color_in is None:
+            continue
+        if color_in is None:
+            continue
+        incoming = next((link for link in links if link.to_socket == color_in), None)
+        lift = nodes.get(TRUNK_LIFT_NODE)
+        if lift is None:
+            lift = _new_mix_color(nodes, TRUNK_LIFT_NODE)
+        try:
+            lift.blend_type = "MULTIPLY"
+        except Exception:
+            pass
+        _mix_factor(lift).default_value = 1.0
+        _set_rgba(_mix_color_sockets(lift)[1], TRUNK_COLOR_LIFT)
+        if incoming is not None and incoming.from_node != lift:
+            source = incoming.from_socket
+            links.remove(incoming)
+            links.new(source, _mix_color_sockets(lift)[0])
+        elif incoming is None:
+            current = list(color_in.default_value)
+            _set_rgba(_mix_color_sockets(lift)[0], current)
+        lift_out = lift.outputs.get("Result") or lift.outputs.get("Color") or lift.outputs[0]
+        if not any(link.from_socket == lift_out and link.to_socket == color_in for link in links):
+            links.new(lift_out, color_in)
+        _tag(lift)
+        changed.append(material.name)
+    return {"materialsChanged": len(changed), "names": changed, "texturesOverwritten": False}
 
 
 def repair_foliage_translucency(scene) -> dict:
@@ -850,6 +927,7 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
     lights = retune_existing_lights(scene)
     background = add_background_separation(scene)
     flora = repair_flora_shader_light_response()
+    trunks = repair_trunk_readability()
     foliage = repair_foliage_translucency(scene)
     depth = apply_depth_cues(scene)
     return {
@@ -864,6 +942,7 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
         "lights": lights,
         "backgroundSeparation": background,
         "floraShader": flora,
+        "trunks": trunks,
         "foliage": foliage,
         "depth": depth,
         "emissionShadersAdded": False,
