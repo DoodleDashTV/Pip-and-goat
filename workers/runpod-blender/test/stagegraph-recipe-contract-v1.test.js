@@ -8,7 +8,9 @@ const contract = require('../src/stagegraph-recipe-contract-v1');
 
 const repoRoot = path.resolve(__dirname, '../../..');
 const recipePath = path.join(repoRoot, 'recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json');
+const activePath = path.join(repoRoot, 'artifacts/tivvlejoy-stagegraph-v1/ACTIVE_RECIPE.json');
 const recipe = JSON.parse(fs.readFileSync(recipePath, 'utf8'));
+const active = JSON.parse(fs.readFileSync(activePath, 'utf8'));
 
 test('real alpha-repair recipe is valid and zero-paid', () => {
   const verdict = contract.validateRecipe(recipe);
@@ -18,6 +20,17 @@ test('real alpha-repair recipe is valid and zero-paid', () => {
   assert.equal(recipe.forbiddenActions.includes('CREATE_PAID_POD'), true);
   assert.equal(recipe.forbiddenActions.includes('RENDER_PAID_FRAME'), true);
   assert.equal(recipe.inputs.rejectedArtifact.sha256, 'a1276acb73ada320240cced525dc9902ff89516da97c019bc87c334a94cce400');
+});
+
+test('active recipe receipt is bound to the exact machine-readable recipe and rejected frame', () => {
+  const verdict = contract.validateRecipe(recipe);
+  assert.equal(active.recipeId, recipe.recipeId);
+  assert.equal(active.recipePath, 'recipes/tivvlejoy-stagegraph/005_vendor_reference_alpha_repair_v1.json');
+  assert.equal(active.recipeCanonicalSha256, verdict.recipeSha256);
+  assert.equal(active.rejectedImageSha256, recipe.inputs.rejectedArtifact.sha256);
+  assert.deepEqual(active.budget, recipe.budget);
+  assert.equal(active.formalStageGraphApproval, false);
+  assert.equal(active.state, 'READY_TO_EXECUTE_ZERO_PAID');
 });
 
 test('execution sequence can only use explicitly allowed actions', () => {
