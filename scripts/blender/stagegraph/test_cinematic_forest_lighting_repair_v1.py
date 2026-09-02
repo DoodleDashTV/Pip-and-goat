@@ -10,8 +10,10 @@ from cinematic_forest_lighting_repair_v1 import (
     EXPOSURE,
     FLORA_AO_DISTANCE,
     FLORA_AO_VALUE,
+    FLORA_BRANCH_LIGHT_INTENSITY,
     FLORA_BUSH_LIGHT_INTENSITY,
     FLORA_CANOPY_LIGHT_INTENSITY,
+    FLORA_DISPLAY_INTENSITY_CAP,
     FLORA_GRASS_LIGHT_INTENSITY,
     GAMMA,
     GROUND_EARTH,
@@ -23,7 +25,11 @@ from cinematic_forest_lighting_repair_v1 import (
     SUN_ENERGY,
     SUN_TRAVEL,
     TRANSLUCENCY_FACTOR,
+    TRUNK_MIN_LUMA,
+    TRUNK_STRENGTH,
     VIEW_TRANSFORM,
+    _clamp_hot_flora_color,
+    _flora_light_intensity_target,
 )
 
 
@@ -51,6 +57,7 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         self.assertLess(red / max(green, 1e-6), 1.35)
         self.assertGreater(green, blue)
         self.assertGreater(GROUND_MOSS[1], GROUND_MOSS[0])
+        self.assertLessEqual(GROUND_MOSS[1] / max(GROUND_MOSS[0], 1e-6), 1.45)
 
     def test_leaf_translucency_stays_physically_plausible(self):
         self.assertGreaterEqual(TRANSLUCENCY_FACTOR, 0.20)
@@ -63,11 +70,26 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         self.assertGreaterEqual(FLORA_CANOPY_LIGHT_INTENSITY, 0.55)
         self.assertLess(FLORA_BUSH_LIGHT_INTENSITY, FLORA_CANOPY_LIGHT_INTENSITY)
         self.assertLess(FLORA_GRASS_LIGHT_INTENSITY, FLORA_CANOPY_LIGHT_INTENSITY)
+        self.assertGreaterEqual(FLORA_GRASS_LIGHT_INTENSITY, 0.50)
+        self.assertGreaterEqual(FLORA_BRANCH_LIGHT_INTENSITY, 0.50)
+        self.assertLessEqual(FLORA_DISPLAY_INTENSITY_CAP, 3.0)
+        self.assertGreaterEqual(TRUNK_MIN_LUMA, 0.18)
+        self.assertGreaterEqual(TRUNK_STRENGTH, 0.40)
+        self.assertEqual(_flora_light_intensity_target("Branch_1.002"), FLORA_BRANCH_LIGHT_INTENSITY)
+        self.assertEqual(_flora_light_intensity_target("TreeTrunk_Mat_1.001"), None)
+        clamped = _clamp_hot_flora_color((0.70, 1.0, 0.03, 1.0), "foliage")
+        self.assertLessEqual(clamped[1], 0.50)
+        self.assertEqual(_clamp_hot_flora_color((0.30, 0.42, 0.18, 1.0), "foliage"), (0.30, 0.42, 0.18, 1.0))
         source = (ROOT / "cinematic_forest_lighting_repair_v1.py").read_text(encoding="utf-8")
         self.assertNotIn("ShaderNodeEmission", source)
         self.assertNotIn("BSDF_EMISSION", source)
         self.assertIn("verify_locks", source)
         self.assertIn("CINEMATIC_CAMERA_LOCATION_CHANGED", source)
         self.assertIn("repair_flora_shader_light_response", source)
+        self.assertIn("repair_treeleaf_groups", source)
+        self.assertIn("repair_trunk_readability", source)
         self.assertIn("install_cycles_safe_flora_surfaces", source)
+        apply_src = source.split("def apply_cinematic_forest_lighting_repair", 1)[1]
+        self.assertNotIn("install_cycles_safe_flora_surfaces", apply_src)
+        self.assertIn("repair_treeleaf_groups()", apply_src)
         self.assertIn("TJ_CinematicCyclesPrincipled_V1", source)
