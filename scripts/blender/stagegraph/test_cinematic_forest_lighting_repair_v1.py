@@ -13,6 +13,7 @@ from cinematic_forest_lighting_repair_v1 import (
     GROUND_MOSS,
     HDRI_CAMERA_STRENGTH,
     HDRI_LIGHT_STRENGTH,
+    PREFERRED_LOOKS,
     SUN_COLOR,
     SUN_ENERGY,
     SUN_TRAVEL,
@@ -37,6 +38,7 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         self.assertLess(EXPOSURE, 0.65)
         self.assertEqual(GAMMA, 1.0)
         self.assertLess(HDRI_CAMERA_STRENGTH, HDRI_LIGHT_STRENGTH)
+        self.assertEqual(PREFERRED_LOOKS[0], "AgX - Medium High Contrast")
 
     def test_ground_recipe_is_earth_moss_not_orange(self):
         red, green, blue = GROUND_EARTH

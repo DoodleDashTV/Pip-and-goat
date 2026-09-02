@@ -142,18 +142,13 @@ def _new_mix_color(nodes, name: str):
 
 
 def select_agx_look(scene) -> str:
-    available = []
-    try:
-        available = [item.identifier for item in scene.view_settings.bl_rna.properties["look"].enum_items]
-    except Exception:
-        available = []
+    scene.view_settings.view_transform = VIEW_TRANSFORM
     for look in PREFERRED_LOOKS:
-        if not available or look in available:
-            try:
-                scene.view_settings.look = look
-                return look
-            except Exception:
-                continue
+        try:
+            scene.view_settings.look = look
+            return str(scene.view_settings.look)
+        except Exception:
+            continue
     scene.view_settings.look = "None"
     return "None"
 
