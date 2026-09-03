@@ -55,6 +55,8 @@ FERN_BLEND = BOTANIQ_MODELS / "plants" / "bq_Plant_Dryopteris-carthusiana_A_spri
 
 BARK_NORMAL_STRENGTH = 0.62
 TILIA_ASPECT = 4.0
+TILIA_WORLD_WIDTH = 0.85
+TILIA_WORLD_HEIGHT = 3.4
 BACKGROUND_Y = 18.0
 
 
@@ -64,8 +66,60 @@ def _tag(id_data, isolation: bool = True) -> None:
     id_data["tj_feature"] = LOOKDEV_FEATURE if isolation else FEATURE
 
 
+def ensure_cutout_png(source: Path, dest: Path) -> Path:
+    """Write an RGBA cutout so foliage cards do not render rectangular ghosts.
+
+    Botaniq leaf/fern maps are often RGBA with a fully opaque black studio
+    backdrop. Keep existing alpha only when it already punches a hole.
+    """
+    if not source.is_file():
+        return dest
+    try:
+        from PIL import Image
+    except Exception:
+        return source if source.is_file() else dest
+    image = Image.open(source)
+    rgba = image.convert("RGBA")
+    pixels = list(rgba.getdata())
+    existing_alpha = sum(1 for _r, _g, _b, a in pixels if a < 16)
+    if existing_alpha > max(64, len(pixels) * 0.04) and dest.is_file():
+        return dest
+    if existing_alpha > max(64, len(pixels) * 0.04):
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        rgba.save(dest)
+        return dest
+    keyed = []
+    for r, g, b, _a in pixels:
+        luma = (0.2126 * r) + (0.7152 * g) + (0.0722 * b)
+        chroma = max(r, g, b) - min(r, g, b)
+        # Drop near-white paper and the Botaniq black studio backdrop.
+        if luma > 232 and chroma < 18:
+            keyed.append((r, g, b, 0))
+        elif luma < 18 and chroma < 14:
+            keyed.append((r, g, b, 0))
+        else:
+            keyed.append((r, g, b, 255))
+    rgba.putdata(keyed)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    rgba.save(dest)
+    return dest
+
+
 def leaf_albedo_path() -> Path:
-    return LEAF_ALBEDO if LEAF_ALBEDO.is_file() else LEAF_ALBEDO_SRC
+    if LEAF_ALBEDO.is_file():
+        return LEAF_ALBEDO
+    if LEAF_ALBEDO_SRC.is_file():
+        return ensure_cutout_png(LEAF_ALBEDO_SRC, LEAF_ALBEDO)
+    return LEAF_ALBEDO_SRC
+
+
+def fern_albedo_path() -> Path:
+    if FERN_ALBEDO.is_file():
+        return FERN_ALBEDO
+    src = BOTANIQ_TEX / "bq_Fern_Diffuse.png"
+    if src.is_file():
+        return ensure_cutout_png(src, FERN_ALBEDO)
+    return src
 
 
 def required_owned_paths() -> dict[str, Path]:
@@ -76,7 +130,7 @@ def required_owned_paths() -> dict[str, Path]:
         "litterAlbedo": LITTER_ALBEDO,
         "leafAlbedo": leaf_albedo_path(),
         "leafNormal": LEAF_NORMAL,
-        "fernAlbedo": FERN_ALBEDO,
+        "fernAlbedo": fern_albedo_path(),
         "shrubBlend": SHRUB_BLEND,
         "grassBlend": GRASS_BLEND,
         "fernBlend": FERN_BLEND,
@@ -314,28 +368,34 @@ def make_ground_material():
     ):
         links.new(mapping.outputs["Vector"], node.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Saturation"].default_value = 0.72
-    hsv.inputs["Value"].default_value = 0.62
+    hsv.inputs["Hue"].default_value = 0.48
+    hsv.inputs["Saturation"].default_value = 0.78
+    hsv.inputs["Value"].default_value = 0.42
     links.new(soil.outputs["Color"], hsv.inputs["Color"])
+    soil_grade = _mix_color(nodes, "TJ_SoilGrade")
+    fac, a, b = _mix_sockets(soil_grade)
+    fac.default_value = 0.38
+    links.new(hsv.outputs["Color"], a)
+    b.default_value = (0.16, 0.10, 0.06, 1.0)
     base_litter = _mix_color(nodes, "TJ_SoilBaseLitter")
     fac, a, b = _mix_sockets(base_litter)
-    fac.default_value = 0.52
-    links.new(hsv.outputs["Color"], a)
+    fac.default_value = 0.74
+    links.new(_mix_out(soil_grade), a)
     links.new(litter.outputs["Color"], b)
     litter_noise = nodes.new("ShaderNodeTexNoise")
-    litter_noise.inputs["Scale"].default_value = 1.15
+    litter_noise.inputs["Scale"].default_value = 1.05
     litter_noise.inputs["Detail"].default_value = 8.0
     moss_noise = nodes.new("ShaderNodeTexNoise")
-    moss_noise.inputs["Scale"].default_value = 1.55
+    moss_noise.inputs["Scale"].default_value = 1.35
     moss_noise.inputs["Detail"].default_value = 6.0
     links.new(coord.outputs["Object"], litter_noise.inputs["Vector"])
     links.new(coord.outputs["Object"], moss_noise.inputs["Vector"])
     litter_ramp = nodes.new("ShaderNodeValToRGB")
-    litter_ramp.color_ramp.elements[0].position = 0.38
-    litter_ramp.color_ramp.elements[1].position = 0.66
+    litter_ramp.color_ramp.elements[0].position = 0.28
+    litter_ramp.color_ramp.elements[1].position = 0.58
     moss_ramp = nodes.new("ShaderNodeValToRGB")
-    moss_ramp.color_ramp.elements[0].position = 0.64
-    moss_ramp.color_ramp.elements[1].position = 0.82
+    moss_ramp.color_ramp.elements[0].position = 0.40
+    moss_ramp.color_ramp.elements[1].position = 0.68
     links.new(litter_noise.outputs["Fac"], litter_ramp.inputs["Fac"])
     links.new(moss_noise.outputs["Fac"], moss_ramp.inputs["Fac"])
     mix_needles = _mix_color(nodes, "TJ_Needles")
@@ -407,17 +467,21 @@ def cylindrical_unwrap_trunk_faces(obj, aspect: float = TILIA_ASPECT) -> dict:
         for loop_index in poly.loop_indices:
             co = mesh.vertices[mesh.loops[loop_index].vertex_index].co
             # Seam on +Y (away from approved camera at -Y).
-            u = (math.atan2(co.x, -co.y) / (2.0 * math.pi)) + 0.5
-            # 1024x4096 Tilia strip ~0.85 m by 3.4 m. V uses world height, not C*4,
-            # so bark fissures keep photographic proportion on a short lookdev trunk.
-            v = (co.z - z0) / 3.4
+            angle = (math.atan2(co.x, -co.y) / (2.0 * math.pi)) + 0.5
+            # 1024x4096 Tilia strip is ~0.85 m by 3.4 m. U tiles by circumference
+            # so the photographic bark width is not stretched around a fat trunk.
+            u = angle * (circumference / TILIA_WORLD_WIDTH)
+            v = (co.z - z0) / TILIA_WORLD_HEIGHT
             uv.data[loop_index].uv = (u, v)
     return {
         "faces": faces,
         "radius": round(radius, 4),
         "height": round(z1 - z0, 4),
+        "circumference": round(circumference, 4),
         "aspect": aspect,
         "seam": "+Y",
+        "worldWidth": TILIA_WORLD_WIDTH,
+        "worldHeight": TILIA_WORLD_HEIGHT,
     }
 
 
@@ -859,7 +923,7 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         for slot in ground.material_slots:
             slot.link = "OBJECT"
             slot.material = mats["ground"]
-            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 0, 3, 3)
+        scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 4, 5, 4)
 
     bpy.context.view_layer.update()
     return {
@@ -884,7 +948,7 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         "ground": make_ground_material(),
         "leaf": make_foliage_material("TJ_ProdLeaf_Corylus_V1", leaf_albedo_path(), LEAF_NORMAL, 0.22, clip=True),
         "litter": make_opaque_pbr("TJ_ProdLitterPatch_V1", LITTER_ALBEDO, LITTER_NORMAL, 0.86, mapping="uv"),
-        "fern": make_foliage_material("TJ_ProdFern_V1", FERN_ALBEDO, FERN_NORMAL, 0.18, clip=False),
+        "fern": make_foliage_material("TJ_ProdFern_V1", fern_albedo_path(), FERN_NORMAL, 0.18, clip=True),
         "moss": make_opaque_pbr("TJ_ProdMossMound_V1", MOSS_ALBEDO, None, 0.84, mapping="object"),
         "flower": make_foliage_material("TJ_ProdFlower_V1", FLOWER_ALBEDO, FLOWER_NORMAL, 0.12, clip=True),
         "rock": make_opaque_pbr("TJ_ProdRock_Granite_V1", ROCK_ALBEDO, ROCK_NORMAL, 0.76, mapping="object"),
