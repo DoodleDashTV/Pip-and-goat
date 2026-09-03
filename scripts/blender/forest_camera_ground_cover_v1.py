@@ -137,18 +137,19 @@ def make_soil_cover_material(name: str = "TJ_CoverSoil_Loose_V1", albedo=None, n
     tex = nodes.new("ShaderNodeTexImage")
     tex.image = _load_image(albedo or SOIL_ALBEDO, "sRGB")
     links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
-    # V4 crushed chroma (sat 0.78, value 0.34, near-black mix) and the
-    # locked camera floor read RGB ~66,64,67. Boost warmth so earth survives
-    # cool HDRI/AgX without returning to V1 terracotta.
+    # V5 red-shifted and still-darkened the map: floor went mauve-gray
+    # (fg ~86,74,80) with brown pixels still ~1%. Keep Soil_Loose's native
+    # R>G>B ratio (raw ~139,123,105) and lift value so cool HDRI cannot
+    # crush it to neutral gray.
     graded = _grade_albedo(
         nodes,
         links,
         tex.outputs["Color"],
-        hue=0.38,
-        sat=1.25,
-        value=0.58,
-        grade=(0.18, 0.10, 0.04),
-        mix_fac=0.32,
+        hue=0.50,
+        sat=1.18,
+        value=1.08,
+        grade=(0.16, 0.13, 0.09),
+        mix_fac=0.16,
     )
     links.new(graded, shader.inputs["Base Color"])
     shader.inputs["Roughness"].default_value = 0.93

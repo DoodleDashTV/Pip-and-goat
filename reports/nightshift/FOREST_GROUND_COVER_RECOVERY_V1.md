@@ -16,17 +16,19 @@ V4+ sits at `z=0.034` so the dressing is above preserved EcoKit `Floral_*` cards
 | V2 | `fffe871b050db2a18a465e9d94fd78f2e2ee050db1e27c7d1d6db09d2219da78` | FAIL | Foreground salmon mostly gone; horizon salmon band y≈447 RGB 83,46,39 R−B=44 |
 | V3 | `93d8bf4634da135d18abe6671e3de525d8d0bd77aa17bac6e6f2b7d04618c12a` | FAIL | Vendor plane hidden; horizon salmon band remains y≈447 RGB 81,49,44 R−B=37 |
 | V4 | `ba9c2cbc054fa6839fd05ace65f203c7dc55d57ed080835f1be3ace2e50b8220` | FAIL | Salmon band gone (warmest R−B=6.8). Floor reads neutral gray RGB ~66,64,67. Brown soil not readable. Green stem-mapped twigs. |
+| V5 | `e29450431246b44059577775e4da14ee4c37ce8725c3df1b847a0d87b9d310fe` | FAIL | Salmon still 0%. Soil still not brown (lower-40% brown=1.0%). Foreground ~86,74,80 mauve-gray after red hue shift. |
 
 All 1280×720, locked camera/lighting, 20 samples, unpaid CPU.
 
-## V4 pixel note
+## Pixel notes
 
-Vision captions kept reporting a salmon horizon on V4. Scanline RGB does not. V2/V3 still have a warm band at y≈447; V4 does not. The remaining V4 failure is chroma crush on the cover soil, not a leftover vendor-plane salmon shader.
+Vision captions keep reporting a salmon horizon after V3. Scanline RGB does not on V4/V5. V2/V3 still have a warm band at y≈447; V4/V5 do not.
 
-## V5 correction (responds to V4 gray soil)
+Soil_Loose raw albedo averages ~139,123,105. Isolated lookdev PASS averages ~99,94,86. Locked-camera cover sits near 50–60 gray. Lighting is crushing chroma; cover grade must preserve the native R>G>B ratio and not darken the map.
 
-- Raise soil HSV saturation/value and reduce the near-black mix so earth survives cool HDRI/AgX
-- Map twigs to Corylus bark, not green `Stem_Diffuse`
-- Slightly larger hero litter clusters
+## V6 correction (responds to V5 mauve-gray)
+
+- Hue 0.50 (no red shift), sat 1.18, value 1.08
+- Light mix toward (0.16, 0.13, 0.09) so blue bounce cannot neutralize earth
 
 `forestMaterialsProductionReady=false`. Lighting stays gated.
