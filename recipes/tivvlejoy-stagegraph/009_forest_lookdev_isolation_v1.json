@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_RECIPE_V1",
+  "id": "FOREST_LOOKDEV_ISOLATION_GATE_V1",
+  "title": "Isolate production materials under neutral studio lighting",
+  "geometryRebuilt": false,
+  "purchasedAssetsPreserved": true,
+  "cameraChanged": false,
+  "animationRendered": false,
+  "paidCreate": false,
+  "proof": {
+    "resolution": [960, 720],
+    "stills": [
+      "LOOKDEV_BARK_V1",
+      "LOOKDEV_GROUND_V1",
+      "LOOKDEV_BUSH_V1",
+      "LOOKDEV_LEAF_V1",
+      "LOOKDEV_GRASS_FLOWER_V1"
+    ],
+    "samples": 24,
+    "device": "CPU"
+  }
+}
