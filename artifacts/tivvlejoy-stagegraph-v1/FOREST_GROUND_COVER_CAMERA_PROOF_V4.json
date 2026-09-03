@@ -1,0 +1,274 @@
+{
+  "bytes": 1430683,
+  "cameraChanged": false,
+  "composition": {
+    "cameraLensMm": 42.0,
+    "cameraLocation": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "cameraLookAt": [
+      0.0,
+      9.5,
+      2.6
+    ],
+    "fillLocation": [
+      0.0,
+      -4.0,
+      8.0
+    ],
+    "placed": {
+      "bushes": 24,
+      "fallenLeaves": 65,
+      "ferns": 28,
+      "floral": 16,
+      "grass": 70,
+      "trees": 14
+    },
+    "sceneLayoutUnchanged": true,
+    "seed": 7301,
+    "sunRotationDeg": [
+      58.0,
+      -8.0,
+      -42.0
+    ]
+  },
+  "compositionChanged": false,
+  "device": "CPU",
+  "dimensions": [
+    1280,
+    720
+  ],
+  "groundCover": {
+    "applied": true,
+    "backgroundVegetationChanged": false,
+    "cameraChanged": false,
+    "compositionChanged": false,
+    "counts": {
+      "litterLeaves": 59,
+      "litterPatches": 40,
+      "mossClumps": 8,
+      "mossPatches": 12,
+      "needlePatches": 10,
+      "rocks": 8,
+      "soilPatches": 970,
+      "twigs": 17,
+      "understory": 6
+    },
+    "coverClearanceZ": 0.034,
+    "feature": "forest_camera_ground_cover_v1",
+    "floralCardZ": 0.015,
+    "footprint": {
+      "farY": 36.0,
+      "heroY": 8.0,
+      "midY": 18.0,
+      "xMax": 40.0,
+      "xMin": -40.0,
+      "yMax": 100.0,
+      "yMin": -5.0
+    },
+    "lightingChanged": false,
+    "schema": "TIVVLEJOY_FOREST_CAMERA_GROUND_COVER_APPLY_V1",
+    "sources": {
+      "litter": "irregular Fallen_Leaves_Autumn patches + sparse ovate Corylus",
+      "moss": "Moss_Diffuse patches + low Rhytidiadelphus clumps",
+      "needles": "bq_Ground_Fallen_Needles_Diffuse.jpg",
+      "rock": "bq_Rock_Granite_A_spring-summer-autumn.blend",
+      "soil": "bq_Soil_Loose_Diffuse.jpg",
+      "soilRough": "bq_Soil_Rough_Diffuse.jpg",
+      "twig": "bq_Twig_Tilia-europaea_A_spring-summer-autumn.blend"
+    },
+    "terrainChanged": false,
+    "vendorGroundHiddenAfterCover": true,
+    "vendorGroundShaderChanged": false,
+    "waterChanged": false
+  },
+  "lightingChanged": false,
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_GROUND_COVER_CAMERA_PROOF_V4.png",
+  "placed": {
+    "bushes": 24,
+    "fallenLeaves": 65,
+    "ferns": 28,
+    "floral": 16,
+    "grass": 70,
+    "trees": 14
+  },
+  "production": {
+    "applied": true,
+    "barkKind": "tilia",
+    "blocked": false,
+    "cameraChanged": false,
+    "compositionChanged": false,
+    "feature": "forest_botaniq_production_recovery_v1",
+    "leafAlphaSource": "Corylus PNG alpha",
+    "lightingChanged": false,
+    "lookdev": {},
+    "production": {
+      "atmosphere": {
+        "bottomVerts": 0,
+        "lifted": true,
+        "zMin": 0.28
+      },
+      "carpet": {
+        "enabled": false,
+        "reason": "CAMERA_V2_DECALS_READ_AS_GRAY_TILES"
+      },
+      "floorArchitecture": "in_place_subdivided_uv",
+      "ground": true,
+      "productionFloor": "TJ_VendorGround",
+      "trees": {
+        "treeObjects": 14,
+        "uniqueMeshes": 9,
+        "unwraps": [
+          {
+            "aspect": 4.0,
+            "circumference": 28.2467,
+            "faces": 2155,
+            "height": 22.2309,
+            "object": "Tree_2_005.001",
+            "radius": 4.4956,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 34.7651,
+            "faces": 2146,
+            "height": 21.9991,
+            "object": "Tree_2_003.001",
+            "radius": 5.533,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 48.332,
+            "faces": 2892,
+            "height": 18.5497,
+            "object": "Tree_5_004.001",
+            "radius": 7.6923,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 17.5976,
+            "faces": 1975,
+            "height": 24.922,
+            "object": "Tree_4_006.001",
+            "radius": 2.8007,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 18.7256,
+            "faces": 2976,
+            "height": 23.8851,
+            "object": "Tree_1_004.001",
+            "radius": 2.9803,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 10.0133,
+            "faces": 2431,
+            "height": 23.9137,
+            "object": "Tree_1_002.001",
+            "radius": 1.5937,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 12.1169,
+            "faces": 2099,
+            "height": 25.6376,
+            "object": "Tree_3_006.001",
+            "radius": 1.9285,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 37.1189,
+            "faces": 1587,
+            "height": 25.2368,
+            "object": "Tree_2_002.001",
+            "radius": 5.9077,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          },
+          {
+            "aspect": 4.0,
+            "circumference": 18.3758,
+            "faces": 2291,
+            "height": 22.626,
+            "object": "Tree_1_003.001",
+            "radius": 2.9246,
+            "seam": "+Y",
+            "worldHeight": 3.4,
+            "worldWidth": 0.85
+          }
+        ]
+      },
+      "vegetation": {
+        "backgroundPreserved": {
+          "bushes": 5,
+          "fallenLeaves": 5,
+          "ferns": 6,
+          "floral": 2,
+          "grass": 14
+        },
+        "clustered": {
+          "bushes": 1,
+          "ferns": 8,
+          "grass": 16
+        },
+        "replaced": {
+          "bushes": 19,
+          "fallenLeaves": 60,
+          "ferns": 22,
+          "floral": 14,
+          "grass": 56
+        }
+      },
+      "vendorGroundHidden": false
+    },
+    "purchasedAssetsPreserved": true,
+    "schema": "TIVVLEJOY_BOTANIQ_FOREST_PRODUCTION_RECOVERY_APPLY_V1",
+    "shrubMaterialLocalized": true,
+    "terrainChanged": false,
+    "waterChanged": false
+  },
+  "productionCamera": {
+    "cameraChanged": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ]
+  },
+  "result": "RENDERED",
+  "samples": 20,
+  "schema": "TIVVLEJOY_FOREST_CAMERA_GROUND_COVER_PROOF_V1",
+  "seconds": 388.0,
+  "sha256": "ba9c2cbc054fa6839fd05ace65f203c7dc55d57ed080835f1be3ace2e50b8220",
+  "terrainChanged": false,
+  "vendorGroundShaderChanged": false,
+  "visualApproval": false,
+  "waterChanged": false
+}

@@ -32,8 +32,6 @@ from forest_botaniq_production_recovery_v1 import (
     SOIL_ALBEDO,
     SOIL_NORMAL,
     SOIL_ROUGH_ALBEDO,
-    STEM_ALBEDO,
-    STEM_NORMAL,
     _instance_like,
     fern_albedo_path,
     leaf_albedo_path,
@@ -139,15 +137,18 @@ def make_soil_cover_material(name: str = "TJ_CoverSoil_Loose_V1", albedo=None, n
     tex = nodes.new("ShaderNodeTexImage")
     tex.image = _load_image(albedo or SOIL_ALBEDO, "sRGB")
     links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+    # V4 crushed chroma (sat 0.78, value 0.34, near-black mix) and the
+    # locked camera floor read RGB ~66,64,67. Boost warmth so earth survives
+    # cool HDRI/AgX without returning to V1 terracotta.
     graded = _grade_albedo(
         nodes,
         links,
         tex.outputs["Color"],
-        hue=0.40,
-        sat=0.78,
-        value=0.34,
-        grade=(0.09, 0.055, 0.028),
-        mix_fac=0.48,
+        hue=0.38,
+        sat=1.25,
+        value=0.58,
+        grade=(0.18, 0.10, 0.04),
+        mix_fac=0.32,
     )
     links.new(graded, shader.inputs["Base Color"])
     shader.inputs["Roughness"].default_value = 0.93
@@ -464,11 +465,13 @@ def apply_camera_ground_cover(scene) -> dict:
     needle_mat = make_needle_patch_material()
     moss_mat = make_moss_patch_material()
     rock_mat = make_opaque_pbr("TJ_CoverRock_Granite_V1", ROCK_ALBEDO, ROCK_NORMAL, 0.78, mapping="object")
+    # Stem_Diffuse is saturated green grass tissue. Twigs must read as wood.
     stem_mat = make_opaque_pbr(
         "TJ_CoverTwig_V1",
-        STEM_ALBEDO if STEM_ALBEDO.is_file() else CORYLUS_BARK_ALBEDO,
-        STEM_NORMAL or CORYLUS_BARK_NORMAL,
-        0.7,
+        CORYLUS_BARK_ALBEDO,
+        CORYLUS_BARK_NORMAL,
+        0.78,
+        mapping="object",
     )
 
     moss_a = _append_named(MOSS_A, "bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn")
@@ -519,14 +522,14 @@ def apply_camera_ground_cover(scene) -> dict:
         make_irregular_patch(collection, f"TJ_CoverSoil_{index:03d}", (x, y), radius, rot, mat, rng)
         counts["soilPatches"] += 1
 
-    for c_index, (cx, cy) in enumerate(_cluster_centers(rng, 16, -1.4, 16.0)):
-        pile = rng.randint(2, 3)
+    for c_index, (cx, cy) in enumerate(_cluster_centers(rng, 20, -1.8, 16.0)):
+        pile = rng.randint(2, 4)
         for piece in range(pile):
             make_irregular_patch(
                 collection,
                 f"TJ_CoverLitterPatch_{c_index:02d}_{piece:02d}",
                 (cx + rng.uniform(-0.55, 0.55), cy + rng.uniform(-0.55, 0.55)),
-                rng.uniform(0.55, 1.05),
+                rng.uniform(0.70, 1.35),
                 rng.uniform(-math.pi, math.pi),
                 litter_mat,
                 rng,
