@@ -10,16 +10,17 @@ branch=cursor/tivvlejoy-botaniq-forest-production-recovery-eed2
 - Created `assets/inbox/ground/` repo-side intake marker files.
 - Added `.gitattributes` so `assets/inbox/ground/*.zip` is tracked with Git LFS.
 - Updated `assets/inbox/ground/.gitignore` to allow only manifest files and ZIP intake files.
-- Added `TIVVLEJOY_GROUND_PACKS_MANIFEST.md` with expected sizes, SHA256 hashes, contents, and registry IDs.
+- Added `TIVVLEJOY_GROUND_PACKS_MANIFEST.md` with expected sizes, SHA256 hashes, contents, registry IDs, and saved copy IDs.
+- Saved clean copies in ChatGPT Library.
 - Created a local Git LFS commit successfully in Codex scratch.
 
 ## Verified ZIPs
 
-| File | Size | SHA256 |
-| --- | ---: | --- |
-| `dirt_4k.blend.zip` | 75,865,762 bytes | `126184ec4cb24629b970c81053630ca4ff7be65e07d5af604c3495b5dd27f855` |
-| `sparse_grass_4k.blend.zip` | 107,110,182 bytes | `a7c199590a03f45bb8c00c44fb6b77096b107fc2cd075019b30ea590bbf64327` |
-| `grass_path_2_4k.blend.zip` | 57,953,894 bytes | `73658d129d9572d058aa0525e9bcbecc3e39a7d172025396674570e951ba9d9c` |
+| File | Size | SHA256 | Library file ID |
+| --- | ---: | --- | --- |
+| `dirt_4k.blend.zip` | 75,853,439 bytes | `126184ec4cb24629b970c81053630ca4ff7be65e07d5af604c3495b5dd27f855` | `libfile_8d0fb7b9668c8191badaf5b89537a699` |
+| `sparse_grass_4k.blend.zip` | 107,103,973 bytes | `a7c199590a03f45bb8c00c44fb6b77096b107fc2cd075019b30ea590bbf64327` | `libfile_c145793538608191a906c25f81e572a4` |
+| `grass_path_2_4k.blend.zip` | 57,949,131 bytes | `73658d129d9572d058aa0525e9bcbecc3e39a7d172025396674570e951ba9d9c` | `libfile_09c98cfcd9008191b096889e88c001e1` |
 
 ## Blocker
 
