@@ -269,6 +269,15 @@ def suppress_ecokit_visual_noise(scene) -> list[dict]:
             "forest_lookdev_isolation_v1",
         }:
             continue
+        if obj.name.startswith("TJ_ProdFlower"):
+            obj.hide_render = True
+            obj["tj_feature"] = "forest_ecokit_noise_hidden"
+            hidden.append({
+                "name": obj.name,
+                "reason": "prod_flower_rainbow_card",
+                "y": round(float(obj.location.y), 4),
+            })
+            continue
         if obj.name.startswith("TJ_"):
             continue
         low = obj.name.lower()
