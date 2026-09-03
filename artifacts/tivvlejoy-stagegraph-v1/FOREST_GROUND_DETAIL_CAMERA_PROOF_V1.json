@@ -1,0 +1,248 @@
+{
+  "cameraChanged": false,
+  "cinematicLightingStarted": false,
+  "compositionChanged": false,
+  "detail": {
+    "applied": true,
+    "counts": {
+      "litterLeaves": 90,
+      "mossClumps": 6,
+      "needleLeaves": 35,
+      "pebbles": 5,
+      "twigs": 10
+    },
+    "feature": "forest_ground_detail_recovery_v1",
+    "lightingLocked": true,
+    "litterArchitectureAfter": "physical ovate Corylus/autumn clusters + needle strips",
+    "mossArchitectureAfter": "low Rhytidiadelphus clumps in damp/rock niches only",
+    "schema": "TIVVLEJOY_FOREST_GROUND_DETAIL_APPLY_V1",
+    "soilArchitecturePreserved": true,
+    "stampsHidden": [
+      "TJ_CoverLitterPatch_00_00",
+      "TJ_CoverLitterPatch_00_01",
+      "TJ_CoverLitterPatch_01_00",
+      "TJ_CoverLitterPatch_01_01",
+      "TJ_CoverLitterPatch_02_00",
+      "TJ_CoverLitterPatch_02_01",
+      "TJ_CoverLitterPatch_02_02",
+      "TJ_CoverLitterPatch_02_03",
+      "TJ_CoverLitterPatch_03_00",
+      "TJ_CoverLitterPatch_03_01",
+      "TJ_CoverLitterPatch_04_00",
+      "TJ_CoverLitterPatch_04_01",
+      "TJ_CoverLitterPatch_04_02",
+      "TJ_CoverLitterPatch_05_00",
+      "TJ_CoverLitterPatch_05_01",
+      "TJ_CoverLitterPatch_05_02",
+      "TJ_CoverLitterPatch_06_00",
+      "TJ_CoverLitterPatch_06_01",
+      "TJ_CoverLitterPatch_07_00",
+      "TJ_CoverLitterPatch_07_01",
+      "TJ_CoverLitterPatch_08_00",
+      "TJ_CoverLitterPatch_08_01",
+      "TJ_CoverLitterPatch_08_02",
+      "TJ_CoverLitterPatch_08_03",
+      "TJ_CoverLitterPatch_09_00",
+      "TJ_CoverLitterPatch_09_01",
+      "TJ_CoverLitterPatch_09_02",
+      "TJ_CoverLitterPatch_10_00",
+      "TJ_CoverLitterPatch_10_01",
+      "TJ_CoverLitterPatch_10_02",
+      "TJ_CoverLitterPatch_10_03",
+      "TJ_CoverLitterPatch_11_00",
+      "TJ_CoverLitterPatch_11_01",
+      "TJ_CoverLitterPatch_12_00",
+      "TJ_CoverLitterPatch_12_01",
+      "TJ_CoverLitterPatch_12_02",
+      "TJ_CoverLitterPatch_13_00",
+      "TJ_CoverLitterPatch_13_01",
+      "TJ_CoverLitterPatch_13_02",
+      "TJ_CoverLitterPatch_13_03",
+      "TJ_CoverLitterPatch_14_00",
+      "TJ_CoverLitterPatch_14_01",
+      "TJ_CoverLitterPatch_15_00",
+      "TJ_CoverLitterPatch_15_01",
+      "TJ_CoverLitterPatch_15_02",
+      "TJ_CoverLitterPatch_15_03",
+      "TJ_CoverLitterPatch_16_00",
+      "TJ_CoverLitterPatch_16_01",
+      "TJ_CoverLitterPatch_16_02",
+      "TJ_CoverLitterPatch_16_03",
+      "TJ_CoverLitterPatch_17_00",
+      "TJ_CoverLitterPatch_17_01",
+      "TJ_CoverLitterPatch_17_02",
+      "TJ_CoverLitterPatch_17_03",
+      "TJ_CoverLitterPatch_18_00",
+      "TJ_CoverLitterPatch_18_01",
+      "TJ_CoverLitterPatch_19_00",
+      "TJ_CoverLitterPatch_19_01",
+      "TJ_CoverLitterPatch_19_02",
+      "TJ_CoverNeedlePatch_00",
+      "TJ_CoverNeedlePatch_01",
+      "TJ_CoverNeedlePatch_02",
+      "TJ_CoverNeedlePatch_03",
+      "TJ_CoverNeedlePatch_04",
+      "TJ_CoverNeedlePatch_05",
+      "TJ_CoverNeedlePatch_06",
+      "TJ_CoverNeedlePatch_07",
+      "TJ_CoverNeedlePatch_08",
+      "TJ_CoverNeedlePatch_09",
+      "TJ_CoverMossPatch_00",
+      "TJ_CoverMossPatch_01",
+      "TJ_CoverMossPatch_02",
+      "TJ_CoverMossPatch_03",
+      "TJ_CoverMossPatch_04",
+      "TJ_CoverMossPatch_05",
+      "TJ_CoverMossPatch_06",
+      "TJ_CoverMossPatch_07",
+      "TJ_CoverMossPatch_08",
+      "TJ_CoverMossPatch_09",
+      "TJ_CoverMossPatch_10",
+      "TJ_CoverMossPatch_11"
+    ]
+  },
+  "groundCoverArchitectureChanged": false,
+  "lightingLocked": {
+    "bounceColor": [
+      0.78,
+      0.82,
+      0.7
+    ],
+    "bounceEnergy": 210.0,
+    "class": "locked_v3",
+    "exposure": 1.1,
+    "fillColor": [
+      0.82,
+      0.78,
+      0.7
+    ],
+    "fillEnergy": 520.0,
+    "gamma": 1.06,
+    "hdriStrength": 0.12,
+    "hideBounce": false,
+    "hideRim": false,
+    "look": "None",
+    "neutralWorld": false,
+    "rimEnergy": 1.85,
+    "sunColor": [
+      1.0,
+      0.76,
+      0.55
+    ],
+    "sunEnergy": 5.4,
+    "viewTransform": "AgX"
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "productionCamera": {
+    "cameraChanged": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ]
+  },
+  "rainbowSpeckObjectsHidden": [
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_00",
+      "y": 3.4118,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_01",
+      "y": 4.8322,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_02",
+      "y": 9.4829,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_03",
+      "y": 3.9144,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_04",
+      "y": 4.9234,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_05",
+      "y": 16.606,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_06",
+      "y": 16.83,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_07",
+      "y": 14.287,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_08",
+      "y": 8.6725,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_09",
+      "y": 15.3499,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_10",
+      "y": 13.0079,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_11",
+      "y": 11.2476,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_12",
+      "y": 6.4523,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_13",
+      "y": 3.6807,
+      "zone": "foreground"
+    }
+  ],
+  "result": "RENDERED",
+  "samples": 20,
+  "schema": "TIVVLEJOY_FOREST_GROUND_DETAIL_PROOF_V1",
+  "still": {
+    "bytes": 1500877,
+    "dimensions": [
+      1280,
+      720
+    ],
+    "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_GROUND_DETAIL_CAMERA_PROOF_V1.png",
+    "seconds": 396.91,
+    "sha256": "3013d9beba4a9dd2c18a38b4df33a16cfc6a35664ae335f995e4d6041923fd4f"
+  },
+  "terrainChanged": false,
+  "visualApproval": true,
+  "waterChanged": false
+}
