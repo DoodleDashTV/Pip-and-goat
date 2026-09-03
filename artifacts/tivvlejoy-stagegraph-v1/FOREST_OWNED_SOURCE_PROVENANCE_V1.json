@@ -68,7 +68,7 @@
       "productionObject": "TJ_ProdForestFloor",
       "modification": "layered world-space mix; vendor solid-color plane hidden",
       "isolatedStatus": "PASS",
-      "cameraStatus": "PENDING_OVERLAY_PROOF"
+      "cameraStatus": "FAIL_SOLID_COLOR_AT_LOCKED_CAMERA"
     },
     {
       "role": "backgroundCards",
