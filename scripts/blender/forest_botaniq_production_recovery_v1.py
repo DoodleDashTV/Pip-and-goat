@@ -333,17 +333,18 @@ def make_ground_material():
     nodes = material.node_tree.nodes
     links = material.node_tree.links
     shader, _output = _principled(nodes, links)
-    coord = nodes.new("ShaderNodeTexCoord")
-    # Object space: 1 UV tile \u2248 2.2 m so a 2 m lookdev patch still shows soil structure.
+    geom = nodes.new("ShaderNodeNewGeometry")
+    # World metres, not object-local: the production ground is a scaled unit
+    # plane, so Object coords collapse the whole forest to one terracotta sample.
     soil_map = nodes.new("ShaderNodeMapping")
-    soil_map.inputs["Scale"].default_value = (0.45, 0.45, 0.45)
+    soil_map.inputs["Scale"].default_value = (0.42, 0.42, 0.42)
     litter_map = nodes.new("ShaderNodeMapping")
-    litter_map.inputs["Scale"].default_value = (0.38, 0.38, 0.38)
+    litter_map.inputs["Scale"].default_value = (0.34, 0.34, 0.34)
     litter_map.inputs["Rotation"].default_value = (0.0, 0.0, 0.35)
     moss_map = nodes.new("ShaderNodeMapping")
-    moss_map.inputs["Scale"].default_value = (0.70, 0.70, 0.70)
+    moss_map.inputs["Scale"].default_value = (0.58, 0.58, 0.58)
     for mapping in (soil_map, litter_map, moss_map):
-        links.new(coord.outputs["Object"], mapping.inputs["Vector"])
+        links.new(geom.outputs["Position"], mapping.inputs["Vector"])
     soil = nodes.new("ShaderNodeTexImage")
     soil.image = _load_image(SOIL_ALBEDO if SOIL_ALBEDO.is_file() else SOIL_ROUGH_ALBEDO, "sRGB")
     soil_n = nodes.new("ShaderNodeTexImage")
@@ -388,8 +389,8 @@ def make_ground_material():
     moss_noise = nodes.new("ShaderNodeTexNoise")
     moss_noise.inputs["Scale"].default_value = 1.35
     moss_noise.inputs["Detail"].default_value = 6.0
-    links.new(coord.outputs["Object"], litter_noise.inputs["Vector"])
-    links.new(coord.outputs["Object"], moss_noise.inputs["Vector"])
+    links.new(geom.outputs["Position"], litter_noise.inputs["Vector"])
+    links.new(geom.outputs["Position"], moss_noise.inputs["Vector"])
     litter_ramp = nodes.new("ShaderNodeValToRGB")
     litter_ramp.color_ramp.elements[0].position = 0.28
     litter_ramp.color_ramp.elements[1].position = 0.58

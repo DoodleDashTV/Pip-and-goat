@@ -34,6 +34,8 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("cylindrical_unwrap_trunk_faces", source)
         self.assertIn("bq_Soil_Loose_Diffuse", source)
         self.assertIn("ensure_cutout_png", source)
+        self.assertIn("ShaderNodeNewGeometry", source)
+        self.assertIn("Position", source)
         self.assertIn("_exile", source)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", source)
 
