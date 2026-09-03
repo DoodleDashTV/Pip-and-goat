@@ -8,7 +8,6 @@
   "startingBranch": "cursor/tivvlejoy-cinematic-forest-lighting-7f52",
   "startingHead": "93fc9c9bb4964b6dc3ee3fb51bb979487b507ef8",
   "endingBranch": "cursor/tivvlejoy-cinematic-forest-lighting-7f52",
-  "endingHeadPendingCommit": true,
   "barkArchitectureBefore": "TreeTrunk_Mat_1 vendor group: Tree Trunk_1.png in Base Color through Bright/Contrast; clay/plastic trunks",
   "barkArchitectureAfter": "TJ_ProdTrunk_* wrapper: vendor wood Color albedo; Tree Trunk_1.png Non-Color MapRange->Bump+Roughness; Object-mapped",
   "barkTextureColorSpace": "Non-Color",
@@ -74,5 +73,6 @@
     "No cinematic grazing-light hierarchy; shadows do not describe form"
   ],
   "blocker": "NONE",
-  "nextAction": "Keep the Color_1+mask / Non-Color-bark architecture and build a locked-camera grazing-key bark light that makes Tree Trunk_1 relief visible without raising exposure or adding a frontal fill."
+  "nextAction": "Keep the Color_1+mask / Non-Color-bark architecture and build a locked-camera grazing-key bark light that makes Tree Trunk_1 relief visible without raising exposure or adding a frontal fill.",
+  "endingHead": "d2a79c9bfdc7b809a20f504752c97365839c55e0"
 }
