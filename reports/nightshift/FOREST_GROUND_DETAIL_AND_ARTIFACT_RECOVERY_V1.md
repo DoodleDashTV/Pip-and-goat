@@ -72,7 +72,7 @@ No terrain, creek, camera, lighting, or vegetation-architecture rebuild.
 |---|---|---|---|
 | OBJECT_ID_V1 | `56cdc63ea8e325ac2102f642426b5bb8170921afc31128dd4790946a95d1b23e` | DIAGNOSTIC | magenta = ProdFlower specks |
 | GROUND_DETAIL_V1 | `3013d9beba4a9dd2c18a38b4df33a16cfc6a35664ae335f995e4d6041923fd4f` | PASS | specks gone; gray stamps gone; physical litter/twigs/pebbles readable |
-| MATERIAL_RECOVERY_V3 | rendered after V1 PASS | five-material review | bark/ground/shrub/leaf/grass-fern |
+| MATERIAL_RECOVERY_V3 | `204b214d2811c0a9b254ca8b26cfa54b156a4cdb17fee45ee7ebcf3f34b3ce76` | PASS | Same locked-camera production still as ground-detail V1 (pixel MAD=0). Bark/ground/shrub/leaf/grass-fern all PASS. |
 
 All 1280×720, locked camera, 20 samples, unpaid CPU. V1 vs V3 extreme-foreground soil scanline y=680 is identical RGB 129.7/113.2/92.9 — lighting and soil foundation unchanged. Stamp-removal sites around y=635 move from gray ~76–89 to brown earth/litter ~120–139.
 
