@@ -39,10 +39,10 @@ COLLECTION_NAME = "TJ_CAMERA_GROUND_COVER_V1"
 
 # Visible floor from TJ_VendorReference_Camera at (0, -12.5, 2.15), 42 mm.
 FOOTPRINT = {
-    "xMin": -9.2,
-    "xMax": 9.2,
-    "yMin": -2.4,
-    "yMax": 30.0,
+    "xMin": -16.0,
+    "xMax": 16.0,
+    "yMin": -5.0,
+    "yMax": 32.0,
     "heroY": 8.0,
     "midY": 18.0,
 }
@@ -101,15 +101,15 @@ def make_soil_cover_material():
     shader, _output = _principled(nodes, links)
     coord = nodes.new("ShaderNodeTexCoord")
     mapping = nodes.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (0.55, 0.55, 0.55)
-    links.new(coord.outputs["Object"], mapping.inputs["Vector"])
+    mapping.inputs["Scale"].default_value = (0.85, 0.85, 0.85)
+    links.new(coord.outputs["UV"], mapping.inputs["Vector"])
     tex = nodes.new("ShaderNodeTexImage")
     tex.image = _load_image(SOIL_ALBEDO, "sRGB")
     links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Hue"].default_value = 0.46
-    hsv.inputs["Saturation"].default_value = 0.42
-    hsv.inputs["Value"].default_value = 0.34
+    hsv.inputs["Hue"].default_value = 0.48
+    hsv.inputs["Saturation"].default_value = 0.58
+    hsv.inputs["Value"].default_value = 0.52
     links.new(tex.outputs["Color"], hsv.inputs["Color"])
     links.new(hsv.outputs["Color"], shader.inputs["Base Color"])
     shader.inputs["Roughness"].default_value = 0.92
@@ -274,21 +274,21 @@ def _place_source(source, collection, location, name, scale, rotation_z):
 
 def _soil_sites(rng) -> list[tuple[float, float, float, float]]:
     sites = []
-    spacing = 1.55
+    spacing = 1.35
     y = FOOTPRINT["yMin"]
     row = 0
     while y <= FOOTPRINT["yMax"]:
-        x = FOOTPRINT["xMin"] + (0.42 if row % 2 else 0.0)
+        x = FOOTPRINT["xMin"] + (0.55 if row % 2 else 0.0)
         while x <= FOOTPRINT["xMax"]:
-            px = x + rng.uniform(-0.38, 0.38)
-            py = y + rng.uniform(-0.38, 0.38)
+            px = x + rng.uniform(-0.28, 0.28)
+            py = y + rng.uniform(-0.28, 0.28)
             if in_footprint(px, py):
-                radius = rng.uniform(1.15, 1.85)
+                radius = rng.uniform(1.55, 2.25)
                 if py > FOOTPRINT["midY"]:
-                    radius *= 1.25
+                    radius *= 1.15
                 sites.append((px, py, radius, rng.uniform(-math.pi, math.pi)))
             x += spacing
-        y += spacing * 0.86
+        y += spacing * 0.78
         row += 1
     return sites
 
@@ -356,12 +356,9 @@ def apply_camera_ground_cover(scene) -> dict:
     twig_tilia = _append_named(TWIG_TILIA, "bq_Twig_Tilia-europaea_A_spring-summer-autumn")
     twig_oak = _append_named(TWIG_OAK, "bq_Twig_Quercus-robur_A_spring-summer-autumn")
     twig_spruce = _append_named(TWIG_SPRUCE, "bq_Twig_Picea-abies_A_spring-summer-autumn")
+    # V1: appended autumn leaf objects without vendor library materials
+    # rendered as rainbow/debug pixels. Keep ovate localized leaves only.
     autumn_objs = []
-    for leaf_name in AUTUMN_LEAVES:
-        obj = _append_named(FALLEN_B, leaf_name)
-        if obj is not None:
-            rebuild_appended_materials(obj, autumn_mat)
-            autumn_objs.append(obj)
 
     grass = bpy.data.objects.get("bq_Grass_Carex-oshimensis_A_spring")
     fern = bpy.data.objects.get("bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn")
@@ -443,15 +440,15 @@ def apply_camera_ground_cover(scene) -> dict:
         if not moss_sources:
             continue
         source = moss_sources[m_index % len(moss_sources)]
-        clump = rng.randint(4, 8)
+        clump = rng.randint(3, 5)
         for piece in range(clump):
-            sx = rng.uniform(9.5, 14.5)
+            sx = rng.uniform(5.5, 8.5)
             _place_source(
                 source,
                 collection,
-                (cx + rng.uniform(-0.28, 0.28), cy + rng.uniform(-0.28, 0.28), 0.011),
+                (cx + rng.uniform(-0.22, 0.22), cy + rng.uniform(-0.22, 0.22), 0.014),
                 f"TJ_CoverMoss_{m_index:02d}_{piece:02d}",
-                scale=(sx, sx, rng.uniform(3.2, 5.5)),
+                scale=(sx, sx, rng.uniform(1.8, 2.8)),
                 rotation_z=rng.uniform(-math.pi, math.pi),
             )
             counts["mossClumps"] += 1
