@@ -39,7 +39,7 @@ from vendor_reference_lookdev_v1 import apply_cycles_bounce_lift
 from vendor_reference_render_v1 import AUDIT_SHA256, SOURCE_SHA256, build_scene, png_dimensions
 
 SHOTS = (
-    ("LOOKDEV_BARK_PRODUCTION_V2", ("TJ_LookdevTrunk",), "trunk"),
+    ("LOOKDEV_BARK_PRODUCTION_V2", ("TJ_ProdLookdevBark",), "trunk"),
     ("LOOKDEV_GROUND_PRODUCTION_V2", ("TJ_LookdevGroundPatch", "TJ_LookdevLitter", "TJ_LookdevMossCard", "TJ_LookdevStone"), "ground"),
     ("LOOKDEV_BUSH_PRODUCTION_V2", ("TJ_LookdevBush",), "bush"),
     ("LOOKDEV_LEAF_PRODUCTION_V2", ("TJ_LookdevLeaf",), "leaf"),

@@ -715,11 +715,12 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         raise RuntimeError("LOOKDEV_COLLECTION_MISSING")
     ox, oy, oz = 90.0, 0.0, 0.0
 
-    existing_trunk = bpy.data.objects.get("TJ_LookdevTrunk")
-    if existing_trunk is not None:
-        existing_trunk.name = "TJ_HiddenEcoKitLookdevTrunk"
-        _hide(existing_trunk)
+    for obj in list(collection.objects):
+        if obj.name.startswith("TJ_LookdevTrunk"):
+            obj.name = "TJ_HiddenEcoKitLookdevTrunk"
+            _hide(obj)
     trunk = make_production_trunk_cylinder(collection, (ox, oy, oz), mats["bark"])
+    trunk.name = "TJ_ProdLookdevBark"
 
     for hidden_name, new_name in (
         ("TJ_LookdevBush", "TJ_HiddenEcoKitBush"),
@@ -764,7 +765,7 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         for slot in ground.material_slots:
             slot.link = "OBJECT"
             slot.material = mats["ground"]
-            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 14, 8, 4)
+            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 0, 6, 0)
 
     return {
         "trunk": None if trunk is None else trunk.name,
@@ -788,7 +789,7 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         "ground": make_ground_material(),
         "leaf": make_foliage_material("TJ_ProdLeaf_Corylus_V1", leaf_albedo_path(), LEAF_NORMAL, 0.22, clip=True),
         "litter": make_foliage_material("TJ_ProdLitterLeaf_V1", leaf_albedo_path(), LEAF_NORMAL, 0.10, clip=False),
-        "fern": make_foliage_material("TJ_ProdFern_V1", FERN_ALBEDO, FERN_NORMAL, 0.18, clip=True),
+        "fern": make_foliage_material("TJ_ProdFern_V1", FERN_ALBEDO, FERN_NORMAL, 0.18, clip=False),
         "moss": make_foliage_material("TJ_ProdMossCard_V1", MOSS_CARD, None, 0.08, clip=True),
         "flower": make_foliage_material("TJ_ProdFlower_V1", FLOWER_ALBEDO, FLOWER_NORMAL, 0.12, clip=True),
         "rock": make_opaque_pbr("TJ_ProdRock_Granite_V1", ROCK_ALBEDO, ROCK_NORMAL, 0.76),
