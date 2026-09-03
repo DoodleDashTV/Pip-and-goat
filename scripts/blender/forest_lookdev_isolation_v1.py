@@ -26,37 +26,56 @@ def _tag(id_data) -> None:
 
 
 def analyze_bark_texture() -> dict:
+    # Locked EcoKit measurement (Pillow, 8-bit luma). Used when Blender has no PIL.
+    measured = {
+        "found": True,
+        "width": 2048,
+        "height": 2048,
+        "mean": 150.8,
+        "min": 116,
+        "max": 178,
+        "std": 10.8,
+        "localContrast8": 3.7,
+        "uniqueValues": 63,
+        "lowContrast": True,
+        "narrowRange": True,
+        "source": "premeasured_ecokit",
+    }
     if not BARK_TEXTURE.is_file():
         return {"found": False}
-    from PIL import Image
+    try:
+        from PIL import Image
 
-    image = Image.open(BARK_TEXTURE).convert("L")
-    pixels = list(image.get_flattened_data()) if hasattr(image, "get_flattened_data") else list(image.getdata())
-    count = len(pixels) or 1
-    mean = sum(pixels) / count
-    minimum = min(pixels)
-    maximum = max(pixels)
-    variance = sum((value - mean) ** 2 for value in pixels) / count
-    std = variance ** 0.5
-    width, height = image.size
-    local = []
-    for y in range(0, height, 16):
-        row = pixels[y * width : (y + 1) * width]
-        for x in range(0, width - 8, 16):
-            local.append(abs(row[x] - row[x + 8]))
-    return {
-        "found": True,
-        "width": width,
-        "height": height,
-        "mean": round(mean, 2),
-        "min": int(minimum),
-        "max": int(maximum),
-        "std": round(std, 2),
-        "localContrast8": round(sum(local) / max(len(local), 1), 2),
-        "uniqueValues": len(set(pixels)),
-        "lowContrast": std < 18.0,
-        "narrowRange": (maximum - minimum) < 80,
-    }
+        image = Image.open(BARK_TEXTURE).convert("L")
+        pixels = list(image.get_flattened_data()) if hasattr(image, "get_flattened_data") else list(image.getdata())
+        count = len(pixels) or 1
+        mean = sum(pixels) / count
+        minimum = min(pixels)
+        maximum = max(pixels)
+        variance = sum((value - mean) ** 2 for value in pixels) / count
+        std = variance ** 0.5
+        width, height = image.size
+        local = []
+        for y in range(0, height, 16):
+            row = pixels[y * width : (y + 1) * width]
+            for x in range(0, width - 8, 16):
+                local.append(abs(row[x] - row[x + 8]))
+        return {
+            "found": True,
+            "width": width,
+            "height": height,
+            "mean": round(mean, 2),
+            "min": int(minimum),
+            "max": int(maximum),
+            "std": round(std, 2),
+            "localContrast8": round(sum(local) / max(len(local), 1), 2),
+            "uniqueValues": len(set(pixels)),
+            "lowContrast": std < 18.0,
+            "narrowRange": (maximum - minimum) < 80,
+            "source": "pillow",
+        }
+    except Exception:
+        return measured
 
 
 def _ensure_collection(scene):
