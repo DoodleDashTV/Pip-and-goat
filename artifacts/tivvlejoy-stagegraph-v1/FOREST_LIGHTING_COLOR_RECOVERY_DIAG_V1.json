@@ -1,0 +1,540 @@
+{
+  "applies": {
+    "baseline": {
+      "cameraChanged": false,
+      "class": "baseline",
+      "compositionChanged": false,
+      "exposure": 0.6499999761581421,
+      "feature": "forest_lighting_color_recovery_v1",
+      "gamma": 1.059999942779541,
+      "groundCoverArchitectureChanged": false,
+      "lights": {
+        "bounce": {
+          "color": [
+            0.7799999713897705,
+            0.8199999928474426,
+            0.699999988079071
+          ],
+          "energy": 210.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_ClearingBounce"
+        },
+        "fill": {
+          "color": [
+            0.6200000047683716,
+            0.7400000095367432,
+            0.9200000166893005
+          ],
+          "energy": 520.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_SoftFill"
+        },
+        "rim": {
+          "color": [
+            0.6800000071525574,
+            0.800000011920929,
+            1.0
+          ],
+          "energy": 1.850000023841858,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_CanopyRim"
+        },
+        "sun": {
+          "color": [
+            1.0,
+            0.7599999904632568,
+            0.550000011920929
+          ],
+          "energy": 5.400000095367432,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_GoldenSun"
+        }
+      },
+      "look": "None",
+      "productionCamera": {
+        "cameraChanged": false,
+        "lensMm": 42.0,
+        "location": [
+          0.0,
+          -12.5,
+          2.15
+        ]
+      },
+      "schema": "TIVVLEJOY_FOREST_LIGHTING_VARIANT_APPLY_V1",
+      "terrainChanged": false,
+      "vegetationArchitectureChanged": false,
+      "viewTransform": "AgX",
+      "waterChanged": false,
+      "world": {
+        "found": true,
+        "neutralWorld": false,
+        "strength": 0.5799999833106995
+      }
+    },
+    "exposure": {
+      "cameraChanged": false,
+      "class": "exposure",
+      "compositionChanged": false,
+      "exposure": 1.399999976158142,
+      "feature": "forest_lighting_color_recovery_v1",
+      "gamma": 1.0,
+      "groundCoverArchitectureChanged": false,
+      "lights": {
+        "bounce": {
+          "color": [
+            0.7799999713897705,
+            0.8199999928474426,
+            0.699999988079071
+          ],
+          "energy": 210.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_ClearingBounce"
+        },
+        "fill": {
+          "color": [
+            0.6200000047683716,
+            0.7400000095367432,
+            0.9200000166893005
+          ],
+          "energy": 520.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_SoftFill"
+        },
+        "rim": {
+          "color": [
+            0.6800000071525574,
+            0.800000011920929,
+            1.0
+          ],
+          "energy": 1.850000023841858,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_CanopyRim"
+        },
+        "sun": {
+          "color": [
+            1.0,
+            0.7599999904632568,
+            0.550000011920929
+          ],
+          "energy": 5.400000095367432,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_GoldenSun"
+        }
+      },
+      "look": "None",
+      "productionCamera": {
+        "cameraChanged": false,
+        "lensMm": 42.0,
+        "location": [
+          0.0,
+          -12.5,
+          2.15
+        ]
+      },
+      "schema": "TIVVLEJOY_FOREST_LIGHTING_VARIANT_APPLY_V1",
+      "terrainChanged": false,
+      "vegetationArchitectureChanged": false,
+      "viewTransform": "AgX",
+      "waterChanged": false,
+      "world": {
+        "found": true,
+        "neutralWorld": false,
+        "strength": 0.5799999833106995
+      }
+    },
+    "keyfill": {
+      "cameraChanged": false,
+      "class": "keyfill",
+      "compositionChanged": false,
+      "exposure": 0.6499999761581421,
+      "feature": "forest_lighting_color_recovery_v1",
+      "gamma": 1.059999942779541,
+      "groundCoverArchitectureChanged": false,
+      "lights": {
+        "bounce": {
+          "color": [
+            0.7799999713897705,
+            0.8199999928474426,
+            0.699999988079071
+          ],
+          "energy": 50.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_ClearingBounce"
+        },
+        "fill": {
+          "color": [
+            0.6200000047683716,
+            0.7400000095367432,
+            0.9200000166893005
+          ],
+          "energy": 140.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_SoftFill"
+        },
+        "rim": {
+          "color": [
+            0.6800000071525574,
+            0.800000011920929,
+            1.0
+          ],
+          "energy": 1.850000023841858,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_CanopyRim"
+        },
+        "sun": {
+          "color": [
+            1.0,
+            0.7599999904632568,
+            0.550000011920929
+          ],
+          "energy": 5.400000095367432,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_GoldenSun"
+        }
+      },
+      "look": "None",
+      "productionCamera": {
+        "cameraChanged": false,
+        "lensMm": 42.0,
+        "location": [
+          0.0,
+          -12.5,
+          2.15
+        ]
+      },
+      "schema": "TIVVLEJOY_FOREST_LIGHTING_VARIANT_APPLY_V1",
+      "terrainChanged": false,
+      "vegetationArchitectureChanged": false,
+      "viewTransform": "AgX",
+      "waterChanged": false,
+      "world": {
+        "found": true,
+        "neutralWorld": false,
+        "strength": 0.5799999833106995
+      }
+    },
+    "neutral": {
+      "cameraChanged": false,
+      "class": "neutral_reference",
+      "compositionChanged": false,
+      "exposure": 0.0,
+      "feature": "forest_lighting_color_recovery_v1",
+      "gamma": 1.0,
+      "groundCoverArchitectureChanged": false,
+      "lights": {
+        "bounce": {
+          "color": [
+            0.7799999713897705,
+            0.8199999928474426,
+            0.699999988079071
+          ],
+          "energy": 0.0,
+          "found": true,
+          "hide_render": true,
+          "name": "TJ_ClearingBounce"
+        },
+        "fill": {
+          "color": [
+            0.8500000238418579,
+            0.8500000238418579,
+            0.8500000238418579
+          ],
+          "energy": 70.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_SoftFill"
+        },
+        "rim": {
+          "color": [
+            0.6800000071525574,
+            0.800000011920929,
+            1.0
+          ],
+          "energy": 0.0,
+          "found": true,
+          "hide_render": true,
+          "name": "TJ_CanopyRim"
+        },
+        "sun": {
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "energy": 4.199999809265137,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_GoldenSun"
+        }
+      },
+      "look": "None",
+      "productionCamera": {
+        "cameraChanged": false,
+        "lensMm": 42.0,
+        "location": [
+          0.0,
+          -12.5,
+          2.15
+        ]
+      },
+      "schema": "TIVVLEJOY_FOREST_LIGHTING_VARIANT_APPLY_V1",
+      "terrainChanged": false,
+      "vegetationArchitectureChanged": false,
+      "viewTransform": "AgX",
+      "waterChanged": false,
+      "world": {
+        "found": true,
+        "neutralWorld": true,
+        "strength": 0.14000000059604645
+      }
+    },
+    "world": {
+      "cameraChanged": false,
+      "class": "world",
+      "compositionChanged": false,
+      "exposure": 0.6499999761581421,
+      "feature": "forest_lighting_color_recovery_v1",
+      "gamma": 1.059999942779541,
+      "groundCoverArchitectureChanged": false,
+      "lights": {
+        "bounce": {
+          "color": [
+            0.7799999713897705,
+            0.8199999928474426,
+            0.699999988079071
+          ],
+          "energy": 210.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_ClearingBounce"
+        },
+        "fill": {
+          "color": [
+            0.6200000047683716,
+            0.7400000095367432,
+            0.9200000166893005
+          ],
+          "energy": 520.0,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_SoftFill"
+        },
+        "rim": {
+          "color": [
+            0.6800000071525574,
+            0.800000011920929,
+            1.0
+          ],
+          "energy": 1.850000023841858,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_CanopyRim"
+        },
+        "sun": {
+          "color": [
+            1.0,
+            0.7599999904632568,
+            0.550000011920929
+          ],
+          "energy": 5.400000095367432,
+          "found": true,
+          "hide_render": false,
+          "name": "TJ_GoldenSun"
+        }
+      },
+      "look": "None",
+      "productionCamera": {
+        "cameraChanged": false,
+        "lensMm": 42.0,
+        "location": [
+          0.0,
+          -12.5,
+          2.15
+        ]
+      },
+      "schema": "TIVVLEJOY_FOREST_LIGHTING_VARIANT_APPLY_V1",
+      "terrainChanged": false,
+      "vegetationArchitectureChanged": false,
+      "viewTransform": "AgX",
+      "waterChanged": false,
+      "world": {
+        "found": true,
+        "neutralWorld": false,
+        "strength": 0.07999999821186066
+      }
+    }
+  },
+  "baseline": {
+    "bounceColor": [
+      0.78,
+      0.82,
+      0.7
+    ],
+    "bounceEnergy": 210.0,
+    "exposure": 0.65,
+    "fillColor": [
+      0.62,
+      0.74,
+      0.92
+    ],
+    "fillEnergy": 520.0,
+    "gamma": 1.06,
+    "hdriStrength": 0.58,
+    "look": "None",
+    "lookdevId": "VENDOR_REFERENCE_LOOKDEV_EXPOSURE_REPAIR_V2",
+    "rimEnergy": 1.85,
+    "sunColor": [
+      1.0,
+      0.76,
+      0.55
+    ],
+    "sunEnergy": 5.4,
+    "viewTransform": "AgX"
+  },
+  "cameraChanged": false,
+  "colorManagementBefore": {
+    "exposure": 0.6499999761581421,
+    "gamma": 1.059999942779541,
+    "look": "None",
+    "viewTransform": "AgX"
+  },
+  "compositionChanged": false,
+  "device": "CPU",
+  "ecoKitNoiseRemoved": [
+    {
+      "name": "Tree_5_004.001",
+      "reason": "image",
+      "y": 7.8
+    },
+    {
+      "name": "Tree_5_004.002",
+      "reason": "image",
+      "y": 24.4
+    }
+  ],
+  "groundCover": {
+    "applied": true,
+    "backgroundVegetationChanged": false,
+    "cameraChanged": false,
+    "compositionChanged": false,
+    "counts": {
+      "litterLeaves": 76,
+      "litterPatches": 59,
+      "mossClumps": 8,
+      "mossPatches": 12,
+      "needlePatches": 10,
+      "rocks": 8,
+      "soilPatches": 970,
+      "twigs": 17,
+      "understory": 6
+    },
+    "coverClearanceZ": 0.034,
+    "feature": "forest_camera_ground_cover_v1",
+    "floralCardZ": 0.015,
+    "footprint": {
+      "farY": 36.0,
+      "heroY": 8.0,
+      "midY": 18.0,
+      "xMax": 40.0,
+      "xMin": -40.0,
+      "yMax": 100.0,
+      "yMin": -5.0
+    },
+    "lightingChanged": false,
+    "schema": "TIVVLEJOY_FOREST_CAMERA_GROUND_COVER_APPLY_V1",
+    "sources": {
+      "litter": "irregular Fallen_Leaves_Autumn patches + sparse ovate Corylus",
+      "moss": "Moss_Diffuse patches + low Rhytidiadelphus clumps",
+      "needles": "bq_Ground_Fallen_Needles_Diffuse.jpg",
+      "rock": "bq_Rock_Granite_A_spring-summer-autumn.blend",
+      "soil": "bq_Soil_Loose_Diffuse.jpg",
+      "soilRough": "bq_Soil_Rough_Diffuse.jpg",
+      "twig": "bq_Twig_Tilia-europaea_A_spring-summer-autumn.blend"
+    },
+    "terrainChanged": false,
+    "vendorGroundHiddenAfterCover": true,
+    "vendorGroundShaderChanged": false,
+    "waterChanged": false
+  },
+  "mode": "diagnose",
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "productionCamera": {
+    "cameraChanged": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ]
+  },
+  "result": "RENDERED",
+  "samples": 12,
+  "schema": "TIVVLEJOY_FOREST_LIGHTING_COLOR_RECOVERY_DIAG_V1",
+  "stills": {
+    "baseline": {
+      "bytes": 1430454,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_DIAG_BASELINE_V1.png",
+      "seconds": 233.01,
+      "sha256": "817a485d4515328db4ea7290df0499ab61c8c849d1b0842754203de199977d91"
+    },
+    "exposure": {
+      "bytes": 1497990,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_DIAG_EXPOSURE_V1.png",
+      "seconds": 231.21,
+      "sha256": "e02079cdc517de0014c716f3a1c73acac9c11842cc60fc6f47cf1a5e65677d9f"
+    },
+    "keyfill": {
+      "bytes": 1308509,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_DIAG_KEYFILL_V1.png",
+      "seconds": 809.4,
+      "sha256": "e1b7f2009c522903c0e8fc3ac08ecc48436e71a63f99e24c75694095de2d0ce0"
+    },
+    "neutral": {
+      "bytes": 935861,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_DIAG_NEUTRAL_REFERENCE_V1.png",
+      "seconds": 228.82,
+      "sha256": "90d64cd622de61ad77a00c9f6b0ed33f21bfd16467d1afe13ab7316d364256e7"
+    },
+    "world": {
+      "bytes": 1332993,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LIGHTING_DIAG_WORLD_V1.png",
+      "seconds": 230.33,
+      "sha256": "5e92dd5dd936967657e4065f11a0773c89d302e23bb246df79e30bf6254c10a2"
+    }
+  },
+  "terrainChanged": false,
+  "waterChanged": false
+}

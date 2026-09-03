@@ -232,22 +232,24 @@ def apply_lighting_variant(scene, variant: dict) -> dict:
     }
 
 
-def _uses_noise_image(obj) -> bool:
-    for slot in obj.material_slots:
-        material = slot.material
-        if material is None or not material.use_nodes or material.node_tree is None:
-            continue
-        stack = [material.node_tree]
-        while stack:
-            tree = stack.pop()
-            for node in tree.nodes:
-                image = getattr(node, "image", None)
-                name = (getattr(image, "name", "") or "").lower()
-                if image is not None and any(token in name for token in NOISE_IMAGE_TOKENS):
-                    return True
-                if node.type == "GROUP" and node.node_tree is not None:
-                    stack.append(node.node_tree)
+def _material_uses_noise_image(material) -> bool:
+    if material is None or not material.use_nodes or material.node_tree is None:
+        return False
+    stack = [material.node_tree]
+    while stack:
+        tree = stack.pop()
+        for node in tree.nodes:
+            image = getattr(node, "image", None)
+            name = (getattr(image, "name", "") or "").lower()
+            if image is not None and any(token in name for token in NOISE_IMAGE_TOKENS):
+                return True
+            if node.type == "GROUP" and node.node_tree is not None:
+                stack.append(node.node_tree)
     return False
+
+
+def _uses_noise_image(obj) -> bool:
+    return any(_material_uses_noise_image(slot.material) for slot in obj.material_slots)
 
 
 def suppress_ecokit_visual_noise(scene) -> list[dict]:
@@ -270,13 +272,22 @@ def suppress_ecokit_visual_noise(scene) -> list[dict]:
         if obj.name.startswith("TJ_"):
             continue
         low = obj.name.lower()
+        if low.startswith("tree_") or "tree_" in low:
+            continue
         name_hit = any(token in low for token in NOISE_NAME_TOKENS)
-        image_hit = _uses_noise_image(obj)
         leftover_floral = (
             low.startswith("floral_")
             and float(obj.location.y) < 18.0
             and feature != "forest_botaniq_hidden"
         )
+        # Firefly textures live on shared EcoKit library graphs. Only hide an
+        # object when every slot is a particle image, or the mesh is a flat card.
+        image_hit = False
+        if not name_hit and not leftover_floral and _uses_noise_image(obj):
+            slots = [slot.material for slot in obj.material_slots if slot.material]
+            noise_slots = sum(1 for material in slots if _material_uses_noise_image(material))
+            flat_card = max(obj.dimensions) > 0.01 and min(obj.dimensions) < 0.08
+            image_hit = bool(slots) and (noise_slots == len(slots) or (noise_slots and flat_card))
         if not (name_hit or image_hit or leftover_floral):
             continue
         obj.hide_render = True
