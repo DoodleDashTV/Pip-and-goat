@@ -24,6 +24,7 @@ from ecokit_cycles_alpha_v1 import (
 )
 from forest_botaniq_production_recovery_v1 import (
     apply_botaniq_production_recovery,
+    bind_production_ground,
     missing_owned_paths,
 )
 from forest_lookdev_isolation_v1 import (
@@ -259,6 +260,10 @@ def main():
     for obj in collection.objects:
         if obj.type == "MESH" and obj.get("tj_recovery"):
             obj.hide_render = True
+    ground = scene.objects.get("TJ_VendorGround") or __import__("bpy").data.objects.get("TJ_VendorGround")
+    ground_mat = __import__("bpy").data.materials.get("TJ_ProdGround_SoilLitterMoss_V1")
+    if ground is not None and ground_mat is not None:
+        bind_production_ground(ground, ground_mat)
     locks_after = verify_production_camera(scene)
     if scene.camera is None or scene.camera.name != camera.name:
         scene.camera = camera

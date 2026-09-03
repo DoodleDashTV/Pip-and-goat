@@ -37,6 +37,8 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("ShaderNodeNewGeometry", source)
         self.assertIn("Position", source)
         self.assertIn("_exile", source)
+        self.assertIn("bind_production_ground", source)
+        self.assertIn("user_remap", source)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", source)
 
     def test_required_owned_sources(self):

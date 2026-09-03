@@ -939,6 +939,39 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
     }
 
 
+def bind_production_ground(ground, material) -> dict:
+    """Replace the solid vendor groundColor on every user, not just one slot."""
+    import bpy
+
+    vendor = bpy.data.materials.get("TJ_VendorGround_Mat")
+    if vendor is not None and vendor != material:
+        try:
+            vendor.user_remap(material)
+        except Exception:
+            pass
+    if ground.data.materials:
+        ground.data.materials[0] = material
+    else:
+        ground.data.materials.append(material)
+    if not ground.material_slots:
+        ground.data.materials.append(material)
+    for slot in ground.material_slots:
+        slot.link = "OBJECT"
+        slot.material = material
+    ground.hide_render = False
+    ground.hide_viewport = False
+    try:
+        ground.hide_set(False)
+    except Exception:
+        pass
+    return {
+        "object": ground.name,
+        "material": material.name,
+        "vendorRemapped": bool(vendor is not None and vendor != material),
+        "slots": [slot.material.name if slot.material else None for slot in ground.material_slots],
+    }
+
+
 def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str = "tilia") -> dict:
     import bpy
 
@@ -975,13 +1008,7 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         veg = replace_ecokit_vegetation(root, shrub, grass, fern, mats["leaf"], mats["flower"], mats["litter"])
         ground = bpy.data.objects.get("TJ_VendorGround")
         if ground is not None:
-            if ground.data.materials:
-                ground.data.materials[0] = mats["ground"]
-            else:
-                ground.data.materials.append(mats["ground"])
-            for slot in ground.material_slots:
-                slot.link = "OBJECT"
-                slot.material = mats["ground"]
+            bind_production_ground(ground, mats["ground"])
             scatter_floor_geometry(root, (0.0, 3.5, 0.0), mats["litter"], mats["moss"], mats["rock"], 22, 10, 6)
         production = {"trees": trees, "vegetation": veg, "ground": ground is not None}
     if mode in {"lookdev", "both"}:
