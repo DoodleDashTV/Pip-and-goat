@@ -59,11 +59,11 @@ SKY_BLUE_LIFT = (0.10, 0.28, 0.72, 1.0)
 SKY_LIFT_FAC = 0.18
 GENERATED_SKY_PATH = Path("/tmp/tj_afternoon_sky_card_v2.png")
 
-AFTERNOON_SUN_ENERGY = 15.6
+AFTERNOON_SUN_ENERGY = 17.2
 AFTERNOON_SUN_COLOR = (1.0, 0.93, 0.74)
 AFTERNOON_EXPOSURE = 1.10
-AFTERNOON_FILL_ENERGY = 250.0
-AFTERNOON_BOUNCE_ENERGY = 140.0
+AFTERNOON_FILL_ENERGY = 320.0
+AFTERNOON_BOUNCE_ENERGY = 165.0
 AFTERNOON_RIM_ENERGY = 4.6
 AFTERNOON_RIM_COLOR = (1.0, 0.90, 0.72)
 AFTERNOON_RIM_TRAVEL = (-0.28, -0.52, -0.81)
@@ -467,11 +467,15 @@ def _paint_readable_clouds(image, width: int, height: int) -> None:
     overlay = Image.new("L", (width, height), 0)
     draw = ImageDraw.Draw(overlay)
     rng = random.Random(7)
+    # Low image-Y is the texture top (top canopy gap). High image-Y is
+    # the card bottom, which the locked camera sees as the horizon band.
     clouds = [
-        (360, 280, 150, 58),
-        (780, 220, 190, 70),
-        (1180, 300, 140, 54),
-        (560, 400, 110, 42),
+        (380, 250, 140, 52),
+        (820, 210, 170, 60),
+        (320, 630, 160, 64),
+        (780, 600, 190, 72),
+        (1220, 650, 150, 58),
+        (560, 710, 100, 40),
     ]
     for cx, cy, rx, ry in clouds:
         draw.ellipse((cx - rx, cy - ry, cx + rx, cy + ry), fill=236)
@@ -498,28 +502,24 @@ def generate_afternoon_sky_texture(path: Path = GENERATED_SKY_PATH) -> Path:
     """
     path = Path(path)
     try:
-        from PIL import Image, ImageEnhance
+        from PIL import Image
     except ImportError:
         Image = None
-        ImageEnhance = None
 
     if Image is not None:
         width, height = 1536, 768
-        source = _ecokit_sky_path()
-        if source is not None:
-            image = Image.open(source).convert("RGB").resize((width, height), Image.Resampling.LANCZOS)
-            image = ImageEnhance.Color(image).enhance(1.18)
-            image = ImageEnhance.Contrast(image).enhance(1.16)
-        else:
-            pixels = []
-            for y in range(height):
-                t = y / (height - 1)
-                r = int(32 + 86 * t)
-                g = int(96 + 70 * t)
-                b = int(186 + 36 * t)
-                pixels.extend([(r, g, b)] * width)
-            image = Image.new("RGB", (width, height))
-            image.putdata(pixels)
+        # Do not stretch EcoKit Sky_World_2 to 2:1 — that turns horizon
+        # clouds into camera-visible white bands. A painted rich-blue
+        # field plus large puffs stays readable in the locked gap.
+        pixels = []
+        for y in range(height):
+            t = y / (height - 1)
+            r = int(28 + 70 * t)
+            g = int(102 + 58 * t)
+            b = int(196 + 28 * t)
+            pixels.extend([(r, g, b)] * width)
+        image = Image.new("RGB", (width, height))
+        image.putdata(pixels)
         _paint_readable_clouds(image, width, height)
         path.parent.mkdir(parents=True, exist_ok=True)
         image.save(path, "PNG")
@@ -699,13 +699,16 @@ def scatter_canopy_leaf_cards(scene) -> dict:
         if z_max < 3.2:
             continue
         near = (min(ys) + max(ys)) * 0.5 < 10.0
-        ovate_count = 18 if near else 12
-        sprite_count = 14 if near else 8
+        ovate_count = 16 if near else 10
+        sprite_count = 12 if near else 7
         y_cam = min(ys) + (max(ys) - min(ys)) * 0.35
         for index in range(ovate_count):
             lx = rng.uniform(min(xs), max(xs))
+            # Keep the locked-camera sky hole open; bias cards to the sides.
+            if abs(lx) < 2.6:
+                lx = rng.choice((-1.0, 1.0)) * rng.uniform(2.8, max(abs(min(xs)), abs(max(xs)), 4.2))
             ly = rng.uniform(min(ys), y_cam + (max(ys) - min(ys)) * 0.25)
-            lz = rng.uniform(max(z_min + (z_max - z_min) * 0.58, 3.6), z_max * 0.99)
+            lz = rng.uniform(max(z_min + (z_max - z_min) * 0.50, 3.4), z_max * 0.92)
             leaf = make_ovate_leaf(
                 collection,
                 f"TJ_CanopyLeaf_{tree.name}_{index:02d}",
@@ -713,21 +716,23 @@ def scatter_canopy_leaf_cards(scene) -> dict:
                 leaf_mat,
                 rng,
             )
-            leaf.scale = tuple(float(v) * rng.uniform(3.2, 5.4) for v in leaf.scale)
+            leaf.scale = tuple(float(v) * rng.uniform(3.0, 4.8) for v in leaf.scale)
             leaf.rotation_euler[0] = rng.uniform(-0.95, 0.95)
             leaf["tj_feature"] = FEATURE
             ovate += 1
         for index in range(sprite_count):
             lx = rng.uniform(min(xs), max(xs))
+            if abs(lx) < 2.6:
+                lx = rng.choice((-1.0, 1.0)) * rng.uniform(2.8, max(abs(min(xs)), abs(max(xs)), 4.2))
             ly = rng.uniform(min(ys), y_cam)
-            lz = rng.uniform(max(z_min + (z_max - z_min) * 0.62, 4.0), z_max * 0.99)
+            lz = rng.uniform(max(z_min + (z_max - z_min) * 0.48, 3.5), z_max * 0.90)
             sprite = make_canopy_leaf_sprite(
                 collection,
                 f"TJ_CanopySprite_{tree.name}_{index:02d}",
                 (lx, ly, lz),
                 leaf_mat,
                 rng,
-                scale=rng.uniform(1.6, 2.8),
+                scale=rng.uniform(1.4, 2.4),
             )
             sprite["tj_feature"] = FEATURE
             sprites += 1
