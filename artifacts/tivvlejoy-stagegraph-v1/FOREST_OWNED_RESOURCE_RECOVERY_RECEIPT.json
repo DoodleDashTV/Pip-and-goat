@@ -2,6 +2,7 @@
   "schema": "TIVVLEJOY_FOREST_OWNED_RESOURCE_RECOVERY_V1",
   "executionStatus": "FAIL",
   "startingHead": "471dc781da5f44ce05247159691535679d2e997a",
+  "endingHead": "933984946f10bf59d280bde53efceda84c11a074",
   "endingBranch": "cursor/tivvlejoy-owned-resource-recovery-7f52",
   "visualApproval": false,
   "ownedAssetLocationsSearched": [
