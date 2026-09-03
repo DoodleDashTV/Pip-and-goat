@@ -149,10 +149,16 @@ def _shot_aim(objects, kind: str):
 
     subject = objects[0]
     if kind == "trunk":
-        from forest_lookdev_isolation_v1 import _bbox_center
-        return _bbox_center(subject)
+        height = max(float(subject.dimensions.z), 2.15)
+        loc = Vector(subject.location)
+        if loc.length < 1.0:
+            loc = Vector((90.0, 0.0, 0.0))
+        return loc + Vector((0.0, 0.0, height * 0.48))
     if kind == "leaf":
         return Vector(subject.location) + Vector((0.0, 0.0, 0.45))
+    if kind == "ground":
+        patch = next((obj for obj in objects if obj.name.startswith("TJ_LookdevGroundPatch")), objects[0])
+        return Vector(patch.location) + Vector((0.0, 0.0, 0.05))
     center = Vector((0.0, 0.0, 0.0))
     for obj in objects:
         center += obj.location
@@ -241,8 +247,10 @@ def main():
             continue
         shown = _exclusive_visibility(scene, visible)
         scene.camera = lookdev_camera
+        bpy.context.view_layer.update()
         _frame_shot(lookdev_camera, visible, kind)
         install_studio_rig(collection, visible[0], aim=_shot_aim(visible, kind))
+        bpy.context.view_layer.update()
         stills[name] = render_path(scene, out_dir / f"{name}.png")
         stills[name]["subjects"] = shown
         stills[name]["subjectVerts"] = [len(obj.data.vertices) for obj in visible]

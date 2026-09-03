@@ -314,23 +314,28 @@ def make_ground_material():
     ):
         links.new(mapping.outputs["Vector"], node.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Saturation"].default_value = 0.82
-    hsv.inputs["Value"].default_value = 0.86
+    hsv.inputs["Saturation"].default_value = 0.78
+    hsv.inputs["Value"].default_value = 0.80
     links.new(soil.outputs["Color"], hsv.inputs["Color"])
+    base_litter = _mix_color(nodes, "TJ_SoilBaseLitter")
+    fac, a, b = _mix_sockets(base_litter)
+    fac.default_value = 0.34
+    links.new(hsv.outputs["Color"], a)
+    links.new(litter.outputs["Color"], b)
     litter_noise = nodes.new("ShaderNodeTexNoise")
-    litter_noise.inputs["Scale"].default_value = 1.35
+    litter_noise.inputs["Scale"].default_value = 1.15
     litter_noise.inputs["Detail"].default_value = 8.0
     moss_noise = nodes.new("ShaderNodeTexNoise")
-    moss_noise.inputs["Scale"].default_value = 1.8
+    moss_noise.inputs["Scale"].default_value = 1.55
     moss_noise.inputs["Detail"].default_value = 6.0
     links.new(coord.outputs["Object"], litter_noise.inputs["Vector"])
     links.new(coord.outputs["Object"], moss_noise.inputs["Vector"])
     litter_ramp = nodes.new("ShaderNodeValToRGB")
-    litter_ramp.color_ramp.elements[0].position = 0.18
-    litter_ramp.color_ramp.elements[1].position = 0.48
+    litter_ramp.color_ramp.elements[0].position = 0.46
+    litter_ramp.color_ramp.elements[1].position = 0.74
     moss_ramp = nodes.new("ShaderNodeValToRGB")
-    moss_ramp.color_ramp.elements[0].position = 0.62
-    moss_ramp.color_ramp.elements[1].position = 0.80
+    moss_ramp.color_ramp.elements[0].position = 0.68
+    moss_ramp.color_ramp.elements[1].position = 0.86
     links.new(litter_noise.outputs["Fac"], litter_ramp.inputs["Fac"])
     links.new(moss_noise.outputs["Fac"], moss_ramp.inputs["Fac"])
     mix_needles = _mix_color(nodes, "TJ_Needles")
@@ -340,7 +345,7 @@ def make_ground_material():
     links.new(needles.outputs["Color"], b)
     mix_litter = _mix_color(nodes, "TJ_SoilLitter")
     fac, a, b = _mix_sockets(mix_litter)
-    links.new(hsv.outputs["Color"], a)
+    links.new(_mix_out(base_litter), a)
     links.new(_mix_out(mix_needles), b)
     links.new(litter_ramp.outputs["Color"], fac)
     mix_moss = _mix_color(nodes, "TJ_LitterMoss")
@@ -737,9 +742,9 @@ def scatter_floor_geometry(collection, origin, litter_mat, moss_mat, rock_mat, c
         make_decal(
             collection,
             f"TJ_LookdevLitterPatch_{index:02d}" if lookdev else f"TJ_ProdLitterPatch_{index:02d}",
-            (ox + rng.uniform(-0.85, 0.85), oy + rng.uniform(-0.85, 0.85), oz + 0.006),
+            (ox + rng.uniform(-0.55, 0.55), oy + rng.uniform(-0.55, 0.55), oz + 0.018),
             rng.uniform(-3.1, 3.1),
-            (rng.uniform(0.28, 0.42), rng.uniform(0.28, 0.42), 1.0),
+            (rng.uniform(0.16, 0.24), rng.uniform(0.16, 0.24), 1.0),
             litter_mat,
         )
     for index in range(count_moss):
@@ -747,7 +752,7 @@ def scatter_floor_geometry(collection, origin, litter_mat, moss_mat, rock_mat, c
             collection,
             f"TJ_LookdevMossMound_{index:02d}" if lookdev else f"TJ_ProdMossMound_{index:02d}",
             (ox + rng.uniform(-0.8, 0.8), oy + rng.uniform(-0.8, 0.8), oz),
-            (rng.uniform(0.10, 0.18), rng.uniform(0.10, 0.18), rng.uniform(0.04, 0.07)),
+            (rng.uniform(0.12, 0.20), rng.uniform(0.12, 0.20), rng.uniform(0.10, 0.16)),
             moss_mat,
         )
     for index in range(count_rock):
@@ -852,8 +857,9 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         for slot in ground.material_slots:
             slot.link = "OBJECT"
             slot.material = mats["ground"]
-            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 8, 5, 4)
+            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 4, 3, 3)
 
+    bpy.context.view_layer.update()
     return {
         "trunk": None if trunk is None else trunk.name,
         "bush": shrub.name,

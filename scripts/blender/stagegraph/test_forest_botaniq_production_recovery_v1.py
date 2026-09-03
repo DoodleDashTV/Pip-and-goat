@@ -49,4 +49,5 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("verify_production_camera", proof)
         self.assertIn("_exclusive_visibility", proof)
         self.assertIn("BARK_SUBJECT_NOT_CYLINDER", proof)
+        self.assertIn("view_layer.update", proof)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", proof)
