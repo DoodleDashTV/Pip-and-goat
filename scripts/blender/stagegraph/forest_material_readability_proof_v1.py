@@ -29,11 +29,11 @@ from vendor_reference_lookdev_v1 import apply_cycles_bounce_lift
 from vendor_reference_render_v1 import SOURCE_SHA256, AUDIT_SHA256, build_scene, png_dimensions
 
 CROPS = {
-    "BARK_PROOF": (0.14, 0.40, 0.18, 0.70),
-    "FOREST_FLOOR_PROOF": (0.12, 0.88, 0.00, 0.36),
-    "FLORA_PROOF": (0.02, 0.52, 0.06, 0.42),
-    "CANOPY_DEPTH_PROOF": (0.18, 0.82, 0.52, 0.98),
-    "SKY_DEPTH_PROOF": (0.28, 0.72, 0.68, 0.96),
+    "BARK_PROOF_V2": (0.14, 0.40, 0.18, 0.70),
+    "FOREST_FLOOR_PROOF_V2": (0.12, 0.88, 0.00, 0.36),
+    "FLORA_PROOF_V2": (0.02, 0.52, 0.06, 0.42),
+    "CANOPY_DEPTH_PROOF_V2": (0.18, 0.82, 0.52, 0.98),
+    "SKY_DEPTH_PROOF_V2": (0.28, 0.72, 0.68, 0.96),
 }
 
 
@@ -133,12 +133,12 @@ def main():
         scene.render.use_border = False
         scene.render.use_crop_to_border = False
         scene.cycles.samples = int(args.samples)
-        full = render_path(scene, out_dir / "FOREST_MATERIAL_READABILITY_PROOF_V1.png")
+        full = render_path(scene, out_dir / "FOREST_PRODUCTION_SHADING_PROOF_V1.png")
         if full["dimensions"] != [1280, 720]:
             raise RuntimeError("PROOF_DIMENSION_MISMATCH")
 
     receipt = {
-        "schema": "TIVVLEJOY_FOREST_MATERIAL_READABILITY_PROOF_V1",
+        "schema": "TIVVLEJOY_FOREST_PRODUCTION_SHADING_PROOF_V1",
         "result": "RENDERED",
         "paidCreateCount": 0,
         "paidSpendUsd": 0,
@@ -162,13 +162,14 @@ def main():
             "ground": cinematic.get("ground"),
             "trunks": cinematic.get("trunks"),
             "floraShader": cinematic.get("floraShader"),
+            "productionShading": cinematic.get("productionShading"),
             "cameraChanged": False,
             "geometryRebuilt": False,
         },
         "visualApproval": False,
         "vendorReferenceReproducedApproved": False,
     }
-    (out_dir / "FOREST_MATERIAL_READABILITY_PROOF_V1.json").write_text(
+    (out_dir / "FOREST_PRODUCTION_SHADING_PROOF_V1.json").write_text(
         json.dumps(receipt, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )

@@ -875,6 +875,9 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
     trunks = repair_trunk_readability()
     foliage = repair_foliage_translucency(scene)
     depth = apply_depth_cues(scene)
+    from forest_production_shading_rebuild_v1 import apply_forest_production_shading_rebuild
+
+    production = apply_forest_production_shading_rebuild(scene)
     return {
         "schema": "TIVVLEJOY_CINEMATIC_FOREST_LIGHTING_REPAIR_V1",
         "feature": FEATURE,
@@ -891,6 +894,7 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
         "trunks": trunks,
         "foliage": foliage,
         "depth": depth,
+        "productionShading": production,
         "emissionShadersAdded": False,
         "purchasedTexturesOverwritten": False,
         "vendorBlendSaved": False,

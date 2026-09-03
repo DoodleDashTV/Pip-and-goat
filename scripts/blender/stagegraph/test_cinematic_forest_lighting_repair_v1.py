@@ -95,4 +95,5 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         apply_src = source.split("def apply_cinematic_forest_lighting_repair", 1)[1]
         self.assertNotIn("install_cycles_safe_flora_surfaces", apply_src)
         self.assertIn("repair_treeleaf_groups()", apply_src)
+        self.assertIn("apply_forest_production_shading_rebuild", apply_src)
         self.assertIn("TJ_CinematicCyclesPrincipled_V1", source)
