@@ -1,0 +1,941 @@
+{
+  "camera": {
+    "changed": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "name": "TJ_VendorReference_Camera"
+  },
+  "cinematicRepair": {
+    "cameraChanged": false,
+    "colorManagement": {
+      "exposure": 0.3799999952316284,
+      "gamma": 1.0,
+      "look": "AgX - Base Contrast",
+      "viewTransform": "AgX"
+    },
+    "floraShader": {
+      "aoDistance": 0.08,
+      "aoValue": 0.04,
+      "emissionEnabled": false,
+      "groupsChanged": [
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader"
+        },
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader.001"
+        }
+      ],
+      "materialsChanged": 46,
+      "names": [
+        "Branch_1.001",
+        "Branch_1.002",
+        "Branch_1.004",
+        "Branch_1.010",
+        "Bushes_Mat_1.006",
+        "Fallen Leaf_Mat_1.001",
+        "Fallen Leaf_Mat_1.002",
+        "Fallen Leaf_Mat_1.004",
+        "Fallen Leaf_Mat_1.009",
+        "Floral_Mat_1.001",
+        "Floral_Mat_1.002",
+        "Floral_Mat_1.004",
+        "Floral_Mat_1.007",
+        "Grass_Mat_1",
+        "Grass_Mat_1.001",
+        "Grass_Mat_1.002",
+        "Grass_Mat_1.003",
+        "Grass_Mat_1.004",
+        "Grass_Mat_1.005",
+        "Grass_Mat_1.006",
+        "Grass_Mat_1.007",
+        "Grass_Mat_1.011",
+        "Grass_Mat_1.012",
+        "Grass_Mat_1.015",
+        "Grass_Mat_1.016",
+        "Grass_Mat_1.017",
+        "Grass_Mat_1.018",
+        "Grass_Mat_1.019",
+        "Grass_Mat_1.020",
+        "Leaf Blade",
+        "Leaf Blade_1-1",
+        "Leaf Blade_1-1.001",
+        "Leaf Blade_2-1",
+        "Leaf Blade_Mat_1.001",
+        "Leaf Blade_Mat_1.002",
+        "Leaf Blade_Mat_1.004",
+        "Leaf Blade_Mat_1.005",
+        "Leaf Blade_Mat_1.008",
+        "Lotus Leaf_Mat_1.006",
+        "Moss_Mat_1",
+        "Moss_Mat_1.001",
+        "Stipe_Mat_1.001",
+        "Stipe_Mat_1.013",
+        "Vines_1-2",
+        "Vines_1-2.001",
+        "Vines_2-2"
+      ],
+      "texturesOverwritten": false
+    },
+    "geometryRebuilt": false,
+    "ground": {
+      "applied": true,
+      "largeOliveNoiseRemoved": true,
+      "material": "TJ_VendorGround_Mat",
+      "purchasedDirtAlbedoFound": false,
+      "purchasedTexturesUsed": [
+        "Moss_2.png",
+        "Moss_1.png"
+      ],
+      "texturesOverwritten": false
+    },
+    "productionShading": {
+      "bark": {
+        "assignments": [
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_002",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_003",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_004",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_004.001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_005",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_006",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_007",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1.001",
+            "object": "Tree Trunk_1_008",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1.001"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_1_001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_1_002",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_1_003",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_1_004",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_1_005",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_1_006",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_2_001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_2_002",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_2_003",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_2_004",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_2_005",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_2_006",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_3_001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_3_002",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_3_003",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_3_004",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_3_005",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_3_006",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_4_001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_4_002",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_4_003",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_4_004",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_4_005",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_4_006",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_5_001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_5_002",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_5_003",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_5_004",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_5_005",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_5_006",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_1",
+            "object": "Tree_Mat_001",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_1"
+          },
+          {
+            "from": "TreeTrunk_Mat_2",
+            "object": "Tree_Mat_002",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_2"
+          },
+          {
+            "from": "TreeTrunk_Mat_3",
+            "object": "Tree_Mat_003",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_3"
+          },
+          {
+            "from": "TreeTrunk_Mat_4",
+            "object": "Tree_Mat_004",
+            "slot": 0,
+            "to": "TJ_ProdTrunk_TreeTrunk_Mat_4"
+          }
+        ],
+        "bumpDistance": 0.11,
+        "bumpStrength": 0.95,
+        "materialsCreated": [
+          "TJ_ProdTrunk_TreeTrunk_Mat_1.001",
+          "TJ_ProdTrunk_TreeTrunk_Mat_1",
+          "TJ_ProdTrunk_TreeTrunk_Mat_2",
+          "TJ_ProdTrunk_TreeTrunk_Mat_3",
+          "TJ_ProdTrunk_TreeTrunk_Mat_4"
+        ],
+        "textureColorSpace": "Non-Color",
+        "texturesOverwritten": false,
+        "vendorMaterialsPreserved": true
+      },
+      "cameraChanged": false,
+      "dressing": {
+        "fallenLeafInstanceCountAfter": 180,
+        "fallenLeafInstanceCountBefore": 65,
+        "fallenLeavesAdded": 115,
+        "geometryRebuilt": false,
+        "rocksAdded": 20
+      },
+      "emissionShadersAdded": false,
+      "exposure": 0.38,
+      "feature": "forest_production_shading_rebuild_v1",
+      "flora": {
+        "details": [
+          {
+            "mode": "color1_mask",
+            "name": "Branch_1.001",
+            "role": "branch",
+            "usedImage": "Flora_1.png.001"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Branch_1.002",
+            "role": "branch",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Branch_1.004",
+            "role": "branch",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Branch_1.010",
+            "role": "branch",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Bushes_Mat_1.006",
+            "role": "bush",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Fallen Leaf_Mat_1.001",
+            "role": "fallen",
+            "usedImage": "Flora_1.png.001"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Fallen Leaf_Mat_1.002",
+            "role": "fallen",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Fallen Leaf_Mat_1.004",
+            "role": "fallen",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Fallen Leaf_Mat_1.009",
+            "role": "fallen",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Floral_Mat_1.001",
+            "role": "flower",
+            "usedImage": "Flora_1.png.001"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Floral_Mat_1.002",
+            "role": "flower",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Floral_Mat_1.004",
+            "role": "flower",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Floral_Mat_1.007",
+            "role": "flower",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Flower_Mat_1.014",
+            "role": "flower",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.001",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.002",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.003",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.004",
+            "role": "grass",
+            "usedImage": "Flora_1.png.001"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.005",
+            "role": "grass",
+            "usedImage": "Flora_1.png.001"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.006",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.007",
+            "role": "grass",
+            "usedImage": "Flora_1.png.001"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.011",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.012",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.015",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.016",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.017",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.018",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.019",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Grass_Mat_1.020",
+            "role": "grass",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_1-1",
+            "role": "leaf",
+            "usedImage": null
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_1-1.001",
+            "role": "leaf",
+            "usedImage": null
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_2-1",
+            "role": "leaf",
+            "usedImage": null
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_Mat_1.001",
+            "role": "leaf",
+            "usedImage": "Flora_1.png.001"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_Mat_1.002",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_Mat_1.004",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_Mat_1.005",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Leaf Blade_Mat_1.008",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Lotus Leaf_Mat_1.006",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Moss_Mat_1",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Moss_Mat_1.001",
+            "role": "leaf",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Stipe_Mat_1.001",
+            "role": "branch",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Stipe_Mat_1.013",
+            "role": "branch",
+            "usedImage": "Flora_1.png"
+          },
+          {
+            "mode": "vendor_cycles",
+            "name": "TreeLeaf_Mat_1",
+            "role": "leaf",
+            "usedImage": null
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Vines_1",
+            "role": "leaf",
+            "usedImage": null
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Vines_1-2",
+            "role": "leaf",
+            "usedImage": "Moss_2.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Vines_1-2.001",
+            "role": "leaf",
+            "usedImage": "Moss_2.png"
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Vines_1.001",
+            "role": "leaf",
+            "usedImage": null
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Vines_2",
+            "role": "leaf",
+            "usedImage": null
+          },
+          {
+            "mode": "color1_mask",
+            "name": "Vines_2-2",
+            "role": "leaf",
+            "usedImage": "Moss_2.png"
+          }
+        ],
+        "emissionEnabled": false,
+        "materialsWrapped": 51,
+        "names": [
+          "Branch_1.001",
+          "Branch_1.002",
+          "Branch_1.004",
+          "Branch_1.010",
+          "Bushes_Mat_1.006",
+          "Fallen Leaf_Mat_1.001",
+          "Fallen Leaf_Mat_1.002",
+          "Fallen Leaf_Mat_1.004",
+          "Fallen Leaf_Mat_1.009",
+          "Floral_Mat_1.001",
+          "Floral_Mat_1.002",
+          "Floral_Mat_1.004",
+          "Floral_Mat_1.007",
+          "Flower_Mat_1.014",
+          "Grass_Mat_1",
+          "Grass_Mat_1.001",
+          "Grass_Mat_1.002",
+          "Grass_Mat_1.003",
+          "Grass_Mat_1.004",
+          "Grass_Mat_1.005",
+          "Grass_Mat_1.006",
+          "Grass_Mat_1.007",
+          "Grass_Mat_1.011",
+          "Grass_Mat_1.012",
+          "Grass_Mat_1.015",
+          "Grass_Mat_1.016",
+          "Grass_Mat_1.017",
+          "Grass_Mat_1.018",
+          "Grass_Mat_1.019",
+          "Grass_Mat_1.020",
+          "Leaf Blade",
+          "Leaf Blade_1-1",
+          "Leaf Blade_1-1.001",
+          "Leaf Blade_2-1",
+          "Leaf Blade_Mat_1.001",
+          "Leaf Blade_Mat_1.002",
+          "Leaf Blade_Mat_1.004",
+          "Leaf Blade_Mat_1.005",
+          "Leaf Blade_Mat_1.008",
+          "Lotus Leaf_Mat_1.006",
+          "Moss_Mat_1",
+          "Moss_Mat_1.001",
+          "Stipe_Mat_1.001",
+          "Stipe_Mat_1.013",
+          "TreeLeaf_Mat_1",
+          "Vines_1",
+          "Vines_1-2",
+          "Vines_1-2.001",
+          "Vines_1.001",
+          "Vines_2",
+          "Vines_2-2"
+        ],
+        "skipped": [],
+        "texturesOverwritten": false,
+        "vendorShaderPreserved": true
+      },
+      "geometryRebuilt": false,
+      "ground": {
+        "applied": true,
+        "material": "TJ_VendorGround_Mat",
+        "mossTexturesUsedAsAlbedo": false,
+        "mossUsedAsSparseDressing": true,
+        "texturesOverwritten": false
+      },
+      "lights": {
+        "bounce": 150.0,
+        "canopyFill": 280.0,
+        "fill": 140.0,
+        "hdriLight": 0.9
+      },
+      "purchasedTexturesOverwritten": false,
+      "schema": "TIVVLEJOY_FOREST_PRODUCTION_SHADING_REBUILD_V1",
+      "sky": {
+        "applied": true,
+        "flatCardRemoved": true,
+        "ownedSkyPreviewRemoved": true,
+        "skyCameraSource": "HDRI_UPPER_PLUS_ATMOSPHERIC_GRADIENT",
+        "skyLightingSource": "tj_hdri_diag_8k.jpg"
+      }
+    },
+    "trunks": {
+      "bright": 0.06,
+      "brightRaised": false,
+      "colorLifted": false,
+      "contrast": 0.2,
+      "groups": [
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_0"
+        },
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_1"
+        },
+        {
+          "brightRestored": false,
+          "contrast": null,
+          "mix001": null,
+          "name": "TreeTrunk_Mat_2"
+        },
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_3"
+        },
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_4"
+        }
+      ],
+      "materialsRestored": [
+        "TreeTrunk_Mat_1",
+        "TreeTrunk_Mat_1.001",
+        "TreeTrunk_Mat_3",
+        "TreeTrunk_Mat_4"
+      ],
+      "textureUsed": "Tree Trunk_1.png",
+      "texturesOverwritten": false
+    },
+    "world": {
+      "cameraSky": {
+        "applied": true,
+        "cameraSkySource": "sunny_vondelpark_2k.hdr",
+        "cameraStrengthUnchanged": true,
+        "ownedHdriKeptForLighting": true
+      },
+      "cameraSkyProtected": true,
+      "cameraStrength": 0.52,
+      "greyGroundReplaced": true,
+      "hdriImage": "tj_hdri_diag_8k.jpg",
+      "lightStrength": 1.6
+    }
+  },
+  "composition": {
+    "cameraLensMm": 42.0,
+    "cameraLocation": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "cameraLookAt": [
+      0.0,
+      9.5,
+      2.6
+    ],
+    "fillLocation": [
+      0.0,
+      -4.0,
+      8.0
+    ],
+    "placed": {
+      "bushes": 24,
+      "fallenLeaves": 65,
+      "ferns": 28,
+      "floral": 16,
+      "grass": 70,
+      "trees": 14
+    },
+    "sceneLayoutUnchanged": true,
+    "seed": 7301,
+    "sunRotationDeg": [
+      58.0,
+      -8.0,
+      -42.0
+    ]
+  },
+  "cropSamples": 16,
+  "crops": {
+    "BARK_PROOF_V2": {
+      "bytes": 231676,
+      "dimensions": [
+        333,
+        375
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/BARK_PROOF_V2.png",
+      "seconds": 14.3,
+      "sha256": "635fa93dd4c33f7ac423adc2448a68aaa15e4acd17d9d0edd9f9b51332ddc267"
+    },
+    "CANOPY_DEPTH_PROOF_V2": {
+      "bytes": 554383,
+      "dimensions": [
+        819,
+        331
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/CANOPY_DEPTH_PROOF_V2.png",
+      "seconds": 36.69,
+      "sha256": "3f6a2b0be0d324488ec8c5c66229603f9127e7d6ce2b0760aa32363a226d3635"
+    },
+    "FLORA_PROOF_V2": {
+      "bytes": 267839,
+      "dimensions": [
+        640,
+        259
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FLORA_PROOF_V2.png",
+      "seconds": 17.38,
+      "sha256": "f1f05424d0c552b8d7b65f4d5e71eaf39f8f02dcc6184d9a06088a9b62bd53ab"
+    },
+    "FOREST_FLOOR_PROOF_V2": {
+      "bytes": 375914,
+      "dimensions": [
+        973,
+        259
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FOREST_FLOOR_PROOF_V2.png",
+      "seconds": 23.69,
+      "sha256": "b83f9358ba3e4c82d77b9575b4c40c8af73287c8e6616dc3e6436e419632112f"
+    },
+    "SKY_DEPTH_PROOF_V2": {
+      "bytes": 241291,
+      "dimensions": [
+        563,
+        202
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/SKY_DEPTH_PROOF_V2.png",
+      "seconds": 19.26,
+      "sha256": "29dc2eefadc7a0c415ea87c6bc0e8d1a0ca9db40b7071f97802554246c3c52b6"
+    }
+  },
+  "device": "CPU",
+  "exposure": 0.38,
+  "full": null,
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "placed": {
+    "bushes": 24,
+    "fallenLeaves": 65,
+    "ferns": 28,
+    "floral": 16,
+    "grass": 70,
+    "trees": 14
+  },
+  "result": "RENDERED",
+  "samples": 32,
+  "schema": "TIVVLEJOY_FOREST_PRODUCTION_SHADING_PROOF_V1",
+  "vendorReferenceReproducedApproved": false,
+  "visualApproval": false
+}
