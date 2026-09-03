@@ -146,6 +146,30 @@ def _mix_color_out(node):
     return node.outputs[0]
 
 
+def ensure_uvs(obj) -> bool:
+    mesh = getattr(obj, "data", None)
+    if mesh is None or not hasattr(mesh, "uv_layers"):
+        return False
+    if mesh.uv_layers:
+        return False
+    layer = mesh.uv_layers.new(name="UVMap")
+    xs = [vert.co.x for vert in mesh.vertices] or [0.0]
+    ys = [vert.co.y for vert in mesh.vertices] or [0.0]
+    zs = [vert.co.z for vert in mesh.vertices] or [0.0]
+    use_xy = (max(xs) - min(xs)) >= (max(zs) - min(zs))
+    for poly in mesh.polygons:
+        for loop_index in poly.loop_indices:
+            vert = mesh.vertices[mesh.loops[loop_index].vertex_index]
+            if use_xy:
+                u = (vert.co.x - min(xs)) / max(max(xs) - min(xs), 1e-6)
+                v = (vert.co.y - min(ys)) / max(max(ys) - min(ys), 1e-6)
+            else:
+                u = (vert.co.x - min(xs)) / max(max(xs) - min(xs), 1e-6)
+                v = (vert.co.z - min(zs)) / max(max(zs) - min(zs), 1e-6)
+            layer.data[loop_index].uv = (u, v)
+    return True
+
+
 def assign_object_material(obj, material, copy_mesh: bool = True) -> None:
     if copy_mesh and obj.data is not None and getattr(obj.data, "materials", None) is not None:
         if obj.data.users > 1 or not obj.data.name.startswith("TJ_Lookdev"):
@@ -171,9 +195,9 @@ def make_bark_material():
     albedo = _tex_node(nodes, _load_image(BARK_ALBEDO, "sRGB"), False)
     normal_tex = _tex_node(nodes, _load_image(BARK_NORMAL, "Non-Color"), True)
     mapping = nodes.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (1.0, 0.42, 1.0)
+    mapping.inputs["Scale"].default_value = (0.55, 0.55, 0.18)
     coord = nodes.new("ShaderNodeTexCoord")
-    links.new(coord.outputs["UV"], mapping.inputs["Vector"])
+    links.new(coord.outputs["Object"], mapping.inputs["Vector"])
     links.new(mapping.outputs["Vector"], albedo.inputs["Vector"])
     links.new(mapping.outputs["Vector"], normal_tex.inputs["Vector"])
     links.new(albedo.outputs["Color"], shader.inputs["Base Color"])
@@ -199,7 +223,7 @@ def make_ground_material():
     moss_map = nodes.new("ShaderNodeMapping")
     moss_map.inputs["Scale"].default_value = (3.2, 3.2, 3.2)
     for mapping in (soil_map, litter_map, moss_map):
-        links.new(coord.outputs["UV"], mapping.inputs["Vector"])
+        links.new(coord.outputs["Generated"], mapping.inputs["Vector"])
 
     soil = _tex_node(nodes, _load_image(SOIL_ALBEDO, "sRGB"), False)
     soil_n = _tex_node(nodes, _load_image(SOIL_NORMAL, "Non-Color"), True)
@@ -223,8 +247,8 @@ def make_ground_material():
     moss_noise = nodes.new("ShaderNodeTexNoise")
     moss_noise.inputs["Scale"].default_value = 4.2
     moss_noise.inputs["Detail"].default_value = 6.0
-    links.new(coord.outputs["UV"], litter_noise.inputs["Vector"])
-    links.new(coord.outputs["UV"], moss_noise.inputs["Vector"])
+    links.new(coord.outputs["Generated"], litter_noise.inputs["Vector"])
+    links.new(coord.outputs["Generated"], moss_noise.inputs["Vector"])
 
     litter_ramp = nodes.new("ShaderNodeValToRGB")
     litter_ramp.color_ramp.elements[0].position = 0.28
@@ -316,6 +340,43 @@ def make_cutout_material(name: str, albedo_path: Path, normal_path: Path | None,
     return material
 
 
+def _force_hashed_alpha(material) -> bool:
+    if material is None or not material.use_nodes:
+        return False
+    material.blend_method = "HASHED"
+    if hasattr(material, "shadow_method"):
+        material.shadow_method = "HASHED"
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    images = [node for node in nodes if node.type == "TEX_IMAGE" and node.image]
+    shaders = [node for node in nodes if node.type == "BSDF_PRINCIPLED"]
+    if not images or not shaders:
+        return False
+    image_node = images[0]
+    shader = shaders[0]
+    if "Alpha" in image_node.outputs and "Alpha" in shader.inputs:
+        already = any(link.to_socket == shader.inputs["Alpha"] for link in links)
+        if not already:
+            links.new(image_node.outputs["Alpha"], shader.inputs["Alpha"])
+    return True
+
+
+def harden_appended_vegetation_alpha(objects) -> int:
+    count = 0
+    seen = set()
+    for obj in objects:
+        for slot in getattr(obj, "material_slots", []):
+            material = slot.material
+            if material is None or material.name in seen:
+                continue
+            seen.add(material.name)
+            low = material.name.lower()
+            if any(token in low for token in ("leaf", "fern", "grass", "flower")):
+                if _force_hashed_alpha(material):
+                    count += 1
+    return count
+
+
 def remap_botaniq_images() -> int:
     import bpy
 
@@ -401,6 +462,7 @@ def _make_card(collection, name, location, rotation, scale, material):
     obj.rotation_euler = Euler(rotation)
     obj.scale = scale
     mesh.materials.append(material)
+    ensure_uvs(obj)
     _tag(mesh)
     _tag(obj)
     return obj
@@ -434,6 +496,7 @@ def apply_owned_resource_recovery(scene) -> dict:
 
     ground = bpy.data.objects.get("TJ_LookdevGroundPatch")
     if ground is not None:
+        ensure_uvs(ground)
         assign_object_material(ground, ground_mat, copy_mesh=False)
 
     rock = bpy.data.objects.get("TJ_LookdevRock")
@@ -467,6 +530,7 @@ def apply_owned_resource_recovery(scene) -> dict:
     grass = _append_object(GRASS_BLEND, "bq_Grass_Carex-oshimensis_A_spring")
     fern = _append_object(FERN_BLEND, "bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn")
     remapped += remap_botaniq_images()
+    alpha_hardened = harden_appended_vegetation_alpha((shrub, grass, fern))
 
     ox, oy, oz = 90.0, 0.0, 0.0
     _place_owned(shrub, collection, (ox + 8.0, oy, oz), "TJ_LookdevBush", scale=(1.15, 1.15, 1.15))
@@ -493,6 +557,7 @@ def apply_owned_resource_recovery(scene) -> dict:
         "feature": FEATURE,
         "missing": [],
         "imagesRemapped": remapped,
+        "alphaHardened": alpha_hardened,
         "barkSource": str(BARK_ALBEDO),
         "groundLayers": ["soil_loose", "fallen_leaves", "fallen_needles", "moss"],
         "bushSource": SHRUB_BLEND.name,
