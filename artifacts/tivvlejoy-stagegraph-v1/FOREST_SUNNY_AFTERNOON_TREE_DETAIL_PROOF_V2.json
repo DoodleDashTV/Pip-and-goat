@@ -1,0 +1,1298 @@
+{
+  "afternoonRecovery": {
+    "afternoonExposure": 1.22,
+    "bark": {
+      "afternoonContrast": 0.26,
+      "baselineContrast": 0.2,
+      "brightRaised": false,
+      "contrastNodes": 4,
+      "texturesOverwritten": false,
+      "vendorBarkRestored": {
+        "bright": 0.06,
+        "brightRaised": false,
+        "colorLifted": false,
+        "contrast": 0.2,
+        "groups": [
+          {
+            "brightRestored": true,
+            "contrast": 0.20000000298023224,
+            "mix001": "MULTIPLY_TO_MIX",
+            "name": "TreeTrunk_Mat_0"
+          },
+          {
+            "brightRestored": true,
+            "contrast": 0.20000000298023224,
+            "mix001": "MULTIPLY_TO_MIX",
+            "name": "TreeTrunk_Mat_1"
+          },
+          {
+            "brightRestored": false,
+            "contrast": null,
+            "mix001": null,
+            "name": "TreeTrunk_Mat_2"
+          },
+          {
+            "brightRestored": true,
+            "contrast": 0.20000000298023224,
+            "mix001": "MULTIPLY_TO_MIX",
+            "name": "TreeTrunk_Mat_3"
+          },
+          {
+            "brightRestored": true,
+            "contrast": 0.20000000298023224,
+            "mix001": "MULTIPLY_TO_MIX",
+            "name": "TreeTrunk_Mat_4"
+          }
+        ],
+        "materialsRestored": [
+          "TreeTrunk_Mat_1",
+          "TreeTrunk_Mat_1.001",
+          "TreeTrunk_Mat_3",
+          "TreeTrunk_Mat_4"
+        ],
+        "textureUsed": "Tree Trunk_1.png",
+        "texturesOverwritten": false
+      }
+    },
+    "cameraChanged": false,
+    "canopy": {
+      "emissionEnabled": false,
+      "floraLifted": [
+        "Branch_1.001",
+        "Branch_1.002",
+        "Branch_1.004",
+        "Branch_1.010",
+        "Bushes_Mat_1.006",
+        "Fallen Leaf_Mat_1.001",
+        "Fallen Leaf_Mat_1.002",
+        "Fallen Leaf_Mat_1.004",
+        "Fallen Leaf_Mat_1.009",
+        "Floral_Mat_1.001",
+        "Floral_Mat_1.002",
+        "Floral_Mat_1.004",
+        "Floral_Mat_1.007",
+        "Grass_Mat_1",
+        "Grass_Mat_1.001",
+        "Grass_Mat_1.002",
+        "Grass_Mat_1.003",
+        "Grass_Mat_1.004",
+        "Grass_Mat_1.005",
+        "Grass_Mat_1.006",
+        "Grass_Mat_1.007",
+        "Grass_Mat_1.011",
+        "Grass_Mat_1.012",
+        "Grass_Mat_1.015",
+        "Grass_Mat_1.016",
+        "Grass_Mat_1.017",
+        "Grass_Mat_1.018",
+        "Grass_Mat_1.019",
+        "Grass_Mat_1.020",
+        "Leaf Blade",
+        "Leaf Blade_1-1",
+        "Leaf Blade_1-1.001",
+        "Leaf Blade_2-1",
+        "Leaf Blade_Mat_1.001",
+        "Leaf Blade_Mat_1.002",
+        "Leaf Blade_Mat_1.004",
+        "Leaf Blade_Mat_1.005",
+        "Leaf Blade_Mat_1.008",
+        "Lotus Leaf_Mat_1.006",
+        "Moss_Mat_1",
+        "Moss_Mat_1.001",
+        "Stipe_Mat_1.001",
+        "Stipe_Mat_1.013",
+        "Vines_1-2",
+        "Vines_1-2.001",
+        "Vines_2-2"
+      ],
+      "foliageRepair": {
+        "factor": 0.28,
+        "materialsUpdated": 12,
+        "names": [
+          "TJ_ProdLeaf_Corylus_V1",
+          "TJ_ProdFern_V1",
+          "Leaf Blade",
+          "Vines_1.001",
+          "Vines_1-2.001",
+          "Leaf Blade_1-1.001",
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "TJ_CoverLeaf_Autumn_V1",
+          "TJ_CoverLeaf_Corylus_V1",
+          "TJ_DetailLeaf_Autumn_V1",
+          "TJ_DetailLeaf_Corylus_V1"
+        ],
+        "texturesOverwritten": false
+      },
+      "texturesOverwritten": false,
+      "translucencyFactor": 0.22,
+      "treeleafLifted": [
+        "TreeLeaf_Mat_1"
+      ]
+    },
+    "compositionChanged": false,
+    "cycles": {
+      "applied": true,
+      "diffuseBounces": 12,
+      "maxBounces": 16,
+      "transparentMaxBounces": 24
+    },
+    "emissionShadersAdded": false,
+    "feature": "forest_sunny_afternoon_tree_detail_v1",
+    "finalVideoRenderStarted": false,
+    "groundArchitectureChanged": false,
+    "groundDressingChanged": false,
+    "haze": {
+      "atmosphere": {
+        "applied": true,
+        "density": 0.00015
+      },
+      "compositorDisabled": true,
+      "compositorNodeZeroed": true,
+      "mist": {
+        "enabled": false
+      }
+    },
+    "lights": {
+      "bounce": {
+        "color": [
+          0.78,
+          0.82,
+          0.7
+        ],
+        "energy": 180.0,
+        "location": [
+          0.0,
+          8.2,
+          4.2
+        ],
+        "name": "TJ_ClearingBounce"
+      },
+      "canopyFill": {
+        "color": [
+          0.7,
+          0.82,
+          1.0
+        ],
+        "energy": 620.0,
+        "location": [
+          0.0,
+          -9.3,
+          12.65
+        ],
+        "name": "TJ_ForestCanopyFill_V1"
+      },
+      "canopyRim": {
+        "color": [
+          0.74,
+          0.86,
+          1.0
+        ],
+        "energy": 340.0,
+        "location": [
+          8.5,
+          6.0,
+          9.6751
+        ],
+        "name": "TJ_ForestCanopyRim_V1"
+      },
+      "fill": {
+        "color": [
+          0.82,
+          0.78,
+          0.7
+        ],
+        "energy": 360.0,
+        "location": [
+          0.0,
+          -7.2,
+          11.5
+        ],
+        "name": "TJ_SoftFill"
+      },
+      "rim": {
+        "color": [
+          1.0,
+          0.88,
+          0.7
+        ],
+        "energy": 3.4000000953674316,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "name": "TJ_CanopyRim"
+      },
+      "sun": {
+        "color": [
+          1.0,
+          0.92,
+          0.74
+        ],
+        "energy": 13.199999809265137,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "name": "TJ_GoldenSun"
+      }
+    },
+    "locks": {
+      "cameraChanged": false,
+      "cameraLensMm": 42.0,
+      "cameraLocation": [
+        0.0,
+        -12.5,
+        2.15
+      ],
+      "geometryRebuilt": false
+    },
+    "materialLightingLock": {
+      "afternoonExposureAuthorized": true,
+      "exposure": 1.2200000286102295,
+      "gamma": 1.059999942779541,
+      "hdriStrength": 0.12,
+      "materialLightingPreserved": false,
+      "viewTransform": "AgX"
+    },
+    "photoStampsReintroduced": false,
+    "priorMaterialLock": {
+      "exposure": 1.100000023841858,
+      "gamma": 1.059999942779541,
+      "hdriStrength": 0.11999999731779099,
+      "materialLightingPreserved": true,
+      "viewTransform": "AgX"
+    },
+    "prodFlowerReintroduced": false,
+    "productionCamera": {
+      "cameraChanged": false,
+      "lensMm": 42.0,
+      "location": [
+        0.0,
+        -12.5,
+        2.15
+      ]
+    },
+    "schema": "TIVVLEJOY_FOREST_SUNNY_AFTERNOON_TREE_DETAIL_V1",
+    "sky": {
+      "applied": true,
+      "cameraSky": "Sky_World_2.png",
+      "cameraStrength": 2.4,
+      "lightingHdriStrength": 0.11999999731779099,
+      "ownedLightingHdriPreserved": true,
+      "priorLightingStrength": 0.11999999731779099
+    },
+    "terrainChanged": false,
+    "waterChanged": false
+  },
+  "animationRendered": false,
+  "cameraChanged": false,
+  "canopyRepair": {
+    "colorManagementChanged": false,
+    "compositionLocked": true,
+    "diagnose": {
+      "ao": {
+        "aoFactor": 1.0,
+        "useAmbientOcclusion": false
+      },
+      "bounds": {
+        "canopyZMax": 12.404,
+        "canopyZMedian": 0.015,
+        "max": [
+          165.815,
+          173.001,
+          18.0
+        ],
+        "min": [
+          -158.827,
+          -148.159,
+          -0.319
+        ]
+      },
+      "camera": {
+        "lensMm": 42.0,
+        "location": [
+          0.0,
+          -12.5,
+          2.15
+        ],
+        "look": [
+          0.0,
+          0.9998,
+          0.0205
+        ],
+        "name": "TJ_VendorReference_Camera"
+      },
+      "cameraFacingIsBacklit": true,
+      "cameraLightDot": 0.57,
+      "colorManagement": {
+        "exposure": 1.100000023841858,
+        "gamma": 1.059999942779541,
+        "look": "None",
+        "viewTransform": "AgX"
+      },
+      "cycles": {
+        "aoBounces": 1,
+        "diffuseBounces": 8,
+        "samples": 24
+      },
+      "foliage": [
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": true,
+          "hasTranslucent": true,
+          "meanTextureLuma": null,
+          "name": "TJ_ProdLeaf_Corylus_V1",
+          "nodeTypes": [
+            "BSDF_PRINCIPLED",
+            "BSDF_TRANSLUCENT",
+            "MIX",
+            "MIX_SHADER",
+            "NEW_GEOMETRY",
+            "NORMAL_MAP",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VECT_MATH"
+          ],
+          "shadowMethod": null,
+          "transmission": 0.0
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": true,
+          "hasTranslucent": true,
+          "meanTextureLuma": null,
+          "name": "TJ_ProdFern_V1",
+          "nodeTypes": [
+            "BSDF_PRINCIPLED",
+            "BSDF_TRANSLUCENT",
+            "MIX",
+            "MIX_SHADER",
+            "NEW_GEOMETRY",
+            "NORMAL_MAP",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VECT_MATH"
+          ],
+          "shadowMethod": null,
+          "transmission": 0.0
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": false,
+          "hasTranslucent": false,
+          "meanTextureLuma": null,
+          "name": "Leaf Blade",
+          "nodeTypes": [
+            "GROUP",
+            "MAPPING",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "UVMAP",
+            "VALTORGB"
+          ],
+          "shadowMethod": null,
+          "transmission": null
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": false,
+          "hasTranslucent": false,
+          "meanTextureLuma": null,
+          "name": "Vines_1.001",
+          "nodeTypes": [
+            "BSDF_DIFFUSE",
+            "OUTPUT_MATERIAL"
+          ],
+          "shadowMethod": null,
+          "transmission": null
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": false,
+          "hasTranslucent": false,
+          "meanTextureLuma": null,
+          "name": "Vines_1-2.001",
+          "nodeTypes": [
+            "ATTRIBUTE",
+            "GROUP",
+            "MAPPING",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VALTORGB"
+          ],
+          "shadowMethod": null,
+          "transmission": null
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": false,
+          "hasTranslucent": false,
+          "meanTextureLuma": null,
+          "name": "Leaf Blade_1-1.001",
+          "nodeTypes": [
+            "ATTRIBUTE",
+            "GROUP",
+            "MAPPING",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VALTORGB"
+          ],
+          "shadowMethod": null,
+          "transmission": null
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": false,
+          "hasTranslucent": false,
+          "meanTextureLuma": null,
+          "name": "Leaf Blade_Mat_1.008",
+          "nodeTypes": [
+            "GROUP",
+            "MAPPING",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "UVMAP",
+            "VALTORGB"
+          ],
+          "shadowMethod": null,
+          "transmission": null
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": false,
+          "hasTranslucent": false,
+          "meanTextureLuma": null,
+          "name": "Fallen Leaf_Mat_1.009",
+          "nodeTypes": [
+            "ATTRIBUTE",
+            "GROUP",
+            "MAPPING",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VALTORGB"
+          ],
+          "shadowMethod": null,
+          "transmission": null
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": true,
+          "hasTranslucent": true,
+          "meanTextureLuma": null,
+          "name": "TJ_CoverLeaf_Autumn_V1",
+          "nodeTypes": [
+            "BSDF_PRINCIPLED",
+            "BSDF_TRANSLUCENT",
+            "HUE_SAT",
+            "MIX",
+            "MIX_SHADER",
+            "NEW_GEOMETRY",
+            "NORMAL_MAP",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VECT_MATH"
+          ],
+          "shadowMethod": null,
+          "transmission": 0.0
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": true,
+          "hasTranslucent": true,
+          "meanTextureLuma": null,
+          "name": "TJ_CoverLeaf_Corylus_V1",
+          "nodeTypes": [
+            "BSDF_PRINCIPLED",
+            "BSDF_TRANSLUCENT",
+            "MIX",
+            "MIX_SHADER",
+            "NEW_GEOMETRY",
+            "NORMAL_MAP",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VECT_MATH"
+          ],
+          "shadowMethod": null,
+          "transmission": 0.0
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": true,
+          "hasTranslucent": true,
+          "meanTextureLuma": null,
+          "name": "TJ_DetailLeaf_Autumn_V1",
+          "nodeTypes": [
+            "BSDF_PRINCIPLED",
+            "BSDF_TRANSLUCENT",
+            "HUE_SAT",
+            "MIX",
+            "MIX_SHADER",
+            "NEW_GEOMETRY",
+            "NORMAL_MAP",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VECT_MATH"
+          ],
+          "shadowMethod": null,
+          "transmission": 0.0
+        },
+        {
+          "blendMethod": "HASHED",
+          "hasPrincipled": true,
+          "hasTranslucent": true,
+          "meanTextureLuma": null,
+          "name": "TJ_DetailLeaf_Corylus_V1",
+          "nodeTypes": [
+            "BSDF_PRINCIPLED",
+            "BSDF_TRANSLUCENT",
+            "MIX",
+            "MIX_SHADER",
+            "NEW_GEOMETRY",
+            "NORMAL_MAP",
+            "OUTPUT_MATERIAL",
+            "TEX_IMAGE",
+            "VECT_MATH"
+          ],
+          "shadowMethod": null,
+          "transmission": 0.0
+        }
+      ],
+      "foliageMaterialCount": 12,
+      "foliageWithTranslucency": 6,
+      "lights": [
+        {
+          "color": [
+            1.0,
+            0.76,
+            0.55
+          ],
+          "energy": 5.400000095367432,
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "TJ_GoldenSun",
+          "ours": false,
+          "rotationDeg": [
+            58.0,
+            -8.0,
+            -42.0
+          ],
+          "size": 0.0,
+          "travel": [
+            0.6223,
+            0.5809,
+            -0.5248
+          ],
+          "type": "SUN"
+        },
+        {
+          "color": [
+            0.82,
+            0.78,
+            0.7
+          ],
+          "energy": 520.0,
+          "location": [
+            0.0,
+            -4.0,
+            8.0
+          ],
+          "name": "TJ_SoftFill",
+          "ours": false,
+          "rotationDeg": [
+            66.801,
+            -0.0,
+            0.0
+          ],
+          "size": 7.0,
+          "travel": [
+            0.0,
+            0.9191,
+            -0.3939
+          ],
+          "type": "AREA"
+        },
+        {
+          "color": [
+            0.68,
+            0.8,
+            1.0
+          ],
+          "energy": 1.850000023841858,
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "name": "TJ_CanopyRim",
+          "ours": false,
+          "rotationDeg": [
+            38.0,
+            10.0,
+            138.0
+          ],
+          "size": 0.0,
+          "travel": [
+            -0.3103,
+            -0.5491,
+            -0.776
+          ],
+          "type": "SUN"
+        },
+        {
+          "color": [
+            0.78,
+            0.82,
+            0.7
+          ],
+          "energy": 210.0,
+          "location": [
+            0.0,
+            8.0,
+            1.4
+          ],
+          "name": "TJ_ClearingBounce",
+          "ours": false,
+          "rotationDeg": [
+            -78.69,
+            180.0,
+            0.0
+          ],
+          "size": 9.0,
+          "travel": [
+            -0.0,
+            -0.9806,
+            0.1961
+          ],
+          "type": "AREA"
+        }
+      ],
+      "rootCauseCandidates": [
+        "CAMERA_FACING_FOREST_IS_BACKLIT_BY_KEY_SUN",
+        "EXISTING_BOUNCE_SITS_NEAR_GROUND_AND_PREFERS_TERRAIN",
+        "HDRI_AMBIENT_FILL_IS_TOO_WEAK_FOR_CANOPY_SHADOW_SIDE"
+      ],
+      "scene": "TJ_VENDOR_REFERENCE_GOLDEN_FOREST",
+      "schema": "TIVVLEJOY_FOREST_CANOPY_LIGHTING_DIAGNOSE_V1",
+      "world": {
+        "hdriRotation": null,
+        "hdriStrength": 0.11999999731779099
+      }
+    },
+    "feature": "forest_canopy_lighting_repair_v1",
+    "globalExposureDelta": 0.0,
+    "lighting": {
+      "collection": "TJ_FOREST_LIGHTING_REPAIR_V1",
+      "duplicateGeneratedLights": 0,
+      "exposureChanged": false,
+      "fill": {
+        "aim": [
+          0.0,
+          12.0,
+          6.0
+        ],
+        "color": [
+          0.699999988079071,
+          0.8199999928474426,
+          1.0
+        ],
+        "energy": 780.0,
+        "lightLinking": true,
+        "location": [
+          0.0,
+          -9.3,
+          12.65
+        ],
+        "name": "TJ_ForestCanopyFill_V1",
+        "size": 22.0
+      },
+      "receiverCount": 134,
+      "rim": {
+        "energy": 210.0,
+        "lightLinking": true,
+        "location": [
+          8.5,
+          6.0,
+          9.6751
+        ],
+        "name": "TJ_ForestCanopyRim_V1"
+      }
+    },
+    "materials": {
+      "changes": [
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "TJ_ProdLeaf_Corylus_V1"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "TJ_ProdFern_V1"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "Leaf Blade"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "Vines_1.001"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "Vines_1-2.001"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "Leaf Blade_1-1.001"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "Leaf Blade_Mat_1.008"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "Fallen Leaf_Mat_1.009"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "TJ_CoverLeaf_Autumn_V1"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "TJ_CoverLeaf_Corylus_V1"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "TJ_DetailLeaf_Autumn_V1"
+        },
+        {
+          "action": "ADDED_TRANSLUCENT_MIX",
+          "factor": 0.16,
+          "name": "TJ_DetailLeaf_Corylus_V1"
+        }
+      ],
+      "materialsChanged": 12,
+      "materialsVisited": 12,
+      "skipped": [],
+      "texturesOverwritten": false,
+      "vendorBlendSaved": false
+    },
+    "schema": "TIVVLEJOY_FOREST_CANOPY_LIGHTING_REPAIR_V1",
+    "vendorBlendSaved": false,
+    "verify": {
+      "cameraLensMm": 42.0,
+      "cameraLocation": [
+        0.0,
+        -12.5,
+        2.15
+      ],
+      "collectionPresent": true,
+      "duplicateFill": false,
+      "exposure": 1.100000023841858,
+      "fillPresent": true,
+      "foliageMixCount": 12,
+      "generatedLightNames": [
+        "TJ_ForestCanopyFill_V1",
+        "TJ_ForestCanopyRim_V1"
+      ],
+      "ok": true,
+      "rimPresent": true
+    }
+  },
+  "cinematicRecovery": {
+    "atmosphere": {
+      "anisotropy": 0.44,
+      "applied": true,
+      "color": [
+        0.7,
+        0.79,
+        0.9,
+        1.0
+      ],
+      "density": 0.0019
+    },
+    "backgroundSeparation": {
+      "energy": 80.0,
+      "lightLinking": true,
+      "name": "TJ_CinematicBgSeparation_V1",
+      "receiverCount": 15
+    },
+    "cameraChanged": false,
+    "cinematicLightingStarted": true,
+    "cycles": {
+      "applied": true,
+      "diffuseBounces": 12,
+      "maxBounces": 16,
+      "transparentMaxBounces": 24
+    },
+    "depth": {
+      "compositor": true,
+      "mist": {
+        "depth": 60.0,
+        "enabled": true,
+        "start": 34.0
+      },
+      "mistStrength": 0.07
+    },
+    "emissionShadersAdded": false,
+    "feature": "forest_cinematic_lighting_recovery_v1",
+    "floraShader": {
+      "aoDistance": 0.08,
+      "aoValue": 0.04,
+      "emissionEnabled": false,
+      "groupsChanged": [
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader"
+        },
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader.001"
+        }
+      ],
+      "materialsChanged": 46,
+      "names": [
+        "Branch_1.001",
+        "Branch_1.002",
+        "Branch_1.004",
+        "Branch_1.010",
+        "Bushes_Mat_1.006",
+        "Fallen Leaf_Mat_1.001",
+        "Fallen Leaf_Mat_1.002",
+        "Fallen Leaf_Mat_1.004",
+        "Fallen Leaf_Mat_1.009",
+        "Floral_Mat_1.001",
+        "Floral_Mat_1.002",
+        "Floral_Mat_1.004",
+        "Floral_Mat_1.007",
+        "Grass_Mat_1",
+        "Grass_Mat_1.001",
+        "Grass_Mat_1.002",
+        "Grass_Mat_1.003",
+        "Grass_Mat_1.004",
+        "Grass_Mat_1.005",
+        "Grass_Mat_1.006",
+        "Grass_Mat_1.007",
+        "Grass_Mat_1.011",
+        "Grass_Mat_1.012",
+        "Grass_Mat_1.015",
+        "Grass_Mat_1.016",
+        "Grass_Mat_1.017",
+        "Grass_Mat_1.018",
+        "Grass_Mat_1.019",
+        "Grass_Mat_1.020",
+        "Leaf Blade",
+        "Leaf Blade_1-1",
+        "Leaf Blade_1-1.001",
+        "Leaf Blade_2-1",
+        "Leaf Blade_Mat_1.001",
+        "Leaf Blade_Mat_1.002",
+        "Leaf Blade_Mat_1.004",
+        "Leaf Blade_Mat_1.005",
+        "Leaf Blade_Mat_1.008",
+        "Lotus Leaf_Mat_1.006",
+        "Moss_Mat_1",
+        "Moss_Mat_1.001",
+        "Stipe_Mat_1.001",
+        "Stipe_Mat_1.013",
+        "Vines_1-2",
+        "Vines_1-2.001",
+        "Vines_2-2"
+      ],
+      "texturesOverwritten": false
+    },
+    "foliage": {
+      "factor": 0.28,
+      "materialsUpdated": 12,
+      "names": [
+        "TJ_ProdLeaf_Corylus_V1",
+        "TJ_ProdFern_V1",
+        "Leaf Blade",
+        "Vines_1.001",
+        "Vines_1-2.001",
+        "Leaf Blade_1-1.001",
+        "Leaf Blade_Mat_1.008",
+        "Fallen Leaf_Mat_1.009",
+        "TJ_CoverLeaf_Autumn_V1",
+        "TJ_CoverLeaf_Corylus_V1",
+        "TJ_DetailLeaf_Autumn_V1",
+        "TJ_DetailLeaf_Corylus_V1"
+      ],
+      "texturesOverwritten": false
+    },
+    "geometryRebuilt": false,
+    "groundArchitectureChanged": false,
+    "groundDressingChanged": false,
+    "legacyFeatureReferenced": "cinematic_forest_lighting_repair_v1",
+    "lights": {
+      "bounce": {
+        "color": [
+          0.78,
+          0.82,
+          0.7
+        ],
+        "energy": 210.0,
+        "location": [
+          0.0,
+          8.2,
+          4.2
+        ],
+        "name": "TJ_ClearingBounce"
+      },
+      "fill": {
+        "color": [
+          0.82,
+          0.78,
+          0.7
+        ],
+        "energy": 440.0,
+        "location": [
+          0.0,
+          -7.2,
+          11.5
+        ],
+        "name": "TJ_SoftFill"
+      },
+      "rim": {
+        "color": [
+          0.68,
+          0.8,
+          1.0
+        ],
+        "energy": 2.8499999046325684,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "name": "TJ_CanopyRim"
+      },
+      "sun": {
+        "color": [
+          1.0,
+          0.82,
+          0.62
+        ],
+        "energy": 7.400000095367432,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "name": "TJ_GoldenSun",
+        "travel": [
+          0.4682168607927412,
+          0.4007144299864404,
+          -0.7875283594068425
+        ]
+      }
+    },
+    "locks": {
+      "cameraChanged": false,
+      "cameraLensMm": 42.0,
+      "cameraLocation": [
+        0.0,
+        -12.5,
+        2.15
+      ],
+      "geometryRebuilt": false
+    },
+    "look": {
+      "exposure": 1.100000023841858,
+      "exposureChanged": false,
+      "gamma": 1.059999942779541,
+      "look": "AgX - Base Contrast",
+      "viewTransform": "AgX"
+    },
+    "materialLightingLock": {
+      "exposure": 1.100000023841858,
+      "gamma": 1.059999942779541,
+      "hdriStrength": 0.11999999731779099,
+      "materialLightingPreserved": true,
+      "viewTransform": "AgX"
+    },
+    "productionCamera": {
+      "cameraChanged": false,
+      "lensMm": 42.0,
+      "location": [
+        0.0,
+        -12.5,
+        2.15
+      ]
+    },
+    "schema": "TIVVLEJOY_FOREST_CINEMATIC_LIGHTING_RECOVERY_V1",
+    "treeleaf": {
+      "materialsChanged": 1,
+      "names": [
+        "TreeLeaf_Mat_1"
+      ],
+      "texturesOverwritten": false
+    },
+    "trunkShaderChanged": false,
+    "worldHdriStrengthChanged": false
+  },
+  "compositionChanged": false,
+  "finalVideoRenderReady": false,
+  "finalVideoRenderStarted": false,
+  "groundCoverArchitectureChanged": false,
+  "groundDetail": {
+    "applied": true,
+    "counts": {
+      "litterLeaves": 90,
+      "mossClumps": 6,
+      "needleLeaves": 35,
+      "pebbles": 5,
+      "twigs": 10
+    },
+    "feature": "forest_ground_detail_recovery_v1",
+    "lightingLocked": true,
+    "litterArchitectureAfter": "physical ovate Corylus/autumn clusters + needle strips",
+    "mossArchitectureAfter": "low Rhytidiadelphus clumps in damp/rock niches only",
+    "schema": "TIVVLEJOY_FOREST_GROUND_DETAIL_APPLY_V1",
+    "soilArchitecturePreserved": true,
+    "stampsHidden": [
+      "TJ_CoverLitterPatch_00_00",
+      "TJ_CoverLitterPatch_00_01",
+      "TJ_CoverLitterPatch_01_00",
+      "TJ_CoverLitterPatch_01_01",
+      "TJ_CoverLitterPatch_02_00",
+      "TJ_CoverLitterPatch_02_01",
+      "TJ_CoverLitterPatch_02_02",
+      "TJ_CoverLitterPatch_02_03",
+      "TJ_CoverLitterPatch_03_00",
+      "TJ_CoverLitterPatch_03_01",
+      "TJ_CoverLitterPatch_04_00",
+      "TJ_CoverLitterPatch_04_01",
+      "TJ_CoverLitterPatch_04_02",
+      "TJ_CoverLitterPatch_05_00",
+      "TJ_CoverLitterPatch_05_01",
+      "TJ_CoverLitterPatch_05_02",
+      "TJ_CoverLitterPatch_06_00",
+      "TJ_CoverLitterPatch_06_01",
+      "TJ_CoverLitterPatch_07_00",
+      "TJ_CoverLitterPatch_07_01",
+      "TJ_CoverLitterPatch_08_00",
+      "TJ_CoverLitterPatch_08_01",
+      "TJ_CoverLitterPatch_08_02",
+      "TJ_CoverLitterPatch_08_03",
+      "TJ_CoverLitterPatch_09_00",
+      "TJ_CoverLitterPatch_09_01",
+      "TJ_CoverLitterPatch_09_02",
+      "TJ_CoverLitterPatch_10_00",
+      "TJ_CoverLitterPatch_10_01",
+      "TJ_CoverLitterPatch_10_02",
+      "TJ_CoverLitterPatch_10_03",
+      "TJ_CoverLitterPatch_11_00",
+      "TJ_CoverLitterPatch_11_01",
+      "TJ_CoverLitterPatch_12_00",
+      "TJ_CoverLitterPatch_12_01",
+      "TJ_CoverLitterPatch_12_02",
+      "TJ_CoverLitterPatch_13_00",
+      "TJ_CoverLitterPatch_13_01",
+      "TJ_CoverLitterPatch_13_02",
+      "TJ_CoverLitterPatch_13_03",
+      "TJ_CoverLitterPatch_14_00",
+      "TJ_CoverLitterPatch_14_01",
+      "TJ_CoverLitterPatch_15_00",
+      "TJ_CoverLitterPatch_15_01",
+      "TJ_CoverLitterPatch_15_02",
+      "TJ_CoverLitterPatch_15_03",
+      "TJ_CoverLitterPatch_16_00",
+      "TJ_CoverLitterPatch_16_01",
+      "TJ_CoverLitterPatch_16_02",
+      "TJ_CoverLitterPatch_16_03",
+      "TJ_CoverLitterPatch_17_00",
+      "TJ_CoverLitterPatch_17_01",
+      "TJ_CoverLitterPatch_17_02",
+      "TJ_CoverLitterPatch_17_03",
+      "TJ_CoverLitterPatch_18_00",
+      "TJ_CoverLitterPatch_18_01",
+      "TJ_CoverLitterPatch_19_00",
+      "TJ_CoverLitterPatch_19_01",
+      "TJ_CoverLitterPatch_19_02",
+      "TJ_CoverNeedlePatch_00",
+      "TJ_CoverNeedlePatch_01",
+      "TJ_CoverNeedlePatch_02",
+      "TJ_CoverNeedlePatch_03",
+      "TJ_CoverNeedlePatch_04",
+      "TJ_CoverNeedlePatch_05",
+      "TJ_CoverNeedlePatch_06",
+      "TJ_CoverNeedlePatch_07",
+      "TJ_CoverNeedlePatch_08",
+      "TJ_CoverNeedlePatch_09",
+      "TJ_CoverMossPatch_00",
+      "TJ_CoverMossPatch_01",
+      "TJ_CoverMossPatch_02",
+      "TJ_CoverMossPatch_03",
+      "TJ_CoverMossPatch_04",
+      "TJ_CoverMossPatch_05",
+      "TJ_CoverMossPatch_06",
+      "TJ_CoverMossPatch_07",
+      "TJ_CoverMossPatch_08",
+      "TJ_CoverMossPatch_09",
+      "TJ_CoverMossPatch_10",
+      "TJ_CoverMossPatch_11"
+    ]
+  },
+  "groundDressingChanged": false,
+  "materialLightingLocked": {
+    "bounceColor": [
+      0.78,
+      0.82,
+      0.7
+    ],
+    "bounceEnergy": 210.0,
+    "class": "locked_v3",
+    "exposure": 1.1,
+    "fillColor": [
+      0.82,
+      0.78,
+      0.7
+    ],
+    "fillEnergy": 520.0,
+    "gamma": 1.06,
+    "hdriStrength": 0.12,
+    "hideBounce": false,
+    "hideRim": false,
+    "look": "None",
+    "neutralWorld": false,
+    "rimEnergy": 1.85,
+    "sunColor": [
+      1.0,
+      0.76,
+      0.55
+    ],
+    "sunEnergy": 5.4,
+    "viewTransform": "AgX"
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "productionCamera": {
+    "cameraChanged": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ]
+  },
+  "rainbowSpeckObjectsHidden": [
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_00",
+      "y": 3.4118,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_01",
+      "y": 4.8322,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_02",
+      "y": 9.4829,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_03",
+      "y": 3.9144,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_04",
+      "y": 4.9234,
+      "zone": "foreground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_05",
+      "y": 16.606,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_06",
+      "y": 16.83,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_07",
+      "y": 14.287,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_08",
+      "y": 8.6725,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_09",
+      "y": 15.3499,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_10",
+      "y": 13.0079,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_11",
+      "y": 11.2476,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_12",
+      "y": 6.4523,
+      "zone": "midground"
+    },
+    {
+      "class": "prod_flower",
+      "name": "TJ_ProdFlower_13",
+      "y": 3.6807,
+      "zone": "foreground"
+    }
+  ],
+  "result": "RENDERED",
+  "samples": 24,
+  "schema": "TIVVLEJOY_FOREST_SUNNY_AFTERNOON_TREE_DETAIL_PROOF_V1",
+  "still": {
+    "bytes": 1617962,
+    "dimensions": [
+      1280,
+      720
+    ],
+    "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_SUNNY_AFTERNOON_TREE_DETAIL_PROOF_V2.png",
+    "seconds": 211.02,
+    "sha256": "bb66eaf79eb8422260fce5be8245fad8990a616ea90f65e2a075c2f9678d31ba"
+  },
+  "terrainChanged": false,
+  "visualApproval": false,
+  "waterChanged": false
+}
