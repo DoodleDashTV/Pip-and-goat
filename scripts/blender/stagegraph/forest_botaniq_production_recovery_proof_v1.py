@@ -123,8 +123,8 @@ def _shot_aim(objects, kind: str):
 
     subject = objects[0]
     if kind == "trunk":
-        base = subject.location
-        return Vector((base.x, base.y, base.z + 0.85))
+        from forest_lookdev_isolation_v1 import _bbox_center
+        return _bbox_center(subject)
     if kind == "leaf":
         return Vector(subject.location) + Vector((0.0, 0.0, 0.45))
     center = Vector((0.0, 0.0, 0.0))

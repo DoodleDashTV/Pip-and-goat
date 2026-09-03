@@ -280,7 +280,7 @@ def make_ground_material():
     for mapping in (soil_map, litter_map, moss_map):
         links.new(coord.outputs["Generated"], mapping.inputs["Vector"])
     soil = nodes.new("ShaderNodeTexImage")
-    soil.image = _load_image(SOIL_ALBEDO, "sRGB")
+    soil.image = _load_image(SOIL_ROUGH_ALBEDO if SOIL_ROUGH_ALBEDO.is_file() else SOIL_ALBEDO, "sRGB")
     soil_n = nodes.new("ShaderNodeTexImage")
     soil_n.image = _load_image(SOIL_NORMAL, "Non-Color")
     soil_n.image.colorspace_settings.name = "Non-Color"
@@ -293,8 +293,8 @@ def make_ground_material():
     for node, mapping in ((soil, soil_map), (soil_n, soil_map), (litter, litter_map), (needles, litter_map), (moss, moss_map)):
         links.new(mapping.outputs["Vector"], node.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Saturation"].default_value = 0.72
-    hsv.inputs["Value"].default_value = 0.92
+    hsv.inputs["Saturation"].default_value = 0.62
+    hsv.inputs["Value"].default_value = 0.62
     links.new(soil.outputs["Color"], hsv.inputs["Color"])
     litter_noise = nodes.new("ShaderNodeTexNoise")
     litter_noise.inputs["Scale"].default_value = 7.5
@@ -673,6 +673,40 @@ def scatter_floor_geometry(collection, origin, leaf_mat, moss_mat, rock_mat, cou
     return {"litterCards": count_leaf, "mossCards": count_moss, "rocks": count_rock}
 
 
+def make_production_trunk_cylinder(collection, location, bark_mat):
+    import bpy
+    from mathutils import Vector
+
+    segments = 24
+    radius = 0.32
+    height = 2.15
+    verts = []
+    faces = []
+    for index in range(segments):
+        angle = 2.0 * math.pi * index / segments
+        x = radius * math.cos(angle)
+        y = radius * math.sin(angle)
+        verts.append((x, y, 0.0))
+        verts.append((x, y, height))
+    for index in range(segments):
+        i0 = 2 * index
+        i1 = i0 + 1
+        j0 = 2 * ((index + 1) % segments)
+        j1 = j0 + 1
+        faces.append((i0, j0, j1, i1))
+    mesh = bpy.data.meshes.new("TJ_LookdevTrunk_CylMesh")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new("TJ_LookdevTrunk", mesh)
+    collection.objects.link(obj)
+    obj.location = Vector(location)
+    mesh.materials.append(bark_mat)
+    apply_bark_to_object(obj, bark_mat)
+    _tag(mesh)
+    _tag(obj)
+    return obj
+
+
 def apply_lookdev_subjects(scene, mats, sources) -> dict:
     import bpy
 
@@ -681,19 +715,11 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         raise RuntimeError("LOOKDEV_COLLECTION_MISSING")
     ox, oy, oz = 90.0, 0.0, 0.0
 
-    trunk = bpy.data.objects.get("TJ_LookdevTrunk")
-    vendor_trunk = bpy.data.objects.get("Tree Trunk_1_001")
-    if vendor_trunk is not None:
-        if trunk is not None:
-            _hide(trunk)
-            trunk.name = "TJ_HiddenEcoKitLookdevTrunk"
-        trunk = vendor_trunk.copy()
-        trunk.data = vendor_trunk.data.copy()
-        trunk.data.name = "TJ_LookdevTrunk_CylMesh"
-        collection.objects.link(trunk)
-        _place(trunk, collection, (ox, oy, oz), "TJ_LookdevTrunk", scale=(2.8, 2.8, 2.8))
-    if trunk is not None:
-        apply_bark_to_object(trunk, mats["bark"])
+    existing_trunk = bpy.data.objects.get("TJ_LookdevTrunk")
+    if existing_trunk is not None:
+        existing_trunk.name = "TJ_HiddenEcoKitLookdevTrunk"
+        _hide(existing_trunk)
+    trunk = make_production_trunk_cylinder(collection, (ox, oy, oz), mats["bark"])
 
     for hidden_name, new_name in (
         ("TJ_LookdevBush", "TJ_HiddenEcoKitBush"),
@@ -727,8 +753,7 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
     _place(fern, collection, (ox + 20.4, oy + 0.35, oz), "TJ_LookdevFlower", scale=(1.15, 1.15, 1.15))
     rebuild_appended_materials(fern, mats["fern"], stem_mat=mats["stem"])
 
-    leaf = make_card(collection, "TJ_LookdevLeaf", (ox + 14.0, oy, oz + 0.35), (0.15, 0.0, 0.0), (0.85, 0.85, 0.85), mats["leaf"])
-    make_card(collection, "TJ_LookdevLeaf_B", (ox + 14.18, oy + 0.06, oz + 0.32), (0.2, 0.55, 1.05), (0.7, 0.7, 0.7), mats["leaf"])
+    leaf = make_card(collection, "TJ_LookdevLeaf", (ox + 14.0, oy, oz + 0.35), (0.12, 0.0, 0.0), (0.95, 0.95, 0.95), mats["leaf"])
 
     ground = bpy.data.objects.get("TJ_LookdevGroundPatch")
     if ground is not None:
@@ -739,7 +764,7 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         for slot in ground.material_slots:
             slot.link = "OBJECT"
             slot.material = mats["ground"]
-        scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["leaf"], mats["moss"], mats["rock"])
+            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 14, 8, 4)
 
     return {
         "trunk": None if trunk is None else trunk.name,
@@ -762,6 +787,7 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         "bark": make_bark_material(bark_kind),
         "ground": make_ground_material(),
         "leaf": make_foliage_material("TJ_ProdLeaf_Corylus_V1", leaf_albedo_path(), LEAF_NORMAL, 0.22, clip=True),
+        "litter": make_foliage_material("TJ_ProdLitterLeaf_V1", leaf_albedo_path(), LEAF_NORMAL, 0.10, clip=False),
         "fern": make_foliage_material("TJ_ProdFern_V1", FERN_ALBEDO, FERN_NORMAL, 0.18, clip=True),
         "moss": make_foliage_material("TJ_ProdMossCard_V1", MOSS_CARD, None, 0.08, clip=True),
         "flower": make_foliage_material("TJ_ProdFlower_V1", FLOWER_ALBEDO, FLOWER_NORMAL, 0.12, clip=True),
@@ -793,7 +819,7 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
             for slot in ground.material_slots:
                 slot.link = "OBJECT"
                 slot.material = mats["ground"]
-            scatter_floor_geometry(root, (0.0, 3.5, 0.0), mats["leaf"], mats["moss"], mats["rock"], 22, 10, 6)
+            scatter_floor_geometry(root, (0.0, 3.5, 0.0), mats["litter"], mats["moss"], mats["rock"], 22, 10, 6)
         production = {"trees": trees, "vegetation": veg, "ground": ground is not None}
     if mode in {"lookdev", "both"}:
         lookdev = apply_lookdev_subjects(scene, mats, sources)
