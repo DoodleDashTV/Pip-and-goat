@@ -1,8 +1,8 @@
 # TivvleJoy Ground Pack Intake Manifest
 
-Status: source ZIPs verified in ChatGPT/Codex scratch and saved in ChatGPT Library. ZIP binaries are not yet pushed to GitHub because this runtime lacks normal `git push` authentication for Git LFS.
+Status: all three source ZIPs were re-materialized from ChatGPT Library into the current Codex runtime and re-verified byte-for-byte against this manifest. The local resume gate for `TIVVLEJOY_DIRT_PACK_INTEGRATION_V1` is satisfied. The ZIP binaries are still not committed to this public GitHub repository; environments without the materialized copies must obtain them through Git LFS or private asset storage.
 
-The repository is public. These three ground packs were provided by Justin as free packs, but they are still large binary source assets. Commit them only through Git LFS or place them in private asset storage before resuming integration.
+The repository is public. These three ground packs were provided by Justin as free packs, but they are still large binary source assets. Keep the binaries out of normal Git history; use Git LFS or private asset storage for durable remote placement.
 
 ## Required ZIPs
 
@@ -20,16 +20,33 @@ The repository is public. These three ground packs were provided by Justin as fr
 | `sparse_grass_4k.blend.zip` | `TJ_GROUND_SPARSE_GRASS_4K_001` |
 | `grass_path_2_4k.blend.zip` | `TJ_GROUND_GRASS_PATH_2_4K_001` |
 
+Machine-readable registry: `assets/inbox/ground/ground_pack_registry.json`.
+
+Verifier: `scripts/verify_tivvlejoy_ground_packs.py`.
+
+The verifier is fail-closed and checks exact byte size, SHA-256, ZIP CRC, required members, and the expected `.blend` member without extracting or mutating the source archives.
+
 ## Saved Copies
 
-Clean copies were saved in ChatGPT Library after upload:
+Canonical clean copies currently retained in ChatGPT Library:
 
 | File | Library file ID |
 | --- | --- |
-| `dirt_4k.blend.zip` | `libfile_8d0fb7b9668c8191badaf5b89537a699` |
-| `sparse_grass_4k.blend.zip` | `libfile_c145793538608191a906c25f81e572a4` |
-| `grass_path_2_4k.blend.zip` | `libfile_09c98cfcd9008191b096889e88c001e1` |
+| `dirt_4k.blend.zip` | `file_00000000da6081f493bf021121e28850` |
+| `sparse_grass_4k.blend.zip` | `file_00000000c72c820a8161fe10f148d0a9` |
+| `grass_path_2_4k.blend.zip` | `file_0000000086408246a0b5045f7bba0ac7` |
+
+## Current Verification Receipt
+
+`TIVVLEJOY_GROUND_PACK_VERIFY_V1` = **PASS** in the current runtime against the canonical ZIPs.
+
+- Pack count: 3
+- Exact sizes: PASS
+- SHA-256: PASS
+- ZIP CRC/member checks: PASS
+- Source archives mutated: NO
+- Paid render started: NO
 
 ## Resume Gate
 
-Resume `TIVVLEJOY_DIRT_PACK_INTEGRATION_V1` only after all three ZIPs are present at `assets/inbox/ground/` through Git LFS checkout, local file placement, ChatGPT Library materialization in Codex, or private asset storage. Preserve camera, terrain, water, sky card, and approved Botaniq hero trees. Do not start paid renders.
+`TIVVLEJOY_DIRT_PACK_INTEGRATION_V1` may continue in this runtime because all three canonical ZIPs are materialized and verified. Preserve camera, terrain, water, sky card, and approved Botaniq hero trees. Do not start paid renders. Any later environment that does not have the three ZIPs must restore them through Git LFS checkout, local file placement, ChatGPT Library materialization in Codex, or private asset storage before running the ground-pack integration.
