@@ -86,19 +86,22 @@ HERO_RECEIVER_COLLECTION = "TJ_HERO_TREE_RECEIVERS_V1"
 HERO_CANOPY_KEY_NAME = "TJ_HeroCanopyKey_V1"
 HERO_CANOPY_KEY_R_NAME = "TJ_HeroCanopyKey_R_V1"
 HERO_TRUNK_KICKER_NAME = "TJ_HeroTrunkKicker_V1"
-HERO_CANOPY_KEY_ENERGY = 720.0
+HERO_CANOPY_KEY_ENERGY = 1100.0
 HERO_CANOPY_KEY_COLOR = (1.0, 0.93, 0.72)
 HERO_CANOPY_KEY_SIZE = 16.0
 HERO_CANOPY_KEY_LOCATION = (-2.4, -8.6, 6.8)
 HERO_CANOPY_KEY_AIM = (0.0, 8.0, 5.8)
-HERO_CANOPY_KEY_R_ENERGY = 460.0
+HERO_CANOPY_KEY_R_ENERGY = 780.0
 HERO_CANOPY_KEY_R_LOCATION = (3.4, -8.2, 6.2)
 HERO_CANOPY_KEY_R_AIM = (2.2, 8.2, 5.2)
-HERO_TRUNK_KICKER_ENERGY = 640.0
+HERO_TRUNK_KICKER_ENERGY = 860.0
 HERO_TRUNK_KICKER_COLOR = (1.0, 0.88, 0.62)
 HERO_TRUNK_KICKER_SIZE = 1.4
 HERO_TRUNK_KICKER_LOCATION = (-8.6, -4.2, 3.4)
 HERO_TRUNK_KICKER_AIM = (-7.2, 2.2, 2.6)
+HERO_TRUNK_KICKER_C_NAME = "TJ_HeroTrunkKicker_C_V1"
+HERO_TRUNK_KICKER_C_LOCATION = (-2.2, -6.4, 2.9)
+HERO_TRUNK_KICKER_C_AIM = (-0.6, 5.0, 2.3)
 HERO_DAPPLE_ENERGY = 920.0
 # Sit under the Botaniq lids so spots reach the path instead of dying in cards.
 HERO_DAPPLE_SPOTS = (
@@ -397,7 +400,7 @@ def tune_botaniq_hero_materials() -> dict:
             if "bq_brightness" in node.inputs:
                 node.inputs["bq_brightness"].default_value = 1.55
             if "Value" in node.inputs and "Leaf" in material.name:
-                node.inputs["Value"].default_value = 1.70
+                node.inputs["Value"].default_value = 2.05
             if "Translucency Value" in node.inputs:
                 node.inputs["Translucency Value"].default_value = 1.25
         material.blend_method = "HASHED"
@@ -519,6 +522,23 @@ def add_hero_linked_lights(scene) -> dict:
     _aim_at(kicker, HERO_TRUNK_KICKER_AIM)
     kicker_linked = _apply_light_linking(kicker, receivers)
 
+    kicker_c = _ensure_light(collection, HERO_TRUNK_KICKER_C_NAME, "AREA")
+    kicker_c.data.type = "AREA"
+    if hasattr(kicker_c.data, "shape"):
+        kicker_c.data.shape = "DISK"
+    kicker_c.data.size = HERO_TRUNK_KICKER_SIZE
+    kicker_c.data.energy = HERO_TRUNK_KICKER_ENERGY
+    kicker_c.data.color = HERO_TRUNK_KICKER_COLOR
+    kicker_c.data.use_shadow = False
+    if hasattr(kicker_c.data, "spread"):
+        try:
+            kicker_c.data.spread = math.radians(70.0)
+        except Exception:
+            pass
+    kicker_c.location = HERO_TRUNK_KICKER_C_LOCATION
+    _aim_at(kicker_c, HERO_TRUNK_KICKER_C_AIM)
+    kicker_c_linked = _apply_light_linking(kicker_c, receivers)
+
     retargeted = []
     for name in EXISTING_LINKED_LIGHTS:
         obj = scene.objects.get(name)
@@ -548,11 +568,15 @@ def add_hero_linked_lights(scene) -> dict:
     if not kicker_linked:
         kicker.hide_render = True
         kicker.data.energy = 0.0
+    if not kicker_c_linked:
+        kicker_c.hide_render = True
+        kicker_c.data.energy = 0.0
     return {
         "receiverCount": len(receivers.objects),
         "canopyKeyLinked": key_linked,
         "canopyKeyRightLinked": key_r_linked,
         "trunkKickerLinked": kicker_linked,
+        "centerTrunkKickerLinked": kicker_c_linked,
         "retargetedLinkedLights": retargeted,
         "dapplesRetuned": dapples,
         "canopyKeyEnergy": float(key.data.energy),

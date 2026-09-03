@@ -17,6 +17,7 @@ from forest_hero_tree_replacement_v1 import (
     HERO_RECEIVER_COLLECTION,
     HERO_SUN_ENERGY,
     HERO_SUN_TRAVEL,
+    HERO_TRUNK_KICKER_C_NAME,
     HERO_TRUNK_KICKER_NAME,
     missing_hero_paths,
 )
