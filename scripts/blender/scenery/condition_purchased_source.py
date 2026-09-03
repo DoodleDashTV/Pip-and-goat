@@ -9,6 +9,8 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ground_pack_intake import condition_ground_source
+
 CONDITION_CATALOG = (
     {"sourceId": "SRC_VILLAGE_BLEND_ZIP", "role": "village_blender", "kind": "geometry_library"},
     {"sourceId": "SRC_VILLAGE_TEXTURES_ZIP", "role": "village_textures", "kind": "texture_library"},
@@ -24,6 +26,9 @@ CONDITION_CATALOG = (
     {"sourceId": "SRC_STYLIZED_TAVERN_INTERIOR", "role": "stylized_tavern", "kind": "geometry_library"},
     {"sourceId": "SRC_3DT_MOUNTAIN_PACK", "role": "mountains_3dt", "kind": "geometry_library"},
     {"sourceId": "SRC_BOTANIQ_FULL", "role": "botaniq_full", "kind": "vegetation_library"},
+    {"sourceId": "SRC_TIVVLEJOY_DIRT_4K", "role": "ground_dirt", "kind": "ground_material_library"},
+    {"sourceId": "SRC_TIVVLEJOY_SPARSE_GRASS_4K", "role": "ground_sparse_grass", "kind": "ground_material_library"},
+    {"sourceId": "SRC_TIVVLEJOY_GRASS_PATH_2_4K", "role": "ground_grass_path", "kind": "ground_material_library"},
 )
 
 
@@ -55,6 +60,8 @@ def inspect_zip(path: Path) -> dict:
 
 
 def condition_one(source: Path, out_root: Path, source_id: str, role: str) -> dict:
+    if role.startswith("ground_"):
+        return condition_ground_source(source, out_root, source_id, role)
     if not source.is_file():
         return {
             "sourceId": source_id,
@@ -131,6 +138,9 @@ def main() -> int:
         "SRC_BOTANIQ_GEOSCATTER_BIOMES": "16-SRC_BOTANIQ_GEOSCATTER_BIOMES.zip",
         "SRC_3DT_MOUNTAIN_PACK": "SRC_3DT_MOUNTAIN_PACK.zip",
         "SRC_BOTANIQ_FULL": "SRC_BOTANIQ_FULL.zip",
+        "SRC_TIVVLEJOY_DIRT_4K": "dirt_4k.blend.zip",
+        "SRC_TIVVLEJOY_SPARSE_GRASS_4K": "sparse_grass_4k.blend.zip",
+        "SRC_TIVVLEJOY_GRASS_PATH_2_4K": "grass_path_2_4k.blend.zip",
     }
     receipts = []
     for spec in CONDITION_CATALOG:
