@@ -1,0 +1,59 @@
+{
+  "schema": "TIVVLEJOY_GROUND_PACK_INTAKE_V1",
+  "status": "PASS",
+  "generatedAt": "2026-09-03T23:52:59Z",
+  "sourceRootKind": "private_local_recovery",
+  "productionSceneModified": false,
+  "paidExecutionPerformed": false,
+  "sourceBinariesCommittedToGit": false,
+  "packs": [
+    {
+      "registryId": "TJ_GROUND_DIRT_4K_001",
+      "sourceFile": "dirt_4k.blend.zip",
+      "expectedBytes": 75853439,
+      "expectedSha256": "126184ec4cb24629b970c81053630ca4ff7be65e07d5af604c3495b5dd27f855",
+      "sourceBytes": 75853439,
+      "sourceSha256": "126184ec4cb24629b970c81053630ca4ff7be65e07d5af604c3495b5dd27f855",
+      "status": "PASS",
+      "wrapper": "zstd",
+      "wrappedBlendBytes": 217924,
+      "wrappedBlendSha256": "cfc1da90977983de73cf007ce313e8703793f14da86a36446bcbc6dc6503bb25",
+      "normalizedBlendBytes": 1293768,
+      "normalizedBlendSha256": "918b884cc3c3023591aea212c9ed95b0279b12101650d78b740269c964691979",
+      "blend": {"version": "4.02", "pointerBits": 64, "endianness": "little", "hasDNA1": true, "hasENDB": true},
+      "textureCount": 4
+    },
+    {
+      "registryId": "TJ_GROUND_SPARSE_GRASS_4K_001",
+      "sourceFile": "sparse_grass_4k.blend.zip",
+      "expectedBytes": 107103973,
+      "expectedSha256": "a7c199590a03f45bb8c00c44fb6b77096b107fc2cd075019b30ea590bbf64327",
+      "sourceBytes": 107103973,
+      "sourceSha256": "a7c199590a03f45bb8c00c44fb6b77096b107fc2cd075019b30ea590bbf64327",
+      "status": "PASS",
+      "wrapper": "zstd",
+      "wrappedBlendBytes": 216906,
+      "wrappedBlendSha256": "38babc0f60d278340edd07381c7339181e584edf3b2835fbd91b356604abab99",
+      "normalizedBlendBytes": 1302332,
+      "normalizedBlendSha256": "c846dce23bfd624ea652c8471fde7293e50a6d0d1e942603e6ef9a4cdf996f46",
+      "blend": {"version": "4.02", "pointerBits": 64, "endianness": "little", "hasDNA1": true, "hasENDB": true},
+      "textureCount": 5
+    },
+    {
+      "registryId": "TJ_GROUND_GRASS_PATH_2_4K_001",
+      "sourceFile": "grass_path_2_4k.blend.zip",
+      "expectedBytes": 57949131,
+      "expectedSha256": "73658d129d9572d058aa0525e9bcbecc3e39a7d172025396674570e951ba9d9c",
+      "sourceBytes": 57949131,
+      "sourceSha256": "73658d129d9572d058aa0525e9bcbecc3e39a7d172025396674570e951ba9d9c",
+      "status": "PASS",
+      "wrapper": "gzip",
+      "wrappedBlendBytes": 275931,
+      "wrappedBlendSha256": "81886890c3bb6af3ecb5f849f7b54e0397f17c8a26a722de58c03ab4de528a8b",
+      "normalizedBlendBytes": 1402856,
+      "normalizedBlendSha256": "d0820554d8aa1306273ae6b1a1aa8247c9225949d4d58cc183e051f60eb193da",
+      "blend": {"version": "2.93", "pointerBits": 64, "endianness": "little", "hasDNA1": true, "hasENDB": true},
+      "textureCount": 4
+    }
+  ]
+}
