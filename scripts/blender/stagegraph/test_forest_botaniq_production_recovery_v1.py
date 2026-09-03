@@ -11,6 +11,8 @@ from forest_botaniq_production_recovery_v1 import (
     BARK_NORMAL_STRENGTH,
     FEATURE,
     TILIA_ASPECT,
+    TILIA_WORLD_HEIGHT,
+    TILIA_WORLD_WIDTH,
     required_owned_paths,
 )
 
@@ -21,6 +23,8 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertEqual(FEATURE, "forest_botaniq_production_recovery_v1")
         self.assertLess(BARK_NORMAL_STRENGTH, 0.75)
         self.assertEqual(TILIA_ASPECT, 4.0)
+        self.assertEqual(TILIA_WORLD_WIDTH, 0.85)
+        self.assertEqual(TILIA_WORLD_HEIGHT, 3.4)
         self.assertGreater(BACKGROUND_Y, 12.0)
         self.assertIn("cameraChanged\": False", source)
         self.assertIn("terrainChanged\": False", source)
@@ -29,7 +33,12 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertNotIn("ShaderNodeEmission", source)
         self.assertIn("cylindrical_unwrap_trunk_faces", source)
         self.assertIn("bq_Soil_Loose_Diffuse", source)
+        self.assertIn("ensure_cutout_png", source)
+        self.assertIn("ShaderNodeNewGeometry", source)
+        self.assertIn("Position", source)
         self.assertIn("_exile", source)
+        self.assertIn("bind_production_ground", source)
+        self.assertIn("user_remap", source)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", source)
 
     def test_required_owned_sources(self):
