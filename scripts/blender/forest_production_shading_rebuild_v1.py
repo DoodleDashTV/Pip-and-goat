@@ -15,8 +15,8 @@ FLORA_MIX = "TJ_ProdFloraMix_V1"
 FLORA_BUMP = "TJ_ProdFloraBump_V1"
 
 VENDOR_WOOD = (0.2482, 0.0989, 0.0393, 1.0)
-BARK_BUMP_STRENGTH = 0.72
-BARK_BUMP_DISTANCE = 0.065
+BARK_BUMP_STRENGTH = 0.95
+BARK_BUMP_DISTANCE = 0.11
 BARK_ROUGH_MIN = 0.74
 BARK_ROUGH_MAX = 0.94
 
@@ -29,9 +29,10 @@ FALLEN_LEAF_TARGET = 180
 ROCK_INSTANCE_TARGET = 20
 ROCK_BLEND = Path("/tmp/tivvlejoy-ecokit/Stylised EcoKit/Rock_Models.blend")
 
-FILL_ENERGY = 180.0
-BOUNCE_ENERGY = 160.0
-CANOPY_FILL_ENERGY = 340.0
+FILL_ENERGY = 140.0
+BOUNCE_ENERGY = 150.0
+CANOPY_FILL_ENERGY = 280.0
+HDRI_LIGHT_STRENGTH = 0.90
 EXPOSURE = 0.38
 
 
@@ -281,7 +282,7 @@ def install_production_earth() -> dict:
     moss_mask = nodes.new("ShaderNodeMath")
     moss_mask.location = (40, -200)
     moss_mask.operation = "GREATER_THAN"
-    moss_mask.inputs[1].default_value = 0.82
+    moss_mask.inputs[1].default_value = 0.90
     links.new(mid.outputs["Fac"], moss_mask.inputs[0])
     moss_mix = _new_mix(nodes, "TJ_ProdEarthMossDress_V1")
     moss_mix.location = (480, 40)
@@ -578,7 +579,7 @@ def scatter_forest_dressing(scene) -> dict:
             obj = source.copy()
             obj.data = source.data
             root.objects.link(obj)
-            obj.location = (rng.uniform(-8.5, 8.5), rng.uniform(-6.0, 16.0), 0.012)
+            obj.location = (rng.uniform(-7.5, 7.5), rng.uniform(-3.5, 10.0), 0.014)
             obj.rotation_euler.z += rng.uniform(-math.pi, math.pi)
             scale = rng.uniform(0.85, 1.25)
             obj.scale = tuple(float(v) * scale for v in obj.scale)
@@ -725,6 +726,12 @@ def rebalance_production_lights(scene) -> dict:
     if canopy is not None:
         canopy.data.energy = CANOPY_FILL_ENERGY
         changed["canopyFill"] = CANOPY_FILL_ENERGY
+    world = scene.world
+    if world is not None and world.use_nodes and world.node_tree is not None:
+        light_bg = world.node_tree.nodes.get("TJ_CinematicWorldLight_V1")
+        if light_bg is not None and "Strength" in light_bg.inputs:
+            light_bg.inputs["Strength"].default_value = HDRI_LIGHT_STRENGTH
+            changed["hdriLight"] = HDRI_LIGHT_STRENGTH
     scene.view_settings.exposure = EXPOSURE
     return changed
 

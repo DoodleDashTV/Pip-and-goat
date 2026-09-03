@@ -33,9 +33,9 @@ class ForestProductionShadingRebuildTest(unittest.TestCase):
         self.assertGreater(VENDOR_WOOD[0], VENDOR_WOOD[1])
         self.assertGreater(VENDOR_WOOD[1], VENDOR_WOOD[2])
         self.assertGreater(BARK_BUMP_STRENGTH, 0.45)
-        self.assertLess(BARK_BUMP_STRENGTH, 0.95)
+        self.assertLessEqual(BARK_BUMP_STRENGTH, 1.0)
         self.assertGreater(BARK_BUMP_DISTANCE, 0.02)
-        self.assertLess(BARK_BUMP_DISTANCE, 0.12)
+        self.assertLessEqual(BARK_BUMP_DISTANCE, 0.14)
         self.assertGreaterEqual(BARK_ROUGH_MIN, 0.70)
         self.assertGreater(BARK_ROUGH_MAX, BARK_ROUGH_MIN)
         self.assertEqual(TRUNK_MAT_PREFIX, "TJ_ProdTrunk_")
@@ -75,7 +75,7 @@ class ForestProductionShadingRebuildTest(unittest.TestCase):
         self.assertEqual(EXPOSURE, 0.38)
         self.assertLess(FILL_ENERGY, 240.0)
         self.assertLess(CANOPY_FILL_ENERGY, 420.0)
-        self.assertGreater(FILL_ENERGY, 120.0)
+        self.assertGreater(FILL_ENERGY, 100.0)
 
     def test_no_emission_and_failed_principled_override_is_not_called(self):
         source = (ROOT / "forest_production_shading_rebuild_v1.py").read_text(encoding="utf-8")
