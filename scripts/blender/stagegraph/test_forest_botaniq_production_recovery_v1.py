@@ -28,6 +28,8 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("lightingChanged\": False", source)
         self.assertNotIn("ShaderNodeEmission", source)
         self.assertIn("cylindrical_unwrap_trunk_faces", source)
+        self.assertIn("bq_Soil_Loose_Diffuse", source)
+        self.assertIn("_exile", source)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", source)
 
     def test_required_owned_sources(self):
@@ -45,4 +47,6 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("LOOKDEV_GRASS_FERN_PRODUCTION_V2", proof)
         self.assertIn("FOREST_MATERIAL_RECOVERY_CAMERA_PROOF_V1", proof)
         self.assertIn("verify_production_camera", proof)
+        self.assertIn("_exclusive_visibility", proof)
+        self.assertIn("BARK_SUBJECT_NOT_CYLINDER", proof)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", proof)

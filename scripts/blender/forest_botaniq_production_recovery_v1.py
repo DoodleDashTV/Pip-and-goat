@@ -58,10 +58,10 @@ TILIA_ASPECT = 4.0
 BACKGROUND_Y = 18.0
 
 
-def _tag(id_data) -> None:
+def _tag(id_data, isolation: bool = True) -> None:
     id_data["tj_generated"] = True
-    id_data["tj_feature"] = LOOKDEV_FEATURE
     id_data["tj_recovery"] = FEATURE
+    id_data["tj_feature"] = LOOKDEV_FEATURE if isolation else FEATURE
 
 
 def leaf_albedo_path() -> Path:
@@ -244,19 +244,29 @@ def make_foliage_material(name: str, albedo_path: Path, normal_path: Path | None
     return material
 
 
-def make_opaque_pbr(name: str, albedo_path: Path, normal_path: Path | None, roughness: float = 0.8):
+def make_opaque_pbr(name: str, albedo_path: Path, normal_path: Path | None, roughness: float = 0.8, mapping: str = "uv"):
     material = _new_material(name)
     nodes = material.node_tree.nodes
     links = material.node_tree.links
     shader, _output = _principled(nodes, links)
     tex = nodes.new("ShaderNodeTexImage")
     tex.image = _load_image(albedo_path, "sRGB")
-    links.new(tex.outputs["Color"], shader.inputs["Base Color"])
     shader.inputs["Roughness"].default_value = roughness
+    vector = None
+    if mapping == "object":
+        coord = nodes.new("ShaderNodeTexCoord")
+        scale = nodes.new("ShaderNodeMapping")
+        scale.inputs["Scale"].default_value = (1.8, 1.8, 1.8)
+        links.new(coord.outputs["Object"], scale.inputs["Vector"])
+        vector = scale.outputs["Vector"]
+        links.new(vector, tex.inputs["Vector"])
+    links.new(tex.outputs["Color"], shader.inputs["Base Color"])
     if normal_path is not None and normal_path.is_file():
         ntex = nodes.new("ShaderNodeTexImage")
         ntex.image = _load_image(normal_path, "Non-Color")
         ntex.image.colorspace_settings.name = "Non-Color"
+        if vector is not None:
+            links.new(vector, ntex.inputs["Vector"])
         nmap = nodes.new("ShaderNodeNormalMap")
         nmap.inputs["Strength"].default_value = 0.55
         links.new(ntex.outputs["Color"], nmap.inputs["Color"])
@@ -270,51 +280,62 @@ def make_ground_material():
     links = material.node_tree.links
     shader, _output = _principled(nodes, links)
     coord = nodes.new("ShaderNodeTexCoord")
+    # Object space: 1 UV tile \u2248 2.2 m so a 2 m lookdev patch still shows soil structure.
     soil_map = nodes.new("ShaderNodeMapping")
-    soil_map.inputs["Scale"].default_value = (16.0, 16.0, 16.0)
+    soil_map.inputs["Scale"].default_value = (0.45, 0.45, 0.45)
     litter_map = nodes.new("ShaderNodeMapping")
-    litter_map.inputs["Scale"].default_value = (11.0, 11.0, 11.0)
-    litter_map.inputs["Rotation"].default_value = (0.0, 0.0, 0.4)
+    litter_map.inputs["Scale"].default_value = (0.38, 0.38, 0.38)
+    litter_map.inputs["Rotation"].default_value = (0.0, 0.0, 0.35)
     moss_map = nodes.new("ShaderNodeMapping")
-    moss_map.inputs["Scale"].default_value = (22.0, 22.0, 22.0)
+    moss_map.inputs["Scale"].default_value = (0.70, 0.70, 0.70)
     for mapping in (soil_map, litter_map, moss_map):
-        links.new(coord.outputs["Generated"], mapping.inputs["Vector"])
+        links.new(coord.outputs["Object"], mapping.inputs["Vector"])
     soil = nodes.new("ShaderNodeTexImage")
-    soil.image = _load_image(SOIL_ROUGH_ALBEDO if SOIL_ROUGH_ALBEDO.is_file() else SOIL_ALBEDO, "sRGB")
+    soil.image = _load_image(SOIL_ALBEDO if SOIL_ALBEDO.is_file() else SOIL_ROUGH_ALBEDO, "sRGB")
     soil_n = nodes.new("ShaderNodeTexImage")
     soil_n.image = _load_image(SOIL_NORMAL, "Non-Color")
     soil_n.image.colorspace_settings.name = "Non-Color"
     litter = nodes.new("ShaderNodeTexImage")
     litter.image = _load_image(LITTER_ALBEDO, "sRGB")
+    litter_n = nodes.new("ShaderNodeTexImage")
+    litter_n.image = _load_image(LITTER_NORMAL, "Non-Color")
+    litter_n.image.colorspace_settings.name = "Non-Color"
     needles = nodes.new("ShaderNodeTexImage")
     needles.image = _load_image(NEEDLES_ALBEDO, "sRGB")
     moss = nodes.new("ShaderNodeTexImage")
     moss.image = _load_image(MOSS_ALBEDO, "sRGB")
-    for node, mapping in ((soil, soil_map), (soil_n, soil_map), (litter, litter_map), (needles, litter_map), (moss, moss_map)):
+    for node, mapping in (
+        (soil, soil_map),
+        (soil_n, soil_map),
+        (litter, litter_map),
+        (litter_n, litter_map),
+        (needles, litter_map),
+        (moss, moss_map),
+    ):
         links.new(mapping.outputs["Vector"], node.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Saturation"].default_value = 0.62
-    hsv.inputs["Value"].default_value = 0.62
+    hsv.inputs["Saturation"].default_value = 0.82
+    hsv.inputs["Value"].default_value = 0.86
     links.new(soil.outputs["Color"], hsv.inputs["Color"])
     litter_noise = nodes.new("ShaderNodeTexNoise")
-    litter_noise.inputs["Scale"].default_value = 7.5
+    litter_noise.inputs["Scale"].default_value = 1.35
     litter_noise.inputs["Detail"].default_value = 8.0
     moss_noise = nodes.new("ShaderNodeTexNoise")
-    moss_noise.inputs["Scale"].default_value = 5.0
+    moss_noise.inputs["Scale"].default_value = 1.8
     moss_noise.inputs["Detail"].default_value = 6.0
-    links.new(coord.outputs["Generated"], litter_noise.inputs["Vector"])
-    links.new(coord.outputs["Generated"], moss_noise.inputs["Vector"])
+    links.new(coord.outputs["Object"], litter_noise.inputs["Vector"])
+    links.new(coord.outputs["Object"], moss_noise.inputs["Vector"])
     litter_ramp = nodes.new("ShaderNodeValToRGB")
-    litter_ramp.color_ramp.elements[0].position = 0.32
-    litter_ramp.color_ramp.elements[1].position = 0.68
+    litter_ramp.color_ramp.elements[0].position = 0.18
+    litter_ramp.color_ramp.elements[1].position = 0.48
     moss_ramp = nodes.new("ShaderNodeValToRGB")
-    moss_ramp.color_ramp.elements[0].position = 0.70
-    moss_ramp.color_ramp.elements[1].position = 0.86
+    moss_ramp.color_ramp.elements[0].position = 0.62
+    moss_ramp.color_ramp.elements[1].position = 0.80
     links.new(litter_noise.outputs["Fac"], litter_ramp.inputs["Fac"])
     links.new(moss_noise.outputs["Fac"], moss_ramp.inputs["Fac"])
     mix_needles = _mix_color(nodes, "TJ_Needles")
     fac, a, b = _mix_sockets(mix_needles)
-    fac.default_value = 0.28
+    fac.default_value = 0.22
     links.new(litter.outputs["Color"], a)
     links.new(needles.outputs["Color"], b)
     mix_litter = _mix_color(nodes, "TJ_SoilLitter")
@@ -328,10 +349,15 @@ def make_ground_material():
     links.new(moss.outputs["Color"], b)
     links.new(moss_ramp.outputs["Color"], fac)
     links.new(_mix_out(mix_moss), shader.inputs["Base Color"])
-    shader.inputs["Roughness"].default_value = 0.88
+    shader.inputs["Roughness"].default_value = 0.90
     nmap = nodes.new("ShaderNodeNormalMap")
-    nmap.inputs["Strength"].default_value = 0.5
-    links.new(soil_n.outputs["Color"], nmap.inputs["Color"])
+    nmap.inputs["Strength"].default_value = 0.42
+    mix_n = _mix_color(nodes, "TJ_GroundNormalMix")
+    fac, a, b = _mix_sockets(mix_n)
+    links.new(soil_n.outputs["Color"], a)
+    links.new(litter_n.outputs["Color"], b)
+    links.new(litter_ramp.outputs["Color"], fac)
+    links.new(_mix_out(mix_n), nmap.inputs["Color"])
     links.new(nmap.outputs["Normal"], shader.inputs["Normal"])
     return material
 
@@ -455,6 +481,29 @@ def write_card_uvs(obj) -> None:
             uv.data[loop_index].uv = corners[offset % 4]
 
 
+def make_decal(collection, name, location, rotation_z, scale, material):
+    import bpy
+    from mathutils import Euler, Vector
+
+    mesh = bpy.data.meshes.new(name + "_Mesh")
+    mesh.from_pydata(
+        [(-0.5, -0.5, 0.0), (0.5, -0.5, 0.0), (0.5, 0.5, 0.0), (-0.5, 0.5, 0.0)],
+        [],
+        [(0, 1, 2, 3)],
+    )
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.location = Vector(location)
+    obj.rotation_euler = Euler((0.0, 0.0, rotation_z))
+    obj.scale = scale
+    mesh.materials.append(material)
+    write_card_uvs(obj)
+    _tag(mesh)
+    _tag(obj)
+    return obj
+
+
 def make_card(collection, name, location, rotation, scale, material):
     import bpy
     from mathutils import Euler, Vector
@@ -511,6 +560,19 @@ def _hide(obj) -> None:
     obj.hide_render = True
     obj.hide_viewport = True
     obj["tj_feature"] = "forest_botaniq_hidden"
+    try:
+        obj.hide_set(True)
+    except Exception:
+        pass
+
+
+def _exile(obj) -> None:
+    _hide(obj)
+    if obj is None:
+        return
+    obj.location = (90.0, -80.0, -40.0)
+    for col in list(obj.users_collection):
+        col.objects.unlink(obj)
 
 
 def _place(obj, collection, location, name, scale=None, rotation_z=0.0):
@@ -527,7 +589,8 @@ def _place(obj, collection, location, name, scale=None, rotation_z=0.0):
     obj.rotation_euler.z = rotation_z
     obj.hide_render = False
     obj.hide_viewport = False
-    _tag(obj)
+    isolation = obj.name.startswith("TJ_Lookdev") or obj.name.startswith("TJ_ProdLookdev")
+    _tag(obj, isolation=isolation)
     return obj
 
 
@@ -567,7 +630,7 @@ def apply_production_trees(root, bark_mat) -> dict:
     return {"treeObjects": count, "uniqueMeshes": len(seen), "unwraps": reports}
 
 
-def replace_ecokit_vegetation(root, shrub, grass, fern, leaf_mat, flower_mat) -> dict:
+def replace_ecokit_vegetation(root, shrub, grass, fern, leaf_mat, flower_mat, litter_mat=None) -> dict:
     import random
 
     rng = random.Random(7301)
@@ -613,13 +676,13 @@ def replace_ecokit_vegetation(root, shrub, grass, fern, leaf_mat, flower_mat) ->
                 )
                 replaced["floral"] += 1
             elif kind == "fallenLeaves":
-                make_card(
+                make_decal(
                     root,
                     f"TJ_ProdLitter_{replaced['fallenLeaves']:02d}",
-                    (obj.location.x, obj.location.y, 0.01),
-                    (1.45, 0.0, rng.uniform(-3.1, 3.1)),
-                    (0.16, 0.16, 0.16),
-                    leaf_mat,
+                    (obj.location.x, obj.location.y, 0.012),
+                    rng.uniform(-3.1, 3.1),
+                    (rng.uniform(0.22, 0.38), rng.uniform(0.22, 0.38), 1.0),
+                    litter_mat or leaf_mat,
                 )
                 replaced["fallenLeaves"] += 1
             continue
@@ -639,38 +702,63 @@ def replace_ecokit_vegetation(root, shrub, grass, fern, leaf_mat, flower_mat) ->
     return {"replaced": replaced, "backgroundPreserved": preserved}
 
 
-def scatter_floor_geometry(collection, origin, leaf_mat, moss_mat, rock_mat, count_leaf=18, count_moss=8, count_rock=5) -> dict:
+def make_moss_mound(collection, name, location, scale, material):
+    import bpy
+    from mathutils import Vector
+
+    segments = 10
+    verts = [(0.0, 0.0, 0.55)]
+    faces = []
+    for index in range(segments):
+        angle = 2.0 * math.pi * index / segments
+        verts.append((math.cos(angle), math.sin(angle), 0.0))
+    for index in range(segments):
+        faces.append((0, 1 + index, 1 + ((index + 1) % segments)))
+    mesh = bpy.data.meshes.new(name + "_Mesh")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.location = Vector(location)
+    obj.scale = scale
+    mesh.materials.append(material)
+    _tag(mesh)
+    _tag(obj)
+    return obj
+
+
+def scatter_floor_geometry(collection, origin, litter_mat, moss_mat, rock_mat, count_leaf=10, count_moss=6, count_rock=5) -> dict:
     import random
 
     rng = random.Random(7301)
     ox, oy, oz = origin
+    lookdev = collection.name == COLLECTION_NAME
     for index in range(count_leaf):
-        make_card(
+        make_decal(
             collection,
-            f"TJ_LookdevLitter_{index:02d}" if "Lookdev" in collection.name or collection.name == COLLECTION_NAME else f"TJ_ProdFloorLeaf_{index:02d}",
-            (ox + rng.uniform(-0.9, 0.9), oy + rng.uniform(-0.9, 0.9), oz + 0.008),
-            (1.42, rng.uniform(-0.2, 0.2), rng.uniform(-3.1, 3.1)),
-            (rng.uniform(0.12, 0.22), 0.18, rng.uniform(0.12, 0.22)),
-            leaf_mat,
+            f"TJ_LookdevLitterPatch_{index:02d}" if lookdev else f"TJ_ProdLitterPatch_{index:02d}",
+            (ox + rng.uniform(-0.85, 0.85), oy + rng.uniform(-0.85, 0.85), oz + 0.006),
+            rng.uniform(-3.1, 3.1),
+            (rng.uniform(0.28, 0.42), rng.uniform(0.28, 0.42), 1.0),
+            litter_mat,
         )
     for index in range(count_moss):
-        make_card(
+        make_moss_mound(
             collection,
-            f"TJ_LookdevMossCard_{index:02d}" if collection.name == COLLECTION_NAME else f"TJ_ProdMoss_{index:02d}",
-            (ox + rng.uniform(-0.85, 0.85), oy + rng.uniform(-0.85, 0.85), oz + 0.006),
-            (1.48, 0.0, rng.uniform(-3.1, 3.1)),
-            (rng.uniform(0.18, 0.32), 0.2, rng.uniform(0.12, 0.2)),
+            f"TJ_LookdevMossMound_{index:02d}" if lookdev else f"TJ_ProdMossMound_{index:02d}",
+            (ox + rng.uniform(-0.8, 0.8), oy + rng.uniform(-0.8, 0.8), oz),
+            (rng.uniform(0.10, 0.18), rng.uniform(0.10, 0.18), rng.uniform(0.04, 0.07)),
             moss_mat,
         )
     for index in range(count_rock):
         make_rock(
             collection,
-            f"TJ_LookdevStone_{index:02d}" if collection.name == COLLECTION_NAME else f"TJ_ProdStone_{index:02d}",
-            (ox + rng.uniform(-0.8, 0.8), oy + rng.uniform(-0.8, 0.8), oz),
-            (rng.uniform(0.7, 1.3), rng.uniform(0.7, 1.2), rng.uniform(0.6, 1.1)),
+            f"TJ_LookdevStone_{index:02d}" if lookdev else f"TJ_ProdStone_{index:02d}",
+            (ox + rng.uniform(-0.75, 0.75), oy + rng.uniform(-0.75, 0.75), oz),
+            (rng.uniform(0.55, 1.05), rng.uniform(0.5, 0.95), rng.uniform(0.45, 0.85)),
             rock_mat,
         )
-    return {"litterCards": count_leaf, "mossCards": count_moss, "rocks": count_rock}
+    return {"litterPatches": count_leaf, "mossMounds": count_moss, "rocks": count_rock}
 
 
 def make_production_trunk_cylinder(collection, location, bark_mat):
@@ -694,16 +782,16 @@ def make_production_trunk_cylinder(collection, location, bark_mat):
         j0 = 2 * ((index + 1) % segments)
         j1 = j0 + 1
         faces.append((i0, j0, j1, i1))
-    mesh = bpy.data.meshes.new("TJ_LookdevTrunk_CylMesh")
+    mesh = bpy.data.meshes.new("TJ_ProdLookdevBark_CylMesh")
     mesh.from_pydata(verts, [], faces)
     mesh.update()
-    obj = bpy.data.objects.new("TJ_LookdevTrunk", mesh)
+    obj = bpy.data.objects.new("TJ_ProdLookdevBark", mesh)
     collection.objects.link(obj)
     obj.location = Vector(location)
     mesh.materials.append(bark_mat)
     apply_bark_to_object(obj, bark_mat)
     _tag(mesh)
-    _tag(obj)
+    _tag(obj, isolation=True)
     return obj
 
 
@@ -716,11 +804,10 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
     ox, oy, oz = 90.0, 0.0, 0.0
 
     for obj in list(collection.objects):
-        if obj.name.startswith("TJ_LookdevTrunk"):
-            obj.name = "TJ_HiddenEcoKitLookdevTrunk"
-            _hide(obj)
+        if obj.name.startswith("TJ_LookdevTrunk") or obj.name.startswith("TJ_HiddenEcoKit"):
+            obj.name = "TJ_HiddenEcoKitLookdevTrunk" if obj.name.startswith("TJ_LookdevTrunk") else obj.name
+            _exile(obj)
     trunk = make_production_trunk_cylinder(collection, (ox, oy, oz), mats["bark"])
-    trunk.name = "TJ_ProdLookdevBark"
 
     for hidden_name, new_name in (
         ("TJ_LookdevBush", "TJ_HiddenEcoKitBush"),
@@ -731,10 +818,10 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         obj = bpy.data.objects.get(hidden_name)
         if obj is not None:
             obj.name = new_name
-            _hide(obj)
+            _exile(obj)
     for obj in list(collection.objects):
         if obj.name.startswith("TJ_LookdevFallen") or obj.name in {"TJ_LookdevMoss", "TJ_LookdevGroundGrass", "TJ_LookdevRock"}:
-            _hide(obj)
+            _exile(obj)
 
     shrub = sources["shrub"].copy()
     shrub.data = sources["shrub"].data
@@ -765,7 +852,7 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         for slot in ground.material_slots:
             slot.link = "OBJECT"
             slot.material = mats["ground"]
-            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 0, 6, 0)
+            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 8, 5, 4)
 
     return {
         "trunk": None if trunk is None else trunk.name,
@@ -788,11 +875,11 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         "bark": make_bark_material(bark_kind),
         "ground": make_ground_material(),
         "leaf": make_foliage_material("TJ_ProdLeaf_Corylus_V1", leaf_albedo_path(), LEAF_NORMAL, 0.22, clip=True),
-        "litter": make_foliage_material("TJ_ProdLitterLeaf_V1", leaf_albedo_path(), LEAF_NORMAL, 0.10, clip=False),
+        "litter": make_opaque_pbr("TJ_ProdLitterPatch_V1", LITTER_ALBEDO, LITTER_NORMAL, 0.86, mapping="uv"),
         "fern": make_foliage_material("TJ_ProdFern_V1", FERN_ALBEDO, FERN_NORMAL, 0.18, clip=False),
-        "moss": make_foliage_material("TJ_ProdMossCard_V1", MOSS_CARD, None, 0.08, clip=True),
+        "moss": make_opaque_pbr("TJ_ProdMossMound_V1", MOSS_ALBEDO, None, 0.84, mapping="object"),
         "flower": make_foliage_material("TJ_ProdFlower_V1", FLOWER_ALBEDO, FLOWER_NORMAL, 0.12, clip=True),
-        "rock": make_opaque_pbr("TJ_ProdRock_Granite_V1", ROCK_ALBEDO, ROCK_NORMAL, 0.76),
+        "rock": make_opaque_pbr("TJ_ProdRock_Granite_V1", ROCK_ALBEDO, ROCK_NORMAL, 0.76, mapping="object"),
         "shrubBark": make_opaque_pbr("TJ_ProdShrubBark_V1", CORYLUS_BARK_ALBEDO, CORYLUS_BARK_NORMAL, 0.8),
         "stem": make_opaque_pbr("TJ_ProdStem_V1", STEM_ALBEDO, STEM_NORMAL, 0.62),
     }
@@ -810,7 +897,7 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
     root = scene.collection.children.get("TJ_VENDOR_REFERENCE_ROOT")
     if mode in {"production", "both"} and root is not None:
         trees = apply_production_trees(root, mats["bark"])
-        veg = replace_ecokit_vegetation(root, shrub, grass, fern, mats["leaf"], mats["flower"])
+        veg = replace_ecokit_vegetation(root, shrub, grass, fern, mats["leaf"], mats["flower"], mats["litter"])
         ground = bpy.data.objects.get("TJ_VendorGround")
         if ground is not None:
             if ground.data.materials:

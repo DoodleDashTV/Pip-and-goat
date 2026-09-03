@@ -40,7 +40,11 @@ from vendor_reference_render_v1 import AUDIT_SHA256, SOURCE_SHA256, build_scene,
 
 SHOTS = (
     ("LOOKDEV_BARK_PRODUCTION_V2", ("TJ_ProdLookdevBark",), "trunk"),
-    ("LOOKDEV_GROUND_PRODUCTION_V2", ("TJ_LookdevGroundPatch", "TJ_LookdevLitter", "TJ_LookdevMossCard", "TJ_LookdevStone"), "ground"),
+    (
+        "LOOKDEV_GROUND_PRODUCTION_V2",
+        ("TJ_LookdevGroundPatch", "TJ_LookdevLitterPatch", "TJ_LookdevMossMound", "TJ_LookdevStone"),
+        "ground",
+    ),
     ("LOOKDEV_BUSH_PRODUCTION_V2", ("TJ_LookdevBush",), "bush"),
     ("LOOKDEV_LEAF_PRODUCTION_V2", ("TJ_LookdevLeaf",), "leaf"),
     ("LOOKDEV_GRASS_FERN_PRODUCTION_V2", ("TJ_LookdevGrass", "TJ_LookdevFlower"), "grass"),
@@ -108,14 +112,36 @@ def render_path(scene, path: Path) -> dict:
     }
 
 
-def _shot_objects(collection, prefixes):
+def _shot_objects(scene, prefixes):
     selected = []
-    for obj in collection.objects:
-        if obj.type != "MESH" or obj.hide_viewport:
+    for obj in scene.objects:
+        if obj.type != "MESH":
+            continue
+        if obj.name.startswith("TJ_HiddenEcoKit"):
             continue
         if any(obj.name.startswith(prefix) for prefix in prefixes):
+            obj.hide_viewport = False
+            obj.hide_render = False
             selected.append(obj)
     return selected
+
+
+def _exclusive_visibility(scene, keep) -> list[str]:
+    keep_set = set(keep)
+    visible = []
+    for obj in scene.objects:
+        if obj.type != "MESH":
+            continue
+        show = obj in keep_set
+        obj.hide_render = not show
+        obj.hide_viewport = not show
+        try:
+            obj.hide_set(not show)
+        except Exception:
+            pass
+        if show:
+            visible.append(obj.name)
+    return visible
 
 
 def _shot_aim(objects, kind: str):
@@ -138,7 +164,9 @@ def _frame_shot(camera, objects, kind: str) -> None:
 
     target = _shot_aim(objects, kind)
     if kind == "trunk":
-        camera.location = (target.x + 0.85, target.y - 1.85, target.z + 0.15)
+        subject = objects[0]
+        height = max(float(subject.dimensions.z), 1.6)
+        camera.location = (target.x + 0.70, target.y - max(1.55, height * 0.85), target.z + 0.05)
         camera.data.lens = 85.0
     elif kind == "ground":
         camera.location = (target.x + 0.35, target.y - 3.05, target.z + 2.35)
@@ -199,17 +227,25 @@ def main():
 
     stills = {}
     for name, prefixes, kind in SHOTS:
-        visible = _shot_objects(collection, prefixes)
+        visible = _shot_objects(scene, prefixes)
         if not visible:
             stills[name] = {"missing": True, "prefixes": list(prefixes)}
             continue
-        for obj in collection.objects:
-            if obj.type != "MESH":
-                continue
-            obj.hide_render = obj not in visible
+        if kind == "trunk" and len(visible[0].data.vertices) > 200:
+            stills[name] = {
+                "missing": True,
+                "reason": "BARK_SUBJECT_NOT_CYLINDER",
+                "object": visible[0].name,
+                "vertices": len(visible[0].data.vertices),
+            }
+            continue
+        shown = _exclusive_visibility(scene, visible)
+        scene.camera = lookdev_camera
         _frame_shot(lookdev_camera, visible, kind)
         install_studio_rig(collection, visible[0], aim=_shot_aim(visible, kind))
         stills[name] = render_path(scene, out_dir / f"{name}.png")
+        stills[name]["subjects"] = shown
+        stills[name]["subjectVerts"] = [len(obj.data.vertices) for obj in visible]
 
     restore_production(scene, isolation)
     for obj in collection.objects:
