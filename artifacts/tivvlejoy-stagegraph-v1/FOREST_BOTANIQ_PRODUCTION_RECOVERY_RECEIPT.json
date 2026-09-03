@@ -2,7 +2,7 @@
   "schema": "TIVVLEJOY_BOTANIQ_FOREST_PRODUCTION_RECOVERY_V1",
   "executionStatus": "FAIL",
   "startingHead": "aba1bdb6f9fc34c29941df46c66235aabdd720d6",
-  "endingHead": "PENDING_STAMP",
+  "endingHead": "37e678d877f27af5ab9c943ceba72d6b0d5a0f89",
   "endingBranch": "cursor/tivvlejoy-botaniq-forest-production-recovery-eed2",
   "stackedOn": "cursor/tivvlejoy-botaniq-forest-production-recovery-7f52",
   "draftPullRequest": 175,
