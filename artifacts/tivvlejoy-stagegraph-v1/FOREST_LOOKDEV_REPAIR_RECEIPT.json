@@ -1,0 +1,23 @@
+{
+  "schema": "TIVVLEJOY_FOREST_LOOKDEV_REPAIR_RECEIPT_V1",
+  "executionStatus": "FAIL",
+  "visualApproval": false,
+  "vendorReferenceReproducedApproved": false,
+  "baselineImagePath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_CINEMATIC_LIGHTING_PROOF_V3.png",
+  "baselineImageSha256": "17f023b73feede1627ec7c35c762d0f5e9dc1625c40071db86fbe9b365269609",
+  "baselineResolution": [1280, 720],
+  "repairedImagePath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LOOKDEV_REPAIR_PROOF_V2.png",
+  "repairedImageSha256": "a4a159f320ef781c091d0ef4be1c14a83c798aa0d8c8277f39d6244b65de5a9a",
+  "repairedResolution": [1280, 720],
+  "comparisonImagePath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LOOKDEV_REPAIR_COMPARISON.png",
+  "comparisonImageSha256": "43b4291394944ed703cca991e0c26cd5b95e0e85e06831e9fef42a4cb2b58258",
+  "firstLookdevStillPath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LOOKDEV_REPAIR_PROOF.png",
+  "firstLookdevStillSha256": "32decbaf1790ebb853361ca89b783453bd8b159980ddb0ec9ebaff4b26e55219",
+  "cameraChanged": false,
+  "geometryRebuilt": false,
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "samples": 32,
+  "device": "CPU",
+  "blenderVersion": "4.3.2"
+}
