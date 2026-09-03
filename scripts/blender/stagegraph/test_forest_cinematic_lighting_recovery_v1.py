@@ -22,6 +22,7 @@ class ForestCinematicLightingRecoveryTest(unittest.TestCase):
     def test_does_not_rebuild_ground_or_legacy_cinematic_world(self):
         source = (ROOT / "forest_cinematic_lighting_recovery_v1.py").read_text(encoding="utf-8")
         self.assertIn("verify_material_lighting_lock", source)
+        self.assertIn("_lighting_hdri_strength", source)
         self.assertIn("retune_cinematic_lights", source)
         self.assertNotIn("apply_cinematic_world", source)
         self.assertNotIn("apply_ground_lookdev", source)

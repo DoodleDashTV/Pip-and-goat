@@ -192,15 +192,26 @@ def retune_cinematic_lights(scene) -> dict:
     return changed
 
 
+def _lighting_hdri_strength(scene) -> float | None:
+    world = scene.world
+    if world is None or not world.use_nodes or world.node_tree is None:
+        return None
+    named = world.node_tree.nodes.get("TJ_CinematicWorldLight_V1")
+    if named is not None and named.bl_idname == "ShaderNodeBackground":
+        return float(named.inputs["Strength"].default_value)
+    afternoon_camera = world.node_tree.nodes.get("TJ_AfternoonSkyBg_V1")
+    for node in world.node_tree.nodes:
+        if node.bl_idname != "ShaderNodeBackground":
+            continue
+        if afternoon_camera is not None and node == afternoon_camera:
+            continue
+        return float(node.inputs["Strength"].default_value)
+    return None
+
+
 def verify_material_lighting_lock(scene) -> dict:
     view = scene.view_settings
-    hdri_strength = None
-    world = scene.world
-    if world is not None and world.use_nodes and world.node_tree is not None:
-        for node in world.node_tree.nodes:
-            if node.bl_idname == "ShaderNodeBackground":
-                hdri_strength = float(node.inputs["Strength"].default_value)
-                break
+    hdri_strength = _lighting_hdri_strength(scene)
     ok = (
         abs(float(view.exposure) - LOCKED_MATERIAL_LIGHTING["exposure"]) <= 0.02
         and abs(float(view.gamma) - LOCKED_MATERIAL_LIGHTING["gamma"]) <= 0.02
