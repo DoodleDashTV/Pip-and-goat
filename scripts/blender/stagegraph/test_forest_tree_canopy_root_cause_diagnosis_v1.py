@@ -22,13 +22,12 @@ class ForestTreeCanopyRootCauseDiagnosisTest(unittest.TestCase):
         self.assertEqual(classify_distance(10.0), "midground")
         self.assertEqual(classify_distance(18.0), "background")
 
-    def test_hero_catalog_lists_purchased_fagus_salix_and_finds_none_on_disk(self):
+    def test_hero_catalog_lists_purchased_fagus_salix(self):
         self.assertIn("bq_Tree_Fagus-sylvatica_A_summer.blend", BOTANIQ_HERO_TREES)
         self.assertIn("bq_Tree_Salix-babylonica_C_summer.blend", BOTANIQ_HERO_TREES)
         catalog = catalog_hero_tree_assets()
-        self.assertFalse(catalog["heroQualityTreesPresent"])
         self.assertTrue(catalog["heroQualityTreesCatalogued"])
-        self.assertGreaterEqual(len(catalog["missing"]), 6)
+        self.assertEqual(len(catalog["present"]) + len(catalog["missing"]), 6)
 
     def test_overlays_cover_afternoon_and_interior_prefixes(self):
         self.assertIn("TJ_CanopyLeaf_", OVERLAY_PREFIXES)
