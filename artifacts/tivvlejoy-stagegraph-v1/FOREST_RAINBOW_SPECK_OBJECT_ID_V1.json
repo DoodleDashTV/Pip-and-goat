@@ -1,0 +1,5739 @@
+{
+  "cameraChanged": false,
+  "lightingLocked": {
+    "bounceColor": [
+      0.78,
+      0.82,
+      0.7
+    ],
+    "bounceEnergy": 210.0,
+    "class": "locked_v3",
+    "exposure": 1.1,
+    "fillColor": [
+      0.82,
+      0.78,
+      0.7
+    ],
+    "fillEnergy": 520.0,
+    "gamma": 1.06,
+    "hdriStrength": 0.12,
+    "hideBounce": false,
+    "hideRim": false,
+    "look": "None",
+    "neutralWorld": false,
+    "rimEnergy": 1.85,
+    "sunColor": [
+      1.0,
+      0.76,
+      0.55
+    ],
+    "sunEnergy": 5.4,
+    "viewTransform": "AgX"
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "painted": {
+    "candidates": [
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          125.141,
+          125.141,
+          0.0
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_011.001",
+        "y": 3.4118,
+        "zone": "foreground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          201.924,
+          201.924,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_ecokit_floral"
+        ],
+        "name": "Floral_0_008.001",
+        "y": 18.8076,
+        "zone": "background"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.97,
+          0.914,
+          0.892
+        ],
+        "hide_render": true,
+        "materials": [
+          "Stipe_Mat_1.013",
+          "Flower_Mat_1.014"
+        ],
+        "name": "Floral_1_005.001",
+        "y": 4.8322,
+        "zone": "foreground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          197.489,
+          197.489,
+          0.0
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_014.001",
+        "y": 9.4829,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          1.726,
+          1.69,
+          0.62
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_2_003.001",
+        "y": 3.9144,
+        "zone": "foreground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          175.06,
+          175.06,
+          0.0
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_008.002",
+        "y": 4.9234,
+        "zone": "foreground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          97.944,
+          97.944,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_ecokit_floral"
+        ],
+        "name": "Floral_0_001.001",
+        "y": 18.4599,
+        "zone": "background"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          145.826,
+          145.826,
+          0.0
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_009.001",
+        "y": 16.606,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.426,
+          0.402,
+          0.392
+        ],
+        "hide_render": true,
+        "materials": [
+          "Stipe_Mat_1.013",
+          "Flower_Mat_1.014"
+        ],
+        "name": "Floral_1_011.001",
+        "y": 16.83,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          225.178,
+          225.178,
+          0.0
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_009.002",
+        "y": 14.287,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          1.431,
+          1.382,
+          0.514
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_2_007.001",
+        "y": 8.6725,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          101.814,
+          101.814,
+          0.0
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_009.003",
+        "y": 15.3499,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.538,
+          0.615,
+          0.521
+        ],
+        "hide_render": true,
+        "materials": [
+          "Stipe_Mat_1.013",
+          "Flower_Mat_1.014"
+        ],
+        "name": "Floral_1_001.001",
+        "y": 13.0079,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          240.919,
+          240.919,
+          0.0
+        ],
+        "hide_render": true,
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_012.001",
+        "y": 11.2476,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.492,
+          0.562,
+          0.476
+        ],
+        "hide_render": true,
+        "materials": [
+          "Stipe_Mat_1.013",
+          "Flower_Mat_1.014"
+        ],
+        "name": "Floral_1_001.002",
+        "y": 6.4523,
+        "zone": "midground"
+      },
+      {
+        "class": "ecokit_floral",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.945,
+          1.056,
+          0.702
+        ],
+        "hide_render": true,
+        "materials": [
+          "Stipe_Mat_1.013",
+          "Flower_Mat_1.014"
+        ],
+        "name": "Floral_1_012.001",
+        "y": 3.6807,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          7.924,
+          8.792,
+          0.21
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_006.001",
+        "y": 16.1722,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          4.244,
+          3.858,
+          0.415
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_009.001",
+        "y": -0.9505,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          9.743,
+          8.855,
+          0.274
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_038.001",
+        "y": 4.9218,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          18.394,
+          17.007,
+          0.443
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_005.001",
+        "y": 16.7663,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          12.28,
+          11.161,
+          0.345
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_038.002",
+        "y": 6.9181,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          13.585,
+          14.915,
+          0.409
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_017.001",
+        "y": 3.9801,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.126,
+          12.838,
+          0.397
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_028.001",
+        "y": 14.6835,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          15.847,
+          13.266,
+          0.415
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_010.001",
+        "y": 5.333,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          10.386,
+          9.921,
+          0.269
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_003.001",
+        "y": 9.2716,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          11.479,
+          12.737,
+          0.304
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_006.002",
+        "y": 12.8054,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.374,
+          3.067,
+          0.33
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_004.002",
+        "y": 15.5295,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.222,
+          2.191,
+          0.315
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_007.002",
+        "y": 3.0197,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.674,
+          13.337,
+          0.413
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_fallen_leaf"
+        ],
+        "name": "Fallen Leaf_0_022.001",
+        "y": 18.6731,
+        "zone": "background"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          8.568,
+          9.407,
+          0.258
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_fallen_leaf",
+          "TJ_RainbowId_fallen_leaf",
+          "TJ_RainbowId_fallen_leaf"
+        ],
+        "name": "Fallen Leaf_1_017.002",
+        "y": 18.9838,
+        "zone": "background"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          18.496,
+          15.507,
+          0.443
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_013.001",
+        "y": 11.7895,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.564,
+          13.237,
+          0.409
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_fallen_leaf"
+        ],
+        "name": "Fallen Leaf_0_025.001",
+        "y": 19.4036,
+        "zone": "background"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          7.489,
+          6.807,
+          0.211
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_039.001",
+        "y": 3.041,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          4.08,
+          2.972,
+          0.399
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_003.001",
+        "y": 5.8338,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          11.017,
+          10.013,
+          0.31
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_035.001",
+        "y": 15.0412,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          7.249,
+          6.589,
+          0.204
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_034.001",
+        "y": 5.0759,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          7.606,
+          8.797,
+          0.24
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_019.001",
+        "y": 3.2281,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          11.981,
+          10.889,
+          0.337
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_028.002",
+        "y": 5.0285,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          15.717,
+          15.014,
+          0.407
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_003.002",
+        "y": 13.1945,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          7.138,
+          6.487,
+          0.201
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_036.001",
+        "y": 17.4848,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          8.236,
+          6.895,
+          0.216
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_010.002",
+        "y": -0.0518,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          10.34,
+          12.019,
+          0.307
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_018.001",
+        "y": 16.893,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          12.682,
+          11.526,
+          0.357
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_024.001",
+        "y": 16.6908,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.194,
+          2.903,
+          0.313
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_006.001",
+        "y": -0.4631,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          9.393,
+          10.69,
+          0.265
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_004.001",
+        "y": -0.6502,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          16.522,
+          13.832,
+          0.433
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_010.003",
+        "y": 11.8515,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          11.766,
+          10.673,
+          0.269
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_014.001",
+        "y": 14.8118,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.513,
+          2.703,
+          0.344
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_015.001",
+        "y": 2.8173,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          1.96,
+          1.781,
+          0.192
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_005.004",
+        "y": 17.3038,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.031,
+          12.753,
+          0.394
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_027.001",
+        "y": 17.5982,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.087,
+          1.808,
+          0.302
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_020.001",
+        "y": 13.2113,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.386,
+          2.168,
+          0.233
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_002.001",
+        "y": 1.3779,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.517,
+          13.194,
+          0.408
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_027.002",
+        "y": 3.5833,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          15.978,
+          14.493,
+          0.365
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_014.002",
+        "y": 5.6608,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.854,
+          2.965,
+          0.377
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_014.001",
+        "y": 3.6411,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          15.716,
+          10.857,
+          0.38
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_012.001",
+        "y": 8.3909,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          10.313,
+          9.354,
+          0.236
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_014.003",
+        "y": 8.6398,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.254,
+          12.955,
+          0.401
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_030.001",
+        "y": 0.8614,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.041,
+          1.855,
+          0.2
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_fallen_leaf"
+        ],
+        "name": "Fallen Leaf_0_001.001",
+        "y": 18.9846,
+        "zone": "background"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.616,
+          12.254,
+          0.35
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_013.002",
+        "y": 2.5857,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          14.855,
+          13.501,
+          0.418
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_029.001",
+        "y": 5.14,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          4.388,
+          3.988,
+          0.429
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_011.001",
+        "y": 15.9465,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.92,
+          1.986,
+          0.286
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_007.003",
+        "y": 12.8048,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          15.385,
+          17.864,
+          0.42
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_015.001",
+        "y": 17.4309,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          9.201,
+          8.363,
+          0.259
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_024.002",
+        "y": 11.2728,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.74,
+          2.877,
+          0.366
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_013.001",
+        "y": 16.2158,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          13.065,
+          9.026,
+          0.315
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_012.002",
+        "y": 9.243,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          3.598,
+          3.27,
+          0.352
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_011.002",
+        "y": -0.3861,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          11.644,
+          10.583,
+          0.327
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_035.002",
+        "y": 4.905,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.015,
+          1.831,
+          0.197
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_010.001",
+        "y": 10.9055,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          4.354,
+          3.958,
+          0.426
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_004.003",
+        "y": 15.1899,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.981,
+          2.684,
+          0.341
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_019.001",
+        "y": 14.7773,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.654,
+          2.413,
+          0.26
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_012.001",
+        "y": 16.2653,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          8.188,
+          7.57,
+          0.197
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_005.002",
+        "y": 1.3159,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          12.149,
+          10.7,
+          0.303
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_020.001",
+        "y": 4.2512,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          10.404,
+          9.456,
+          0.292
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_037.001",
+        "y": 15.8019,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          12.858,
+          11.686,
+          0.361
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_029.002",
+        "y": 8.1569,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.804,
+          1.642,
+          0.274
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_021.001",
+        "y": 12.6016,
+        "zone": "midground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          2.466,
+          2.22,
+          0.282
+        ],
+        "hide_render": true,
+        "materials": [
+          "Leaf Blade_Mat_1.008"
+        ],
+        "name": "Fallen Leaf_0_019.002",
+        "y": 3.5994,
+        "zone": "foreground"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          8.863,
+          8.055,
+          0.249
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_fallen_leaf"
+        ],
+        "name": "Fallen Leaf_0_024.003",
+        "y": 19.1572,
+        "zone": "background"
+      },
+      {
+        "class": "fallen_leaf",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          11.33,
+          10.298,
+          0.319
+        ],
+        "hide_render": true,
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_022.002",
+        "y": -0.3044,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_00",
+        "y": 3.4118,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_01",
+        "y": 4.8322,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_02",
+        "y": 9.4829,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_03",
+        "y": 3.9144,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_04",
+        "y": 4.9234,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_05",
+        "y": 16.606,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_06",
+        "y": 16.83,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_07",
+        "y": 14.287,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_08",
+        "y": 8.6725,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_09",
+        "y": 15.3499,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_10",
+        "y": 13.0079,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_11",
+        "y": 11.2476,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_12",
+        "y": 6.4523,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_flower",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.22,
+          0.0,
+          0.28
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_flower"
+        ],
+        "name": "TJ_ProdFlower_13",
+        "y": 3.6807,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.317,
+          0.351,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_00",
+        "y": 16.1722,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.29,
+          0.325,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_01",
+        "y": -0.9505,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.305,
+          0.262,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_02",
+        "y": 4.9218,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.326,
+          0.242,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_03",
+        "y": 16.7663,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.255,
+          0.285,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_04",
+        "y": 6.9181,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.264,
+          0.345,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_05",
+        "y": 3.9801,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.377,
+          0.225,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_06",
+        "y": 14.6835,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.221,
+          0.274,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_07",
+        "y": 5.333,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.23,
+          0.335,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_08",
+        "y": 9.2716,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.277,
+          0.324,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_09",
+        "y": 12.8054,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.36,
+          0.296,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_10",
+        "y": 15.5295,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.333,
+          0.37,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_11",
+        "y": 3.0197,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.36,
+          0.223,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_12",
+        "y": 11.7895,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.35,
+          0.304,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_13",
+        "y": 3.041,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.278,
+          0.352,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_14",
+        "y": 5.8338,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.268,
+          0.311,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_15",
+        "y": 15.0412,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.251,
+          0.244,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_16",
+        "y": 5.0759,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.337,
+          0.377,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_17",
+        "y": 3.2281,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.288,
+          0.339,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_18",
+        "y": 5.0285,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.343,
+          0.353,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_19",
+        "y": 13.1945,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.272,
+          0.371,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_20",
+        "y": 17.4848,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.226,
+          0.339,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_21",
+        "y": -0.0518,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.267,
+          0.323,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_22",
+        "y": 16.893,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.266,
+          0.357,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_23",
+        "y": 16.6908,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.345,
+          0.261,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_24",
+        "y": -0.4631,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.362,
+          0.352,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_25",
+        "y": -0.6502,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.231,
+          0.335,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_26",
+        "y": 11.8515,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.248,
+          0.313,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_27",
+        "y": 14.8118,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.254,
+          0.375,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_28",
+        "y": 2.8173,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.233,
+          0.376,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_29",
+        "y": 17.3038,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.241,
+          0.311,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_30",
+        "y": 17.5982,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.361,
+          0.243,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_31",
+        "y": 13.2113,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.374,
+          0.259,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_32",
+        "y": 1.3779,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.289,
+          0.259,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_33",
+        "y": 3.5833,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.28,
+          0.247,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_34",
+        "y": 5.6608,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.221,
+          0.25,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_35",
+        "y": 3.6411,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.337,
+          0.222,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_36",
+        "y": 8.3909,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.363,
+          0.349,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_37",
+        "y": 8.6398,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.351,
+          0.269,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_38",
+        "y": 0.8614,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.337,
+          0.348,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_39",
+        "y": 2.5857,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.33,
+          0.35,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_40",
+        "y": 5.14,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.317,
+          0.251,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_41",
+        "y": 15.9465,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.366,
+          0.363,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_42",
+        "y": 12.8048,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.337,
+          0.349,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_43",
+        "y": 17.4309,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.339,
+          0.295,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_44",
+        "y": 11.2728,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.288,
+          0.29,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_45",
+        "y": 16.2158,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.37,
+          0.336,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_46",
+        "y": 9.243,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.262,
+          0.354,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_47",
+        "y": -0.3861,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.342,
+          0.377,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_48",
+        "y": 4.905,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.291,
+          0.325,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_49",
+        "y": 10.9055,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.235,
+          0.348,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_50",
+        "y": 15.1899,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.353,
+          0.235,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_51",
+        "y": 14.7773,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.295,
+          0.236,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_52",
+        "y": 16.2653,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.252,
+          0.234,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_53",
+        "y": 1.3159,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.283,
+          0.325,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_54",
+        "y": 4.2512,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.318,
+          0.33,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_55",
+        "y": 15.8019,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.222,
+          0.298,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_56",
+        "y": 8.1569,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.226,
+          0.323,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_57",
+        "y": 12.6016,
+        "zone": "midground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.253,
+          0.346,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_58",
+        "y": 3.5994,
+        "zone": "foreground"
+      },
+      {
+        "class": "prod_litter",
+        "collections": [
+          "TJ_VENDOR_REFERENCE_ROOT"
+        ],
+        "dimensions": [
+          0.287,
+          0.24,
+          0.0
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_prod_litter"
+        ],
+        "name": "TJ_ProdLitter_59",
+        "y": -0.3044,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.478,
+          1.177,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_00_00",
+        "y": 3.1358,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.482,
+          1.349,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_00_01",
+        "y": 2.8942,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.131,
+          0.384,
+          0.015
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_00_00",
+        "y": 2.9353,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.161,
+          0.417,
+          0.026
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_00_01",
+        "y": 2.4993,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.144,
+          0.565,
+          0.024
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_00_02",
+        "y": 2.4621,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.206,
+          0.607,
+          0.024
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_00_03",
+        "y": 2.5108,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.112,
+          0.284,
+          0.037
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_00_04",
+        "y": 2.4113,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.206,
+          0.331,
+          0.037
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_00_05",
+        "y": 2.609,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.313,
+          1.547,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_01_00",
+        "y": 5.1346,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.386,
+          1.634,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_01_01",
+        "y": 4.3453,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.176,
+          0.422,
+          0.031
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_01_00",
+        "y": 4.5042,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.224,
+          0.345,
+          0.02
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_01_01",
+        "y": 4.8671,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.203,
+          0.483,
+          0.033
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_01_02",
+        "y": 4.6858,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.201,
+          0.391,
+          0.034
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_01_03",
+        "y": 4.5414,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.201,
+          0.321,
+          0.015
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_01_04",
+        "y": 4.5893,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.258,
+          0.47,
+          0.037
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_01_05",
+        "y": 4.7533,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.996,
+          3.027,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_02_00",
+        "y": 7.2495,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.81,
+          1.44,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_02_01",
+        "y": 7.7149,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.688,
+          1.007,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_02_02",
+        "y": 7.616,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.113,
+          1.538,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_02_03",
+        "y": 7.6816,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.207,
+          0.443,
+          0.023
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_02_00",
+        "y": 8.1472,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.228,
+          0.649,
+          0.036
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_02_01",
+        "y": 7.4248,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.182,
+          0.322,
+          0.025
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_02_02",
+        "y": 7.6384,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.247,
+          0.29,
+          0.015
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_02_03",
+        "y": 7.5065,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.298,
+          0.396,
+          0.022
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_02_04",
+        "y": 7.9975,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.235,
+          0.491,
+          0.023
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_02_05",
+        "y": 8.0515,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.284,
+          1.644,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_03_00",
+        "y": 12.4201,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.701,
+          1.735,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_03_01",
+        "y": 12.313,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.123,
+          0.29,
+          0.019
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_03_00",
+        "y": 12.555,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.138,
+          0.182,
+          0.01
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_03_01",
+        "y": 12.6794,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.935,
+          1.658,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_04_00",
+        "y": 0.123,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.593,
+          2.004,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_04_01",
+        "y": 0.0592,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.765,
+          2.301,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_04_02",
+        "y": 1.1061,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.18,
+          0.608,
+          0.014
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_04_00",
+        "y": 0.6608,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.201,
+          0.566,
+          0.02
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_04_01",
+        "y": 0.6119,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.223,
+          0.294,
+          0.031
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_04_02",
+        "y": 0.9457,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.184,
+          0.41,
+          0.035
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_04_03",
+        "y": 0.4767,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.294,
+          0.373,
+          0.022
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_04_04",
+        "y": 0.6839,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.244,
+          0.414,
+          0.02
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_04_05",
+        "y": 0.8629,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.286,
+          1.085,
+          0.009
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_05_00",
+        "y": 6.6505,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.517,
+          1.446,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_05_01",
+        "y": 7.2325,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.642,
+          2.122,
+          0.009
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_05_02",
+        "y": 6.8564,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.153,
+          0.416,
+          0.017
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_05_00",
+        "y": 6.8525,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.237,
+          0.404,
+          0.015
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_05_01",
+        "y": 6.6423,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.186,
+          0.368,
+          0.041
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_05_02",
+        "y": 6.3243,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.462,
+          1.352,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_06_00",
+        "y": 8.6696,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.38,
+          1.112,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_06_01",
+        "y": 8.6468,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.145,
+          0.187,
+          0.013
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_06_00",
+        "y": 8.1492,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.117,
+          0.163,
+          0.012
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_06_01",
+        "y": 8.2329,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.216,
+          1.399,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_07_00",
+        "y": 15.8365,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.619,
+          1.222,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_07_01",
+        "y": 15.4107,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.117,
+          0.16,
+          0.017
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_07_00",
+        "y": 15.0682,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.09,
+          0.241,
+          0.014
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_07_01",
+        "y": 15.4854,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.351,
+          1.935,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_08_00",
+        "y": 1.3874,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.585,
+          1.837,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_08_01",
+        "y": 1.8145,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.598,
+          0.983,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_08_02",
+        "y": 1.5658,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.533,
+          1.075,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_08_03",
+        "y": 1.0991,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.279,
+          0.432,
+          0.023
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_08_00",
+        "y": 1.6231,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.243,
+          0.498,
+          0.018
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_08_01",
+        "y": 1.5385,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.173,
+          0.491,
+          0.019
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_08_02",
+        "y": 1.3897,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.191,
+          0.48,
+          0.023
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_08_03",
+        "y": 1.1809,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.209,
+          0.613,
+          0.023
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_08_04",
+        "y": 1.0747,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.161,
+          0.525,
+          0.031
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_08_05",
+        "y": 1.0979,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.277,
+          1.886,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_09_00",
+        "y": 15.9472,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.525,
+          1.695,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_09_01",
+        "y": 15.8624,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.127,
+          1.631,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_09_02",
+        "y": 15.402,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.143,
+          0.29,
+          0.009
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_09_00",
+        "y": 15.6995,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.127,
+          0.182,
+          0.015
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_09_01",
+        "y": 15.6865,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.139,
+          0.281,
+          0.016
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_09_02",
+        "y": 15.5973,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.142,
+          0.214,
+          0.011
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_09_03",
+        "y": 16.1035,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.416,
+          1.834,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_10_00",
+        "y": 10.5569,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.755,
+          2.319,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_10_01",
+        "y": 10.6856,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.344,
+          1.319,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_10_02",
+        "y": 9.9179,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.906,
+          2.199,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_10_03",
+        "y": 10.076,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.126,
+          0.228,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_10_00",
+        "y": 10.4747,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.111,
+          0.224,
+          0.01
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_10_01",
+        "y": 10.0629,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.483,
+          1.443,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_11_00",
+        "y": 13.6867,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.52,
+          2.051,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_11_01",
+        "y": 13.6783,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.127,
+          0.257,
+          0.016
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_11_00",
+        "y": 13.2792,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.135,
+          0.208,
+          0.011
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_11_01",
+        "y": 12.962,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.086,
+          0.207,
+          0.018
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_11_02",
+        "y": 13.3425,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.443,
+          1.517,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_12_00",
+        "y": 0.4258,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.062,
+          2.672,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_12_01",
+        "y": 1.1736,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.676,
+          1.356,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_12_02",
+        "y": 0.7122,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.127,
+          0.384,
+          0.036
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_12_00",
+        "y": 0.4326,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.201,
+          0.507,
+          0.014
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_12_01",
+        "y": 0.6494,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.202,
+          0.312,
+          0.013
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_12_02",
+        "y": 0.7722,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.175,
+          0.373,
+          0.034
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_12_03",
+        "y": 0.9442,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.161,
+          1.825,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_13_00",
+        "y": 0.607,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.984,
+          1.591,
+          0.004
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_13_01",
+        "y": -0.1348,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.21,
+          2.361,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_13_02",
+        "y": 0.541,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.689,
+          1.419,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_13_03",
+        "y": 0.6173,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.185,
+          0.325,
+          0.018
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_13_00",
+        "y": 0.2271,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.186,
+          0.268,
+          0.032
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_13_01",
+        "y": 0.372,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.202,
+          0.389,
+          0.016
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_13_02",
+        "y": 0.2062,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.604,
+          1.364,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_14_00",
+        "y": 13.745,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.21,
+          2.414,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_14_01",
+        "y": 14.2543,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.119,
+          0.143,
+          0.012
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_14_00",
+        "y": 13.6995,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.136,
+          0.244,
+          0.015
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_14_01",
+        "y": 13.6383,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.983,
+          1.537,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_15_00",
+        "y": 15.5689,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.432,
+          1.452,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_15_01",
+        "y": 15.8765,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.724,
+          1.798,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_15_02",
+        "y": 16.4338,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.596,
+          1.207,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_15_03",
+        "y": 16.5444,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.12,
+          0.162,
+          0.016
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_15_00",
+        "y": 16.1463,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.117,
+          0.167,
+          0.01
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_15_01",
+        "y": 16.1694,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.199,
+          2.173,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_16_00",
+        "y": 15.1224,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.084,
+          2.26,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_16_01",
+        "y": 15.4862,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.605,
+          1.852,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_16_02",
+        "y": 15.3033,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.35,
+          2.386,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_16_03",
+        "y": 15.3935,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.09,
+          0.297,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_16_00",
+        "y": 15.8888,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.11,
+          0.217,
+          0.012
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_16_01",
+        "y": 15.6416,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.138,
+          0.197,
+          0.013
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_16_02",
+        "y": 15.6831,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.129,
+          0.15,
+          0.015
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_16_03",
+        "y": 15.4048,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.298,
+          1.053,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_17_00",
+        "y": 4.0691,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.218,
+          1.487,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_17_01",
+        "y": 4.0745,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.085,
+          2.261,
+          0.009
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_17_02",
+        "y": 3.7453,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.909,
+          2.097,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_17_03",
+        "y": 3.7185,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.21,
+          0.257,
+          0.016
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_17_00",
+        "y": 3.6892,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.232,
+          0.381,
+          0.024
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_17_01",
+        "y": 3.6315,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.159,
+          0.507,
+          0.02
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_17_02",
+        "y": 4.0499,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.223,
+          0.549,
+          0.04
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_17_03",
+        "y": 3.8467,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.19,
+          0.32,
+          0.037
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_17_04",
+        "y": 3.8267,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.184,
+          0.352,
+          0.023
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_17_05",
+        "y": 3.4786,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.804,
+          1.41,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_18_00",
+        "y": 8.6994,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.701,
+          1.79,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_18_01",
+        "y": 8.7692,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.168,
+          0.197,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_18_00",
+        "y": 8.3641,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.111,
+          0.323,
+          0.01
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_18_01",
+        "y": 8.6704,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.121,
+          0.146,
+          0.017
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_18_02",
+        "y": 8.4786,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.121,
+          0.272,
+          0.016
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_18_03",
+        "y": 9.0982,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.39,
+          1.981,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_19_00",
+        "y": 12.9979,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.777,
+          1.724,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_19_01",
+        "y": 12.8029,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          2.334,
+          2.46,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverLitterPatch_19_02",
+        "y": 12.8489,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.084,
+          0.228,
+          0.009
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_19_00",
+        "y": 12.9031,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.122,
+          0.151,
+          0.012
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_19_01",
+        "y": 12.8792,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_ovate",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.113,
+          0.159,
+          0.011
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_ovate"
+        ],
+        "name": "TJ_CoverLitter_19_02",
+        "y": 12.3392,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.391,
+          1.774,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_00",
+        "y": 2.3867,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.134,
+          1.379,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_01",
+        "y": 3.5169,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.489,
+          1.481,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_02",
+        "y": 9.6648,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.064,
+          1.118,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_03",
+        "y": 12.2168,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.61,
+          1.418,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_04",
+        "y": 1.0989,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.784,
+          0.568,
+          0.009
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_05",
+        "y": 5.2105,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.829,
+          0.786,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_06",
+        "y": 8.6862,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.238,
+          1.162,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_07",
+        "y": 10.5344,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.448,
+          0.954,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_08",
+        "y": 14.1891,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.689,
+          1.545,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverNeedlePatch_09",
+        "y": 5.6223,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.851,
+          0.9,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_00",
+        "y": 2.9561,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.438,
+          1.115,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_01",
+        "y": 5.1795,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.391,
+          1.805,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_02",
+        "y": 6.6581,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.307,
+          1.392,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_03",
+        "y": 12.9016,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.013,
+          1.148,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_04",
+        "y": 14.7311,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.983,
+          0.852,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_05",
+        "y": 10.0052,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.149,
+          0.912,
+          0.009
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_06",
+        "y": 8.3823,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.265,
+          1.465,
+          0.008
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_07",
+        "y": 13.7458,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.36,
+          1.441,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_08",
+        "y": 4.65,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.867,
+          0.698,
+          0.005
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_09",
+        "y": 5.3492,
+        "zone": "foreground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          1.078,
+          0.864,
+          0.007
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_10",
+        "y": 8.7484,
+        "zone": "midground"
+      },
+      {
+        "class": "cover_stamp",
+        "collections": [
+          "TJ_CAMERA_GROUND_COVER_V1"
+        ],
+        "dimensions": [
+          0.666,
+          0.922,
+          0.006
+        ],
+        "hide_render": false,
+        "materials": [
+          "TJ_RainbowId_cover_stamp"
+        ],
+        "name": "TJ_CoverMossPatch_11",
+        "y": 12.4944,
+        "zone": "midground"
+      }
+    ],
+    "darkened": 984,
+    "legend": {
+      "cover_ovate": "yellow TJ_CoverLitter ovate",
+      "cover_stamp": "orange photo stamps",
+      "ecokit_floral": "cyan EcoKit Floral_*",
+      "fallen_leaf": "lime Fallen Leaf_*",
+      "firefly_card": "red firefly/butterfly card",
+      "prod_flower": "magenta TJ_ProdFlower",
+      "prod_litter": "blue TJ_ProdLitter"
+    },
+    "painted": {
+      "cover_ovate": 76,
+      "cover_stamp": 81,
+      "ecokit_floral": 2,
+      "fallen_leaf": 5,
+      "firefly_card": 0,
+      "prod_flower": 14,
+      "prod_litter": 60
+    },
+    "schema": "TIVVLEJOY_FOREST_RAINBOW_SPECK_OBJECT_ID_V1"
+  },
+  "result": "RENDERED",
+  "samples": 8,
+  "schema": "TIVVLEJOY_FOREST_RAINBOW_SPECK_OBJECT_ID_PROOF_V1",
+  "still": {
+    "bytes": 1000659,
+    "dimensions": [
+      1280,
+      720
+    ],
+    "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_RAINBOW_SPECK_OBJECT_ID_V1.png",
+    "seconds": 15.19,
+    "sha256": "56cdc63ea8e325ac2102f642426b5bb8170921afc31128dd4790946a95d1b23e"
+  }
+}
