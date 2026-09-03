@@ -34,6 +34,7 @@ class ForestSunnyAfternoonTreeDetailTest(unittest.TestCase):
         self.assertIn("install_camera_sky_card", source)
         self.assertIn("scatter_canopy_leaf_cards", source)
         self.assertIn("generate_afternoon_sky_texture", source)
+        self.assertIn("AFTERNOON_SKY_TEXTURE_UNAVAILABLE", source)
         self.assertIn("_assign_quad_uvs", source)
         self.assertIn("make_canopy_leaf_sprite", source)
         self.assertIn("sharpen_canopy_materials", source)

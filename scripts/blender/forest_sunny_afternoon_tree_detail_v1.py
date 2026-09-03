@@ -491,28 +491,49 @@ def _paint_readable_clouds(image, width: int, height: int) -> None:
 
 
 def generate_afternoon_sky_texture(path: Path = GENERATED_SKY_PATH) -> Path:
-    """Camera-readable rich blue sky. Prefer EcoKit Sky_World_2, then paint clouds."""
-    from PIL import Image, ImageEnhance
+    """Camera-readable rich blue sky. Prefer EcoKit Sky_World_2, then paint clouds.
 
-    width, height = 1536, 768
+    Blender's bundled Python has no PIL. Host Python paints the card when
+    available; otherwise reuse a prewritten file or copy Sky_World_2.
+    """
+    path = Path(path)
+    try:
+        from PIL import Image, ImageEnhance
+    except ImportError:
+        Image = None
+        ImageEnhance = None
+
+    if Image is not None:
+        width, height = 1536, 768
+        source = _ecokit_sky_path()
+        if source is not None:
+            image = Image.open(source).convert("RGB").resize((width, height), Image.Resampling.LANCZOS)
+            image = ImageEnhance.Color(image).enhance(1.18)
+            image = ImageEnhance.Contrast(image).enhance(1.16)
+        else:
+            pixels = []
+            for y in range(height):
+                t = y / (height - 1)
+                r = int(32 + 86 * t)
+                g = int(96 + 70 * t)
+                b = int(186 + 36 * t)
+                pixels.extend([(r, g, b)] * width)
+            image = Image.new("RGB", (width, height))
+            image.putdata(pixels)
+        _paint_readable_clouds(image, width, height)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        image.save(path, "PNG")
+        return path
+
+    if path.is_file() and path.stat().st_size > 1000:
+        return path
     source = _ecokit_sky_path()
-    if source is not None:
-        image = Image.open(source).convert("RGB").resize((width, height), Image.Resampling.LANCZOS)
-        image = ImageEnhance.Color(image).enhance(1.18)
-        image = ImageEnhance.Contrast(image).enhance(1.16)
-    else:
-        pixels = []
-        for y in range(height):
-            t = y / (height - 1)
-            r = int(32 + 86 * t)
-            g = int(96 + 70 * t)
-            b = int(186 + 36 * t)
-            pixels.extend([(r, g, b)] * width)
-        image = Image.new("RGB", (width, height))
-        image.putdata(pixels)
-    _paint_readable_clouds(image, width, height)
+    if source is None:
+        raise RuntimeError("AFTERNOON_SKY_TEXTURE_UNAVAILABLE")
+    import shutil
+
     path.parent.mkdir(parents=True, exist_ok=True)
-    image.save(path, "PNG")
+    shutil.copy2(source, path)
     return path
 
 
