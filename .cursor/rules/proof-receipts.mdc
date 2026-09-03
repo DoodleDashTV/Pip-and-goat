@@ -1,0 +1,13 @@
+---
+description: Proof and receipt requirements for TivvleJoy production tasks
+globs: artifacts/**/*.{json,md} reports/**/*.md
+alwaysApply: false
+---
+
+# Proof receipts
+
+- Every significant visual task writes a receipt with executionStatus, startingHead, endingHead, paidCreateCount, paidSpendUsd, and finalClassification.
+- Record SHA256 and path for every proof still.
+- Classify each class honestly. PARTIAL is allowed inside notes; the terminal state is still PASS, FAIL, or BLOCKED.
+- Do not mark PASS because a PNG file exists. The image contents must meet the acceptance text.
+- Keep receipts next to the stills they describe.

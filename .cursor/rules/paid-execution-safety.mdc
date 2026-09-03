@@ -1,0 +1,12 @@
+---
+description: Paid execution safety for TivvleJoy cloud/GPU work
+alwaysApply: true
+---
+
+# Paid execution safety
+
+- paidCreateCount must stay 0 unless the current user prompt explicitly authorizes a paid CREATE.
+- No RunPod, RenderPod, or paid remote GPU without that authorization.
+- No marketplace purchases and no random internet asset downloads.
+- If paid infra is required and unauthorized, return BLOCKED / PAID_EXECUTION_REQUIRES_AUTHORIZATION and continue unpaid work.
+- Local Blender CPU stills are unpaid and preferred for lookdev and material proofs.

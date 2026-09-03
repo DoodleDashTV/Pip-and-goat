@@ -1,0 +1,14 @@
+---
+description: Visual quality gates for TivvleJoy rendered proofs
+globs: artifacts/tivvlejoy-stagegraph-v1/**/*
+alwaysApply: false
+---
+
+# Visual quality gates
+
+- Judge quality from the rendered frame, not from node graphs.
+- Isolated lookdev must expose defects (neutral studio, no cinematic disguise).
+- Camera-distance proof is required before claiming the production scene improved.
+- Reject: rectangular foliage ghosts, stretched bark streaks, orange/salmon ground planes, single-plane grass in the foreground, crushed-black canopies used as a lighting cheat.
+- Lighting rebuild is forbidden while materials/vegetation still fail isolated or camera proofs.
+- Numerical tests catch technical breakage. They cannot certify artistic PASS.

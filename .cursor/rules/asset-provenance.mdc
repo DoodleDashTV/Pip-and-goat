@@ -1,0 +1,13 @@
+---
+description: Purchased asset provenance for TivvleJoy
+globs: artifacts/**/*MANIFEST* scripts/blender/**/*.py
+alwaysApply: false
+---
+
+# Asset provenance
+
+- Record pack, archive, source blend/texture, production object/material, and modification type for production substitutions.
+- Never delete purchased source archives.
+- Never permanently overwrite vendor source files.
+- Silent skip of a required purchased asset is a defect. Fail closed with an explicit error.
+- EcoKit, Botaniq, Forest Nature Kit, HDRI packs, and other owned libraries remain reusable even when a specific implementation is hidden from camera.

@@ -1,0 +1,16 @@
+---
+description: Blender production workflow for TivvleJoy environments
+globs: scripts/blender/**/*.py
+alwaysApply: false
+---
+
+# Blender production
+
+- Localize linked vendor materials before repairing alpha, normals, or color space.
+- Build foliage as local Principled graphs. Do not depend on Botaniq addon node groups.
+- Bark uses a cylindrical/longitudinal unwrap. Never object-project a 1:4 strip onto square-atlas UVs.
+- Texture color spaces: albedo sRGB, data maps Non-Color.
+- Keep bump/normal strength restrained. No emission used to hide bad albedo.
+- Distance tiers: hero/foreground get real volume; EcoKit cards stay only where the camera cannot read their defects.
+- Factory-startup local Blender is the zero-paid proof path. Do not require a saved .blend as the only entry point.
+- Vendor source .blend/.zip files are read-only. Duplicate or overlay; do not overwrite purchased archives.

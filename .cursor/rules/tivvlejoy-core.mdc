@@ -1,0 +1,15 @@
+---
+description: Core TivvleJoy production honesty and lock rules
+alwaysApply: true
+---
+
+# TivvleJoy core
+
+- Visual work ends as PASS, FAIL, or BLOCKED. Never imply success from tests or code inspection alone.
+- A rendered proof is required before any visual PASS.
+- Do not invent proof paths, hashes, costs, or render results.
+- Failed visual candidates are not promoted. Revert regressions.
+- Use the strongest already-owned asset for each production role. Preserving a purchased archive does not require keeping a defective implementation visible.
+- Approved camera, water, and character identity stay locked unless a later prompt explicitly authorizes a change.
+- Prefer recoverable stacked draft PRs. Do not merge production PRs unless explicitly asked.
+- Commit verified milestones, not noise after every tiny edit.
