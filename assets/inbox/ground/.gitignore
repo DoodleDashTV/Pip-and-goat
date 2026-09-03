@@ -1,0 +1,6 @@
+# TivvleJoy owned ground pack inbox
+# Commercial source assets are placed here locally or pulled from private asset storage.
+# Do not commit purchased asset binaries or extracted texture payloads to this public repo.
+*
+!.gitignore
+!TIVVLEJOY_GROUND_PACKS_MANIFEST.md
