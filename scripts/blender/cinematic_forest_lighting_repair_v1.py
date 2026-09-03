@@ -16,7 +16,7 @@ SUN_ENERGY = 8.6
 SUN_COLOR = (1.0, 0.94, 0.86)
 SUN_ANGLE_DEG = 4.2
 
-FILL_ENERGY = 300.0
+FILL_ENERGY = 240.0
 FILL_COLOR = (0.58, 0.74, 1.0)
 FILL_LOCATION = (0.0, -7.2, 11.5)
 FILL_AIM = (0.0, 8.0, 5.5)
@@ -26,13 +26,13 @@ RIM_ENERGY = 3.15
 RIM_COLOR = (0.72, 0.84, 1.0)
 RIM_TRAVEL = (-0.28, -0.52, -0.81)
 
-BOUNCE_ENERGY = 180.0
+BOUNCE_ENERGY = 150.0
 BOUNCE_COLOR = (0.38, 0.52, 0.36)
 BOUNCE_LOCATION = (0.0, 8.2, 4.2)
 BOUNCE_AIM = (0.0, 8.0, 9.0)
 BOUNCE_SIZE = 12.0
 
-CANOPY_FILL_ENERGY = 480.0
+CANOPY_FILL_ENERGY = 420.0
 CANOPY_FILL_COLOR = (0.66, 0.80, 1.0)
 CANOPY_FILL_LOCATION = (0.0, -6.0, 11.2)
 CANOPY_FILL_AIM = (0.0, 8.5, 6.0)
@@ -82,9 +82,9 @@ FLORA_GRASS_LIGHT_INTENSITY = 0.55
 FLORA_FALLEN_LIGHT_INTENSITY = 0.20
 FLORA_BRANCH_LIGHT_INTENSITY = 0.58
 FLORA_DISPLAY_INTENSITY_CAP = 3.0
-TRUNK_STRENGTH = 0.55
-TRUNK_MIN_LUMA = 0.28
-TRUNK_BRIGHT = 0.28
+TRUNK_STRENGTH = 0.20
+TRUNK_MIN_LUMA = 0.08
+TRUNK_BRIGHT = 0.06
 
 DIFFUSE_BOUNCES = 12
 GLOSSY_BOUNCES = 4
@@ -332,80 +332,10 @@ def apply_cinematic_world(scene) -> dict:
 
 
 def apply_ground_lookdev(scene) -> dict:
-    import bpy
+    from forest_material_readability_repair_v1 import apply_purchased_forest_floor
 
-    ground = scene.objects.get("TJ_VendorGround")
-    if ground is None or ground.data is None:
-        return {"applied": False, "reason": "GROUND_MISSING"}
-    material = None
-    if ground.data.materials:
-        material = ground.data.materials[0]
-    if material is None:
-        material = bpy.data.materials.get("TJ_VendorGround_Mat")
-    if material is None:
-        material = bpy.data.materials.new("TJ_VendorGround_Mat")
-        ground.data.materials.append(material)
-    material.use_nodes = True
-    nodes = material.node_tree.nodes
-    links = material.node_tree.links
-    nodes.clear()
-    output = nodes.new("ShaderNodeOutputMaterial")
-    output.location = (720, 80)
-    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
-    bsdf.location = (400, 80)
-    tex_coord = nodes.new("ShaderNodeTexCoord")
-    tex_coord.location = (-720, 80)
-    noise_a = nodes.new("ShaderNodeTexNoise")
-    noise_a.location = (-480, 180)
-    noise_a.inputs["Scale"].default_value = 9.0
-    noise_a.inputs["Detail"].default_value = 8.0
-    noise_a.inputs["Roughness"].default_value = 0.52
-    noise_b = nodes.new("ShaderNodeTexNoise")
-    noise_b.location = (-480, -40)
-    noise_b.inputs["Scale"].default_value = 5.5
-    noise_b.inputs["Detail"].default_value = 4.0
-    noise_b.inputs["Roughness"].default_value = 0.62
-    links.new(tex_coord.outputs["Object"], noise_a.inputs["Vector"])
-    links.new(tex_coord.outputs["Object"], noise_b.inputs["Vector"])
-
-    earth_moss = _new_mix_color(nodes, "TJ_GroundEarthMoss_V1")
-    earth_moss.location = (-160, 180)
-    _set_rgba(_mix_color_sockets(earth_moss)[0], (*GROUND_EARTH, 1.0))
-    _set_rgba(_mix_color_sockets(earth_moss)[1], (*GROUND_MOSS, 1.0))
-    links.new(noise_a.outputs["Fac"], _mix_factor(earth_moss))
-
-    damp_rock = _new_mix_color(nodes, "TJ_GroundDampRock_V1")
-    damp_rock.location = (-160, -40)
-    _set_rgba(_mix_color_sockets(damp_rock)[0], (*GROUND_DAMP, 1.0))
-    _set_rgba(_mix_color_sockets(damp_rock)[1], (*GROUND_ROCK, 1.0))
-    links.new(noise_b.outputs["Fac"], _mix_factor(damp_rock))
-
-    combine = _new_mix_color(nodes, "TJ_GroundCombine_V1")
-    combine.location = (120, 80)
-    _mix_factor(combine).default_value = 0.38
-    links.new(noise_b.outputs["Fac"], _mix_factor(combine))
-    earth_out = earth_moss.outputs.get("Result") or earth_moss.outputs.get("Color") or earth_moss.outputs[0]
-    damp_out = damp_rock.outputs.get("Result") or damp_rock.outputs.get("Color") or damp_rock.outputs[0]
-    links.new(earth_out, _mix_color_sockets(combine)[0])
-    links.new(damp_out, _mix_color_sockets(combine)[1])
-    combine_out = combine.outputs.get("Result") or combine.outputs.get("Color") or combine.outputs[0]
-    links.new(combine_out, bsdf.inputs["Base Color"])
-    if "Roughness" in bsdf.inputs:
-        bsdf.inputs["Roughness"].default_value = 0.91
-    if "Specular IOR Level" in bsdf.inputs:
-        bsdf.inputs["Specular IOR Level"].default_value = 0.18
-    elif "Specular" in bsdf.inputs:
-        bsdf.inputs["Specular"].default_value = 0.18
-    links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])
-    _tag(material)
-    return {
-        "applied": True,
-        "material": material.name,
-        "earth": list(GROUND_EARTH),
-        "moss": list(GROUND_MOSS),
-        "orangeCastReduced": True,
-        "texturesOverwritten": False,
-    }
+    _ = scene
+    return apply_purchased_forest_floor()
 
 
 def apply_atmosphere_lookdev(scene) -> dict:
@@ -604,12 +534,14 @@ def _flora_color_role(name: str) -> str:
         return "fallen"
     if any(word in low for word in ("branch", "stipe", "bark", "trunk", "wood")):
         return "branch"
+    if any(word in low for word in ("floral", "flower")):
+        return "flower"
     return "foliage"
 
 
 def _clamp_hot_flora_color(rgba, role: str):
     red, green, blue, alpha = [float(value) for value in rgba]
-    if role == "branch":
+    if role in {"branch", "flower"}:
         return (red, green, blue, alpha)
     if role == "fallen":
         if red > green:
@@ -786,64 +718,9 @@ TRUNK_COLOR_LIFT = (1.38, 1.24, 1.12, 1.0)
 
 
 def repair_trunk_readability() -> dict:
-    import bpy
+    from forest_material_readability_repair_v1 import restore_vendor_bark
 
-    groups_changed = []
-    for group in bpy.data.node_groups:
-        if not str(group.name).startswith("TreeTrunk_Mat"):
-            continue
-        touched = False
-        for node in group.nodes:
-            if node.type != "BRIGHTCONTRAST":
-                continue
-            if "Bright" in node.inputs and float(node.inputs["Bright"].default_value) < TRUNK_BRIGHT:
-                node.inputs["Bright"].default_value = TRUNK_BRIGHT
-                touched = True
-        if touched:
-            _tag(group)
-            groups_changed.append(group.name)
-
-    changed = []
-    for material in bpy.data.materials:
-        low = str(material.name or "").lower()
-        if "trunk" not in low:
-            continue
-        if any(word in low for word in ("leaf", "grass", "water", "ground")):
-            continue
-        if not material.use_nodes or material.node_tree is None:
-            continue
-        touched = False
-        for node in material.node_tree.nodes:
-            if node.type != "GROUP":
-                continue
-            luma = None
-            if "Color" in node.inputs:
-                color = list(node.inputs["Color"].default_value)
-                luma = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2]
-                if 0.001 < luma < TRUNK_MIN_LUMA:
-                    lift = TRUNK_MIN_LUMA / luma
-                    node.inputs["Color"].default_value = (
-                        min(color[0] * lift, 0.48),
-                        min(color[1] * lift, 0.36),
-                        min(color[2] * lift, 0.24),
-                        color[3] if len(color) > 3 else 1.0,
-                    )
-                    luma = TRUNK_MIN_LUMA
-                    touched = True
-            if "Strength" in node.inputs and luma is not None and luma < 0.45:
-                current = float(node.inputs["Strength"].default_value)
-                if current < TRUNK_STRENGTH:
-                    node.inputs["Strength"].default_value = TRUNK_STRENGTH
-                    touched = True
-        if touched:
-            _tag(material)
-            changed.append(material.name)
-    return {
-        "materialsChanged": len(changed),
-        "names": changed,
-        "groupsChanged": groups_changed,
-        "texturesOverwritten": False,
-    }
+    return restore_vendor_bark()
 
 
 def repair_treeleaf_groups() -> dict:
@@ -984,6 +861,11 @@ def apply_cinematic_forest_lighting_repair(scene) -> dict:
     color = apply_color_management(scene)
     cycles = apply_cycles_quality(scene)
     world = apply_cinematic_world(scene)
+    from forest_material_readability_repair_v1 import enhance_camera_sky_variation
+
+    sky = enhance_camera_sky_variation(scene)
+    world = dict(world)
+    world["cameraSky"] = sky
     ground = apply_ground_lookdev(scene)
     atmosphere = apply_atmosphere_lookdev(scene)
     lights = retune_existing_lights(scene)
