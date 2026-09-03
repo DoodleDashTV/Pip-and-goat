@@ -69,6 +69,7 @@ class ForestProductionShadingRebuildTest(unittest.TestCase):
         self.assertIn("Shader_Cycles", source)
         wrapper = source.split("def install_flora_production_wrappers", 1)[1]
         self.assertIn("TJ_ProdFloraAlpha_V1", wrapper)
+        self.assertIn("GREATER_THAN", wrapper)
         self.assertNotIn("links.new(image_node.outputs[\"Color\"], _mix_ab(tint)[0])", wrapper)
 
     def test_lighting_is_rebalanced_not_washed(self):

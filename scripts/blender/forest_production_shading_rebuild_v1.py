@@ -470,23 +470,24 @@ def install_flora_production_wrappers() -> dict:
         if "Specular IOR Level" in principled.inputs:
             principled.inputs["Specular IOR Level"].default_value = 0.18
         if image_node is not None and "Alpha" in principled.inputs:
-            alpha_range = nodes.get("TJ_ProdFloraAlpha_V1")
-            if alpha_range is None:
-                alpha_range = nodes.new("ShaderNodeMapRange")
-                alpha_range.name = "TJ_ProdFloraAlpha_V1"
-            alpha_range.location = (principled.location.x - 260, principled.location.y - 80)
-            alpha_range.inputs["From Min"].default_value = 0.16
-            alpha_range.inputs["From Max"].default_value = 0.34
-            alpha_range.inputs["To Min"].default_value = 0.0
-            alpha_range.inputs["To Max"].default_value = 1.0
-            links.new(image_node.outputs["Color"], alpha_range.inputs["Value"])
-            links.new(alpha_range.outputs["Result"], principled.inputs["Alpha"])
+            clip = nodes.get("TJ_ProdFloraAlpha_V1")
+            if clip is None or clip.type != "MATH":
+                if clip is not None:
+                    nodes.remove(clip)
+                clip = nodes.new("ShaderNodeMath")
+                clip.name = "TJ_ProdFloraAlpha_V1"
+            clip.operation = "GREATER_THAN"
+            clip.location = (principled.location.x - 260, principled.location.y - 80)
+            clip.inputs[1].default_value = 0.28
+            links.new(image_node.outputs["Color"], clip.inputs[0])
+            links.new(clip.outputs["Value"], principled.inputs["Alpha"])
             try:
                 material.blend_method = "CLIP"
             except Exception:
                 material.blend_method = "HASHED"
             if hasattr(material, "alpha_threshold"):
-                material.alpha_threshold = 0.35
+                material.alpha_threshold = 0.28
+            _tag(clip)
             bump = nodes.get(FLORA_BUMP)
             if bump is None:
                 bump = nodes.new("ShaderNodeBump")
@@ -497,7 +498,6 @@ def install_flora_production_wrappers() -> dict:
             links.new(image_node.outputs["Color"], bump.inputs["Height"])
             links.new(bump.outputs["Normal"], principled.inputs["Normal"])
             _tag(bump)
-            _tag(alpha_range)
 
         surface = principled.outputs["BSDF"]
         if role in {"leaf", "bush", "grass", "flower"}:
