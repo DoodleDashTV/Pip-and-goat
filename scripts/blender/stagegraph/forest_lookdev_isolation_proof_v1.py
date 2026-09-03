@@ -77,6 +77,8 @@ def configure_lookdev_render(scene, samples: int) -> None:
     scene.render.film_transparent = False
     scene.render.use_border = False
     scene.render.use_crop_to_border = False
+    if hasattr(scene.render, "use_compositing"):
+        scene.render.use_compositing = False
     scene.cycles.samples = int(samples)
     scene.cycles.use_denoising = True
     scene.cycles.device = "CPU"
@@ -114,31 +116,40 @@ def _shot_objects(collection, prefixes):
     return selected
 
 
-def _frame_shot(camera, objects, kind: str) -> None:
+def _shot_aim(objects, kind: str):
+    from mathutils import Vector
+
     subject = objects[0]
     if kind == "trunk":
         base = subject.location
-        camera.location = (base.x + 1.35, base.y - 2.85, base.z + 1.65)
-        from mathutils import Vector
+        return Vector((base.x, base.y, base.z + 1.45))
+    center = Vector((0.0, 0.0, 0.0))
+    for obj in objects:
+        center += obj.location
+    return center / max(len(objects), 1)
 
-        target = Vector((base.x, base.y, base.z + 1.45))
-        camera.rotation_euler = (target - camera.location).to_track_quat("-Z", "Y").to_euler()
+
+def _frame_shot(camera, objects, kind: str) -> None:
+    from mathutils import Vector
+
+    subject = objects[0]
+    target = _shot_aim(objects, kind)
+    if kind == "trunk":
+        camera.location = (target.x + 1.35, target.y - 2.85, target.z + 0.20)
         camera.data.lens = 85.0
-        return
-    if kind == "ground":
-        frame_subject(camera, subject, distance=3.15, height=2.55, lateral=0.15)
+    elif kind == "ground":
+        camera.location = (target.x + 0.35, target.y - 3.05, target.z + 2.45)
         camera.data.lens = 50.0
-        return
-    if kind == "bush":
-        frame_subject(camera, subject, distance=2.6, height=1.05, lateral=0.35)
+    elif kind == "bush":
+        camera.location = (target.x + 0.45, target.y - 2.55, target.z + 1.05)
         camera.data.lens = 70.0
-        return
-    if kind == "leaf":
-        frame_subject(camera, subject, distance=2.1, height=0.85, lateral=0.25)
+    elif kind == "leaf":
+        camera.location = (target.x + 0.35, target.y - 2.05, target.z + 0.85)
         camera.data.lens = 80.0
-        return
-    frame_subject(camera, subject, distance=2.3, height=0.9, lateral=0.2)
-    camera.data.lens = 70.0
+    else:
+        camera.location = (target.x + 0.25, target.y - 2.15, target.z + 0.95)
+        camera.data.lens = 70.0
+    camera.rotation_euler = (Vector(target) - camera.location).to_track_quat("-Z", "Y").to_euler()
 
 
 def main():
@@ -180,8 +191,8 @@ def main():
             if obj.type != "MESH":
                 continue
             obj.hide_render = obj not in visible
-        install_studio_rig(collection, visible[0])
         _frame_shot(lookdev_camera, visible, kind)
+        install_studio_rig(collection, visible[0], aim=_shot_aim(visible, kind))
         stills[name] = render_path(scene, out_dir / f"{name}.png")
 
     restore_production(scene, isolation)

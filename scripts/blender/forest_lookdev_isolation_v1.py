@@ -319,8 +319,10 @@ def install_lookdev_subjects(scene) -> dict:
     }
 
 
-def install_studio_rig(collection, subject) -> dict:
-    center = _bbox_center(subject)
+def install_studio_rig(collection, subject, aim=None) -> dict:
+    from mathutils import Vector
+
+    center = Vector(aim) if aim is not None else _bbox_center(subject)
     key = _make_light(
         collection,
         "TJ_LookdevKey",

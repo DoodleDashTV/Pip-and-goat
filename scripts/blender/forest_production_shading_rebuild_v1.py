@@ -475,13 +475,18 @@ def install_flora_production_wrappers() -> dict:
                 alpha_range = nodes.new("ShaderNodeMapRange")
                 alpha_range.name = "TJ_ProdFloraAlpha_V1"
             alpha_range.location = (principled.location.x - 260, principled.location.y - 80)
-            alpha_range.inputs["From Min"].default_value = 0.04
-            alpha_range.inputs["From Max"].default_value = 0.22
+            alpha_range.inputs["From Min"].default_value = 0.16
+            alpha_range.inputs["From Max"].default_value = 0.34
             alpha_range.inputs["To Min"].default_value = 0.0
             alpha_range.inputs["To Max"].default_value = 1.0
             links.new(image_node.outputs["Color"], alpha_range.inputs["Value"])
             links.new(alpha_range.outputs["Result"], principled.inputs["Alpha"])
-            material.blend_method = "HASHED"
+            try:
+                material.blend_method = "CLIP"
+            except Exception:
+                material.blend_method = "HASHED"
+            if hasattr(material, "alpha_threshold"):
+                material.alpha_threshold = 0.35
             bump = nodes.get(FLORA_BUMP)
             if bump is None:
                 bump = nodes.new("ShaderNodeBump")
