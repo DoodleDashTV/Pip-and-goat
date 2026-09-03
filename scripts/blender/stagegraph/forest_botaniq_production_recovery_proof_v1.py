@@ -172,8 +172,8 @@ def _frame_shot(camera, objects, kind: str) -> None:
     if kind == "trunk":
         subject = objects[0]
         height = max(float(subject.dimensions.z), 1.6)
-        camera.location = (target.x + 0.70, target.y - max(1.55, height * 0.85), target.z + 0.05)
-        camera.data.lens = 85.0
+        camera.location = (target.x + 1.05, target.y - max(2.55, height * 1.25), target.z + 0.22)
+        camera.data.lens = 70.0
     elif kind == "ground":
         camera.location = (target.x + 0.35, target.y - 3.05, target.z + 2.35)
         camera.data.lens = 50.0
@@ -181,8 +181,8 @@ def _frame_shot(camera, objects, kind: str) -> None:
         camera.location = (target.x + 0.55, target.y - 2.65, target.z + 1.15)
         camera.data.lens = 70.0
     elif kind == "leaf":
-        camera.location = (target.x + 0.15, target.y - 1.55, target.z + 0.20)
-        camera.data.lens = 85.0
+        camera.location = (target.x + 0.22, target.y - 2.25, target.z + 0.28)
+        camera.data.lens = 70.0
     else:
         camera.location = (target.x + 0.25, target.y - 2.05, target.z + 0.55)
         camera.data.lens = 70.0

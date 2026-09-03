@@ -923,7 +923,9 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         for slot in ground.material_slots:
             slot.link = "OBJECT"
             slot.material = mats["ground"]
-        scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 4, 5, 4)
+        # Lookdev floor: layered soil/litter/moss shader only. Extra decals
+        # z-fight and punch black holes through the 2 m patch.
+        scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 0, 0, 0)
 
     bpy.context.view_layer.update()
     return {
