@@ -63,6 +63,7 @@ class ForestHeroTreeReplacementTest(unittest.TestCase):
         self.assertIn(HERO_CANOPY_KEY_NAME, source)
         self.assertIn(HERO_CANOPY_KEY_R_NAME, source)
         self.assertIn(HERO_TRUNK_KICKER_NAME, source)
+        self.assertIn(HERO_TRUNK_KICKER_C_NAME, source)
         self.assertIn("HERO_DAPPLE_SPOTS", source)
         self.assertIn(HERO_RECEIVER_COLLECTION, source)
         self.assertIn("use_shadow = False", source)
