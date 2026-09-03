@@ -1,8 +1,14 @@
 """Locked-camera forest-floor dressing. Does not touch the vendor ground shader.
 
-Covers the visible TJ_VendorGround footprint with owned Botaniq meshes and
-localized soil/litter/moss/rock materials. Terrain, camera, water, lighting,
-and background EcoKit (y >= 18 plants) stay locked.
+Covers the visible TJ_VendorGround footprint — and the preserved EcoKit floral
+cards that sit on top of it at y >= 18 — with owned Botaniq meshes and
+localized soil/litter/moss/rock materials.
+
+Those floral cards are not hidden or edited (background lock). Cover geometry
+is placed above their z=0.015 plane so the locked camera reads dressed earth
+instead of the card albedo.
+
+Terrain, camera, water, lighting, and background EcoKit plants stay locked.
 """
 
 from __future__ import annotations
@@ -17,34 +23,43 @@ from forest_botaniq_production_recovery_v1 import (
     CORYLUS_BARK_NORMAL,
     FERN_NORMAL,
     LEAF_NORMAL,
+    LITTER_ALBEDO,
+    LITTER_NORMAL,
     MOSS_ALBEDO,
     NEEDLES_ALBEDO,
     ROCK_ALBEDO,
     ROCK_NORMAL,
     SOIL_ALBEDO,
     SOIL_NORMAL,
+    SOIL_ROUGH_ALBEDO,
     STEM_ALBEDO,
     STEM_NORMAL,
     _instance_like,
-    ensure_cutout_png,
     fern_albedo_path,
     leaf_albedo_path,
     make_foliage_material,
     make_opaque_pbr,
-    rebuild_appended_materials,
+    write_world_metre_uvs,
 )
 
 FEATURE = "forest_camera_ground_cover_v1"
 COLLECTION_NAME = "TJ_CAMERA_GROUND_COVER_V1"
 
+# Preserved EcoKit Floral_* cards at y >= 18 are 100–200 m quads at this height.
+# Cover must sit above them. Do not hide or relocate those objects.
+FLORAL_CARD_Z = 0.015
+COVER_CLEARANCE_Z = 0.034
+
 # Visible floor from TJ_VendorReference_Camera at (0, -12.5, 2.15), 42 mm.
+# Horizon ground is ~60–100 m out; V1–V3 stopped at y=38 and left a salmon band.
 FOOTPRINT = {
-    "xMin": -18.0,
-    "xMax": 18.0,
+    "xMin": -40.0,
+    "xMax": 40.0,
     "yMin": -5.0,
-    "yMax": 38.0,
+    "yMax": 100.0,
     "heroY": 8.0,
     "midY": 18.0,
+    "farY": 36.0,
 }
 
 MOSS_A = BOTANIQ_MODELS / "mosses-and-lichens" / "bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn.blend"
@@ -55,14 +70,6 @@ PEBBLE_B = BOTANIQ_MODELS / "rocks" / "bq_Rock_Pebble_B_spring-summer-autumn.ble
 TWIG_TILIA = BOTANIQ_MODELS / "misc" / "bq_Twig_Tilia-europaea_A_spring-summer-autumn.blend"
 TWIG_OAK = BOTANIQ_MODELS / "misc" / "bq_Twig_Quercus-robur_A_spring-summer-autumn.blend"
 TWIG_SPRUCE = BOTANIQ_MODELS / "misc" / "bq_Twig_Picea-abies_A_spring-summer-autumn.blend"
-FALLEN_B = BOTANIQ_MODELS / "misc" / "bq_pps_Misc_Fallen-Leaves_B_autumn.blend"
-MOSS_LOREUS = BOTANIQ_TEX / "bq_Moss_Rhytidiadelphus-loreus_Diffuse.png"
-
-AUTUMN_LEAVES = (
-    "bq_Leaf_Acer-saccharum_A_autumn",
-    "bq_Leaf_Quercus-robur_A_autumn",
-    "bq_Leaf_Fagus-sylvatica_A_autumn",
-)
 
 
 def camera_footprint() -> dict:
@@ -71,6 +78,12 @@ def camera_footprint() -> dict:
 
 def in_footprint(x: float, y: float) -> bool:
     return FOOTPRINT["xMin"] <= x <= FOOTPRINT["xMax"] and FOOTPRINT["yMin"] <= y <= FOOTPRINT["yMax"]
+
+
+def _frustum_half_x(y: float) -> float:
+    """Half-width of the locked 42 mm floor strip at world y, plus margin."""
+    distance = max(y + 12.5, 4.0)
+    return max(16.0, min(40.0, distance * 0.50 + 5.0))
 
 
 def _cover_tag(id_data) -> None:
@@ -91,11 +104,31 @@ def _new_material(name: str):
     return material
 
 
-def make_soil_cover_material():
-    """Dark earth for cover patches only. Does not replace the vendor ground material."""
+def _grade_albedo(nodes, links, color_socket, hue: float, sat: float, value: float, grade, mix_fac: float):
+    from forest_botaniq_production_recovery_v1 import _mix_color, _mix_out, _mix_sockets
+
+    hsv = nodes.new("ShaderNodeHueSaturation")
+    hsv.inputs["Hue"].default_value = hue
+    hsv.inputs["Saturation"].default_value = sat
+    hsv.inputs["Value"].default_value = value
+    links.new(color_socket, hsv.inputs["Color"])
+    mix = _mix_color(nodes, "TJ_CoverGrade")
+    fac, sock_a, sock_b = _mix_sockets(mix)
+    fac.default_value = mix_fac
+    links.new(hsv.outputs["Color"], sock_a)
+    sock_b.default_value = (*grade, 1.0)
+    return _mix_out(mix)
+
+
+def make_soil_cover_material(name: str = "TJ_CoverSoil_Loose_V1", albedo=None, normal=None):
+    """Dark earth for cover patches only. Matches the isolated-PASS soil grade.
+
+    Cover V1–V3 used Value=0.70 and read gray under locked lookdev lighting.
+    Isolated TJ_ProdGround uses Value=0.36 plus a dark-earth mix.
+    """
     from forest_botaniq_production_recovery_v1 import _load_image, _principled
 
-    material = _new_material("TJ_CoverSoil_Loose_V1")
+    material = _new_material(name)
     nodes = material.node_tree.nodes
     links = material.node_tree.links
     shader, _output = _principled(nodes, links)
@@ -104,38 +137,128 @@ def make_soil_cover_material():
     mapping.inputs["Scale"].default_value = (0.85, 0.85, 0.85)
     links.new(coord.outputs["UV"], mapping.inputs["Vector"])
     tex = nodes.new("ShaderNodeTexImage")
-    tex.image = _load_image(SOIL_ALBEDO, "sRGB")
+    tex.image = _load_image(albedo or SOIL_ALBEDO, "sRGB")
     links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
-    hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Hue"].default_value = 0.50
-    hsv.inputs["Saturation"].default_value = 0.64
-    hsv.inputs["Value"].default_value = 0.70
-    links.new(tex.outputs["Color"], hsv.inputs["Color"])
-    links.new(hsv.outputs["Color"], shader.inputs["Base Color"])
-    shader.inputs["Roughness"].default_value = 0.92
-    if SOIL_NORMAL.is_file():
+    graded = _grade_albedo(
+        nodes,
+        links,
+        tex.outputs["Color"],
+        hue=0.40,
+        sat=0.78,
+        value=0.34,
+        grade=(0.09, 0.055, 0.028),
+        mix_fac=0.48,
+    )
+    links.new(graded, shader.inputs["Base Color"])
+    shader.inputs["Roughness"].default_value = 0.93
+    n_path = normal if normal is not None else SOIL_NORMAL
+    if n_path is not None and n_path.is_file():
         ntex = nodes.new("ShaderNodeTexImage")
-        ntex.image = _load_image(SOIL_NORMAL, "Non-Color")
+        ntex.image = _load_image(n_path, "Non-Color")
         ntex.image.colorspace_settings.name = "Non-Color"
         links.new(mapping.outputs["Vector"], ntex.inputs["Vector"])
         nmap = nodes.new("ShaderNodeNormalMap")
-        nmap.inputs["Strength"].default_value = 0.38
+        nmap.inputs["Strength"].default_value = 0.42
         links.new(ntex.outputs["Color"], nmap.inputs["Color"])
         links.new(nmap.outputs["Normal"], shader.inputs["Normal"])
     return material
 
 
-def make_needle_cluster_material():
+def make_litter_patch_material():
+    """Muted decomposed litter. Autumn albedo is graded down so it cannot carpet."""
+    from forest_botaniq_production_recovery_v1 import _load_image, _principled
+
+    material = _new_material("TJ_CoverLitterPatch_V1")
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    shader, _output = _principled(nodes, links)
+    coord = nodes.new("ShaderNodeTexCoord")
+    mapping = nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (0.72, 0.72, 0.72)
+    links.new(coord.outputs["UV"], mapping.inputs["Vector"])
+    tex = nodes.new("ShaderNodeTexImage")
+    tex.image = _load_image(LITTER_ALBEDO, "sRGB")
+    links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+    graded = _grade_albedo(
+        nodes,
+        links,
+        tex.outputs["Color"],
+        hue=0.08,
+        sat=0.42,
+        value=0.40,
+        grade=(0.10, 0.07, 0.04),
+        mix_fac=0.38,
+    )
+    links.new(graded, shader.inputs["Base Color"])
+    shader.inputs["Roughness"].default_value = 0.90
+    if LITTER_NORMAL.is_file():
+        ntex = nodes.new("ShaderNodeTexImage")
+        ntex.image = _load_image(LITTER_NORMAL, "Non-Color")
+        ntex.image.colorspace_settings.name = "Non-Color"
+        links.new(mapping.outputs["Vector"], ntex.inputs["Vector"])
+        nmap = nodes.new("ShaderNodeNormalMap")
+        nmap.inputs["Strength"].default_value = 0.35
+        links.new(ntex.outputs["Color"], nmap.inputs["Color"])
+        links.new(nmap.outputs["Normal"], shader.inputs["Normal"])
+    return material
+
+
+def make_needle_patch_material():
     from forest_botaniq_production_recovery_v1 import _load_image, _principled
 
     material = _new_material("TJ_CoverNeedles_V1")
     nodes = material.node_tree.nodes
     links = material.node_tree.links
     shader, _output = _principled(nodes, links)
+    coord = nodes.new("ShaderNodeTexCoord")
+    mapping = nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (0.90, 0.90, 0.90)
+    links.new(coord.outputs["UV"], mapping.inputs["Vector"])
     tex = nodes.new("ShaderNodeTexImage")
     tex.image = _load_image(NEEDLES_ALBEDO, "sRGB")
-    links.new(tex.outputs["Color"], shader.inputs["Base Color"])
+    links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+    graded = _grade_albedo(
+        nodes,
+        links,
+        tex.outputs["Color"],
+        hue=0.48,
+        sat=0.38,
+        value=0.38,
+        grade=(0.08, 0.07, 0.04),
+        mix_fac=0.34,
+    )
+    links.new(graded, shader.inputs["Base Color"])
     shader.inputs["Roughness"].default_value = 0.88
+    return material
+
+
+def make_moss_patch_material():
+    """Thin ground-conforming moss. Not a hemisphere. Secondary to soil."""
+    from forest_botaniq_production_recovery_v1 import _load_image, _principled
+
+    material = _new_material("TJ_CoverMossPatch_V1")
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    shader, _output = _principled(nodes, links)
+    coord = nodes.new("ShaderNodeTexCoord")
+    mapping = nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (0.55, 0.55, 0.55)
+    links.new(coord.outputs["UV"], mapping.inputs["Vector"])
+    tex = nodes.new("ShaderNodeTexImage")
+    tex.image = _load_image(MOSS_ALBEDO, "sRGB")
+    links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+    graded = _grade_albedo(
+        nodes,
+        links,
+        tex.outputs["Color"],
+        hue=0.50,
+        sat=0.48,
+        value=0.42,
+        grade=(0.05, 0.07, 0.03),
+        mix_fac=0.40,
+    )
+    links.new(graded, shader.inputs["Base Color"])
+    shader.inputs["Roughness"].default_value = 0.86
     return material
 
 
@@ -174,43 +297,39 @@ def _ensure_collection(scene):
     return collection
 
 
-def make_soil_patch(collection, name, location, radius, rotation_z, material, rng):
-    """Low irregular earth patch. Not a scene-wide plane. Not a hemisphere."""
+def make_irregular_patch(collection, name, location, radius, rotation_z, material, rng, z=COVER_CLEARANCE_Z):
+    """Low irregular earth/litter/moss patch. Not a scene-wide plane. Not a hemisphere."""
     import bpy
     from mathutils import Vector
 
-    segments = 11
-    verts = [(0.0, 0.0, rng.uniform(0.010, 0.018))]
+    segments = 13
+    verts = [(0.0, 0.0, rng.uniform(0.004, 0.010))]
     faces = []
     for index in range(segments):
         angle = 2.0 * math.pi * index / segments
-        jitter = rng.uniform(0.62, 1.08)
+        jitter = rng.uniform(0.58, 1.12)
         verts.append(
             (
                 math.cos(angle) * jitter,
                 math.sin(angle) * jitter,
-                rng.uniform(0.004, 0.012),
+                rng.uniform(0.001, 0.008),
             )
         )
     for index in range(segments):
         faces.append((0, 1 + index, 1 + ((index + 1) % segments)))
     mesh = bpy.data.meshes.new(name + "_Mesh")
     mesh.from_pydata(verts, [], faces)
-    if mesh.uv_layers.active is None:
-        mesh.uv_layers.new(name="TJ_CoverSoil")
-    uv = mesh.uv_layers.active
-    for loop in mesh.loops:
-        vx, vy, _vz = verts[loop.vertex_index]
-        uv.data[loop.index].uv = (vx * 0.72 + rng.uniform(0.0, 0.4), vy * 0.72 + rng.uniform(0.0, 0.4))
     mesh.update()
     obj = bpy.data.objects.new(name, mesh)
     collection.objects.link(obj)
-    obj.location = Vector((location[0], location[1], 0.012))
+    obj.location = Vector((location[0], location[1], z))
     obj.rotation_euler.z = rotation_z
-    obj.scale = (radius, radius * rng.uniform(0.72, 1.18), 1.0)
+    obj.scale = (radius, radius * rng.uniform(0.68, 1.22), 1.0)
     mesh.materials.append(material)
     _cover_tag(mesh)
     _cover_tag(obj)
+    bpy.context.view_layer.update()
+    write_world_metre_uvs(obj)
     return obj
 
 
@@ -219,8 +338,8 @@ def make_ovate_leaf(collection, name, location, material, rng):
     import bpy
     from mathutils import Euler, Vector
 
-    width = rng.uniform(0.07, 0.13)
-    length = rng.uniform(0.10, 0.18)
+    width = rng.uniform(0.10, 0.18)
+    length = rng.uniform(0.14, 0.26)
     cup = rng.uniform(0.006, 0.016)
     verts = [
         (0.0, -length * 0.08, 0.0),
@@ -274,29 +393,30 @@ def _place_source(source, collection, location, name, scale, rotation_z):
 
 def _soil_sites(rng) -> list[tuple[float, float, float, float]]:
     sites = []
-    spacing = 1.35
     y = FOOTPRINT["yMin"]
     row = 0
     while y <= FOOTPRINT["yMax"]:
-        x = FOOTPRINT["xMin"] + (0.55 if row % 2 else 0.0)
+        if y < FOOTPRINT["midY"]:
+            spacing, r0, r1 = 1.55, 1.90, 2.60
+        elif y < FOOTPRINT["farY"]:
+            spacing, r0, r1 = 2.45, 2.90, 4.00
+        else:
+            spacing, r0, r1 = 5.60, 6.40, 9.20
+        x = FOOTPRINT["xMin"] + (0.48 * spacing if row % 2 else 0.0)
+        half = _frustum_half_x(y)
         while x <= FOOTPRINT["xMax"]:
-            px = x + rng.uniform(-0.28, 0.28)
-            py = y + rng.uniform(-0.28, 0.28)
-            if in_footprint(px, py):
-                radius = rng.uniform(1.65, 2.35)
-                if py > FOOTPRINT["midY"]:
-                    radius *= 1.35
-                if py > 28.0:
-                    radius *= 1.25
-                sites.append((px, py, radius, rng.uniform(-math.pi, math.pi)))
+            px = x + rng.uniform(-0.24 * spacing, 0.24 * spacing)
+            py = y + rng.uniform(-0.22 * spacing, 0.22 * spacing)
+            if in_footprint(px, py) and abs(px) <= half + 2.0:
+                sites.append((px, py, rng.uniform(r0, r1), rng.uniform(-math.pi, math.pi)))
             x += spacing
-        y += spacing * 0.78
+        y += spacing * 0.70
         row += 1
     return sites
 
 
 def _cluster_centers(rng, count: int, y_min: float, y_max: float) -> list[tuple[float, float]]:
-    attractors = [(-3.1, 2.2), (2.4, 4.8), (-1.2, 8.6), (3.6, 12.1), (0.1, 0.4), (-4.4, 6.5), (4.8, 9.4)]
+    attractors = [(-3.1, 2.2), (2.4, 4.8), (-1.2, 8.6), (3.6, 12.1), (0.1, 0.4), (-4.4, 6.5), (4.8, 9.4), (-0.8, 15.2)]
     centers = []
     for index in range(count):
         if rng.random() < 0.7:
@@ -319,16 +439,18 @@ def apply_camera_ground_cover(scene) -> dict:
             collection.objects.unlink(obj)
 
     soil_mat = make_soil_cover_material()
+    soil_rough = (
+        make_soil_cover_material("TJ_CoverSoil_Rough_V1", SOIL_ROUGH_ALBEDO, None)
+        if SOIL_ROUGH_ALBEDO.is_file()
+        else soil_mat
+    )
     leaf_mat = make_foliage_material("TJ_CoverLeaf_Corylus_V1", leaf_albedo_path(), LEAF_NORMAL, 0.10, clip=True)
     autumn_mat = make_foliage_material("TJ_CoverLeaf_Autumn_V1", leaf_albedo_path(), LEAF_NORMAL, 0.08, clip=True)
     if autumn_mat.node_tree:
-        for node in autumn_mat.node_tree.nodes:
-            if node.bl_idname == "ShaderNodeBsdfPrincipled":
-                continue
         hsv = autumn_mat.node_tree.nodes.new("ShaderNodeHueSaturation")
-        hsv.inputs["Hue"].default_value = 0.06
-        hsv.inputs["Saturation"].default_value = 0.72
-        hsv.inputs["Value"].default_value = 0.62
+        hsv.inputs["Hue"].default_value = 0.07
+        hsv.inputs["Saturation"].default_value = 0.48
+        hsv.inputs["Value"].default_value = 0.52
         links = autumn_mat.node_tree.links
         image_nodes = [node for node in autumn_mat.node_tree.nodes if node.bl_idname == "ShaderNodeTexImage"]
         shader = next((node for node in autumn_mat.node_tree.nodes if node.bl_idname == "ShaderNodeBsdfPrincipled"), None)
@@ -338,17 +460,16 @@ def apply_camera_ground_cover(scene) -> dict:
                     links.remove(link)
             links.new(image_nodes[0].outputs["Color"], hsv.inputs["Color"])
             links.new(hsv.outputs["Color"], shader.inputs["Base Color"])
-    moss_src = MOSS_LOREUS if MOSS_LOREUS.is_file() else MOSS_ALBEDO
-    if moss_src.suffix.lower() == ".png":
-        moss_cut = BOTANIQ_TEX / "bq_Moss_Rhytidiadelphus-loreus_Diffuse_rgba.png"
-        moss_src = ensure_cutout_png(moss_src, moss_cut)
-        moss_mat = make_foliage_material("TJ_CoverMoss_V1", moss_src, None, 0.04, clip=True)
-    else:
-        moss_mat = make_opaque_pbr("TJ_CoverMoss_V1", moss_src, None, 0.86, mapping="object")
+    litter_mat = make_litter_patch_material()
+    needle_mat = make_needle_patch_material()
+    moss_mat = make_moss_patch_material()
     rock_mat = make_opaque_pbr("TJ_CoverRock_Granite_V1", ROCK_ALBEDO, ROCK_NORMAL, 0.78, mapping="object")
-    needle_mat = make_needle_cluster_material()
-    stem_mat = make_opaque_pbr("TJ_CoverTwig_V1", STEM_ALBEDO if STEM_ALBEDO.is_file() else CORYLUS_BARK_ALBEDO, STEM_NORMAL or CORYLUS_BARK_NORMAL, 0.7)
-    fern_mat = make_foliage_material("TJ_CoverFern_V1", fern_albedo_path(), FERN_NORMAL, 0.16, clip=True)
+    stem_mat = make_opaque_pbr(
+        "TJ_CoverTwig_V1",
+        STEM_ALBEDO if STEM_ALBEDO.is_file() else CORYLUS_BARK_ALBEDO,
+        STEM_NORMAL or CORYLUS_BARK_NORMAL,
+        0.7,
+    )
 
     moss_a = _append_named(MOSS_A, "bq_Moss_Rhytidiadelphus-squarrosus_A_spring-summer-autumn")
     moss_b = _append_named(MOSS_B, "bq_Moss_Rhytidiadelphus-squarrosus_B_spring-summer-autumn")
@@ -358,14 +479,22 @@ def apply_camera_ground_cover(scene) -> dict:
     twig_tilia = _append_named(TWIG_TILIA, "bq_Twig_Tilia-europaea_A_spring-summer-autumn")
     twig_oak = _append_named(TWIG_OAK, "bq_Twig_Quercus-robur_A_spring-summer-autumn")
     twig_spruce = _append_named(TWIG_SPRUCE, "bq_Twig_Picea-abies_A_spring-summer-autumn")
-    # V1: appended autumn leaf objects without vendor library materials
-    # rendered as rainbow/debug pixels. Keep ovate localized leaves only.
-    autumn_objs = []
 
     grass = bpy.data.objects.get("bq_Grass_Carex-oshimensis_A_spring")
-    fern = bpy.data.objects.get("bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn")
+    fern = bpy.data.objects.get("bq_Plant_Dryopteris-carthusiana_A_spring")
+    if fern is None:
+        fern = bpy.data.objects.get("bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn")
 
-    for source, mat in ((moss_a, moss_mat), (moss_b, moss_mat), (granite, rock_mat), (pebble_a, rock_mat), (pebble_b, rock_mat), (twig_tilia, stem_mat), (twig_oak, stem_mat), (twig_spruce, stem_mat)):
+    for source, mat in (
+        (moss_a, moss_mat),
+        (moss_b, moss_mat),
+        (granite, rock_mat),
+        (pebble_a, rock_mat),
+        (pebble_b, rock_mat),
+        (twig_tilia, stem_mat),
+        (twig_oak, stem_mat),
+        (twig_spruce, stem_mat),
+    ):
         if source is not None and mat is not None:
             if not source.material_slots:
                 source.data.materials.append(mat)
@@ -375,8 +504,10 @@ def apply_camera_ground_cover(scene) -> dict:
 
     counts = {
         "soilPatches": 0,
+        "litterPatches": 0,
         "litterLeaves": 0,
-        "needleClusters": 0,
+        "needlePatches": 0,
+        "mossPatches": 0,
         "mossClumps": 0,
         "rocks": 0,
         "twigs": 0,
@@ -384,70 +515,95 @@ def apply_camera_ground_cover(scene) -> dict:
     }
 
     for index, (x, y, radius, rot) in enumerate(_soil_sites(rng)):
-        make_soil_patch(collection, f"TJ_CoverSoil_{index:03d}", (x, y), radius, rot, soil_mat, rng)
+        mat = soil_rough if index % 4 == 2 else soil_mat
+        make_irregular_patch(collection, f"TJ_CoverSoil_{index:03d}", (x, y), radius, rot, mat, rng)
         counts["soilPatches"] += 1
 
-    for c_index, (cx, cy) in enumerate(_cluster_centers(rng, 18, -1.6, 14.5)):
-        pile = rng.randint(6, 11)
+    for c_index, (cx, cy) in enumerate(_cluster_centers(rng, 16, -1.4, 16.0)):
+        pile = rng.randint(2, 3)
+        for piece in range(pile):
+            make_irregular_patch(
+                collection,
+                f"TJ_CoverLitterPatch_{c_index:02d}_{piece:02d}",
+                (cx + rng.uniform(-0.55, 0.55), cy + rng.uniform(-0.55, 0.55)),
+                rng.uniform(0.55, 1.05),
+                rng.uniform(-math.pi, math.pi),
+                litter_mat,
+                rng,
+                z=COVER_CLEARANCE_Z + 0.006,
+            )
+            counts["litterPatches"] += 1
         hero = cy < FOOTPRINT["heroY"]
-        for leaf_i in range(pile):
-            lx = cx + rng.uniform(-0.42, 0.42)
-            ly = cy + rng.uniform(-0.42, 0.42)
+        for leaf_i in range(rng.randint(3, 6) if hero else rng.randint(2, 4)):
+            lx = cx + rng.uniform(-0.38, 0.38)
+            ly = cy + rng.uniform(-0.38, 0.38)
             if not in_footprint(lx, ly):
                 continue
             leaf = make_ovate_leaf(
                 collection,
                 f"TJ_CoverLitter_{c_index:02d}_{leaf_i:02d}",
-                (lx, ly, rng.uniform(0.018, 0.032)),
-                autumn_mat if rng.random() < 0.55 else leaf_mat,
+                (lx, ly, COVER_CLEARANCE_Z + rng.uniform(0.008, 0.016)),
+                autumn_mat if rng.random() < 0.35 else leaf_mat,
                 rng,
             )
             if hero:
-                leaf.scale = tuple(float(v) * rng.uniform(2.1, 2.8) for v in leaf.scale)
+                leaf.scale = tuple(float(v) * rng.uniform(1.6, 2.2) for v in leaf.scale)
             counts["litterLeaves"] += 1
 
-    for n_index, (cx, cy) in enumerate(_cluster_centers(rng, 8, -0.6, 14.0)):
-        for strip in range(4):
-            make_ovate_leaf(
-                collection,
-                f"TJ_CoverNeedle_{n_index:02d}_{strip:02d}",
-                (cx + rng.uniform(-0.22, 0.22), cy + rng.uniform(-0.22, 0.22), 0.016),
-                needle_mat,
-                rng,
-            )
-            counts["needleClusters"] += 1
+    for n_index, (cx, cy) in enumerate(_cluster_centers(rng, 10, -0.6, 15.0)):
+        make_irregular_patch(
+            collection,
+            f"TJ_CoverNeedlePatch_{n_index:02d}",
+            (cx, cy),
+            rng.uniform(0.45, 0.85),
+            rng.uniform(-math.pi, math.pi),
+            needle_mat,
+            rng,
+            z=COVER_CLEARANCE_Z + 0.005,
+        )
+        counts["needlePatches"] += 1
         if twig_spruce is not None:
             _place_source(
                 twig_spruce,
                 collection,
-                (cx + rng.uniform(-0.2, 0.2), cy, 0.014),
+                (cx + rng.uniform(-0.2, 0.2), cy, COVER_CLEARANCE_Z),
                 f"TJ_CoverSpruceTwig_{n_index:02d}",
                 scale=(rng.uniform(0.9, 1.5), rng.uniform(0.9, 1.4), rng.uniform(0.8, 1.2)),
                 rotation_z=rng.uniform(-math.pi, math.pi),
             )
             counts["twigs"] += 1
 
+    for m_index, (cx, cy) in enumerate(_cluster_centers(rng, 12, -0.8, 16.5)):
+        make_irregular_patch(
+            collection,
+            f"TJ_CoverMossPatch_{m_index:02d}",
+            (cx, cy),
+            rng.uniform(0.40, 0.85),
+            rng.uniform(-math.pi, math.pi),
+            moss_mat,
+            rng,
+            z=COVER_CLEARANCE_Z + 0.004,
+        )
+        counts["mossPatches"] += 1
+
     moss_sources = [item for item in (moss_a, moss_b) if item is not None]
-    for m_index, (cx, cy) in enumerate(_cluster_centers(rng, 14, -0.8, 15.5)):
+    for m_index, (cx, cy) in enumerate(_cluster_centers(rng, 8, -0.6, 14.0)):
         if not moss_sources:
             continue
         source = moss_sources[m_index % len(moss_sources)]
-        clump = rng.randint(3, 5)
-        for piece in range(clump):
-            sx = rng.uniform(5.5, 8.5)
-            _place_source(
-                source,
-                collection,
-                (cx + rng.uniform(-0.22, 0.22), cy + rng.uniform(-0.22, 0.22), 0.014),
-                f"TJ_CoverMoss_{m_index:02d}_{piece:02d}",
-                scale=(sx, sx, rng.uniform(1.8, 2.8)),
-                rotation_z=rng.uniform(-math.pi, math.pi),
-            )
-            counts["mossClumps"] += 1
+        sx = rng.uniform(2.2, 3.4)
+        _place_source(
+            source,
+            collection,
+            (cx, cy, COVER_CLEARANCE_Z),
+            f"TJ_CoverMossClump_{m_index:02d}",
+            scale=(sx, sx, rng.uniform(0.55, 0.95)),
+            rotation_z=rng.uniform(-math.pi, math.pi),
+        )
+        counts["mossClumps"] += 1
 
     rock_sources = [item for item in (granite, pebble_a, pebble_b) if item is not None]
-    rock_spots = _cluster_centers(rng, 9, -0.4, 14.8)
-    for r_index, (cx, cy) in enumerate(rock_spots):
+    for r_index, (cx, cy) in enumerate(_cluster_centers(rng, 8, -0.4, 14.8)):
         if not rock_sources:
             break
         source = granite if granite is not None and r_index % 3 == 0 else rock_sources[r_index % len(rock_sources)]
@@ -455,7 +611,7 @@ def apply_camera_ground_cover(scene) -> dict:
         _place_source(
             source,
             collection,
-            (cx, cy, 0.0),
+            (cx, cy, COVER_CLEARANCE_Z - 0.01),
             f"TJ_CoverRock_{r_index:02d}",
             scale=(scale, scale * rng.uniform(0.8, 1.15), scale * rng.uniform(0.45, 0.75)),
             rotation_z=rng.uniform(-math.pi, math.pi),
@@ -469,7 +625,7 @@ def apply_camera_ground_cover(scene) -> dict:
         _place_source(
             source,
             collection,
-            (cx, cy, 0.013),
+            (cx, cy, COVER_CLEARANCE_Z),
             f"TJ_CoverTwig_{t_index:02d}",
             scale=(rng.uniform(0.8, 1.6), rng.uniform(0.8, 1.4), rng.uniform(0.7, 1.1)),
             rotation_z=rng.uniform(-math.pi, math.pi),
@@ -513,12 +669,15 @@ def apply_camera_ground_cover(scene) -> dict:
         "feature": FEATURE,
         "applied": True,
         "footprint": camera_footprint(),
+        "coverClearanceZ": COVER_CLEARANCE_Z,
+        "floralCardZ": FLORAL_CARD_Z,
         "counts": counts,
         "sources": {
             "soil": SOIL_ALBEDO.name,
-            "litter": "ovate Corylus/autumn clusters + appended Botaniq autumn leaves if present",
+            "soilRough": SOIL_ROUGH_ALBEDO.name if SOIL_ROUGH_ALBEDO.is_file() else None,
+            "litter": "irregular Fallen_Leaves_Autumn patches + sparse ovate Corylus",
             "needles": NEEDLES_ALBEDO.name,
-            "moss": MOSS_A.name if MOSS_A.is_file() else None,
+            "moss": "Moss_Diffuse patches + low Rhytidiadelphus clumps",
             "rock": GRANITE_A.name if GRANITE_A.is_file() else None,
             "twig": TWIG_TILIA.name if TWIG_TILIA.is_file() else None,
         },

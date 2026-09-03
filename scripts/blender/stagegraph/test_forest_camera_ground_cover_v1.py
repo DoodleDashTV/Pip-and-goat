@@ -13,12 +13,13 @@ class ForestCameraGroundCoverTest(unittest.TestCase):
     def test_footprint_covers_locked_camera_floor(self):
         self.assertEqual(FEATURE, "forest_camera_ground_cover_v1")
         box = camera_footprint()
-        self.assertLessEqual(box["xMin"], -17.5)
-        self.assertGreaterEqual(box["xMax"], 17.5)
+        self.assertLessEqual(box["xMin"], -24.0)
+        self.assertGreaterEqual(box["xMax"], 24.0)
         self.assertLessEqual(box["yMin"], -4.5)
-        self.assertGreaterEqual(box["yMax"], 36.0)
+        self.assertGreaterEqual(box["yMax"], 80.0)
         self.assertTrue(in_footprint(0.0, 3.5))
-        self.assertFalse(in_footprint(40.0, 3.5))
+        self.assertTrue(in_footprint(0.0, 80.0))
+        self.assertFalse(in_footprint(80.0, 3.5))
 
     def test_does_not_touch_locks_or_vendor_shader(self):
         source = (ROOT / "forest_camera_ground_cover_v1.py").read_text(encoding="utf-8")
@@ -26,6 +27,9 @@ class ForestCameraGroundCoverTest(unittest.TestCase):
         self.assertIn("cameraChanged\": False", source)
         self.assertIn("waterChanged\": False", source)
         self.assertIn("lightingChanged\": False", source)
+        self.assertIn("COVER_CLEARANCE_Z", source)
+        self.assertIn("write_world_metre_uvs", source)
+        self.assertIn("make_irregular_patch", source)
         self.assertNotIn("user_remap", source)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", source)
         self.assertNotIn("TJ_VendorGround_Mat", source)
