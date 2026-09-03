@@ -59,11 +59,11 @@ SKY_BLUE_LIFT = (0.10, 0.28, 0.72, 1.0)
 SKY_LIFT_FAC = 0.18
 GENERATED_SKY_PATH = Path("/tmp/tj_afternoon_sky_card_v2.png")
 
-AFTERNOON_SUN_ENERGY = 17.2
-AFTERNOON_SUN_COLOR = (1.0, 0.93, 0.74)
+AFTERNOON_SUN_ENERGY = 18.0
+AFTERNOON_SUN_COLOR = (1.0, 0.94, 0.76)
 AFTERNOON_EXPOSURE = 1.10
-AFTERNOON_FILL_ENERGY = 320.0
-AFTERNOON_BOUNCE_ENERGY = 165.0
+AFTERNOON_FILL_ENERGY = 350.0
+AFTERNOON_BOUNCE_ENERGY = 185.0
 AFTERNOON_RIM_ENERGY = 4.6
 AFTERNOON_RIM_COLOR = (1.0, 0.90, 0.72)
 AFTERNOON_RIM_TRAVEL = (-0.28, -0.52, -0.81)
@@ -699,8 +699,8 @@ def scatter_canopy_leaf_cards(scene) -> dict:
         if z_max < 3.2:
             continue
         near = (min(ys) + max(ys)) * 0.5 < 10.0
-        ovate_count = 16 if near else 10
-        sprite_count = 12 if near else 7
+        ovate_count = 20 if near else 12
+        sprite_count = 16 if near else 9
         y_cam = min(ys) + (max(ys) - min(ys)) * 0.35
         for index in range(ovate_count):
             lx = rng.uniform(min(xs), max(xs))
