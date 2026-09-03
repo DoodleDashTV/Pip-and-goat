@@ -192,7 +192,7 @@ def main():
 
     stills = {}
     for name, prefixes, kind in SHOTS:
-        visible = [obj for obj in _shot_objects(collection, prefixes) if not obj.hide_render]
+        visible = _shot_objects(collection, prefixes)
         if not visible:
             stills[name] = {"missing": True, "prefixes": list(prefixes)}
             continue

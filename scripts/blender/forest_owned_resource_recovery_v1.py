@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from forest_lookdev_isolation_v1 import FEATURE as LOOKDEV_FEATURE
+
 FEATURE = "forest_owned_resource_recovery_v1"
 COLLECTION_NAME = "TJ_LOOKDEV_ISOLATION_V1"
 
@@ -50,7 +52,8 @@ GROUND_NORMAL_STRENGTH = 0.55
 
 def _tag(id_data) -> None:
     id_data["tj_generated"] = True
-    id_data["tj_feature"] = FEATURE
+    id_data["tj_feature"] = LOOKDEV_FEATURE
+    id_data["tj_recovery"] = FEATURE
 
 
 def required_owned_paths() -> dict[str, Path]:
@@ -438,10 +441,10 @@ def apply_owned_resource_recovery(scene) -> dict:
         assign_object_material(rock, rock_mat, copy_mesh=True)
 
     rename_hidden = {
-        "TJ_LookdevBush": "TJ_LookdevBush_EcoKitHidden",
-        "TJ_LookdevLeaf": "TJ_LookdevLeaf_EcoKitHidden",
-        "TJ_LookdevGrass": "TJ_LookdevGrass_EcoKitHidden",
-        "TJ_LookdevFlower": "TJ_LookdevFlower_EcoKitHidden",
+        "TJ_LookdevBush": "TJ_HiddenEcoKitBush",
+        "TJ_LookdevLeaf": "TJ_HiddenEcoKitLeaf",
+        "TJ_LookdevGrass": "TJ_HiddenEcoKitGrass",
+        "TJ_LookdevFlower": "TJ_HiddenEcoKitFlower",
     }
     for name in list(bpy.data.objects.keys()):
         obj = bpy.data.objects.get(name)
@@ -451,10 +454,12 @@ def apply_owned_resource_recovery(scene) -> dict:
             "TJ_LookdevMoss",
             "TJ_LookdevGroundGrass",
         }:
+            obj["tj_feature"] = "forest_owned_resource_recovery_hidden"
             _hide(obj)
             continue
         if name in rename_hidden:
             obj.name = rename_hidden[name]
+            obj["tj_feature"] = "forest_owned_resource_recovery_hidden"
             _hide(obj)
 
     remapped = remap_botaniq_images()
