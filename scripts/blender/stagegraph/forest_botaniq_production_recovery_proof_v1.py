@@ -24,7 +24,7 @@ from ecokit_cycles_alpha_v1 import (
 )
 from forest_botaniq_production_recovery_v1 import (
     apply_botaniq_production_recovery,
-    bind_production_ground,
+    install_production_forest_floor,
     missing_owned_paths,
 )
 from forest_lookdev_isolation_v1 import (
@@ -64,6 +64,7 @@ def parse_args():
     parser.add_argument("--samples", type=int, default=24)
     parser.add_argument("--bark-kind", default="tilia")
     parser.add_argument("--camera-proof", action="store_true")
+    parser.add_argument("--skip-lookdev-stills", action="store_true")
     return parser.parse_args(raw)
 
 
@@ -233,7 +234,8 @@ def main():
     isolation = isolate_for_lookdev(scene)
 
     stills = {}
-    for name, prefixes, kind in SHOTS:
+    shot_list = () if args.skip_lookdev_stills else SHOTS
+    for name, prefixes, kind in shot_list:
         visible = _shot_objects(scene, prefixes)
         if not visible:
             stills[name] = {"missing": True, "prefixes": list(prefixes)}
@@ -260,10 +262,19 @@ def main():
     for obj in collection.objects:
         if obj.type == "MESH" and obj.get("tj_recovery"):
             obj.hide_render = True
-    ground = scene.objects.get("TJ_VendorGround") or __import__("bpy").data.objects.get("TJ_VendorGround")
-    ground_mat = __import__("bpy").data.materials.get("TJ_ProdGround_SoilLitterMoss_V1")
-    if ground is not None and ground_mat is not None:
-        bind_production_ground(ground, ground_mat)
+    bpy = __import__("bpy")
+    ground_mat = bpy.data.materials.get("TJ_ProdGround_SoilLitterMoss_V1")
+    root = scene.collection.children.get("TJ_VENDOR_REFERENCE_ROOT")
+    if ground_mat is not None and root is not None:
+        install_production_forest_floor(root, ground_mat)
+    vendor = scene.objects.get("TJ_VendorGround") or bpy.data.objects.get("TJ_VendorGround")
+    if vendor is not None:
+        vendor.hide_render = True
+        vendor.hide_viewport = True
+    floor = scene.objects.get("TJ_ProdForestFloor") or bpy.data.objects.get("TJ_ProdForestFloor")
+    if floor is not None:
+        floor.hide_render = False
+        floor.hide_viewport = False
     locks_after = verify_production_camera(scene)
     if scene.camera is None or scene.camera.name != camera.name:
         scene.camera = camera

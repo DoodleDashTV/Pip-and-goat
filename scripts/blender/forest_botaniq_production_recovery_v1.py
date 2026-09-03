@@ -939,6 +939,55 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
     }
 
 
+def install_production_forest_floor(collection, material):
+    """Hide the solid-color vendor plane and overlay a production floor mesh.
+
+    Remapping TJ_VendorGround_Mat failed three times at the locked camera.
+    A new mesh at z=0.012 keeps the same extent without changing terrain
+    topology, water, camera, or lighting.
+    """
+    import bpy
+    from mathutils import Vector
+
+    vendor = bpy.data.objects.get("TJ_VendorGround")
+    if vendor is not None:
+        _hide(vendor)
+
+    existing = bpy.data.objects.get("TJ_ProdForestFloor")
+    if existing is not None:
+        for slot in existing.material_slots:
+            slot.link = "OBJECT"
+            slot.material = material
+        if existing.data.materials:
+            existing.data.materials[0] = material
+        existing.hide_render = False
+        existing.hide_viewport = False
+        _tag(existing, isolation=False)
+        return existing
+
+    mesh = bpy.data.meshes.new("TJ_ProdForestFloor_Mesh")
+    mesh.from_pydata(
+        [(-16.0, -5.0, 0.0), (16.0, -5.0, 0.0), (16.0, 32.0, 0.0), (-16.0, 32.0, 0.0)],
+        [],
+        [(0, 1, 2, 3)],
+    )
+    if mesh.uv_layers.active is None:
+        mesh.uv_layers.new(name="TJ_ForestFloor")
+    uv = mesh.uv_layers.active
+    world = ((-16.0, -5.0), (16.0, -5.0), (16.0, 32.0), (-16.0, 32.0))
+    for loop in mesh.loops:
+        x, y = world[loop.vertex_index]
+        uv.data[loop.index].uv = (x / 3.2, y / 3.2)
+    mesh.update()
+    obj = bpy.data.objects.new("TJ_ProdForestFloor", mesh)
+    collection.objects.link(obj)
+    obj.location = Vector((0.0, 0.0, 0.012))
+    mesh.materials.append(material)
+    _tag(mesh)
+    _tag(obj, isolation=False)
+    return obj
+
+
 def bind_production_ground(ground, material) -> dict:
     """Replace the solid vendor groundColor on every user, not just one slot."""
     import bpy
@@ -1007,10 +1056,18 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         trees = apply_production_trees(root, mats["bark"])
         veg = replace_ecokit_vegetation(root, shrub, grass, fern, mats["leaf"], mats["flower"], mats["litter"])
         ground = bpy.data.objects.get("TJ_VendorGround")
+        floor = install_production_forest_floor(root, mats["ground"])
         if ground is not None:
             bind_production_ground(ground, mats["ground"])
-            scatter_floor_geometry(root, (0.0, 3.5, 0.0), mats["litter"], mats["moss"], mats["rock"], 22, 10, 6)
-        production = {"trees": trees, "vegetation": veg, "ground": ground is not None}
+            _hide(ground)
+        scatter_floor_geometry(root, (0.0, 3.5, 0.0), mats["litter"], mats["moss"], mats["rock"], 22, 10, 6)
+        production = {
+            "trees": trees,
+            "vegetation": veg,
+            "ground": ground is not None,
+            "productionFloor": None if floor is None else floor.name,
+            "vendorGroundHidden": True,
+        }
     if mode in {"lookdev", "both"}:
         lookdev = apply_lookdev_subjects(scene, mats, sources)
 

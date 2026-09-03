@@ -38,6 +38,8 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("Position", source)
         self.assertIn("_exile", source)
         self.assertIn("bind_production_ground", source)
+        self.assertIn("install_production_forest_floor", source)
+        self.assertIn("TJ_ProdForestFloor", source)
         self.assertIn("user_remap", source)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", source)
 
@@ -58,5 +60,7 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("verify_production_camera", proof)
         self.assertIn("_exclusive_visibility", proof)
         self.assertIn("BARK_SUBJECT_NOT_CYLINDER", proof)
+        self.assertIn("skip_lookdev_stills", proof)
+        self.assertIn("TJ_ProdForestFloor", proof)
         self.assertIn("view_layer.update", proof)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", proof)
