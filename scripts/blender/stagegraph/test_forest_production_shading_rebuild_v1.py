@@ -63,6 +63,13 @@ class ForestProductionShadingRebuildTest(unittest.TestCase):
         self.assertEqual(_flora_role("Fallen Leaf_0"), "fallen")
         self.assertEqual(FLORA_WRAPPER, "TJ_ProdFloraPrincipled_V1")
         self.assertGreaterEqual(FALLEN_LEAF_TARGET, 150)
+        source = (ROOT / "forest_production_shading_rebuild_v1.py").read_text(encoding="utf-8")
+        self.assertIn("_first_mask_image", source)
+        self.assertIn("color1_mask", source)
+        self.assertIn("Shader_Cycles", source)
+        wrapper = source.split("def install_flora_production_wrappers", 1)[1]
+        self.assertIn("TJ_ProdFloraAlpha_V1", wrapper)
+        self.assertNotIn("links.new(image_node.outputs[\"Color\"], _mix_ab(tint)[0])", wrapper)
 
     def test_lighting_is_rebalanced_not_washed(self):
         self.assertEqual(EXPOSURE, 0.38)

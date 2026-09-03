@@ -186,17 +186,17 @@ def _build_trunk_material(name: str, wood, grain_image):
         tex_coord.location = (-720, -140)
         mapping = nodes.new("ShaderNodeMapping")
         mapping.location = (-520, -140)
-        mapping.inputs["Scale"].default_value = (1.0, 2.4, 1.0)
+        mapping.inputs["Scale"].default_value = (1.6, 4.8, 1.6)
         img = nodes.new("ShaderNodeTexImage")
         img.name = "TJ_ProdTrunkGrain_V1"
         img.location = (-300, -140)
         img.image = grain_image
-        links.new(tex_coord.outputs["UV"], mapping.inputs["Vector"])
+        links.new(tex_coord.outputs["Object"], mapping.inputs["Vector"])
         links.new(mapping.outputs["Vector"], img.inputs["Vector"])
         remap = nodes.new("ShaderNodeMapRange")
         remap.location = (-40, -140)
-        remap.inputs["From Min"].default_value = 0.18
-        remap.inputs["From Max"].default_value = 0.82
+        remap.inputs["From Min"].default_value = 0.32
+        remap.inputs["From Max"].default_value = 0.70
         remap.inputs["To Min"].default_value = 0.0
         remap.inputs["To Max"].default_value = 1.0
         links.new(img.outputs["Color"], remap.inputs["Value"])
@@ -330,22 +330,43 @@ def _flora_role(name: str) -> str | None:
     return None
 
 
-def _first_image(material):
+def _is_particle_image(image) -> bool:
+    name = (getattr(image, "name", "") or "").lower()
+    return any(word in name for word in ("firefly", "butterfly"))
+
+
+def _first_mask_image(material):
     if not material.use_nodes or material.node_tree is None:
         return None
-    return next((node for node in material.node_tree.nodes if node.type == "TEX_IMAGE" and getattr(node, "image", None)), None)
+
+    def _walk(nodes):
+        for node in nodes:
+            if node.type == "TEX_IMAGE" and getattr(node, "image", None) and not _is_particle_image(node.image):
+                return node
+        for node in nodes:
+            if node.type == "GROUP" and node.node_tree is not None:
+                found = _walk(node.node_tree.nodes)
+                if found is not None:
+                    return found
+        return None
+
+    return _walk(material.node_tree.nodes)
 
 
 def _flora_group(material):
     if not material.use_nodes or material.node_tree is None:
         return None
-    return next(
-        (
-            node for node in material.node_tree.nodes
-            if node.type == "GROUP" and node.node_tree is not None and str(node.node_tree.name).startswith("Flora_Shader")
-        ),
-        None,
-    )
+    groups = [
+        node for node in material.node_tree.nodes
+        if node.type == "GROUP" and node.node_tree is not None
+    ]
+    for node in groups:
+        if str(node.node_tree.name).startswith("Flora_Shader"):
+            return node
+    for node in groups:
+        if "Color_1" in node.inputs:
+            return node
+    return groups[0] if groups else None
 
 
 def _active_cycles_output(material):
@@ -353,6 +374,15 @@ def _active_cycles_output(material):
     if not outputs:
         return None
     return next((node for node in outputs if getattr(node, "is_active_output", False)), outputs[0])
+
+
+def _lift_crushed_vendor_color(rgba, role: str):
+    red, green, blue, alpha = [float(value) for value in rgba[:4]]
+    luma = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+    if role in {"flower", "fallen", "branch"} or luma >= 0.11:
+        return (red, green, blue, alpha)
+    scale = 0.16 / max(luma, 0.01)
+    return (min(red * scale, 0.55), min(green * scale, 0.62), min(blue * scale, 0.28), alpha)
 
 
 def install_flora_production_wrappers() -> dict:
@@ -370,9 +400,28 @@ def install_flora_production_wrappers() -> dict:
             continue
         nodes = material.node_tree.nodes
         links = material.node_tree.links
-        image_node = _first_image(material)
+        image_node = _first_mask_image(material)
+        if image_node is not None and image_node.id_data != material.node_tree:
+            image_node = None
         group = _flora_group(material)
-        skip_image = image_node is None or any(word in (image_node.image.name or "").lower() for word in ("firefly", "butterfly"))
+        vendor_color = (0.20, 0.32, 0.10, 1.0)
+        if group is not None and "Color_1" in group.inputs:
+            vendor_color = tuple(list(group.inputs["Color_1"].default_value)[:4])
+        vendor_color = _lift_crushed_vendor_color(vendor_color, role)
+
+        if group is not None and "Shader_Cycles" in group.outputs:
+            for link in list(links):
+                if link.to_socket == output.inputs["Surface"]:
+                    links.remove(link)
+            links.new(group.outputs["Shader_Cycles"], output.inputs["Surface"])
+            if hasattr(output, "target"):
+                try:
+                    output.target = "CYCLES"
+                except Exception:
+                    pass
+            changed.append({"name": material.name, "role": role, "usedImage": getattr(getattr(image_node, "image", None), "name", None), "mode": "vendor_cycles"})
+            continue
+
         principled = nodes.get(FLORA_WRAPPER)
         if principled is None:
             principled = nodes.new("ShaderNodeBsdfPrincipled")
@@ -385,22 +434,27 @@ def install_flora_production_wrappers() -> dict:
             tint.blend_type = "MULTIPLY"
         except Exception:
             pass
-        tint.location = (principled.location.x - 240, principled.location.y + 40)
-        vendor_color = (0.20, 0.32, 0.10, 1.0)
-        if group is not None and "Color_1" in group.inputs:
-            vendor_color = tuple(list(group.inputs["Color_1"].default_value)[:4])
+        tint.location = (principled.location.x - 260, principled.location.y + 40)
         for socket in (_mix_ab(tint)[0], _mix_ab(tint)[1], _mix_fac(tint)):
             for link in list(links):
                 if link.to_socket == socket:
                     links.remove(link)
-        if role == "branch" or skip_image:
-            _mix_fac(tint).default_value = 0.0
-            _set_rgba(_mix_ab(tint)[0], vendor_color)
-            _set_rgba(_mix_ab(tint)[1], vendor_color)
+        _set_rgba(_mix_ab(tint)[0], vendor_color)
+        if image_node is not None:
+            mask_range = nodes.get("TJ_ProdFloraMaskRange_V1")
+            if mask_range is None:
+                mask_range = nodes.new("ShaderNodeMapRange")
+                mask_range.name = "TJ_ProdFloraMaskRange_V1"
+            mask_range.location = (tint.location.x - 220, tint.location.y - 40)
+            mask_range.inputs["From Min"].default_value = 0.12
+            mask_range.inputs["From Max"].default_value = 1.0
+            mask_range.inputs["To Min"].default_value = 0.78
+            mask_range.inputs["To Max"].default_value = 1.0
+            links.new(image_node.outputs["Color"], mask_range.inputs["Value"])
+            links.new(mask_range.outputs["Result"], _mix_ab(tint)[1])
+            _mix_fac(tint).default_value = 1.0
         else:
-            tint_fac = {"leaf": 0.18, "bush": 0.20, "grass": 0.16, "flower": 0.14, "fallen": 0.12}.get(role, 0.16)
-            _mix_fac(tint).default_value = tint_fac
-            links.new(image_node.outputs["Color"], _mix_ab(tint)[0])
+            _mix_fac(tint).default_value = 0.0
             _set_rgba(_mix_ab(tint)[1], vendor_color)
         links.new(_mix_out(tint), principled.inputs["Base Color"])
         if "Roughness" in principled.inputs:
@@ -414,20 +468,30 @@ def install_flora_production_wrappers() -> dict:
             }.get(role, 0.62)
         if "Specular IOR Level" in principled.inputs:
             principled.inputs["Specular IOR Level"].default_value = 0.18
-        if image_node is not None and "Alpha" in image_node.outputs and "Alpha" in principled.inputs:
-            links.new(image_node.outputs["Alpha"], principled.inputs["Alpha"])
+        if image_node is not None and "Alpha" in principled.inputs:
+            alpha_range = nodes.get("TJ_ProdFloraAlpha_V1")
+            if alpha_range is None:
+                alpha_range = nodes.new("ShaderNodeMapRange")
+                alpha_range.name = "TJ_ProdFloraAlpha_V1"
+            alpha_range.location = (principled.location.x - 260, principled.location.y - 80)
+            alpha_range.inputs["From Min"].default_value = 0.04
+            alpha_range.inputs["From Max"].default_value = 0.22
+            alpha_range.inputs["To Min"].default_value = 0.0
+            alpha_range.inputs["To Max"].default_value = 1.0
+            links.new(image_node.outputs["Color"], alpha_range.inputs["Value"])
+            links.new(alpha_range.outputs["Result"], principled.inputs["Alpha"])
             material.blend_method = "HASHED"
-        if not skip_image and image_node is not None:
             bump = nodes.get(FLORA_BUMP)
             if bump is None:
                 bump = nodes.new("ShaderNodeBump")
                 bump.name = FLORA_BUMP
-            bump.location = (principled.location.x - 240, principled.location.y - 220)
-            bump.inputs["Strength"].default_value = 0.22
-            bump.inputs["Distance"].default_value = 0.008
+            bump.location = (principled.location.x - 260, principled.location.y - 260)
+            bump.inputs["Strength"].default_value = 0.28
+            bump.inputs["Distance"].default_value = 0.006
             links.new(image_node.outputs["Color"], bump.inputs["Height"])
             links.new(bump.outputs["Normal"], principled.inputs["Normal"])
             _tag(bump)
+            _tag(alpha_range)
 
         surface = principled.outputs["BSDF"]
         if role in {"leaf", "bush", "grass", "flower"}:
@@ -467,7 +531,7 @@ def install_flora_production_wrappers() -> dict:
                     output.target = "CYCLES"
                 except Exception:
                     pass
-            shader_out = next((sock for sock in group.outputs if sock.type == "SHADER"), None)
+            shader_out = next((sock for sock in group.outputs if sock.name in {"Shader", "Shader_EEVEE", "BSDF"} or sock.type == "SHADER"), None)
             if shader_out is None and group.outputs:
                 shader_out = group.outputs[0]
             if shader_out is not None:
@@ -480,7 +544,12 @@ def install_flora_production_wrappers() -> dict:
                     pass
         _tag(principled)
         _tag(tint)
-        changed.append({"name": material.name, "role": role, "usedImage": None if skip_image else getattr(getattr(image_node, "image", None), "name", None)})
+        changed.append({
+            "name": material.name,
+            "role": role,
+            "usedImage": getattr(getattr(image_node, "image", None), "name", None),
+            "mode": "color1_mask",
+        })
     return {
         "materialsWrapped": len(changed),
         "names": [item["name"] for item in changed],

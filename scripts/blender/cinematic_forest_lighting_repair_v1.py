@@ -256,10 +256,12 @@ def apply_cinematic_world(scene) -> dict:
     horizon.name = "TJ_CinematicHorizon_V1"
     horizon.location = (-220, 40)
     horizon.color_ramp.interpolation = "EASE"
+    # World Incoming.Z is toward the camera, so sky views land near 0 and
+    # ground views land near 1. White at 0 selects the HDRI/sky socket.
     horizon.color_ramp.elements[0].position = 0.46
-    horizon.color_ramp.elements[0].color = (0.0, 0.0, 0.0, 1.0)
+    horizon.color_ramp.elements[0].color = (1.0, 1.0, 1.0, 1.0)
     horizon.color_ramp.elements[1].position = 0.54
-    horizon.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    horizon.color_ramp.elements[1].color = (0.0, 0.0, 0.0, 1.0)
     links.new(remap.outputs["Result"], horizon.inputs["Fac"])
 
     tex_coord = nodes.new("ShaderNodeTexCoord")
