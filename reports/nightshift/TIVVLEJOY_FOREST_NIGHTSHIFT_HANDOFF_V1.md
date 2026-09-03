@@ -5,7 +5,7 @@
 startingBranch=cursor/tivvlejoy-botaniq-forest-production-recovery-eed2  
 startingHead=70a13a1d33b445ad104b37c14901d80d333dc489  
 endingBranch=cursor/tivvlejoy-botaniq-forest-production-recovery-eed2  
-endingHead=PENDING_STAMP  
+endingHead=b93ef27d7178f124ea325f39f8fa939858ffebe7  
 executionStatus=PARTIAL  
 draftPR=175  
 paidCreateCount=0  
