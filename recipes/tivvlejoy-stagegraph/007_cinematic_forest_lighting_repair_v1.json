@@ -1,0 +1,23 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_RECIPE_V1",
+  "id": "CINEMATIC_FOREST_LIGHTING_REPAIR_V1",
+  "title": "Cinematic forest lighting and lookdev pass",
+  "geometryRebuilt": false,
+  "purchasedAssetsPreserved": true,
+  "cameraChanged": false,
+  "animationRendered": false,
+  "paidCreate": false,
+  "proof": {
+    "resolution": [1280, 720],
+    "count": 1,
+    "samples": 48,
+    "device": "CPU"
+  },
+  "rootCauses": [
+    "HDRI_LOWER_HEMISPHERE_IS_FLAT_GREY",
+    "FILL_LIGHTS_OVERPOWER_KEY_SUN",
+    "GROUND_ALBEDO_AND_WARM_SUN_STACK_ORANGE",
+    "EXPOSURE_WASHES_SKY_WHILE_CANOPY_STAYS_DARK",
+    "LEAF_CARDS_NEED_TRANSLUCENCY_AND_BOUNCE"
+  ]
+}

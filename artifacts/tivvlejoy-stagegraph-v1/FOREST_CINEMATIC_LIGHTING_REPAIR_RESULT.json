@@ -1,0 +1,54 @@
+{
+  "schema": "TIVVLEJOY_CINEMATIC_FOREST_LIGHTING_REPAIR_RESULT_V1",
+  "status": "PARTIAL_NOT_PASSED",
+  "visualApproval": false,
+  "vendorReferenceReproducedApproved": false,
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "cameraChanged": false,
+  "geometryRebuilt": false,
+  "purchasedAssetsPreserved": true,
+  "animationRendered": false,
+  "nominatedProof": {
+    "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_CINEMATIC_LIGHTING_PROOF_V2.png",
+    "sha256": "7811dc62fcec3e8c9b5c5df7f20d08942fd6cb6401eb3525c04a56783c771c12",
+    "resolution": [1280, 720],
+    "samples": 32,
+    "seconds": 267.89
+  },
+  "failedIterations": [
+    {
+      "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_CINEMATIC_LIGHTING_PROOF.png",
+      "sha256": "a068f6a82136be5bf1591ed9086c46156e1916b44d0f86937ab67ecd044a9a38",
+      "reason": "Exposure/mist/contrast pass did not lift Flora_Shader albedo crush"
+    },
+    {
+      "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_CINEMATIC_LIGHTING_PROOF_V3.png",
+      "sha256": "6ae8aa56946c840e008cef464d4d6781501a5d82f2aebf4d52174aba55330420",
+      "reason": "Cycles Principled override removed orange but collapsed canopy luma"
+    }
+  ],
+  "rootCauseFound": [
+    "HDRI_LOWER_HEMISPHERE_IS_FLAT_GREY",
+    "FILL_LIGHTS_OVERPOWERED_KEY_SUN",
+    "AGX_EXPOSURE_0_65_WASHED_SKY",
+    "FLORA_SHADER_BAKES_15M_AO_AND_LIGHT_INTENSITY_0_08_INTO_ALBEDO",
+    "FALLEN_LEAF_TEXTURES_STILL_READ_ORANGE_ON_THE_FLOOR"
+  ],
+  "changesMade": [
+    "High side-key sun (38, 2, -52), energy 8.8, cooler tint",
+    "Reduced fill/bounce so the key can read",
+    "Replaced grey HDRI ground with moss bounce and camera haze",
+    "Lowered exposure to 0.40 and used AgX Base Contrast",
+    "Retuned generated ground toward earth/moss",
+    "Neutralized Flora_Shader AO to 0.18m local and lifted Light Intensity in memory",
+    "Did not rebuild geometry, move the camera, or enable emission"
+  ],
+  "remainingHumanVisibleIssues": [
+    "Canopy still darker than a finished animated-feature forest",
+    "Ground still has leftover warm/orange leaf-litter read",
+    "Sky/background still pale through the trees",
+    "Sun direction is present but not obviously cinematic"
+  ],
+  "readyForHumanVisualReview": true
+}

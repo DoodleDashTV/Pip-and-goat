@@ -1,0 +1,30 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_RECIPE_V1",
+  "id": "FOREST_PRODUCTION_SHADING_REBUILD_V1",
+  "title": "Non-destructive Cycles production shaders for the purchased forest",
+  "geometryRebuilt": false,
+  "purchasedAssetsPreserved": true,
+  "cameraChanged": false,
+  "animationRendered": false,
+  "paidCreate": false,
+  "proof": {
+    "resolution": [1280, 720],
+    "crops": [
+      "BARK_PROOF_V2",
+      "FOREST_FLOOR_PROOF_V2",
+      "FLORA_PROOF_V2",
+      "CANOPY_DEPTH_PROOF_V2",
+      "SKY_DEPTH_PROOF_V2"
+    ],
+    "cropSamples": 16,
+    "fullSamples": 32,
+    "device": "CPU"
+  },
+  "rootCauses": [
+    "TREE_TRUNK_1_USED_AS_ALBEDO_WASHES_BARK",
+    "NO_PURCHASED_DIRT_ALBEDO_MOSS_TILES_ARE_NOT_SOIL",
+    "FLORA_SHADER_IS_EEVEE_AUTHORED_AND_CRUSHES_IN_CYCLES",
+    "HDRI_LOWER_HEMISPHERE_IS_FLAT_GREY",
+    "SKY_WORLD_2_MIX_READS_AS_PURPLE_CARD"
+  ]
+}

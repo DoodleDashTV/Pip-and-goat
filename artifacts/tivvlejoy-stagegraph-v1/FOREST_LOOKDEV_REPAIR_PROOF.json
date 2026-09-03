@@ -1,0 +1,324 @@
+{
+  "animationRendered": false,
+  "camera": {
+    "changed": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "name": "TJ_VendorReference_Camera"
+  },
+  "canopyRepair": {
+    "globalExposureDelta": 0.0,
+    "materialsChanged": 6
+  },
+  "canopyRepairApplied": true,
+  "cinematicRepair": {
+    "atmosphere": {
+      "anisotropy": 0.44,
+      "applied": true,
+      "color": [
+        0.7,
+        0.79,
+        0.9,
+        1.0
+      ],
+      "density": 0.0019
+    },
+    "cameraChanged": false,
+    "colorManagement": {
+      "exposure": 0.3799999952316284,
+      "gamma": 1.0,
+      "look": "AgX - Base Contrast",
+      "viewTransform": "AgX"
+    },
+    "cyclesFlora": null,
+    "emissionShadersAdded": false,
+    "floraShader": {
+      "aoDistance": 0.08,
+      "aoValue": 0.04,
+      "emissionEnabled": false,
+      "groupsChanged": [
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader"
+        },
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader.001"
+        }
+      ],
+      "materialsChanged": 46,
+      "names": [
+        "Branch_1.001",
+        "Branch_1.002",
+        "Branch_1.004",
+        "Branch_1.010",
+        "Bushes_Mat_1.006",
+        "Fallen Leaf_Mat_1.001",
+        "Fallen Leaf_Mat_1.002",
+        "Fallen Leaf_Mat_1.004",
+        "Fallen Leaf_Mat_1.009",
+        "Floral_Mat_1.001",
+        "Floral_Mat_1.002",
+        "Floral_Mat_1.004",
+        "Floral_Mat_1.007",
+        "Grass_Mat_1",
+        "Grass_Mat_1.001",
+        "Grass_Mat_1.002",
+        "Grass_Mat_1.003",
+        "Grass_Mat_1.004",
+        "Grass_Mat_1.005",
+        "Grass_Mat_1.006",
+        "Grass_Mat_1.007",
+        "Grass_Mat_1.011",
+        "Grass_Mat_1.012",
+        "Grass_Mat_1.015",
+        "Grass_Mat_1.016",
+        "Grass_Mat_1.017",
+        "Grass_Mat_1.018",
+        "Grass_Mat_1.019",
+        "Grass_Mat_1.020",
+        "Leaf Blade",
+        "Leaf Blade_1-1",
+        "Leaf Blade_1-1.001",
+        "Leaf Blade_2-1",
+        "Leaf Blade_Mat_1.001",
+        "Leaf Blade_Mat_1.002",
+        "Leaf Blade_Mat_1.004",
+        "Leaf Blade_Mat_1.005",
+        "Leaf Blade_Mat_1.008",
+        "Lotus Leaf_Mat_1.006",
+        "Moss_Mat_1",
+        "Moss_Mat_1.001",
+        "Stipe_Mat_1.001",
+        "Stipe_Mat_1.013",
+        "Vines_1-2",
+        "Vines_1-2.001",
+        "Vines_2-2"
+      ],
+      "texturesOverwritten": false
+    },
+    "foliage": {
+      "factor": 0.28,
+      "materialsUpdated": 6,
+      "names": [
+        "Leaf Blade",
+        "Vines_1.001",
+        "Vines_1-2.001",
+        "Leaf Blade_1-1.001",
+        "Leaf Blade_Mat_1.008",
+        "Fallen Leaf_Mat_1.009"
+      ],
+      "texturesOverwritten": false
+    },
+    "geometryRebuilt": false,
+    "ground": {
+      "applied": true,
+      "earth": [
+        0.038,
+        0.034,
+        0.026
+      ],
+      "material": "TJ_VendorGround_Mat",
+      "moss": [
+        0.04,
+        0.052,
+        0.034
+      ],
+      "orangeCastReduced": true,
+      "texturesOverwritten": false
+    },
+    "lights": {
+      "bounce": {
+        "color": [
+          0.38,
+          0.52,
+          0.36
+        ],
+        "energy": 120.0,
+        "location": [
+          0.0,
+          8.2,
+          4.2
+        ],
+        "name": "TJ_ClearingBounce"
+      },
+      "canopyFill": {
+        "color": [
+          0.66,
+          0.8,
+          1.0
+        ],
+        "energy": 400.0,
+        "location": [
+          0.0,
+          -6.0,
+          11.2
+        ],
+        "name": "TJ_ForestCanopyFill_V1"
+      },
+      "canopyRim": {
+        "color": [
+          0.74,
+          0.86,
+          1.0
+        ],
+        "energy": 260.0,
+        "location": [
+          8.5,
+          6.0,
+          20.918
+        ],
+        "name": "TJ_ForestCanopyRim_V1"
+      },
+      "fill": {
+        "color": [
+          0.58,
+          0.74,
+          1.0
+        ],
+        "energy": 220.0,
+        "location": [
+          0.0,
+          -7.2,
+          11.5
+        ],
+        "name": "TJ_SoftFill"
+      },
+      "rim": {
+        "color": [
+          0.72,
+          0.84,
+          1.0
+        ],
+        "energy": 3.1500000953674316,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "name": "TJ_CanopyRim"
+      },
+      "sun": {
+        "color": [
+          1.0,
+          0.94,
+          0.86
+        ],
+        "energy": 8.600000381469727,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "name": "TJ_GoldenSun",
+        "rotationDeg": [
+          38.0,
+          2.0,
+          -52.0
+        ],
+        "travel": [
+          0.4682168607927412,
+          0.4007144299864404,
+          -0.7875283594068425
+        ]
+      }
+    },
+    "treeleaf": {
+      "materialsChanged": 1,
+      "names": [
+        "TreeLeaf_Mat_1"
+      ],
+      "texturesOverwritten": false
+    },
+    "trunks": {
+      "materialsChanged": 5,
+      "names": [
+        "TreeTrunk_Mat_1",
+        "TreeTrunk_Mat_1.001",
+        "TreeTrunk_Mat_2",
+        "TreeTrunk_Mat_3",
+        "TreeTrunk_Mat_4"
+      ],
+      "texturesOverwritten": false
+    },
+    "vendorBlendSaved": false,
+    "world": {
+      "cameraSkyProtected": true,
+      "cameraStrength": 0.52,
+      "greyGroundReplaced": true,
+      "hdriImage": "tj_hdri_diag_8k.jpg",
+      "lightStrength": 1.6
+    }
+  },
+  "composition": {
+    "cameraLensMm": 42.0,
+    "cameraLocation": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "cameraLookAt": [
+      0.0,
+      9.5,
+      2.6
+    ],
+    "fillLocation": [
+      0.0,
+      -4.0,
+      8.0
+    ],
+    "placed": {
+      "bushes": 24,
+      "fallenLeaves": 65,
+      "ferns": 28,
+      "floral": 16,
+      "grass": 70,
+      "trees": 14
+    },
+    "sceneLayoutUnchanged": true,
+    "seed": 7301,
+    "sunRotationDeg": [
+      58.0,
+      -8.0,
+      -42.0
+    ]
+  },
+  "device": "CPU",
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "placed": {
+    "bushes": 24,
+    "fallenLeaves": 65,
+    "ferns": 28,
+    "floral": 16,
+    "grass": 70,
+    "trees": 14
+  },
+  "proof": {
+    "bytes": 1625301,
+    "dimensions": [
+      1280,
+      720
+    ],
+    "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FOREST_LOOKDEV_REPAIR_PROOF.png",
+    "seconds": 272.15,
+    "sha256": "32decbaf1790ebb853361ca89b783453bd8b159980ddb0ec9ebaff4b26e55219"
+  },
+  "renderEngine": "CYCLES",
+  "resolution": [
+    1280,
+    720
+  ],
+  "result": "RENDERED",
+  "samples": 32,
+  "schema": "TIVVLEJOY_CINEMATIC_FOREST_LIGHTING_PROOF_V1",
+  "vendorBlendSaved": false,
+  "vendorReferenceReproducedApproved": false,
+  "visualApproval": false
+}

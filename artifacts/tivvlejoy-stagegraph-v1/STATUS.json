@@ -91,5 +91,19 @@
   "recipeExecutionResult": "PASS",
   "recipeResultPath": "artifacts/tivvlejoy-stagegraph-v1/VENDOR_REFERENCE_EXPOSURE_REPAIR_RESULT.json",
   "recipeResultSha256": "5d41c48a16ccc8d45eb802f3136ccf01d10548b13ab140668ad50d498313cfa4",
-  "nextRequiredHumanDecision": "HUMAN_VISUAL_REVIEW_OF_EXPOSURE_REPAIRED_VENDOR_REFERENCE_FRAME"
+  "nextRequiredHumanDecision": "HUMAN_VISUAL_REVIEW_OF_CINEMATIC_LIGHTING_PROOF",
+  "cinematicForestLightingRepairImplemented": true,
+  "cinematicForestLightingRepairStatus": "FAIL",
+  "materialReadabilityRepairStatus": "FAIL",
+  "materialReadabilityFullFrameRendered": false,
+  "cinematicForestLightingProofPath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LOOKDEV_REPAIR_PROOF_V2.png",
+  "cinematicForestLightingProofSha256": "a4a159f320ef781c091d0ef4be1c14a83c798aa0d8c8277f39d6244b65de5a9a",
+  "cinematicForestLightingProofResolution": [1280, 720],
+  "cinematicForestLookdevBaselinePath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_CINEMATIC_LIGHTING_PROOF_V3.png",
+  "cinematicForestLookdevBaselineSha256": "17f023b73feede1627ec7c35c762d0f5e9dc1625c40071db86fbe9b365269609",
+  "cinematicForestLookdevComparisonPath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_LOOKDEV_REPAIR_COMPARISON.png",
+  "cinematicCameraChanged": false,
+  "cinematicGeometryRebuilt": false,
+  "cinematicAnimationRendered": false,
+  "cinematicLookdevExecutionStatus": "FAIL"
 }
