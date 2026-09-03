@@ -306,14 +306,17 @@ def retune_hero_sun(scene) -> dict:
     fill = scene.objects.get("TJ_SoftFill")
     canopy_fill = scene.objects.get("TJ_ForestCanopyFill_V1")
     if sun is not None and sun.type == "LIGHT":
-        _retune_light(sun, HERO_SUN_ENERGY, HERO_SUN_COLOR)
-        sun.data.angle = math.radians(HERO_SUN_ANGLE_DEG)
-        travel = Vector(HERO_SUN_TRAVEL).normalized()
-        sun.rotation_euler = travel.to_track_quat("-Z", "Y").to_euler()
+        _retune_light(
+            sun,
+            energy=HERO_SUN_ENERGY,
+            color=HERO_SUN_COLOR,
+            angle_deg=HERO_SUN_ANGLE_DEG,
+            travel=HERO_SUN_TRAVEL,
+        )
     if fill is not None and fill.type == "LIGHT":
-        _retune_light(fill, HERO_FILL_ENERGY, fill.data.color)
+        _retune_light(fill, energy=HERO_FILL_ENERGY)
     if canopy_fill is not None and canopy_fill.type == "LIGHT":
-        _retune_light(canopy_fill, HERO_CANOPY_FILL_ENERGY, canopy_fill.data.color)
+        _retune_light(canopy_fill, energy=HERO_CANOPY_FILL_ENERGY)
     scene.view_settings.exposure = LOCKED_MATERIAL_LIGHTING["exposure"]
     scene.view_settings.gamma = LOCKED_MATERIAL_LIGHTING["gamma"]
     scene.view_settings.view_transform = LOCKED_MATERIAL_LIGHTING["viewTransform"]
