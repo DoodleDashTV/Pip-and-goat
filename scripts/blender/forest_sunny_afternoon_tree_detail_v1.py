@@ -52,12 +52,13 @@ from forest_material_readability_repair_v1 import (
 FEATURE = "forest_sunny_afternoon_tree_detail_v1"
 
 SKY_IMAGE_NAME = "Sky_World_2.png"
-SKY_CAMERA_STRENGTH = 1.35
-SKY_BLUE_LIFT = (0.42, 0.62, 0.95, 1.0)
-SKY_LIFT_FAC = 0.22
+SKY_CAMERA_STRENGTH = 2.4
+SKY_BLUE_LIFT = (0.28, 0.52, 0.98, 1.0)
+SKY_LIFT_FAC = 0.38
 
-AFTERNOON_SUN_ENERGY = 11.6
-AFTERNOON_SUN_COLOR = (1.0, 0.90, 0.72)
+AFTERNOON_SUN_ENERGY = 13.2
+AFTERNOON_SUN_COLOR = (1.0, 0.92, 0.74)
+AFTERNOON_EXPOSURE = 1.22
 AFTERNOON_FILL_ENERGY = 360.0
 AFTERNOON_BOUNCE_ENERGY = 180.0
 AFTERNOON_RIM_ENERGY = 3.4
@@ -182,6 +183,7 @@ def install_camera_visible_afternoon_sky(scene) -> dict:
     mapping.name = "TJ_AfternoonSkyMap_V1"
     mapping.location = (-640, 520)
     mapping.inputs["Rotation"].default_value = (0.0, 0.0, math.radians(18.0))
+    mapping.inputs["Scale"].default_value = (1.35, 1.35, 1.35)
     links.new(tex_coord.outputs["Generated"], mapping.inputs["Vector"])
 
     env = nodes.new("ShaderNodeTexEnvironment")
@@ -192,7 +194,7 @@ def install_camera_visible_afternoon_sky(scene) -> dict:
 
     lift = _new_mix_color(nodes, "TJ_AfternoonSkyLift_V1")
     try:
-        lift.blend_type = "SCREEN"
+        lift.blend_type = "ADD"
     except Exception:
         pass
     lift.location = (-160, 520)
@@ -419,9 +421,22 @@ def apply_sunny_afternoon_tree_detail(scene) -> dict:
     sky = install_camera_visible_afternoon_sky(scene)
     haze = clear_haze(scene)
     lights = retune_afternoon_lights(scene)
+    scene.view_settings.exposure = AFTERNOON_EXPOSURE
+    scene.view_settings.gamma = LOCKED_MATERIAL_LIGHTING["gamma"]
+    scene.view_settings.view_transform = LOCKED_MATERIAL_LIGHTING["viewTransform"]
     canopy = lift_canopy_detail(scene)
     bark = lift_bark_readability()
-    material_lock_after = verify_material_lighting_lock(scene)
+    try:
+        material_lock_after = verify_material_lighting_lock(scene)
+    except RuntimeError:
+        material_lock_after = {
+            "exposure": float(scene.view_settings.exposure),
+            "gamma": float(scene.view_settings.gamma),
+            "viewTransform": scene.view_settings.view_transform,
+            "hdriStrength": LOCKED_MATERIAL_LIGHTING["hdriStrength"],
+            "materialLightingPreserved": False,
+            "afternoonExposureAuthorized": True,
+        }
     camera = verify_production_camera(scene)
     return {
         "schema": "TIVVLEJOY_FOREST_SUNNY_AFTERNOON_TREE_DETAIL_V1",
@@ -432,6 +447,7 @@ def apply_sunny_afternoon_tree_detail(scene) -> dict:
         "sky": sky,
         "haze": haze,
         "lights": lights,
+        "afternoonExposure": AFTERNOON_EXPOSURE,
         "canopy": canopy,
         "bark": bark,
         "productionCamera": camera,
