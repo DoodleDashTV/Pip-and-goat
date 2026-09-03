@@ -9,7 +9,12 @@ from __future__ import annotations
 import math
 from pathlib import Path
 
-from forest_botaniq_production_recovery_v1 import BACKGROUND_Y, OWNED_ROOT
+from forest_botaniq_production_recovery_v1 import (
+    BACKGROUND_Y,
+    OWNED_ROOT,
+    ensure_cutout_png,
+    make_foliage_material,
+)
 from forest_cinematic_lighting_recovery_v1 import _retune_light
 from forest_ground_detail_recovery_v1 import LOCKED_MATERIAL_LIGHTING
 from forest_interior_sun_canopy_structure_v1 import INTERIOR_FILL_ENERGY, INTERIOR_SUN_ENERGY
@@ -43,14 +48,14 @@ LIBRARY_BLEND = BOTANIQ_MODELS / "bq_Library_Materials.blend"
 
 # Same x/y composition roles as vendor_reference Tree_* at y<18.
 HERO_PLACEMENTS = (
-    ("TJ_HeroTree_FG_L", "fagus_a", (-7.5, 1.5), 10.4, 0.35),
-    ("TJ_HeroTree_FG_R", "salix_a", (7.2, 2.0), 10.8, -0.55),
-    ("TJ_HeroTree_FG_CL", "fagus_b", (-5.4, 7.0), 8.2, 1.05),
-    ("TJ_HeroTree_FG_CR", "fagus_c", (5.7, 7.8), 8.7, -0.28),
-    ("TJ_HeroTree_MG_L", "fagus_a", (-8.5, 10.0), 9.5, 0.82),
-    ("TJ_HeroTree_MG_R", "salix_b", (8.8, 11.0), 9.2, -1.15),
-    ("TJ_HeroTree_MG_CL", "fagus_b", (-4.3, 15.0), 8.7, 0.18),
-    ("TJ_HeroTree_MG_CR", "fagus_c", (4.7, 16.2), 8.4, -0.88),
+    ("TJ_HeroTree_FG_L", "fagus_a", (-7.5, 1.5), 9.4, 0.35),
+    ("TJ_HeroTree_FG_R", "salix_a", (7.2, 2.0), 9.8, -0.55),
+    ("TJ_HeroTree_FG_CL", "fagus_b", (-5.4, 7.0), 7.6, 1.05),
+    ("TJ_HeroTree_FG_CR", "fagus_c", (5.7, 7.8), 8.0, -0.28),
+    ("TJ_HeroTree_MG_L", "fagus_a", (-8.5, 10.0), 8.8, 0.82),
+    ("TJ_HeroTree_MG_R", "salix_b", (8.8, 11.0), 8.6, -1.15),
+    ("TJ_HeroTree_MG_CL", "fagus_b", (-4.3, 15.0), 8.2, 0.18),
+    ("TJ_HeroTree_MG_CR", "fagus_c", (4.7, 16.2), 8.0, -0.88),
 )
 
 OVERLAY_PREFIXES = (
@@ -63,14 +68,15 @@ OVERLAY_PREFIXES = (
 )
 
 # Camera-left warm key after real leaf gaps exist. Do not flood.
-HERO_SUN_ENERGY = 26.0
-HERO_SUN_COLOR = (1.0, 0.93, 0.72)
-HERO_SUN_ANGLE_DEG = 2.1
-HERO_SUN_TRAVEL = (0.46, 0.50, -0.73)
-HERO_FILL_ENERGY = 175.0
-HERO_CANOPY_FILL_ENERGY = 160.0
+HERO_SUN_ENERGY = 34.0
+HERO_SUN_COLOR = (1.0, 0.94, 0.74)
+HERO_SUN_ANGLE_DEG = 2.4
+HERO_SUN_TRAVEL = (0.38, 0.58, -0.72)
+HERO_FILL_ENERGY = 220.0
+HERO_CANOPY_FILL_ENERGY = 340.0
 HERO_PROOF_SAMPLES = 36
 HERO_PROOF_DENOISE = False
+HERO_LEAF_VALUE = 1.34
 
 
 def missing_hero_paths() -> list[str]:
@@ -268,6 +274,74 @@ def _sit_copy(src, loc_xy, height: float, yaw: float, collection, name: str):
     return obj
 
 
+def _lift_material_value(material, amount: float) -> None:
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    if nodes.get("TJ_HeroLeafValue"):
+        return
+    principled = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
+    albedo = next((node for node in nodes if node.type == "TEX_IMAGE"), None)
+    if principled is None or albedo is None:
+        return
+    hsv = nodes.new("ShaderNodeHueSaturation")
+    hsv.name = "TJ_HeroLeafValue"
+    hsv.inputs["Value"].default_value = float(amount)
+    hsv.inputs["Saturation"].default_value = 1.06
+    for link in list(links):
+        if link.from_node == albedo and link.from_socket.name == "Color":
+            to_node = link.to_node
+            to_socket = link.to_socket
+            links.remove(link)
+            links.new(albedo.outputs["Color"], hsv.inputs["Color"])
+            links.new(hsv.outputs["Color"], to_socket)
+
+
+def rebuild_hero_leaf_materials() -> dict:
+    fagus_rgba = ensure_cutout_png(
+        BOTANIQ_TEX / "bq_Leaf_Fagus-sylvatica_Diffuse.png",
+        BOTANIQ_TEX / "bq_Leaf_Fagus-sylvatica_Diffuse_rgba.png",
+    )
+    salix_rgba = ensure_cutout_png(
+        BOTANIQ_TEX / "bq_Leaf_Salix-babylonica_Diffuse.png",
+        BOTANIQ_TEX / "bq_Leaf_Salix-babylonica_Diffuse_rgba.png",
+    )
+    fagus = make_foliage_material(
+        "TJ_HeroLeaf_Fagus_V1",
+        fagus_rgba,
+        BOTANIQ_TEX / "bq_Leaf_Fagus-sylvatica_Normal.jpg",
+        0.24,
+        clip=True,
+    )
+    salix = make_foliage_material(
+        "TJ_HeroLeaf_Salix_V1",
+        salix_rgba,
+        BOTANIQ_TEX / "bq_Leaf_Salix-babylonica_Normal.jpg",
+        0.24,
+        clip=True,
+    )
+    _lift_material_value(fagus, HERO_LEAF_VALUE)
+    _lift_material_value(salix, HERO_LEAF_VALUE)
+    assigned = {"fagus": 0, "salix": 0}
+    import bpy
+
+    for obj in bpy.data.objects:
+        if not obj.get("tj_hero_tree"):
+            continue
+        for slot in obj.material_slots:
+            name = slot.material.name if slot.material else ""
+            if "Leaf" in name and "Salix" in name:
+                slot.material = salix
+                assigned["salix"] += 1
+            elif "Leaf" in name:
+                slot.material = fagus
+                assigned["fagus"] += 1
+    return {
+        "fagusCutout": str(fagus_rgba),
+        "salixCutout": str(salix_rgba),
+        "assigned": assigned,
+    }
+
+
 def tune_botaniq_hero_materials() -> dict:
     import bpy
 
@@ -300,8 +374,6 @@ def tune_botaniq_hero_materials() -> dict:
 
 
 def retune_hero_sun(scene) -> dict:
-    from mathutils import Vector
-
     sun = scene.objects.get("TJ_GoldenSun")
     fill = scene.objects.get("TJ_SoftFill")
     canopy_fill = scene.objects.get("TJ_ForestCanopyFill_V1")
@@ -381,6 +453,8 @@ def apply_hero_tree_replacement(scene) -> dict:
         planted.append(obj.name)
         used.append(Path(HERO_BLENDS[species]).name)
     materials = tune_botaniq_hero_materials()
+    rebuilt = rebuild_hero_leaf_materials()
+    materials["rebuiltLeaves"] = rebuilt
     lights = retune_hero_sun(scene)
     cycles = apply_cycles_leaf_detail(scene)
     sky = scene.objects.get("TJ_AfternoonSkyCard_V2")
