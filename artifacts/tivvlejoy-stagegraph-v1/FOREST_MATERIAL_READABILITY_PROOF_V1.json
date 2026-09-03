@@ -1,0 +1,263 @@
+{
+  "camera": {
+    "changed": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "name": "TJ_VendorReference_Camera"
+  },
+  "cinematicRepair": {
+    "cameraChanged": false,
+    "colorManagement": {
+      "exposure": 0.3799999952316284,
+      "gamma": 1.0,
+      "look": "AgX - Base Contrast",
+      "viewTransform": "AgX"
+    },
+    "floraShader": {
+      "aoDistance": 0.08,
+      "aoValue": 0.04,
+      "emissionEnabled": false,
+      "groupsChanged": [
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader"
+        },
+        {
+          "aoNodes": 1,
+          "distance": 0.08,
+          "name": "Flora_Shader.001"
+        }
+      ],
+      "materialsChanged": 46,
+      "names": [
+        "Branch_1.001",
+        "Branch_1.002",
+        "Branch_1.004",
+        "Branch_1.010",
+        "Bushes_Mat_1.006",
+        "Fallen Leaf_Mat_1.001",
+        "Fallen Leaf_Mat_1.002",
+        "Fallen Leaf_Mat_1.004",
+        "Fallen Leaf_Mat_1.009",
+        "Floral_Mat_1.001",
+        "Floral_Mat_1.002",
+        "Floral_Mat_1.004",
+        "Floral_Mat_1.007",
+        "Grass_Mat_1",
+        "Grass_Mat_1.001",
+        "Grass_Mat_1.002",
+        "Grass_Mat_1.003",
+        "Grass_Mat_1.004",
+        "Grass_Mat_1.005",
+        "Grass_Mat_1.006",
+        "Grass_Mat_1.007",
+        "Grass_Mat_1.011",
+        "Grass_Mat_1.012",
+        "Grass_Mat_1.015",
+        "Grass_Mat_1.016",
+        "Grass_Mat_1.017",
+        "Grass_Mat_1.018",
+        "Grass_Mat_1.019",
+        "Grass_Mat_1.020",
+        "Leaf Blade",
+        "Leaf Blade_1-1",
+        "Leaf Blade_1-1.001",
+        "Leaf Blade_2-1",
+        "Leaf Blade_Mat_1.001",
+        "Leaf Blade_Mat_1.002",
+        "Leaf Blade_Mat_1.004",
+        "Leaf Blade_Mat_1.005",
+        "Leaf Blade_Mat_1.008",
+        "Lotus Leaf_Mat_1.006",
+        "Moss_Mat_1",
+        "Moss_Mat_1.001",
+        "Stipe_Mat_1.001",
+        "Stipe_Mat_1.013",
+        "Vines_1-2",
+        "Vines_1-2.001",
+        "Vines_2-2"
+      ],
+      "texturesOverwritten": false
+    },
+    "geometryRebuilt": false,
+    "ground": {
+      "applied": true,
+      "largeOliveNoiseRemoved": true,
+      "material": "TJ_VendorGround_Mat",
+      "purchasedDirtAlbedoFound": false,
+      "purchasedTexturesUsed": [
+        "Moss_2.png",
+        "Moss_1.png"
+      ],
+      "texturesOverwritten": false
+    },
+    "trunks": {
+      "bright": 0.06,
+      "brightRaised": false,
+      "colorLifted": false,
+      "contrast": 0.2,
+      "groups": [
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_0"
+        },
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_1"
+        },
+        {
+          "brightRestored": false,
+          "contrast": null,
+          "mix001": null,
+          "name": "TreeTrunk_Mat_2"
+        },
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_3"
+        },
+        {
+          "brightRestored": true,
+          "contrast": 0.20000000298023224,
+          "mix001": "MULTIPLY_TO_MIX",
+          "name": "TreeTrunk_Mat_4"
+        }
+      ],
+      "materialsRestored": [
+        "TreeTrunk_Mat_1",
+        "TreeTrunk_Mat_1.001",
+        "TreeTrunk_Mat_3",
+        "TreeTrunk_Mat_4"
+      ],
+      "textureUsed": "Tree Trunk_1.png",
+      "texturesOverwritten": false
+    },
+    "world": {
+      "cameraSky": {
+        "applied": true,
+        "cameraSkySource": "sunny_vondelpark_2k.hdr",
+        "cameraStrengthUnchanged": true,
+        "ownedHdriKeptForLighting": true
+      },
+      "cameraSkyProtected": true,
+      "cameraStrength": 0.52,
+      "greyGroundReplaced": true,
+      "hdriImage": "tj_hdri_diag_8k.jpg",
+      "lightStrength": 1.6
+    }
+  },
+  "composition": {
+    "cameraLensMm": 42.0,
+    "cameraLocation": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "cameraLookAt": [
+      0.0,
+      9.5,
+      2.6
+    ],
+    "fillLocation": [
+      0.0,
+      -4.0,
+      8.0
+    ],
+    "placed": {
+      "bushes": 24,
+      "fallenLeaves": 65,
+      "ferns": 28,
+      "floral": 16,
+      "grass": 70,
+      "trees": 14
+    },
+    "sceneLayoutUnchanged": true,
+    "seed": 7301,
+    "sunRotationDeg": [
+      58.0,
+      -8.0,
+      -42.0
+    ]
+  },
+  "cropSamples": 16,
+  "crops": {
+    "BARK_PROOF": {
+      "bytes": 230269,
+      "dimensions": [
+        333,
+        375
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/BARK_PROOF.png",
+      "seconds": 21.19,
+      "sha256": "c58888324c84f8c4432e18dbece6573571adfd6940464e673407c5c9cf9d46e4"
+    },
+    "CANOPY_DEPTH_PROOF": {
+      "bytes": 517115,
+      "dimensions": [
+        819,
+        331
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/CANOPY_DEPTH_PROOF.png",
+      "seconds": 52.44,
+      "sha256": "c349df4fd135900e59a15ec486bb7ca432ecdaaceee53732419302594401caf7"
+    },
+    "FLORA_PROOF": {
+      "bytes": 307324,
+      "dimensions": [
+        640,
+        259
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FLORA_PROOF.png",
+      "seconds": 24.87,
+      "sha256": "8226144a38b8f5cdd6b3ebac9d0cc067465443b94c29c69ed0ee5229a7a1bf65"
+    },
+    "FOREST_FLOOR_PROOF": {
+      "bytes": 464990,
+      "dimensions": [
+        973,
+        259
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FOREST_FLOOR_PROOF.png",
+      "seconds": 35.88,
+      "sha256": "ff784d208836e4a656f230c7986deab86d1c0137d46c1abd64125a9bfe640c0b"
+    },
+    "SKY_DEPTH_PROOF": {
+      "bytes": 217999,
+      "dimensions": [
+        563,
+        202
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/SKY_DEPTH_PROOF.png",
+      "seconds": 26.38,
+      "sha256": "f600df0a4c185b024db55872d8d6f32a6f6a4b30d57062f46998970707d99901"
+    }
+  },
+  "device": "CPU",
+  "exposure": 0.38,
+  "full": null,
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "placed": {
+    "bushes": 24,
+    "fallenLeaves": 65,
+    "ferns": 28,
+    "floral": 16,
+    "grass": 70,
+    "trees": 14
+  },
+  "result": "RENDERED",
+  "samples": 32,
+  "schema": "TIVVLEJOY_FOREST_MATERIAL_READABILITY_PROOF_V1",
+  "vendorReferenceReproducedApproved": false,
+  "visualApproval": false
+}

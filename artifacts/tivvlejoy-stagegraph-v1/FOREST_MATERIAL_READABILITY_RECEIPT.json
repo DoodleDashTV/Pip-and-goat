@@ -1,0 +1,22 @@
+{
+  "schema": "TIVVLEJOY_FOREST_MATERIAL_READABILITY_REPAIR_RECEIPT_V1",
+  "executionStatus": "FAIL",
+  "visualApproval": false,
+  "fullFrameRendered": false,
+  "fullFrameSkippedReason": "ALL_FIVE_TARGETED_CROPS_FAILED_VISUAL_GATE",
+  "globalExposureBefore": 0.38,
+  "globalExposureAfter": 0.38,
+  "barkProofPath": "artifacts/tivvlejoy-stagegraph-v1/BARK_PROOF.png",
+  "barkProofSha256": "c58888324c84f8c4432e18dbece6573571adfd6940464e673407c5c9cf9d46e4",
+  "forestFloorProofPath": "artifacts/tivvlejoy-stagegraph-v1/FOREST_FLOOR_PROOF.png",
+  "forestFloorProofSha256": "ff784d208836e4a656f230c7986deab86d1c0137d46c1abd64125a9bfe640c0b",
+  "floraProofPath": "artifacts/tivvlejoy-stagegraph-v1/FLORA_PROOF.png",
+  "floraProofSha256": "8226144a38b8f5cdd6b3ebac9d0cc067465443b94c29c69ed0ee5229a7a1bf65",
+  "canopyDepthProofPath": "artifacts/tivvlejoy-stagegraph-v1/CANOPY_DEPTH_PROOF.png",
+  "canopyDepthProofSha256": "c349df4fd135900e59a15ec486bb7ca432ecdaaceee53732419302594401caf7",
+  "skyDepthProofPath": "artifacts/tivvlejoy-stagegraph-v1/SKY_DEPTH_PROOF.png",
+  "skyDepthProofSha256": "f600df0a4c185b024db55872d8d6f32a6f6a4b30d57062f46998970707d99901",
+  "finalProofPath": "NONE",
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0
+}

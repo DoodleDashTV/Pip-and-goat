@@ -1,0 +1,49 @@
+{
+  "schema": "TIVVLEJOY_BARK_SHADER_TRACE_V1",
+  "heroMaterial": "TreeTrunk_Mat_1",
+  "heroGroup": "TreeTrunk_Mat_1",
+  "texture": {
+    "name": "Tree Trunk_1.png",
+    "size": [2048, 2048],
+    "mode": "RGBA",
+    "colorspace": "sRGB",
+    "character": "stylized grayscale vertical grain, not a photographic brown bark albedo"
+  },
+  "vendorSocketsBeforeFailedLift": {
+    "Color": [0.2482, 0.0989, 0.0393, 1.0],
+    "Strength": 0.2,
+    "Gradient": 0.3,
+    "Random Color": 0.2,
+    "Bright": 0.06,
+    "Contrast": 0.14
+  },
+  "albedoPath": [
+    "Image Texture Tree Trunk_1.png",
+    "Image Texture.001 Tree Trunk_1.png (second UV offset)",
+    "Mix.001 MULTIPLY (squares grayscale midtones)",
+    "Mix OVERLAY with Group Input Color",
+    "Bright/Contrast",
+    "Mix.002 MULTIPLY with Object-Info ColorRamp",
+    "Mix.004 MIX with height-gradient Mix.003",
+    "Principled BSDF Base Color"
+  ],
+  "bumpPath": [
+    "Bright/Contrast output",
+    "ColorRamp.002",
+    "Bump.Height",
+    "Principled BSDF Normal"
+  ],
+  "whyTextureDidNotReadOnV2": [
+    "Bright raised 0.06 to 0.28 flattened grain and bump",
+    "Color lifted to (0.48, 0.219, 0.087) dominated Overlay",
+    "Mix.001 MULTIPLY squared the grayscale map",
+    "Texture is low-frequency stylized grain, not ridge/crack albedo"
+  ],
+  "thisPassChanges": [
+    "Bright restored to 0.06",
+    "Color restored to vendor (0.2482, 0.0989, 0.0393)",
+    "Strength restored to 0.20",
+    "Mix.001 MULTIPLY changed to MIX 0.5",
+    "Contrast 0.14 to 0.20"
+  ]
+}
