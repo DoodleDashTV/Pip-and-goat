@@ -39,10 +39,10 @@ COLLECTION_NAME = "TJ_CAMERA_GROUND_COVER_V1"
 
 # Visible floor from TJ_VendorReference_Camera at (0, -12.5, 2.15), 42 mm.
 FOOTPRINT = {
-    "xMin": -16.0,
-    "xMax": 16.0,
+    "xMin": -18.0,
+    "xMax": 18.0,
     "yMin": -5.0,
-    "yMax": 32.0,
+    "yMax": 38.0,
     "heroY": 8.0,
     "midY": 18.0,
 }
@@ -107,9 +107,9 @@ def make_soil_cover_material():
     tex.image = _load_image(SOIL_ALBEDO, "sRGB")
     links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Hue"].default_value = 0.48
-    hsv.inputs["Saturation"].default_value = 0.58
-    hsv.inputs["Value"].default_value = 0.52
+    hsv.inputs["Hue"].default_value = 0.50
+    hsv.inputs["Saturation"].default_value = 0.64
+    hsv.inputs["Value"].default_value = 0.70
     links.new(tex.outputs["Color"], hsv.inputs["Color"])
     links.new(hsv.outputs["Color"], shader.inputs["Base Color"])
     shader.inputs["Roughness"].default_value = 0.92
@@ -283,9 +283,11 @@ def _soil_sites(rng) -> list[tuple[float, float, float, float]]:
             px = x + rng.uniform(-0.28, 0.28)
             py = y + rng.uniform(-0.28, 0.28)
             if in_footprint(px, py):
-                radius = rng.uniform(1.55, 2.25)
+                radius = rng.uniform(1.65, 2.35)
                 if py > FOOTPRINT["midY"]:
-                    radius *= 1.15
+                    radius *= 1.35
+                if py > 28.0:
+                    radius *= 1.25
                 sites.append((px, py, radius, rng.uniform(-math.pi, math.pi)))
             x += spacing
         y += spacing * 0.78
@@ -385,33 +387,23 @@ def apply_camera_ground_cover(scene) -> dict:
         make_soil_patch(collection, f"TJ_CoverSoil_{index:03d}", (x, y), radius, rot, soil_mat, rng)
         counts["soilPatches"] += 1
 
-    for c_index, (cx, cy) in enumerate(_cluster_centers(rng, 16, -1.2, 16.5)):
-        pile = rng.randint(5, 10)
+    for c_index, (cx, cy) in enumerate(_cluster_centers(rng, 18, -1.6, 14.5)):
+        pile = rng.randint(6, 11)
+        hero = cy < FOOTPRINT["heroY"]
         for leaf_i in range(pile):
-            lx = cx + rng.uniform(-0.38, 0.38)
-            ly = cy + rng.uniform(-0.38, 0.38)
+            lx = cx + rng.uniform(-0.42, 0.42)
+            ly = cy + rng.uniform(-0.42, 0.42)
             if not in_footprint(lx, ly):
                 continue
-            use_autumn = autumn_objs and rng.random() < 0.45
-            if use_autumn:
-                source = autumn_objs[leaf_i % len(autumn_objs)]
-                scale = rng.uniform(0.9, 1.6)
-                _place_source(
-                    source,
-                    collection,
-                    (lx, ly, rng.uniform(0.018, 0.034)),
-                    f"TJ_CoverAutumn_{c_index:02d}_{leaf_i:02d}",
-                    scale=(scale, scale, scale * 0.7),
-                    rotation_z=rng.uniform(-math.pi, math.pi),
-                )
-            else:
-                make_ovate_leaf(
-                    collection,
-                    f"TJ_CoverLitter_{c_index:02d}_{leaf_i:02d}",
-                    (lx, ly, rng.uniform(0.018, 0.032)),
-                    autumn_mat if rng.random() < 0.55 else leaf_mat,
-                    rng,
-                )
+            leaf = make_ovate_leaf(
+                collection,
+                f"TJ_CoverLitter_{c_index:02d}_{leaf_i:02d}",
+                (lx, ly, rng.uniform(0.018, 0.032)),
+                autumn_mat if rng.random() < 0.55 else leaf_mat,
+                rng,
+            )
+            if hero:
+                leaf.scale = tuple(float(v) * rng.uniform(2.1, 2.8) for v in leaf.scale)
             counts["litterLeaves"] += 1
 
     for n_index, (cx, cy) in enumerate(_cluster_centers(rng, 8, -0.6, 14.0)):
@@ -508,6 +500,13 @@ def apply_camera_ground_cover(scene) -> dict:
             )
             counts["understory"] += 1
 
+    vendor = bpy.data.objects.get("TJ_VendorGround")
+    vendor_hidden = False
+    if vendor is not None:
+        # Object stays in the scene. Shader is untouched. Hide only so the
+        # far plane edge cannot flash salmon past the cover layer.
+        vendor.hide_render = True
+        vendor_hidden = True
     bpy.context.view_layer.update()
     return {
         "schema": "TIVVLEJOY_FOREST_CAMERA_GROUND_COVER_APPLY_V1",
@@ -524,6 +523,7 @@ def apply_camera_ground_cover(scene) -> dict:
             "twig": TWIG_TILIA.name if TWIG_TILIA.is_file() else None,
         },
         "vendorGroundShaderChanged": False,
+        "vendorGroundHiddenAfterCover": vendor_hidden,
         "terrainChanged": False,
         "cameraChanged": False,
         "waterChanged": False,

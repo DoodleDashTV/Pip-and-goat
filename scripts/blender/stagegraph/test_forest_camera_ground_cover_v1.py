@@ -13,10 +13,10 @@ class ForestCameraGroundCoverTest(unittest.TestCase):
     def test_footprint_covers_locked_camera_floor(self):
         self.assertEqual(FEATURE, "forest_camera_ground_cover_v1")
         box = camera_footprint()
-        self.assertLessEqual(box["xMin"], -15.5)
-        self.assertGreaterEqual(box["xMax"], 15.5)
+        self.assertLessEqual(box["xMin"], -17.5)
+        self.assertGreaterEqual(box["xMax"], 17.5)
         self.assertLessEqual(box["yMin"], -4.5)
-        self.assertGreaterEqual(box["yMax"], 31.0)
+        self.assertGreaterEqual(box["yMax"], 36.0)
         self.assertTrue(in_footprint(0.0, 3.5))
         self.assertFalse(in_footprint(40.0, 3.5))
 
