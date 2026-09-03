@@ -1,0 +1,26 @@
+{
+  "schema": "TIVVLEJOY_STAGEGRAPH_RECIPE_V1",
+  "id": "FOREST_BOTANIQ_PRODUCTION_RECOVERY_V1",
+  "title": "Replace defective EcoKit vegetation/UVs with owned Botaniq production materials",
+  "geometryRebuilt": false,
+  "purchasedAssetsPreserved": true,
+  "cameraChanged": false,
+  "lightingChanged": false,
+  "terrainChanged": false,
+  "waterChanged": false,
+  "animationRendered": false,
+  "paidCreate": false,
+  "proof": {
+    "resolution": [960, 720],
+    "stills": [
+      "LOOKDEV_BARK_PRODUCTION_V2",
+      "LOOKDEV_GROUND_PRODUCTION_V2",
+      "LOOKDEV_BUSH_PRODUCTION_V2",
+      "LOOKDEV_LEAF_PRODUCTION_V2",
+      "LOOKDEV_GRASS_FERN_PRODUCTION_V2"
+    ],
+    "cameraProof": "FOREST_MATERIAL_RECOVERY_CAMERA_PROOF_V1",
+    "samples": 24,
+    "device": "CPU"
+  }
+}
