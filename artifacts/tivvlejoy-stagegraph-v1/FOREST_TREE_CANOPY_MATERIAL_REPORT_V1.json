@@ -1,0 +1,1851 @@
+{
+  "sourceCollections": [
+    {
+      "collection": "Tree_1",
+      "found": true,
+      "objectCount": 6,
+      "objects": [
+        {
+          "name": "Tree_1_001",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.108",
+          "vertices": 127212,
+          "polygons": 33129,
+          "canopyPolygons": 33129,
+          "medianFaceArea": 1.3852,
+          "largeFaceRatio": 0.8388,
+          "veryLargeFaces": 22892,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_1_002",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.107",
+          "vertices": 145576,
+          "polygons": 38181,
+          "canopyPolygons": 38181,
+          "medianFaceArea": 0.43424,
+          "largeFaceRatio": 0.7589,
+          "veryLargeFaces": 18813,
+          "geometryType": "blob_or_large_card",
+          "users": 3
+        },
+        {
+          "name": "Tree_1_003",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.106",
+          "vertices": 146586,
+          "polygons": 38327,
+          "canopyPolygons": 38327,
+          "medianFaceArea": 0.59287,
+          "largeFaceRatio": 0.8022,
+          "veryLargeFaces": 21495,
+          "geometryType": "blob_or_large_card",
+          "users": 2
+        },
+        {
+          "name": "Tree_1_004",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.099",
+          "vertices": 211390,
+          "polygons": 55028,
+          "canopyPolygons": 55028,
+          "medianFaceArea": 0.86553,
+          "largeFaceRatio": 0.8284,
+          "veryLargeFaces": 36517,
+          "geometryType": "blob_or_large_card",
+          "users": 2
+        },
+        {
+          "name": "Tree_1_005",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.100",
+          "vertices": 267550,
+          "polygons": 69521,
+          "canopyPolygons": 69521,
+          "medianFaceArea": 0.88363,
+          "largeFaceRatio": 0.8325,
+          "veryLargeFaces": 46493,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_1_006",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.104",
+          "vertices": 188112,
+          "polygons": 48926,
+          "canopyPolygons": 48926,
+          "medianFaceArea": 0.81893,
+          "largeFaceRatio": 0.8393,
+          "veryLargeFaces": 31586,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        }
+      ]
+    },
+    {
+      "collection": "Tree_2",
+      "found": true,
+      "objectCount": 6,
+      "objects": [
+        {
+          "name": "Tree_2_001",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.087",
+          "vertices": 85144,
+          "polygons": 22422,
+          "canopyPolygons": 22422,
+          "medianFaceArea": 3.59392,
+          "largeFaceRatio": 0.8854,
+          "veryLargeFaces": 17041,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_2_002",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.073",
+          "vertices": 88622,
+          "polygons": 23323,
+          "canopyPolygons": 23323,
+          "medianFaceArea": 3.74798,
+          "largeFaceRatio": 0.8888,
+          "veryLargeFaces": 17914,
+          "geometryType": "blob_or_large_card",
+          "users": 2
+        },
+        {
+          "name": "Tree_2_003",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.069",
+          "vertices": 134416,
+          "polygons": 35179,
+          "canopyPolygons": 35179,
+          "medianFaceArea": 2.72153,
+          "largeFaceRatio": 0.8731,
+          "veryLargeFaces": 26519,
+          "geometryType": "blob_or_large_card",
+          "users": 3
+        },
+        {
+          "name": "Tree_2_004",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.068",
+          "vertices": 134640,
+          "polygons": 35403,
+          "canopyPolygons": 35403,
+          "medianFaceArea": 1.76341,
+          "largeFaceRatio": 0.8462,
+          "veryLargeFaces": 25560,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_2_005",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.065",
+          "vertices": 159038,
+          "polygons": 41337,
+          "canopyPolygons": 41337,
+          "medianFaceArea": 1.70848,
+          "largeFaceRatio": 0.8633,
+          "veryLargeFaces": 30772,
+          "geometryType": "blob_or_large_card",
+          "users": 4
+        },
+        {
+          "name": "Tree_2_006",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.009",
+          "vertices": 171342,
+          "polygons": 45140,
+          "canopyPolygons": 45140,
+          "medianFaceArea": 1.73814,
+          "largeFaceRatio": 0.8434,
+          "veryLargeFaces": 32327,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        }
+      ]
+    },
+    {
+      "collection": "Tree_3",
+      "found": true,
+      "objectCount": 6,
+      "objects": [
+        {
+          "name": "Tree_3_001",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.047",
+          "vertices": 127972,
+          "polygons": 33889,
+          "canopyPolygons": 33889,
+          "medianFaceArea": 1.35677,
+          "largeFaceRatio": 0.8548,
+          "veryLargeFaces": 23150,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_3_002",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.046",
+          "vertices": 217572,
+          "polygons": 57590,
+          "canopyPolygons": 57590,
+          "medianFaceArea": 1.27785,
+          "largeFaceRatio": 0.8356,
+          "veryLargeFaces": 39137,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_3_003",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.045",
+          "vertices": 305278,
+          "polygons": 80594,
+          "canopyPolygons": 80594,
+          "medianFaceArea": 1.22029,
+          "largeFaceRatio": 0.8306,
+          "veryLargeFaces": 53891,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_3_004",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.028",
+          "vertices": 155106,
+          "polygons": 40411,
+          "canopyPolygons": 40411,
+          "medianFaceArea": 1.17765,
+          "largeFaceRatio": 0.8491,
+          "veryLargeFaces": 28537,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_3_005",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.027",
+          "vertices": 208070,
+          "polygons": 54288,
+          "canopyPolygons": 54288,
+          "medianFaceArea": 1.16001,
+          "largeFaceRatio": 0.8715,
+          "veryLargeFaces": 38754,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_3_006",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.026",
+          "vertices": 158410,
+          "polygons": 41138,
+          "canopyPolygons": 41138,
+          "medianFaceArea": 1.11969,
+          "largeFaceRatio": 0.8577,
+          "veryLargeFaces": 28865,
+          "geometryType": "blob_or_large_card",
+          "users": 2
+        }
+      ]
+    },
+    {
+      "collection": "Tree_4",
+      "found": true,
+      "objectCount": 6,
+      "objects": [
+        {
+          "name": "Tree_4_001",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.038",
+          "vertices": 260860,
+          "polygons": 67540,
+          "canopyPolygons": 67540,
+          "medianFaceArea": 2.92512,
+          "largeFaceRatio": 0.8753,
+          "veryLargeFaces": 51801,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_4_002",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.018",
+          "vertices": 176580,
+          "polygons": 45982,
+          "canopyPolygons": 45982,
+          "medianFaceArea": 2.16561,
+          "largeFaceRatio": 0.8574,
+          "veryLargeFaces": 33794,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_4_003",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.030",
+          "vertices": 215690,
+          "polygons": 56308,
+          "canopyPolygons": 56308,
+          "medianFaceArea": 2.7565,
+          "largeFaceRatio": 0.8708,
+          "veryLargeFaces": 42407,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_4_004",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.011",
+          "vertices": 173518,
+          "polygons": 45497,
+          "canopyPolygons": 45497,
+          "medianFaceArea": 2.51393,
+          "largeFaceRatio": 0.8627,
+          "veryLargeFaces": 33655,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_4_005",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.014",
+          "vertices": 41160,
+          "polygons": 21469,
+          "canopyPolygons": 21469,
+          "medianFaceArea": 5.66931,
+          "largeFaceRatio": 0.944,
+          "veryLargeFaces": 19625,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_4_006",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.006",
+          "vertices": 130810,
+          "polygons": 34150,
+          "canopyPolygons": 34150,
+          "medianFaceArea": 2.56723,
+          "largeFaceRatio": 0.8716,
+          "veryLargeFaces": 25419,
+          "geometryType": "blob_or_large_card",
+          "users": 2
+        }
+      ]
+    },
+    {
+      "collection": "Tree_5",
+      "found": true,
+      "objectCount": 6,
+      "objects": [
+        {
+          "name": "Tree_5_001",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade",
+            "Vines_1.001",
+            "Vines_1-2.001",
+            "Leaf Blade_1-1.001"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.051",
+          "vertices": 292620,
+          "polygons": 76634,
+          "canopyPolygons": 76634,
+          "medianFaceArea": 1.38437,
+          "largeFaceRatio": 0.857,
+          "veryLargeFaces": 52842,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_5_002",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade",
+            "Vines_1.001",
+            "Vines_1-2.001",
+            "Leaf Blade_1-1.001"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.024",
+          "vertices": 305416,
+          "polygons": 81040,
+          "canopyPolygons": 81040,
+          "medianFaceArea": 1.42987,
+          "largeFaceRatio": 0.8817,
+          "veryLargeFaces": 50954,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_5_003",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade",
+            "Vines_1.001",
+            "Vines_1-2.001",
+            "Leaf Blade_1-1.001"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.041",
+          "vertices": 227514,
+          "polygons": 60055,
+          "canopyPolygons": 60055,
+          "medianFaceArea": 1.32493,
+          "largeFaceRatio": 0.8839,
+          "veryLargeFaces": 38942,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_5_004",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade",
+            "Vines_1.001",
+            "Vines_1-2.001",
+            "Leaf Blade_1-1.001"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.007",
+          "vertices": 232040,
+          "polygons": 61688,
+          "canopyPolygons": 61688,
+          "medianFaceArea": 0.95257,
+          "largeFaceRatio": 0.8018,
+          "veryLargeFaces": 36302,
+          "geometryType": "blob_or_large_card",
+          "users": 3
+        },
+        {
+          "name": "Tree_5_005",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade",
+            "Vines_1.001",
+            "Vines_1-2.001",
+            "Leaf Blade_1-1.001"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.005",
+          "vertices": 184330,
+          "polygons": 49080,
+          "canopyPolygons": 49080,
+          "medianFaceArea": 1.88697,
+          "largeFaceRatio": 0.8985,
+          "veryLargeFaces": 34740,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        },
+        {
+          "name": "Tree_5_006",
+          "type": "MESH",
+          "hideRender": false,
+          "materials": [
+            "TreeTrunk_Mat_1",
+            "Leaf Blade",
+            "Vines_1.001",
+            "Vines_1-2.001",
+            "Leaf Blade_1-1.001"
+          ],
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "meshName": "BezierCurve.008",
+          "vertices": 207678,
+          "polygons": 54903,
+          "canopyPolygons": 54903,
+          "medianFaceArea": 1.57808,
+          "largeFaceRatio": 0.8793,
+          "veryLargeFaces": 35770,
+          "geometryType": "blob_or_large_card",
+          "users": 1
+        }
+      ]
+    }
+  ],
+  "heroCatalog": {
+    "pack": "Botaniq Full 7.2 deciduous (already purchased / lookdev-intake listed)",
+    "searchedDirectories": [
+      "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models/deciduous",
+      "/tmp/o14-v4-source/SRC_BOTANIQ_FULL_7_2_0/quality/botaniq_full/blends/models/deciduous",
+      "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models"
+    ],
+    "directoryExists": true,
+    "present": [],
+    "missing": [
+      {
+        "name": "bq_Tree_Fagus-sylvatica_A_summer.blend",
+        "expectedPath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models/deciduous/bq_Tree_Fagus-sylvatica_A_summer.blend"
+      },
+      {
+        "name": "bq_Tree_Fagus-sylvatica_B_summer.blend",
+        "expectedPath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models/deciduous/bq_Tree_Fagus-sylvatica_B_summer.blend"
+      },
+      {
+        "name": "bq_Tree_Fagus-sylvatica_C_summer.blend",
+        "expectedPath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models/deciduous/bq_Tree_Fagus-sylvatica_C_summer.blend"
+      },
+      {
+        "name": "bq_Tree_Salix-babylonica_A_summer.blend",
+        "expectedPath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models/deciduous/bq_Tree_Salix-babylonica_A_summer.blend"
+      },
+      {
+        "name": "bq_Tree_Salix-babylonica_B_summer.blend",
+        "expectedPath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models/deciduous/bq_Tree_Salix-babylonica_B_summer.blend"
+      },
+      {
+        "name": "bq_Tree_Salix-babylonica_C_summer.blend",
+        "expectedPath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/blends/models/deciduous/bq_Tree_Salix-babylonica_C_summer.blend"
+      }
+    ],
+    "localModelKindsOnDisk": [
+      "grass",
+      "misc",
+      "mosses-and-lichens",
+      "plants",
+      "rocks",
+      "shrubs"
+    ],
+    "heroQualityTreesPresent": false,
+    "heroQualityTreesCatalogued": true,
+    "note": "Lookdev intake lists Fagus/Salix summer hero .blends, but the unpaid Botaniq extract on this host has grass/misc/mosses/plants/rocks/shrubs only. Production recovery only rebinds EcoKit Tree_* bark. It never replaces EcoKit canopies with Botaniq trees."
+  },
+  "vendorPreviews": [
+    {
+      "name": "Tree_1_001.png",
+      "path": "/tmp/tivvlejoy-ecokit/Stylised EcoKit/assets library/Tree_1_001.png",
+      "exists": true,
+      "bytes": 363456,
+      "readsAs": "stylized dense stamp-clump canopy, not hero leaf cards"
+    },
+    {
+      "name": "Tree_2_001.png",
+      "path": "/tmp/tivvlejoy-ecokit/Stylised EcoKit/assets library/Tree_2_001.png",
+      "exists": true,
+      "bytes": 378879,
+      "readsAs": "stylized dense stamp-clump canopy, not hero leaf cards"
+    },
+    {
+      "name": "Tree_3_001.png",
+      "path": "/tmp/tivvlejoy-ecokit/Stylised EcoKit/assets library/Tree_3_001.png",
+      "exists": true,
+      "bytes": 349230,
+      "readsAs": "stylized dense stamp-clump canopy, not hero leaf cards"
+    },
+    {
+      "name": "Tree_4_001.png",
+      "path": "/tmp/tivvlejoy-ecokit/Stylised EcoKit/assets library/Tree_4_001.png",
+      "exists": true,
+      "bytes": 397438,
+      "readsAs": "stylized dense stamp-clump canopy, not hero leaf cards"
+    },
+    {
+      "name": "Tree_5_001.png",
+      "path": "/tmp/tivvlejoy-ecokit/Stylised EcoKit/assets library/Tree_5_001.png",
+      "exists": true,
+      "bytes": 368352,
+      "readsAs": "stylized dense stamp-clump canopy, not hero leaf cards"
+    },
+    {
+      "name": "Tree_GN_001.png",
+      "path": "/tmp/tivvlejoy-ecokit/Stylised EcoKit/assets library/Tree_GN_001.png",
+      "exists": true,
+      "bytes": 291130,
+      "readsAs": "stylized dense stamp-clump canopy, not hero leaf cards"
+    }
+  ],
+  "visibleTrees": [
+    {
+      "name": "Tree_2_005.001",
+      "class": "foreground",
+      "sourceCollection": "Tree_2",
+      "distanceFromCameraM": 16.027,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": true,
+      "geometryType": "large_alpha_cards",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.065",
+          "vertices": 159038,
+          "polygons": 41337,
+          "canopyPolygons": 39182,
+          "medianFaceArea": 0.34736,
+          "largeFaceRatio": 0.7887,
+          "veryLargeFaces": 16742,
+          "geometryType": "large_alpha_cards",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 4,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    },
+    {
+      "name": "Tree_2_003.001",
+      "class": "foreground",
+      "sourceCollection": "Tree_2",
+      "distanceFromCameraM": 16.331,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": true,
+      "geometryType": "blob_or_large_card",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.069",
+          "vertices": 134416,
+          "polygons": 35179,
+          "canopyPolygons": 33033,
+          "medianFaceArea": 0.67767,
+          "largeFaceRatio": 0.825,
+          "veryLargeFaces": 19759,
+          "geometryType": "blob_or_large_card",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 3,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    },
+    {
+      "name": "Tree_2_003.002",
+      "class": "foreground",
+      "sourceCollection": "Tree_2",
+      "distanceFromCameraM": 20.348,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": true,
+      "geometryType": "blob_or_large_card",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.069",
+          "vertices": 134416,
+          "polygons": 35179,
+          "canopyPolygons": 33033,
+          "medianFaceArea": 0.38044,
+          "largeFaceRatio": 0.773,
+          "veryLargeFaces": 15086,
+          "geometryType": "blob_or_large_card",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 3,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    },
+    {
+      "name": "Tree_5_004.001",
+      "class": "foreground",
+      "sourceCollection": "Tree_5",
+      "distanceFromCameraM": 21.194,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": true,
+      "geometryType": "large_alpha_cards",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.007",
+          "vertices": 232040,
+          "polygons": 61688,
+          "canopyPolygons": 58796,
+          "medianFaceArea": 0.15766,
+          "largeFaceRatio": 0.5831,
+          "veryLargeFaces": 20417,
+          "geometryType": "large_alpha_cards",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 3,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        },
+        {
+          "name": "Vines_1.001",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [],
+          "images": [],
+          "problems": [
+            "DIFFUSE_ONLY_NO_PRINCIPLED",
+            "NO_IMAGE_TEXTURES"
+          ],
+          "role": "canopy"
+        },
+        {
+          "name": "Vines_1-2.001",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader"
+          ],
+          "images": [
+            {
+              "name": "Moss_2.png",
+              "size": [
+                2048,
+                2048
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Moss_2.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        },
+        {
+          "name": "Leaf Blade_1-1.001",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader"
+          ],
+          "images": [
+            {
+              "name": "firefly_1.png",
+              "size": [
+                2048,
+                2048
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/firefly_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    },
+    {
+      "name": "Tree_2_005.002",
+      "class": "midground",
+      "sourceCollection": "Tree_2",
+      "distanceFromCameraM": 24.148,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": false,
+      "geometryType": "large_alpha_cards",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.065",
+          "vertices": 159038,
+          "polygons": 41337,
+          "canopyPolygons": 39182,
+          "medianFaceArea": 0.23975,
+          "largeFaceRatio": 0.7384,
+          "veryLargeFaces": 12423,
+          "geometryType": "large_alpha_cards",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 4,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    },
+    {
+      "name": "Tree_4_006.001",
+      "class": "midground",
+      "sourceCollection": "Tree_4",
+      "distanceFromCameraM": 25.186,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": false,
+      "geometryType": "large_alpha_cards",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.006",
+          "vertices": 130810,
+          "polygons": 34150,
+          "canopyPolygons": 32175,
+          "medianFaceArea": 0.3029,
+          "largeFaceRatio": 0.7455,
+          "veryLargeFaces": 12304,
+          "geometryType": "large_alpha_cards",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 2,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    },
+    {
+      "name": "Tree_1_004.001",
+      "class": "midground",
+      "sourceCollection": "Tree_1",
+      "distanceFromCameraM": 27.917,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": false,
+      "geometryType": "large_alpha_cards",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.099",
+          "vertices": 211390,
+          "polygons": 55028,
+          "canopyPolygons": 52052,
+          "medianFaceArea": 0.13254,
+          "largeFaceRatio": 0.6481,
+          "veryLargeFaces": 6871,
+          "geometryType": "large_alpha_cards",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 2,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    },
+    {
+      "name": "Tree_2_005.003",
+      "class": "midground",
+      "sourceCollection": "Tree_2",
+      "distanceFromCameraM": 29.162,
+      "inFrustum": true,
+      "heroQuality": false,
+      "heroMidgroundSuitable": false,
+      "heroMidgroundSuitableReason": "EcoKit Tree_* are stylized stamp-clump / background LOD assets. Vendor previews show two-to-three soft green masses, not readable leaf cards. Unsuitable as hero or midground at 42 mm.",
+      "tooCloseForAssetQuality": false,
+      "geometryType": "large_alpha_cards",
+      "canopyMeshes": [
+        {
+          "meshName": "BezierCurve.065",
+          "vertices": 159038,
+          "polygons": 41337,
+          "canopyPolygons": 39182,
+          "medianFaceArea": 0.23574,
+          "largeFaceRatio": 0.7356,
+          "veryLargeFaces": 12208,
+          "geometryType": "large_alpha_cards",
+          "geometryNodesModifiers": [
+            "GeometryNodes"
+          ],
+          "users": 4,
+          "evaluated": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "TJ_ProdBark_Tilia_V1",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": true,
+          "hasTranslucent": false,
+          "alphaLinked": false,
+          "normalLinked": true,
+          "roughness": 0.7799999713897705,
+          "groupShaders": [],
+          "images": [
+            {
+              "name": "bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            },
+            {
+              "name": "bq_Bark_Tilia-europaea_Normal.jpg",
+              "size": [
+                1024,
+                4096
+              ],
+              "colorspace": "Non-Color",
+              "packed": false,
+              "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Normal.jpg",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "NO_TRANSLUCENCY",
+            "PRINCIPLED_ALPHA_NOT_LINKED"
+          ],
+          "role": "trunk"
+        },
+        {
+          "name": "Leaf Blade",
+          "blendMethod": "HASHED",
+          "shadowMethod": null,
+          "hasPrincipled": false,
+          "hasTranslucent": true,
+          "alphaLinked": false,
+          "normalLinked": false,
+          "roughness": null,
+          "groupShaders": [
+            "Flora_Shader",
+            "Blur Node"
+          ],
+          "images": [
+            {
+              "name": "Flora_1.png",
+              "size": [
+                4096,
+                4096
+              ],
+              "colorspace": "sRGB",
+              "packed": false,
+              "filepath": "//Textures/Flora_1.png",
+              "sourceTree": "Shader Nodetree",
+              "hasAlpha": true
+            }
+          ],
+          "problems": [
+            "STYLIZED_GROUP_SHADER_NO_PRINCIPLED"
+          ],
+          "role": "canopy"
+        }
+      ]
+    }
+  ],
+  "overlays": {
+    "count": 906,
+    "vertices": 22698,
+    "sampleNames": [
+      "TJ_CanopyLeaf_Tree_2_005.001_00",
+      "TJ_CanopyLeaf_Tree_2_005.001_01",
+      "TJ_CanopyLeaf_Tree_2_005.001_02",
+      "TJ_CanopyLeaf_Tree_2_005.001_03",
+      "TJ_CanopyLeaf_Tree_2_005.001_04",
+      "TJ_CanopyLeaf_Tree_2_005.001_05",
+      "TJ_CanopyLeaf_Tree_2_005.001_06",
+      "TJ_CanopyLeaf_Tree_2_005.001_07",
+      "TJ_CanopyLeaf_Tree_2_005.001_08",
+      "TJ_CanopyLeaf_Tree_2_005.001_09",
+      "TJ_CanopyLeaf_Tree_2_005.001_10",
+      "TJ_CanopyLeaf_Tree_2_005.001_11",
+      "TJ_CanopyLeaf_Tree_2_005.001_12",
+      "TJ_CanopyLeaf_Tree_2_005.001_13",
+      "TJ_CanopyLeaf_Tree_2_005.001_14",
+      "TJ_CanopyLeaf_Tree_2_005.001_15"
+    ],
+    "prefixes": [
+      "TJ_CanopyLeaf_",
+      "TJ_CanopySprite_",
+      "TJ_StructLeaf_",
+      "TJ_StructSprite_",
+      "TJ_StructTwig_",
+      "TJ_StructRim_"
+    ],
+    "materials": [
+      {
+        "name": "TJ_CanopyLeafDetail_Corylus_V2",
+        "blendMethod": "HASHED",
+        "shadowMethod": null,
+        "hasPrincipled": true,
+        "hasTranslucent": true,
+        "alphaLinked": true,
+        "normalLinked": true,
+        "roughness": 0.5199999809265137,
+        "groupShaders": [],
+        "images": [
+          {
+            "name": "bq_Leaf_Corylus-avellana_Diffuse_rgba.png",
+            "size": [
+              2048,
+              2048
+            ],
+            "colorspace": "sRGB",
+            "packed": false,
+            "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Leaf_Corylus-avellana_Diffuse_rgba.png",
+            "sourceTree": "Shader Nodetree",
+            "hasAlpha": true
+          },
+          {
+            "name": "bq_Leaf_Corylus-avellana_Normal.jpg",
+            "size": [
+              2048,
+              2048
+            ],
+            "colorspace": "Non-Color",
+            "packed": false,
+            "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Leaf_Corylus-avellana_Normal.jpg",
+            "sourceTree": "Shader Nodetree",
+            "hasAlpha": true
+          }
+        ],
+        "problems": [],
+        "role": "canopy"
+      },
+      {
+        "name": "TJ_CanopyStructure_Corylus_V3",
+        "blendMethod": "HASHED",
+        "shadowMethod": null,
+        "hasPrincipled": true,
+        "hasTranslucent": true,
+        "alphaLinked": true,
+        "normalLinked": true,
+        "roughness": 0.5199999809265137,
+        "groupShaders": [],
+        "images": [
+          {
+            "name": "bq_Leaf_Corylus-avellana_Diffuse_rgba.png",
+            "size": [
+              2048,
+              2048
+            ],
+            "colorspace": "sRGB",
+            "packed": false,
+            "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Leaf_Corylus-avellana_Diffuse_rgba.png",
+            "sourceTree": "Shader Nodetree",
+            "hasAlpha": true
+          },
+          {
+            "name": "bq_Leaf_Corylus-avellana_Normal.jpg",
+            "size": [
+              2048,
+              2048
+            ],
+            "colorspace": "Non-Color",
+            "packed": false,
+            "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Leaf_Corylus-avellana_Normal.jpg",
+            "sourceTree": "Shader Nodetree",
+            "hasAlpha": true
+          }
+        ],
+        "problems": [],
+        "role": "canopy"
+      },
+      {
+        "name": "TJ_CoverTwig_V1",
+        "blendMethod": "HASHED",
+        "shadowMethod": null,
+        "hasPrincipled": true,
+        "hasTranslucent": false,
+        "alphaLinked": false,
+        "normalLinked": true,
+        "roughness": 0.7799999713897705,
+        "groupShaders": [],
+        "images": [
+          {
+            "name": "bq_Bark_Corylus-avellana_Diffuse.jpg",
+            "size": [
+              1024,
+              2048
+            ],
+            "colorspace": "sRGB",
+            "packed": false,
+            "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Corylus-avellana_Diffuse.jpg",
+            "sourceTree": "Shader Nodetree",
+            "hasAlpha": true
+          },
+          {
+            "name": "bq_Bark_Corylus-avellana_Normal.jpg",
+            "size": [
+              1024,
+              2048
+            ],
+            "colorspace": "Non-Color",
+            "packed": false,
+            "filepath": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Corylus-avellana_Normal.jpg",
+            "sourceTree": "Shader Nodetree",
+            "hasAlpha": true
+          }
+        ],
+        "problems": [
+          "NO_TRANSLUCENCY",
+          "PRINCIPLED_ALPHA_NOT_LINKED"
+        ],
+        "role": "other"
+      }
+    ]
+  }
+}
