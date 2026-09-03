@@ -56,6 +56,8 @@ HERO_PLACEMENTS = (
     ("TJ_HeroTree_MG_R", "salix_b", (8.8, 11.0), 8.6, -1.15),
     ("TJ_HeroTree_MG_CL", "fagus_b", (-4.3, 15.0), 8.2, 0.18),
     ("TJ_HeroTree_MG_CR", "fagus_c", (4.7, 16.2), 8.0, -0.88),
+    ("TJ_HeroTree_BG_L", "fagus_c", (-9.5, 20.0), 10.0, 0.45),
+    ("TJ_HeroTree_BG_R", "fagus_b", (9.8, 21.0), 9.8, -0.62),
 )
 
 OVERLAY_PREFIXES = (
@@ -197,7 +199,9 @@ def hide_ecokit_hero_trees(scene) -> dict:
     for obj in scene.objects:
         if obj.type != "MESH":
             continue
-        if obj.name.startswith("Tree_") and float(obj.location.y) < BACKGROUND_Y:
+        if obj.name.startswith("Tree_"):
+            # 42 mm still reads y=18–26 EcoKit as midground clump lids.
+            # Hide, do not delete; Botaniq side trees keep depth.
             obj.hide_render = True
             obj.hide_viewport = True
             hidden_trees.append(obj.name)
@@ -359,13 +363,11 @@ def tune_botaniq_hero_materials() -> dict:
             if "Translucency Factor" in node.inputs:
                 node.inputs["Translucency Factor"].default_value = 0.22
             if "bq_brightness" in node.inputs:
-                node.inputs["bq_brightness"].default_value = max(
-                    float(node.inputs["bq_brightness"].default_value), 1.05
-                )
+                node.inputs["bq_brightness"].default_value = 1.55
             if "Value" in node.inputs and "Leaf" in material.name:
-                node.inputs["Value"].default_value = max(
-                    float(node.inputs["Value"].default_value), 1.04
-                )
+                node.inputs["Value"].default_value = 1.70
+            if "Translucency Value" in node.inputs:
+                node.inputs["Translucency Value"].default_value = 1.25
         material.blend_method = "HASHED"
         if hasattr(material, "shadow_method"):
             material.shadow_method = "HASHED"
@@ -453,8 +455,6 @@ def apply_hero_tree_replacement(scene) -> dict:
         planted.append(obj.name)
         used.append(Path(HERO_BLENDS[species]).name)
     materials = tune_botaniq_hero_materials()
-    rebuilt = rebuild_hero_leaf_materials()
-    materials["rebuiltLeaves"] = rebuilt
     lights = retune_hero_sun(scene)
     cycles = apply_cycles_leaf_detail(scene)
     sky = scene.objects.get("TJ_AfternoonSkyCard_V2")
