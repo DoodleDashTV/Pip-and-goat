@@ -1,8 +1,8 @@
 # TivvleJoy Ground Pack Intake Manifest
 
-Status: source ZIPs verified in ChatGPT/Codex scratch, not committed to Git.
+Status: source ZIPs verified in ChatGPT/Codex scratch and saved in ChatGPT Library. ZIP binaries are not yet pushed to GitHub because this runtime lacks normal `git push` authentication for Git LFS.
 
-The repository is public, so purchased/commercial ZIPs and extracted textures must stay out of Git history. Place the three ZIPs locally at `assets/inbox/ground/` or pull them from private asset storage before resuming integration.
+The repository is public. These three ground packs were provided by Justin as free packs, but they are still large binary source assets. Commit them only through Git LFS or place them in private asset storage before resuming integration.
 
 ## Required ZIPs
 
@@ -22,4 +22,4 @@ The repository is public, so purchased/commercial ZIPs and extracted textures mu
 
 ## Resume Gate
 
-Resume `TIVVLEJOY_DIRT_PACK_INTEGRATION_V1` only after all three ZIPs are present locally or available from private asset storage. Preserve camera, terrain, water, sky card, and approved Botaniq hero trees. Do not start paid renders.
+Resume `TIVVLEJOY_DIRT_PACK_INTEGRATION_V1` only after all three ZIPs are present at `assets/inbox/ground/` through Git LFS checkout, local file placement, or private asset storage. Preserve camera, terrain, water, sky card, and approved Botaniq hero trees. Do not start paid renders.
