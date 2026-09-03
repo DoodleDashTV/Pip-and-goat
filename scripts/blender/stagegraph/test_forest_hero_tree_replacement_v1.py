@@ -9,11 +9,14 @@ from forest_hero_tree_replacement_v1 import (
     BACKGROUND_Y,
     FEATURE,
     HERO_BLENDS,
+    HERO_CANOPY_KEY_NAME,
     HERO_FILL_ENERGY,
     HERO_PLACEMENTS,
     HERO_PROOF_DENOISE,
+    HERO_RECEIVER_COLLECTION,
     HERO_SUN_ENERGY,
     HERO_SUN_TRAVEL,
+    HERO_TRUNK_KICKER_NAME,
     missing_hero_paths,
 )
 from forest_interior_sun_canopy_structure_v1 import INTERIOR_FILL_ENERGY, INTERIOR_SUN_ENERGY
@@ -53,6 +56,12 @@ class ForestHeroTreeReplacementTest(unittest.TestCase):
         self.assertNotIn("apply_cinematic_forest_lighting_repair", proof)
         self.assertNotIn("apply_purchased_forest_floor", source)
         self.assertNotIn("apply_ground_lookdev", source)
+        self.assertIn("add_hero_linked_lights", source)
+        self.assertIn("light_linking", source)
+        self.assertIn(HERO_CANOPY_KEY_NAME, source)
+        self.assertIn(HERO_TRUNK_KICKER_NAME, source)
+        self.assertIn(HERO_RECEIVER_COLLECTION, source)
+        self.assertIn("use_shadow = False", source)
 
     def test_missing_paths_are_exact_when_absent(self):
         paths = missing_hero_paths()

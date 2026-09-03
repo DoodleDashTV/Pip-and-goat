@@ -49,7 +49,7 @@ def parse_args():
     parser.add_argument("--owned-hdri", required=True)
     parser.add_argument("--image-bindings-json", default="[]")
     parser.add_argument("--out-dir", required=True)
-    parser.add_argument("--samples", type=int, default=36)
+    parser.add_argument("--samples", type=int, default=48)
     parser.add_argument("--bark-kind", default="tilia")
     parser.add_argument("--proof-name", default="FOREST_HERO_TREE_REPLACEMENT_PROOF_V1.png")
     return parser.parse_args(raw)

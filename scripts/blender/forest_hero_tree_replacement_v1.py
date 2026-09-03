@@ -1,7 +1,8 @@
 """Replace camera-visible EcoKit Tree_* with unpaid-recovered Botaniq heroes.
 
-Hides EcoKit foreground/midground trees (y<18). Keeps EcoKit at y>=18.
-Does not change camera, terrain, water, ground dressing, or the V3 sky card.
+Hides EcoKit Tree_* (including y>=18 stamp lids that still fill the 42 mm
+sky hole). Botaniq BG trees keep depth. Does not change camera, terrain,
+water, ground dressing, or the V3 sky card.
 """
 
 from __future__ import annotations
@@ -46,18 +47,19 @@ REQUIRED_TEXTURES = (
 )
 LIBRARY_BLEND = BOTANIQ_MODELS / "bq_Library_Materials.blend"
 
-# Same x/y composition roles as vendor_reference Tree_* at y<18.
+# Same composition roles as vendor_reference Tree_* at y<18, opened so the
+# 42 mm path and sky hole stay readable and sunlight can reach trunks.
 HERO_PLACEMENTS = (
-    ("TJ_HeroTree_FG_L", "fagus_a", (-7.5, 1.5), 9.4, 0.35),
-    ("TJ_HeroTree_FG_R", "salix_a", (7.2, 2.0), 9.8, -0.55),
-    ("TJ_HeroTree_FG_CL", "fagus_b", (-5.4, 7.0), 7.6, 1.05),
-    ("TJ_HeroTree_FG_CR", "fagus_c", (5.7, 7.8), 8.0, -0.28),
-    ("TJ_HeroTree_MG_L", "fagus_a", (-8.5, 10.0), 8.8, 0.82),
-    ("TJ_HeroTree_MG_R", "salix_b", (8.8, 11.0), 8.6, -1.15),
-    ("TJ_HeroTree_MG_CL", "fagus_b", (-4.3, 15.0), 8.2, 0.18),
-    ("TJ_HeroTree_MG_CR", "fagus_c", (4.7, 16.2), 8.0, -0.88),
-    ("TJ_HeroTree_BG_L", "fagus_c", (-9.5, 20.0), 10.0, 0.45),
-    ("TJ_HeroTree_BG_R", "fagus_b", (9.8, 21.0), 9.8, -0.62),
+    ("TJ_HeroTree_FG_L", "fagus_a", (-8.2, 1.8), 8.6, 0.35),
+    ("TJ_HeroTree_FG_R", "salix_a", (8.0, 2.2), 8.8, -0.55),
+    ("TJ_HeroTree_FG_CL", "fagus_b", (-6.6, 7.2), 6.8, 1.05),
+    ("TJ_HeroTree_FG_CR", "fagus_c", (6.8, 8.0), 7.0, -0.28),
+    ("TJ_HeroTree_MG_L", "fagus_a", (-9.0, 10.2), 8.4, 0.82),
+    ("TJ_HeroTree_MG_R", "salix_b", (9.2, 11.2), 8.2, -1.15),
+    ("TJ_HeroTree_MG_CL", "fagus_b", (-6.2, 15.2), 7.2, 0.18),
+    ("TJ_HeroTree_MG_CR", "fagus_c", (6.4, 16.4), 7.0, -0.88),
+    ("TJ_HeroTree_BG_L", "fagus_c", (-10.0, 20.5), 9.6, 0.45),
+    ("TJ_HeroTree_BG_R", "fagus_b", (10.2, 21.5), 9.4, -0.62),
 )
 
 OVERLAY_PREFIXES = (
@@ -70,15 +72,35 @@ OVERLAY_PREFIXES = (
 )
 
 # Camera-left warm key after real leaf gaps exist. Do not flood.
-HERO_SUN_ENERGY = 34.0
+HERO_SUN_ENERGY = 38.0
 HERO_SUN_COLOR = (1.0, 0.94, 0.74)
 HERO_SUN_ANGLE_DEG = 2.4
 HERO_SUN_TRAVEL = (0.38, 0.58, -0.72)
-HERO_FILL_ENERGY = 220.0
+HERO_FILL_ENERGY = 260.0
 HERO_CANOPY_FILL_ENERGY = 340.0
-HERO_PROOF_SAMPLES = 36
+HERO_PROOF_SAMPLES = 48
 HERO_PROOF_DENOISE = False
 HERO_LEAF_VALUE = 1.34
+
+HERO_RECEIVER_COLLECTION = "TJ_HERO_TREE_RECEIVERS_V1"
+HERO_CANOPY_KEY_NAME = "TJ_HeroCanopyKey_V1"
+HERO_TRUNK_KICKER_NAME = "TJ_HeroTrunkKicker_V1"
+HERO_CANOPY_KEY_ENERGY = 520.0
+HERO_CANOPY_KEY_COLOR = (1.0, 0.95, 0.78)
+HERO_CANOPY_KEY_SIZE = 16.0
+HERO_CANOPY_KEY_LOCATION = (-2.4, -8.6, 6.8)
+HERO_CANOPY_KEY_AIM = (0.0, 8.0, 5.8)
+HERO_TRUNK_KICKER_ENERGY = 480.0
+HERO_TRUNK_KICKER_COLOR = (1.0, 0.90, 0.66)
+HERO_TRUNK_KICKER_SIZE = 1.4
+HERO_TRUNK_KICKER_LOCATION = (-8.6, -4.2, 3.4)
+HERO_TRUNK_KICKER_AIM = (-7.2, 2.2, 2.6)
+HERO_DAPPLE_ENERGY = 780.0
+EXISTING_LINKED_LIGHTS = (
+    "TJ_ForestCanopyFill_V1",
+    "TJ_ForestCanopyRim_V1",
+    "TJ_InteriorTrunkKicker_V3",
+)
 
 
 def missing_hero_paths() -> list[str]:
@@ -375,6 +397,136 @@ def tune_botaniq_hero_materials() -> dict:
     return {"materialsTuned": sorted(set(tuned))}
 
 
+def _aim_at(obj, target) -> None:
+    from mathutils import Vector
+
+    direction = Vector(target) - obj.location
+    if direction.length < 1e-6:
+        return
+    obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
+
+
+def _ensure_light(collection, name: str, light_type: str):
+    import bpy
+
+    existing = bpy.data.objects.get(name)
+    if existing is not None and existing.type == "LIGHT":
+        if existing.name not in collection.objects:
+            collection.objects.link(existing)
+        _tag(existing)
+        _tag(existing.data)
+        return existing
+    data = bpy.data.lights.new(name, type=light_type)
+    obj = bpy.data.objects.new(name, data)
+    collection.objects.link(obj)
+    _tag(data)
+    _tag(obj)
+    return obj
+
+
+def _apply_light_linking(light_obj, receiver_collection) -> bool:
+    linking = getattr(light_obj, "light_linking", None)
+    if linking is None:
+        return False
+    try:
+        linking.receiver_collection = receiver_collection
+        return True
+    except Exception:
+        return False
+
+
+def _hero_receiver_collection(scene):
+    import bpy
+
+    collection = _ensure_collection(scene, HERO_RECEIVER_COLLECTION)
+    for obj in list(collection.objects):
+        collection.objects.unlink(obj)
+    for obj in scene.objects:
+        if obj.type == "MESH" and obj.get("tj_hero_tree"):
+            if obj.name not in collection.objects:
+                collection.objects.link(obj)
+    return collection
+
+
+def add_hero_linked_lights(scene) -> dict:
+    """Camera-side key/kicker that only hit Botaniq heroes.
+
+    Prior canopy fill and the interior trunk kicker stay linked to hidden
+    EcoKit receivers, so they never light the replacements. A shadowless
+    camera-facing key paints leaf cards and bark without flooding the floor.
+    If light linking is unavailable the extra lights stay hidden.
+    """
+    collection = _ensure_collection(scene, COLLECTION_NAME)
+    receivers = _hero_receiver_collection(scene)
+    key = _ensure_light(collection, HERO_CANOPY_KEY_NAME, "AREA")
+    key.data.type = "AREA"
+    if hasattr(key.data, "shape"):
+        key.data.shape = "DISK"
+    key.data.size = HERO_CANOPY_KEY_SIZE
+    key.data.energy = HERO_CANOPY_KEY_ENERGY
+    key.data.color = HERO_CANOPY_KEY_COLOR
+    key.data.use_shadow = False
+    if hasattr(key.data, "spread"):
+        try:
+            key.data.spread = math.radians(120.0)
+        except Exception:
+            pass
+    key.location = HERO_CANOPY_KEY_LOCATION
+    _aim_at(key, HERO_CANOPY_KEY_AIM)
+    key_linked = _apply_light_linking(key, receivers)
+
+    kicker = _ensure_light(collection, HERO_TRUNK_KICKER_NAME, "AREA")
+    kicker.data.type = "AREA"
+    if hasattr(kicker.data, "shape"):
+        kicker.data.shape = "DISK"
+    kicker.data.size = HERO_TRUNK_KICKER_SIZE
+    kicker.data.energy = HERO_TRUNK_KICKER_ENERGY
+    kicker.data.color = HERO_TRUNK_KICKER_COLOR
+    kicker.data.use_shadow = False
+    if hasattr(kicker.data, "spread"):
+        try:
+            kicker.data.spread = math.radians(70.0)
+        except Exception:
+            pass
+    kicker.location = HERO_TRUNK_KICKER_LOCATION
+    _aim_at(kicker, HERO_TRUNK_KICKER_AIM)
+    kicker_linked = _apply_light_linking(kicker, receivers)
+
+    retargeted = []
+    for name in EXISTING_LINKED_LIGHTS:
+        obj = scene.objects.get(name)
+        if obj is None or obj.type != "LIGHT":
+            continue
+        if _apply_light_linking(obj, receivers):
+            if name == "TJ_ForestCanopyFill_V1":
+                obj.data.use_shadow = False
+            retargeted.append(name)
+
+    dapples = []
+    for obj in scene.objects:
+        if obj.type != "LIGHT" or not obj.name.startswith("TJ_InteriorDapple_"):
+            continue
+        obj.data.energy = HERO_DAPPLE_ENERGY
+        dapples.append(obj.name)
+
+    if not key_linked:
+        key.hide_render = True
+        key.data.energy = 0.0
+    if not kicker_linked:
+        kicker.hide_render = True
+        kicker.data.energy = 0.0
+    return {
+        "receiverCount": len(receivers.objects),
+        "canopyKeyLinked": key_linked,
+        "trunkKickerLinked": kicker_linked,
+        "retargetedLinkedLights": retargeted,
+        "dapplesRetuned": dapples,
+        "canopyKeyEnergy": float(key.data.energy),
+        "trunkKickerEnergy": float(kicker.data.energy),
+        "canopyKeyShadows": bool(key.data.use_shadow),
+    }
+
+
 def retune_hero_sun(scene) -> dict:
     sun = scene.objects.get("TJ_GoldenSun")
     fill = scene.objects.get("TJ_SoftFill")
@@ -455,6 +607,7 @@ def apply_hero_tree_replacement(scene) -> dict:
         planted.append(obj.name)
         used.append(Path(HERO_BLENDS[species]).name)
     materials = tune_botaniq_hero_materials()
+    linked = add_hero_linked_lights(scene)
     lights = retune_hero_sun(scene)
     cycles = apply_cycles_leaf_detail(scene)
     sky = scene.objects.get("TJ_AfternoonSkyCard_V2")
@@ -470,6 +623,7 @@ def apply_hero_tree_replacement(scene) -> dict:
         "heroQualityTreesPresent": bool(planted),
         "materials": materials,
         "lights": lights,
+        "linkedLights": linked,
         "cycles": cycles,
         "skyCardPreserved": sky is not None and not sky.hide_render,
         "productionCamera": camera,
@@ -478,7 +632,8 @@ def apply_hero_tree_replacement(scene) -> dict:
         "waterChanged": False,
         "compositionChanged": False,
         "groundDressingChanged": False,
-        "backgroundEcoKitPreserved": True,
+        "backgroundEcoKitPreserved": False,
+        "ecokitBackgroundHiddenAsStampLids": True,
         "finalVideoRenderStarted": False,
         "paidCreateCount": 0,
         "paidSpendUsd": 0,
