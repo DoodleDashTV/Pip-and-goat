@@ -1,0 +1,172 @@
+{
+  "cameraChanged": false,
+  "cinematicRepairApplied": true,
+  "composition": {
+    "cameraLensMm": 42.0,
+    "cameraLocation": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "cameraLookAt": [
+      0.0,
+      9.5,
+      2.6
+    ],
+    "fillLocation": [
+      0.0,
+      -4.0,
+      8.0
+    ],
+    "placed": {
+      "bushes": 24,
+      "fallenLeaves": 65,
+      "ferns": 28,
+      "floral": 16,
+      "grass": 70,
+      "trees": 14
+    },
+    "sceneLayoutUnchanged": true,
+    "seed": 7301,
+    "sunRotationDeg": [
+      58.0,
+      -8.0,
+      -42.0
+    ]
+  },
+  "device": "CPU",
+  "lookdev": {
+    "barkTexture": {
+      "found": true,
+      "height": 2048,
+      "localContrast8": 3.7,
+      "lowContrast": true,
+      "max": 178,
+      "mean": 150.8,
+      "min": 116,
+      "narrowRange": true,
+      "source": "premeasured_ecokit",
+      "std": 10.8,
+      "uniqueValues": 63,
+      "width": 2048
+    },
+    "cameraChanged": false,
+    "feature": "forest_lookdev_isolation_v1",
+    "productionGeometryChanged": false,
+    "purchasedAssetsPreserved": true,
+    "schema": "TIVVLEJOY_FOREST_LOOKDEV_ISOLATION_GATE_V1",
+    "studio": {
+      "exposure": 0.0,
+      "fillEnergy": 70.0,
+      "keyEnergy": 420.0,
+      "rimEnergy": 110.0,
+      "worldStrength": 0.14
+    },
+    "subjects": {
+      "camera": "TJ_LookdevIsolation_Camera",
+      "fallenLeavesOnPatch": 36,
+      "fallenSources": 180,
+      "origin": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "placed": {
+        "bush": "TJ_LookdevBush",
+        "flower": "TJ_LookdevFlower",
+        "grass": "TJ_LookdevGrass",
+        "ground": "TJ_LookdevGroundPatch",
+        "leaf": "TJ_LookdevLeaf",
+        "rock": "TJ_LookdevRock",
+        "trunk": "TJ_LookdevTrunk"
+      },
+      "sourcesFound": {
+        "bush": "Bushes_1_003.001",
+        "flower": "Floral_0_011.001",
+        "grass": "Grass_0_008.001",
+        "ground_mat": "TJ_VendorGround_Mat",
+        "leaf": "Fern_3_002.001",
+        "moss": null,
+        "rock": "TJ_ProdRock_00",
+        "tree": "Tree_1_004.001",
+        "trunk": "Tree_1_004.001"
+      }
+    }
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "placed": {
+    "bushes": 24,
+    "fallenLeaves": 65,
+    "ferns": 28,
+    "floral": 16,
+    "grass": 70,
+    "trees": 14
+  },
+  "productionCamera": {
+    "cameraChanged": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ]
+  },
+  "productionGeometryChanged": false,
+  "result": "RENDERED",
+  "samples": 24,
+  "schema": "TIVVLEJOY_FOREST_LOOKDEV_ISOLATION_PROOF_V1",
+  "stills": {
+    "LOOKDEV_BARK_V1": {
+      "bytes": 775170,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_BARK_V1.png",
+      "seconds": 8.22,
+      "sha256": "081d86849a5dc951e36e11ad52969869d21e8f0400809081563dad8eeff6ecdc"
+    },
+    "LOOKDEV_BUSH_V1": {
+      "bytes": 858395,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_BUSH_V1.png",
+      "seconds": 23.27,
+      "sha256": "68f74a231d723a3cdc9f8fdea64949df3690fe7783ca44e23abdea58c3244d33"
+    },
+    "LOOKDEV_GRASS_FLOWER_V1": {
+      "bytes": 738211,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_GRASS_FLOWER_V1.png",
+      "seconds": 11.52,
+      "sha256": "0ac59ceba4a761a4aac0d06134b65bb7904f56d06307162e8fc046b195e379b2"
+    },
+    "LOOKDEV_GROUND_V1": {
+      "bytes": 778085,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_GROUND_V1.png",
+      "seconds": 43.85,
+      "sha256": "dc7b94efcabbd857a34174885e9edde6173340e36c4ced6ef7faf5dd7cb90110"
+    },
+    "LOOKDEV_LEAF_V1": {
+      "bytes": 654697,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_LEAF_V1.png",
+      "seconds": 6.8,
+      "sha256": "ee743507b5b96bde5aee7db431323a85b1386907132ece0d6c08243961417e5d"
+    }
+  },
+  "visualApproval": false
+}
