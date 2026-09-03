@@ -65,6 +65,7 @@ class ForestTreeCanopyRootCauseDiagnosisTest(unittest.TestCase):
         self.assertTrue(summary["lodOrProxyDetected"])
         self.assertTrue(summary["denoiseOrSampleBlurRisk"])
         self.assertIn("OVERLAY_CARDS_OCCUPY_FEW_CAMERA_RAYS", summary["lightingBlockersFound"])
+        self.assertTrue(summary["lodOrProxyDetected"])
         self.assertIn("Stop overlaying", summary["bestRepairPath"])
         self.assertIn("Fagus/Salix", summary["bestRepairPath"])
 

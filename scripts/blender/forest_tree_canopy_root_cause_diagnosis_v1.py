@@ -52,9 +52,16 @@ def _round(values) -> list[float]:
     return [round(float(v), 4) for v in values]
 
 
+RAY_SKIP_PREFIXES = (
+    "TJ_Atmosphere",
+    "TJ_InteriorSunGobo",
+    "TJ_InteriorGobo",
+    "TJ_AfternoonSkyCard",
+)
+
 def _is_trunk_material_name(name: str | None) -> bool:
     low = (name or "").lower()
-    return any(token in low for token in ("trunk", "bark", "wood", "tilia", "corylus"))
+    return any(token in low for token in ("trunk", "bark", "wood", "tilia"))
 
 
 def _is_canopy_material_name(name: str | None) -> bool:
@@ -347,12 +354,11 @@ def classify_distance(y: float) -> str:
 
 
 def _source_collection_guess(obj) -> str:
-    name = obj.name.split(".")[0]
-    data_name = obj.data.name.split(".")[0] if obj.type == "MESH" else ""
-    for candidate in (name, data_name):
-        if candidate in ECOKIT_TREE_COLLECTIONS:
-            return candidate
-    return name
+    for candidate in (obj.name, obj.data.name if obj.type == "MESH" else ""):
+        for collection in ECOKIT_TREE_COLLECTIONS:
+            if candidate == collection or candidate.startswith(collection + "_") or candidate.startswith(collection + "."):
+                return collection
+    return obj.name.split(".")[0]
 
 
 def catalog_placed_trees(scene) -> list[dict]:
@@ -378,7 +384,14 @@ def catalog_placed_trees(scene) -> list[dict]:
         } or None
         stats = _evaluated_mesh_stats(obj, canopy_slots=canopy_slots)
         hero_ok = (
-            stats["geometryType"] not in {"blob_or_large_card", "dense_small_stamp_cards", "billboard_or_proxy"}
+            stats["geometryType"] not in {
+                "blob_or_large_card",
+                "dense_small_stamp_cards",
+                "billboard_or_proxy",
+                "large_alpha_cards",
+                "mixed_card_cluster",
+            }
+            and not stats["geometryNodesModifiers"]
             and stats["polygons"] > 8000
         )
         too_close = bool(cam_dist is not None and cam_dist < 22.0 and not hero_ok)
@@ -441,6 +454,28 @@ def catalog_overlays(scene) -> dict:
     }
 
 
+def _ray_cast_skip(scene, depsgraph, origin, direction, distance: float = 120.0):
+    from mathutils import Vector
+
+    pos = Vector(origin)
+    travel = Vector(direction).normalized()
+    remaining = float(distance)
+    for _ in range(12):
+        result, loc, nrm, index, hit, matrix = scene.ray_cast(
+            depsgraph, pos, travel, distance=remaining
+        )
+        if not result or hit is None:
+            return False, None, None, None
+        if hit.name.startswith(RAY_SKIP_PREFIXES):
+            pos = Vector(loc) + travel * 0.05
+            remaining = float(distance) - (pos - Vector(origin)).length
+            if remaining <= 0.05:
+                return False, None, None, None
+            continue
+        return True, loc, hit, round(float((Vector(loc) - Vector(origin)).length), 3)
+    return False, None, None, None
+
+
 def camera_ray_hits(scene, camera, width: int = 48, height: int = 27) -> dict:
     import bpy
     from mathutils import Vector
@@ -462,11 +497,11 @@ def camera_ray_hits(scene, camera, width: int = 48, height: int = 27) -> dict:
             origin = camera.matrix_world.translation
             point = bl + (br - bl) * u + (tl - bl) * v
             direction = (point - origin).normalized()
-            result, loc, nrm, index, obj, matrix = scene.ray_cast(depsgraph, origin, direction)
-            if not result or obj is None:
+            result, loc, hit, dist = _ray_cast_skip(scene, depsgraph, origin, direction)
+            if not result or hit is None:
                 sky_hits += 1
                 continue
-            name = obj.name
+            name = hit.name
             hits[name] = hits.get(name, 0) + 1
             if name.startswith("Tree_"):
                 tree_hits += 1
@@ -506,9 +541,7 @@ def sun_occlusion_to_trunks(scene, trees: list[dict]) -> list[dict]:
         if obj is None:
             continue
         origin = Vector(obj.location) + Vector((0.0, 0.0, 2.6))
-        result, loc, nrm, index, hit, matrix = scene.ray_cast(
-            depsgraph, origin, toward_sun, distance=80.0
-        )
+        result, loc, hit, dist = _ray_cast_skip(scene, depsgraph, origin, toward_sun, distance=80.0)
         blocked = bool(result and hit is not None)
         rows.append({
             "tree": tree["name"],
@@ -521,7 +554,7 @@ def sun_occlusion_to_trunks(scene, trees: list[dict]) -> list[dict]:
                 else "overlay" if hit.name.startswith(OVERLAY_PREFIXES)
                 else "other"
             ),
-            "hitDistance": None if not blocked else round(float((Vector(loc) - origin).length), 3),
+            "hitDistance": None if not blocked else dist,
         })
     return rows
 
@@ -553,6 +586,11 @@ def _assign_object_color(obj, material, rgb) -> None:
 
 
 def paint_tree_object_ids(scene, trees: list[dict] | None = None) -> dict:
+    hidden = []
+    for obj in scene.objects:
+        if obj.name.startswith(RAY_SKIP_PREFIXES) and not obj.hide_render:
+            obj.hide_render = True
+            hidden.append(obj.name)
     material = _object_color_material("TJ_TreeId_ObjectColor")
     painted = {"foreground": 0, "midground": 0, "background": 0, "overlay": 0, "other": 0}
     legend = {}
@@ -606,6 +644,7 @@ def paint_tree_object_ids(scene, trees: list[dict] | None = None) -> dict:
         "legendMeaning": ID_LEGEND,
         "overlayColor": [0.05, 0.95, 0.95],
         "idMaterial": material.name,
+        "hiddenForIdProof": hidden,
     }
 
 
@@ -665,7 +704,13 @@ def synthesize(trees, overlays, rays, sun_rows, hero, denoise, source_collection
                 if image.get("size"):
                     resolutions.append(image["size"])
     lod = any(
-        tree["geometryType"] in {"dense_small_stamp_cards", "blob_or_large_card", "billboard_or_proxy"}
+        tree["geometryType"] in {
+            "dense_small_stamp_cards",
+            "blob_or_large_card",
+            "billboard_or_proxy",
+            "large_alpha_cards",
+            "mixed_card_cluster",
+        } or tree.get("geometryNodesModifiers")
         for tree in visible
     )
     too_close = any(tree["tooCloseForAssetQuality"] for tree in visible)
