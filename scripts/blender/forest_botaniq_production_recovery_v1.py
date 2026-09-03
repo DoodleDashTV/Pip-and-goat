@@ -314,12 +314,12 @@ def make_ground_material():
     ):
         links.new(mapping.outputs["Vector"], node.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Saturation"].default_value = 0.78
-    hsv.inputs["Value"].default_value = 0.80
+    hsv.inputs["Saturation"].default_value = 0.72
+    hsv.inputs["Value"].default_value = 0.62
     links.new(soil.outputs["Color"], hsv.inputs["Color"])
     base_litter = _mix_color(nodes, "TJ_SoilBaseLitter")
     fac, a, b = _mix_sockets(base_litter)
-    fac.default_value = 0.34
+    fac.default_value = 0.52
     links.new(hsv.outputs["Color"], a)
     links.new(litter.outputs["Color"], b)
     litter_noise = nodes.new("ShaderNodeTexNoise")
@@ -331,11 +331,11 @@ def make_ground_material():
     links.new(coord.outputs["Object"], litter_noise.inputs["Vector"])
     links.new(coord.outputs["Object"], moss_noise.inputs["Vector"])
     litter_ramp = nodes.new("ShaderNodeValToRGB")
-    litter_ramp.color_ramp.elements[0].position = 0.46
-    litter_ramp.color_ramp.elements[1].position = 0.74
+    litter_ramp.color_ramp.elements[0].position = 0.38
+    litter_ramp.color_ramp.elements[1].position = 0.66
     moss_ramp = nodes.new("ShaderNodeValToRGB")
-    moss_ramp.color_ramp.elements[0].position = 0.68
-    moss_ramp.color_ramp.elements[1].position = 0.86
+    moss_ramp.color_ramp.elements[0].position = 0.64
+    moss_ramp.color_ramp.elements[1].position = 0.82
     links.new(litter_noise.outputs["Fac"], litter_ramp.inputs["Fac"])
     links.new(moss_noise.outputs["Fac"], moss_ramp.inputs["Fac"])
     mix_needles = _mix_color(nodes, "TJ_Needles")
@@ -408,7 +408,9 @@ def cylindrical_unwrap_trunk_faces(obj, aspect: float = TILIA_ASPECT) -> dict:
             co = mesh.vertices[mesh.loops[loop_index].vertex_index].co
             # Seam on +Y (away from approved camera at -Y).
             u = (math.atan2(co.x, -co.y) / (2.0 * math.pi)) + 0.5
-            v = (co.z - z0) / max(circumference * aspect, 1e-4)
+            # 1024x4096 Tilia strip ~0.85 m by 3.4 m. V uses world height, not C*4,
+            # so bark fissures keep photographic proportion on a short lookdev trunk.
+            v = (co.z - z0) / 3.4
             uv.data[loop_index].uv = (u, v)
     return {
         "faces": faces,
@@ -857,7 +859,7 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
         for slot in ground.material_slots:
             slot.link = "OBJECT"
             slot.material = mats["ground"]
-            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 4, 3, 3)
+            scatter_floor_geometry(collection, (ox + 26.0, oy, oz), mats["litter"], mats["moss"], mats["rock"], 0, 3, 3)
 
     bpy.context.view_layer.update()
     return {
