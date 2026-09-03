@@ -50,36 +50,37 @@ GOBO_COLLECTION = "TJ_INTERIOR_GOBO_V3"
 CANOPY_STRUCTURE_COLLECTION = "TJ_CANOPY_STRUCTURE_V3"
 GOBO_PATH = Path("/tmp/tj_interior_sun_gobo_v3.png")
 
-# Harder key so one trunk side and canopy edges read as sunlight.
-INTERIOR_SUN_ENERGY = 38.0
-INTERIOR_SUN_COLOR = (1.0, 0.90, 0.66)
-INTERIOR_SUN_ANGLE_DEG = 2.5
-INTERIOR_SUN_TRAVEL = (0.58, 0.22, -0.78)
+# Harder left-rake key so one trunk side and canopy edges read as sunlight.
+# First V1 flood-dapple flattened the key and warmed the floor too far.
+INTERIOR_SUN_ENERGY = 46.0
+INTERIOR_SUN_COLOR = (1.0, 0.91, 0.70)
+INTERIOR_SUN_ANGLE_DEG = 1.7
+INTERIOR_SUN_TRAVEL = (0.74, 0.06, -0.67)
 
 # Quieter fill than V3's 350 so the key is not flattened.
-INTERIOR_FILL_ENERGY = 205.0
-INTERIOR_FILL_SIZE = 6.2
-INTERIOR_BOUNCE_ENERGY = 125.0
-INTERIOR_BOUNCE_COLOR = (1.0, 0.86, 0.60)
-INTERIOR_RIM_ENERGY = 5.4
-INTERIOR_CANOPY_FILL_ENERGY = 300.0
-INTERIOR_CANOPY_RIM_ENERGY = 560.0
+INTERIOR_FILL_ENERGY = 155.0
+INTERIOR_FILL_SIZE = 5.4
+INTERIOR_BOUNCE_ENERGY = 72.0
+INTERIOR_BOUNCE_COLOR = (0.92, 0.82, 0.68)
+INTERIOR_RIM_ENERGY = 6.2
+INTERIOR_CANOPY_FILL_ENERGY = 220.0
+INTERIOR_CANOPY_RIM_ENERGY = 640.0
 
 TRUNK_KICKER_NAME = "TJ_InteriorTrunkKicker_V3"
-TRUNK_KICKER_ENERGY = 320.0
-TRUNK_KICKER_COLOR = (1.0, 0.88, 0.62)
-TRUNK_KICKER_LOCATION = (-8.4, -3.2, 4.4)
-TRUNK_KICKER_AIM = (-7.2, 2.2, 3.1)
-TRUNK_KICKER_SIZE = 1.7
+TRUNK_KICKER_ENERGY = 480.0
+TRUNK_KICKER_COLOR = (1.0, 0.90, 0.68)
+TRUNK_KICKER_LOCATION = (-11.2, -1.6, 5.2)
+TRUNK_KICKER_AIM = (-6.8, 3.4, 2.8)
+TRUNK_KICKER_SIZE = 1.15
 
-DAPPLE_ENERGY = 240.0
-DAPPLE_COLOR = (1.0, 0.84, 0.56)
-DAPPLE_SIZE = 1.55
+# Tight spots add sun pools without flooding the whole floor.
+DAPPLE_ENERGY = 620.0
+DAPPLE_COLOR = (1.0, 0.88, 0.64)
+DAPPLE_SIZE = 0.72
 DAPPLE_SPOTS = (
-    ("TJ_InteriorDapple_A_V3", (-2.4, -1.2, 6.8), (-2.1, 2.4, 0.04)),
-    ("TJ_InteriorDapple_B_V3", (2.6, 0.4, 7.1), (2.4, 4.8, 0.04)),
-    ("TJ_InteriorDapple_C_V3", (0.2, 2.8, 6.6), (0.4, 7.6, 0.04)),
-    ("TJ_InteriorDapple_D_V3", (-3.6, 4.0, 6.9), (-3.2, 9.2, 0.04)),
+    ("TJ_InteriorDapple_A_V3", (-2.0, -2.4, 8.4), (-1.6, 2.8, 0.04)),
+    ("TJ_InteriorDapple_B_V3", (1.8, 1.0, 8.8), (1.4, 6.4, 0.04)),
+    ("TJ_InteriorDapple_C_V3", (0.1, 3.6, 8.2), (0.2, 9.0, 0.04)),
 )
 
 
@@ -289,13 +290,27 @@ def add_interior_kickers(scene) -> dict:
         kicker.data.spread = math.radians(70.0)
     kicker.location = TRUNK_KICKER_LOCATION
     _aim_at(kicker, TRUNK_KICKER_AIM)
+    receivers = _ensure_collection(scene, "TJ_INTERIOR_TRUNK_RECEIVERS_V3")
+    for obj in list(receivers.objects):
+        receivers.objects.unlink(obj)
+    for obj in scene.objects:
+        if obj.type == "MESH" and obj.name.startswith("Tree_") and float(obj.location.y) < 18.0:
+            if obj.name not in receivers.objects:
+                receivers.objects.link(obj)
+    linking = getattr(kicker, "light_linking", None)
+    if linking is not None:
+        linking.receiver_collection = receivers
     spots = []
     for name, location, aim in DAPPLE_SPOTS:
-        spot = _ensure_light(collection, name, "AREA")
+        spot = _ensure_light(collection, name, "SPOT")
         spot.data.energy = DAPPLE_ENERGY
         spot.data.color = DAPPLE_COLOR
-        if hasattr(spot.data, "size"):
-            spot.data.size = DAPPLE_SIZE
+        if hasattr(spot.data, "spot_size"):
+            spot.data.spot_size = math.radians(22.0)
+        if hasattr(spot.data, "spot_blend"):
+            spot.data.spot_blend = 0.38
+        if hasattr(spot.data, "shadow_soft_size"):
+            spot.data.shadow_soft_size = 0.18
         spot.location = location
         _aim_at(spot, aim)
         spots.append({"name": name, "location": list(location), "aim": list(aim)})
@@ -407,7 +422,7 @@ def scatter_canopy_structure(scene) -> dict:
         twig_src = _append_twig(TWIG_OAK, "bq_Twig_Quercus-robur_A_spring-summer-autumn")
     for tree in trees:
         near = float(obj_mean_y(tree)) < 10.5
-        samples = _sample_canopy_points(tree, rng, 12 if near else 8)
+        samples = _sample_canopy_points(tree, rng, 16 if near else 10)
         for index, (point, normal) in enumerate(samples):
             offset = point + normal * rng.uniform(-0.04, 0.10) + Vector((0.0, -0.12, 0.02))
             cluster = 5 if near else 4
@@ -442,6 +457,24 @@ def scatter_canopy_structure(scene) -> dict:
                 )
                 sprite["tj_feature"] = FEATURE
                 sprites += 1
+        # Extra cards on the sky-hole silhouette so clumps break against blue.
+        rim_count = 10 if near else 6
+        for rim_i in range(rim_count):
+            side = rng.choice((-1.0, 1.0))
+            lx = side * rng.uniform(2.7, 7.4)
+            ly = rng.uniform(max(float(tree.location.y) - 1.2, -1.0), min(float(tree.location.y) + 2.4, 16.5))
+            lz = rng.uniform(6.2, 11.4)
+            leaf = make_ovate_leaf(
+                collection,
+                f"TJ_StructRim_{tree.name}_{rim_i:02d}",
+                (lx, ly, lz),
+                leaf_mat,
+                rng,
+            )
+            leaf.scale = tuple(float(v) * rng.uniform(4.2, 6.4) for v in leaf.scale)
+            leaf.rotation_euler[0] = rng.uniform(-1.1, 1.1)
+            leaf["tj_feature"] = FEATURE
+            leaves += 1
         if twig_src is not None:
             for twig_i in range(3 if near else 2):
                 point, normal = samples[twig_i % len(samples)]
