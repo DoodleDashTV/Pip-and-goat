@@ -9,6 +9,7 @@ alwaysApply: false
 - Judge quality from the rendered frame, not from node graphs.
 - Isolated lookdev must expose defects (neutral studio, no cinematic disguise).
 - Camera-distance proof is required before claiming the production scene improved.
+- Isolated lookdev PASS does not imply locked-camera PASS. The forest floor shader can be correct at 2 m and still read as a salmon plane at 42 mm.
 - Reject: rectangular foliage ghosts, stretched bark streaks, orange/salmon ground planes, single-plane grass in the foreground, crushed-black canopies used as a lighting cheat.
 - Lighting rebuild is forbidden while materials/vegetation still fail isolated or camera proofs.
 - Numerical tests catch technical breakage. They cannot certify artistic PASS.

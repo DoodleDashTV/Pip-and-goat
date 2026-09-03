@@ -46,7 +46,9 @@ Approved camera: `TJ_VendorReference_Camera` at `(0, -12.5, 2.15)`, 42 mm. Do no
   --samples 24 --bark-kind tilia
 ```
 
-Add `--camera-proof` only after isolated stills pass. Add `--skip-lookdev-stills` to rerun camera only.
+Add `--camera-proof` only after isolated stills pass. Add `--skip-lookdev-stills` to rerun camera only. Camera output is `FOREST_MATERIAL_RECOVERY_CAMERA_PROOF_V2.png`.
+
+Local CPU cost for that camera still: ~9.5 min, peak ~4.6 GB, 1280×720, 28 samples. Unpaid.
 
 A PNG on disk is not a PASS. Classify from the image.
 
@@ -60,5 +62,5 @@ Forbidden unless the current prompt explicitly authorizes a CREATE. Night-shift 
 |---|---|---|
 | Vertical bark streaks | Square-atlas UVs + 1:4 Tilia | Cylindrical unwrap, physical V=3.4 m |
 | Dark leaf rectangles | Opaque studio-black treated as alpha | `ensure_cutout_png` then CLIP |
-| Isolated ground good, camera terracotta | Vendor solid color, restore un-hide, or high-frequency albedo denoised at 42 mm | In-place subdivided UV floor on `TJ_VendorGround` + physical litter carpet. Do not repeat slot-remap / overlay. |
+| Isolated ground good, camera terracotta | Production shader is on the visible subdivided `TJ_VendorGround` (diagnose JSON). Grazing 42 mm + locked lookdev lighting + denoise flatten Botaniq albedo to salmon. | Do not repeat slot-remap / overlay / UV rebind. Next try: real Botaniq ground-cover meshes that occlude the plane. Lighting stays gated. |
 | Linked Botaniq nodes missing | Addon groups not present | Local Principled rebuild |

@@ -66,9 +66,9 @@
       ],
       "productionMaterial": "TJ_ProdGround_SoilLitterMoss_V1",
       "productionObject": "TJ_VendorGround",
-      "modification": "in-place subdivided world-metre UVs + macro Position noise + physical litter/moss/rock carpet; atmosphere volume bottom lifted off z=0",
+      "modification": "in-place subdivided world-metre UVs + macro Position noise; atmosphere volume bottom lifted off z=0; decal carpet excluded after camera V2 gray-tile FAIL",
       "isolatedStatus": "PASS",
-      "cameraStatus": "PENDING_V2_PROOF"
+      "cameraStatus": "FAIL_SOLID_COLOR_AT_LOCKED_CAMERA"
     },
     {
       "role": "backgroundCards",

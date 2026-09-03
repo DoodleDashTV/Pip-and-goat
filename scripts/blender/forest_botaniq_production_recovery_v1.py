@@ -1286,15 +1286,16 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         floor = install_production_forest_floor(root, mats["ground"])
         if ground is not None:
             bind_production_ground(ground, mats["ground"])
-        carpet = scatter_camera_footprint_carpet(root, mats["litter"], mats["moss"], mats["rock"])
+        # Camera V2 proved simple litter decals read as gray tiles on the
+        # locked frame. Do not promote that experiment into production.
         production = {
             "trees": trees,
             "vegetation": veg,
             "ground": ground is not None,
             "productionFloor": None if floor is None else floor.name,
             "vendorGroundHidden": False,
-            "floorArchitecture": "in_place_subdivided_uv_plus_physical_carpet",
-            "carpet": carpet,
+            "floorArchitecture": "in_place_subdivided_uv",
+            "carpet": {"enabled": False, "reason": "CAMERA_V2_DECALS_READ_AS_GRAY_TILES"},
             "atmosphere": lift_atmosphere_volume_bottom(),
         }
     if mode in {"lookdev", "both"}:

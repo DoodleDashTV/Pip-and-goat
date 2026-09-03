@@ -44,7 +44,8 @@ class ForestBotaniqProductionRecoveryTest(unittest.TestCase):
         self.assertIn("scatter_camera_footprint_carpet", source)
         self.assertIn("cluster_understory_near_trees", source)
         self.assertIn("enforce_production_floor", source)
-        self.assertIn("in_place_subdivided_uv_plus_physical_carpet", source)
+        self.assertIn("in_place_subdivided_uv", source)
+        self.assertIn("CAMERA_V2_DECALS_READ_AS_GRAY_TILES", source)
         self.assertNotIn("apply_cinematic_forest_lighting_repair", source)
         self.assertNotIn("user_remap", source)
 

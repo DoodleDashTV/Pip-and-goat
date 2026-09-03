@@ -1,14 +1,14 @@
 {
   "cameraChanged": false,
   "cameraProof": {
-    "bytes": 1460650,
+    "bytes": 1441799,
     "dimensions": [
       1280,
       720
     ],
-    "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/FOREST_MATERIAL_RECOVERY_CAMERA_PROOF_V1.png",
-    "seconds": 554.77,
-    "sha256": "1a02c803d38c3c7f7ce4f3dce7f0bc4e097df7a58916ab1decb0b530e2468323"
+    "path": "artifacts/tivvlejoy-stagegraph-v1/FOREST_MATERIAL_RECOVERY_CAMERA_PROOF_V2.png",
+    "seconds": 569.8,
+    "sha256": "b58d3ea9b02a6c4d2d0827cf8cdc1ce2e80aa71096d93377c3d59c39e7c6ce32"
   },
   "composition": {
     "cameraLensMm": 42.0,
@@ -45,6 +45,2071 @@
   },
   "compositionChanged": false,
   "device": "CPU",
+  "floorDiagnose": {
+    "objects": [
+      {
+        "dimensions": [
+          32.0,
+          37.0,
+          0.016
+        ],
+        "hide_render": false,
+        "hide_viewport": false,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "materials": [
+          "TJ_ProdGround_SoilLitterMoss_V1"
+        ],
+        "name": "TJ_VendorGround",
+        "tj_feature": "forest_botaniq_production_recovery_v1",
+        "verts": 525
+      },
+      {
+        "dimensions": [
+          36.0,
+          44.0,
+          17.72
+        ],
+        "hide_render": false,
+        "hide_viewport": true,
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "materials": [
+          "TJ_Atmosphere_Mat"
+        ],
+        "name": "TJ_Atmosphere",
+        "tj_feature": null,
+        "verts": 8
+      },
+      {
+        "dimensions": [
+          125.141,
+          125.141,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -9.0037,
+          3.4118,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_011.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          201.924,
+          201.924,
+          0.0
+        ],
+        "hide_render": false,
+        "hide_viewport": true,
+        "location": [
+          1.14,
+          18.8076,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_008.001",
+        "tj_feature": null,
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          197.489,
+          197.489,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          9.5846,
+          9.4829,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_014.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          175.06,
+          175.06,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -4.4091,
+          4.9234,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_008.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          97.944,
+          97.944,
+          0.0
+        ],
+        "hide_render": false,
+        "hide_viewport": true,
+        "location": [
+          -3.6584,
+          18.4599,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_001.001",
+        "tj_feature": null,
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          145.826,
+          145.826,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -0.175,
+          16.606,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_009.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          225.178,
+          225.178,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          7.1015,
+          14.287,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_009.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          101.814,
+          101.814,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          9.6251,
+          15.3499,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_009.003",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          240.919,
+          240.919,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          0.5802,
+          11.2476,
+          0.015
+        ],
+        "materials": [
+          "Floral_Mat_1.007"
+        ],
+        "name": "Floral_0_012.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 4
+      },
+      {
+        "dimensions": [
+          9.743,
+          8.855,
+          0.274
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          5.0333,
+          4.9218,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_038.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          18.394,
+          17.007,
+          0.443
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -6.8556,
+          16.7663,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_005.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 721
+      },
+      {
+        "dimensions": [
+          12.28,
+          11.161,
+          0.345
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -5.0434,
+          6.9181,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_038.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          13.585,
+          14.915,
+          0.409
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -5.1931,
+          3.9801,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_017.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 806
+      },
+      {
+        "dimensions": [
+          14.126,
+          12.838,
+          0.397
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -2.3996,
+          14.6835,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_028.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          15.847,
+          13.266,
+          0.415
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -5.332,
+          5.333,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_010.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 782
+      },
+      {
+        "dimensions": [
+          10.386,
+          9.921,
+          0.269
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -2.9316,
+          9.2716,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_003.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 866
+      },
+      {
+        "dimensions": [
+          11.479,
+          12.737,
+          0.304
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -6.3567,
+          12.8054,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_006.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 715
+      },
+      {
+        "dimensions": [
+          14.674,
+          13.337,
+          0.413
+        ],
+        "hide_render": false,
+        "hide_viewport": true,
+        "location": [
+          3.7244,
+          18.6731,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_022.001",
+        "tj_feature": null,
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          8.568,
+          9.407,
+          0.258
+        ],
+        "hide_render": false,
+        "hide_viewport": true,
+        "location": [
+          -7.2579,
+          18.9838,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_017.002",
+        "tj_feature": null,
+        "verts": 806
+      },
+      {
+        "dimensions": [
+          18.496,
+          15.507,
+          0.443
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          4.9978,
+          11.7895,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_013.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 761
+      },
+      {
+        "dimensions": [
+          14.564,
+          13.237,
+          0.409
+        ],
+        "hide_render": false,
+        "hide_viewport": true,
+        "location": [
+          -0.2357,
+          19.4036,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_025.001",
+        "tj_feature": null,
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          11.017,
+          10.013,
+          0.31
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -1.3735,
+          15.0412,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_035.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          11.981,
+          10.889,
+          0.337
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          10.3364,
+          5.0285,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_028.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          15.717,
+          15.014,
+          0.407
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -9.9047,
+          13.1945,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_003.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 866
+      },
+      {
+        "dimensions": [
+          10.34,
+          12.019,
+          0.307
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -5.5746,
+          16.893,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_018.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 722
+      },
+      {
+        "dimensions": [
+          12.682,
+          11.526,
+          0.357
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -5.0511,
+          16.6908,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_024.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          9.393,
+          10.69,
+          0.265
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -0.432,
+          -0.6502,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_004.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 751
+      },
+      {
+        "dimensions": [
+          16.522,
+          13.832,
+          0.433
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -7.3077,
+          11.8515,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_010.003",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 782
+      },
+      {
+        "dimensions": [
+          11.766,
+          10.673,
+          0.269
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -8.9022,
+          14.8118,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_014.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 784
+      },
+      {
+        "dimensions": [
+          14.031,
+          12.753,
+          0.394
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          2.8467,
+          17.5982,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_027.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          14.517,
+          13.194,
+          0.408
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -7.2523,
+          3.5833,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_027.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          15.978,
+          14.493,
+          0.365
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          7.8683,
+          5.6608,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_014.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 784
+      },
+      {
+        "dimensions": [
+          15.716,
+          10.857,
+          0.38
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -2.3293,
+          8.3909,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_012.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 749
+      },
+      {
+        "dimensions": [
+          10.313,
+          9.354,
+          0.236
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -8.7408,
+          8.6398,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_014.003",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 784
+      },
+      {
+        "dimensions": [
+          14.254,
+          12.955,
+          0.401
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          1.4077,
+          0.8614,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_030.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          14.616,
+          12.254,
+          0.35
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -10.0498,
+          2.5857,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_013.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 761
+      },
+      {
+        "dimensions": [
+          14.855,
+          13.501,
+          0.418
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          10.4069,
+          5.14,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_029.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          15.385,
+          17.864,
+          0.42
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          3.2713,
+          17.4309,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_015.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 769
+      },
+      {
+        "dimensions": [
+          9.201,
+          8.363,
+          0.259
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -9.6703,
+          11.2728,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_024.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          13.065,
+          9.026,
+          0.315
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -7.6934,
+          9.243,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_012.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 749
+      },
+      {
+        "dimensions": [
+          11.644,
+          10.583,
+          0.327
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          4.6155,
+          4.905,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_035.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          12.149,
+          10.7,
+          0.303
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -7.7949,
+          4.2512,
+          0.015
+        ],
+        "materials": [
+          "Leaf Blade_Mat_1.008",
+          "Fallen Leaf_Mat_1.009",
+          "Branch_1.010"
+        ],
+        "name": "Fallen Leaf_1_020.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 677
+      },
+      {
+        "dimensions": [
+          10.404,
+          9.456,
+          0.292
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          7.1531,
+          15.8019,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_037.001",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          12.858,
+          11.686,
+          0.361
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -3.3211,
+          8.1569,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_029.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          8.863,
+          8.055,
+          0.249
+        ],
+        "hide_render": false,
+        "hide_viewport": true,
+        "location": [
+          3.7031,
+          19.1572,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_024.003",
+        "tj_feature": null,
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          11.33,
+          10.298,
+          0.319
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          -6.7706,
+          -0.3044,
+          0.015
+        ],
+        "materials": [
+          "Fallen Leaf_Mat_1.009"
+        ],
+        "name": "Fallen Leaf_0_022.002",
+        "tj_feature": "forest_botaniq_hidden",
+        "verts": 25
+      },
+      {
+        "dimensions": [
+          2.0,
+          2.0,
+          0.0
+        ],
+        "hide_render": true,
+        "hide_viewport": true,
+        "location": [
+          116.0,
+          0.0,
+          0.0
+        ],
+        "materials": [
+          "TJ_ProdGround_SoilLitterMoss_V1"
+        ],
+        "name": "TJ_LookdevGroundPatch",
+        "tj_feature": "forest_lookdev_isolation_v1",
+        "verts": 4
+      }
+    ],
+    "paidCreateCount": 0,
+    "schema": "TIVVLEJOY_CAMERA_FLOOR_DIAGNOSE_V1"
+  },
+  "floorEnforce": {
+    "atmosphere": {
+      "bottomVerts": 0,
+      "lifted": true,
+      "zMin": 0.28
+    },
+    "diagnosis": {
+      "objects": [
+        {
+          "dimensions": [
+            32.0,
+            37.0,
+            0.016
+          ],
+          "hide_render": false,
+          "hide_viewport": false,
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "materials": [
+            "TJ_ProdGround_SoilLitterMoss_V1"
+          ],
+          "name": "TJ_VendorGround",
+          "tj_feature": "forest_botaniq_production_recovery_v1",
+          "verts": 525
+        },
+        {
+          "dimensions": [
+            36.0,
+            44.0,
+            17.72
+          ],
+          "hide_render": false,
+          "hide_viewport": true,
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "materials": [
+            "TJ_Atmosphere_Mat"
+          ],
+          "name": "TJ_Atmosphere",
+          "tj_feature": null,
+          "verts": 8
+        },
+        {
+          "dimensions": [
+            125.141,
+            125.141,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -9.0037,
+            3.4118,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_011.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            201.924,
+            201.924,
+            0.0
+          ],
+          "hide_render": false,
+          "hide_viewport": true,
+          "location": [
+            1.14,
+            18.8076,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_008.001",
+          "tj_feature": null,
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            197.489,
+            197.489,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            9.5846,
+            9.4829,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_014.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            175.06,
+            175.06,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -4.4091,
+            4.9234,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_008.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            97.944,
+            97.944,
+            0.0
+          ],
+          "hide_render": false,
+          "hide_viewport": true,
+          "location": [
+            -3.6584,
+            18.4599,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_001.001",
+          "tj_feature": null,
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            145.826,
+            145.826,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -0.175,
+            16.606,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_009.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            225.178,
+            225.178,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            7.1015,
+            14.287,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_009.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            101.814,
+            101.814,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            9.6251,
+            15.3499,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_009.003",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            240.919,
+            240.919,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            0.5802,
+            11.2476,
+            0.015
+          ],
+          "materials": [
+            "Floral_Mat_1.007"
+          ],
+          "name": "Floral_0_012.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 4
+        },
+        {
+          "dimensions": [
+            9.743,
+            8.855,
+            0.274
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            5.0333,
+            4.9218,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_038.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            18.394,
+            17.007,
+            0.443
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -6.8556,
+            16.7663,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_005.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 721
+        },
+        {
+          "dimensions": [
+            12.28,
+            11.161,
+            0.345
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -5.0434,
+            6.9181,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_038.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            13.585,
+            14.915,
+            0.409
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -5.1931,
+            3.9801,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_017.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 806
+        },
+        {
+          "dimensions": [
+            14.126,
+            12.838,
+            0.397
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -2.3996,
+            14.6835,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_028.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            15.847,
+            13.266,
+            0.415
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -5.332,
+            5.333,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_010.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 782
+        },
+        {
+          "dimensions": [
+            10.386,
+            9.921,
+            0.269
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -2.9316,
+            9.2716,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_003.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 866
+        },
+        {
+          "dimensions": [
+            11.479,
+            12.737,
+            0.304
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -6.3567,
+            12.8054,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_006.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 715
+        },
+        {
+          "dimensions": [
+            14.674,
+            13.337,
+            0.413
+          ],
+          "hide_render": false,
+          "hide_viewport": true,
+          "location": [
+            3.7244,
+            18.6731,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_022.001",
+          "tj_feature": null,
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            8.568,
+            9.407,
+            0.258
+          ],
+          "hide_render": false,
+          "hide_viewport": true,
+          "location": [
+            -7.2579,
+            18.9838,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_017.002",
+          "tj_feature": null,
+          "verts": 806
+        },
+        {
+          "dimensions": [
+            18.496,
+            15.507,
+            0.443
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            4.9978,
+            11.7895,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_013.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 761
+        },
+        {
+          "dimensions": [
+            14.564,
+            13.237,
+            0.409
+          ],
+          "hide_render": false,
+          "hide_viewport": true,
+          "location": [
+            -0.2357,
+            19.4036,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_025.001",
+          "tj_feature": null,
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            11.017,
+            10.013,
+            0.31
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -1.3735,
+            15.0412,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_035.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            11.981,
+            10.889,
+            0.337
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            10.3364,
+            5.0285,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_028.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            15.717,
+            15.014,
+            0.407
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -9.9047,
+            13.1945,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_003.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 866
+        },
+        {
+          "dimensions": [
+            10.34,
+            12.019,
+            0.307
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -5.5746,
+            16.893,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_018.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 722
+        },
+        {
+          "dimensions": [
+            12.682,
+            11.526,
+            0.357
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -5.0511,
+            16.6908,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_024.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            9.393,
+            10.69,
+            0.265
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -0.432,
+            -0.6502,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_004.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 751
+        },
+        {
+          "dimensions": [
+            16.522,
+            13.832,
+            0.433
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -7.3077,
+            11.8515,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_010.003",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 782
+        },
+        {
+          "dimensions": [
+            11.766,
+            10.673,
+            0.269
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -8.9022,
+            14.8118,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_014.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 784
+        },
+        {
+          "dimensions": [
+            14.031,
+            12.753,
+            0.394
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            2.8467,
+            17.5982,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_027.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            14.517,
+            13.194,
+            0.408
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -7.2523,
+            3.5833,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_027.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            15.978,
+            14.493,
+            0.365
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            7.8683,
+            5.6608,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_014.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 784
+        },
+        {
+          "dimensions": [
+            15.716,
+            10.857,
+            0.38
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -2.3293,
+            8.3909,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_012.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 749
+        },
+        {
+          "dimensions": [
+            10.313,
+            9.354,
+            0.236
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -8.7408,
+            8.6398,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_014.003",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 784
+        },
+        {
+          "dimensions": [
+            14.254,
+            12.955,
+            0.401
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            1.4077,
+            0.8614,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_030.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            14.616,
+            12.254,
+            0.35
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -10.0498,
+            2.5857,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_013.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 761
+        },
+        {
+          "dimensions": [
+            14.855,
+            13.501,
+            0.418
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            10.4069,
+            5.14,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_029.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            15.385,
+            17.864,
+            0.42
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            3.2713,
+            17.4309,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_015.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 769
+        },
+        {
+          "dimensions": [
+            9.201,
+            8.363,
+            0.259
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -9.6703,
+            11.2728,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_024.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            13.065,
+            9.026,
+            0.315
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -7.6934,
+            9.243,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_012.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 749
+        },
+        {
+          "dimensions": [
+            11.644,
+            10.583,
+            0.327
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            4.6155,
+            4.905,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_035.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            12.149,
+            10.7,
+            0.303
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -7.7949,
+            4.2512,
+            0.015
+          ],
+          "materials": [
+            "Leaf Blade_Mat_1.008",
+            "Fallen Leaf_Mat_1.009",
+            "Branch_1.010"
+          ],
+          "name": "Fallen Leaf_1_020.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 677
+        },
+        {
+          "dimensions": [
+            10.404,
+            9.456,
+            0.292
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            7.1531,
+            15.8019,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_037.001",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            12.858,
+            11.686,
+            0.361
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -3.3211,
+            8.1569,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_029.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            8.863,
+            8.055,
+            0.249
+          ],
+          "hide_render": false,
+          "hide_viewport": true,
+          "location": [
+            3.7031,
+            19.1572,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_024.003",
+          "tj_feature": null,
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            11.33,
+            10.298,
+            0.319
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            -6.7706,
+            -0.3044,
+            0.015
+          ],
+          "materials": [
+            "Fallen Leaf_Mat_1.009"
+          ],
+          "name": "Fallen Leaf_0_022.002",
+          "tj_feature": "forest_botaniq_hidden",
+          "verts": 25
+        },
+        {
+          "dimensions": [
+            2.0,
+            2.0,
+            0.0
+          ],
+          "hide_render": true,
+          "hide_viewport": true,
+          "location": [
+            116.0,
+            0.0,
+            0.0
+          ],
+          "materials": [
+            "TJ_ProdGround_SoilLitterMoss_V1"
+          ],
+          "name": "TJ_LookdevGroundPatch",
+          "tj_feature": "forest_lookdev_isolation_v1",
+          "verts": 4
+        }
+      ],
+      "paidCreateCount": 0,
+      "schema": "TIVVLEJOY_CAMERA_FLOOR_DIAGNOSE_V1"
+    },
+    "floorMaterial": "TJ_ProdGround_SoilLitterMoss_V1",
+    "floorObject": "TJ_VendorGround",
+    "overlayHidden": false,
+    "productionScatterRevealed": 287,
+    "rebuilt": {
+      "cols": 20,
+      "faces": 480,
+      "rows": 24,
+      "vertices": 525
+    }
+  },
   "lightingChanged": false,
   "lookdevIsolation": {
     "barkTexture": {
@@ -149,8 +2214,19 @@
     "lightingChanged": false,
     "lookdev": {},
     "production": {
+      "atmosphere": {
+        "bottomVerts": 0,
+        "lifted": true,
+        "zMin": 0.28
+      },
+      "carpet": {
+        "litterPatches": 56,
+        "mossMounds": 22,
+        "rocks": 12
+      },
+      "floorArchitecture": "in_place_subdivided_uv_plus_physical_carpet",
       "ground": true,
-      "productionFloor": "TJ_ProdForestFloor",
+      "productionFloor": "TJ_VendorGround",
       "trees": {
         "treeObjects": 14,
         "uniqueMeshes": 9,
@@ -264,6 +2340,11 @@
           "floral": 2,
           "grass": 14
         },
+        "clustered": {
+          "bushes": 1,
+          "ferns": 8,
+          "grass": 16
+        },
         "replaced": {
           "bushes": 19,
           "fallenLeaves": 60,
@@ -272,7 +2353,7 @@
           "grass": 56
         }
       },
-      "vendorGroundHidden": true
+      "vendorGroundHidden": false
     },
     "purchasedAssetsPreserved": true,
     "schema": "TIVVLEJOY_BOTANIQ_FOREST_PRODUCTION_RECOVERY_APPLY_V1",
@@ -290,9 +2371,92 @@
     ]
   },
   "result": "RENDERED",
-  "samples": 16,
+  "samples": 24,
   "schema": "TIVVLEJOY_BOTANIQ_FOREST_PRODUCTION_RECOVERY_PROOF_V1",
-  "stills": {},
+  "stills": {
+    "LOOKDEV_BARK_PRODUCTION_V2": {
+      "bytes": 998635,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_BARK_PRODUCTION_V2.png",
+      "seconds": 4.99,
+      "sha256": "30094aa70929b6ffc8bcd90d5363dd0881e57a4dfb8a7ee674f277c98e3d9f6b",
+      "subjectVerts": [
+        48
+      ],
+      "subjects": [
+        "TJ_ProdLookdevBark"
+      ]
+    },
+    "LOOKDEV_BUSH_PRODUCTION_V2": {
+      "bytes": 662602,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_BUSH_PRODUCTION_V2.png",
+      "seconds": 4.5,
+      "sha256": "f40cf129ad0afc61f4d314747d1f623b413bff3ffedb0109374f1f3690d3da79",
+      "subjectVerts": [
+        35234
+      ],
+      "subjects": [
+        "TJ_LookdevBush"
+      ]
+    },
+    "LOOKDEV_GRASS_FERN_PRODUCTION_V2": {
+      "bytes": 1180434,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_GRASS_FERN_PRODUCTION_V2.png",
+      "seconds": 11.63,
+      "sha256": "155867c4176de06a49c7b8834f41d93bada7d03d8d2640a13a0ac4fb21bcab6e",
+      "subjectVerts": [
+        37026,
+        19458
+      ],
+      "subjects": [
+        "TJ_LookdevGrass",
+        "TJ_LookdevFlower"
+      ]
+    },
+    "LOOKDEV_GROUND_PRODUCTION_V2": {
+      "bytes": 1047363,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_GROUND_PRODUCTION_V2.png",
+      "seconds": 6.28,
+      "sha256": "64cec42acb51a15c600a5a6de90346f2b337c50b23647bf311af3b40efa7eb03",
+      "subjectVerts": [
+        4
+      ],
+      "subjects": [
+        "TJ_LookdevGroundPatch"
+      ]
+    },
+    "LOOKDEV_LEAF_PRODUCTION_V2": {
+      "bytes": 853513,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_LEAF_PRODUCTION_V2.png",
+      "seconds": 5.46,
+      "sha256": "5f3029b407b07b08e076e88e471f92b583b30cec290d7cc3372f2d6c5e1038d0",
+      "subjectVerts": [
+        4
+      ],
+      "subjects": [
+        "TJ_LookdevLeaf"
+      ]
+    }
+  },
   "terrainChanged": false,
   "visualApproval": false,
   "waterChanged": false
