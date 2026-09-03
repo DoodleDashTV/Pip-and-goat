@@ -1,0 +1,88 @@
+{
+  "schema": "TIVVLEJOY_FOREST_OWNED_SOURCE_PROVENANCE_V1",
+  "paidCreateCount": 0,
+  "vendorOriginalsPreserved": true,
+  "assets": [
+    {
+      "role": "bark",
+      "pack": "Botaniq Full 7.2.0",
+      "sourceArchive": "botaniq_full-7.2.0.paq.zip",
+      "sourceTexture": "bq_Bark_Tilia-europaea_Diffuse.jpg + Normal.jpg",
+      "productionMaterial": "TJ_ProdBark_Tilia_V1",
+      "modification": "cylindrical unwrap + local Principled",
+      "isolatedStatus": "PASS"
+    },
+    {
+      "role": "barkFallback",
+      "pack": "Stylized Forest Nature Kit",
+      "sourceArchive": "Stylized_Forest_Nature_Kit.zip",
+      "sourceTexture": "Textures_Stylized_Forest_Kit/1024/Trunks/Stylized_Trunk_01_*",
+      "productionMaterial": "TJ_ProdBark_FNKit_V1",
+      "modification": "unused while Tilia isolated proof passes",
+      "isolatedStatus": "NOT_SELECTED"
+    },
+    {
+      "role": "shrub",
+      "pack": "Botaniq Full 7.2.0",
+      "sourceBlend": "bq_Shrub_Corylus-avellana_A_spring-summer.blend",
+      "productionObjectPrefix": "TJ_ProdBushes_",
+      "modification": "appended instance + localized Principled leaf/bark",
+      "isolatedStatus": "PASS"
+    },
+    {
+      "role": "leaf",
+      "pack": "Botaniq Full 7.2.0",
+      "sourceTexture": "bq_Leaf_Corylus-avellana_Diffuse.png",
+      "productionMaterial": "TJ_ProdLeaf_Corylus_V1",
+      "modification": "studio-black keyed to alpha; local CLIP Principled + translucency",
+      "isolatedStatus": "PASS"
+    },
+    {
+      "role": "grass",
+      "pack": "Botaniq Full 7.2.0",
+      "sourceBlend": "bq_Grass_Carex-oshimensis_A_spring.blend",
+      "productionObjectPrefix": "TJ_ProdGrass_",
+      "modification": "appended clump instance; EcoKit billboards hidden for y<18",
+      "isolatedStatus": "PASS"
+    },
+    {
+      "role": "fern",
+      "pack": "Botaniq Full 7.2.0",
+      "sourceBlend": "bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn.blend",
+      "sourceTexture": "bq_Fern_Diffuse.png",
+      "productionMaterial": "TJ_ProdFern_V1",
+      "modification": "keyed fern atlas + localized Principled",
+      "isolatedStatus": "PASS"
+    },
+    {
+      "role": "forestFloor",
+      "pack": "Botaniq Full 7.2.0",
+      "sourceTextures": [
+        "bq_Soil_Loose_Diffuse.jpg",
+        "bq_Ground_Fallen_Leaves_Autumn_Diffuse.jpg",
+        "bq_Ground_Fallen_Needles_Diffuse.jpg",
+        "bq_Moss_Diffuse.jpg",
+        "bq_Rock_Granite-brown_Diffuse.jpg"
+      ],
+      "productionMaterial": "TJ_ProdGround_SoilLitterMoss_V1",
+      "productionObject": "TJ_ProdForestFloor",
+      "modification": "layered world-space mix; vendor solid-color plane hidden",
+      "isolatedStatus": "PASS",
+      "cameraStatus": "PENDING_OVERLAY_PROOF"
+    },
+    {
+      "role": "backgroundCards",
+      "pack": "Stylised EcoKit",
+      "sourceBlend": "Flora_Mat&GN&Models.blend",
+      "modification": "preserved for y>=18 only",
+      "isolatedStatus": "BACKGROUND_ONLY"
+    },
+    {
+      "role": "hdri",
+      "pack": "owned diagnostic HDRI",
+      "sourceTexture": "tj_hdri_diag_8k.jpg",
+      "modification": "substitutes vendor sunny_vondelpark path",
+      "isolatedStatus": "BOUND"
+    }
+  ]
+}
