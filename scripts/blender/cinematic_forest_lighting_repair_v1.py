@@ -16,7 +16,7 @@ SUN_ENERGY = 8.6
 SUN_COLOR = (1.0, 0.94, 0.86)
 SUN_ANGLE_DEG = 4.2
 
-FILL_ENERGY = 220.0
+FILL_ENERGY = 300.0
 FILL_COLOR = (0.58, 0.74, 1.0)
 FILL_LOCATION = (0.0, -7.2, 11.5)
 FILL_AIM = (0.0, 8.0, 5.5)
@@ -26,13 +26,13 @@ RIM_ENERGY = 3.15
 RIM_COLOR = (0.72, 0.84, 1.0)
 RIM_TRAVEL = (-0.28, -0.52, -0.81)
 
-BOUNCE_ENERGY = 120.0
+BOUNCE_ENERGY = 180.0
 BOUNCE_COLOR = (0.38, 0.52, 0.36)
 BOUNCE_LOCATION = (0.0, 8.2, 4.2)
 BOUNCE_AIM = (0.0, 8.0, 9.0)
 BOUNCE_SIZE = 12.0
 
-CANOPY_FILL_ENERGY = 400.0
+CANOPY_FILL_ENERGY = 480.0
 CANOPY_FILL_COLOR = (0.66, 0.80, 1.0)
 CANOPY_FILL_LOCATION = (0.0, -6.0, 11.2)
 CANOPY_FILL_AIM = (0.0, 8.5, 6.0)
@@ -45,8 +45,8 @@ CYCLES_COLOR_LIFT = "TJ_CinematicCyclesColorLift_V1"
 CYCLES_LEAF_LIFT = (1.18, 1.28, 1.06, 1.0)
 CYCLES_FALLEN_LIFT = (1.02, 1.06, 1.08, 1.0)
 
-GROUND_EARTH = (0.038, 0.034, 0.026)
-GROUND_MOSS = (0.040, 0.052, 0.034)
+GROUND_EARTH = (0.050, 0.044, 0.034)
+GROUND_MOSS = (0.046, 0.056, 0.038)
 GROUND_DAMP = (0.028, 0.030, 0.026)
 GROUND_ROCK = (0.048, 0.046, 0.042)
 
@@ -82,8 +82,9 @@ FLORA_GRASS_LIGHT_INTENSITY = 0.55
 FLORA_FALLEN_LIGHT_INTENSITY = 0.20
 FLORA_BRANCH_LIGHT_INTENSITY = 0.58
 FLORA_DISPLAY_INTENSITY_CAP = 3.0
-TRUNK_STRENGTH = 0.42
-TRUNK_MIN_LUMA = 0.20
+TRUNK_STRENGTH = 0.55
+TRUNK_MIN_LUMA = 0.28
+TRUNK_BRIGHT = 0.28
 
 DIFFUSE_BOUNCES = 12
 GLOSSY_BOUNCES = 4
@@ -787,6 +788,21 @@ TRUNK_COLOR_LIFT = (1.38, 1.24, 1.12, 1.0)
 def repair_trunk_readability() -> dict:
     import bpy
 
+    groups_changed = []
+    for group in bpy.data.node_groups:
+        if not str(group.name).startswith("TreeTrunk_Mat"):
+            continue
+        touched = False
+        for node in group.nodes:
+            if node.type != "BRIGHTCONTRAST":
+                continue
+            if "Bright" in node.inputs and float(node.inputs["Bright"].default_value) < TRUNK_BRIGHT:
+                node.inputs["Bright"].default_value = TRUNK_BRIGHT
+                touched = True
+        if touched:
+            _tag(group)
+            groups_changed.append(group.name)
+
     changed = []
     for material in bpy.data.materials:
         low = str(material.name or "").lower()
@@ -800,19 +816,21 @@ def repair_trunk_readability() -> dict:
         for node in material.node_tree.nodes:
             if node.type != "GROUP":
                 continue
+            luma = None
             if "Color" in node.inputs:
                 color = list(node.inputs["Color"].default_value)
                 luma = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2]
                 if 0.001 < luma < TRUNK_MIN_LUMA:
                     lift = TRUNK_MIN_LUMA / luma
                     node.inputs["Color"].default_value = (
-                        min(color[0] * lift, 0.42),
-                        min(color[1] * lift, 0.32),
-                        min(color[2] * lift, 0.22),
+                        min(color[0] * lift, 0.48),
+                        min(color[1] * lift, 0.36),
+                        min(color[2] * lift, 0.24),
                         color[3] if len(color) > 3 else 1.0,
                     )
+                    luma = TRUNK_MIN_LUMA
                     touched = True
-            if "Strength" in node.inputs:
+            if "Strength" in node.inputs and luma is not None and luma < 0.45:
                 current = float(node.inputs["Strength"].default_value)
                 if current < TRUNK_STRENGTH:
                     node.inputs["Strength"].default_value = TRUNK_STRENGTH
@@ -820,7 +838,12 @@ def repair_trunk_readability() -> dict:
         if touched:
             _tag(material)
             changed.append(material.name)
-    return {"materialsChanged": len(changed), "names": changed, "texturesOverwritten": False}
+    return {
+        "materialsChanged": len(changed),
+        "names": changed,
+        "groupsChanged": groups_changed,
+        "texturesOverwritten": False,
+    }
 
 
 def repair_treeleaf_groups() -> dict:

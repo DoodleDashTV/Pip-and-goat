@@ -25,6 +25,7 @@ from cinematic_forest_lighting_repair_v1 import (
     SUN_ENERGY,
     SUN_TRAVEL,
     TRANSLUCENCY_FACTOR,
+    TRUNK_BRIGHT,
     TRUNK_MIN_LUMA,
     TRUNK_STRENGTH,
     VIEW_TRANSFORM,
@@ -75,6 +76,7 @@ class CinematicForestLightingRepairTest(unittest.TestCase):
         self.assertLessEqual(FLORA_DISPLAY_INTENSITY_CAP, 3.0)
         self.assertGreaterEqual(TRUNK_MIN_LUMA, 0.18)
         self.assertGreaterEqual(TRUNK_STRENGTH, 0.40)
+        self.assertGreaterEqual(TRUNK_BRIGHT, 0.24)
         self.assertEqual(_flora_light_intensity_target("Branch_1.002"), FLORA_BRANCH_LIGHT_INTENSITY)
         self.assertEqual(_flora_light_intensity_target("TreeTrunk_Mat_1.001"), None)
         clamped = _clamp_hot_flora_color((0.70, 1.0, 0.03, 1.0), "foliage")
