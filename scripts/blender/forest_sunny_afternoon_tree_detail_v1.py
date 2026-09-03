@@ -41,6 +41,8 @@ from forest_cinematic_lighting_recovery_v1 import (
     apply_cycles_quality,
     verify_material_lighting_lock,
 )
+from forest_botaniq_production_recovery_v1 import LEAF_NORMAL, leaf_albedo_path, make_foliage_material
+from forest_camera_ground_cover_v1 import make_ovate_leaf
 from forest_ground_detail_recovery_v1 import LOCKED_MATERIAL_LIGHTING
 from forest_lookdev_isolation_v1 import verify_production_camera
 from forest_material_readability_repair_v1 import (
@@ -52,21 +54,24 @@ from forest_material_readability_repair_v1 import (
 FEATURE = "forest_sunny_afternoon_tree_detail_v1"
 
 SKY_IMAGE_NAME = "Sky_World_2.png"
-SKY_CAMERA_STRENGTH = 2.4
-SKY_BLUE_LIFT = (0.28, 0.52, 0.98, 1.0)
-SKY_LIFT_FAC = 0.38
+SKY_CAMERA_STRENGTH = 1.05
+SKY_BLUE_LIFT = (0.10, 0.28, 0.72, 1.0)
+SKY_LIFT_FAC = 0.18
+GENERATED_SKY_PATH = Path("/tmp/tj_afternoon_sky_card_v2.png")
 
-AFTERNOON_SUN_ENERGY = 13.2
-AFTERNOON_SUN_COLOR = (1.0, 0.92, 0.74)
-AFTERNOON_EXPOSURE = 1.22
-AFTERNOON_FILL_ENERGY = 360.0
-AFTERNOON_BOUNCE_ENERGY = 180.0
-AFTERNOON_RIM_ENERGY = 3.4
-AFTERNOON_RIM_COLOR = (1.0, 0.88, 0.70)
+AFTERNOON_SUN_ENERGY = 15.6
+AFTERNOON_SUN_COLOR = (1.0, 0.93, 0.74)
+AFTERNOON_EXPOSURE = 1.10
+AFTERNOON_FILL_ENERGY = 250.0
+AFTERNOON_BOUNCE_ENERGY = 140.0
+AFTERNOON_RIM_ENERGY = 4.6
+AFTERNOON_RIM_COLOR = (1.0, 0.90, 0.72)
 AFTERNOON_RIM_TRAVEL = (-0.28, -0.52, -0.81)
 
-CANOPY_FILL_ENERGY = 620.0
-CANOPY_RIM_ENERGY = 340.0
+CANOPY_FILL_ENERGY = 780.0
+CANOPY_RIM_ENERGY = 480.0
+SKY_CARD_COLLECTION = "TJ_AFTERNOON_SKY_CARD_V2"
+CANOPY_LEAF_COLLECTION = "TJ_CANOPY_LEAF_DETAIL_V2"
 FLORA_CANOPY_INTENSITY = 0.92
 TREELEAF_INTENSITY = 0.78
 AFTERNOON_TRANSLUCENCY = 0.22
@@ -382,13 +387,334 @@ def lift_canopy_detail(scene) -> dict:
         if color is not None and "Color" in color.outputs:
             color.outputs["Color"].default_value = AFTERNOON_TRANSLUCENT_COLOR
 
+    contrast = sharpen_canopy_materials()
     return {
         "floraLifted": flora,
         "treeleafLifted": treeleaf,
         "translucencyFactor": AFTERNOON_TRANSLUCENCY,
         "foliageRepair": foliage,
+        "canopyContrast": contrast,
         "texturesOverwritten": False,
         "emissionEnabled": False,
+    }
+
+
+def sharpen_canopy_materials() -> dict:
+    """Raise leaf-card contrast/roughness/normal without touching ground."""
+    import bpy
+
+    skip = ("ground", "soil", "bark", "trunk", "rock", "fallen", "grass", "floral", "water", "moss")
+    hints = ("treeleaf", "branch_", "leaf_tree", "vine", "leaves")
+    touched = []
+    for material in bpy.data.materials:
+        name = str(material.name or "").lower()
+        if any(word in name for word in skip):
+            continue
+        if not any(word in name for word in hints):
+            continue
+        if not material.use_nodes or material.node_tree is None:
+            continue
+        nodes = material.node_tree.nodes
+        links = material.node_tree.links
+        changed = False
+        for node in nodes:
+            if node.type == "BSDF_PRINCIPLED" and "Roughness" in node.inputs:
+                node.inputs["Roughness"].default_value = min(
+                    float(node.inputs["Roughness"].default_value),
+                    0.44,
+                )
+                changed = True
+            if node.type == "NORMAL_MAP" and "Strength" in node.inputs:
+                node.inputs["Strength"].default_value = max(
+                    float(node.inputs["Strength"].default_value),
+                    0.85,
+                )
+                changed = True
+        if nodes.get("TJ_CanopyAlbedoContrast_V2") is None:
+            images = [node for node in nodes if node.type == "TEX_IMAGE"]
+            principled = next((node for node in nodes if node.type == "BSDF_PRINCIPLED"), None)
+            if images and principled is not None and "Base Color" in principled.inputs:
+                contrast = nodes.new("ShaderNodeBrightContrast")
+                contrast.name = "TJ_CanopyAlbedoContrast_V2"
+                contrast.inputs["Bright"].default_value = 0.04
+                contrast.inputs["Contrast"].default_value = 0.22
+                for link in list(links):
+                    if link.to_socket == principled.inputs["Base Color"]:
+                        links.new(link.from_socket, contrast.inputs["Color"])
+                        links.remove(link)
+                links.new(contrast.outputs["Color"], principled.inputs["Base Color"])
+                changed = True
+        if changed:
+            _tag(material)
+            touched.append(material.name)
+    return {"materials": touched, "groundTouched": False}
+
+
+def _ecokit_sky_path() -> Path | None:
+    for folder in SKY_SEARCH_DIRS:
+        path = folder / SKY_IMAGE_NAME
+        if path.is_file():
+            return path
+    return None
+
+
+def _paint_readable_clouds(image, width: int, height: int) -> None:
+    """Distinct soft white puffs in the camera-visible mid/upper band."""
+    import random
+
+    from PIL import Image, ImageDraw, ImageFilter
+
+    overlay = Image.new("L", (width, height), 0)
+    draw = ImageDraw.Draw(overlay)
+    rng = random.Random(7)
+    clouds = [
+        (360, 280, 150, 58),
+        (780, 220, 190, 70),
+        (1180, 300, 140, 54),
+        (560, 400, 110, 42),
+    ]
+    for cx, cy, rx, ry in clouds:
+        draw.ellipse((cx - rx, cy - ry, cx + rx, cy + ry), fill=236)
+        for _ in range(3):
+            ox = rng.randint(-rx // 3, rx // 3)
+            oy = rng.randint(-ry // 4, ry // 4)
+            rxx = rng.randint(rx // 3, int(rx * 0.55))
+            ryy = rng.randint(ry // 3, int(ry * 0.55))
+            draw.ellipse(
+                (cx + ox - rxx, cy + oy - ryy, cx + ox + rxx, cy + oy + ryy),
+                fill=210,
+            )
+    overlay = overlay.filter(ImageFilter.GaussianBlur(radius=9))
+    white = Image.new("RGB", (width, height), (252, 250, 245))
+    composited = Image.composite(white, image, overlay)
+    image.paste(composited)
+
+
+def generate_afternoon_sky_texture(path: Path = GENERATED_SKY_PATH) -> Path:
+    """Camera-readable rich blue sky. Prefer EcoKit Sky_World_2, then paint clouds."""
+    from PIL import Image, ImageEnhance
+
+    width, height = 1536, 768
+    source = _ecokit_sky_path()
+    if source is not None:
+        image = Image.open(source).convert("RGB").resize((width, height), Image.Resampling.LANCZOS)
+        image = ImageEnhance.Color(image).enhance(1.18)
+        image = ImageEnhance.Contrast(image).enhance(1.16)
+    else:
+        pixels = []
+        for y in range(height):
+            t = y / (height - 1)
+            r = int(32 + 86 * t)
+            g = int(96 + 70 * t)
+            b = int(186 + 36 * t)
+            pixels.extend([(r, g, b)] * width)
+        image = Image.new("RGB", (width, height))
+        image.putdata(pixels)
+    _paint_readable_clouds(image, width, height)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(path, "PNG")
+    return path
+
+
+def _assign_quad_uvs(mesh) -> None:
+    if mesh.uv_layers.active is None:
+        mesh.uv_layers.new(name="UVMap")
+    uv = mesh.uv_layers.active
+    corners = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
+    for loop in mesh.loops:
+        uv.data[loop.index].uv = corners[loop.vertex_index % 4]
+
+
+def _camera_only_emission(name: str, image):
+    import bpy
+
+    material = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    emission = nodes.new("ShaderNodeEmission")
+    emission.inputs["Strength"].default_value = 1.04
+    tex = nodes.new("ShaderNodeTexImage")
+    tex.image = image
+    tex.interpolation = "Smart"
+    tex.extension = "EXTEND"
+    try:
+        image.colorspace_settings.name = "sRGB"
+    except Exception:
+        pass
+    coords = nodes.new("ShaderNodeTexCoord")
+    links.new(coords.outputs["UV"], tex.inputs["Vector"])
+    light_path = nodes.new("ShaderNodeLightPath")
+    transparent = nodes.new("ShaderNodeBsdfTransparent")
+    mix = nodes.new("ShaderNodeMixShader")
+    links.new(tex.outputs["Color"], emission.inputs["Color"])
+    links.new(light_path.outputs["Is Camera Ray"], mix.inputs["Fac"])
+    links.new(transparent.outputs["BSDF"], mix.inputs[1])
+    links.new(emission.outputs["Emission"], mix.inputs[2])
+    links.new(mix.outputs["Shader"], output.inputs["Surface"])
+    if hasattr(material, "shadow_method"):
+        material.shadow_method = "NONE"
+    _tag(material)
+    return material
+
+
+def install_camera_sky_card(scene) -> dict:
+    """Far-field UV-mapped sky card so clouds read in the locked-camera gap."""
+    import bpy
+    from mathutils import Vector
+
+    sky_path = generate_afternoon_sky_texture()
+    image = bpy.data.images.load(str(sky_path), check_existing=True)
+    collection = bpy.data.collections.get(SKY_CARD_COLLECTION)
+    if collection is None:
+        collection = bpy.data.collections.new(SKY_CARD_COLLECTION)
+    if collection.name not in scene.collection.children:
+        scene.collection.children.link(collection)
+    existing = bpy.data.objects.get("TJ_AfternoonSkyCard_V2")
+    if existing is not None:
+        bpy.data.objects.remove(existing, do_unlink=True)
+
+    mesh = bpy.data.meshes.new("TJ_AfternoonSkyCard_V2_Mesh")
+    verts = [(-58.0, 0.0, -18.0), (58.0, 0.0, -18.0), (58.0, 0.0, 28.0), (-58.0, 0.0, 28.0)]
+    mesh.from_pydata(verts, [], [(0, 1, 2, 3)])
+    _assign_quad_uvs(mesh)
+    mesh.update()
+    obj = bpy.data.objects.new("TJ_AfternoonSkyCard_V2", mesh)
+    collection.objects.link(obj)
+    obj.location = Vector((0.0, 62.0, 16.5))
+    obj.data.materials.append(_camera_only_emission("TJ_AfternoonSkyCard_Mat_V2", image))
+    obj.visible_shadow = False
+    if hasattr(obj, "visible_diffuse"):
+        obj.visible_diffuse = False
+    if hasattr(obj, "visible_glossy"):
+        obj.visible_glossy = False
+    if hasattr(obj, "visible_transmission"):
+        obj.visible_transmission = False
+    _tag(obj)
+    _tag(mesh)
+    return {
+        "applied": True,
+        "reused": False,
+        "path": str(sky_path),
+        "location": [0.0, 62.0, 16.5],
+        "hasUvMap": True,
+        "cameraOnly": True,
+        "sourceSky": SKY_IMAGE_NAME,
+    }
+
+
+def make_canopy_leaf_sprite(collection, name, location, material, rng, scale: float):
+    """Camera-facing Corylus alpha card. Canopy only — never ground."""
+    import bpy
+    from mathutils import Euler, Vector
+
+    width = rng.uniform(0.62, 1.05) * scale
+    height = rng.uniform(0.78, 1.35) * scale
+    verts = [
+        (-width * 0.5, 0.0, 0.0),
+        (width * 0.5, 0.0, 0.0),
+        (width * 0.5, 0.0, height),
+        (-width * 0.5, 0.0, height),
+    ]
+    mesh = bpy.data.meshes.new(name + "_Mesh")
+    mesh.from_pydata(verts, [], [(0, 1, 2, 3)])
+    _assign_quad_uvs(mesh)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.location = Vector((location[0], location[1], location[2]))
+    obj.rotation_euler = Euler(
+        (rng.uniform(-0.35, 0.35), rng.uniform(-0.22, 0.22), rng.uniform(-0.85, 0.85))
+    )
+    mesh.materials.append(material)
+    _tag(mesh)
+    _tag(obj)
+    return obj
+
+
+def scatter_canopy_leaf_cards(scene) -> dict:
+    """Non-destructive leaf-card overlays on Tree_* canopies only."""
+    import random
+
+    import bpy
+    from mathutils import Vector
+
+    collection = bpy.data.collections.get(CANOPY_LEAF_COLLECTION)
+    if collection is None:
+        collection = bpy.data.collections.new(CANOPY_LEAF_COLLECTION)
+    if collection.name not in scene.collection.children:
+        scene.collection.children.link(collection)
+    for old in list(collection.objects):
+        if str(old.name).startswith("TJ_CanopyLeaf_") or str(old.name).startswith("TJ_CanopySprite_"):
+            bpy.data.objects.remove(old, do_unlink=True)
+    leaf_mat = make_foliage_material(
+        "TJ_CanopyLeafDetail_Corylus_V2",
+        leaf_albedo_path(),
+        LEAF_NORMAL,
+        0.20,
+        clip=True,
+    )
+    rng = random.Random(9103)
+    ovate = 0
+    sprites = 0
+    trees = []
+    for obj in scene.objects:
+        if obj.type != "MESH" or not obj.name.startswith("Tree_"):
+            continue
+        if obj.hide_render:
+            continue
+        y = float(obj.location.y)
+        if y < -2.0 or y >= 18.0:
+            continue
+        trees.append(obj)
+    for tree in trees:
+        corners = [tree.matrix_world @ Vector(corner) for corner in tree.bound_box]
+        xs = [c.x for c in corners]
+        ys = [c.y for c in corners]
+        zs = [c.z for c in corners]
+        z_min, z_max = min(zs), max(zs)
+        if z_max < 3.2:
+            continue
+        near = (min(ys) + max(ys)) * 0.5 < 10.0
+        ovate_count = 18 if near else 12
+        sprite_count = 14 if near else 8
+        y_cam = min(ys) + (max(ys) - min(ys)) * 0.35
+        for index in range(ovate_count):
+            lx = rng.uniform(min(xs), max(xs))
+            ly = rng.uniform(min(ys), y_cam + (max(ys) - min(ys)) * 0.25)
+            lz = rng.uniform(max(z_min + (z_max - z_min) * 0.58, 3.6), z_max * 0.99)
+            leaf = make_ovate_leaf(
+                collection,
+                f"TJ_CanopyLeaf_{tree.name}_{index:02d}",
+                (lx, ly, lz),
+                leaf_mat,
+                rng,
+            )
+            leaf.scale = tuple(float(v) * rng.uniform(3.2, 5.4) for v in leaf.scale)
+            leaf.rotation_euler[0] = rng.uniform(-0.95, 0.95)
+            leaf["tj_feature"] = FEATURE
+            ovate += 1
+        for index in range(sprite_count):
+            lx = rng.uniform(min(xs), max(xs))
+            ly = rng.uniform(min(ys), y_cam)
+            lz = rng.uniform(max(z_min + (z_max - z_min) * 0.62, 4.0), z_max * 0.99)
+            sprite = make_canopy_leaf_sprite(
+                collection,
+                f"TJ_CanopySprite_{tree.name}_{index:02d}",
+                (lx, ly, lz),
+                leaf_mat,
+                rng,
+                scale=rng.uniform(1.6, 2.8),
+            )
+            sprite["tj_feature"] = FEATURE
+            sprites += 1
+    return {
+        "trees": len(trees),
+        "leaves": ovate,
+        "sprites": sprites,
+        "groundTouched": False,
     }
 
 
@@ -419,12 +745,14 @@ def apply_sunny_afternoon_tree_detail(scene) -> dict:
     material_lock = verify_material_lighting_lock(scene)
     cycles = apply_cycles_quality(scene)
     sky = install_camera_visible_afternoon_sky(scene)
+    sky_card = install_camera_sky_card(scene)
     haze = clear_haze(scene)
     lights = retune_afternoon_lights(scene)
     scene.view_settings.exposure = AFTERNOON_EXPOSURE
     scene.view_settings.gamma = LOCKED_MATERIAL_LIGHTING["gamma"]
     scene.view_settings.view_transform = LOCKED_MATERIAL_LIGHTING["viewTransform"]
     canopy = lift_canopy_detail(scene)
+    canopy_leaves = scatter_canopy_leaf_cards(scene)
     bark = lift_bark_readability()
     try:
         material_lock_after = verify_material_lighting_lock(scene)
@@ -445,10 +773,12 @@ def apply_sunny_afternoon_tree_detail(scene) -> dict:
         "materialLightingLock": material_lock_after,
         "cycles": cycles,
         "sky": sky,
+        "skyCard": sky_card,
         "haze": haze,
         "lights": lights,
         "afternoonExposure": AFTERNOON_EXPOSURE,
         "canopy": canopy,
+        "canopyLeaves": canopy_leaves,
         "bark": bark,
         "productionCamera": camera,
         "groundArchitectureChanged": False,

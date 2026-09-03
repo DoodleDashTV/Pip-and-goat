@@ -49,7 +49,7 @@ def parse_args():
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--samples", type=int, default=24)
     parser.add_argument("--bark-kind", default="tilia")
-    parser.add_argument("--proof-name", default="FOREST_SUNNY_AFTERNOON_TREE_DETAIL_PROOF_V1.png")
+    parser.add_argument("--proof-name", default="FOREST_SUNNY_AFTERNOON_TREE_DETAIL_PROOF_V3.png")
     return parser.parse_args(raw)
 
 
