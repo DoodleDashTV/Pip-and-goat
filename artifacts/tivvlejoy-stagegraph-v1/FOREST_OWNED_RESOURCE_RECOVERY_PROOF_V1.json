@@ -1,0 +1,218 @@
+{
+  "cameraChanged": false,
+  "cinematicLightingChanged": false,
+  "composition": {
+    "cameraLensMm": 42.0,
+    "cameraLocation": [
+      0.0,
+      -12.5,
+      2.15
+    ],
+    "cameraLookAt": [
+      0.0,
+      9.5,
+      2.6
+    ],
+    "fillLocation": [
+      0.0,
+      -4.0,
+      8.0
+    ],
+    "placed": {
+      "bushes": 24,
+      "fallenLeaves": 65,
+      "ferns": 28,
+      "floral": 16,
+      "grass": 70,
+      "trees": 14
+    },
+    "sceneLayoutUnchanged": true,
+    "seed": 7301,
+    "sunRotationDeg": [
+      58.0,
+      -8.0,
+      -42.0
+    ]
+  },
+  "device": "CPU",
+  "lightingChanged": false,
+  "lookdev": {
+    "barkTexture": {
+      "found": true,
+      "height": 2048,
+      "localContrast8": 3.7,
+      "lowContrast": true,
+      "max": 178,
+      "mean": 150.8,
+      "min": 116,
+      "narrowRange": true,
+      "source": "premeasured_ecokit",
+      "std": 10.8,
+      "uniqueValues": 63,
+      "width": 2048
+    },
+    "cameraChanged": false,
+    "feature": "forest_lookdev_isolation_v1",
+    "productionGeometryChanged": false,
+    "purchasedAssetsPreserved": true,
+    "schema": "TIVVLEJOY_FOREST_LOOKDEV_ISOLATION_GATE_V1",
+    "studio": {
+      "exposure": 0.0,
+      "fillEnergy": 70.0,
+      "keyEnergy": 420.0,
+      "rimEnergy": 110.0,
+      "worldStrength": 0.14
+    },
+    "subjects": {
+      "camera": "TJ_LookdevIsolation_Camera",
+      "fallenLeavesOnPatch": 36,
+      "fallenSources": 65,
+      "origin": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "placed": {
+        "bush": "TJ_LookdevBush",
+        "flower": "TJ_LookdevFlower",
+        "grass": "TJ_LookdevGrass",
+        "ground": "TJ_LookdevGroundPatch",
+        "leaf": "TJ_LookdevLeaf",
+        "trunk": "TJ_LookdevTrunk"
+      },
+      "sourcesFound": {
+        "bush": "Bushes_1_003.001",
+        "flower": "Floral_0_011.001",
+        "grass": "Grass_0_008.001",
+        "ground_mat": "TJ_VendorGround_Mat",
+        "leaf": "Fern_3_002.001",
+        "moss": null,
+        "rock": null,
+        "tree": "Tree_1_004.001",
+        "trunk": "Tree_1_004.001"
+      }
+    }
+  },
+  "paidCreateCount": 0,
+  "paidSpendUsd": 0,
+  "placed": {
+    "bushes": 24,
+    "fallenLeaves": 65,
+    "ferns": 28,
+    "floral": 16,
+    "grass": 70,
+    "trees": 14
+  },
+  "productionCamera": {
+    "cameraChanged": false,
+    "lensMm": 42.0,
+    "location": [
+      0.0,
+      -12.5,
+      2.15
+    ]
+  },
+  "productionGeometryChanged": false,
+  "purchasedAssetsPreserved": true,
+  "recovery": {
+    "alphaHardened": 0,
+    "applied": true,
+    "barkSource": "/tmp/tivvlejoy-owned-recovery/botaniq/botaniq_full/textures/bq_Bark_Tilia-europaea_Diffuse.jpg",
+    "blocked": false,
+    "bushSource": "bq_Shrub_Corylus-avellana_A_spring-summer.blend",
+    "cameraChanged": false,
+    "feature": "forest_owned_resource_recovery_v1",
+    "fnkitInspected": {
+      "leafAlbedo": true,
+      "leafOpacity": true,
+      "trunkAlbedo": true
+    },
+    "grassFlowerSource": [
+      "bq_Grass_Carex-oshimensis_A_spring.blend",
+      "bq_Plant_Dryopteris-carthusiana_A_spring-summer-autumn.blend",
+      "bq_Flowers_Diffuse.png"
+    ],
+    "groundLayers": [
+      "soil_loose",
+      "fallen_leaves",
+      "fallen_needles",
+      "moss"
+    ],
+    "imagesRemapped": 2,
+    "leafSource": "bq_Leaf_Corylus-avellana_Diffuse_rgba.png",
+    "lightingChanged": false,
+    "missing": [],
+    "productionGeometryChanged": false,
+    "purchasedAssetsPreserved": true,
+    "schema": "TIVVLEJOY_FOREST_OWNED_RESOURCE_RECOVERY_APPLY_V1",
+    "subjects": {
+      "bush": "TJ_LookdevBush",
+      "fern": "TJ_LookdevFlower",
+      "flowerCard": "TJ_LookdevFlowerCard",
+      "grass": "TJ_LookdevGrass",
+      "ground": "TJ_LookdevGroundPatch",
+      "leaf": "TJ_LookdevLeaf",
+      "leafCross": "TJ_LookdevLeaf_B",
+      "rock": null,
+      "trunk": "TJ_LookdevTrunk"
+    },
+    "waterChanged": false
+  },
+  "result": "RENDERED",
+  "samples": 24,
+  "schema": "TIVVLEJOY_FOREST_OWNED_RESOURCE_RECOVERY_PROOF_V1",
+  "stills": {
+    "LOOKDEV_BARK_OWNED_V1": {
+      "bytes": 613955,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_BARK_OWNED_V1.png",
+      "seconds": 6.18,
+      "sha256": "2bac5bd7005610058d2044a7e2630cbf4373841879565803e1779c4e4268d6e0"
+    },
+    "LOOKDEV_BUSH_OWNED_V1": {
+      "bytes": 662592,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_BUSH_OWNED_V1.png",
+      "seconds": 4.91,
+      "sha256": "342717c3915ba68a7977c2ddc024dbf4cab7b8760e08c6e27fee1df0861af9e9"
+    },
+    "LOOKDEV_GRASS_FLOWER_OWNED_V1": {
+      "bytes": 1340234,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_GRASS_FLOWER_OWNED_V1.png",
+      "seconds": 17.18,
+      "sha256": "a63a2de2f219e7e1d79e6ce7cdae5d9563af0cb3ee7e662de40569349bbbae90"
+    },
+    "LOOKDEV_GROUND_OWNED_V1": {
+      "bytes": 982919,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_GROUND_OWNED_V1.png",
+      "seconds": 6.5,
+      "sha256": "29481215fd9ae1ade2a83a1eeb099340b0d8c94f73612274e4675bc4f058a1bb"
+    },
+    "LOOKDEV_LEAF_OWNED_V1": {
+      "bytes": 469110,
+      "dimensions": [
+        960,
+        720
+      ],
+      "path": "/workspace/artifacts/tivvlejoy-stagegraph-v1/LOOKDEV_LEAF_OWNED_V1.png",
+      "seconds": 3.37,
+      "sha256": "bbf79409d8a90e68155dd504f84dfff4161dba0da0a627060d5d985e7e2912af"
+    }
+  },
+  "visualApproval": false,
+  "waterChanged": false
+}
