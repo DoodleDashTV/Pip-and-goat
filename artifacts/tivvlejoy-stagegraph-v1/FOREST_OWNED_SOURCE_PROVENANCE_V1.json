@@ -65,10 +65,10 @@
         "bq_Rock_Granite-brown_Diffuse.jpg"
       ],
       "productionMaterial": "TJ_ProdGround_SoilLitterMoss_V1",
-      "productionObject": "TJ_ProdForestFloor",
-      "modification": "layered world-space mix; vendor solid-color plane hidden",
+      "productionObject": "TJ_VendorGround",
+      "modification": "in-place subdivided world-metre UVs + macro Position noise + physical litter/moss/rock carpet; atmosphere volume bottom lifted off z=0",
       "isolatedStatus": "PASS",
-      "cameraStatus": "FAIL_SOLID_COLOR_AT_LOCKED_CAMERA"
+      "cameraStatus": "PENDING_V2_PROOF"
     },
     {
       "role": "backgroundCards",

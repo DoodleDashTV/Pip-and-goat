@@ -60,5 +60,5 @@ Forbidden unless the current prompt explicitly authorizes a CREATE. Night-shift 
 |---|---|---|
 | Vertical bark streaks | Square-atlas UVs + 1:4 Tilia | Cylindrical unwrap, physical V=3.4 m |
 | Dark leaf rectangles | Opaque studio-black treated as alpha | `ensure_cutout_png` then CLIP |
-| Isolated ground good, camera terracotta | Vendor `TJ_VendorGround_Mat` still visible | Hide vendor plane; overlay `TJ_ProdForestFloor` |
+| Isolated ground good, camera terracotta | Vendor solid color, restore un-hide, or high-frequency albedo denoised at 42 mm | In-place subdivided UV floor on `TJ_VendorGround` + physical litter carpet. Do not repeat slot-remap / overlay. |
 | Linked Botaniq nodes missing | Addon groups not present | Local Principled rebuild |

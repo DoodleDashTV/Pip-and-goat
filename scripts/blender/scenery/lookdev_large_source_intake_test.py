@@ -7,6 +7,7 @@ import zipfile
 from pathlib import Path
 
 from lookdev_large_source_intake import (
+    extract_decision,
     extract_verified_members,
     inspect_zip_integrity,
     lookdev_should_extract_member,
@@ -36,6 +37,40 @@ def test_lookdev_refuses_scripts_and_dumps():
         1415 * 1024 * 1024,
         'mountains_3dt',
     ) is True
+
+
+def test_library_materials_has_explicit_cap():
+    allowed = extract_decision("bq_Library_Materials.blend", 180 * 1024 * 1024, "botaniq_full")
+    assert allowed["allow"] is True
+    assert allowed["required"] is True
+    denied = extract_decision("bq_Library_Materials.blend", 500 * 1024 * 1024, "botaniq_full")
+    assert denied["allow"] is False
+    assert denied["required"] is True
+    assert denied["reason"].startswith("exceeds_configured_cap")
+
+
+def test_required_blend_skip_is_explicit_error(tmp_path: Path):
+    import lookdev_large_source_intake as intake
+
+    previous = intake.LOOKDEV_VERIFIED_BLEND_MAX_BYTES["bq_library_materials.blend"]
+    intake.LOOKDEV_VERIFIED_BLEND_MAX_BYTES["bq_library_materials.blend"] = 32
+    try:
+        tmp_path.mkdir(parents=True, exist_ok=True)
+        zip_path = tmp_path / "lib.zip"
+        with zipfile.ZipFile(zip_path, "w") as archive:
+            archive.writestr("bq_Library_Materials.blend", b"BLENDER" * 64)
+        receipt = extract_verified_members(
+            zip_path,
+            tmp_path / "out",
+            ("bq_Library_Materials.blend",),
+            "SRC_BOTANIQ_FULL_7_2_0",
+            "botaniq_full",
+        )
+        assert receipt["status"] == "REQUIRED_MEMBER_SKIPPED"
+        assert receipt["error"].startswith("REQUIRED_MEMBER_SKIPPED:")
+        assert receipt["skipped"][0]["required"] is True
+    finally:
+        intake.LOOKDEV_VERIFIED_BLEND_MAX_BYTES["bq_library_materials.blend"] = previous
 
 
 def test_safe_member_path_blocks_traversal(tmp_path: Path):
@@ -81,9 +116,11 @@ if __name__ == '__main__':
     from tempfile import TemporaryDirectory
     test_production_cap_still_blocks_unknown_large_blends()
     test_lookdev_refuses_scripts_and_dumps()
+    test_library_materials_has_explicit_cap()
     with TemporaryDirectory() as tmp:
         root = Path(tmp)
         test_safe_member_path_blocks_traversal(root)
+        test_required_blend_skip_is_explicit_error(root / "required")
         test_extract_writes_provenance_and_skips_bad_crc(root / 'extract')
         test_bad_zip_fails_integrity(root / 'bad')
     print('lookdev_large_source_intake_test PASS')

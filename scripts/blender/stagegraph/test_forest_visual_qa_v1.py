@@ -42,4 +42,6 @@ class ForestVisualQaTest(unittest.TestCase):
         self.assertIn("artisticPassForbidden", source)
         self.assertIn("UNEXPECTED_EMISSION", source)
         self.assertIn("DATA_MAP_NOT_NONCOLOR", source)
+        self.assertIn("VENDOR_GROUND_STILL_SOLID_COLOR", source)
+        self.assertIn("ATMOSPHERE_SHARES_GROUND_PLANE", source)
         self.assertNotIn("finalClassification\": \"PASS\"", source)

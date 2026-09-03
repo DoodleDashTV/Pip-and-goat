@@ -334,17 +334,19 @@ def make_ground_material():
     links = material.node_tree.links
     shader, _output = _principled(nodes, links)
     geom = nodes.new("ShaderNodeNewGeometry")
-    # World metres, not object-local: the production ground is a scaled unit
-    # plane, so Object coords collapse the whole forest to one terracotta sample.
+    coord = nodes.new("ShaderNodeTexCoord")
+    # Photo maps use authored world-metre UVs (1 tile ~ 3.2 m). Geometry
+    # Position stays on the noise only: a 32 m single quad + 28-sample denoise
+    # smeared high-frequency Position tiling into a salmon plane at 42 mm.
     soil_map = nodes.new("ShaderNodeMapping")
-    soil_map.inputs["Scale"].default_value = (0.42, 0.42, 0.42)
+    soil_map.inputs["Scale"].default_value = (0.85, 0.85, 0.85)
     litter_map = nodes.new("ShaderNodeMapping")
-    litter_map.inputs["Scale"].default_value = (0.34, 0.34, 0.34)
+    litter_map.inputs["Scale"].default_value = (0.62, 0.62, 0.62)
     litter_map.inputs["Rotation"].default_value = (0.0, 0.0, 0.35)
     moss_map = nodes.new("ShaderNodeMapping")
-    moss_map.inputs["Scale"].default_value = (0.58, 0.58, 0.58)
+    moss_map.inputs["Scale"].default_value = (0.48, 0.48, 0.48)
     for mapping in (soil_map, litter_map, moss_map):
-        links.new(geom.outputs["Position"], mapping.inputs["Vector"])
+        links.new(coord.outputs["UV"], mapping.inputs["Vector"])
     soil = nodes.new("ShaderNodeTexImage")
     soil.image = _load_image(SOIL_ALBEDO if SOIL_ALBEDO.is_file() else SOIL_ROUGH_ALBEDO, "sRGB")
     soil_n = nodes.new("ShaderNodeTexImage")
@@ -369,34 +371,34 @@ def make_ground_material():
     ):
         links.new(mapping.outputs["Vector"], node.inputs["Vector"])
     hsv = nodes.new("ShaderNodeHueSaturation")
-    hsv.inputs["Hue"].default_value = 0.48
-    hsv.inputs["Saturation"].default_value = 0.78
-    hsv.inputs["Value"].default_value = 0.42
+    hsv.inputs["Hue"].default_value = 0.42
+    hsv.inputs["Saturation"].default_value = 0.52
+    hsv.inputs["Value"].default_value = 0.36
     links.new(soil.outputs["Color"], hsv.inputs["Color"])
     soil_grade = _mix_color(nodes, "TJ_SoilGrade")
     fac, a, b = _mix_sockets(soil_grade)
-    fac.default_value = 0.38
+    fac.default_value = 0.46
     links.new(hsv.outputs["Color"], a)
-    b.default_value = (0.16, 0.10, 0.06, 1.0)
+    b.default_value = (0.08, 0.065, 0.04, 1.0)
     base_litter = _mix_color(nodes, "TJ_SoilBaseLitter")
     fac, a, b = _mix_sockets(base_litter)
-    fac.default_value = 0.74
+    fac.default_value = 0.58
     links.new(_mix_out(soil_grade), a)
     links.new(litter.outputs["Color"], b)
     litter_noise = nodes.new("ShaderNodeTexNoise")
-    litter_noise.inputs["Scale"].default_value = 1.05
-    litter_noise.inputs["Detail"].default_value = 8.0
+    litter_noise.inputs["Scale"].default_value = 0.22
+    litter_noise.inputs["Detail"].default_value = 4.0
     moss_noise = nodes.new("ShaderNodeTexNoise")
-    moss_noise.inputs["Scale"].default_value = 1.35
-    moss_noise.inputs["Detail"].default_value = 6.0
+    moss_noise.inputs["Scale"].default_value = 0.18
+    moss_noise.inputs["Detail"].default_value = 3.0
     links.new(geom.outputs["Position"], litter_noise.inputs["Vector"])
     links.new(geom.outputs["Position"], moss_noise.inputs["Vector"])
     litter_ramp = nodes.new("ShaderNodeValToRGB")
-    litter_ramp.color_ramp.elements[0].position = 0.28
-    litter_ramp.color_ramp.elements[1].position = 0.58
+    litter_ramp.color_ramp.elements[0].position = 0.40
+    litter_ramp.color_ramp.elements[1].position = 0.56
     moss_ramp = nodes.new("ShaderNodeValToRGB")
-    moss_ramp.color_ramp.elements[0].position = 0.40
-    moss_ramp.color_ramp.elements[1].position = 0.68
+    moss_ramp.color_ramp.elements[0].position = 0.48
+    moss_ramp.color_ramp.elements[1].position = 0.63
     links.new(litter_noise.outputs["Fac"], litter_ramp.inputs["Fac"])
     links.new(moss_noise.outputs["Fac"], moss_ramp.inputs["Fac"])
     mix_needles = _mix_color(nodes, "TJ_Needles")
@@ -571,8 +573,9 @@ def make_decal(collection, name, location, rotation_z, scale, material):
     obj.scale = scale
     mesh.materials.append(material)
     write_card_uvs(obj)
-    _tag(mesh)
-    _tag(obj)
+    isolation = collection.name == COLLECTION_NAME
+    _tag(mesh, isolation=isolation)
+    _tag(obj, isolation=isolation)
     return obj
 
 
@@ -594,8 +597,9 @@ def make_card(collection, name, location, rotation, scale, material):
     obj.scale = scale
     mesh.materials.append(material)
     write_card_uvs(obj)
-    _tag(mesh)
-    _tag(obj)
+    isolation = collection.name == COLLECTION_NAME
+    _tag(mesh, isolation=isolation)
+    _tag(obj, isolation=isolation)
     return obj
 
 
@@ -621,8 +625,9 @@ def make_rock(collection, name, location, scale, material):
     obj.location = Vector(location)
     obj.scale = scale
     mesh.materials.append(material)
-    _tag(mesh)
-    _tag(obj)
+    isolation = collection.name == COLLECTION_NAME
+    _tag(mesh, isolation=isolation)
+    _tag(obj, isolation=isolation)
     return obj
 
 
@@ -771,7 +776,40 @@ def replace_ecokit_vegetation(root, shrub, grass, fern, leaf_mat, flower_mat, li
             rotation_z=obj.rotation_euler.z + rng.uniform(-0.4, 0.4),
         )
         replaced[kind] += 1
-    return {"replaced": replaced, "backgroundPreserved": preserved}
+    clustered = cluster_understory_near_trees(root, shrub, grass, fern, rng)
+    return {"replaced": replaced, "backgroundPreserved": preserved, "clustered": clustered}
+
+
+def cluster_understory_near_trees(root, shrub, grass, fern, rng) -> dict:
+    """Ecological clumps at tree bases instead of even leftover scatter."""
+    extra = {"bushes": 0, "grass": 0, "ferns": 0}
+    trees = [
+        obj
+        for obj in root.objects
+        if obj.type == "MESH" and obj.name.startswith("Tree_") and float(obj.location.y) < BACKGROUND_Y
+    ]
+    for tree in trees:
+        tx, ty = float(tree.location.x), float(tree.location.y)
+        for kind, source, count in (
+            ("grass", grass, 2),
+            ("ferns", fern, 1),
+            ("bushes", shrub, 1 if rng.random() < 0.4 else 0),
+        ):
+            if source is None:
+                continue
+            for _ in range(count):
+                angle = rng.uniform(-math.pi, math.pi)
+                dist = rng.uniform(0.55, 1.9)
+                _instance_like(
+                    source,
+                    root,
+                    (tx + math.cos(angle) * dist, ty + math.sin(angle) * dist, 0.0),
+                    f"TJ_Prod{kind.title()}_Cluster_{extra[kind]:02d}",
+                    scale=tuple(float(v) * rng.uniform(0.55, 1.2) for v in source.scale),
+                    rotation_z=rng.uniform(-3.1, 3.1),
+                )
+                extra[kind] += 1
+    return extra
 
 
 def make_moss_mound(collection, name, location, scale, material):
@@ -794,8 +832,9 @@ def make_moss_mound(collection, name, location, scale, material):
     obj.location = Vector(location)
     obj.scale = scale
     mesh.materials.append(material)
-    _tag(mesh)
-    _tag(obj)
+    isolation = collection.name == COLLECTION_NAME
+    _tag(mesh, isolation=isolation)
+    _tag(obj, isolation=isolation)
     return obj
 
 
@@ -917,6 +956,7 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
 
     ground = bpy.data.objects.get("TJ_LookdevGroundPatch")
     if ground is not None:
+        write_world_metre_uvs(ground)
         if ground.data.materials:
             ground.data.materials[0] = mats["ground"]
         else:
@@ -939,85 +979,272 @@ def apply_lookdev_subjects(scene, mats, sources) -> dict:
     }
 
 
-def install_production_forest_floor(collection, material):
-    """Hide the solid-color vendor plane and overlay a production floor mesh.
+WORLD_UV_METRES = 3.2
+ATMOSPHERE_BOTTOM_Z = 0.28
+GROUND_EXTENT = (-16.0, 16.0, -5.0, 32.0)
 
-    Remapping TJ_VendorGround_Mat failed three times at the locked camera.
-    A new mesh at z=0.012 keeps the same extent without changing terrain
-    topology, water, camera, or lighting.
+
+def write_world_metre_uvs(obj, metres_per_tile: float = WORLD_UV_METRES) -> int:
+    """Author UVs from world XY so albedo density is independent of object scale."""
+    from mathutils import Vector
+
+    mesh = obj.data
+    if mesh.uv_layers.active is None:
+        mesh.uv_layers.new(name="TJ_WorldMetres")
+    uv = mesh.uv_layers.active
+    matrix = obj.matrix_world
+    written = 0
+    for loop in mesh.loops:
+        co = matrix @ Vector(mesh.vertices[loop.vertex_index].co)
+        uv.data[loop.index].uv = (co.x / metres_per_tile, co.y / metres_per_tile)
+        written += 1
+    return written
+
+
+def rebuild_vendor_ground_subdivided(obj, cols: int = 20, rows: int = 24):
+    """Replace the 4-vert vendor plane with a UV grid. Same XY extent, z≈0.
+
+    This is not a terrain-topology redesign: the silhouette stays a flat
+    forest floor. Subdivision exists so UVs, normals, and grazing light
+    have more than one sample.
     """
+    x0, x1, y0, y1 = GROUND_EXTENT
+    verts = []
+    faces = []
+    for j in range(rows + 1):
+        y = y0 + (y1 - y0) * (j / rows)
+        for i in range(cols + 1):
+            x = x0 + (x1 - x0) * (i / cols)
+            z = 0.008 * math.sin(x * 1.7) * math.cos(y * 1.25)
+            verts.append((x, y, z))
+    for j in range(rows):
+        for i in range(cols):
+            a = j * (cols + 1) + i
+            faces.append((a, a + 1, a + cols + 2, a + cols + 1))
+    mesh = obj.data
+    if hasattr(mesh, "clear_geometry"):
+        mesh.clear_geometry()
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj.location = (0.0, 0.0, 0.0)
+    obj.scale = (1.0, 1.0, 1.0)
+    obj.rotation_euler = (0.0, 0.0, 0.0)
+    write_world_metre_uvs(obj)
+    _tag(mesh, isolation=False)
+    _tag(obj, isolation=False)
+    return {"vertices": len(verts), "faces": len(faces), "cols": cols, "rows": rows}
+
+
+def lift_atmosphere_volume_bottom(z_min: float = ATMOSPHERE_BOTTOM_Z) -> dict:
+    """Keep volume density; stop the box sharing the z=0 ground plane."""
+    import bpy
+
+    obj = bpy.data.objects.get("TJ_Atmosphere")
+    if obj is None or obj.type != "MESH":
+        return {"lifted": False}
+    changed = 0
+    for vert in obj.data.vertices:
+        if vert.co.z < 0.05:
+            vert.co.z = float(z_min)
+            changed += 1
+    obj.data.update()
+    return {"lifted": True, "bottomVerts": changed, "zMin": float(z_min)}
+
+
+def assign_object_material(obj, material) -> None:
+    if obj.data.materials:
+        obj.data.materials[0] = material
+    else:
+        obj.data.materials.append(material)
+    if not obj.material_slots:
+        obj.data.materials.append(material)
+    for slot in obj.material_slots:
+        slot.link = "OBJECT"
+        slot.material = material
+    obj.hide_render = False
+    obj.hide_viewport = False
+    try:
+        obj.hide_set(False)
+    except Exception:
+        pass
+
+
+def scatter_camera_footprint_carpet(collection, litter_mat, moss_mat, rock_mat) -> dict:
+    """Physical litter/moss/rock across the locked-camera footprint.
+
+    A shader-only plane denoises to terracotta at 42 mm. Volume that must
+    read as forest floor has to occupy space.
+    """
+    import random
+
+    rng = random.Random(7301)
+    attractors = ((-3.2, 2.4), (2.6, 5.1), (-1.1, 9.0), (3.8, 12.4), (0.2, 0.8))
+    litter = moss = rock = 0
+    for index in range(56):
+        if rng.random() < 0.72:
+            ax, ay = attractors[index % len(attractors)]
+            x = ax + rng.uniform(-1.6, 1.6)
+            y = ay + rng.uniform(-1.4, 1.4)
+        else:
+            x = rng.uniform(-7.5, 7.5)
+            y = rng.uniform(-0.8, 15.5)
+        make_decal(
+            collection,
+            f"TJ_ProdLitterPatch_{index:02d}",
+            (x, y, 0.02),
+            rng.uniform(-3.1, 3.1),
+            (rng.uniform(0.28, 0.62), rng.uniform(0.28, 0.62), 1.0),
+            litter_mat,
+        )
+        litter += 1
+    for index in range(22):
+        ax, ay = attractors[index % len(attractors)]
+        make_moss_mound(
+            collection,
+            f"TJ_ProdMossMound_{index:02d}",
+            (ax + rng.uniform(-1.8, 1.8), ay + rng.uniform(-1.6, 1.6), 0.0),
+            (rng.uniform(0.18, 0.38), rng.uniform(0.18, 0.38), rng.uniform(0.08, 0.16)),
+            moss_mat,
+        )
+        moss += 1
+    for index in range(12):
+        make_rock(
+            collection,
+            f"TJ_ProdStone_{index:02d}",
+            (rng.uniform(-6.5, 6.5), rng.uniform(0.2, 14.0), 0.0),
+            (rng.uniform(0.7, 1.35), rng.uniform(0.6, 1.15), rng.uniform(0.45, 0.9)),
+            rock_mat,
+        )
+        rock += 1
+    return {"litterPatches": litter, "mossMounds": moss, "rocks": rock}
+
+
+def diagnose_camera_floor(scene) -> dict:
+    """Record which render-visible meshes can shade the locked-camera floor."""
+    rows = []
+    for obj in scene.objects:
+        if obj.type != "MESH":
+            continue
+        low = obj.name.lower()
+        groundish = any(token in low for token in ("ground", "floor", "atmosphere", "water", "creek"))
+        dims = [round(float(v), 3) for v in obj.dimensions]
+        large_flat = dims[0] > 8.0 and dims[1] > 8.0 and dims[2] < 1.2
+        if not (groundish or large_flat):
+            continue
+        slots = [slot.material.name if slot.material else None for slot in obj.material_slots]
+        rows.append({
+            "name": obj.name,
+            "hide_render": bool(obj.hide_render),
+            "hide_viewport": bool(obj.hide_viewport),
+            "location": [round(float(v), 4) for v in obj.location],
+            "dimensions": dims,
+            "materials": slots,
+            "verts": len(obj.data.vertices) if obj.data else 0,
+            "tj_feature": obj.get("tj_feature"),
+        })
+    return {
+        "schema": "TIVVLEJOY_CAMERA_FLOOR_DIAGNOSE_V1",
+        "objects": rows,
+        "paidCreateCount": 0,
+    }
+
+
+def install_production_forest_floor(collection, material):
+    """In-place UV floor on TJ_VendorGround. Overlay hide+remap is retired.
+
+    Four prior camera-floor strategies (slot assign, world Position, vendor remap,
+    hide+overlay) still produced a salmon plane. This fifth architecture keeps
+    the approved object, rewrites its mesh/UVs, and leaves it visible.
+    """
+    import bpy
+
+    overlay = bpy.data.objects.get("TJ_ProdForestFloor")
+    if overlay is not None:
+        _hide(overlay)
+
+    vendor = bpy.data.objects.get("TJ_VendorGround")
+    if vendor is None:
+        vendor = install_overlay_floor_fallback(collection, material)
+        return vendor
+
+    rebuild_vendor_ground_subdivided(vendor)
+    assign_object_material(vendor, material)
+    if vendor.name not in collection.objects:
+        collection.objects.link(vendor)
+    _tag(vendor, isolation=False)
+    lift_atmosphere_volume_bottom()
+    return vendor
+
+
+def install_overlay_floor_fallback(collection, material):
+    """Only used when TJ_VendorGround is missing from the scene graph."""
     import bpy
     from mathutils import Vector
 
-    vendor = bpy.data.objects.get("TJ_VendorGround")
-    if vendor is not None:
-        _hide(vendor)
-
     existing = bpy.data.objects.get("TJ_ProdForestFloor")
     if existing is not None:
-        for slot in existing.material_slots:
-            slot.link = "OBJECT"
-            slot.material = material
-        if existing.data.materials:
-            existing.data.materials[0] = material
+        assign_object_material(existing, material)
         existing.hide_render = False
-        existing.hide_viewport = False
-        _tag(existing, isolation=False)
         return existing
-
     mesh = bpy.data.meshes.new("TJ_ProdForestFloor_Mesh")
     mesh.from_pydata(
         [(-16.0, -5.0, 0.0), (16.0, -5.0, 0.0), (16.0, 32.0, 0.0), (-16.0, 32.0, 0.0)],
         [],
         [(0, 1, 2, 3)],
     )
-    if mesh.uv_layers.active is None:
-        mesh.uv_layers.new(name="TJ_ForestFloor")
-    uv = mesh.uv_layers.active
-    world = ((-16.0, -5.0), (16.0, -5.0), (16.0, 32.0), (-16.0, 32.0))
-    for loop in mesh.loops:
-        x, y = world[loop.vertex_index]
-        uv.data[loop.index].uv = (x / 3.2, y / 3.2)
     mesh.update()
     obj = bpy.data.objects.new("TJ_ProdForestFloor", mesh)
     collection.objects.link(obj)
-    obj.location = Vector((0.0, 0.0, 0.012))
+    obj.location = Vector((0.0, 0.0, 0.0))
     mesh.materials.append(material)
+    write_world_metre_uvs(obj)
     _tag(mesh)
     _tag(obj, isolation=False)
     return obj
 
 
 def bind_production_ground(ground, material) -> dict:
-    """Replace the solid vendor groundColor on every user, not just one slot."""
-    import bpy
-
-    vendor = bpy.data.materials.get("TJ_VendorGround_Mat")
-    if vendor is not None and vendor != material:
-        try:
-            vendor.user_remap(material)
-        except Exception:
-            pass
-    if ground.data.materials:
-        ground.data.materials[0] = material
-    else:
-        ground.data.materials.append(material)
-    if not ground.material_slots:
-        ground.data.materials.append(material)
-    for slot in ground.material_slots:
-        slot.link = "OBJECT"
-        slot.material = material
-    ground.hide_render = False
-    ground.hide_viewport = False
-    try:
-        ground.hide_set(False)
-    except Exception:
-        pass
+    """Assign the production floor material. Do not remap the vendor color datablock."""
+    assign_object_material(ground, material)
     return {
         "object": ground.name,
         "material": material.name,
-        "vendorRemapped": bool(vendor is not None and vendor != material),
+        "vendorRemapped": False,
         "slots": [slot.material.name if slot.material else None for slot in ground.material_slots],
+        "verts": len(ground.data.vertices) if ground.data else 0,
+    }
+
+
+def enforce_production_floor(scene, material) -> dict:
+    """Re-assert the in-place floor after lookdev isolate/restore."""
+    import bpy
+
+    root = scene.collection.children.get("TJ_VENDOR_REFERENCE_ROOT") or scene.collection
+    overlay = bpy.data.objects.get("TJ_ProdForestFloor")
+    if overlay is not None:
+        _hide(overlay)
+    vendor = bpy.data.objects.get("TJ_VendorGround")
+    rebuilt = None
+    if vendor is not None:
+        rebuilt = rebuild_vendor_ground_subdivided(vendor)
+        assign_object_material(vendor, material)
+    else:
+        vendor = install_overlay_floor_fallback(root, material)
+    revealed = 0
+    for obj in scene.objects:
+        if obj.get("tj_recovery") == FEATURE and str(obj.name).startswith("TJ_Prod"):
+            obj.hide_render = False
+            obj.hide_viewport = False
+            revealed += 1
+    atmosphere = lift_atmosphere_volume_bottom()
+    return {
+        "floorObject": None if vendor is None else vendor.name,
+        "floorMaterial": material.name if material is not None else None,
+        "rebuilt": rebuilt,
+        "atmosphere": atmosphere,
+        "overlayHidden": overlay is not None,
+        "productionScatterRevealed": revealed,
+        "diagnosis": diagnose_camera_floor(scene),
     }
 
 
@@ -1059,14 +1286,16 @@ def apply_botaniq_production_recovery(scene, mode: str = "both", bark_kind: str 
         floor = install_production_forest_floor(root, mats["ground"])
         if ground is not None:
             bind_production_ground(ground, mats["ground"])
-            _hide(ground)
-        scatter_floor_geometry(root, (0.0, 3.5, 0.0), mats["litter"], mats["moss"], mats["rock"], 22, 10, 6)
+        carpet = scatter_camera_footprint_carpet(root, mats["litter"], mats["moss"], mats["rock"])
         production = {
             "trees": trees,
             "vegetation": veg,
             "ground": ground is not None,
             "productionFloor": None if floor is None else floor.name,
-            "vendorGroundHidden": True,
+            "vendorGroundHidden": False,
+            "floorArchitecture": "in_place_subdivided_uv_plus_physical_carpet",
+            "carpet": carpet,
+            "atmosphere": lift_atmosphere_volume_bottom(),
         }
     if mode in {"lookdev", "both"}:
         lookdev = apply_lookdev_subjects(scene, mats, sources)

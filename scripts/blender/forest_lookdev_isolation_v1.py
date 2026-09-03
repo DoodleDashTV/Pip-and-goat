@@ -392,8 +392,13 @@ def restore_production(scene, isolation: dict) -> None:
 
     for name in isolation.get("hidden") or []:
         obj = scene.objects.get(name) or bpy.data.objects.get(name)
-        if obj is not None:
-            obj.hide_render = False
+        if obj is None:
+            continue
+        # EcoKit cards and other recovery hides must stay hidden. Blindly
+        # restoring every isolate() name re-exposes defective vendor planes.
+        if obj.get("tj_feature") == "forest_botaniq_hidden":
+            continue
+        obj.hide_render = False
     world_name = isolation.get("previousWorld")
     if world_name:
         world = bpy.data.worlds.get(world_name)

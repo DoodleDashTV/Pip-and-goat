@@ -73,12 +73,29 @@ def inspect_scene(scene) -> dict:
             faults.extend(check_material_graph(material))
     floor = bpy.data.objects.get("TJ_ProdForestFloor")
     vendor = bpy.data.objects.get("TJ_VendorGround")
+    vendor_slots = []
+    if vendor is not None:
+        vendor_slots = [slot.material.name if slot.material else None for slot in vendor.material_slots]
+    production_on_vendor = "TJ_ProdGround_SoilLitterMoss_V1" in vendor_slots
+    if vendor is not None and not vendor.hide_render and not production_on_vendor:
+        faults.append("VENDOR_GROUND_STILL_SOLID_COLOR")
+    if vendor is not None and production_on_vendor and len(vendor.data.vertices) < 16:
+        faults.append("VENDOR_GROUND_NOT_SUBDIVIDED")
+    atmosphere = bpy.data.objects.get("TJ_Atmosphere")
+    atmosphere_bottom = None
+    if atmosphere is not None and atmosphere.type == "MESH" and atmosphere.data.vertices:
+        atmosphere_bottom = min(float(v.co.z) for v in atmosphere.data.vertices)
+        if atmosphere_bottom < 0.05:
+            faults.append("ATMOSPHERE_SHARES_GROUND_PLANE")
     return {
         "schema": "TIVVLEJOY_FOREST_VISUAL_QA_V1",
         "feature": FEATURE,
         "faults": faults,
-        "productionFloorPresent": floor is not None and not floor.hide_render,
+        "productionFloorPresent": (vendor is not None and production_on_vendor and not vendor.hide_render)
+        or (floor is not None and not floor.hide_render),
         "vendorGroundHidden": vendor is None or bool(vendor.hide_render),
+        "productionMaterialOnVendor": production_on_vendor,
+        "atmosphereBottomZ": atmosphere_bottom,
         "artisticPassForbidden": True,
         "paidCreateCount": 0,
     }

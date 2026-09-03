@@ -24,7 +24,8 @@ from ecokit_cycles_alpha_v1 import (
 )
 from forest_botaniq_production_recovery_v1 import (
     apply_botaniq_production_recovery,
-    install_production_forest_floor,
+    diagnose_camera_floor,
+    enforce_production_floor,
     missing_owned_paths,
 )
 from forest_lookdev_isolation_v1 import (
@@ -65,6 +66,7 @@ def parse_args():
     parser.add_argument("--bark-kind", default="tilia")
     parser.add_argument("--camera-proof", action="store_true")
     parser.add_argument("--skip-lookdev-stills", action="store_true")
+    parser.add_argument("--diagnose-floor", action="store_true")
     return parser.parse_args(raw)
 
 
@@ -264,27 +266,32 @@ def main():
             obj.hide_render = True
     bpy = __import__("bpy")
     ground_mat = bpy.data.materials.get("TJ_ProdGround_SoilLitterMoss_V1")
-    root = scene.collection.children.get("TJ_VENDOR_REFERENCE_ROOT")
-    if ground_mat is not None and root is not None:
-        install_production_forest_floor(root, ground_mat)
-    vendor = scene.objects.get("TJ_VendorGround") or bpy.data.objects.get("TJ_VendorGround")
-    if vendor is not None:
-        vendor.hide_render = True
-        vendor.hide_viewport = True
-    floor = scene.objects.get("TJ_ProdForestFloor") or bpy.data.objects.get("TJ_ProdForestFloor")
-    if floor is not None:
-        floor.hide_render = False
-        floor.hide_viewport = False
+    floor_enforce = None
+    if ground_mat is not None:
+        floor_enforce = enforce_production_floor(scene, ground_mat)
     locks_after = verify_production_camera(scene)
     if scene.camera is None or scene.camera.name != camera.name:
         scene.camera = camera
 
     camera_proof = None
-    if args.camera_proof:
+    floor_diagnose = None
+    if args.diagnose_floor or args.camera_proof:
+        floor_diagnose = diagnose_camera_floor(scene)
+        (out_dir / "FOREST_CAMERA_FLOOR_DIAGNOSE_V1.json").write_text(
+            json.dumps(floor_diagnose, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+    if args.diagnose_floor:
+        scene.render.resolution_x = 640
+        scene.render.resolution_y = 360
+        scene.cycles.samples = 6
+        scene.cycles.use_denoising = False
+        camera_proof = render_path(scene, out_dir / "FOREST_CAMERA_FLOOR_DIAGNOSE_V1.png")
+        camera_proof["kind"] = "diagnose"
+    elif args.camera_proof:
         scene.render.resolution_x = 1280
         scene.render.resolution_y = 720
         scene.cycles.samples = max(int(args.samples), 28)
-        camera_proof = render_path(scene, out_dir / "FOREST_MATERIAL_RECOVERY_CAMERA_PROOF_V1.png")
+        camera_proof = render_path(scene, out_dir / "FOREST_MATERIAL_RECOVERY_CAMERA_PROOF_V2.png")
 
     receipt = {
         "schema": "TIVVLEJOY_BOTANIQ_FOREST_PRODUCTION_RECOVERY_PROOF_V1",
@@ -300,6 +307,8 @@ def main():
         "lookdevIsolation": lookdev,
         "lookdevRecovery": recovery,
         "stills": stills,
+        "floorEnforce": floor_enforce,
+        "floorDiagnose": floor_diagnose,
         "cameraProof": camera_proof,
         "visualApproval": False,
         "cameraChanged": False,

@@ -35,10 +35,21 @@ LOOKDEV_VERIFIED_BLEND_MAX_BYTES = {
     "grassy.blend": 700 * 1024 * 1024,
     "meadow.blend": 700 * 1024 * 1024,
     "3dt_pack_mountains.blend": 1600 * 1024 * 1024,
+    # Vendor library graph. Must not vanish behind the generic 100 MiB bq_ cap.
+    "bq_library_materials.blend": 400 * 1024 * 1024,
 }
 
 # Individual Botaniq Full library assets are native .blend files under 80 MiB.
 LOOKDEV_BOTANIQ_MEMBER_MAX_BYTES = 100 * 1024 * 1024
+
+# Explicit requested members that must never be dropped without an error.
+REQUIRED_PURCHASED_BLENDS = frozenset({
+    "flora_mat&gn&models.blend",
+    "rock_models.blend",
+    "stylized_forest_nature_kit.blend",
+    "3dt_pack_mountains.blend",
+    "bq_library_materials.blend",
+})
 
 BOTANIQ_QUALITY_MEMBERS = (
     "botaniq_full/blends/models/deciduous/bq_Tree_Salix-babylonica_C_summer.blend",
@@ -166,37 +177,51 @@ def safe_member_path(destination: Path, member: str) -> Path | None:
     return target
 
 
-def lookdev_should_extract_member(filename: str, file_size: int, role: str) -> bool:
-    """Allow verified large originals for local lookdev only."""
+def extract_decision(filename: str, file_size: int, role: str) -> dict:
+    """Allow/deny plus an explicit reason. Never silently drop a required blend."""
     rel = Path(str(filename).replace("\\", "/"))
-    if rel.is_absolute() or ".." in rel.parts:
-        return False
     name = rel.name.lower()
     ext = Path(name).suffix.lower()
     size = int(file_size or 0)
+    if rel.is_absolute() or ".." in rel.parts:
+        return {"allow": False, "reason": "unsafe_path", "required": name in REQUIRED_PURCHASED_BLENDS}
+    required = name in REQUIRED_PURCHASED_BLENDS
     if ext in BLOCKED_EXTRACT_EXTS:
-        return False
+        return {"allow": False, "reason": "blocked_extension", "required": required}
     if ext not in SUPPORT_EXTS:
-        return False
+        return {"allow": False, "reason": "unsupported_extension", "required": required}
     if ext == ".obj" and is_dump_name(filename):
-        return False
+        return {"allow": False, "reason": "dump_obj", "required": required}
     if ext == ".blend":
         cap = LOOKDEV_VERIFIED_BLEND_MAX_BYTES.get(name)
-        if cap is not None and 0 < size <= cap:
-            return True
-        if name.startswith("bq_") and 0 < size <= LOOKDEV_BOTANIQ_MEMBER_MAX_BYTES:
-            return True
-        return False
+        if cap is not None:
+            if 0 < size <= cap:
+                return {"allow": True, "reason": "verified_blend", "required": required, "cap": cap}
+            return {"allow": False, "reason": f"exceeds_configured_cap:{cap}", "required": required, "cap": cap}
+        if name.startswith("bq_"):
+            cap = LOOKDEV_BOTANIQ_MEMBER_MAX_BYTES
+            if 0 < size <= cap:
+                return {"allow": True, "reason": "botaniq_member", "required": required, "cap": cap}
+            return {"allow": False, "reason": f"exceeds_configured_cap:{cap}", "required": required, "cap": cap}
+        return {"allow": False, "reason": "blend_not_allowlisted", "required": required}
     if ext == ".hdr" and role == "sky_hdri":
-        return 0 < size <= LOOKDEV_HDR_MAX_BYTES
+        if 0 < size <= LOOKDEV_HDR_MAX_BYTES:
+            return {"allow": True, "reason": "hdr_allowlisted", "required": required}
+        return {"allow": False, "reason": f"exceeds_configured_cap:{LOOKDEV_HDR_MAX_BYTES}", "required": required}
     if ext == ".tga" and role == "forest_nature":
-        return 0 < size <= LOOKDEV_TGA_MAX_BYTES
-    # Cabin maps and other modest support files stay under production image caps.
+        if 0 < size <= LOOKDEV_TGA_MAX_BYTES:
+            return {"allow": True, "reason": "tga_allowlisted", "required": required}
+        return {"allow": False, "reason": f"exceeds_configured_cap:{LOOKDEV_TGA_MAX_BYTES}", "required": required}
     if ext in {".png", ".jpg", ".jpeg"} and size <= 20 * 1024 * 1024:
-        return True
+        return {"allow": True, "reason": "image_under_cap", "required": required}
     if ext in {".fbx", ".glb", ".gltf"} and size <= 48 * 1024 * 1024:
-        return True
-    return False
+        return {"allow": True, "reason": "mesh_under_cap", "required": required}
+    return {"allow": False, "reason": "not_allowlisted", "required": required}
+
+
+def lookdev_should_extract_member(filename: str, file_size: int, role: str) -> bool:
+    """Allow verified large originals for local lookdev only."""
+    return bool(extract_decision(filename, file_size, role)["allow"])
 
 
 def should_extract_member(filename: str, file_size: int, role: str, intake: str = PRODUCTION_INTAKE) -> bool:
@@ -267,19 +292,24 @@ def extract_verified_members(
                 receipt["skipped"].append({"member": member, "reason": "not_in_zip"})
                 continue
             ext = Path(member).suffix.lower()
+            size = int(info.file_size or 0)
+            decision = extract_decision(member, size, role)
             if ext in BLOCKED_EXTRACT_EXTS:
                 receipt["skipped"].append({"member": member, "reason": "blocked_extension"})
                 continue
-            if not lookdev_should_extract_member(member, int(info.file_size or 0), role):
+            if not decision["allow"]:
                 # Cabin .blend files are under the 180 MiB production cap and
                 # are not in the large-blend allowlist. Still extract them here
                 # because this is an explicit verified-member request.
-                if ext == ".blend" and int(info.file_size or 0) <= 180 * 1024 * 1024:
+                if ext == ".blend" and size <= 180 * 1024 * 1024 and not decision.get("required"):
                     pass
-                elif ext in {".png", ".jpg", ".jpeg"} and int(info.file_size or 0) <= 20 * 1024 * 1024:
+                elif ext in {".png", ".jpg", ".jpeg"} and size <= 20 * 1024 * 1024:
                     pass
                 else:
-                    receipt["skipped"].append({"member": member, "reason": "not_allowlisted"})
+                    skip = {"member": member, "reason": decision["reason"], "required": bool(decision.get("required"))}
+                    receipt["skipped"].append(skip)
+                    if decision.get("required") and decision["reason"] != "blocked_extension":
+                        receipt["error"] = "REQUIRED_MEMBER_SKIPPED:" + member + ":" + decision["reason"]
                     continue
             target = safe_member_path(destination, member)
             if target is None:
@@ -297,7 +327,10 @@ def extract_verified_members(
                 "bytes": target.stat().st_size,
                 "sha256": sha256_file(target),
             })
-    receipt["status"] = "MATERIALIZED" if receipt["extracted"] else "NO_MEMBERS"
+    if receipt.get("error", "").startswith("REQUIRED_MEMBER_SKIPPED"):
+        receipt["status"] = "REQUIRED_MEMBER_SKIPPED"
+    else:
+        receipt["status"] = "MATERIALIZED" if receipt["extracted"] else "NO_MEMBERS"
     (destination / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     return receipt
 

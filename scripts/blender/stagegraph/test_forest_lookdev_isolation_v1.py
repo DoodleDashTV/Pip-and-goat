@@ -26,6 +26,7 @@ class ForestLookdevIsolationTest(unittest.TestCase):
         source = (ROOT / "forest_lookdev_isolation_v1.py").read_text(encoding="utf-8")
         self.assertIn("LOOKDEV_PRODUCTION_CAMERA_LOCATION_CHANGED", source)
         self.assertIn("productionGeometryChanged\": False", source)
+        self.assertIn("forest_botaniq_hidden", source)
         self.assertNotIn("ShaderNodeEmission", source)
         apply_src = source.split("def apply_forest_lookdev_isolation", 1)[1]
         self.assertIn("verify_production_camera", apply_src)
