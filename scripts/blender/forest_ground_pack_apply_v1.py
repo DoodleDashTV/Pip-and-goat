@@ -153,10 +153,36 @@ def apply_ground_packs(scene) -> dict:
         material, receipt = load_pack_material(spec)
         loaded[spec["role"]] = {"spec": spec, "material": material, "receipt": receipt}
 
-    planted = {"path": [], "dirt": [], "sparse": []}
+    planted = {"path": [], "dirt": [], "sparse": [], "retargetedCover": []}
     path_mat = loaded["ground_grass_path"]["material"]
     dirt_mat = loaded["ground_dirt"]["material"]
     sparse_mat = loaded["ground_sparse_grass"]["material"]
+
+    # Apply packs to the already-visible cover soil instead of burying
+    # new patches under the locked dressing layer.
+    for obj in bpy.data.objects:
+        if not str(obj.name).startswith("TJ_CoverSoil_") or obj.hide_render:
+            continue
+        x, y = float(obj.location.x), float(obj.location.y)
+        if y < -2.0 or y > 16.5:
+            continue
+        target = None
+        role = None
+        if abs(x) <= 1.15 and path_mat is not None:
+            target, role = path_mat, "path"
+        elif 1.15 < abs(x) <= 2.55 and sparse_mat is not None:
+            target, role = sparse_mat, "sparse"
+        elif abs(x) <= 3.2 and dirt_mat is not None and (int(abs(x) * 10) + int(y)) % 5 == 0:
+            target, role = dirt_mat, "dirt"
+        if target is None:
+            continue
+        if obj.data.materials:
+            obj.data.materials[0] = target
+        else:
+            obj.data.materials.append(target)
+        planted["retargetedCover"].append(obj.name)
+        planted[role].append(obj.name)
+
     if path_mat is not None:
         for index, (x, y, rx, ry) in enumerate(PATH_SITES):
             obj = make_irregular_patch(
@@ -167,7 +193,7 @@ def apply_ground_packs(scene) -> dict:
                 rng.uniform(-0.16, 0.16),
                 path_mat,
                 rng,
-                z=COVER_CLEARANCE_Z + 0.004,
+                z=COVER_CLEARANCE_Z + 0.018,
             )
             obj.scale = (rx, ry, 1.0)
             _tag(obj)
@@ -182,7 +208,7 @@ def apply_ground_packs(scene) -> dict:
                 rng.uniform(-math.pi, math.pi),
                 dirt_mat,
                 rng,
-                z=COVER_CLEARANCE_Z + 0.003,
+                z=COVER_CLEARANCE_Z + 0.016,
             )
             _tag(obj)
             planted["dirt"].append(obj.name)
@@ -196,7 +222,7 @@ def apply_ground_packs(scene) -> dict:
                 rng.uniform(-math.pi, math.pi),
                 sparse_mat,
                 rng,
-                z=COVER_CLEARANCE_Z + 0.003,
+                z=COVER_CLEARANCE_Z + 0.016,
             )
             _tag(obj)
             planted["sparse"].append(obj.name)
