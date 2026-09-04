@@ -49,22 +49,58 @@ def parse_args():
     return parser.parse_args(raw)
 
 
-def scanlines(path: Path) -> dict:
-    from PIL import Image
-    import numpy as np
+def _rgb_rows(path: Path) -> list[list[tuple[float, float, float]]]:
+    try:
+        from PIL import Image
 
-    image = np.asarray(Image.open(path).convert("RGB"), dtype=np.float32)
+        image = Image.open(path).convert("RGB")
+        width, height = image.size
+        pixels = list(image.getdata())
+        return [
+            [tuple(float(channel) for channel in pixels[y * width + x]) for x in range(width)]
+            for y in range(height)
+        ]
+    except ImportError:
+        import bpy
+
+        image = bpy.data.images.load(str(path), check_existing=False)
+        width, height = int(image.size[0]), int(image.size[1])
+        raw = image.pixels[:]
+        rows = []
+        for y in range(height):
+            src = (height - 1 - y) * width * 4
+            row = []
+            for x in range(width):
+                index = src + x * 4
+                row.append((raw[index] * 255.0, raw[index + 1] * 255.0, raw[index + 2] * 255.0))
+            rows.append(row)
+        return rows
+
+
+def scanlines(path: Path) -> dict:
+    rows = _rgb_rows(path)
 
     def window(y0, y1, x0, x1):
-        patch = image[y0:y1, x0:x1]
-        rgb = patch.mean(axis=(0, 1))
+        total = [0.0, 0.0, 0.0]
+        count = 0
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                pixel = rows[y][x]
+                total[0] += pixel[0]
+                total[1] += pixel[1]
+                total[2] += pixel[2]
+                count += 1
+        rgb = [channel / max(count, 1) for channel in total]
         return {
-            "rgb": [round(float(channel), 1) for channel in rgb],
-            "rb": round(float(rgb[0] - rgb[2]), 1),
+            "rgb": [round(channel, 1) for channel in rgb],
+            "rb": round(rgb[0] - rgb[2], 1),
         }
 
-    red, green, blue = image[:, :, 0], image[:, :, 1], image[:, :, 2]
-    magenta = int(((red > 200) & (blue > 200) & (green < 80)).sum())
+    magenta = 0
+    for row in rows:
+        for red, green, blue in row:
+            if red > 200 and blue > 200 and green < 80:
+                magenta += 1
     return {
         "sky": window(0, 80, 500, 780),
         "floor": window(520, 700, 400, 880),
@@ -77,14 +113,18 @@ def scanlines(path: Path) -> dict:
 def mean_abs_delta(path: Path, baseline: Path) -> float | None:
     if not baseline.is_file():
         return None
-    from PIL import Image
-    import numpy as np
-
-    current = np.asarray(Image.open(path).convert("RGB"), dtype=np.float32)
-    prior = np.asarray(Image.open(baseline).convert("RGB"), dtype=np.float32)
-    if current.shape != prior.shape:
+    current = _rgb_rows(path)
+    prior = _rgb_rows(baseline)
+    if not current or not prior or len(current) != len(prior) or len(current[0]) != len(prior[0]):
         return None
-    return round(float(np.mean(np.abs(current - prior))), 2)
+    total = 0.0
+    count = 0
+    for y, row in enumerate(current):
+        for x, pixel in enumerate(row):
+            other = prior[y][x]
+            total += abs(pixel[0] - other[0]) + abs(pixel[1] - other[1]) + abs(pixel[2] - other[2])
+            count += 3
+    return round(total / max(count, 1), 2)
 
 
 def render_still(scene, path: Path) -> dict:
